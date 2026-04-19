@@ -1,6 +1,6 @@
 ---
 name: Core or profile proposal
-about: Propose a change to APP core, a profile, or an extension boundary
+about: Propose a change to the core, a profile, or an extension boundary
 title: "[proposal] "
 labels: design
 assignees: Poke-nushi
@@ -21,9 +21,9 @@ What gap or inconsistency are you trying to address?
 
 Describe the new semantics, field, or rule.
 
-## Why APP?
+## Why This Draft?
 
-Explain why this belongs in APP rather than A2A, MCP, OAuth, OpenID, VC, or deployment policy.
+Explain why this belongs in this draft rather than A2A, MCP, OAuth, OpenID, VC, or deployment policy.
 
 ## Compatibility impact
 

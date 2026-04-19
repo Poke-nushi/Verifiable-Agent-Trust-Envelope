@@ -38,7 +38,7 @@ For anything that would expose real secrets, credentials, production exploit det
 
 - do not post the raw material publicly
 - prefer GitHub private vulnerability reporting if it is enabled for the repository
-- maintainers should enable GitHub private vulnerability reporting before broad public release
+- maintainers should enable GitHub private vulnerability reporting for the public repository as early as possible
 - otherwise contact the repository owner privately before disclosure
 
 Until a dedicated channel exists, treat private coordination as preferred for anything that would materially help an attacker.
