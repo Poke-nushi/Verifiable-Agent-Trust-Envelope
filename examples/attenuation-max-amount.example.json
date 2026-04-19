@@ -1,0 +1,8 @@
+{
+  "version": "app-effect-0.1",
+  "mode": "narrow",
+  "require_new_permit": false,
+  "constraints": {
+    "max_amount_usd": 25
+  }
+}

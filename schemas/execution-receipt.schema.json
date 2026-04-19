@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:app:schema:execution-receipt:0.1",
+  "title": "Trust Envelope Execution Receipt",
+  "description": "Draft JSON Schema for the decoded v0.1 Execution Receipt (AER) payload in Verifiable Agent Trust Envelope. Packaging such as JWS is transport-level and validated separately.",
+  "type": "object",
+  "required": [
+    "version",
+    "receipt_id",
+    "transaction_id",
+    "actor",
+    "runtime_ref",
+    "permit_ref",
+    "verifier",
+    "issuer_role",
+    "skill",
+    "input_hash",
+    "output_hash",
+    "policy_ref",
+    "started_at",
+    "finished_at",
+    "outcome"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "aer-0.1"
+    },
+    "receipt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "actor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "principal": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runtime_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "permit_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "verifier": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issuer_role": {
+      "type": "string",
+      "enum": [
+        "runtime",
+        "verifier",
+        "broker"
+      ]
+    },
+    "skill": {
+      "type": "object",
+      "required": [
+        "id",
+        "version"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "input_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "output_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policy_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "artifact_digests": {
+      "type": "object",
+      "properties": {
+        "request": {
+          "type": "string",
+          "minLength": 1
+        },
+        "response": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "finished_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "success",
+        "failure",
+        "partial",
+        "cancelled"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

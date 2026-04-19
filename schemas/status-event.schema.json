@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:app:schema:status-event:0.1",
+  "title": "Trust Envelope Status Event",
+  "description": "Draft JSON Schema for a decoded push-style status event payload in Verifiable Agent Trust Envelope. Packaging such as JWS is transport-level and validated separately.",
+  "type": "object",
+  "required": [
+    "version",
+    "issuer",
+    "delivery",
+    "event_id",
+    "generated_at",
+    "next_update_at",
+    "entries"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "asn-event-0.1"
+    },
+    "issuer": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "delivery": {
+      "type": "string",
+      "const": "push"
+    },
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "next_update_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "entries": {
+      "type": "object",
+      "required": [
+        "passport",
+        "runtime",
+        "permit"
+      ],
+      "properties": {
+        "passport": {
+          "$ref": "#/$defs/statusEntry"
+        },
+        "runtime": {
+          "$ref": "#/$defs/statusEntry"
+        },
+        "permit": {
+          "$ref": "#/$defs/statusEntry"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "statusEntry": {
+      "type": "object",
+      "required": [
+        "id",
+        "state",
+        "last_changed_at",
+        "reason"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "active",
+            "suspended",
+            "revoked",
+            "quarantined",
+            "attenuated"
+          ]
+        },
+        "last_changed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effect": {
+          "$ref": "#/$defs/effect"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "attenuated"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "effect"
+            ]
+          }
+        }
+      ],
+      "additionalProperties": true
+    },
+    "effect": {
+      "type": "object",
+      "required": [
+        "mode",
+        "constraints",
+        "require_new_permit"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "narrow"
+          ]
+        },
+        "require_new_permit": {
+          "type": "boolean"
+        },
+        "supersedes": {
+          "type": "string",
+          "minLength": 1
+        },
+        "constraints": {
+          "$ref": "#/$defs/effectConstraints"
+        }
+      },
+      "additionalProperties": true
+    },
+    "effectConstraints": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "type": "string",
+          "minLength": 1
+        },
+        "max_amount_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max_redelegation_depth": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tool_allowlist": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "approval": {
+          "type": "object",
+          "required": [
+            "mode"
+          ],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "minLength": 1
+            },
+            "policy_ref": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

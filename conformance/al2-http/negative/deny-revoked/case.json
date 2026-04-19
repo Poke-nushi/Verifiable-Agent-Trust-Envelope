@@ -1,0 +1,8 @@
+{
+  "version": "app-conformance-case-0.1",
+  "profile": "AL2-http",
+  "name": "deny-revoked",
+  "scenario": "deny-revoked",
+  "category": "negative",
+  "description": "Revoked permit status should fail closed."
+}

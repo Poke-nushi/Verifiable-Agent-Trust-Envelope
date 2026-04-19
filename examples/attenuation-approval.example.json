@@ -1,0 +1,11 @@
+{
+  "version": "app-effect-0.1",
+  "mode": "narrow",
+  "require_new_permit": true,
+  "constraints": {
+    "approval": {
+      "mode": "human_required",
+      "policy_ref": "policy:example:manual-review"
+    }
+  }
+}

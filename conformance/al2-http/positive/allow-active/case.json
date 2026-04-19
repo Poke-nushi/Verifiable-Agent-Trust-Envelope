@@ -1,0 +1,8 @@
+{
+  "version": "app-conformance-case-0.1",
+  "profile": "AL2-http",
+  "name": "allow-active",
+  "scenario": "allow-active",
+  "category": "positive",
+  "description": "Active status and matching request should result in allow."
+}

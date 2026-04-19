@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Where Verifiable Agent Trust Envelope Fits</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      color-scheme: dark;
+    }
+
+    body {
+      font-family: "JetBrains Mono", monospace;
+      min-height: 100vh;
+      padding: 28px;
+      color: #f8fafc;
+      background:
+        radial-gradient(circle at top left, rgba(34, 211, 238, 0.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(251, 191, 36, 0.08), transparent 24%),
+        linear-gradient(180deg, #020617 0%, #020617 54%, #040b18 100%);
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    .header {
+      margin-bottom: 22px;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .pulse-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: #22d3ee;
+      box-shadow: 0 0 18px rgba(34, 211, 238, 0.45);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.55;
+        transform: scale(0.94);
+      }
+    }
+
+    h1 {
+      font-size: 1.48rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+      margin-left: 24px;
+      max-width: 980px;
+      color: #94a3b8;
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    .diagram-container {
+      padding: 22px;
+      border: 1px solid rgba(30, 41, 59, 0.95);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.74), rgba(15, 23, 42, 0.54));
+      box-shadow: inset 0 1px 0 rgba(148, 163, 184, 0.08);
+      overflow-x: auto;
+    }
+
+    svg {
+      width: 100%;
+      min-width: 1080px;
+      display: block;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .card {
+      padding: 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(30, 41, 59, 0.95);
+      background: rgba(15, 23, 42, 0.62);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .card-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      flex: 0 0 auto;
+    }
+
+    .card-dot.cyan { background: #22d3ee; }
+    .card-dot.emerald { background: #34d399; }
+    .card-dot.amber { background: #fbbf24; }
+
+    .card h3 {
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .card ul {
+      list-style: none;
+      color: #94a3b8;
+      font-size: 0.76rem;
+      line-height: 1.65;
+    }
+
+    .card li + li {
+      margin-top: 6px;
+    }
+
+    .footer {
+      margin-top: 16px;
+      text-align: center;
+      color: #475569;
+      font-size: 0.74rem;
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.26rem;
+      }
+
+      .subtitle {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-row">
+        <div class="pulse-dot"></div>
+        <h1>Where Verifiable Agent Trust Envelope Fits</h1>
+      </div>
+      <p class="subtitle">
+        This draft composes with discovery, authorization, credential, and runtime layers while adding portable trust / permit / receipt semantics
+        for external agent actions across vendors and surfaces.
+      </p>
+    </div>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 1180 760" role="img" aria-label="Where Verifiable Agent Trust Envelope fits in the agent stack">
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
+          </marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+
+        <rect width="1180" height="760" fill="#020617" />
+        <rect width="1180" height="760" fill="url(#grid)" />
+
+        <path d="M290 140 L385 140" fill="none" stroke="#64748b" stroke-width="2.25" marker-end="url(#arrowhead)" />
+        <path d="M290 220 L385 220" fill="none" stroke="#64748b" stroke-width="2.25" marker-end="url(#arrowhead)" />
+        <path d="M290 300 L385 300" fill="none" stroke="#64748b" stroke-width="2.25" marker-end="url(#arrowhead)" />
+        <path d="M290 380 L385 380" fill="none" stroke="#64748b" stroke-width="2.25" marker-end="url(#arrowhead)" />
+        <path d="M290 460 L385 460" fill="none" stroke="#64748b" stroke-width="2.25" marker-end="url(#arrowhead)" />
+
+        <path d="M735 180 L835 180" fill="none" stroke="#64748b" stroke-width="2.25" marker-end="url(#arrowhead)" />
+        <path d="M735 290 L835 290" fill="none" stroke="#64748b" stroke-width="2.25" marker-end="url(#arrowhead)" />
+        <path d="M735 400 L835 400" fill="none" stroke="#64748b" stroke-width="2.25" marker-end="url(#arrowhead)" />
+
+        <path d="M960 240 L960 540" fill="none" stroke="#64748b" stroke-width="2.2" marker-end="url(#arrowhead)" />
+
+        <rect x="60" y="60" width="1060" height="560" rx="12" fill="rgba(251, 191, 36, 0.05)" stroke="#fbbf24" stroke-width="1.2" stroke-dasharray="8,4"/>
+        <text x="74" y="79" fill="#fbbf24" font-size="10" font-weight="600">This draft composes with adjacent layers rather than replacing them</text>
+
+        <text x="175" y="112" fill="#cbd5e1" font-size="11" font-weight="600" text-anchor="middle">Adjacent layers</text>
+        <text x="560" y="112" fill="#cbd5e1" font-size="11" font-weight="600" text-anchor="middle">Portable trust envelope</text>
+        <text x="960" y="112" fill="#cbd5e1" font-size="11" font-weight="600" text-anchor="middle">Execution and governance surfaces</text>
+        <text x="960" y="530" fill="#cbd5e1" font-size="11" font-weight="600" text-anchor="middle">Outcomes</text>
+
+        <rect x="90" y="125" width="200" height="52" rx="6" fill="#0f172a"/>
+        <rect x="90" y="125" width="200" height="52" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="190" y="146" fill="white" font-size="11" font-weight="600" text-anchor="middle">A2A</text>
+        <text x="190" y="162" fill="#94a3b8" font-size="8" text-anchor="middle">discovery / delegation</text>
+
+        <rect x="90" y="205" width="200" height="52" rx="6" fill="#0f172a"/>
+        <rect x="90" y="205" width="200" height="52" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="190" y="226" fill="white" font-size="11" font-weight="600" text-anchor="middle">MCP</text>
+        <text x="190" y="242" fill="#94a3b8" font-size="8" text-anchor="middle">tool and resource access</text>
+
+        <rect x="90" y="285" width="200" height="52" rx="6" fill="#0f172a"/>
+        <rect x="90" y="285" width="200" height="52" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="190" y="306" fill="white" font-size="11" font-weight="600" text-anchor="middle">OAuth / OpenID</text>
+        <text x="190" y="322" fill="#94a3b8" font-size="8" text-anchor="middle">delegated auth / federation</text>
+
+        <rect x="90" y="365" width="200" height="52" rx="6" fill="#0f172a"/>
+        <rect x="90" y="365" width="200" height="52" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="190" y="386" fill="white" font-size="11" font-weight="600" text-anchor="middle">VC / JWT</text>
+        <text x="190" y="402" fill="#94a3b8" font-size="8" text-anchor="middle">signed credentials</text>
+
+        <rect x="90" y="445" width="200" height="52" rx="6" fill="#0f172a"/>
+        <rect x="90" y="445" width="200" height="52" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="190" y="466" fill="white" font-size="11" font-weight="600" text-anchor="middle">Workload identity</text>
+        <text x="190" y="482" fill="#94a3b8" font-size="8" text-anchor="middle">runtime trust anchors</text>
+
+        <rect x="385" y="125" width="350" height="390" rx="10" fill="#0f172a"/>
+        <rect x="385" y="125" width="350" height="390" rx="10" fill="rgba(8, 51, 68, 0.22)" stroke="#22d3ee" stroke-width="1.6" stroke-dasharray="6,4"/>
+        <text x="400" y="146" fill="#22d3ee" font-size="9" font-weight="600">portable trust context across surfaces</text>
+
+        <rect x="450" y="150" width="220" height="60" rx="6" fill="#0f172a"/>
+        <rect x="450" y="150" width="220" height="60" rx="6" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="560" y="173" fill="white" font-size="11" font-weight="600" text-anchor="middle">Actor / principal / runtime</text>
+        <text x="560" y="190" fill="#94a3b8" font-size="8" text-anchor="middle">who acts, for whom, in which runtime</text>
+
+        <rect x="450" y="260" width="220" height="60" rx="6" fill="#0f172a"/>
+        <rect x="450" y="260" width="220" height="60" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="560" y="283" fill="white" font-size="11" font-weight="600" text-anchor="middle">Mission permit</text>
+        <text x="560" y="300" fill="#94a3b8" font-size="8" text-anchor="middle">task-scoped authority for this action</text>
+
+        <rect x="450" y="370" width="220" height="60" rx="6" fill="#0f172a"/>
+        <rect x="450" y="370" width="220" height="60" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="560" y="393" fill="white" font-size="11" font-weight="600" text-anchor="middle">Execution receipt</text>
+        <text x="560" y="410" fill="#94a3b8" font-size="8" text-anchor="middle">what happened and what can be proven later</text>
+
+        <rect x="450" y="450" width="220" height="60" rx="6" fill="#0f172a"/>
+        <rect x="450" y="450" width="220" height="60" rx="6" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1.5"/>
+        <text x="560" y="473" fill="white" font-size="11" font-weight="600" text-anchor="middle">Status / attenuation</text>
+        <text x="560" y="490" fill="#94a3b8" font-size="8" text-anchor="middle">whether authority is still usable or narrowed</text>
+
+        <rect x="835" y="150" width="250" height="60" rx="6" fill="#0f172a"/>
+        <rect x="835" y="150" width="250" height="60" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="960" y="173" fill="white" font-size="11" font-weight="600" text-anchor="middle">Verifier / relying party</text>
+        <text x="960" y="190" fill="#94a3b8" font-size="8" text-anchor="middle">evaluates context before action</text>
+
+        <rect x="835" y="260" width="250" height="60" rx="6" fill="#0f172a"/>
+        <rect x="835" y="260" width="250" height="60" rx="6" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1.5"/>
+        <text x="960" y="283" fill="white" font-size="11" font-weight="600" text-anchor="middle">Gateway / delegated identity</text>
+        <text x="960" y="300" fill="#94a3b8" font-size="8" text-anchor="middle">policy enforcement / on-behalf-of context</text>
+
+        <rect x="835" y="370" width="250" height="60" rx="6" fill="#0f172a"/>
+        <rect x="835" y="370" width="250" height="60" rx="6" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="960" y="393" fill="white" font-size="11" font-weight="600" text-anchor="middle">Control plane / vendor surfaces</text>
+        <text x="960" y="410" fill="#94a3b8" font-size="8" text-anchor="middle">orchestration / governance / UX</text>
+
+        <rect x="775" y="560" width="95" height="42" rx="6" fill="#0f172a"/>
+        <rect x="775" y="560" width="95" height="42" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.4"/>
+        <text x="822" y="585" fill="white" font-size="10" font-weight="600" text-anchor="middle">Allow</text>
+
+        <rect x="885" y="560" width="95" height="42" rx="6" fill="#0f172a"/>
+        <rect x="885" y="560" width="95" height="42" rx="6" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1.4"/>
+        <text x="932" y="585" fill="white" font-size="10" font-weight="600" text-anchor="middle">Attenuate</text>
+
+        <rect x="995" y="560" width="95" height="42" rx="6" fill="#0f172a"/>
+        <rect x="995" y="560" width="95" height="42" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.4"/>
+        <text x="1042" y="585" fill="white" font-size="10" font-weight="600" text-anchor="middle">Deny</text>
+
+        <rect x="885" y="612" width="205" height="42" rx="6" fill="#0f172a"/>
+        <rect x="885" y="612" width="205" height="42" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.4"/>
+        <text x="988" y="637" fill="white" font-size="10" font-weight="600" text-anchor="middle">Record receipt</text>
+      </svg>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot cyan"></div>
+          <h3>What This Draft Adds</h3>
+        </div>
+        <ul>
+          <li>- actor / principal / runtime separation</li>
+          <li>- portable permit / receipt / status semantics</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot emerald"></div>
+          <h3>What This Draft Does Not Replace</h3>
+        </div>
+        <ul>
+          <li>- A2A, MCP, OAuth, VC, and workload identity stay in place</li>
+          <li>- This draft composes with them instead of re-specifying them</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot amber"></div>
+          <h3>Why It Matters</h3>
+        </div>
+        <ul>
+          <li>- external agent actions need portable trust context across vendors and surfaces</li>
+          <li>- verifiers need more than discovery and raw credentials alone</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer">
+      README positioning figure for Verifiable Agent Trust Envelope | Built from the same visual system as the reference architecture | Updated 2026-04-19
+    </div>
+  </div>
+</body>
+</html>

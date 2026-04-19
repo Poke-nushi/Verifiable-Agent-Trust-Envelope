@@ -1,0 +1,33 @@
+{
+  "version": "amp-0.1",
+  "permit_id": "amp:txn-18f4",
+  "transaction_id": "txn:6e7d",
+  "actor": "agent:public:ops-reviewer-01",
+  "principal": "user:pairwise:service-x:ab12",
+  "aud": "https://remote-agent.example/a2a",
+  "issued_at": "2026-04-15T02:00:40Z",
+  "actions": [
+    "task.execute",
+    "files.read"
+  ],
+  "constraints": {
+    "resource": "project:alpha",
+    "max_amount_usd": 0,
+    "max_redelegation_depth": 0,
+    "expires_at": "2026-04-15T02:05:00Z",
+    "geography": "JP",
+    "tool_allowlist": [
+      "read_file",
+      "summarize"
+    ]
+  },
+  "approval": {
+    "mode": "policy_auto",
+    "policy_ref": "policy:org:alpha:low-risk-readonly"
+  },
+  "proof_binding": {
+    "type": "cnf-kid",
+    "kid": "runtime-key-77",
+    "spki_sha256": "sha256:example-runtime-spki"
+  }
+}

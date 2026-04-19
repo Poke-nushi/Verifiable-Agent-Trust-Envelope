@@ -1,0 +1,28 @@
+{
+  "version": "aer-0.1",
+  "receipt_id": "aer:54f2",
+  "transaction_id": "txn:6e7d",
+  "actor": "agent:public:ops-reviewer-01",
+  "principal": "user:pairwise:service-x:ab12",
+  "runtime_ref": "arp:09cd",
+  "permit_ref": "amp:txn-18f4",
+  "verifier": "https://remote-agent.example/a2a",
+  "issuer_role": "runtime",
+  "skill": {
+    "id": "report_generation",
+    "version": "1.3.2"
+  },
+  "input_hash": "sha256:example-input-hash",
+  "output_hash": "sha256:example-output-hash",
+  "policy_ref": "policy:org:alpha:low-risk-readonly",
+  "evidence_refs": [
+    "urn:artifact:demo:summary-v1"
+  ],
+  "artifact_digests": {
+    "request": "sha256:example-request-digest",
+    "response": "sha256:example-response-digest"
+  },
+  "started_at": "2026-04-15T02:01:15Z",
+  "finished_at": "2026-04-15T02:01:42Z",
+  "outcome": "success"
+}

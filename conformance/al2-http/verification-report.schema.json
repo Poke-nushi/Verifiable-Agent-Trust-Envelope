@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:app:conformance:al2-http:verification-report:0.1",
+  "title": "Trust Envelope AL2 HTTP Verification Report",
+  "description": "Schema for the normalized verification report emitted by the HTTP verifier wedge demo.",
+  "type": "object",
+  "required": [
+    "version",
+    "profile",
+    "policy_id",
+    "decision",
+    "receipt_emitted",
+    "request",
+    "failed_checks"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "app-verification-report-0.1"
+    },
+    "profile": {
+      "type": "string",
+      "const": "AL2-http"
+    },
+    "checked_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "policy_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "allow",
+        "attenuate",
+        "deny"
+      ]
+    },
+    "receipt_emitted": {
+      "type": "boolean"
+    },
+    "request": {
+      "type": "object",
+      "required": [
+        "action",
+        "resource",
+        "tool"
+      ],
+      "properties": {
+        "action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resource": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tool": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "effective_constraints": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "type": "string",
+          "minLength": 1
+        },
+        "max_amount_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max_redelegation_depth": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tool_allowlist": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "approval": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "minLength": 1
+            },
+            "policy_ref": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "failed_checks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "passed_checks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "additionalProperties": true
+}

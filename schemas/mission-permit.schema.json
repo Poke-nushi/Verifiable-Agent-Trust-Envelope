@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:app:schema:mission-permit:0.1",
+  "title": "Trust Envelope Mission Permit",
+  "description": "Draft JSON Schema for the decoded v0.1 Mission Permit (AMP) payload in Verifiable Agent Trust Envelope. Packaging such as JWS is transport-level and validated separately.",
+  "type": "object",
+  "required": [
+    "version",
+    "permit_id",
+    "transaction_id",
+    "actor",
+    "aud",
+    "issued_at",
+    "actions",
+    "constraints",
+    "approval",
+    "proof_binding"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "amp-0.1"
+    },
+    "permit_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "actor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "principal": {
+      "type": "string",
+      "minLength": 1
+    },
+    "aud": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "required": [
+        "resource",
+        "max_amount_usd",
+        "max_redelegation_depth",
+        "expires_at"
+      ],
+      "properties": {
+        "resource": {
+          "type": "string",
+          "minLength": 1
+        },
+        "max_amount_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max_redelegation_depth": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "geography": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tool_allowlist": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "approval": {
+      "type": "object",
+      "required": [
+        "mode"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policy_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "proof_binding": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cnf": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kid": {
+          "type": "string",
+          "minLength": 1
+        },
+        "spki_sha256": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

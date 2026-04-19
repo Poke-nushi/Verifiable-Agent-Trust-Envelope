@@ -1,0 +1,13 @@
+{
+  "version": "app-verification-report-0.1",
+  "profile": "AL2-http",
+  "policy_id": "policy:example:al2-http-verifier",
+  "decision": "allow",
+  "receipt_emitted": true,
+  "request": {
+    "action": "task.execute",
+    "resource": "project:demo-alpha",
+    "tool": "summarize"
+  },
+  "failed_checks": []
+}

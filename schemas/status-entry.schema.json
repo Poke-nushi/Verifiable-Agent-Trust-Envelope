@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:app:schema:status-entry:0.1",
+  "title": "Trust Envelope Status Entry",
+  "description": "Draft JSON Schema for a decoded per-object status entry payload in Verifiable Agent Trust Envelope. Packaging such as JWS is transport-level and validated separately.",
+  "type": "object",
+  "required": [
+    "version",
+    "issuer",
+    "delivery",
+    "object_type",
+    "object_id",
+    "state",
+    "reason",
+    "last_changed_at",
+    "generated_at",
+    "next_update_at"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "asn-entry-0.1"
+    },
+    "issuer": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "delivery": {
+      "type": "string",
+      "const": "pull"
+    },
+    "object_type": {
+      "type": "string",
+      "enum": [
+        "passport",
+        "runtime",
+        "permit"
+      ]
+    },
+    "object_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "active",
+        "suspended",
+        "revoked",
+        "quarantined",
+        "attenuated"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "effect": {
+      "$ref": "#/$defs/effect"
+    },
+    "last_changed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "next_update_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "effect": {
+      "type": "object",
+      "required": [
+        "mode",
+        "constraints",
+        "require_new_permit"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "narrow"
+          ]
+        },
+        "require_new_permit": {
+          "type": "boolean"
+        },
+        "supersedes": {
+          "type": "string",
+          "minLength": 1
+        },
+        "constraints": {
+          "$ref": "#/$defs/effectConstraints"
+        }
+      },
+      "additionalProperties": true
+    },
+    "effectConstraints": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "type": "string",
+          "minLength": 1
+        },
+        "max_amount_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max_redelegation_depth": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tool_allowlist": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "approval": {
+          "type": "object",
+          "required": [
+            "mode"
+          ],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "minLength": 1
+            },
+            "policy_ref": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "const": "attenuated"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "effect"
+        ]
+      }
+    }
+  ],
+  "additionalProperties": true
+}

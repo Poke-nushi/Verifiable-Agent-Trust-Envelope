@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:app:schema:attenuation-effect:0.1",
+  "title": "Trust Envelope Attenuation Effect",
+  "description": "Draft JSON Schema for a machine-readable attenuation effect object in Verifiable Agent Trust Envelope.",
+  "type": "object",
+  "required": [
+    "version",
+    "mode",
+    "require_new_permit",
+    "constraints"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "app-effect-0.1"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "narrow"
+      ]
+    },
+    "require_new_permit": {
+      "type": "boolean"
+    },
+    "supersedes": {
+      "type": "string",
+      "minLength": 1
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "type": "string",
+          "minLength": 1
+        },
+        "max_amount_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max_redelegation_depth": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tool_allowlist": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "approval": {
+          "type": "object",
+          "required": [
+            "mode"
+          ],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "minLength": 1
+            },
+            "policy_ref": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

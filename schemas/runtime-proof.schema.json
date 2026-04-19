@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:app:schema:runtime-proof:0.1",
+  "title": "Trust Envelope Runtime Proof",
+  "description": "Draft JSON Schema for the decoded v0.1 Runtime Proof (ARP) payload in Verifiable Agent Trust Envelope. Packaging such as JWS is transport-level and validated separately.",
+  "type": "object",
+  "required": [
+    "version",
+    "runtime_id",
+    "subject_id",
+    "attestor",
+    "environment",
+    "challenge_binding",
+    "presented_key",
+    "issued_at",
+    "expires_at"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "arp-0.1"
+    },
+    "runtime_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "subject_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attestor": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "environment": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "class": {
+          "type": "string",
+          "minLength": 1
+        },
+        "measurement": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "challenge_binding": {
+      "type": "object",
+      "required": [
+        "nonce"
+      ],
+      "properties": {
+        "nonce": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aud": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "presented_key": {
+      "type": "object",
+      "required": [
+        "kid"
+      ],
+      "properties": {
+        "kid": {
+          "type": "string",
+          "minLength": 1
+        },
+        "alg": {
+          "type": "string",
+          "minLength": 1
+        },
+        "spki_sha256": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

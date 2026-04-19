@@ -1,0 +1,39 @@
+{
+  "version": "app-verifier-policy-0.1",
+  "policy_id": "policy:example:al2-http-verifier",
+  "profile": "AL2-http",
+  "verifier_id": "https://verifier.example/http",
+  "required_assurance_level": "AL2",
+  "fail_closed": true,
+  "accepted_states": {
+    "passport": [
+      "active"
+    ],
+    "runtime": [
+      "active"
+    ],
+    "permit": [
+      "active",
+      "attenuated"
+    ]
+  },
+  "freshness": {
+    "status_max_age_seconds": 300,
+    "runtime_max_age_seconds": 300,
+    "permit_max_age_seconds": 600
+  },
+  "allowed_actions": [
+    "task.execute",
+    "files.read"
+  ],
+  "allowed_resources": [
+    "project:demo-alpha"
+  ],
+  "attenuation_handlers": {
+    "resource": "replace",
+    "max_amount_usd": "min",
+    "max_redelegation_depth": "min",
+    "tool_allowlist": "intersect",
+    "approval": "escalate"
+  }
+}

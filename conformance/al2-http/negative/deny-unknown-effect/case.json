@@ -1,0 +1,8 @@
+{
+  "version": "app-conformance-case-0.1",
+  "profile": "AL2-http",
+  "name": "deny-unknown-effect",
+  "scenario": "deny-unknown-effect",
+  "category": "negative",
+  "description": "Unknown machine-readable attenuation fields should fail closed."
+}

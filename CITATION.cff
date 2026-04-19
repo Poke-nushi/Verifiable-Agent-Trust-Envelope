@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+title: "Verifiable Agent Trust Envelope"
+message: "If you use or discuss this draft, please cite the repository metadata below."
+type: software
+authors:
+  - family-names: "Poke-nushi"
+repository-code: "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope"
+url: "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope"
+license: Apache-2.0
+version: "v0.1-discussion-draft"
+date-released: 2026-04-17

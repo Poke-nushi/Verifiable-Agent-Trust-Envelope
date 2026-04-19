@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:app:schema:verifier-policy:0.1",
+  "title": "Trust Envelope Verifier Policy",
+  "description": "Draft JSON Schema for a local AL2-style verifier policy used by the HTTP verifier demo for this draft.",
+  "type": "object",
+  "required": [
+    "version",
+    "policy_id",
+    "profile",
+    "verifier_id",
+    "required_assurance_level",
+    "fail_closed",
+    "accepted_states",
+    "freshness",
+    "allowed_actions",
+    "allowed_resources",
+    "attenuation_handlers"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "app-verifier-policy-0.1"
+    },
+    "policy_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "profile": {
+      "type": "string",
+      "const": "AL2-http"
+    },
+    "verifier_id": {
+      "type": "string",
+      "format": "uri"
+    },
+    "required_assurance_level": {
+      "type": "string",
+      "enum": [
+        "AL0",
+        "AL1",
+        "AL2",
+        "AL3",
+        "AL4"
+      ]
+    },
+    "fail_closed": {
+      "type": "boolean"
+    },
+    "accepted_states": {
+      "type": "object",
+      "required": [
+        "passport",
+        "runtime",
+        "permit"
+      ],
+      "properties": {
+        "passport": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "runtime": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "permit": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "freshness": {
+      "type": "object",
+      "required": [
+        "status_max_age_seconds",
+        "runtime_max_age_seconds"
+      ],
+      "properties": {
+        "status_max_age_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "runtime_max_age_seconds": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "allowed_actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "allowed_resources": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "attenuation_handlers": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "type": "string",
+          "enum": [
+            "replace"
+          ]
+        },
+        "max_amount_usd": {
+          "type": "string",
+          "enum": [
+            "min"
+          ]
+        },
+        "max_redelegation_depth": {
+          "type": "string",
+          "enum": [
+            "min"
+          ]
+        },
+        "tool_allowlist": {
+          "type": "string",
+          "enum": [
+            "intersect"
+          ]
+        },
+        "approval": {
+          "type": "string",
+          "enum": [
+            "escalate"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,10 @@
+{
+  "version": "app-effect-0.1",
+  "mode": "narrow",
+  "require_new_permit": false,
+  "constraints": {
+    "tool_allowlist": [
+      "read_file"
+    ]
+  }
+}

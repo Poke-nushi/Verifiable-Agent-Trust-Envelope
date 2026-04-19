@@ -1,0 +1,8 @@
+{
+  "version": "app-conformance-case-0.1",
+  "profile": "AL2-http",
+  "name": "attenuate-tool-narrow",
+  "scenario": "attenuate-tool-narrow",
+  "category": "positive",
+  "description": "A known narrowing effect should produce attenuate instead of deny."
+}

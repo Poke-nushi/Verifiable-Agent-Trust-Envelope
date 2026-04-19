@@ -1,0 +1,43 @@
+{
+  "version": "asn-0.1",
+  "issuer": {
+    "id": "status:example:authority"
+  },
+  "delivery": "stapled",
+  "generated_at": "2026-04-17T00:00:00Z",
+  "next_update_at": "2026-04-17T00:30:00Z",
+  "entries": {
+    "passport": {
+      "id": "appc:123",
+      "state": "active",
+      "last_changed_at": "2026-04-16T23:55:00Z",
+      "reason": "good-standing"
+    },
+    "runtime": {
+      "id": "arp:456",
+      "state": "active",
+      "last_changed_at": "2026-04-16T23:58:00Z",
+      "reason": "fresh-attestation"
+    },
+    "permit": {
+      "id": "amp:789",
+      "state": "attenuated",
+      "last_changed_at": "2026-04-16T23:59:00Z",
+      "reason": "policy-tightened",
+      "effect": {
+        "mode": "narrow",
+        "require_new_permit": false,
+        "constraints": {
+          "max_amount_usd": 0,
+          "max_redelegation_depth": 0,
+          "tool_allowlist": [
+            "read_file"
+          ],
+          "approval": {
+            "mode": "human_required"
+          }
+        }
+      }
+    }
+  }
+}

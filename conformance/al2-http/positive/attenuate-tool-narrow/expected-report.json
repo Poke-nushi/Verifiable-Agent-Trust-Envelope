@@ -1,0 +1,18 @@
+{
+  "version": "app-verification-report-0.1",
+  "profile": "AL2-http",
+  "policy_id": "policy:example:al2-http-verifier",
+  "decision": "attenuate",
+  "receipt_emitted": true,
+  "request": {
+    "action": "task.execute",
+    "resource": "project:demo-alpha",
+    "tool": "read_file"
+  },
+  "effective_constraints": {
+    "tool_allowlist": [
+      "read_file"
+    ]
+  },
+  "failed_checks": []
+}
