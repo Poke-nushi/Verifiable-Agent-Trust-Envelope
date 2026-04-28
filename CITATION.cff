@@ -9,3 +9,8 @@ url: "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope"
 license: Apache-2.0
 version: "v0.1-discussion-draft"
 date-released: 2026-04-19
+doi: 10.5281/zenodo.19839769
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.19839769
+    description: "Zenodo archive of the v0.1 discussion draft"

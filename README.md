@@ -1,5 +1,7 @@
 # Verifiable Agent Trust Envelope
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19839769.svg)](https://doi.org/10.5281/zenodo.19839769)
+
 **A discussion draft for verifier-side trust / permit / receipt decisions in AI agent systems**
 
 `v0.1 discussion draft`  
@@ -183,6 +185,13 @@ python3 scripts/check_repo_strict.py
 
 AI tools were used to assist drafting, review, and reference implementation work in this repository.
 The maintainer is responsible for the final structure, scope decisions, and published contents.
+
+## How to Cite
+
+If you reference this draft in writing, please cite the Zenodo archive of the `v0.1` discussion draft:
+
+- DOI: [10.5281/zenodo.19839769](https://doi.org/10.5281/zenodo.19839769)
+- Machine-readable metadata: [CITATION.cff](CITATION.cff)
 
 ## License
 
