@@ -7,6 +7,7 @@
   "required": [
     "version",
     "policy_id",
+    "policy_version",
     "profile",
     "verifier_id",
     "required_assurance_level",
@@ -23,6 +24,10 @@
       "const": "app-verifier-policy-0.1"
     },
     "policy_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policy_version": {
       "type": "string",
       "minLength": 1
     },

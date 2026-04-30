@@ -2,8 +2,10 @@
   "version": "app-verification-report-0.1",
   "profile": "AL2-http",
   "policy_id": "policy:example:al2-http-verifier",
+  "policy_version": "2026-05-01.1",
   "decision": "deny",
   "receipt_emitted": true,
+  "receipt_phase": "admission",
   "request": {
     "action": "task.execute",
     "resource": "project:demo-alpha",

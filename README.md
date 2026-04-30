@@ -36,7 +36,7 @@ and returns:
 
 `allow / attenuate / deny`
 
-with a machine-readable receipt.
+with a machine-readable admission receipt.
 
 ![Where Verifiable Agent Trust Envelope Fits](docs/figures/where-trust-envelope-fits-readme.png)
 
@@ -49,7 +49,7 @@ It is strongest on the following boundary:
 - modeling **APC**, **ARP**, **AMP**, **AER**, and **ASN** as first-class artifacts
 - making verifier-side ordering explicit for external digital write decisions
 - treating **status** and **attenuation** as protocol concerns rather than afterthoughts
-- requiring machine-readable receipts where later evidence matters
+- separating verifier-signed **admission receipts** from later **post-execution receipts** where later evidence matters
 
 ## What This Draft Does Not Replace
 
@@ -173,6 +173,7 @@ python3 scripts/check_repo_strict.py
 - [CONTRIBUTING.md](CONTRIBUTING.md)
 - [SECURITY.md](SECURITY.md)
 - [docs/standards-and-ecosystem-landscape-2026-04.md](docs/standards-and-ecosystem-landscape-2026-04.md)
+- [docs/standards-and-ecosystem-landscape-2026-05.md](docs/standards-and-ecosystem-landscape-2026-05.md)
 - [docs/non-goals.md](docs/non-goals.md)
 - [docs/delegated-identity-composition-example.md](docs/delegated-identity-composition-example.md)
 - [docs/transport-bindings.md](docs/transport-bindings.md)

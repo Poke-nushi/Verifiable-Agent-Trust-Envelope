@@ -15,7 +15,7 @@ For this draft, conformance work matters early because a verifier must correctly
 - runtime proof
 - mission-scoped permission
 - status information
-- execution receipts
+- admission and post-execution receipts
 
 If two implementations disagree on the order or meaning of those checks, the protocol will fragment even if the JSON shapes look similar.
 
@@ -44,7 +44,7 @@ This draft needs negative tests that show the verifier rejects:
 - stale or revoked status
 - runtime-to-permit binding mismatches
 - audience mismatches
-- receipts that reference the wrong permit or runtime
+- receipts that reference the wrong permit, runtime, or admission receipt
 - permits whose validity window does not cover the execution
 
 These cases are important because many real failures are not signature failures.
@@ -57,14 +57,14 @@ They are semantic failures across otherwise well-formed objects.
 - passport content changes without a new issuer signature
 - runtime proof changes without a new attestor signature
 - permit changes without a new broker signature
-- receipt changes without a new runtime signature
+- post-execution receipt changes without a new runtime or verifier signature
 
 ### 2. Binding Integrity
 
 - runtime subject does not match the passport subject
 - permit actor does not match the passport alias
 - permit proof-of-possession key does not match the runtime-presented key
-- receipt signer does not match the bound runtime key
+- receipt signer does not match the declared `issuer_role`
 - receipt `issuer_role` conflicts with the observed signer role
 
 ### 3. Audience And Scope Integrity

@@ -50,12 +50,14 @@ The draft prefers pairwise presentation where practical, but it does not yet fre
 
 ### 4. Receipt Semantics Need More Precision
 
-The draft already models `issuer_role`, but more work is still needed on:
+The draft now distinguishes admission receipts from post-execution receipts, but more work is still needed on:
 
 - verifier-signed versus runtime-signed receipt semantics
 - evidence attachment models
 - dispute and audit expectations
 - chain linkage across delegated execution
+- canonical correlation rules for `admission_receipt_ref`, `attestation_id`, and profile-specific correlation objects
+- when an admission receipt should be inline, dereferenceable, or both
 
 ### 5. Status Policy Is Still Profile-Dependent
 

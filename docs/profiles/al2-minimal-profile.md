@@ -32,7 +32,7 @@ An AL2 interaction should require:
 - `APC` - valid passport credential
 - `ARP` - fresh runtime proof
 - `AMP` - task-scoped mission permit
-- `AER` - execution receipt for successful or attempted high-risk actions
+- `AER` - admission receipt and, where execution proceeds, post-execution receipt for high-risk actions
 - online or bounded-freshness status checks
 
 ---
@@ -71,18 +71,27 @@ If runtime freshness cannot be established, the verifier should reject.
 An AL2 receipt should include at least:
 
 - `receipt_id`
+- `receipt_phase`
 - `transaction_id`
 - `actor`
 - `runtime_ref`
 - `permit_ref`
 - `verifier`
 - `issuer_role`
-- `policy_ref`
+- `policy_id`
+- `policy_version`
 - `started_at`
 - `finished_at`
 - `outcome`
 - `input_hash` or input reference
 - `output_hash` or output reference
+
+For verifier-signed admission receipts, AL2 should also include:
+
+- `decision`: `allow`, `attenuate`, or `deny`
+- `attenuations[]` when the effective constraints differ from the original permit constraints
+
+For post-execution receipts, AL2 should include `admission_receipt_ref` when an admission receipt was issued.
 
 Optional but strongly recommended:
 

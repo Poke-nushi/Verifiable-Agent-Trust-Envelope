@@ -2,8 +2,10 @@
   "version": "app-verification-report-0.1",
   "profile": "AL2-http",
   "policy_id": "policy:example:al2-http-verifier",
+  "policy_version": "2026-05-01.1",
   "decision": "attenuate",
   "receipt_emitted": true,
+  "receipt_phase": "admission",
   "request": {
     "action": "task.execute",
     "resource": "project:demo-alpha",
@@ -14,5 +16,19 @@
       "read_file"
     ]
   },
+  "attenuations": [
+    {
+      "field": "constraints.tool_allowlist",
+      "original": [
+        "read_file",
+        "summarize"
+      ],
+      "applied": [
+        "read_file"
+      ],
+      "reason_code": "tool-scope-tightened",
+      "source_status_ref": "amp:demo-permit"
+    }
+  ],
   "failed_checks": []
 }

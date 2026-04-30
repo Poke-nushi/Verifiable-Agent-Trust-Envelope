@@ -26,7 +26,9 @@ At minimum, a status-capable deployment of this draft needs:
 - freshness metadata
 - a verifier policy for fail-open or fail-closed behavior
 
-Execution receipts (`AER`) may also have status, but for the minimal model they are usually append-only evidence objects rather than revocable authority artifacts.
+Receipts (`AER`) may also have status, but for the minimal model they are usually append-only evidence objects rather than revocable authority artifacts.
+Admission receipts record the verifier decision at policy-evaluation time.
+Post-execution receipts record or reference what happened later and should link back to the admission receipt when one exists.
 
 ## Core State Vocabulary
 
@@ -45,6 +47,8 @@ Suggested meaning:
 - `revoked`: permanently invalid for trust decisions
 - `quarantined`: blocked because of suspected compromise or abnormal behavior
 - `attenuated`: still usable, but only under narrower policy than originally granted
+
+When a verifier honors an `attenuated` status entry, the admission receipt should carry a structured `attenuations[]` list describing the field narrowed, the original value, the applied value, the reason code, and the source status reference.
 
 Profiles or extensions may add finer detail such as `degraded`, `disputed`, or physical-only states.
 The core vocabulary above is the interoperable baseline for v0.1.

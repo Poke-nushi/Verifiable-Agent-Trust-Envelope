@@ -500,6 +500,31 @@ def apply_effect(
     return narrowed, []
 
 
+def build_attenuations(
+    *,
+    original_constraints: dict[str, Any],
+    effective_constraints: dict[str, Any],
+    effect: dict[str, Any],
+    status_entry: dict[str, Any],
+) -> list[dict[str, Any]]:
+    attenuations = []
+    for key in sorted(effect.get("constraints", {})):
+        original = original_constraints.get(key)
+        applied = effective_constraints.get(key)
+        if original == applied:
+            continue
+        attenuations.append(
+            {
+                "field": f"constraints.{key}",
+                "original": original,
+                "applied": applied,
+                "reason_code": status_entry.get("reason", "status-attenuation"),
+                "source_status_ref": status_entry.get("id"),
+            }
+        )
+    return attenuations
+
+
 def request_within_constraints(
     request: dict[str, Any],
     *,
@@ -528,14 +553,17 @@ def build_receipt(
     permit: dict[str, Any],
     runtime_proof: dict[str, Any],
     decision: str,
+    attenuations: list[dict[str, Any]],
     response_payload: dict[str, Any],
     status_entries: dict[str, Any],
 ) -> tuple[dict[str, Any], str]:
     started_at = demo.utc_now()
     finished_at = demo.utc_now()
+    receipt_id = f"aer:http-verifier:{request['transaction_id']}:{decision}:admission"
     receipt = {
         "version": "aer-0.1",
-        "receipt_id": f"aer:http-verifier:{request['transaction_id']}:{decision}",
+        "receipt_id": receipt_id,
+        "receipt_phase": "admission",
         "transaction_id": request["transaction_id"],
         "actor": permit["actor"],
         "principal": permit.get("principal"),
@@ -543,6 +571,8 @@ def build_receipt(
         "permit_ref": permit["permit_id"],
         "verifier": policy["verifier_id"],
         "issuer_role": "verifier",
+        "decision": decision,
+        "attenuations": attenuations,
         "skill": {
             "id": request["requested_action"],
             "version": "0.1.0",
@@ -550,6 +580,14 @@ def build_receipt(
         "input_hash": canonical_hash(request.get("request_payload", {})),
         "output_hash": canonical_hash(response_payload),
         "policy_ref": policy["policy_id"],
+        "policy_id": policy["policy_id"],
+        "policy_version": policy["policy_version"],
+        "correlation": {
+            "transaction_id": request["transaction_id"],
+            "runtime_ref": runtime_proof["runtime_id"],
+            "permit_ref": permit["permit_id"],
+            "attestation_id": receipt_id,
+        },
         "evidence_refs": [
             f"urn:app:decision:{decision}",
             f"urn:app:permit-state:{status_entries['permit']['state']}",
@@ -656,11 +694,14 @@ def verify_execute_request(
     )
 
     effective_constraints = copy.deepcopy(permit.get("constraints", {}))
+    original_constraints = copy.deepcopy(effective_constraints)
+    attenuations: list[dict[str, Any]] = []
     decision = "allow"
 
     permit_state = entries.get("permit", {}).get("state")
     if permit_state == "attenuated":
-        effect = entries.get("permit", {}).get("effect", {})
+        permit_status = entries.get("permit", {})
+        effect = permit_status.get("effect", {})
         record(
             checks,
             "policy",
@@ -687,6 +728,12 @@ def verify_execute_request(
         )
         if narrowed is not None:
             effective_constraints = narrowed
+            attenuations = build_attenuations(
+                original_constraints=original_constraints,
+                effective_constraints=effective_constraints,
+                effect=effect,
+                status_entry=permit_status,
+            )
         record(
             checks,
             "policy",
@@ -735,8 +782,10 @@ def verify_execute_request(
         "profile": "AL2-http",
         "checked_at": demo.iso(demo.utc_now()),
         "policy_id": policy["policy_id"],
+        "policy_version": policy["policy_version"],
         "decision": decision,
         "receipt_emitted": True,
+        "receipt_phase": "admission",
         "request": {
             "action": request["requested_action"],
             "resource": request["requested_resource"],
@@ -747,12 +796,17 @@ def verify_execute_request(
     }
     if decision == "attenuate":
         report["effective_constraints"] = effective_constraints
+    if attenuations:
+        report["attenuations"] = attenuations
 
     response_payload = {
         "decision": decision,
         "policy_id": policy["policy_id"],
+        "policy_version": policy["policy_version"],
+        "receipt_phase": "admission",
         "failed_checks": report["failed_checks"],
         "effective_constraints": report.get("effective_constraints"),
+        "attenuations": attenuations,
     }
     receipt, token = build_receipt(
         verifier_dir=verifier_dir,
@@ -761,6 +815,7 @@ def verify_execute_request(
         permit=permit,
         runtime_proof=runtime_proof,
         decision=decision,
+        attenuations=attenuations,
         response_payload=response_payload,
         status_entries=entries,
     )
@@ -769,15 +824,15 @@ def verify_execute_request(
         "decision": decision,
         "verification_report": report,
         "check_details": checks,
-        "execution_receipt": receipt,
-        "execution_receipt_jws": token,
+        "admission_receipt": receipt,
+        "admission_receipt_jws": token,
     }
 
 
 def store_response_artifacts(directory: Path, response: dict[str, Any]) -> None:
     write_json(directory / "http-verifier-response.json", response)
-    write_json(directory / "verifier-execution-receipt.json", response["execution_receipt"])
-    write_text(directory / "verifier-execution-receipt.jws", response["execution_receipt_jws"])
+    write_json(directory / "verifier-admission-receipt.json", response["admission_receipt"])
+    write_text(directory / "verifier-admission-receipt.jws", response["admission_receipt_jws"])
 
 
 def serve(directory: Path, *, policy_path: Path, host: str, port: int) -> None:

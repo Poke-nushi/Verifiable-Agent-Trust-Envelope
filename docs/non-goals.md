@@ -16,7 +16,10 @@ If it grows into every adjacent layer, it becomes a vague platform idea instead 
 - a gateway or API management product
 - an eval, observability, or A/B testing suite
 - a payment settlement rail
+- an agent checkout protocol
+- a crawler payment protocol
 - a universal reputation score
+- a request-signature or web bot authentication scheme
 - a mandatory real-name identity system for every assurance level
 - a forced blockchain, cloud, DID method, or PKI topology
 
@@ -29,7 +32,7 @@ The repo is strongest when it stays centered on:
 - credential
 - runtime proof
 - mission permit
-- execution receipt
+- admission and post-execution receipts
 - status and attenuation
 
 ### 2. Compose rather than replace
@@ -39,6 +42,8 @@ Other layers already exist for:
 - discovery
 - messaging
 - delegated authorization
+- checkout and payment tokenization
+- signed automated web requests
 - workload identity
 - governance
 - transport

@@ -1,6 +1,7 @@
 {
   "version": "aer-0.1",
   "receipt_id": "aer:54f2",
+  "receipt_phase": "post_execution",
   "transaction_id": "txn:6e7d",
   "actor": "agent:public:ops-reviewer-01",
   "principal": "user:pairwise:service-x:ab12",
@@ -15,6 +16,9 @@
   "input_hash": "sha256:example-input-hash",
   "output_hash": "sha256:example-output-hash",
   "policy_ref": "policy:org:alpha:low-risk-readonly",
+  "policy_id": "policy:org:alpha:low-risk-readonly",
+  "policy_version": "2026-05-01.1",
+  "admission_receipt_ref": "aer:admission:54f2",
   "evidence_refs": [
     "urn:artifact:demo:summary-v1"
   ],

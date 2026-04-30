@@ -46,7 +46,7 @@ The current repository therefore includes a verifier-centered HTTP wedge that:
 
 - applies `status -> identity -> runtime -> permit -> policy`
 - returns `allow / attenuate / deny`
-- emits a machine-readable receipt
+- emits a machine-readable admission receipt
 
 This draft is not intended to replace A2A, MCP, VC / JWT, OpenID, OAuth, SPIFFE, workload identity, or control-plane products.
 It is intended to compose with those layers at the point where a verifier must admit, narrow, or deny a risky external action.
@@ -334,21 +334,43 @@ Task-scoped authorization artifact.
 - geography or jurisdiction hints
 - tool allowlist refinements
 
-### 7.5 AER - Agent Execution Receipt
-A signed receipt describing the execution outcome.
+### 7.5 AER - Agent Evidence Receipt
+A signed receipt describing either an admission decision or a later execution outcome.
+
+Receipts MUST declare `receipt_phase`.
+
+The minimal phases are:
+
+- `admission` - verifier-signed evidence emitted at policy-evaluation / admission time, before the action executes
+- `post_execution` - evidence emitted or stored after the action completes
+
+This distinction matters because a verifier often has to release an admission decision before the remote action has finished.
+The post-execution receipt can then link back to the admission receipt using `admission_receipt_ref`, `attestation_id`, or a profile-defined `correlation` object.
 
 #### Required fields
 - receipt_id
+- receipt_phase
 - transaction_id
 - actor
 - verifier / resource
 - skill / tool / version
 - runtime_ref
-- policy ref
+- permit_ref
+- policy_id
+- policy_version
 - start / end
 - outcome
 - issuer_role
 - signature package or equivalent integrity protection
+
+For an `admission` receipt, `started_at` and `finished_at` describe the verifier evaluation window, and `outcome` describes the admission decision result.
+For a `post_execution` receipt, those fields describe the execution window and execution outcome.
+
+#### Required admission receipt fields
+- decision: `allow`, `attenuate`, or `deny`
+- policy_id
+- policy_version
+- attenuations[] when status or policy narrows the requested action
 
 #### Recommended fields
 - principal when present
@@ -356,6 +378,9 @@ A signed receipt describing the execution outcome.
 - output hash/ref
 - evidence references
 - artifact digests
+- admission_receipt_ref on post-execution receipts
+- correlation object for implementation-specific linkage
+- attenuation_chain when multiple verifier decisions compose
 
 #### Receipt Signer Semantics
 
@@ -369,8 +394,11 @@ At minimum, a receipt should declare which role signed it:
 This draft allows all three.
 The repository now includes both:
 
-- a packaging-focused minimal demo that uses runtime-signed receipts
-- a verifier-centered HTTP wedge that uses verifier-signed receipts
+- a packaging-focused minimal demo that uses runtime-signed post-execution receipts
+- a verifier-centered HTTP wedge that uses verifier-signed admission receipts
+
+`verifier_score` is deliberately not a universal core field.
+Profiles MAY define verifier-specific scoring, but the interoperable core should not become a global reputation system.
 
 ### 7.6 ASN - Agent Status Network
 The layer responsible for status, revocation, suspension, incident handling, and risk attenuation.
@@ -514,11 +542,13 @@ The current reference path is an HTTP verifier that accepts the trust envelope a
 ### 9.4 Receipts & Audit
 
 **FR-22** high-risk actions MUST generate signed receipts.  
+**FR-22a** receipts MUST declare `receipt_phase` as `admission` or `post_execution`.
 **FR-23** receipt MUST reference runtime, permit, and applicable policy.  
 **FR-24** receipt MUST be tamper-evident.  
 **FR-25** receipt SHOULD support evidence references (hashes, artifact URLs, provenance docs).  
 **FR-26** receipt retention policies MUST be configurable by domain and regulation.  
 **FR-27** receipt correlation between parent and child agents SHOULD be supported.
+**FR-27a** post-execution receipts SHOULD link to the corresponding admission receipt when one exists.
 
 ### 9.5 Revocation & Status
 
@@ -645,7 +675,10 @@ This draft is designed to reuse existing technologies wherever possible.
 
 ### 12.1 Why not replace A2A?
 A2A is strong at **discover and talk**.  
-This draft complements it with **trust and authorize** semantics.
+This draft complements it with **verifier-side admission and evidence** semantics.
+
+A2A task or message metadata may carry references to verifier-side artifacts, such as a permit reference or admission receipt reference.
+The full permit, status, and receipt semantics should remain in an adjacent verifier / receipt layer unless an A2A profile explicitly chooses otherwise.
 
 ### 12.2 Why not replace MCP?
 MCP is strong at **tool and resource access**.  
@@ -703,16 +736,18 @@ Mission permit flow.
 - AMP
 
 ### 13.4 Receipt
-Execution receipt schema and emission flow.
+Admission and post-execution receipt schema and emission flow.
 
 #### Inputs
 - AMP
 - ARP
+- verifier decision metadata
 - execution metadata
 - evidence references
 
 #### Outputs
-- AER
+- admission-phase AER
+- post-execution AER where execution proceeds
 - optional receipt anchor / transparency proof
 
 ### 13.5 Status
@@ -844,6 +879,7 @@ In the compact JWS demo profile, this decoded payload is packaged separately as 
 {
   "version": "aer-0.1",
   "receipt_id": "aer:54f2",
+  "receipt_phase": "post_execution",
   "transaction_id": "txn:6e7d",
   "actor": "agent:public:ops-reviewer-01",
   "principal": "user:pairwise:service-x:ab12",
@@ -858,6 +894,9 @@ In the compact JWS demo profile, this decoded payload is packaged separately as 
   "input_hash": "sha256:...",
   "output_hash": "sha256:...",
   "policy_ref": "policy:org:alpha:low-risk-readonly",
+  "policy_id": "policy:org:alpha:low-risk-readonly",
+  "policy_version": "2026-05-01.1",
+  "admission_receipt_ref": "aer:admission:54f2",
   "evidence_refs": ["urn:artifact:demo:summary-v1"],
   "artifact_digests": {
     "request": "sha256:example-request-digest",

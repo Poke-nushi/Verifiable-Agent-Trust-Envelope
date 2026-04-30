@@ -1,6 +1,7 @@
 {
   "version": "app-verifier-policy-0.1",
   "policy_id": "policy:example:al2-http-verifier",
+  "policy_version": "2026-05-01.1",
   "profile": "AL2-http",
   "verifier_id": "https://verifier.example/http",
   "required_assurance_level": "AL2",

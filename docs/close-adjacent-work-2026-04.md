@@ -18,6 +18,10 @@ The closest public adjacent work today is:
 - **AgentROA** for MCP-adjacent policy enforcement
 - **Agent Auth / AIP drafts** for identity-first agent authentication work
 
+For newer agentic web and commerce infrastructure signals, see:
+
+- [standards-and-ecosystem-landscape-2026-05.md](standards-and-ecosystem-landscape-2026-05.md)
+
 This draft should be read as:
 
 - narrower than APS

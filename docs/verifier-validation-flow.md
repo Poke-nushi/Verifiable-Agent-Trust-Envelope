@@ -127,19 +127,35 @@ If any required check fails, deny before execution.
 
 If the permit is `attenuated` and the verifier understands the `effect` object, the verifier MAY continue with a narrowed effective policy and return an `attenuate` decision instead of a full deny.
 
-If execution proceeds, the verifier should capture enough context to emit or require a receipt.
+At the admission boundary, the verifier should emit or persist a verifier-signed admission receipt.
+If execution proceeds, the verifier should also capture enough context to emit or require a post-execution receipt.
 
-### 10. Emit or require an execution receipt
+### 10. Emit or require receipts
 
-For AL2 and above, the verifier should record at least:
+For AL2 and above, the verifier should distinguish two receipt phases:
+
+- `admission`: emitted at policy-evaluation time, before execution, and carrying the verifier decision
+- `post_execution`: emitted or stored after the action completes, and linked back to the admission receipt when available
+
+An admission receipt should record at least:
 
 - permit reference
 - runtime reference
 - actor reference
 - action/resource
+- decision: `allow`, `attenuate`, or `deny`
+- policy_id and policy_version
+- attenuations[] when the verifier narrowed the original authority
+- timestamp
+
+A post-execution receipt should record at least:
+
+- admission_receipt_ref when an admission receipt exists
+- permit reference
+- runtime reference
+- action/resource
 - outcome
 - start and finish time
-- policy reference
 - evidence references when available
 
 The receipt should also make its signer semantics explicit.

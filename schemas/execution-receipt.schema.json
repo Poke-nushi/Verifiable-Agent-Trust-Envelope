@@ -1,12 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:app:schema:execution-receipt:0.1",
-  "title": "Trust Envelope Execution Receipt",
-  "description": "Draft JSON Schema for the decoded v0.1 Execution Receipt (AER) payload in Verifiable Agent Trust Envelope. Packaging such as JWS is transport-level and validated separately.",
+  "title": "Trust Envelope Evidence Receipt",
+  "description": "Draft JSON Schema for the decoded v0.1 Evidence Receipt (AER) payload in Verifiable Agent Trust Envelope. Admission receipts use the time fields for the verifier evaluation window; post-execution receipts use them for execution timing. Packaging such as JWS is transport-level and validated separately.",
   "type": "object",
   "required": [
     "version",
     "receipt_id",
+    "receipt_phase",
     "transaction_id",
     "actor",
     "runtime_ref",
@@ -17,6 +18,8 @@
     "input_hash",
     "output_hash",
     "policy_ref",
+    "policy_id",
+    "policy_version",
     "started_at",
     "finished_at",
     "outcome"
@@ -29,6 +32,13 @@
     "receipt_id": {
       "type": "string",
       "minLength": 1
+    },
+    "receipt_phase": {
+      "type": "string",
+      "enum": [
+        "admission",
+        "post_execution"
+      ]
     },
     "transaction_id": {
       "type": "string",
@@ -91,6 +101,61 @@
     "policy_ref": {
       "type": "string",
       "minLength": 1
+    },
+    "policy_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policy_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "allow",
+        "attenuate",
+        "deny"
+      ]
+    },
+    "attenuations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "field",
+          "original",
+          "applied",
+          "reason_code"
+        ],
+        "properties": {
+          "field": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason_code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_status_ref": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "admission_receipt_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attestation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "correlation": {
+      "type": "object",
+      "additionalProperties": true
     },
     "evidence_refs": {
       "type": "array",

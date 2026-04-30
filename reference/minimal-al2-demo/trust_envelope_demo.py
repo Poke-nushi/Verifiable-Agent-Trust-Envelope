@@ -469,6 +469,7 @@ def build_demo_bundle(out_dir: Path) -> dict:
     receipt = {
         "version": "aer-0.1",
         "receipt_id": "aer:demo-receipt",
+        "receipt_phase": "post_execution",
         "transaction_id": permit["transaction_id"],
         "actor": permit["actor"],
         "principal": permit["principal"],
@@ -480,6 +481,8 @@ def build_demo_bundle(out_dir: Path) -> dict:
         "input_hash": "sha256:demo-input",
         "output_hash": "sha256:demo-output",
         "policy_ref": permit["approval"]["policy_ref"],
+        "policy_id": permit["approval"]["policy_ref"],
+        "policy_version": "demo-policy-0.1",
         "evidence_refs": ["urn:artifact:demo:summary-v1"],
         "artifact_digests": {
             "request": "sha256:demo-request",

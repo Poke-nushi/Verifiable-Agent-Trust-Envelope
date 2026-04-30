@@ -8,8 +8,10 @@
     "version",
     "profile",
     "policy_id",
+    "policy_version",
     "decision",
     "receipt_emitted",
+    "receipt_phase",
     "request",
     "failed_checks"
   ],
@@ -30,6 +32,10 @@
       "type": "string",
       "minLength": 1
     },
+    "policy_version": {
+      "type": "string",
+      "minLength": 1
+    },
     "decision": {
       "type": "string",
       "enum": [
@@ -40,6 +46,12 @@
     },
     "receipt_emitted": {
       "type": "boolean"
+    },
+    "receipt_phase": {
+      "type": "string",
+      "enum": [
+        "admission"
+      ]
     },
     "request": {
       "type": "object",
@@ -102,6 +114,33 @@
         }
       },
       "additionalProperties": true
+    },
+    "attenuations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "field",
+          "original",
+          "applied",
+          "reason_code"
+        ],
+        "properties": {
+          "field": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason_code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_status_ref": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true
+      }
     },
     "failed_checks": {
       "type": "array",

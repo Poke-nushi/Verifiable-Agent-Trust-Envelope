@@ -8,7 +8,7 @@ It is intentionally focused:
 - it expects `app_context.passport`, `app_context.runtime_proof`, and `app_context.mission_permit`
 - it evaluates the trust envelope artifacts in verifier order: status -> identity -> runtime -> permit -> policy
 - it returns one of three decisions: `allow`, `attenuate`, or `deny`
-- it emits a verifier-signed execution receipt
+- it emits a verifier-signed admission receipt
 
 ## Start Here
 
@@ -17,7 +17,7 @@ If you want the fastest path:
 1. run `generate-demo`
 2. run `serve` against `allow-active`
 3. run `execute-demo`
-4. inspect `verification_report` and the emitted verifier receipt
+4. inspect `verification_report` and the emitted admission receipt
 
 This demo is the most direct illustration of the current repository thesis:
 an external verifier decides `allow / attenuate / deny` from the trust envelope artifacts plus local policy.
@@ -31,7 +31,7 @@ This verifier demo adds the missing adoption wedge:
 - how an external service can request the trust envelope artifacts
 - where local policy fits into evaluation
 - how attenuation becomes an operational decision rather than only a status label
-- how a relying party can emit a verifier-signed `AER`
+- how a relying party can emit a verifier-signed admission-phase `AER`
 
 ## Scenarios
 
@@ -80,21 +80,21 @@ python3 reference/http-verifier-demo/http_verifier_demo.py run-corpus --corpus-r
 Each executed scenario writes:
 
 - `http-verifier-response.json`
-- `verifier-execution-receipt.json`
-- `verifier-execution-receipt.jws`
+- `verifier-admission-receipt.json`
+- `verifier-admission-receipt.jws`
 
 The response includes:
 
 - normalized `verification_report`
 - detailed named checks
-- signed execution receipt
+- signed admission receipt
 
 ## What This Demo Shows Best
 
 - where the trust envelope artifacts appear in a real verifier request
 - how local verifier policy fits into the decision
 - how `attenuated` can become an operational branch instead of a descriptive label
-- how a relying party can emit a verifier-signed `AER`
+- how a relying party can emit a verifier-signed admission-phase `AER`
 
 ## Limits
 

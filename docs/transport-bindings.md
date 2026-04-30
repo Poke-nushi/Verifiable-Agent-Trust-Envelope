@@ -82,12 +82,25 @@ Use this draft to complement A2A discovery and task delegation without changing 
 ### Suggested approach
 
 - keep agent discovery in A2A-native structures
-- carry the trust envelope artifacts in message metadata or a request envelope
+- carry stable references to trust envelope artifacts in task or message metadata where possible
+- avoid requiring A2A to carry full permit, status, or receipt bodies unless a profile explicitly chooses that packaging
 - require the remote agent or service to verify those artifacts before accepting the delegated task
+
+Example metadata shape:
+
+```json
+{
+  "vate": {
+    "permit_ref": "amp:txn-18f4",
+    "admission_receipt_ref": "aer:http-verifier:txn-18f4:allow:admission"
+  }
+}
+```
 
 ### Important rule
 
 An A2A Agent Card should not be treated as sufficient proof of current authority.
+Receipt bodies and attenuation semantics should live in the adjacent verifier / receipt layer, while A2A carries the task flow and optional references.
 
 ---
 

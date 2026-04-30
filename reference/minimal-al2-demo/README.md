@@ -113,7 +113,7 @@ The generator writes:
 The generated payloads now include:
 
 - `mission-permit.json` with `issued_at`
-- `execution-receipt.json` with `issuer_role`, `evidence_refs`, and `artifact_digests`
+- `execution-receipt.json` with `receipt_phase`, `issuer_role`, `policy_id`, `policy_version`, `evidence_refs`, and `artifact_digests`
 - status artifacts that may carry an `effect` object when a permit is attenuated
 
 The verifier writes:
