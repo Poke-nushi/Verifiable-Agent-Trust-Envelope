@@ -1,0 +1,15 @@
+{
+  "type": "web_bot_auth_signature",
+  "uri": "https://agent.example/requests/req-20260504-001/signature",
+  "digest": {
+    "alg": "sha-256",
+    "value": "base64url-web-bot-auth-signature-digest"
+  },
+  "verification": {
+    "result": "verified",
+    "checked_at": "2026-05-04T03:00:01Z",
+    "method": "http-message-signature",
+    "status_result": "active"
+  }
+}
+

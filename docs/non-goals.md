@@ -19,7 +19,12 @@ If it grows into every adjacent layer, it becomes a vague platform idea instead 
 - an agent checkout protocol
 - a crawler payment protocol
 - a universal reputation score
+- a generic trust score for every verifier and domain
 - a request-signature or web bot authentication scheme
+- a global policy language
+- an A2A core state-machine extension
+- an MCP authorization replacement
+- a runtime disclosure manifest format
 - a mandatory real-name identity system for every assurance level
 - a forced blockchain, cloud, DID method, or PKI topology
 
@@ -50,6 +55,9 @@ Other layers already exist for:
 
 This draft should compose with them rather than re-specify them.
 
+For `v0.2`, this means A2A, MCP, OAuth, OID4VP, VC, DID, Web Bot Auth, AP2, x402, ACP, and payment-token systems are treated as adjacent evidence or transport layers.
+VATE standardizes the verifier-side admission decision and receipt semantics around those inputs.
+
 ### 3. Avoid platform sprawl
 
 Recent product signals make this more important, not less.
@@ -74,3 +82,12 @@ This draft is trying to standardize a portable artifact model for:
 - with which receipt afterward
 
 That is the narrow boundary this draft should protect.
+
+The v0.2 AL2 verifier admission profile narrows this further to:
+
+- verifier-side admission requests
+- evidence references
+- `allow`, `attenuate`, or `deny` decisions
+- machine-readable attenuation
+- admission receipts
+- post-execution receipts linked to admission receipts

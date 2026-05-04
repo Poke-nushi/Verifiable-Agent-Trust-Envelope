@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:a2a-metadata:0.2",
+  "title": "A2A VATE Metadata Binding",
+  "description": "Draft v0.2 metadata object for carrying VATE admission and receipt references in A2A metadata.",
+  "type": "object",
+  "required": [
+    "profile",
+    "phase",
+    "transaction_id",
+    "assurance_level",
+    "issuer",
+    "issued_at"
+  ],
+  "properties": {
+    "profile": {
+      "type": "string",
+      "const": "VATE-AL2-Verifier-Admission-v0.2"
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "admission_requested",
+        "admission_issued",
+        "post_execution_receipt_issued"
+      ]
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "assurance_level": {
+      "type": "string",
+      "const": "AL2"
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "allow",
+        "attenuate",
+        "deny"
+      ]
+    },
+    "admission_request": {
+      "$ref": "#/$defs/artifact_reference"
+    },
+    "admission_receipt": {
+      "$ref": "#/$defs/artifact_reference"
+    },
+    "post_execution_receipt": {
+      "$ref": "#/$defs/artifact_reference"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "issuer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "phase": {
+            "const": "admission_requested"
+          }
+        },
+        "required": [
+          "phase"
+        ]
+      },
+      "then": {
+        "required": [
+          "admission_request"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "phase": {
+            "const": "admission_issued"
+          }
+        },
+        "required": [
+          "phase"
+        ]
+      },
+      "then": {
+        "required": [
+          "admission_receipt"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "phase": {
+            "const": "post_execution_receipt_issued"
+          }
+        },
+        "required": [
+          "phase"
+        ]
+      },
+      "then": {
+        "required": [
+          "admission_receipt",
+          "post_execution_receipt"
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "artifact_reference": {
+      "type": "object",
+      "required": [
+        "type",
+        "uri",
+        "media_type",
+        "digest"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "media_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "type": "object",
+          "required": [
+            "alg",
+            "value"
+          ],
+          "properties": {
+            "alg": {
+              "type": "string",
+              "minLength": 1
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

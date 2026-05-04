@@ -134,3 +134,25 @@ That corpus could later back:
 - SDK test fixtures
 - CI conformance runs
 - interoperability bake-offs between independent implementations
+
+## v0.2 AL2 Admission Corpus Direction
+
+The v0.2 AL2 verifier admission profile should add a corpus that focuses on admission and receipt semantics across transports.
+
+Minimum cases:
+
+- `allow`: active status, matching audience, valid runtime, in-scope permit
+- `attenuate`: requested amount or tool scope narrowed by policy or status
+- `deny-expired-permit`: permit validity window fails before admission
+- `deny-audience-mismatch`: permit or token audience does not match verifier
+- `deny-revoked-status`: current status revokes credential, runtime proof, or permit
+- `deny-digest-mismatch`: A2A metadata digest does not match the dereferenced artifact
+- `deny-replayed-admission`: admission receipt is expired, nonce-mismatched, or already consumed where one-time use is required
+- `post-exec-linkage-mismatch`: post-execution receipt does not link to the admitted effective request hash
+
+These cases should validate:
+
+- `schemas/a2a-vate-metadata.schema.json`
+- `schemas/admission-request.schema.json`
+- `schemas/admission-receipt.schema.json`
+- `schemas/post-execution-receipt.schema.json`

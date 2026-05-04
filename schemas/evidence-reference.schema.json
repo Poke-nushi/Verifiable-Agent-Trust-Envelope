@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:evidence-reference:0.2",
+  "title": "VATE Evidence Reference",
+  "description": "Draft v0.2 evidence reference and verification result object for admission receipts.",
+  "type": "object",
+  "required": [
+    "type",
+    "uri",
+    "digest",
+    "verification"
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "agent_card",
+        "oauth_access_token",
+        "oauth_transaction_token",
+        "oid4vp_presentation",
+        "verifiable_credential",
+        "vc_status",
+        "did_document",
+        "web_bot_auth_signature",
+        "http_message_signature",
+        "payment_mandate",
+        "payment_required_state",
+        "delegated_payment_token",
+        "payment_authority",
+        "runtime_attestation",
+        "runtime_disclosure",
+        "local_policy"
+      ]
+    },
+    "uri": {
+      "type": "string",
+      "minLength": 1
+    },
+    "protocol_hint": {
+      "type": "string",
+      "description": "Optional informative hint for the concrete source protocol, such as ap2_mandate, x402, acp_payment_token, or stripe_spt. Verifiers must not depend on this field without local policy.",
+      "minLength": 1
+    },
+    "digest": {
+      "type": "object",
+      "required": [
+        "alg",
+        "value"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "enum": [
+            "sha-256",
+            "sha-384",
+            "sha-512"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "verification": {
+      "type": "object",
+      "required": [
+        "result",
+        "checked_at",
+        "method"
+      ],
+      "properties": {
+        "result": {
+          "type": "string",
+          "enum": [
+            "verified",
+            "failed",
+            "unknown",
+            "stale",
+            "unavailable"
+          ]
+        },
+        "checked_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status_result": {
+          "type": "string",
+          "enum": [
+            "active",
+            "attenuated",
+            "suspended",
+            "revoked",
+            "quarantined",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "failure_reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

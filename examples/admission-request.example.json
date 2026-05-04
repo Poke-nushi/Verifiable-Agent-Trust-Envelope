@@ -1,0 +1,53 @@
+{
+  "version": "vate-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "request_id": "areq-20260504-001",
+  "transaction_id": "txn-20260504-001",
+  "issued_at": "2026-05-04T03:00:00Z",
+  "expires_at": "2026-05-04T03:05:00Z",
+  "action": "commerce.purchase",
+  "target": {
+    "resource": "https://merchant.example/checkout",
+    "audience": "https://agent.example/a2a"
+  },
+  "actor": "did:web:agent.example",
+  "principal": "did:web:user.example",
+  "runtime": "spiffe://agent.example/workload/purchase-agent",
+  "audience": "https://agent.example/a2a",
+  "input_hash": "sha-256:base64url-original-input-digest",
+  "constraints": {
+    "max_amount": {
+      "currency": "USD",
+      "value": "120.00"
+    },
+    "tool_allowlist": [
+      "merchant.checkout.create",
+      "merchant.checkout.confirm"
+    ]
+  },
+  "correlation": {
+    "a2a_context_id": "ctx-abc123",
+    "a2a_task_id": "task-abc123"
+  },
+  "evidence_refs": [
+    {
+      "type": "agent_card",
+      "uri": "https://agent.example/.well-known/agent-card.json",
+      "media_type": "application/json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-agent-card-digest"
+      }
+    },
+    {
+      "type": "payment_authority",
+      "uri": "https://wallet.example/payment-authorities/spt-123",
+      "media_type": "application/payment-token+json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-payment-token-digest"
+      }
+    }
+  ]
+}
+

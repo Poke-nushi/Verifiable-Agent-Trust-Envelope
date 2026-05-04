@@ -79,20 +79,37 @@ Each object may be:
 
 Use this draft to complement A2A discovery and task delegation without changing the purpose of the A2A layer itself.
 
+The `v0.2` direction is a reference-only metadata binding for the AL2 verifier admission profile.
+The detailed draft binding is in [docs/a2a-metadata-binding-v0.2.md](a2a-metadata-binding-v0.2.md).
+
 ### Suggested approach
 
 - keep agent discovery in A2A-native structures
 - carry stable references to trust envelope artifacts in task or message metadata where possible
 - avoid requiring A2A to carry full permit, status, or receipt bodies unless a profile explicitly chooses that packaging
 - require the remote agent or service to verify those artifacts before accepting the delegated task
+- prefer `uri`, `media_type`, `digest`, `issuer`, `issued_at`, and `expires_at` descriptors over bare string references
 
 Example metadata shape:
 
 ```json
 {
-  "vate": {
-    "permit_ref": "amp:txn-18f4",
-    "admission_receipt_ref": "aer:http-verifier:txn-18f4:allow:admission"
+  "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2": {
+    "profile": "VATE-AL2-Verifier-Admission-v0.2",
+    "phase": "admission_issued",
+    "transaction_id": "txn:6e7d",
+    "assurance_level": "AL2",
+    "admission_receipt": {
+      "uri": "https://verifier.example/vate/admission-receipts/admrec-54f2",
+      "media_type": "application/vate-admission-receipt+json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-example-digest"
+      }
+    },
+    "issuer": "did:web:verifier.example",
+    "issued_at": "2026-05-04T03:00:08Z",
+    "expires_at": "2026-05-04T03:10:08Z"
   }
 }
 ```

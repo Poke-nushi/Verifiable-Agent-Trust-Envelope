@@ -1,0 +1,20 @@
+{
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "phase": "admission_issued",
+  "transaction_id": "txn-20260504-001",
+  "assurance_level": "AL2",
+  "decision": "attenuate",
+  "admission_receipt": {
+    "type": "admission_receipt",
+    "uri": "https://verifier.example/vate/admission-receipts/admrec-20260504-001",
+    "media_type": "application/vate-admission-receipt+json",
+    "digest": {
+      "alg": "sha-256",
+      "value": "base64url-admission-receipt-digest"
+    }
+  },
+  "issuer": "did:web:verifier.example",
+  "issued_at": "2026-05-04T03:00:08Z",
+  "expires_at": "2026-05-04T03:10:08Z"
+}
+

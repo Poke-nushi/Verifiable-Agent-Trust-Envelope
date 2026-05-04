@@ -1,0 +1,15 @@
+{
+  "type": "admission_receipt",
+  "uri": "https://verifier.example/vate/admission-receipts/admrec-20260504-001",
+  "media_type": "application/vate-admission-receipt+json",
+  "digest": {
+    "alg": "sha-256",
+    "value": "base64url-admission-receipt-digest"
+  },
+  "phase": "admission",
+  "issuer": "did:web:verifier.example",
+  "kid": "did:web:verifier.example#key-1",
+  "issued_at": "2026-05-04T03:00:08Z",
+  "expires_at": "2026-05-04T03:10:08Z"
+}
+

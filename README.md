@@ -5,6 +5,7 @@
 **A discussion draft for verifier-side trust / permit / receipt decisions in AI agent systems**
 
 `v0.1 discussion draft`  
+`v0.2 AL2 verifier admission profile draft in progress`
 `not production-ready`  
 `seeking critique on boundary, verifier order, and artifact semantics`
 
@@ -38,6 +39,10 @@ and returns:
 
 with a machine-readable admission receipt.
 
+The `v0.2` work keeps that verifier-side boundary but narrows the next deliverable to the [VATE AL2 Verifier Admission Profile v0.2](docs/profiles/vate-al2-verifier-admission-profile-v0.2.md).
+That profile treats A2A, MCP, OAuth, VC, DID, OID4VP, Web Bot Auth, AP2, x402, ACP, and payment-token systems as adjacent layers that can provide evidence.
+VATE defines how a relying party evaluates those inputs before execution and records the decision.
+
 ![Where Verifiable Agent Trust Envelope Fits](docs/figures/where-trust-envelope-fits-readme.png)
 
 ## What This Draft Adds
@@ -50,6 +55,7 @@ It is strongest on the following boundary:
 - making verifier-side ordering explicit for external digital write decisions
 - treating **status** and **attenuation** as protocol concerns rather than afterthoughts
 - separating verifier-signed **admission receipts** from later **post-execution receipts** where later evidence matters
+- defining a reference-only **A2A metadata binding** for VATE admission and receipt artifacts
 
 ## What This Draft Does Not Replace
 
@@ -69,6 +75,7 @@ It is meant to compose with adjacent layers such as:
 - `VC / JWT` for portable signed credentials
 - `OpenID Federation / CAEP` for trust federation and status signaling
 - `SPIFFE / workload identity / cloud attestation` for runtime authenticity anchors
+- `AP2 / x402 / ACP / payment tokens` for commerce and payment authorization evidence
 
 For the explicit non-goals, see [docs/non-goals.md](docs/non-goals.md).
 
@@ -101,7 +108,8 @@ If you are new to the repo, the fastest path is:
 2. [docs/close-adjacent-work-2026-04.md](docs/close-adjacent-work-2026-04.md)
 3. [docs/use-cases.md](docs/use-cases.md)
 4. section `0` and section `1` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md)
-5. [reference/http-verifier-demo/README.md](reference/http-verifier-demo/README.md)
+5. [docs/profiles/vate-al2-verifier-admission-profile-v0.2.md](docs/profiles/vate-al2-verifier-admission-profile-v0.2.md)
+6. [reference/http-verifier-demo/README.md](reference/http-verifier-demo/README.md)
 
 If you want the visual system view, see section `11` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md).
 
@@ -122,9 +130,9 @@ The most useful feedback for this draft is currently:
 - **Repository type**: protocol discussion draft
 - **Document maturity**: early draft
 - **Primary language**: English
-- **Research refresh date**: 2026-04-19
+- **Research refresh date**: 2026-05-04
 - **Primary battlefield**: `AL2` external digital write
-- **Implemented now**: payload schemas, examples, verifier guidance, reference demos, verifier policy example, machine-readable conformance corpus
+- **Implemented now**: payload schemas, examples, verifier guidance, reference demos, verifier policy example, machine-readable conformance corpus, v0.2 AL2 verifier admission profile draft
 - **Planned later**: pairwise presentation profile, richer capability registry, formal `AID`, physical `ABS` profiles
 
 ## Repository Map
@@ -139,6 +147,12 @@ The most useful feedback for this draft is currently:
   Verifier-side validation order
 - [docs/profiles/al2-minimal-profile.md](docs/profiles/al2-minimal-profile.md)
   Baseline profile for the current reference battlefield
+- [docs/profiles/vate-al2-verifier-admission-profile-v0.2.md](docs/profiles/vate-al2-verifier-admission-profile-v0.2.md)
+  Narrow v0.2 profile for verifier-side AL2 admission decisions
+- [docs/a2a-metadata-binding-v0.2.md](docs/a2a-metadata-binding-v0.2.md)
+  Reference-only A2A metadata binding for VATE admission and receipt artifacts
+- [docs/receipt-model-v0.2.md](docs/receipt-model-v0.2.md)
+  v0.2 split between admission receipts and post-execution receipts
 - [docs/known-gaps.md](docs/known-gaps.md)
   Current unresolved design gaps
 - [reference/minimal-al2-demo/README.md](reference/minimal-al2-demo/README.md)
@@ -177,6 +191,8 @@ python3 scripts/check_repo_strict.py
 - [docs/non-goals.md](docs/non-goals.md)
 - [docs/delegated-identity-composition-example.md](docs/delegated-identity-composition-example.md)
 - [docs/transport-bindings.md](docs/transport-bindings.md)
+- [docs/a2a-metadata-binding-v0.2.md](docs/a2a-metadata-binding-v0.2.md)
+- [docs/receipt-model-v0.2.md](docs/receipt-model-v0.2.md)
 - [docs/jws-packaging-and-status-delivery.md](docs/jws-packaging-and-status-delivery.md)
 - [docs/threat-model.md](docs/threat-model.md)
 - [docs/status-network-model.md](docs/status-network-model.md)

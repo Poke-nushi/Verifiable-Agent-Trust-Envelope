@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:artifact-reference:0.2",
+  "title": "VATE Artifact Reference",
+  "description": "Draft v0.2 reference descriptor for dereferenceable or digest-bound VATE and adjacent protocol artifacts.",
+  "type": "object",
+  "required": [
+    "type",
+    "uri",
+    "media_type",
+    "digest"
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "admission_request",
+        "admission_receipt",
+        "post_execution_receipt",
+        "passport_credential",
+        "runtime_proof",
+        "mission_permit",
+        "status",
+        "agent_card",
+        "payment_authority",
+        "evidence"
+      ]
+    },
+    "uri": {
+      "type": "string",
+      "minLength": 1
+    },
+    "media_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "digest": {
+      "type": "object",
+      "required": [
+        "alg",
+        "value"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "enum": [
+            "sha-256",
+            "sha-384",
+            "sha-512"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "admission_requested",
+        "admission_issued",
+        "post_execution_receipt_issued",
+        "admission",
+        "post_execution"
+      ]
+    },
+    "issuer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kid": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}
+

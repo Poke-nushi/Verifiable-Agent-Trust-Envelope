@@ -2,26 +2,24 @@
 
 ## Current Milestone
 
-### `v0.1-discussion-draft`
+### `v0.2-al2-verifier-admission-profile`
 
 Focus:
 
-- narrow verifier-side boundary for `AL2` external digital write
-- small core around `APC`, `ARP`, `AMP`, `AER`, and `ASN`
-- explicit public positioning against close adjacent work
-- English-first public documentation
-- example payloads and payload schemas
-- verifier ordering guidance
-- threat model and status delivery model
-- educational AL2 reference demo
-- verifier-centered HTTP wedge for `allow / attenuate / deny`
-- machine-readable AL2 HTTP conformance corpus
+- preserve the `v0.1` discussion draft as the core framing
+- narrow the next profile to `AL2` verifier-side admission for external digital actions
+- define reference-only A2A metadata binding for admission and receipt artifacts
+- split admission receipts from post-execution receipts in profile-specific schemas
+- make `allow / attenuate / deny` decisions and machine-readable attenuation explicit
+- treat A2A, MCP, OAuth, VC, DID, OID4VP, Web Bot Auth, AP2, x402, ACP, and payment tokens as adjacent evidence or transport layers
+- add examples and schema validation for v0.2 admission requests, A2A references, and receipts
 
 ## Next
 
-- clarify receipt semantics across `runtime`, `verifier`, and `broker`
+- broaden the v0.2 conformance corpus beyond examples
+- add negative cases for expired permits, audience mismatches, revoked status, digest mismatches, replayed admission receipts, and post-execution linkage mismatches
 - refine pairwise presentation guidance
-- add clearer A2A / MCP / OpenID binding notes and transport-bound examples
+- add clearer MCP / OAuth / OpenID binding notes and transport-bound examples
 - improve comparison material around close adjacent work where interoperability questions remain
 - publish a language-neutral conformance corpus shape
 - improve JOSE hardening and profile notes

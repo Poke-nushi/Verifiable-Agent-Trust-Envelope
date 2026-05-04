@@ -28,6 +28,52 @@
       "type": "string",
       "minLength": 1
     },
+    "original_request_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "effective_request_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "op",
+          "path",
+          "reason_code"
+        ],
+        "properties": {
+          "op": {
+            "type": "string",
+            "enum": [
+              "add",
+              "remove",
+              "replace"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason_code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_status_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_evidence_ref": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true
+      }
+    },
     "constraints": {
       "type": "object",
       "properties": {
@@ -68,6 +114,10 @@
           "additionalProperties": true
         }
       },
+      "additionalProperties": true
+    },
+    "effective_constraints": {
+      "type": "object",
       "additionalProperties": true
     }
   },

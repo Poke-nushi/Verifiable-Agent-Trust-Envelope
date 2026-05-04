@@ -1,0 +1,102 @@
+{
+  "version": "vate-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-20260504-attenuate-001",
+  "issued_at": "2026-05-04T03:00:08Z",
+  "expires_at": "2026-05-04T03:10:08Z",
+  "verifier": {
+    "id": "did:web:verifier.example",
+    "key_id": "did:web:verifier.example#key-1"
+  },
+  "request": {
+    "request_id": "areq-20260504-001",
+    "transaction_id": "txn-20260504-001",
+    "a2a_context_id": "ctx-abc123",
+    "a2a_task_id": "task-abc123",
+    "action": "commerce.purchase",
+    "input_hash": "sha-256:base64url-original-input-digest"
+  },
+  "subject": {
+    "principal": "did:web:user.example",
+    "actor": "did:web:agent.example",
+    "runtime": "spiffe://agent.example/workload/purchase-agent"
+  },
+  "evidence": [
+    {
+      "type": "agent_card",
+      "uri": "https://agent.example/.well-known/agent-card.json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-agent-card-digest"
+      },
+      "verification": {
+        "result": "verified",
+        "checked_at": "2026-05-04T03:00:01Z",
+        "method": "signed-agent-card",
+        "status_result": "active"
+      }
+    },
+    {
+      "type": "delegated_payment_token",
+      "protocol_hint": "stripe_spt",
+      "uri": "https://wallet.example/payment-authorities/spt-123",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-payment-token-digest"
+      },
+      "verification": {
+        "result": "verified",
+        "checked_at": "2026-05-04T03:00:03Z",
+        "method": "payment-token-introspection",
+        "status_result": "attenuated"
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "merchant-purchase-al2",
+    "policy_version": "2026-05-04.1",
+    "policy_ref": "https://verifier.example/policies/merchant-purchase-al2/2026-05-04.1"
+  },
+  "decision": {
+    "outcome": "attenuate",
+    "reason_codes": [
+      "PAYMENT_TOKEN_LIMIT",
+      "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+    ],
+    "human_readable_summary": "The request is allowed only up to USD 25.00 because the available payment authority and local policy do not permit the requested USD 120.00 limit."
+  },
+  "attenuation": {
+    "mode": "narrow",
+    "original_request_hash": "sha-256:base64url-original-request-digest",
+    "effective_request_hash": "sha-256:base64url-effective-request-digest",
+    "changes": [
+      {
+        "op": "replace",
+        "path": "/constraints/max_amount/value",
+        "from": "120.00",
+        "to": "25.00",
+        "reason_code": "PAYMENT_TOKEN_LIMIT",
+        "source_evidence_ref": "https://wallet.example/payment-authorities/spt-123"
+      }
+    ],
+    "effective_constraints": {
+      "max_amount": {
+        "currency": "USD",
+        "value": "25.00"
+      },
+      "tool_allowlist": [
+        "merchant.checkout.create",
+        "merchant.checkout.confirm"
+      ],
+      "expires_at": "2026-05-04T03:10:08Z"
+    },
+    "require_new_permit": false
+  },
+  "proof": {
+    "format": "detached_jws",
+    "alg": "ES256",
+    "kid": "did:web:verifier.example#key-1",
+    "signature_ref": "https://verifier.example/vate/signatures/admrec-20260504-attenuate-001.jws"
+  }
+}

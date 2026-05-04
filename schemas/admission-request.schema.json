@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:admission-request:0.2",
+  "title": "VATE Admission Request",
+  "description": "Draft v0.2 verifier admission request for AL2 external digital actions.",
+  "type": "object",
+  "required": [
+    "version",
+    "profile",
+    "request_id",
+    "transaction_id",
+    "issued_at",
+    "expires_at",
+    "action",
+    "target",
+    "actor",
+    "principal",
+    "runtime",
+    "audience",
+    "input_hash",
+    "evidence_refs"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "vate-0.2"
+    },
+    "profile": {
+      "type": "string",
+      "const": "VATE-AL2-Verifier-Admission-v0.2"
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "action": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target": {
+      "type": "object",
+      "required": [
+        "resource",
+        "audience"
+      ],
+      "properties": {
+        "resource": {
+          "type": "string",
+          "minLength": 1
+        },
+        "audience": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "actor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "principal": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runtime": {
+      "type": "string",
+      "minLength": 1
+    },
+    "audience": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "correlation": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "uri",
+          "media_type",
+          "digest"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uri": {
+            "type": "string",
+            "minLength": 1
+          },
+          "media_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "digest": {
+            "type": "object",
+            "required": [
+              "alg",
+              "value"
+            ],
+            "properties": {
+              "alg": {
+                "type": "string",
+                "minLength": 1
+              },
+              "value": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}
+

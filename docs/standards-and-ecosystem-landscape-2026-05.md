@@ -1,5 +1,5 @@
 # Standards and Ecosystem Landscape Update
-## As of 2026-05-01
+## As of 2026-05-04
 
 ## Purpose
 
@@ -46,14 +46,30 @@ VATE can sit after or beside them when a relying party still needs to decide whe
 
 ### A2A task reference
 
-An A2A task message can carry the task and a compact reference to verifier-side artifacts:
+An A2A task message can carry the task and compact references to verifier-side artifacts.
+The v0.2 direction is to use the VATE extension URI as the metadata key and include digest-bound artifact references:
 
 ```json
 {
   "metadata": {
-    "vate": {
-      "permit_ref": "amp:txn-18f4",
-      "admission_receipt_ref": "aer:http-verifier:txn-18f4:allow:admission"
+    "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2": {
+      "profile": "VATE-AL2-Verifier-Admission-v0.2",
+      "phase": "admission_issued",
+      "transaction_id": "txn-20260504-001",
+      "assurance_level": "AL2",
+      "decision": "attenuate",
+      "admission_receipt": {
+        "type": "admission_receipt",
+        "uri": "https://verifier.example/vate/admission-receipts/admrec-20260504-001",
+        "media_type": "application/vate-admission-receipt+json",
+        "digest": {
+          "alg": "sha-256",
+          "value": "base64url-admission-receipt-digest"
+        }
+      },
+      "issuer": "did:web:verifier.example",
+      "issued_at": "2026-05-04T03:00:08Z",
+      "expires_at": "2026-05-04T03:10:08Z"
     }
   }
 }
@@ -97,7 +113,7 @@ VATE does not replace:
 - VC / JWT
 - cloud workload identity
 
-The v0.1.1 direction should therefore strengthen VATE as an adjacent verifier-side trust / permit / receipt layer, not broaden it into registry, commerce, transport, or identity infrastructure.
+The v0.2 direction should therefore strengthen VATE as an adjacent verifier-side admission / permit / receipt layer, not broaden it into registry, commerce, transport, or identity infrastructure.
 
 ---
 
@@ -110,3 +126,4 @@ The v0.1.1 direction should therefore strengthen VATE as an adjacent verifier-si
 - ACP delegated payment specification: https://agentic-commerce-protocol.com/docs/commerce/specs/payment
 - Stripe ACP documentation: https://docs.stripe.com/agentic-commerce/protocol
 - Stripe agentic commerce announcement: https://stripe.com/blog/introducing-our-agentic-commerce-solutions
+- A2A specification: https://a2a-protocol.org/latest/specification/

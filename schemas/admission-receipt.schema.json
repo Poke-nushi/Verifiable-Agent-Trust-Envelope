@@ -1,0 +1,326 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:admission-receipt:0.2",
+  "title": "VATE Admission Receipt",
+  "description": "Draft v0.2 verifier-signed or verifier-issued admission receipt for AL2 external digital actions.",
+  "type": "object",
+  "required": [
+    "version",
+    "profile",
+    "receipt_type",
+    "receipt_id",
+    "issued_at",
+    "expires_at",
+    "verifier",
+    "request",
+    "subject",
+    "evidence",
+    "policy",
+    "decision"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "vate-0.2"
+    },
+    "profile": {
+      "type": "string",
+      "const": "VATE-AL2-Verifier-Admission-v0.2"
+    },
+    "receipt_type": {
+      "type": "string",
+      "const": "admission"
+    },
+    "receipt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "verifier": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "key_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "request": {
+      "type": "object",
+      "required": [
+        "request_id",
+        "transaction_id",
+        "action",
+        "input_hash"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "transaction_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "a2a_context_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "a2a_task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input_hash": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "subject": {
+      "type": "object",
+      "required": [
+        "principal",
+        "actor",
+        "runtime"
+      ],
+      "properties": {
+        "principal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "actor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runtime": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "uri",
+          "digest",
+          "verification"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uri": {
+            "type": "string",
+            "minLength": 1
+          },
+          "protocol_hint": {
+            "type": "string",
+            "description": "Optional informative hint for the concrete source protocol. The canonical evidence type should remain generic unless a profile defines a protocol-specific subtype.",
+            "minLength": 1
+          },
+          "digest": {
+            "type": "object",
+            "required": [
+              "alg",
+              "value"
+            ],
+            "properties": {
+              "alg": {
+                "type": "string",
+                "minLength": 1
+              },
+              "value": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": true
+          },
+          "verification": {
+            "type": "object",
+            "required": [
+              "result",
+              "checked_at",
+              "method"
+            ],
+            "properties": {
+              "result": {
+                "type": "string",
+                "enum": [
+                  "verified",
+                  "failed",
+                  "unknown",
+                  "stale",
+                  "unavailable"
+                ]
+              },
+              "checked_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "method": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status_result": {
+                "type": "string",
+                "minLength": 1
+              },
+              "failure_reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "policy": {
+      "type": "object",
+      "required": [
+        "policy_id",
+        "policy_version",
+        "policy_ref"
+      ],
+      "properties": {
+        "policy_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policy_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policy_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "decision": {
+      "type": "object",
+      "required": [
+        "outcome",
+        "reason_codes"
+      ],
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "attenuate",
+            "deny"
+          ]
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "human_readable_summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "attenuation": {
+      "type": "object",
+      "required": [
+        "mode",
+        "original_request_hash",
+        "effective_request_hash",
+        "changes",
+        "effective_constraints",
+        "require_new_permit"
+      ],
+      "additionalProperties": true
+    },
+    "proof": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": [
+            "detached_jws",
+            "jwt",
+            "vc_proof",
+            "external",
+            "none"
+          ]
+        },
+        "alg": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kid": {
+          "type": "string",
+          "minLength": 1
+        },
+        "signature_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "type": "object",
+            "properties": {
+              "outcome": {
+                "const": "attenuate"
+              }
+            },
+            "required": [
+              "outcome"
+            ]
+          }
+        },
+        "required": [
+          "decision"
+        ]
+      },
+      "then": {
+        "required": [
+          "attenuation"
+        ]
+      }
+    }
+  ],
+  "additionalProperties": true
+}

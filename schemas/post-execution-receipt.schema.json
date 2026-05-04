@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:post-execution-receipt:0.2",
+  "title": "VATE Post-Execution Receipt",
+  "description": "Draft v0.2 post-execution receipt linked to a VATE admission receipt.",
+  "type": "object",
+  "required": [
+    "version",
+    "profile",
+    "receipt_type",
+    "receipt_id",
+    "issued_at",
+    "issuer",
+    "admission",
+    "execution",
+    "result"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "vate-0.2"
+    },
+    "profile": {
+      "type": "string",
+      "const": "VATE-AL2-Verifier-Admission-v0.2"
+    },
+    "receipt_type": {
+      "type": "string",
+      "const": "post_execution"
+    },
+    "receipt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "issuer": {
+      "type": "object",
+      "required": [
+        "id",
+        "role"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "runtime",
+            "agent",
+            "verifier",
+            "broker"
+          ]
+        },
+        "key_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "admission": {
+      "type": "object",
+      "required": [
+        "receipt_id",
+        "uri",
+        "digest",
+        "decision"
+      ],
+      "properties": {
+        "receipt_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "type": "object",
+          "required": [
+            "alg",
+            "value"
+          ],
+          "properties": {
+            "alg": {
+              "type": "string",
+              "minLength": 1
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": true
+        },
+        "decision": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "attenuate"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "execution": {
+      "type": "object",
+      "required": [
+        "transaction_id",
+        "started_at",
+        "finished_at",
+        "effective_request_hash",
+        "runtime"
+      ],
+      "properties": {
+        "transaction_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "a2a_context_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "a2a_task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "finished_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "effective_request_hash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runtime": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "result": {
+      "type": "object",
+      "required": [
+        "outcome",
+        "output_hash",
+        "side_effects",
+        "policy_violations"
+      ],
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "success",
+            "partial_success",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "output_hash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "side_effects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "policy_violations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "error": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "proof": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": [
+            "detached_jws",
+            "jwt",
+            "vc_proof",
+            "external",
+            "none"
+          ]
+        },
+        "alg": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kid": {
+          "type": "string",
+          "minLength": 1
+        },
+        "signature_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}
+

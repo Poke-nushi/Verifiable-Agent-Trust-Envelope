@@ -18,6 +18,7 @@ It is weaker on:
 - multi-implementation interoperability
 - stronger runtime attestation profiles
 - higher-assurance operational guidance
+- v0.2 profile interop across A2A, MCP, and HTTP bindings
 
 ## Current Gaps
 
@@ -59,6 +60,9 @@ The draft now distinguishes admission receipts from post-execution receipts, but
 - canonical correlation rules for `admission_receipt_ref`, `attestation_id`, and profile-specific correlation objects
 - when an admission receipt should be inline, dereferenceable, or both
 
+The v0.2 AL2 verifier admission profile adds separate admission and post-execution receipt schemas.
+Remaining work is to validate those shapes across independent implementations and decide which proof packaging profiles are mandatory for each assurance level.
+
 ### 5. Status Policy Is Still Profile-Dependent
 
 The repo models revocation, suspension, quarantine, and attenuation, but still needs sharper guidance for:
@@ -97,6 +101,22 @@ The future `ABS` direction exists, but the repo does not yet define:
 
 The current corpus is useful, but still narrow.
 It is not yet a cross-language, multi-implementation conformance suite.
+
+v0.2 should add focused cases for:
+
+- A2A metadata reference-only binding
+- expired permit denial
+- audience mismatch denial
+- revoked status denial
+- digest mismatch denial
+- replayed admission receipt denial
+- post-execution receipt linkage mismatch
+- max-amount attenuation
+
+### 10. Persistent Namespace Is Not Yet Chosen
+
+The v0.2 examples use repository-hosted draft URIs.
+A future draft may move schema and extension identifiers to a persistent namespace such as `w3id.org`, but only after the namespace is controlled and documented.
 
 ## Practical Reading Of These Gaps
 
