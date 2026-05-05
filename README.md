@@ -1,6 +1,6 @@
 # Verifiable Agent Trust Envelope
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19839769.svg)](https://doi.org/10.5281/zenodo.19839769)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19839768.svg)](https://doi.org/10.5281/zenodo.19839768)
 
 **A discussion draft for verifier-side trust / permit / receipt decisions in AI agent systems**
 
@@ -218,9 +218,11 @@ The maintainer is responsible for the final structure, scope decisions, and publ
 
 ## How to Cite
 
-If you reference this draft in writing, please cite the Zenodo archive of the `v0.1` discussion draft:
+If you reference the current `v0.2.0` review snapshot in writing, please cite the version-specific Zenodo archive:
 
-- DOI: [10.5281/zenodo.19839769](https://doi.org/10.5281/zenodo.19839769)
+- Version DOI: [10.5281/zenodo.20043166](https://doi.org/10.5281/zenodo.20043166)
+- All-version concept DOI: [10.5281/zenodo.19839768](https://doi.org/10.5281/zenodo.19839768)
+- Earlier `v0.1.0` DOI: [10.5281/zenodo.19839769](https://doi.org/10.5281/zenodo.19839769)
 - Machine-readable metadata: [CITATION.cff](CITATION.cff)
 
 ## License
