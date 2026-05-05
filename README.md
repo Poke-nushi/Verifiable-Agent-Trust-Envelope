@@ -1,6 +1,6 @@
 # Verifiable Agent Trust Envelope
 
-[![DOI](https://zenodo.org/badge/1214949350.svg)](https://zenodo.org/badge/latestdoi/1214949350)
+[![DOI](https://zenodo.org/badge/1214949350.svg)](https://doi.org/10.5281/zenodo.19839768)
 
 **A discussion draft for verifier-side trust / permit / receipt decisions in AI agent systems**
 
