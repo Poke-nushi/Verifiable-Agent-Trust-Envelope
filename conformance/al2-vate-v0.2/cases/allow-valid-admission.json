@@ -1,0 +1,39 @@
+{
+  "version": "vate-conformance-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "case_id": "allow-valid-admission",
+  "title": "Allow a valid AL2 admission receipt",
+  "category": "positive",
+  "purpose": "A verifier should accept an admission receipt when identity, runtime, audience, evidence, and local policy checks pass without attenuation.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-allow.example.json"
+  },
+  "expected": {
+    "admission_decision": "allow",
+    "should_execute": true,
+    "reason_codes": [
+      "EVIDENCE_VERIFIED",
+      "POLICY_MATCH"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "pass"
+      },
+      {
+        "name": "evidence.verification.result",
+        "expected": "pass"
+      },
+      {
+        "name": "policy.policy_version",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "admission receipt shape",
+    "allow decision",
+    "evidence verification results",
+    "policy versioning"
+  ]
+}

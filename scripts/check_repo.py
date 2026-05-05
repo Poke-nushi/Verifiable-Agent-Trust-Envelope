@@ -37,6 +37,7 @@ EXAMPLE_PAIRS = [
     ("examples/receipts/admission-allow.example.json", "schemas/admission-receipt.schema.json"),
     ("examples/receipts/admission-attenuate-max-amount.example.json", "schemas/admission-receipt.schema.json"),
     ("examples/receipts/admission-deny-expired-permit.example.json", "schemas/admission-receipt.schema.json"),
+    ("examples/receipts/admission-deny-audience-mismatch.example.json", "schemas/admission-receipt.schema.json"),
     ("examples/receipts/post-execution-success.example.json", "schemas/post-execution-receipt.schema.json"),
     ("examples/attenuation-tool-allowlist.example.json", "schemas/attenuation-effect.schema.json"),
     ("examples/attenuation-max-amount.example.json", "schemas/attenuation-effect.schema.json"),
@@ -60,6 +61,26 @@ EXAMPLE_PAIRS = [
     (
         "conformance/al2-http/negative/deny-unknown-effect/expected-report.json",
         "conformance/al2-http/verification-report.schema.json",
+    ),
+    (
+        "conformance/al2-vate-v0.2/cases/allow-valid-admission.json",
+        "conformance/al2-vate-v0.2/conformance-case.schema.json",
+    ),
+    (
+        "conformance/al2-vate-v0.2/cases/attenuate-max-amount.json",
+        "conformance/al2-vate-v0.2/conformance-case.schema.json",
+    ),
+    (
+        "conformance/al2-vate-v0.2/cases/deny-expired-permit.json",
+        "conformance/al2-vate-v0.2/conformance-case.schema.json",
+    ),
+    (
+        "conformance/al2-vate-v0.2/cases/deny-audience-mismatch.json",
+        "conformance/al2-vate-v0.2/conformance-case.schema.json",
+    ),
+    (
+        "conformance/al2-vate-v0.2/cases/post-execution-linkage-success.json",
+        "conformance/al2-vate-v0.2/conformance-case.schema.json",
     ),
 ]
 

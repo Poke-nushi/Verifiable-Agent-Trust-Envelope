@@ -5,7 +5,7 @@
 **A discussion draft for verifier-side trust / permit / receipt decisions in AI agent systems**
 
 `v0.1 discussion draft`  
-`v0.2 AL2 verifier admission profile draft in progress`
+`v0.2 AL2 verifier admission profile draft`
 `not production-ready`  
 `seeking critique on boundary, verifier order, and artifact semantics`
 
@@ -42,6 +42,7 @@ with a machine-readable admission receipt.
 The `v0.2` work keeps that verifier-side boundary but narrows the next deliverable to the [VATE AL2 Verifier Admission Profile v0.2](docs/profiles/vate-al2-verifier-admission-profile-v0.2.md).
 That profile treats A2A, MCP, OAuth, VC, DID, OID4VP, Web Bot Auth, AP2, x402, ACP, and payment-token systems as adjacent layers that can provide evidence.
 VATE defines how a relying party evaluates those inputs before execution and records the decision.
+For A2A reviewers, the shortest maintainer-focused brief is [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md).
 
 ![Where Verifiable Agent Trust Envelope Fits](docs/figures/where-trust-envelope-fits-readme.png)
 
@@ -105,11 +106,14 @@ Direct comparison note:
 If you are new to the repo, the fastest path is:
 
 1. this `README.md`
-2. [docs/close-adjacent-work-2026-04.md](docs/close-adjacent-work-2026-04.md)
-3. [docs/use-cases.md](docs/use-cases.md)
-4. section `0` and section `1` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md)
-5. [docs/profiles/vate-al2-verifier-admission-profile-v0.2.md](docs/profiles/vate-al2-verifier-admission-profile-v0.2.md)
-6. [reference/http-verifier-demo/README.md](reference/http-verifier-demo/README.md)
+2. [docs/v0.2-in-5-minutes.md](docs/v0.2-in-5-minutes.md)
+3. [docs/profiles/vate-al2-verifier-admission-profile-v0.2.md](docs/profiles/vate-al2-verifier-admission-profile-v0.2.md)
+4. [docs/a2a-metadata-binding-v0.2.md](docs/a2a-metadata-binding-v0.2.md)
+5. [docs/receipt-model-v0.2.md](docs/receipt-model-v0.2.md)
+6. [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md)
+7. [conformance/al2-vate-v0.2/README.md](conformance/al2-vate-v0.2/README.md)
+8. section `0` and section `1` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md)
+9. [reference/http-verifier-demo/README.md](reference/http-verifier-demo/README.md)
 
 If you want the visual system view, see section `11` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md).
 
@@ -132,7 +136,7 @@ The most useful feedback for this draft is currently:
 - **Primary language**: English
 - **Research refresh date**: 2026-05-04
 - **Primary battlefield**: `AL2` external digital write
-- **Implemented now**: payload schemas, examples, verifier guidance, reference demos, verifier policy example, machine-readable conformance corpus, v0.2 AL2 verifier admission profile draft
+- **Implemented now**: payload schemas, examples, verifier guidance, reference demos, verifier policy example, AL2 HTTP conformance corpus, v0.2 mini conformance corpus, v0.2 AL2 verifier admission profile draft
 - **Planned later**: pairwise presentation profile, richer capability registry, formal `AID`, physical `ABS` profiles
 
 ## Repository Map
@@ -149,10 +153,16 @@ The most useful feedback for this draft is currently:
   Baseline profile for the current reference battlefield
 - [docs/profiles/vate-al2-verifier-admission-profile-v0.2.md](docs/profiles/vate-al2-verifier-admission-profile-v0.2.md)
   Narrow v0.2 profile for verifier-side AL2 admission decisions
+- [docs/v0.2-in-5-minutes.md](docs/v0.2-in-5-minutes.md)
+  Short entry point for the v0.2 draft
+- [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md)
+  A2A maintainer-oriented summary of the metadata-only admission and receipt binding
 - [docs/a2a-metadata-binding-v0.2.md](docs/a2a-metadata-binding-v0.2.md)
   Reference-only A2A metadata binding for VATE admission and receipt artifacts
 - [docs/receipt-model-v0.2.md](docs/receipt-model-v0.2.md)
   v0.2 split between admission receipts and post-execution receipts
+- [conformance/al2-vate-v0.2/README.md](conformance/al2-vate-v0.2/README.md)
+  Mini conformance corpus for v0.2 admission and receipt semantics
 - [docs/known-gaps.md](docs/known-gaps.md)
   Current unresolved design gaps
 - [reference/minimal-al2-demo/README.md](reference/minimal-al2-demo/README.md)
@@ -188,6 +198,9 @@ python3 scripts/check_repo_strict.py
 - [SECURITY.md](SECURITY.md)
 - [docs/standards-and-ecosystem-landscape-2026-04.md](docs/standards-and-ecosystem-landscape-2026-04.md)
 - [docs/standards-and-ecosystem-landscape-2026-05.md](docs/standards-and-ecosystem-landscape-2026-05.md)
+- [docs/v0.2-in-5-minutes.md](docs/v0.2-in-5-minutes.md)
+- [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md)
+- [docs/release-notes/v0.2.0.md](docs/release-notes/v0.2.0.md)
 - [docs/non-goals.md](docs/non-goals.md)
 - [docs/delegated-identity-composition-example.md](docs/delegated-identity-composition-example.md)
 - [docs/transport-bindings.md](docs/transport-bindings.md)

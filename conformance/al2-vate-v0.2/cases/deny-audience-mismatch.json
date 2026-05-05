@@ -1,0 +1,45 @@
+{
+  "version": "vate-conformance-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "case_id": "deny-audience-mismatch",
+  "title": "Deny an audience mismatch before execution",
+  "category": "negative",
+  "purpose": "A verifier should reject a request when the admission request audience does not match the relying party or target resource.",
+  "artifacts": {
+    "base_artifact": "examples/admission-request.example.json",
+    "admission_receipt": "examples/receipts/admission-deny-audience-mismatch.example.json",
+    "mutation": {
+      "op": "replace",
+      "path": "/audience",
+      "from": "https://agent.example/a2a",
+      "to": "https://unexpected.example/a2a"
+    }
+  },
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "AUDIENCE_MISMATCH",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "request.audience",
+        "expected": "fail"
+      },
+      {
+        "name": "target.audience",
+        "expected": "fail"
+      },
+      {
+        "name": "admission_receipt.decision",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "audience binding",
+    "target resource binding",
+    "semantic rejection despite valid JSON shape"
+  ]
+}

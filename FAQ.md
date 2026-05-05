@@ -12,11 +12,13 @@ The focal moment is narrow:
 - the relying party needs to decide `allow / attenuate / deny`
 - the decision should be based on portable artifacts, not only on vendor-local context
 
-In `v0.1`, the repo makes that concrete through a verifier-centered `AL2` HTTP wedge that evaluates:
+The preserved `v0.1` core makes that concrete through a verifier-centered `AL2` HTTP wedge that evaluates:
 
 `status -> identity -> runtime -> permit -> policy`
 
 and then emits a machine-readable receipt.
+
+The `v0.2` profile keeps that boundary, but makes the admission moment more explicit by separating admission requests, admission receipts, A2A metadata references, attenuation records, and post-execution receipts.
 
 ## Why Isn't A Valid Token Enough?
 
@@ -94,14 +96,15 @@ The intended fit is narrower: this draft provides the portable trust envelope th
 That is a fair concern, and the current answer should be:
 
 - the core claim is narrow
-- the `v0.1` battlefield is `AL2` external digital write
+- the durable battlefield is still `AL2` external digital write
+- `v0.2` moves the most concrete new work into an AL2 verifier admission profile
 - broader deployment shapes should move into profiles, extensions, or later drafts where possible
 
 If reviewers think a concept does not help that verifier-side boundary, it is a good candidate to remove from the core.
 
 ## What Is In The Core Today?
 
-The current v0.1 discussion draft centers on:
+The preserved v0.1 core discussion draft centers on:
 
 - `APC` - passport credential
 - `ARP` - runtime proof
@@ -109,7 +112,8 @@ The current v0.1 discussion draft centers on:
 - `AER` - execution receipt
 - `ASN` - status, revocation, and attenuation signaling
 
-The repository also includes payload schemas, examples, verifier guidance, negative tests, and an educational reference demo.
+The repository also includes payload schemas, examples, verifier guidance, negative tests, and educational reference demos.
+The current v0.2 additions provide a concrete AL2 verifier admission profile, reference-only A2A metadata binding, separate admission and post-execution receipt schemas, and a small machine-readable conformance corpus.
 
 ## What Is Still Future Work?
 
@@ -119,7 +123,7 @@ The current repo does not yet freeze:
 - richer capability claim registries
 - formal `AID` identifier abstraction
 - physical `ABS` profiles
-- full conformance corpora across multiple implementations
+- full runnable conformance corpora across multiple implementations
 
 ## What Does `attenuated` Mean?
 

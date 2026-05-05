@@ -1,0 +1,44 @@
+{
+  "version": "vate-conformance-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "case_id": "attenuate-max-amount",
+  "title": "Attenuate a payment-adjacent request by max amount",
+  "category": "positive",
+  "purpose": "A verifier should admit a narrower effective request when local policy or payment authority does not support the original requested amount.",
+  "artifacts": {
+    "a2a_metadata": "examples/a2a/metadata-admission-issued.json",
+    "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json"
+  },
+  "expected": {
+    "admission_decision": "attenuate",
+    "should_execute": true,
+    "reason_codes": [
+      "PAYMENT_TOKEN_LIMIT",
+      "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+    ],
+    "checks": [
+      {
+        "name": "attenuation.original_request_hash",
+        "expected": "present"
+      },
+      {
+        "name": "attenuation.effective_request_hash",
+        "expected": "present"
+      },
+      {
+        "name": "attenuation.changes[0].path",
+        "expected": "present"
+      },
+      {
+        "name": "a2a_metadata.admission_receipt.digest",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "attenuate decision",
+    "machine-readable attenuation",
+    "digest-bound A2A receipt reference",
+    "generic payment evidence type with optional protocol hint"
+  ]
+}

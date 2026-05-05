@@ -135,16 +135,20 @@ That corpus could later back:
 - CI conformance runs
 - interoperability bake-offs between independent implementations
 
-## v0.2 AL2 Admission Corpus Direction
+## v0.2 AL2 Admission Corpus
 
-The v0.2 AL2 verifier admission profile should add a corpus that focuses on admission and receipt semantics across transports.
+The v0.2 AL2 verifier admission profile now includes a small corpus that focuses on admission and receipt semantics across transports.
 
-Minimum cases:
+Current cases:
 
 - `allow`: active status, matching audience, valid runtime, in-scope permit
 - `attenuate`: requested amount or tool scope narrowed by policy or status
 - `deny-expired-permit`: permit validity window fails before admission
 - `deny-audience-mismatch`: permit or token audience does not match verifier
+- `post-exec-linkage-success`: post-execution receipt links to the admitted effective request hash
+
+Remaining useful cases:
+
 - `deny-revoked-status`: current status revokes credential, runtime proof, or permit
 - `deny-digest-mismatch`: A2A metadata digest does not match the dereferenced artifact
 - `deny-replayed-admission`: admission receipt is expired, nonce-mismatched, or already consumed where one-time use is required
@@ -156,3 +160,10 @@ These cases should validate:
 - `schemas/admission-request.schema.json`
 - `schemas/admission-receipt.schema.json`
 - `schemas/post-execution-receipt.schema.json`
+
+The repository now includes a small v0.2 profile corpus under:
+
+- `conformance/al2-vate-v0.2/`
+
+That corpus is not a certification suite.
+It is the first reviewable shape for expected v0.2 admission decisions and post-execution outcomes.

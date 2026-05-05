@@ -99,19 +99,21 @@ The future `ABS` direction exists, but the repo does not yet define:
 
 ### 9. Shared Conformance Across Implementations Is Not Ready
 
-The current corpus is useful, but still narrow.
-It is not yet a cross-language, multi-implementation conformance suite.
+The repo now includes two small machine-readable corpora:
 
-v0.2 should add focused cases for:
+- an `AL2` HTTP corpus for the reference verifier demo
+- a `v0.2` mini corpus for admission decisions, attenuation, A2A metadata references, and post-execution linkage
 
-- A2A metadata reference-only binding
-- expired permit denial
-- audience mismatch denial
+Those corpora make the draft easier to inspect, but they are not yet a cross-language, multi-implementation conformance suite.
+
+Remaining work includes:
+
+- runnable verifier fixtures for the `v0.2` mini corpus
 - revoked status denial
 - digest mismatch denial
 - replayed admission receipt denial
 - post-execution receipt linkage mismatch
-- max-amount attenuation
+- cross-implementation report format and certification language
 
 ### 10. Persistent Namespace Is Not Yet Chosen
 

@@ -1,0 +1,63 @@
+{
+  "version": "vate-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-20260504-deny-audience-001",
+  "issued_at": "2026-05-04T03:00:08Z",
+  "expires_at": "2026-05-04T03:10:08Z",
+  "verifier": {
+    "id": "did:web:verifier.example",
+    "key_id": "did:web:verifier.example#key-1"
+  },
+  "request": {
+    "request_id": "areq-20260504-deny-audience-001",
+    "transaction_id": "txn-20260504-deny-audience-001",
+    "a2a_context_id": "ctx-deny-audience-001",
+    "a2a_task_id": "task-deny-audience-001",
+    "action": "commerce.purchase",
+    "audience": "https://unexpected.example/a2a",
+    "target_audience": "https://agent.example/a2a",
+    "input_hash": "sha-256:base64url-deny-audience-input-digest"
+  },
+  "subject": {
+    "principal": "did:web:user.example",
+    "actor": "did:web:agent.example",
+    "runtime": "spiffe://agent.example/workload/purchase-agent"
+  },
+  "evidence": [
+    {
+      "type": "admission_request",
+      "uri": "https://verifier.example/vate/admission-requests/areq-20260504-deny-audience-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-admission-request-digest"
+      },
+      "verification": {
+        "result": "failed",
+        "checked_at": "2026-05-04T03:00:02Z",
+        "method": "audience-binding-check",
+        "status_result": "mismatch",
+        "failure_reason": "The admission request audience does not match the relying party or target resource."
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "merchant-purchase-al2",
+    "policy_version": "2026-05-04.1",
+    "policy_ref": "https://verifier.example/policies/merchant-purchase-al2/2026-05-04.1"
+  },
+  "decision": {
+    "outcome": "deny",
+    "reason_codes": [
+      "AUDIENCE_MISMATCH",
+      "FAIL_CLOSED"
+    ],
+    "human_readable_summary": "The request is denied because the request audience does not match the relying party or target resource."
+  },
+  "proof": {
+    "format": "detached_jws",
+    "alg": "ES256",
+    "kid": "did:web:verifier.example#key-1",
+    "signature_ref": "https://verifier.example/vate/signatures/admrec-20260504-deny-audience-001.jws"
+  }
+}

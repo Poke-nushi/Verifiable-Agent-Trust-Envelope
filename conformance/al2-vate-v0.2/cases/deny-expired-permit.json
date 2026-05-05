@@ -1,0 +1,39 @@
+{
+  "version": "vate-conformance-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "case_id": "deny-expired-permit",
+  "title": "Deny an expired task-scoped permit",
+  "category": "negative",
+  "purpose": "A verifier should fail closed before execution when task-scoped authority is expired at admission time.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-deny-expired-permit.example.json"
+  },
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "PERMIT_EXPIRED",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      },
+      {
+        "name": "post_execution_receipt",
+        "expected": "absent"
+      }
+    ]
+  },
+  "validation_focus": [
+    "deny decision",
+    "expired authority",
+    "fail-closed behavior",
+    "no execution after denial"
+  ]
+}

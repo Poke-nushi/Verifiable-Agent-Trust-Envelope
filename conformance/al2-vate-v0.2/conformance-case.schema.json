@@ -1,0 +1,198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:conformance:al2-vate-v0.2:case",
+  "title": "VATE AL2 v0.2 Conformance Case",
+  "description": "Minimal machine-readable conformance case shape for the VATE AL2 verifier admission profile v0.2.",
+  "type": "object",
+  "required": [
+    "version",
+    "profile",
+    "case_id",
+    "title",
+    "category",
+    "purpose",
+    "artifacts",
+    "expected"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "vate-conformance-0.2"
+    },
+    "profile": {
+      "type": "string",
+      "const": "VATE-AL2-Verifier-Admission-v0.2"
+    },
+    "case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "positive",
+        "negative",
+        "linkage"
+      ]
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artifacts": {
+      "type": "object",
+      "properties": {
+        "a2a_metadata": {
+          "type": "string",
+          "minLength": 1
+        },
+        "admission_request": {
+          "type": "string",
+          "minLength": 1
+        },
+        "admission_receipt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "post_execution_receipt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_artifact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mutation": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "expected": {
+      "type": "object",
+      "required": [
+        "should_execute",
+        "reason_codes",
+        "checks"
+      ],
+      "properties": {
+        "admission_decision": {
+          "type": "string",
+          "description": "Verifier-side admission decision before execution. This is always allow, attenuate, or deny.",
+          "enum": [
+            "allow",
+            "attenuate",
+            "deny"
+          ]
+        },
+        "post_execution_outcome": {
+          "type": "string",
+          "description": "Post-execution receipt result outcome. This is separate from the admission decision vocabulary.",
+          "enum": [
+            "success",
+            "partial_success",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "should_execute": {
+          "type": "boolean"
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "expected"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expected": {
+                "type": "string",
+                "enum": [
+                  "pass",
+                  "fail",
+                  "present",
+                  "absent"
+                ]
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "validation_focus": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "category": {
+            "enum": [
+              "positive",
+              "negative"
+            ]
+          }
+        },
+        "required": [
+          "category"
+        ]
+      },
+      "then": {
+        "properties": {
+          "expected": {
+            "required": [
+              "admission_decision"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "category": {
+            "const": "linkage"
+          }
+        },
+        "required": [
+          "category"
+        ]
+      },
+      "then": {
+        "properties": {
+          "expected": {
+            "required": [
+              "post_execution_outcome"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": true
+}

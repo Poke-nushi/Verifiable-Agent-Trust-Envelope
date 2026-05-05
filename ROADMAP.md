@@ -13,10 +13,12 @@ Focus:
 - make `allow / attenuate / deny` decisions and machine-readable attenuation explicit
 - treat A2A, MCP, OAuth, VC, DID, OID4VP, Web Bot Auth, AP2, x402, ACP, and payment tokens as adjacent evidence or transport layers
 - add examples and schema validation for v0.2 admission requests, A2A references, and receipts
+- add a maintainer brief and mini conformance corpus for early A2A-adjacent review
+- publish `v0.2.0` as a discussion-draft pre-release
 
 ## Next
 
-- broaden the v0.2 conformance corpus beyond examples
+- broaden the v0.2 mini conformance corpus into runnable verifier fixtures
 - add negative cases for expired permits, audience mismatches, revoked status, digest mismatches, replayed admission receipts, and post-execution linkage mismatches
 - refine pairwise presentation guidance
 - add clearer MCP / OAuth / OpenID binding notes and transport-bound examples

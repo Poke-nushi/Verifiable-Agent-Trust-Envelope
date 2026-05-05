@@ -1,0 +1,47 @@
+{
+  "version": "vate-conformance-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "case_id": "post-execution-linkage-success",
+  "title": "Link post-execution receipt to the admitted effective request",
+  "category": "linkage",
+  "purpose": "A verifier or auditor should be able to link post-execution evidence back to the admission receipt and effective request hash.",
+  "artifacts": {
+    "a2a_metadata": "examples/a2a/metadata-post-execution-issued.json",
+    "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+    "post_execution_receipt": "examples/receipts/post-execution-success.example.json"
+  },
+  "expected": {
+    "admission_decision": "attenuate",
+    "post_execution_outcome": "success",
+    "should_execute": true,
+    "reason_codes": [
+      "ADMISSION_RECEIPT_LINKED",
+      "EFFECTIVE_REQUEST_HASH_MATCH",
+      "NO_POLICY_VIOLATIONS"
+    ],
+    "checks": [
+      {
+        "name": "post_execution.admission.digest",
+        "expected": "present"
+      },
+      {
+        "name": "post_execution.execution.effective_request_hash",
+        "expected": "present"
+      },
+      {
+        "name": "post_execution.result.policy_violations",
+        "expected": "pass"
+      },
+      {
+        "name": "a2a_metadata.post_execution_receipt.digest",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "post-execution receipt linkage",
+    "effective request hash continuity",
+    "side-effect audit record",
+    "digest-bound A2A post-execution reference"
+  ]
+}

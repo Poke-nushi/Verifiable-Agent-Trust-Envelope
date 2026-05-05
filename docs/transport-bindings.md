@@ -100,6 +100,7 @@ Example metadata shape:
     "transaction_id": "txn:6e7d",
     "assurance_level": "AL2",
     "admission_receipt": {
+      "type": "admission_receipt",
       "uri": "https://verifier.example/vate/admission-receipts/admrec-54f2",
       "media_type": "application/vate-admission-receipt+json",
       "digest": {
