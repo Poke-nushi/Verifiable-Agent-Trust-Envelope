@@ -88,6 +88,7 @@ For AL2, an admission receipt should include:
 - decision outcome
 - reason codes
 - policy id and policy version
+- optional policy snapshot reference and digest when audit traceability requires reconstructing the exact policy basis
 - evidence verification results
 - expiration
 - attenuation details when the verifier narrowed the request
@@ -131,6 +132,8 @@ Recommended stages:
 10. Require or issue a post-execution receipt when execution proceeds.
 
 All required stages should be reflected in the receipt evidence and reason codes.
+Policy semantics are intentionally verifier-profile concerns, not A2A transport semantics.
+When policy rules change faster than the transport protocol, an admission receipt may include an optional digest-bound policy snapshot reference so auditors can reconstruct why the verifier made the decision without embedding policy rules in A2A.
 
 ## Decision Model
 

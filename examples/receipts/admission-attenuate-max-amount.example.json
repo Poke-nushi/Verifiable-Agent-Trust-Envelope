@@ -56,7 +56,15 @@
   "policy": {
     "policy_id": "merchant-purchase-al2",
     "policy_version": "2026-05-04.1",
-    "policy_ref": "https://verifier.example/policies/merchant-purchase-al2/2026-05-04.1"
+    "policy_ref": "https://verifier.example/policies/merchant-purchase-al2/2026-05-04.1",
+    "policy_snapshot": {
+      "uri": "https://verifier.example/policies/merchant-purchase-al2/snapshots/2026-05-04.1",
+      "media_type": "application/vate-policy-snapshot+json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-policy-snapshot-digest"
+      }
+    }
   },
   "decision": {
     "outcome": "attenuate",

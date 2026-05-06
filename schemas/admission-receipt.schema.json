@@ -221,6 +221,44 @@
         "policy_ref": {
           "type": "string",
           "minLength": 1
+        },
+        "policy_snapshot": {
+          "type": "object",
+          "description": "Optional digest-bound reference to the concrete policy snapshot used to produce this admission decision.",
+          "required": [
+            "uri",
+            "media_type",
+            "digest"
+          ],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "minLength": 1
+            },
+            "media_type": {
+              "type": "string",
+              "minLength": 1
+            },
+            "digest": {
+              "type": "object",
+              "required": [
+                "alg",
+                "value"
+              ],
+              "properties": {
+                "alg": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": true
         }
       },
       "additionalProperties": true

@@ -2,6 +2,10 @@
 
 This file records dated public changes to the discussion draft.
 
+## 2026-05-07
+
+- Added optional policy snapshot references and digests to the v0.2 admission receipt and A2A metadata binding, keeping policy semantics outside A2A core while improving audit traceability.
+
 ## 2026-05-04
 
 - Added the draft `VATE AL2 Verifier Admission Profile v0.2`.

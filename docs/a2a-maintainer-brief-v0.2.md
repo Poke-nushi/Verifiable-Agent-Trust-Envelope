@@ -45,11 +45,12 @@ A2A metadata may carry:
 - artifact URI
 - media type
 - digest
+- optional policy snapshot reference and digest for audit-heavy deployments
 - issuer
 - issued time
 - expiration time
 
-The full admission request, admission receipt, attenuation details, status evidence, and post-execution receipt stay outside A2A core payloads.
+The full admission request, admission receipt, policy semantics, attenuation details, status evidence, and post-execution receipt stay outside A2A core payloads.
 
 Example:
 
@@ -68,6 +69,15 @@ Example:
       "digest": {
         "alg": "sha-256",
         "value": "base64url-admission-receipt-digest"
+      }
+    },
+    "policy_snapshot": {
+      "type": "policy_snapshot",
+      "uri": "https://verifier.example/policies/merchant-purchase-al2/snapshots/2026-05-04.1",
+      "media_type": "application/vate-policy-snapshot+json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-policy-snapshot-digest"
       }
     },
     "issuer": "did:web:verifier.example",
@@ -93,6 +103,7 @@ This proposal does not require A2A to own:
 
 Those remain adjacent concerns.
 VATE defines how a verifier records its decision around them.
+If an implementation needs to reconstruct why a decision was made, it can reference a digest-bound policy snapshot without asking A2A to understand the policy language.
 
 ## Why This Is Practically Useful
 

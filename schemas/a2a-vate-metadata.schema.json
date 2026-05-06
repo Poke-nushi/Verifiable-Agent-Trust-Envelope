@@ -50,6 +50,10 @@
     "post_execution_receipt": {
       "$ref": "#/$defs/artifact_reference"
     },
+    "policy_snapshot": {
+      "description": "Optional digest-bound reference to the verifier policy snapshot used for the admission decision. This is for audit-heavy deployments and does not make policy semantics part of A2A core.",
+      "$ref": "#/$defs/artifact_reference"
+    },
     "evidence_refs": {
       "type": "array",
       "items": {

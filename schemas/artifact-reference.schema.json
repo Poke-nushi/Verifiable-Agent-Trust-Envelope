@@ -23,6 +23,7 @@
         "status",
         "agent_card",
         "payment_authority",
+        "policy_snapshot",
         "evidence"
       ]
     },
@@ -85,4 +86,3 @@
   },
   "additionalProperties": true
 }
-

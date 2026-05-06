@@ -32,6 +32,10 @@
       {
         "name": "a2a_metadata.admission_receipt.digest",
         "expected": "present"
+      },
+      {
+        "name": "a2a_metadata.policy_snapshot.digest",
+        "expected": "present"
       }
     ]
   },
@@ -39,6 +43,7 @@
     "attenuate decision",
     "machine-readable attenuation",
     "digest-bound A2A receipt reference",
+    "optional policy snapshot reference",
     "generic payment evidence type with optional protocol hint"
   ]
 }
