@@ -1,0 +1,98 @@
+# SUT Adapter Contract
+
+## Status
+
+This note defines the result contract for comparing an external system under test (SUT) against the `VATE AL2 Verifier Admission v0.2` corpus.
+
+It does not require an implementation to use Python.
+The Python runner is only a comparison tool for the published corpus expectations.
+
+## Goal
+
+An external verifier should be able to:
+
+1. Load `conformance/al2-vate-v0.2/corpus.json`.
+2. Execute each listed case in its own runtime.
+3. Emit a SUT result file matching `schemas/sut-result.schema.json`.
+4. Compare that file against the corpus with the reference runner.
+5. Publish the comparison report and, optionally, an implementation report.
+
+This keeps the conformance surface language-neutral while preserving exact expected outcomes and reason codes.
+
+## SUT Result Shape
+
+A SUT result file records one implementation run against one corpus snapshot.
+
+Required top-level fields:
+
+- `version` - currently `vate-sut-results-2026-07`
+- `profile` - currently `VATE-AL2-Verifier-Admission-v0.2`
+- `generated_at`
+- `implementation`
+- `corpus.digest`
+- `results`
+
+Each result entry represents one corpus case:
+
+- `case_id`
+- `status` - `completed`, `skipped`, or `error`
+- `outcome` - the verifier's observed outcome
+- `reason_codes` - the verifier's machine-readable reason codes in order
+- optional `checks` - case-specific check names with `pass: true` when the expected check was satisfied
+- optional `limitations`
+
+The example file is:
+
+- `examples/conformance/sut-results-pass.example.json`
+
+## Compare Command
+
+```bash
+python3 scripts/vate_conformance.py compare \
+  --corpus-root conformance/al2-vate-v0.2 \
+  --sut-results examples/conformance/sut-results-pass.example.json \
+  --report /tmp/vate-sut-compare-report.json
+```
+
+The command writes a normal VATE conformance report shape:
+
+- `schemas/conformance-report.schema.json`
+
+It exits non-zero when:
+
+- the SUT result file has the wrong version or profile
+- the SUT result corpus digest does not match the current corpus
+- a case is missing
+- a case id is duplicated or unknown
+- a case is skipped or errored
+- outcome, reason codes, or required checks do not match the corpus expectation
+
+## Check Semantics
+
+`results[].checks[].pass` means the implementation satisfied the expected check named by the corpus case.
+
+For example, if a negative case says:
+
+```json
+{ "name": "decision.outcome", "expected": "fail" }
+```
+
+then a SUT result should report:
+
+```json
+{ "name": "decision.outcome", "pass": true }
+```
+
+The SUT does not need to reproduce the reference runner's internal boolean model.
+It only needs to state whether the named expected check was satisfied.
+
+## Claim Boundary
+
+Passing `compare` means the SUT result file matched one corpus snapshot.
+
+It does not imply:
+
+- production readiness
+- independent security review
+- endorsement
+- compatibility with future corpus snapshots

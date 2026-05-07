@@ -112,10 +112,10 @@ Those corpora make the draft easier to inspect and replay, but they are not yet 
 Remaining work includes:
 
 - independent implementation reports
-- transport-bound SUT adapters
+- transport-bound SUT adapters beyond the generic result comparison contract
 - production signature verification fixtures
 - cross-implementation report comparison
-- certification language, if a future governance path justifies it
+- formal conformance claim wording, if a future governance path justifies it
 
 ### 10. Persistent Namespace Is Not Yet Chosen
 

@@ -1,0 +1,753 @@
+{
+  "corpus": {
+    "digest": {
+      "alg": "sha-256",
+      "value": "f2788913771138cda568cb04ef0f05f03ef833f3551aab85acb16258f2633abe"
+    },
+    "profile": "VATE-AL2-Verifier-Admission-v0.2"
+  },
+  "generated_at": "2026-07-01T00:30:00Z",
+  "implementation": {
+    "commit": "example-commit",
+    "language": "Example JSON fixture",
+    "name": "Example External VATE Verifier",
+    "source": "https://example.invalid/vate-verifier",
+    "type": "external-verifier",
+    "version": "0.1.0"
+  },
+  "limitations": [
+    "Example fixture generated from corpus expectations; not an independent implementation."
+  ],
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "results": [
+    {
+      "case_id": "allow-jose-detached-runtime-attestation",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "jose.detached_payload_digest",
+          "pass": true
+        },
+        {
+          "name": "jose.signing_input",
+          "pass": true
+        }
+      ],
+      "outcome": "allow",
+      "reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "allow-mcp-oauth-transport-bound",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "request.audience",
+          "pass": true
+        },
+        {
+          "name": "request.transport.protocol",
+          "pass": true
+        },
+        {
+          "name": "request.transport.oauth.audience",
+          "pass": true
+        },
+        {
+          "name": "request.transport.openid.subject",
+          "pass": true
+        },
+        {
+          "name": "evidence[0].protocol_hint",
+          "pass": true
+        },
+        {
+          "name": "evidence[1].protocol_hint",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.result",
+          "pass": true
+        }
+      ],
+      "outcome": "allow",
+      "reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "allow-valid-admission",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.result",
+          "pass": true
+        },
+        {
+          "name": "policy.policy_version",
+          "pass": true
+        }
+      ],
+      "outcome": "allow",
+      "reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "allow-valid-basic-external-write",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.result",
+          "pass": true
+        }
+      ],
+      "outcome": "allow",
+      "reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "allow-valid-with-policy-snapshot",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "policy.policy_snapshot.digest",
+          "pass": true
+        }
+      ],
+      "outcome": "allow",
+      "reason_codes": [
+        "POLICY_SNAPSHOT_MATCH",
+        "POLICY_MATCH"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "allow-valid-with-status-fresh",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.result",
+          "pass": true
+        }
+      ],
+      "outcome": "allow",
+      "reason_codes": [
+        "STATUS_FRESH",
+        "POLICY_MATCH"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "attenuate-max-amount",
+      "checks": [
+        {
+          "name": "attenuation.original_request_hash",
+          "pass": true
+        },
+        {
+          "name": "attenuation.effective_request_hash",
+          "pass": true
+        },
+        {
+          "name": "attenuation.changes[0].path",
+          "pass": true
+        },
+        {
+          "name": "a2a_metadata.admission_receipt.digest",
+          "pass": true
+        },
+        {
+          "name": "a2a_metadata.policy_snapshot.digest",
+          "pass": true
+        }
+      ],
+      "outcome": "attenuate",
+      "reason_codes": [
+        "PAYMENT_TOKEN_LIMIT",
+        "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "attenuate-requires-new-permit",
+      "checks": [
+        {
+          "name": "attenuation.require_new_permit",
+          "pass": true
+        },
+        {
+          "name": "attenuation.changes[0].reason_code",
+          "pass": true
+        }
+      ],
+      "outcome": "attenuate",
+      "reason_codes": [
+        "NEW_PERMIT_REQUIRED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "attenuate-target-scope",
+      "checks": [
+        {
+          "name": "attenuation.original_request_hash",
+          "pass": true
+        },
+        {
+          "name": "attenuation.effective_request_hash",
+          "pass": true
+        },
+        {
+          "name": "attenuation.effective_constraints",
+          "pass": true
+        }
+      ],
+      "outcome": "attenuate",
+      "reason_codes": [
+        "TARGET_SCOPE_NARROWED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-alg-not-allowed",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "ALG_NOT_ALLOWED",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-ambiguous-trust-anchor",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "SCHEMA_INVALID",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-audience-mismatch",
+      "checks": [
+        {
+          "name": "request.audience",
+          "pass": true
+        },
+        {
+          "name": "target.audience",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.decision",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "AUDIENCE_MISMATCH",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-digest-mismatch",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "DIGEST_MISMATCH",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-evidence-type-not-allowed",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "ISSUER_NOT_AUTHORIZED",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-expired-permit",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        },
+        {
+          "name": "post_execution_receipt",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "PERMIT_EXPIRED",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-jose-alg-none",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "ALG_NOT_ALLOWED",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-jose-crit-unsupported",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "SCHEMA_INVALID",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-jose-payload-digest-mismatch",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "DIGEST_MISMATCH",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-kid-mismatch",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "UNKNOWN_TRUST_ANCHOR",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-not-yet-valid-permit",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "PERMIT_NOT_YET_VALID",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-policy-snapshot-mismatch",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "policy.policy_snapshot.digest",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "POLICY_SNAPSHOT_MISMATCH",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-replay-detected",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "REPLAY_DETECTED",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-runtime-mismatch",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "RUNTIME_MISMATCH",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-signature-tampered",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "SIGNATURE_INVALID",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-status-revoked",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "STATUS_REVOKED",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-status-stale-fail-closed",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "STATUS_STALE",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-trust-anchor-expired",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "TRUST_ANCHOR_EXPIRED",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-trust-anchor-not-yet-valid",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "TRUST_ANCHOR_NOT_YET_VALID",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-trust-anchor-revoked",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "TRUST_ANCHOR_REVOKED",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-unknown-trust-anchor",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "UNKNOWN_TRUST_ANCHOR",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "interop-ap2-ucp-commerce-evidence",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "request.audience",
+          "pass": true
+        },
+        {
+          "name": "evidence[0].protocol_hint",
+          "pass": true
+        },
+        {
+          "name": "evidence[1].protocol_hint",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.result",
+          "pass": true
+        }
+      ],
+      "outcome": "allow",
+      "reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "interop-oap-decision-evidence",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence[0].protocol_hint",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.result",
+          "pass": true
+        }
+      ],
+      "outcome": "allow",
+      "reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "post-execution-linkage-mismatch",
+      "checks": [
+        {
+          "name": "post_execution.execution.effective_request_hash",
+          "pass": true
+        },
+        {
+          "name": "result.policy_violations",
+          "pass": true
+        }
+      ],
+      "outcome": "failed",
+      "reason_codes": [
+        "POST_EXEC_LINKAGE_MISMATCH"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "post-execution-linkage-success",
+      "checks": [
+        {
+          "name": "post_execution.admission.digest",
+          "pass": true
+        },
+        {
+          "name": "post_execution.execution.effective_request_hash",
+          "pass": true
+        },
+        {
+          "name": "post_execution.result.policy_violations",
+          "pass": true
+        },
+        {
+          "name": "a2a_metadata.post_execution_receipt.digest",
+          "pass": true
+        }
+      ],
+      "outcome": "success",
+      "reason_codes": [
+        "ADMISSION_RECEIPT_LINKED",
+        "EFFECTIVE_REQUEST_HASH_MATCH",
+        "NO_POLICY_VIOLATIONS"
+      ],
+      "status": "completed"
+    }
+  ],
+  "version": "vate-sut-results-2026-07"
+}

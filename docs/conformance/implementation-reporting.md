@@ -37,6 +37,13 @@ The portable corpus shape is published separately as:
 
 Non-reference implementations should use the corpus index to discover cases and artifacts, then publish their own conformance and implementation reports.
 
+For implementations that do not use the reference runner directly, publish a SUT result file first:
+
+- `schemas/sut-result.schema.json`
+- `docs/conformance/sut-adapter-contract.md`
+
+The reference runner can compare that SUT result file against the corpus and emit a standard conformance report.
+
 ## Reference Runner Command
 
 ```bash

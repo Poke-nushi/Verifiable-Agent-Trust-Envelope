@@ -25,6 +25,7 @@ CONFORMANCE_REPORT_VERSION = "vate-conformance-report-2026-07"
 IMPLEMENTATION_REPORT_VERSION = "vate-implementation-report-2026-07"
 CORPUS_INDEX_VERSION = "vate-conformance-corpus-2026-07"
 CORPUS_INDEX_FILENAME = "corpus.json"
+SUT_RESULTS_VERSION = "vate-sut-results-2026-07"
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -751,6 +752,169 @@ def run_corpus(corpus_root: Path) -> dict[str, Any]:
     return report
 
 
+def load_case_expectations(corpus_root: Path) -> list[dict[str, Any]]:
+    expectations: list[dict[str, Any]] = []
+    for case_path in sorted((corpus_root / "cases").glob("*.json")):
+        case = read_json(case_path)
+        expectations.append(
+            {
+                "case_id": case["case_id"],
+                "category": case["category"],
+                "expected_outcome": expected_outcome(case),
+                "expected_reason_codes": [str(code) for code in case["expected"]["reason_codes"]],
+                "expected_checks": [
+                    {
+                        "name": check["name"],
+                        "expected": check["expected"],
+                    }
+                    for check in case["expected"].get("checks", [])
+                ],
+            }
+        )
+    return expectations
+
+
+def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, Any]:
+    sut_results = read_json(sut_results_path)
+    expectations = load_case_expectations(corpus_root)
+    manifest, digest = corpus_manifest(corpus_root)
+
+    fatal_errors: list[str] = []
+    if not isinstance(sut_results, dict):
+        fatal_errors.append("sut_results: expected object")
+        sut_results = {}
+    if sut_results.get("version") != SUT_RESULTS_VERSION:
+        fatal_errors.append(f"sut_results.version: expected {SUT_RESULTS_VERSION} actual {sut_results.get('version')}")
+    if sut_results.get("profile") != PROFILE:
+        fatal_errors.append(f"sut_results.profile: expected {PROFILE} actual {sut_results.get('profile')}")
+
+    sut_corpus = sut_results.get("corpus", {})
+    if not isinstance(sut_corpus, dict):
+        fatal_errors.append("sut_results.corpus: expected object")
+        sut_corpus = {}
+    if sut_corpus.get("profile") != PROFILE:
+        fatal_errors.append(f"sut_results.corpus.profile: expected {PROFILE} actual {sut_corpus.get('profile')}")
+    if sut_corpus.get("digest") != digest:
+        fatal_errors.append("sut_results.corpus.digest: does not match current corpus digest")
+
+    sut_implementation = sut_results.get("implementation", {})
+    if not isinstance(sut_implementation, dict):
+        fatal_errors.append("sut_results.implementation: expected object")
+        sut_implementation = {}
+
+    raw_results = sut_results.get("results", [])
+    if not isinstance(raw_results, list):
+        fatal_errors.append("sut_results.results: expected array")
+        raw_results = []
+
+    result_by_case: dict[str, dict[str, Any]] = {}
+    duplicate_cases: set[str] = set()
+    for index, result in enumerate(raw_results):
+        if not isinstance(result, dict):
+            fatal_errors.append(f"sut_results.results[{index}]: expected object")
+            continue
+        case_id = result.get("case_id")
+        if not isinstance(case_id, str):
+            fatal_errors.append(f"sut_results.results[{index}]: result missing string case_id")
+            continue
+        if case_id in result_by_case:
+            duplicate_cases.add(case_id)
+        result_by_case[case_id] = result
+    for case_id in sorted(duplicate_cases):
+        fatal_errors.append(f"sut_results.results: duplicate case_id {case_id}")
+
+    expected_case_ids = {case["case_id"] for case in expectations}
+    for case_id in sorted(set(result_by_case) - expected_case_ids):
+        fatal_errors.append(f"sut_results.results: unknown case_id {case_id}")
+
+    cases: list[dict[str, Any]] = []
+    for expected in expectations:
+        result = result_by_case.get(expected["case_id"])
+        failures: list[str] = []
+        if result is None:
+            actual_outcome = "missing"
+            actual_reason_codes: list[str] = []
+            failures.append("sut result missing")
+        else:
+            actual_outcome = str(result.get("outcome", "missing"))
+            raw_reason_codes = result.get("reason_codes", [])
+            if not isinstance(raw_reason_codes, list):
+                actual_reason_codes = []
+                failures.append("reason_codes: expected array")
+            else:
+                actual_reason_codes = [str(code) for code in raw_reason_codes]
+            status = result.get("status")
+            if status == "skipped":
+                failures.append("sut result skipped")
+            elif status != "completed":
+                failures.append(f"sut result status: expected completed actual {status}")
+
+            if actual_outcome != expected["expected_outcome"]:
+                failures.append(f"outcome: expected {expected['expected_outcome']} actual {actual_outcome}")
+            if actual_reason_codes != expected["expected_reason_codes"]:
+                failures.append(f"reason_codes: expected {expected['expected_reason_codes']} actual {actual_reason_codes}")
+
+            raw_checks = result.get("checks", [])
+            if raw_checks is None:
+                raw_checks = []
+            if not isinstance(raw_checks, list):
+                failures.append("checks: expected array")
+                raw_checks = []
+            check_results = {
+                check.get("name"): check
+                for check in raw_checks
+                if isinstance(check, dict)
+            }
+            for check in expected["expected_checks"]:
+                actual_check = check_results.get(check["name"])
+                if actual_check is None:
+                    failures.append(f"check {check['name']}: missing")
+                    continue
+                if actual_check.get("pass") is not True:
+                    failures.append(f"check {check['name']}: expected pass")
+
+        cases.append(
+            {
+                "case_id": expected["case_id"],
+                "category": expected["category"],
+                "expected_outcome": expected["expected_outcome"],
+                "actual_outcome": actual_outcome,
+                "expected_reason_codes": expected["expected_reason_codes"],
+                "actual_reason_codes": actual_reason_codes,
+                "pass": not failures,
+                "failures": failures,
+            }
+        )
+
+    failed = sum(1 for case in cases if not case["pass"])
+    skipped = sum(1 for result in result_by_case.values() if result.get("status") == "skipped")
+    report = {
+        "version": CONFORMANCE_REPORT_VERSION,
+        "profile": PROFILE,
+        "checked_at": iso_now(),
+        "summary": {
+            "total": len(cases),
+            "passed": len(cases) - failed,
+            "failed": failed,
+            "skipped": skipped,
+        },
+        "corpus": {
+            "name": corpus_root.name,
+            "root": display_path(corpus_root.resolve()),
+            "artifact_count": len(manifest),
+            "digest": digest,
+        },
+        "sut_results": {
+            "path": display_path(sut_results_path.resolve()),
+            "implementation": sut_implementation,
+        },
+        "cases": cases,
+    }
+    if fatal_errors:
+        report["fatal_errors"] = fatal_errors
+    return report
+
+
 def make_implementation_report(args: argparse.Namespace, conformance_report: dict[str, Any]) -> dict[str, Any]:
     corpus_root = Path(args.corpus_root)
     manifest, digest = corpus_manifest(corpus_root)
@@ -825,6 +989,10 @@ def parse_args() -> argparse.Namespace:
     index = subparsers.add_parser("index", help="write a language-neutral corpus index")
     index.add_argument("--corpus-root", required=True, help="corpus root containing cases/")
     index.add_argument("--out", required=True, help="path to write the corpus index")
+    compare = subparsers.add_parser("compare", help="compare SUT results against a corpus")
+    compare.add_argument("--corpus-root", required=True, help="corpus root containing cases/")
+    compare.add_argument("--sut-results", required=True, help="path to SUT result JSON")
+    compare.add_argument("--report", required=True, help="path to write the comparison report")
     return parser.parse_args()
 
 
@@ -840,6 +1008,12 @@ def main() -> int:
         return 0
     if args.command == "index":
         write_json(Path(args.out), make_corpus_index(Path(args.corpus_root)))
+        return 0
+    if args.command == "compare":
+        report = compare_sut_results(Path(args.corpus_root), Path(args.sut_results))
+        write_json(Path(args.report), report)
+        if report.get("fatal_errors") or report["summary"]["failed"]:
+            return 1
         return 0
     raise RuntimeError(f"unsupported command {args.command}")
 

@@ -62,6 +62,12 @@ A non-reference implementation can run the corpus without importing Python code:
 
 Implementations MAY use the reference runner as a comparison oracle, but the corpus index is the portable contract.
 
+For external systems under test, use:
+
+- `docs/conformance/sut-adapter-contract.md`
+- `schemas/sut-result.schema.json`
+- `python3 scripts/vate_conformance.py compare`
+
 ## Freshness Rule
 
 When case files or referenced artifacts change, regenerate `corpus.json`:
