@@ -1,0 +1,50 @@
+{
+  "version": "vate-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-20260701-trust-anchor-expired-001",
+  "issued_at": "2026-07-01T00:08:08Z",
+  "expires_at": "2026-07-01T00:18:08Z",
+  "verifier": {
+    "id": "did:web:verifier.example"
+  },
+  "request": {
+    "request_id": "areq-20260701-trust-anchor-expired-001",
+    "transaction_id": "txn-20260701-trust-anchor-expired-001",
+    "action": "storage.object.publish",
+    "input_hash": "sha-256:trust-anchor-expired-input"
+  },
+  "subject": {
+    "principal": "did:web:user.example",
+    "actor": "did:web:agent.example",
+    "runtime": "spiffe://agent.example/workload/publish-agent"
+  },
+  "evidence": [
+    {
+      "type": "runtime_attestation",
+      "uri": "https://agent.example/attestations/runtime/expired-anchor-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "expired-anchor-runtime-attestation-digest"
+      },
+      "verification": {
+        "result": "failed",
+        "checked_at": "2026-07-01T00:08:05Z",
+        "method": "trust-bundle-lookup",
+        "failure_reason": "Trust anchor was outside its accepted time window."
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "al2-storage-publish",
+    "policy_version": "2026-07-01.1",
+    "policy_ref": "https://verifier.example/policies/al2-storage-publish/2026-07-01.1"
+  },
+  "decision": {
+    "outcome": "deny",
+    "reason_codes": [
+      "TRUST_ANCHOR_EXPIRED",
+      "FAIL_CLOSED"
+    ]
+  }
+}

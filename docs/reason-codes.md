@@ -40,6 +40,10 @@ Implementations MAY include additional profile-specific reason codes, but the ca
 - `SIGNATURE_INVALID` - signed evidence failed proof validation
 - `UNKNOWN_TRUST_ANCHOR` - the signer or issuer was not in the accepted trust bundle
 - `ISSUER_NOT_AUTHORIZED` - the issuer was known but not authorized for the evidence type
+- `ALG_NOT_ALLOWED` - the presented proof algorithm was not allowed for the matched trust anchor
+- `TRUST_ANCHOR_EXPIRED` - the matched trust anchor was outside its accepted validity window
+- `TRUST_ANCHOR_NOT_YET_VALID` - the matched trust anchor was not yet valid at verification time
+- `TRUST_ANCHOR_REVOKED` - the matched trust anchor was revoked, disabled, or suspended
 
 ### Binding And Audience
 

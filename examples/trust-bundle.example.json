@@ -6,7 +6,14 @@
       "issuer_id": "did:web:verifier.example",
       "kid": "did:web:verifier.example#key-1",
       "alg": "ES256",
+      "status": "active",
+      "not_before": "2026-01-01T00:00:00Z",
+      "not_after": "2026-12-31T23:59:59Z",
       "public_key_ref": "examples/keys/verifier-key-1.public.jwk",
+      "usages": [
+        "verify_admission_receipt",
+        "verify_policy_snapshot"
+      ],
       "allowed_evidence_types": [
         "admission_receipt",
         "policy_snapshot"
@@ -16,11 +23,63 @@
       "issuer_id": "did:web:agent.example",
       "kid": "did:web:agent.example#runtime-key-1",
       "alg": "ES256",
+      "status": "active",
+      "not_before": "2026-01-01T00:00:00Z",
+      "not_after": "2026-12-31T23:59:59Z",
       "public_key_ref": "examples/keys/agent-runtime-key-1.public.jwk",
+      "usages": [
+        "verify_runtime_evidence",
+        "verify_post_execution_receipt"
+      ],
       "allowed_evidence_types": [
         "agent_card",
         "runtime_attestation",
         "post_execution_receipt"
+      ]
+    },
+    {
+      "issuer_id": "did:web:expired-agent.example",
+      "kid": "did:web:expired-agent.example#runtime-key-1",
+      "alg": "ES256",
+      "status": "active",
+      "not_before": "2026-01-01T00:00:00Z",
+      "not_after": "2026-06-01T00:00:00Z",
+      "public_key_ref": "examples/keys/agent-runtime-key-1.public.jwk",
+      "usages": [
+        "verify_runtime_evidence"
+      ],
+      "allowed_evidence_types": [
+        "runtime_attestation"
+      ]
+    },
+    {
+      "issuer_id": "did:web:future-agent.example",
+      "kid": "did:web:future-agent.example#runtime-key-1",
+      "alg": "ES256",
+      "status": "active",
+      "not_before": "2026-08-01T00:00:00Z",
+      "not_after": "2026-12-31T23:59:59Z",
+      "public_key_ref": "examples/keys/agent-runtime-key-1.public.jwk",
+      "usages": [
+        "verify_runtime_evidence"
+      ],
+      "allowed_evidence_types": [
+        "runtime_attestation"
+      ]
+    },
+    {
+      "issuer_id": "did:web:revoked-agent.example",
+      "kid": "did:web:revoked-agent.example#runtime-key-1",
+      "alg": "ES256",
+      "status": "revoked",
+      "not_before": "2026-01-01T00:00:00Z",
+      "not_after": "2026-12-31T23:59:59Z",
+      "public_key_ref": "examples/keys/agent-runtime-key-1.public.jwk",
+      "usages": [
+        "verify_runtime_evidence"
+      ],
+      "allowed_evidence_types": [
+        "runtime_attestation"
       ]
     }
   ]

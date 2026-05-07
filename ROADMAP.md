@@ -26,7 +26,7 @@ Focus:
 - add clearer MCP / OAuth / OpenID binding notes and transport-bound examples
 - improve comparison material around close adjacent work where interoperability questions remain
 - publish a language-neutral conformance corpus shape
-- improve JOSE hardening and profile notes
+- add production JOSE profile notes beyond the current trust-bundle conformance checks
 
 ## June 2026 Target
 
@@ -38,7 +38,8 @@ Completion means:
 - reproducible implementation reports with corpus manifests
 - transport-bound fixtures for the most important adjacent paths
 - policy snapshot digest checks across receipts, metadata references, and fixtures
-- clearer JOSE and trust-bundle hardening notes
+- trust-bundle hardening checks for issuer, key id, algorithm, evidence type, status, and validity windows
+- clearer production JOSE profile notes
 - language-neutral corpus guidance for non-reference implementations
 - an A2A-adjacent review package that does not require A2A core changes
 

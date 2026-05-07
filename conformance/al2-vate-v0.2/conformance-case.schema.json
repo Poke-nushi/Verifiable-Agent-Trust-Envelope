@@ -200,6 +200,54 @@
         },
         "additionalProperties": true
       }
+    },
+    "trust_checks": {
+      "type": "array",
+      "description": "Checks local trust-bundle admission behavior for issuer, key id, algorithm, evidence type, status, and validity windows.",
+      "items": {
+        "type": "object",
+        "required": [
+          "trust_bundle",
+          "issuer_id",
+          "kid",
+          "evidence_type",
+          "expect_trusted"
+        ],
+        "properties": {
+          "trust_bundle": {
+            "type": "string",
+            "minLength": 1
+          },
+          "issuer_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "alg": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "checked_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expect_trusted": {
+            "type": "boolean"
+          },
+          "expected_failure_reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true
+      }
     }
   },
   "allOf": [

@@ -30,8 +30,15 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/deny-audience-mismatch.json`
 - `cases/deny-digest-mismatch.json`
 - `cases/deny-policy-snapshot-mismatch.json`
+- `cases/deny-ambiguous-trust-anchor.json`
+- `cases/deny-alg-not-allowed.json`
+- `cases/deny-evidence-type-not-allowed.json`
+- `cases/deny-kid-mismatch.json`
 - `cases/deny-signature-tampered.json`
 - `cases/deny-unknown-trust-anchor.json`
+- `cases/deny-trust-anchor-expired.json`
+- `cases/deny-trust-anchor-not-yet-valid.json`
+- `cases/deny-trust-anchor-revoked.json`
 - `cases/deny-runtime-mismatch.json`
 - `cases/deny-status-revoked.json`
 - `cases/deny-status-stale-fail-closed.json`

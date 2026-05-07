@@ -36,6 +36,19 @@ def iso_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
+def parse_time(value: str) -> datetime:
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+def try_parse_time(value: Any) -> datetime | None:
+    if not isinstance(value, str):
+        return None
+    try:
+        return parse_time(value)
+    except ValueError:
+        return None
+
+
 def canonical_bytes(value: Any) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
@@ -272,22 +285,104 @@ def evaluate_trust_checks(case: dict[str, Any]) -> list[str]:
     failures: list[str] = []
     for check in case.get("trust_checks", []):
         bundle = read_json(resolve_artifact_path(case, check["trust_bundle"]))
-        trusted = False
-        for issuer in bundle.get("issuers", []):
-            if issuer.get("issuer_id") != check["issuer_id"]:
-                continue
-            if issuer.get("kid") != check["kid"]:
-                continue
-            if check["evidence_type"] not in issuer.get("allowed_evidence_types", []):
-                continue
-            trusted = True
-            break
+        trusted, failure_reason = evaluate_trust_check(bundle, check)
         expect_trusted = bool(check.get("expect_trusted", True))
         if trusted != expect_trusted:
             failures.append(
                 f"trust {check['issuer_id']} {check['kid']}: expected trusted={expect_trusted} actual trusted={trusted}"
             )
+        expected_failure = check.get("expected_failure_reason")
+        if expected_failure and failure_reason != expected_failure:
+            failures.append(
+                f"trust {check['issuer_id']} {check['kid']}: expected failure={expected_failure} actual failure={failure_reason}"
+            )
     return failures
+
+
+def evaluate_trust_check(bundle: dict[str, Any], check: dict[str, Any]) -> tuple[bool, str | None]:
+    issuers = bundle.get("issuers")
+    if not isinstance(issuers, list) or not issuers:
+        return False, "SCHEMA_INVALID"
+    if not all(isinstance(issuer, dict) for issuer in issuers):
+        return False, "SCHEMA_INVALID"
+
+    issuer_matches = [
+        issuer for issuer in issuers
+        if issuer.get("issuer_id") == check["issuer_id"]
+    ]
+    if not issuer_matches:
+        return False, "UNKNOWN_TRUST_ANCHOR"
+
+    key_matches = [
+        issuer for issuer in issuer_matches
+        if issuer.get("kid") == check["kid"]
+    ]
+    if not key_matches:
+        return False, "UNKNOWN_TRUST_ANCHOR"
+    if len(key_matches) > 1:
+        return False, "SCHEMA_INVALID"
+
+    issuer = key_matches[0]
+    status = issuer.get("status", "active")
+    if status in {"revoked", "disabled", "suspended"}:
+        return False, "TRUST_ANCHOR_REVOKED"
+    if status != "active":
+        return False, "SCHEMA_INVALID"
+
+    if "checked_at" in check:
+        checked_at_value = check.get("checked_at")
+        checked_at = try_parse_time(checked_at_value)
+        if checked_at is None:
+            return False, "SCHEMA_INVALID"
+        if "not_before" in issuer:
+            not_before = issuer.get("not_before")
+            not_before_time = try_parse_time(not_before)
+            if not_before_time is None:
+                return False, "SCHEMA_INVALID"
+            if checked_at < not_before_time:
+                return False, "TRUST_ANCHOR_NOT_YET_VALID"
+        if "not_after" in issuer:
+            not_after = issuer.get("not_after")
+            not_after_time = try_parse_time(not_after)
+            if not_after_time is None:
+                return False, "SCHEMA_INVALID"
+            if checked_at > not_after_time:
+                return False, "TRUST_ANCHOR_EXPIRED"
+
+    if "alg" in check:
+        alg = check.get("alg")
+        if not isinstance(alg, str) or not alg:
+            return False, "SCHEMA_INVALID"
+        allowed_algs = issuer.get("allowed_algs")
+        if allowed_algs is None:
+            issuer_alg = issuer.get("alg")
+            if not isinstance(issuer_alg, str) or not issuer_alg:
+                return False, "SCHEMA_INVALID"
+            allowed_algs = [issuer_alg]
+        if (
+            not isinstance(allowed_algs, list)
+            or not allowed_algs
+            or not all(isinstance(allowed_alg, str) and allowed_alg for allowed_alg in allowed_algs)
+        ):
+            return False, "SCHEMA_INVALID"
+        if alg not in allowed_algs:
+            return False, "ALG_NOT_ALLOWED"
+
+    evidence_type = check.get("evidence_type")
+    if not isinstance(evidence_type, str) or not evidence_type:
+        return False, "SCHEMA_INVALID"
+
+    allowed_evidence_types = issuer.get("allowed_evidence_types")
+    if (
+        not isinstance(allowed_evidence_types, list)
+        or not allowed_evidence_types
+        or not all(isinstance(evidence_type, str) and evidence_type for evidence_type in allowed_evidence_types)
+    ):
+        return False, "SCHEMA_INVALID"
+    if evidence_type not in allowed_evidence_types:
+        return False, "ISSUER_NOT_AUTHORIZED"
+
+    return True, None
 
 
 def evaluate_linkage_checks(
