@@ -1,0 +1,50 @@
+{
+  "version": "vate-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-20260701-unknown-trust-anchor-001",
+  "issued_at": "2026-07-01T00:07:08Z",
+  "expires_at": "2026-07-01T00:17:08Z",
+  "verifier": {
+    "id": "did:web:verifier.example"
+  },
+  "request": {
+    "request_id": "areq-20260701-unknown-trust-anchor-001",
+    "transaction_id": "txn-20260701-unknown-trust-anchor-001",
+    "action": "storage.object.publish",
+    "input_hash": "sha-256:unknown-trust-anchor-input"
+  },
+  "subject": {
+    "principal": "did:web:user.example",
+    "actor": "did:web:unknown-agent.example",
+    "runtime": "spiffe://unknown.example/workload/publish-agent"
+  },
+  "evidence": [
+    {
+      "type": "runtime_attestation",
+      "uri": "https://unknown.example/attestations/runtime/unknown-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "unknown-runtime-attestation-digest"
+      },
+      "verification": {
+        "result": "failed",
+        "checked_at": "2026-07-01T00:07:05Z",
+        "method": "trust-bundle-lookup",
+        "failure_reason": "No trusted issuer matched the presented runtime attestation key."
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "al2-storage-publish",
+    "policy_version": "2026-07-01.1",
+    "policy_ref": "https://verifier.example/policies/al2-storage-publish/2026-07-01.1"
+  },
+  "decision": {
+    "outcome": "deny",
+    "reason_codes": [
+      "UNKNOWN_TRUST_ANCHOR",
+      "FAIL_CLOSED"
+    ]
+  }
+}

@@ -23,6 +23,9 @@ from urllib.request import urlopen
 ROOT = Path(__file__).resolve().parents[1]
 DEMO = ROOT / "reference" / "minimal-al2-demo" / "trust_envelope_demo.py"
 HTTP_DEMO = ROOT / "reference" / "http-verifier-demo" / "http_verifier_demo.py"
+VATE_CONFORMANCE = ROOT / "scripts" / "vate_conformance.py"
+VATE_CORE = ROOT / "reference" / "vate-verifier-core" / "vate_verifier_core.py"
+A2A_ADAPTER = ROOT / "reference" / "a2a-metadata-adapter-demo" / "a2a_metadata_adapter_demo.py"
 EXAMPLE_PAIRS = [
     ("examples/passport-credential.example.json", "schemas/passport-credential.schema.json"),
     ("examples/runtime-proof.example.json", "schemas/runtime-proof.schema.json"),
@@ -42,6 +45,8 @@ EXAMPLE_PAIRS = [
     ("examples/attenuation-tool-allowlist.example.json", "schemas/attenuation-effect.schema.json"),
     ("examples/attenuation-max-amount.example.json", "schemas/attenuation-effect.schema.json"),
     ("examples/attenuation-approval.example.json", "schemas/attenuation-effect.schema.json"),
+    ("examples/trust-bundle.example.json", "schemas/trust-bundle.schema.json"),
+    ("examples/conformance-report.example.json", "schemas/conformance-report.schema.json"),
     ("examples/status-bundle.example.json", "schemas/status-bundle.schema.json"),
     ("examples/status-entry.example.json", "schemas/status-entry.schema.json"),
     ("examples/status-event.example.json", "schemas/status-event.schema.json"),
@@ -83,6 +88,31 @@ EXAMPLE_PAIRS = [
         "conformance/al2-vate-v0.2/conformance-case.schema.json",
     ),
 ]
+
+
+def iter_example_pairs() -> list[tuple[str, str]]:
+    pairs = list(EXAMPLE_PAIRS)
+    pairs.extend(
+        (str(path.relative_to(ROOT)), "schemas/admission-receipt.schema.json")
+        for path in sorted((ROOT / "examples" / "receipts").glob("admission-*.example.json"))
+    )
+    pairs.extend(
+        (str(path.relative_to(ROOT)), "schemas/post-execution-receipt.schema.json")
+        for path in sorted((ROOT / "examples" / "receipts").glob("post-execution*.example.json"))
+    )
+    pairs.extend(
+        (str(path.relative_to(ROOT)), "schemas/admission-request.schema.json")
+        for path in sorted((ROOT / "examples" / "interop").glob("**/vate-admission-request*.json"))
+    )
+    pairs.extend(
+        (str(path.relative_to(ROOT)), "schemas/admission-receipt.schema.json")
+        for path in sorted((ROOT / "examples" / "interop").glob("**/vate-admission-receipt*.json"))
+    )
+    pairs.extend(
+        (str(path.relative_to(ROOT)), "conformance/al2-vate-v0.2/conformance-case.schema.json")
+        for path in sorted((ROOT / "conformance" / "al2-vate-v0.2" / "cases").glob("*.json"))
+    )
+    return sorted(set(pairs))
 
 
 def resolve_local_ref(root_schema: dict, schema: dict) -> dict:
@@ -186,7 +216,7 @@ def wait_for_health(url: str, timeout: float = 10.0) -> None:
 
 
 def validate_examples() -> None:
-    for example_rel, schema_rel in EXAMPLE_PAIRS:
+    for example_rel, schema_rel in iter_example_pairs():
         example = json.loads((ROOT / example_rel).read_text())
         schema = json.loads((ROOT / schema_rel).read_text())
         errors = check(schema, schema, example)
@@ -199,6 +229,9 @@ def main() -> int:
     validate_examples()
     run([sys.executable, "-m", "py_compile", str(DEMO)])
     run([sys.executable, "-m", "py_compile", str(HTTP_DEMO)])
+    run([sys.executable, "-m", "py_compile", str(VATE_CONFORMANCE)])
+    run([sys.executable, "-m", "py_compile", str(VATE_CORE)])
+    run([sys.executable, "-m", "py_compile", str(A2A_ADAPTER)])
 
     tmp_dir = Path(tempfile.mkdtemp(prefix="trust-envelope-check-"))
     port = find_free_port()
@@ -263,6 +296,24 @@ def main() -> int:
                 "--policy",
                 str(ROOT / "policies" / "al2-http-verifier.example.json"),
             ]
+        )
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "run",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.2"),
+                "--report",
+                str(tmp_dir / "vate-conformance-report.json"),
+            ]
+        )
+        run([sys.executable, str(VATE_CORE), "self-test"])
+        subprocess.run(
+            [sys.executable, str(A2A_ADAPTER), "run-demo"],
+            cwd=ROOT,
+            check=True,
+            stdout=subprocess.DEVNULL,
         )
         print("trust envelope draft repo sanity check: ok")
         return 0

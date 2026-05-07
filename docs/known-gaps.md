@@ -18,7 +18,7 @@ It is weaker on:
 - multi-implementation interoperability
 - stronger runtime attestation profiles
 - higher-assurance operational guidance
-- v0.2 profile interop across A2A, MCP, and HTTP bindings
+- independent implementation evidence across A2A, MCP, and HTTP bindings
 
 ## Current Gaps
 
@@ -99,21 +99,20 @@ The future `ABS` direction exists, but the repo does not yet define:
 
 ### 9. Shared Conformance Across Implementations Is Not Ready
 
-The repo now includes two small machine-readable corpora:
+The repo now includes two machine-readable conformance corpora:
 
 - an `AL2` HTTP corpus for the reference verifier demo
-- a `v0.2` mini corpus for admission decisions, attenuation, A2A metadata references, and post-execution linkage
+- a runnable `v0.2` AL2 corpus for admission decisions, attenuation, A2A metadata references, negative cases, adjacent evidence, and post-execution linkage
 
-Those corpora make the draft easier to inspect, but they are not yet a cross-language, multi-implementation conformance suite.
+Those corpora make the draft easier to inspect and replay, but they are not yet a cross-language, multi-implementation certification suite.
 
 Remaining work includes:
 
-- runnable verifier fixtures for the `v0.2` mini corpus
-- revoked status denial
-- digest mismatch denial
-- replayed admission receipt denial
-- post-execution receipt linkage mismatch
-- cross-implementation report format and certification language
+- independent implementation reports
+- transport-bound SUT adapters
+- stronger proof packaging fixtures
+- cross-implementation report comparison
+- certification language, if a future governance path justifies it
 
 ### 10. Persistent Namespace Is Not Yet Chosen
 

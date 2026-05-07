@@ -1,0 +1,39 @@
+{
+  "version": "vate-conformance-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "case_id": "interop-oap-decision-evidence",
+  "title": "Consume OAP decision evidence",
+  "category": "positive",
+  "purpose": "A VATE verifier should be able to consume an OAP-style decision object as adjacent evidence without replacing OAP semantics.",
+  "artifacts": {
+    "admission_request": "examples/interop/oap-to-vate/vate-admission-request-from-oap.example.json",
+    "admission_receipt": "examples/interop/oap-to-vate/vate-admission-receipt-from-oap.example.json"
+  },
+  "expected": {
+    "admission_decision": "allow",
+    "should_execute": true,
+    "reason_codes": [
+      "EVIDENCE_VERIFIED",
+      "POLICY_MATCH"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "pass"
+      },
+      {
+        "name": "evidence[0].protocol_hint",
+        "expected": "present"
+      },
+      {
+        "name": "evidence.verification.result",
+        "expected": "pass"
+      }
+    ]
+  },
+  "validation_focus": [
+    "adjacent evidence",
+    "OAP/APort crosswalk",
+    "VATE admission receipt"
+  ]
+}

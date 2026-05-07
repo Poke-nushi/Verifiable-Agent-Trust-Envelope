@@ -1,0 +1,29 @@
+{
+  "version": "vate-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "request_id": "areq-oap-interop-20260701-001",
+  "transaction_id": "txn-oap-interop-20260701-001",
+  "issued_at": "2026-07-01T00:20:05Z",
+  "expires_at": "2026-07-01T00:25:00Z",
+  "action": "crm.case.update",
+  "target": {
+    "resource": "https://crm.example/cases/case-123",
+    "audience": "https://crm.example/a2a"
+  },
+  "actor": "did:web:agent.example",
+  "principal": "did:web:user.example",
+  "runtime": "spiffe://agent.example/workload/case-agent",
+  "audience": "https://crm.example/a2a",
+  "input_hash": "sha-256:oap-interop-input",
+  "evidence_refs": [
+    {
+      "type": "oap_decision",
+      "uri": "examples/interop/oap-to-vate/oap-decision.example.json",
+      "media_type": "application/oap-decision+json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "oap-decision-digest"
+      }
+    }
+  ]
+}

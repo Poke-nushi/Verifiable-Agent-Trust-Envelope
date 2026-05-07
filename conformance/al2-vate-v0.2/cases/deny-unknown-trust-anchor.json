@@ -1,0 +1,43 @@
+{
+  "version": "vate-conformance-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "case_id": "deny-unknown-trust-anchor",
+  "title": "Deny an unknown trust anchor",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when the presented issuer or key is not trusted for the evidence type.",
+  "artifacts": {
+    "trust_bundle": "examples/trust-bundle.example.json",
+    "admission_receipt": "examples/receipts/admission-deny-unknown-trust-anchor.example.json"
+  },
+  "trust_checks": [
+    {
+      "trust_bundle": "trust_bundle",
+      "issuer_id": "did:web:unknown-agent.example",
+      "kid": "did:web:unknown-agent.example#key-1",
+      "evidence_type": "runtime_attestation",
+      "expect_trusted": false
+    }
+  ],
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "UNKNOWN_TRUST_ANCHOR",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "trust bundle",
+    "unknown issuer"
+  ]
+}

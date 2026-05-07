@@ -72,7 +72,34 @@ EXAMPLE_PAIRS = [
         "conformance/al2-vate-v0.2/cases/post-execution-linkage-success.json",
         "conformance/al2-vate-v0.2/conformance-case.schema.json",
     ),
+    ("examples/trust-bundle.example.json", "schemas/trust-bundle.schema.json"),
+    ("examples/conformance-report.example.json", "schemas/conformance-report.schema.json"),
 ]
+
+
+def iter_example_pairs() -> list[tuple[str, str]]:
+    pairs = list(EXAMPLE_PAIRS)
+    pairs.extend(
+        (str(path.relative_to(ROOT)), "schemas/admission-receipt.schema.json")
+        for path in sorted((ROOT / "examples" / "receipts").glob("admission-*.example.json"))
+    )
+    pairs.extend(
+        (str(path.relative_to(ROOT)), "schemas/post-execution-receipt.schema.json")
+        for path in sorted((ROOT / "examples" / "receipts").glob("post-execution*.example.json"))
+    )
+    pairs.extend(
+        (str(path.relative_to(ROOT)), "schemas/admission-request.schema.json")
+        for path in sorted((ROOT / "examples" / "interop").glob("**/vate-admission-request*.json"))
+    )
+    pairs.extend(
+        (str(path.relative_to(ROOT)), "schemas/admission-receipt.schema.json")
+        for path in sorted((ROOT / "examples" / "interop").glob("**/vate-admission-receipt*.json"))
+    )
+    pairs.extend(
+        (str(path.relative_to(ROOT)), "conformance/al2-vate-v0.2/conformance-case.schema.json")
+        for path in sorted((ROOT / "conformance" / "al2-vate-v0.2" / "cases").glob("*.json"))
+    )
+    return sorted(set(pairs))
 
 
 def load_json(path: Path) -> dict:
@@ -88,7 +115,7 @@ def main() -> int:
             "Install it locally if you want strict schema validation."
         ) from exc
 
-    for example_rel, schema_rel in EXAMPLE_PAIRS:
+    for example_rel, schema_rel in iter_example_pairs():
         example_path = ROOT / example_rel
         schema_path = ROOT / schema_rel
         example = load_json(example_path)

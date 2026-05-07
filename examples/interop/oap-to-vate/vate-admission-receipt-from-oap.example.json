@@ -1,0 +1,52 @@
+{
+  "version": "vate-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-oap-interop-20260701-001",
+  "issued_at": "2026-07-01T00:20:08Z",
+  "expires_at": "2026-07-01T00:25:00Z",
+  "verifier": {
+    "id": "did:web:verifier.example"
+  },
+  "request": {
+    "request_id": "areq-oap-interop-20260701-001",
+    "transaction_id": "txn-oap-interop-20260701-001",
+    "action": "crm.case.update",
+    "input_hash": "sha-256:oap-interop-input"
+  },
+  "subject": {
+    "principal": "did:web:user.example",
+    "actor": "did:web:agent.example",
+    "runtime": "spiffe://agent.example/workload/case-agent"
+  },
+  "evidence": [
+    {
+      "type": "oap_decision",
+      "protocol_hint": "oap_aport",
+      "uri": "examples/interop/oap-to-vate/oap-decision.example.json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "oap-decision-digest"
+      },
+      "verification": {
+        "result": "verified",
+        "checked_at": "2026-07-01T00:20:06Z",
+        "method": "adjacent-decision-verification",
+        "status_result": "active"
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "al2-crm-case-update",
+    "policy_version": "2026-07-01.1",
+    "policy_ref": "https://verifier.example/policies/al2-crm-case-update/2026-07-01.1"
+  },
+  "decision": {
+    "outcome": "allow",
+    "reason_codes": [
+      "EVIDENCE_VERIFIED",
+      "POLICY_MATCH"
+    ],
+    "human_readable_summary": "The verifier accepted the OAP-style decision object as adjacent evidence and admitted the CRM update under local AL2 policy."
+  }
+}

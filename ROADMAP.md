@@ -18,8 +18,8 @@ Focus:
 
 ## Next
 
-- broaden the v0.2 mini conformance corpus into runnable verifier fixtures
-- add negative cases for expired permits, audience mismatches, revoked status, digest mismatches, replayed admission receipts, and post-execution linkage mismatches
+- expand the runnable v0.2 conformance corpus with independent implementation reports
+- refine verifier-core behavior against additional transport-bound fixtures
 - refine optional policy snapshot digest handling across admission receipts, A2A metadata references, and conformance fixtures
 - refine pairwise presentation guidance
 - add clearer MCP / OAuth / OpenID binding notes and transport-bound examples

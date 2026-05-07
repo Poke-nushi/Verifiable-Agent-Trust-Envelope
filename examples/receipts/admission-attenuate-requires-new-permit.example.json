@@ -1,0 +1,67 @@
+{
+  "version": "vate-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-20260701-new-permit-001",
+  "issued_at": "2026-07-01T00:03:08Z",
+  "expires_at": "2026-07-01T00:13:08Z",
+  "verifier": {
+    "id": "did:web:verifier.example"
+  },
+  "request": {
+    "request_id": "areq-20260701-new-permit-001",
+    "transaction_id": "txn-20260701-new-permit-001",
+    "action": "commerce.purchase",
+    "input_hash": "sha-256:new-permit-original-input"
+  },
+  "subject": {
+    "principal": "did:web:user.example",
+    "actor": "did:web:agent.example",
+    "runtime": "spiffe://agent.example/workload/purchase-agent"
+  },
+  "evidence": [
+    {
+      "type": "payment_authority",
+      "uri": "https://wallet.example/payment-authorities/pay-new-permit-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "payment-new-permit-digest"
+      },
+      "verification": {
+        "result": "verified",
+        "checked_at": "2026-07-01T00:03:05Z",
+        "method": "payment-authority-proof",
+        "status_result": "attenuated"
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "merchant-purchase-al2",
+    "policy_version": "2026-07-01.1",
+    "policy_ref": "https://verifier.example/policies/merchant-purchase-al2/2026-07-01.1"
+  },
+  "decision": {
+    "outcome": "attenuate",
+    "reason_codes": [
+      "NEW_PERMIT_REQUIRED"
+    ]
+  },
+  "attenuation": {
+    "mode": "require_new_permit",
+    "original_request_hash": "sha-256:new-permit-original-request",
+    "effective_request_hash": "sha-256:new-permit-effective-request",
+    "changes": [
+      {
+        "op": "replace",
+        "path": "/constraints/approval",
+        "from": "implicit",
+        "to": "fresh_permit_required",
+        "reason_code": "NEW_PERMIT_REQUIRED"
+      }
+    ],
+    "effective_constraints": {
+      "approval": "fresh_permit_required"
+    },
+    "require_new_permit": true
+  }
+}

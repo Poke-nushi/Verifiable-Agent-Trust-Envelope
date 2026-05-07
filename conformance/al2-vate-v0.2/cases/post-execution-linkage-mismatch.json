@@ -1,0 +1,40 @@
+{
+  "version": "vate-conformance-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "case_id": "post-execution-linkage-mismatch",
+  "title": "Reject post-execution linkage mismatch",
+  "category": "linkage",
+  "purpose": "A verifier or auditor should detect when post-execution evidence does not link to the admitted effective request hash.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+    "post_execution_receipt": "examples/receipts/post-execution-linkage-mismatch.example.json"
+  },
+  "linkage_checks": [
+    {
+      "admission_path": "attenuation.effective_request_hash",
+      "post_execution_path": "execution.effective_request_hash",
+      "expect_match": false
+    }
+  ],
+  "expected": {
+    "post_execution_outcome": "failed",
+    "should_execute": true,
+    "reason_codes": [
+      "POST_EXEC_LINKAGE_MISMATCH"
+    ],
+    "checks": [
+      {
+        "name": "post_execution.execution.effective_request_hash",
+        "expected": "present"
+      },
+      {
+        "name": "result.policy_violations",
+        "expected": "fail"
+      }
+    ]
+  },
+  "validation_focus": [
+    "post-execution linkage",
+    "effective request hash mismatch"
+  ]
+}

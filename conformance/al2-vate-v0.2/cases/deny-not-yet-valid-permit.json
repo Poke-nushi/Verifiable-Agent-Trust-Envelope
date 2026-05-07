@@ -1,0 +1,33 @@
+{
+  "version": "vate-conformance-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "case_id": "deny-not-yet-valid-permit",
+  "title": "Deny a permit before its validity window",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when the permit is not yet valid at admission time.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-deny-not-yet-valid-permit.example.json"
+  },
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "PERMIT_NOT_YET_VALID",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "permit validity window",
+    "fail closed"
+  ]
+}

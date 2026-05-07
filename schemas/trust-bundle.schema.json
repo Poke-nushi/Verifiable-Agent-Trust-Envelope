@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:trust-bundle:2026-07",
+  "title": "VATE Test Trust Bundle",
+  "description": "Minimal trust-anchor bundle for VATE AL2 conformance fixtures.",
+  "type": "object",
+  "required": [
+    "version",
+    "trust_bundle_id",
+    "issuers"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "vate-trust-bundle-2026-07"
+    },
+    "trust_bundle_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issuers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "issuer_id",
+          "kid",
+          "alg",
+          "public_key_ref",
+          "allowed_evidence_types"
+        ],
+        "properties": {
+          "issuer_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "alg": {
+            "type": "string",
+            "minLength": 1
+          },
+          "public_key_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "allowed_evidence_types": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

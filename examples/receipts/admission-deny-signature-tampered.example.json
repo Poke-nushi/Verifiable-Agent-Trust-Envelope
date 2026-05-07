@@ -1,0 +1,50 @@
+{
+  "version": "vate-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-20260701-signature-tampered-001",
+  "issued_at": "2026-07-01T00:06:08Z",
+  "expires_at": "2026-07-01T00:16:08Z",
+  "verifier": {
+    "id": "did:web:verifier.example"
+  },
+  "request": {
+    "request_id": "areq-20260701-signature-tampered-001",
+    "transaction_id": "txn-20260701-signature-tampered-001",
+    "action": "repo.pull_request.merge",
+    "input_hash": "sha-256:signature-tampered-input"
+  },
+  "subject": {
+    "principal": "did:web:user.example",
+    "actor": "did:web:agent.example",
+    "runtime": "spiffe://agent.example/workload/repo-agent"
+  },
+  "evidence": [
+    {
+      "type": "mission_permit",
+      "uri": "https://broker.example/permits/permit-signature-tampered-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "permit-signature-tampered-digest"
+      },
+      "verification": {
+        "result": "failed",
+        "checked_at": "2026-07-01T00:06:05Z",
+        "method": "compact-jws",
+        "failure_reason": "The signed evidence payload was changed after signing."
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "al2-repo-merge",
+    "policy_version": "2026-07-01.1",
+    "policy_ref": "https://verifier.example/policies/al2-repo-merge/2026-07-01.1"
+  },
+  "decision": {
+    "outcome": "deny",
+    "reason_codes": [
+      "SIGNATURE_INVALID",
+      "FAIL_CLOSED"
+    ]
+  }
+}
