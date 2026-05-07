@@ -13,6 +13,7 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - deny an expired permit
 - deny an audience mismatch
 - deny an MCP/OAuth request that would widen upstream tool authority
+- deny stale runtime proof before policy or attenuation can admit execution
 - deny stale, revoked, replayed, tampered, mismatched, and untrusted inputs
 - consume AP2 Human Not Present payment-authority evidence without redefining AP2
 - link a post-execution receipt back to the admitted effective request
@@ -36,6 +37,7 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/deny-mcp-oauth-overscope.json`
 - `cases/deny-digest-mismatch.json`
 - `cases/deny-jose-alg-none.json`
+- `cases/deny-jose-hs256-downgrade.json`
 - `cases/deny-jose-crit-unsupported.json`
 - `cases/deny-jose-payload-digest-mismatch.json`
 - `cases/deny-policy-snapshot-mismatch.json`
@@ -49,6 +51,7 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/deny-trust-anchor-not-yet-valid.json`
 - `cases/deny-trust-anchor-revoked.json`
 - `cases/deny-runtime-mismatch.json`
+- `cases/deny-runtime-proof-stale.json`
 - `cases/deny-status-revoked.json`
 - `cases/deny-status-stale-fail-closed.json`
 - `cases/deny-replay-detected.json`

@@ -48,7 +48,9 @@ new adjacent profiles.
   never unions with upstream authorization; first fixture added:
   `deny-mcp-oauth-overscope`
 - add evaluation-order and algorithm-confusion fixtures before presenting the
-  corpus as broad security conformance
+  corpus as broad security conformance; first stale runtime proof fixture added:
+  `deny-runtime-proof-stale`; first HS256 downgrade fixture added:
+  `deny-jose-hs256-downgrade`
 - add an evidence type vocabulary for generic evidence types and
   protocol-specific hints
 - keep the language-neutral conformance corpus index current as cases change

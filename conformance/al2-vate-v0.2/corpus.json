@@ -452,6 +452,30 @@
     },
     {
       "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-jose-hs256-downgrade.example.json",
+        "detached_payload": "examples/jose/detached-runtime-attestation-payload.json",
+        "jose_proof": "examples/jose/jose-detached-runtime-attestation-hs256-downgrade.example.json",
+        "trust_bundle": "examples/trust-bundle.example.json"
+      },
+      "case_id": "deny-jose-hs256-downgrade",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "ALG_NOT_ALLOWED",
+        "FAIL_CLOSED"
+      ],
+      "expected_should_execute": false,
+      "path": "conformance/al2-vate-v0.2/cases/deny-jose-hs256-downgrade.json",
+      "title": "Deny detached JWS fixture using HS256 downgrade",
+      "validation_focus": [
+        "detached JWS fixture",
+        "algorithm confusion",
+        "algorithm allowlist",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
         "admission_receipt": "examples/receipts/admission-deny-jose-payload-digest-mismatch.example.json",
         "detached_payload": "examples/jose/detached-runtime-attestation-payload.json",
         "jose_proof": "examples/jose/jose-detached-runtime-attestation-payload-digest-mismatch.example.json",
@@ -592,6 +616,28 @@
       "validation_focus": [
         "runtime binding",
         "semantic rejection"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-runtime-proof-stale.example.json",
+        "admission_request": "examples/admission-request-runtime-proof-stale.example.json"
+      },
+      "case_id": "deny-runtime-proof-stale",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "RUNTIME_PROOF_STALE",
+        "FAIL_CLOSED"
+      ],
+      "expected_should_execute": false,
+      "path": "conformance/al2-vate-v0.2/cases/deny-runtime-proof-stale.json",
+      "title": "Deny a stale runtime proof before policy admission",
+      "validation_focus": [
+        "runtime proof freshness",
+        "evaluation order",
+        "fail closed before policy allow",
+        "execution gate"
       ]
     },
     {
@@ -847,7 +893,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "02243ffc074a5bbb20497b71a67f14fca06b1a862f16037cc4d51e557bd530f4"
+    "value": "30a95ed7b9d33a84d3103a15b6012c3c65556ceae333f7b5aab48eeb96193a93"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -947,6 +993,10 @@
       "sha256": "3e6e6c3e3254696a3dd751894a2e1645d702faee7791cd51ab8a5bfa5941163b"
     },
     {
+      "path": "conformance/al2-vate-v0.2/cases/deny-jose-hs256-downgrade.json",
+      "sha256": "ec9e04d049cc525e050dbd8ba51eedf62629192fe0d47caef4526023e000f060"
+    },
+    {
       "path": "conformance/al2-vate-v0.2/cases/deny-jose-payload-digest-mismatch.json",
       "sha256": "fe07910a620603b850ee9a9e8eac015157bc82ec16383755ceec14c9fcb998bb"
     },
@@ -973,6 +1023,10 @@
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-runtime-mismatch.json",
       "sha256": "5c00a611f211baa3192bebb85a22443e121286e382956b19eb08423965dea6ca"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-runtime-proof-stale.json",
+      "sha256": "3d8dbd48944679d314745443aecf7a6e07fd917b2a3a22c3948aa005a5657889"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-signature-tampered.json",
@@ -1033,6 +1087,10 @@
     {
       "path": "examples/a2a/metadata-post-execution-issued.json",
       "sha256": "03a1d8b0ebe50265b1ac2eac2d2a626e0913e8dc356855773d195650dd3d5207"
+    },
+    {
+      "path": "examples/admission-request-runtime-proof-stale.example.json",
+      "sha256": "d671f1acf701356d1dd0389338f017aada21bb08cf357edd849b8e7939694eda"
     },
     {
       "path": "examples/admission-request.example.json",
@@ -1119,6 +1177,10 @@
       "sha256": "c6ebeade970a3b3528637bc4089b326778e84c0ed8f4b34e0586f72b1fbacdda"
     },
     {
+      "path": "examples/jose/jose-detached-runtime-attestation-hs256-downgrade.example.json",
+      "sha256": "47779b023ac63d5036659816344f3193c41e5db2fd41acd58c7f5b6871304aaf"
+    },
+    {
       "path": "examples/jose/jose-detached-runtime-attestation-payload-digest-mismatch.example.json",
       "sha256": "0462deb7354478d3ae8e39300d2b210d9e61dae37457d438983afcf4825e0abb"
     },
@@ -1195,6 +1257,10 @@
       "sha256": "509931ec417f24fa31cb5c3a2375f9d1ae83407f7d824fa502f2608a463b6f73"
     },
     {
+      "path": "examples/receipts/admission-deny-jose-hs256-downgrade.example.json",
+      "sha256": "c69406fec2b5deea5de45f99467ff3d1988ec77452b618b2c435f6cddc1c4591"
+    },
+    {
       "path": "examples/receipts/admission-deny-jose-payload-digest-mismatch.example.json",
       "sha256": "40cc2025fed1d789b620ffb1e41e3d6fdd8c29efe78166d64ba5dfcd6632887f"
     },
@@ -1221,6 +1287,10 @@
     {
       "path": "examples/receipts/admission-deny-runtime-mismatch.example.json",
       "sha256": "00fd45665fc1ac64844265a674aa6ba4c5b0f2ebb9cad3d261e5c59a9175397a"
+    },
+    {
+      "path": "examples/receipts/admission-deny-runtime-proof-stale.example.json",
+      "sha256": "a0de52b2ffdfb6397cde3fd6f205b5a2b2b2d03507d0d7a4e328b7495727332c"
     },
     {
       "path": "examples/receipts/admission-deny-signature-tampered.example.json",
@@ -1283,11 +1353,11 @@
     "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.2 --out conformance/al2-vate-v0.2/corpus.json"
   },
   "summary": {
-    "artifact_count": 103,
-    "case_count": 40,
+    "artifact_count": 109,
+    "case_count": 42,
     "category_counts": {
       "linkage": 3,
-      "negative": 24,
+      "negative": 26,
       "positive": 13
     }
   },

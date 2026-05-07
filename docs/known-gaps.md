@@ -186,11 +186,12 @@ Remaining work includes:
   behavior
 - runtime proof freshness, audience, subject, and bound request hash
 - boundary fixtures for status freshness and replay behavior
-- explicit evaluation-order fixtures showing that malformed proof, stale proof,
-  replay, and digest mismatch fail closed before policy or attenuation can allow
-  execution
-- algorithm-confusion fixtures beyond `alg=none`, such as symmetric/asymmetric
-  downgrade attempts
+- more explicit evaluation-order fixtures showing that malformed proof, replay,
+  and digest mismatch fail closed before policy or attenuation can allow
+  execution; the first stale runtime proof fixture is
+  `deny-runtime-proof-stale`
+- more algorithm-confusion fixtures beyond `alg=none`; the first
+  symmetric/asymmetric downgrade fixture is `deny-jose-hs256-downgrade`
 - attenuation boundary fixtures for malicious paths and schema type edges
 
 ### 15. Evidence Type Vocabulary Is Still Informal

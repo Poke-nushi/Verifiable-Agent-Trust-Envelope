@@ -1,0 +1,34 @@
+{
+  "version": "vate-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "request_id": "areq-20260701-runtime-proof-stale-001",
+  "transaction_id": "txn-20260701-runtime-proof-stale-001",
+  "issued_at": "2026-07-01T00:12:00Z",
+  "expires_at": "2026-07-01T00:17:00Z",
+  "action": "crm.case.update",
+  "target": {
+    "resource": "https://crm.example/cases/case-123",
+    "audience": "https://crm.example"
+  },
+  "actor": "did:web:agent.example",
+  "principal": "did:web:user.example",
+  "runtime": "spiffe://agent.example/workload/case-agent",
+  "audience": "https://crm.example",
+  "input_hash": "sha-256:runtime-proof-stale-input",
+  "constraints": {
+    "expected_runtime": "spiffe://agent.example/workload/case-agent",
+    "policy_would_allow_if_runtime_fresh": true,
+    "runtime_proof_max_age_seconds": 300
+  },
+  "evidence_refs": [
+    {
+      "type": "runtime_attestation",
+      "uri": "https://agent.example/attestations/runtime/runtime-proof-stale-001",
+      "media_type": "application/vnd.spiffe.svid+jwt",
+      "digest": {
+        "alg": "sha-256",
+        "value": "runtime-proof-stale-digest"
+      }
+    }
+  ]
+}
