@@ -154,9 +154,9 @@ Remaining work includes:
   adapter behavior and post-execution receipt validation
 - adding more fixtures where an admission decision exists but execution must not
   proceed
-- adding transport-bound fixtures that prove VATE never widens MCP/OAuth
+- adding more transport-bound fixtures that prove VATE never widens MCP/OAuth
   authority beyond the intersection of upstream authorization and local verifier
-  policy
+  policy; the first overscope denial fixture is `deny-mcp-oauth-overscope`
 
 ### 13. Post-Execution Linkage Is Still Too Narrow
 

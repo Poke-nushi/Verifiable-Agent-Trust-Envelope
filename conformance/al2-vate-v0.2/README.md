@@ -12,6 +12,7 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - narrow a request with machine-readable attenuation
 - deny an expired permit
 - deny an audience mismatch
+- deny an MCP/OAuth request that would widen upstream tool authority
 - deny stale, revoked, replayed, tampered, mismatched, and untrusted inputs
 - consume AP2 Human Not Present payment-authority evidence without redefining AP2
 - link a post-execution receipt back to the admitted effective request
@@ -32,6 +33,7 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/deny-expired-permit.json`
 - `cases/deny-not-yet-valid-permit.json`
 - `cases/deny-audience-mismatch.json`
+- `cases/deny-mcp-oauth-overscope.json`
 - `cases/deny-digest-mismatch.json`
 - `cases/deny-jose-alg-none.json`
 - `cases/deny-jose-crit-unsupported.json`

@@ -45,7 +45,8 @@ new adjacent profiles.
 - add minimum AL2 verification context for status freshness, replay protection,
   and runtime binding
 - add transport-bound fixtures proving VATE only narrows MCP/OAuth authority and
-  never unions with upstream authorization
+  never unions with upstream authorization; first fixture added:
+  `deny-mcp-oauth-overscope`
 - add evaluation-order and algorithm-confusion fixtures before presenting the
   corpus as broad security conformance
 - add an evidence type vocabulary for generic evidence types and

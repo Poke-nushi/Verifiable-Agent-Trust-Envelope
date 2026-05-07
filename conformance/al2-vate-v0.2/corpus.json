@@ -496,6 +496,28 @@
     },
     {
       "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-mcp-oauth-overscope.example.json",
+        "admission_request": "examples/transport/mcp-oauth-overscope-admission-request.example.json"
+      },
+      "case_id": "deny-mcp-oauth-overscope",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "TARGET_NOT_PERMITTED",
+        "FAIL_CLOSED"
+      ],
+      "expected_should_execute": false,
+      "path": "conformance/al2-vate-v0.2/cases/deny-mcp-oauth-overscope.json",
+      "title": "Deny an MCP OAuth request that exceeds upstream authority",
+      "validation_focus": [
+        "MCP transport binding",
+        "OAuth resource boundary",
+        "authority intersection",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
         "admission_receipt": "examples/receipts/admission-deny-not-yet-valid-permit.example.json"
       },
       "case_id": "deny-not-yet-valid-permit",
@@ -825,7 +847,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "7f7e4a800aeefc568b2d8594a87fe3f06e0c3c46c76fc8e23444aad58d93edda"
+    "value": "02243ffc074a5bbb20497b71a67f14fca06b1a862f16037cc4d51e557bd530f4"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -931,6 +953,10 @@
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-kid-mismatch.json",
       "sha256": "e46631957b5535443560d4241b5a2ae0dd60b389989b46869bfcaee6f5d2af8c"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-mcp-oauth-overscope.json",
+      "sha256": "73149d00aa6138c3a42618f71ce4650a459609131244d32ab6b2bc39dd594671"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-not-yet-valid-permit.json",
@@ -1177,6 +1203,10 @@
       "sha256": "f05c43e4e94576d9ed3a08bbb04bef6bab8adbe2f8ba80886b472fd76b82e451"
     },
     {
+      "path": "examples/receipts/admission-deny-mcp-oauth-overscope.example.json",
+      "sha256": "650fa451cb17712e4b2d48b11c1386ab1b616b5c78b0361426daf16112374c1f"
+    },
+    {
       "path": "examples/receipts/admission-deny-not-yet-valid-permit.example.json",
       "sha256": "ba2910116cda5a1fc6241ae26b1b719eecc29a2a7c0dd812be9540c4fbb8f4e0"
     },
@@ -1233,6 +1263,10 @@
       "sha256": "9f28bd454acc48df855eba59a0f325e33a8d8b0026fe8d7a9c18cbec9fbb3dd6"
     },
     {
+      "path": "examples/transport/mcp-oauth-overscope-admission-request.example.json",
+      "sha256": "8248c20d69474a0598a84766e6b6c31b958be56a4b94701cb9640fb93d67592e"
+    },
+    {
       "path": "examples/trust-bundle-ambiguous.example.json",
       "sha256": "a7fa6a2d307c78128e98113cd0e4961fa0132a6d1c4a8b0a6a17c4b17268b38f"
     },
@@ -1249,11 +1283,11 @@
     "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.2 --out conformance/al2-vate-v0.2/corpus.json"
   },
   "summary": {
-    "artifact_count": 100,
-    "case_count": 39,
+    "artifact_count": 103,
+    "case_count": 40,
     "category_counts": {
       "linkage": 3,
-      "negative": 23,
+      "negative": 24,
       "positive": 13
     }
   },

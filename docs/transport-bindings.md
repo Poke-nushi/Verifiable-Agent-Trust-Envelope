@@ -158,6 +158,13 @@ The `v0.2` conformance corpus includes one MCP-shaped fixture:
 - `examples/receipts/admission-allow-mcp-oauth-bound.example.json`
 - `conformance/al2-vate-v0.2/cases/allow-mcp-oauth-transport-bound.json`
 
+It also includes a negative fixture proving that VATE cannot widen upstream MCP
+or OAuth authority:
+
+- `examples/transport/mcp-oauth-overscope-admission-request.example.json`
+- `examples/receipts/admission-deny-mcp-oauth-overscope.example.json`
+- `conformance/al2-vate-v0.2/cases/deny-mcp-oauth-overscope.json`
+
 The fixture treats OAuth and OpenID artifacts as verifier evidence.
 It does not define a new MCP authorization flow.
 The verifier-visible requirement is narrower:
