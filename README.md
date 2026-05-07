@@ -113,8 +113,9 @@ If you are new to the repo, the fastest path is:
 6. [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md)
 7. [docs/profiles/vate-al2-admission-interop-profile-2026-07.md](docs/profiles/vate-al2-admission-interop-profile-2026-07.md)
 8. [conformance/al2-vate-v0.2/README.md](conformance/al2-vate-v0.2/README.md)
-9. section `0` and section `1` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md)
-10. [reference/http-verifier-demo/README.md](reference/http-verifier-demo/README.md)
+9. [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)
+10. section `0` and section `1` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md)
+11. [reference/http-verifier-demo/README.md](reference/http-verifier-demo/README.md)
 
 If you want the visual system view, see section `11` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md).
 
@@ -137,7 +138,7 @@ The most useful feedback for this draft is currently:
 - **Primary language**: English
 - **Research refresh date**: 2026-05-04
 - **Primary battlefield**: `AL2` external digital write
-- **Implemented now**: payload schemas, examples, verifier guidance, reference demos, verifier policy example, AL2 HTTP conformance corpus, runnable v0.2 AL2 conformance corpus, v0.2 AL2 verifier admission profile draft, AL2 admission interop profile, dependency-free verifier core, A2A metadata adapter demo
+- **Implemented now**: payload schemas, examples, verifier guidance, reference demos, verifier policy example, AL2 HTTP conformance corpus, runnable v0.2 AL2 conformance corpus, implementation report schema, MCP/OAuth transport-bound fixture, AP2/UCP commerce crosswalk fixture, v0.2 AL2 verifier admission profile draft, AL2 admission interop profile, dependency-free verifier core, A2A metadata adapter demo
 - **Planned later**: pairwise presentation profile, richer capability registry, formal `AID`, physical `ABS` profiles
 
 ## Repository Map
@@ -164,18 +165,24 @@ The most useful feedback for this draft is currently:
   Short entry point for the v0.2 draft
 - [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md)
   A2A maintainer-oriented summary of the metadata-only admission and receipt binding
+- [docs/a2a-issue-update-2026-05.md](docs/a2a-issue-update-2026-05.md)
+  Short A2A-adjacent issue update draft after the runnable v0.2 artifacts
 - [docs/a2a-metadata-binding-v0.2.md](docs/a2a-metadata-binding-v0.2.md)
   Reference-only A2A metadata binding for VATE admission and receipt artifacts
 - [docs/receipt-model-v0.2.md](docs/receipt-model-v0.2.md)
   v0.2 split between admission receipts and post-execution receipts
 - [conformance/al2-vate-v0.2/README.md](conformance/al2-vate-v0.2/README.md)
   Runnable conformance corpus for v0.2 admission and receipt semantics
+- [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)
+  Implementation report format for publishing one run against one corpus snapshot
 - [reference/vate-verifier-core/README.md](reference/vate-verifier-core/README.md)
   Dependency-free verifier core for AL2 admission fixtures
 - [reference/a2a-metadata-adapter-demo/README.md](reference/a2a-metadata-adapter-demo/README.md)
   Dependency-free A2A-shaped metadata adapter demo
 - [docs/interop/oap-aport-crosswalk.md](docs/interop/oap-aport-crosswalk.md)
   OAP / APort decision evidence crosswalk for VATE admission receipts
+- [docs/interop/ap2-ucp-commerce-crosswalk.md](docs/interop/ap2-ucp-commerce-crosswalk.md)
+  AP2 / UCP commerce evidence crosswalk for VATE admission receipts
 - [docs/known-gaps.md](docs/known-gaps.md)
   Current unresolved design gaps
 - [reference/minimal-al2-demo/README.md](reference/minimal-al2-demo/README.md)

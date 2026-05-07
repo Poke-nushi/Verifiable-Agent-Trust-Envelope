@@ -1,0 +1,66 @@
+{
+  "version": "vate-implementation-report-2026-07",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "generated_at": "2026-07-01T00:00:00Z",
+  "status": "pass",
+  "implementation": {
+    "name": "VATE reference artifact checker",
+    "type": "reference-artifact-checker",
+    "version": "0.2",
+    "language": "Python 3 standard library",
+    "source": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+    "commit": "example"
+  },
+  "corpus": {
+    "name": "al2-vate-v0.2",
+    "root": "conformance/al2-vate-v0.2",
+    "case_count": 2,
+    "artifact_count": 2,
+    "digest": {
+      "alg": "sha-256",
+      "value": "example-corpus-digest"
+    },
+    "manifest": [
+      {
+        "path": "conformance/al2-vate-v0.2/cases/allow-valid-admission.json",
+        "sha256": "example-case-digest"
+      },
+      {
+        "path": "examples/receipts/admission-allow.example.json",
+        "sha256": "example-artifact-digest"
+      }
+    ]
+  },
+  "conformance_report": {
+    "uri": "https://example.invalid/vate-conformance-report.json",
+    "media_type": "application/vate-conformance-report+json",
+    "digest": {
+      "alg": "sha-256",
+      "value": "example-report-digest"
+    }
+  },
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0
+  },
+  "case_results": [
+    {
+      "case_id": "allow-valid-admission",
+      "expected_outcome": "allow",
+      "actual_outcome": "allow",
+      "pass": true
+    },
+    {
+      "case_id": "deny-expired-permit",
+      "expected_outcome": "deny",
+      "actual_outcome": "deny",
+      "pass": true
+    }
+  ],
+  "limitations": [
+    "This report records one implementation run against one corpus snapshot.",
+    "Passing cases do not imply production readiness or endorsement."
+  ]
+}

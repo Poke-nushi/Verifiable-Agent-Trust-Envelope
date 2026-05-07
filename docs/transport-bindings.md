@@ -138,6 +138,24 @@ Use this draft to complement MCP authorization and tool access with stronger cal
 
 This draft should not require every MCP tool or server to understand new transport primitives before basic interoperability is possible.
 
+### AL2 transport-bound fixture
+
+The `v0.2` conformance corpus includes one MCP-shaped fixture:
+
+- `examples/transport/mcp-oauth-admission-request.example.json`
+- `examples/receipts/admission-allow-mcp-oauth-bound.example.json`
+- `conformance/al2-vate-v0.2/cases/allow-mcp-oauth-transport-bound.json`
+
+The fixture treats OAuth and OpenID artifacts as verifier evidence.
+It does not define a new MCP authorization flow.
+The verifier-visible requirement is narrower:
+
+- the MCP target audience is stable
+- the OAuth token audience and resource are visible
+- the OpenID subject and client binding are visible
+- the runtime binding is preserved
+- the admission receipt records the evidence and local policy decision
+
 ---
 
 ## REST and Generic HTTP Binding

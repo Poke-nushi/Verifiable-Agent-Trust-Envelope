@@ -19,6 +19,7 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `conformance-case.schema.json` - common shape for the case files
 - `cases/allow-valid-admission.json`
 - `cases/allow-valid-basic-external-write.json`
+- `cases/allow-mcp-oauth-transport-bound.json`
 - `cases/allow-valid-with-status-fresh.json`
 - `cases/allow-valid-with-policy-snapshot.json`
 - `cases/attenuate-max-amount.json`
@@ -34,6 +35,8 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/deny-status-revoked.json`
 - `cases/deny-status-stale-fail-closed.json`
 - `cases/deny-replay-detected.json`
+- `cases/interop-ap2-ucp-commerce-evidence.json`
+- `cases/interop-oap-decision-evidence.json`
 - `cases/post-execution-linkage-success.json`
 - `cases/post-execution-linkage-mismatch.json`
 
@@ -48,6 +51,23 @@ python3 scripts/vate_conformance.py run \
 The report is machine-readable JSON and follows:
 
 - `schemas/conformance-report.schema.json`
+
+To also write a machine-readable implementation report for one run:
+
+```bash
+python3 scripts/vate_conformance.py run \
+  --corpus-root conformance/al2-vate-v0.2 \
+  --report /tmp/vate-conformance-report.json \
+  --implementation-report /tmp/vate-implementation-report.json \
+  --implementation-name "Example VATE verifier" \
+  --implementation-type "verifier" \
+  --implementation-version "0.1.0" \
+  --implementation-language "Python 3"
+```
+
+The implementation report follows:
+
+- `schemas/implementation-report.schema.json`
 
 ## Intent
 

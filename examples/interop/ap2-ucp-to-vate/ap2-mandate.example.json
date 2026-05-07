@@ -1,0 +1,28 @@
+{
+  "type": "ap2_mandate",
+  "mandate_id": "ap2mand-20260507-001",
+  "issuer": "did:web:wallet.example",
+  "issued_at": "2026-05-07T10:00:00Z",
+  "expires_at": "2026-05-07T10:05:00Z",
+  "principal": "did:web:user.example",
+  "actor": "did:web:agent.example",
+  "audience": "https://psp.example/ap2",
+  "merchant": "merchant.example",
+  "intent": "purchase one approved item from the current cart",
+  "constraints": {
+    "max_amount": {
+      "currency": "JPY",
+      "value": "15000"
+    },
+    "allowed_payment_instruments": [
+      "wallet://user.example/cards/card-123"
+    ],
+    "one_time_use": true
+  },
+  "proof": {
+    "format": "detached_jws",
+    "alg": "ES256",
+    "kid": "did:web:wallet.example#key-1",
+    "signature_ref": "https://wallet.example/ap2/mandates/ap2mand-20260507-001.jws"
+  }
+}

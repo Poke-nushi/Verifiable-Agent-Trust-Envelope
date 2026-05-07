@@ -19,6 +19,8 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 PROFILE = "VATE-AL2-Verifier-Admission-v0.2"
+CONFORMANCE_REPORT_VERSION = "vate-conformance-report-2026-07"
+IMPLEMENTATION_REPORT_VERSION = "vate-implementation-report-2026-07"
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -42,6 +44,17 @@ def sha256_value(value: Any) -> str:
     return hashlib.sha256(canonical_bytes(value)).hexdigest()
 
 
+def sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def display_path(path: Path) -> str:
+    try:
+        return str(path.resolve().relative_to(ROOT))
+    except ValueError:
+        return str(path)
+
+
 def resolve_artifact_path(case: dict[str, Any], key_or_path: str) -> Path:
     artifacts = case.get("artifacts", {})
     rel = artifacts.get(key_or_path, key_or_path)
@@ -56,6 +69,36 @@ def load_artifact(case: dict[str, Any], key: str) -> dict[str, Any] | None:
     if not rel:
         return None
     return read_json(resolve_artifact_path(case, key))
+
+
+def referenced_paths(case: dict[str, Any]) -> list[Path]:
+    paths: list[Path] = []
+    for key, value in case.get("artifacts", {}).items():
+        if isinstance(value, str):
+            paths.append(resolve_artifact_path(case, key))
+    for check in case.get("integrity_checks", []):
+        paths.append(resolve_artifact_path(case, check["artifact"]))
+    for check in case.get("trust_checks", []):
+        paths.append(resolve_artifact_path(case, check["trust_bundle"]))
+    return paths
+
+
+def corpus_manifest(corpus_root: Path) -> tuple[list[dict[str, str]], dict[str, str]]:
+    paths: set[Path] = set(path.resolve() for path in corpus_root.rglob("*.json"))
+    for case_path in sorted((corpus_root / "cases").glob("*.json")):
+        case = read_json(case_path)
+        for path in referenced_paths(case):
+            if path.exists():
+                paths.add(path.resolve())
+
+    manifest = [
+        {
+            "path": display_path(path),
+            "sha256": sha256_file(path),
+        }
+        for path in sorted(paths, key=display_path)
+    ]
+    return manifest, {"alg": "sha-256", "value": sha256_value(manifest)}
 
 
 def get_path(value: Any, dotted_path: str) -> Any:
@@ -119,10 +162,16 @@ def actual_linkage_reason_codes(
 
 def expected_outcome(case: dict[str, Any]) -> str:
     expected = case["expected"]
+    if case["category"] == "linkage":
+        return str(expected.get("post_execution_outcome", "missing"))
     return str(expected.get("admission_decision", expected.get("post_execution_outcome", "missing")))
 
 
 def observed_outcome(case: dict[str, Any], admission: dict[str, Any] | None, post_execution: dict[str, Any] | None) -> str:
+    if case["category"] == "linkage":
+        if post_execution is None:
+            return "missing"
+        return str(post_execution.get("result", {}).get("outcome", "missing"))
     if "admission_decision" in case["expected"]:
         return actual_decision(admission)
     if post_execution is None:
@@ -309,7 +358,7 @@ def run_corpus(corpus_root: Path) -> dict[str, Any]:
     cases = [evaluate_case(path) for path in case_paths]
     failed = sum(1 for item in cases if not item["pass"])
     report = {
-        "version": "vate-conformance-report-2026-07",
+        "version": CONFORMANCE_REPORT_VERSION,
         "profile": PROFILE,
         "checked_at": iso_now(),
         "summary": {
@@ -325,12 +374,77 @@ def run_corpus(corpus_root: Path) -> dict[str, Any]:
     return report
 
 
+def make_implementation_report(args: argparse.Namespace, conformance_report: dict[str, Any]) -> dict[str, Any]:
+    corpus_root = Path(args.corpus_root)
+    manifest, digest = corpus_manifest(corpus_root)
+    implementation = {
+        "name": args.implementation_name,
+        "type": args.implementation_type,
+        "version": args.implementation_version,
+        "language": args.implementation_language,
+    }
+    if args.implementation_repo:
+        implementation["source"] = args.implementation_repo
+    if args.implementation_commit:
+        implementation["commit"] = args.implementation_commit
+    if args.environment:
+        implementation["environment"] = args.environment
+
+    failed = bool(conformance_report.get("fatal_errors") or conformance_report["summary"]["failed"])
+    return {
+        "version": IMPLEMENTATION_REPORT_VERSION,
+        "profile": PROFILE,
+        "generated_at": conformance_report["checked_at"],
+        "status": "fail" if failed else "pass",
+        "implementation": implementation,
+        "corpus": {
+            "name": corpus_root.name,
+            "root": display_path(corpus_root.resolve()),
+            "case_count": conformance_report["summary"]["total"],
+            "artifact_count": len(manifest),
+            "digest": digest,
+            "manifest": manifest,
+        },
+        "conformance_report": {
+            "uri": args.conformance_report_uri or str(Path(args.report)),
+            "media_type": "application/vate-conformance-report+json",
+            "digest": {
+                "alg": "sha-256",
+                "value": sha256_value(conformance_report),
+            },
+        },
+        "summary": conformance_report["summary"],
+        "case_results": [
+            {
+                "case_id": case["case_id"],
+                "expected_outcome": case["expected_outcome"],
+                "actual_outcome": case["actual_outcome"],
+                "pass": case["pass"],
+            }
+            for case in conformance_report["cases"]
+        ],
+        "limitations": [
+            "This report records one implementation run against one corpus snapshot.",
+            "Passing cases do not imply production readiness or endorsement.",
+        ],
+    }
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run the VATE AL2 v0.2 conformance corpus")
     subparsers = parser.add_subparsers(dest="command", required=True)
     run = subparsers.add_parser("run", help="run a conformance corpus")
     run.add_argument("--corpus-root", required=True, help="corpus root containing cases/")
     run.add_argument("--report", required=True, help="path to write the machine-readable report")
+    run.add_argument("--implementation-report", help="optional path to write an implementation report")
+    run.add_argument("--implementation-name", default="VATE reference artifact checker")
+    run.add_argument("--implementation-type", default="reference-artifact-checker")
+    run.add_argument("--implementation-version", default="0.2")
+    run.add_argument("--implementation-language", default="Python 3 standard library")
+    run.add_argument("--implementation-repo")
+    run.add_argument("--implementation-commit")
+    run.add_argument("--environment")
+    run.add_argument("--conformance-report-uri")
     return parser.parse_args()
 
 
@@ -339,6 +453,8 @@ def main() -> int:
     if args.command == "run":
         report = run_corpus(Path(args.corpus_root))
         write_json(Path(args.report), report)
+        if args.implementation_report:
+            write_json(Path(args.implementation_report), make_implementation_report(args, report))
         if report.get("fatal_errors") or report["summary"]["failed"]:
             return 1
         return 0

@@ -18,14 +18,29 @@ Focus:
 
 ## Next
 
-- expand the runnable v0.2 conformance corpus with independent implementation reports
-- refine verifier-core behavior against additional transport-bound fixtures
+- collect independent implementation reports using `schemas/implementation-report.schema.json`
+- prepare A2A-adjacent review updates from `docs/a2a-issue-update-2026-05.md`
+- add additional transport-bound fixtures beyond the initial MCP/OAuth and AP2/UCP examples
 - refine optional policy snapshot digest handling across admission receipts, A2A metadata references, and conformance fixtures
 - refine pairwise presentation guidance
 - add clearer MCP / OAuth / OpenID binding notes and transport-bound examples
 - improve comparison material around close adjacent work where interoperability questions remain
 - publish a language-neutral conformance corpus shape
 - improve JOSE hardening and profile notes
+
+## June 2026 Target
+
+The June target is to complete the `v0.2` AL2 review package, not to broaden the protocol.
+Items should land only when they preserve the verifier boundary and pass the runnable checks.
+
+Completion means:
+
+- reproducible implementation reports with corpus manifests
+- transport-bound fixtures for the most important adjacent paths
+- consistent policy snapshot digest handling across receipts, metadata references, and fixtures
+- clearer JOSE and trust-bundle hardening notes
+- language-neutral corpus guidance for non-reference implementations
+- an A2A-adjacent review package that does not require A2A core changes
 
 ## Later
 

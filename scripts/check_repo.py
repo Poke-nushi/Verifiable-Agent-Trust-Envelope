@@ -34,6 +34,7 @@ EXAMPLE_PAIRS = [
     ("examples/artifact-reference.example.json", "schemas/artifact-reference.schema.json"),
     ("examples/evidence-reference.example.json", "schemas/evidence-reference.schema.json"),
     ("examples/admission-request.example.json", "schemas/admission-request.schema.json"),
+    ("examples/transport/mcp-oauth-admission-request.example.json", "schemas/admission-request.schema.json"),
     ("examples/a2a/metadata-admission-requested.json", "schemas/a2a-vate-metadata.schema.json"),
     ("examples/a2a/metadata-admission-issued.json", "schemas/a2a-vate-metadata.schema.json"),
     ("examples/a2a/metadata-post-execution-issued.json", "schemas/a2a-vate-metadata.schema.json"),
@@ -47,6 +48,7 @@ EXAMPLE_PAIRS = [
     ("examples/attenuation-approval.example.json", "schemas/attenuation-effect.schema.json"),
     ("examples/trust-bundle.example.json", "schemas/trust-bundle.schema.json"),
     ("examples/conformance-report.example.json", "schemas/conformance-report.schema.json"),
+    ("examples/implementation-report.example.json", "schemas/implementation-report.schema.json"),
     ("examples/status-bundle.example.json", "schemas/status-bundle.schema.json"),
     ("examples/status-entry.example.json", "schemas/status-entry.schema.json"),
     ("examples/status-event.example.json", "schemas/status-event.schema.json"),
@@ -306,6 +308,16 @@ def main() -> int:
                 str(ROOT / "conformance" / "al2-vate-v0.2"),
                 "--report",
                 str(tmp_dir / "vate-conformance-report.json"),
+                "--implementation-report",
+                str(tmp_dir / "vate-implementation-report.json"),
+                "--implementation-name",
+                "VATE reference artifact checker",
+                "--implementation-type",
+                "reference-artifact-checker",
+                "--implementation-version",
+                "0.2",
+                "--implementation-language",
+                "Python 3 standard library",
             ]
         )
         run([sys.executable, str(VATE_CORE), "self-test"])

@@ -1,0 +1,36 @@
+{
+  "type": "ucp_checkout_session",
+  "session_id": "ucpchk-20260507-001",
+  "merchant": "merchant.example",
+  "created_at": "2026-05-07T10:00:04Z",
+  "expires_at": "2026-05-07T10:05:00Z",
+  "checkout_uri": "https://merchant.example/ucp/checkout/ucpchk-20260507-001",
+  "audience": "https://merchant.example/ucp",
+  "cart": {
+    "cart_id": "cart-20260507-001",
+    "items": [
+      {
+        "sku": "sku-running-shoes-001",
+        "quantity": 1,
+        "unit_price": {
+          "currency": "JPY",
+          "value": "12800"
+        }
+      }
+    ],
+    "total": {
+      "currency": "JPY",
+      "value": "12800"
+    }
+  },
+  "payment": {
+    "ap2_mandate_id": "ap2mand-20260507-001",
+    "psp_audience": "https://psp.example/ap2"
+  },
+  "proof": {
+    "format": "detached_jws",
+    "alg": "ES256",
+    "kid": "did:web:merchant.example#key-1",
+    "signature_ref": "https://merchant.example/ucp/signatures/ucpchk-20260507-001.jws"
+  }
+}

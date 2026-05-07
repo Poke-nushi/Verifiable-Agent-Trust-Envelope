@@ -1,0 +1,55 @@
+{
+  "version": "vate-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "request_id": "areq-ap2-ucp-interop-20260507-001",
+  "transaction_id": "txn-ap2-ucp-interop-20260507-001",
+  "issued_at": "2026-05-07T10:00:05Z",
+  "expires_at": "2026-05-07T10:05:00Z",
+  "action": "commerce.purchase",
+  "target": {
+    "resource": "https://merchant.example/ucp/checkout/ucpchk-20260507-001",
+    "audience": "https://merchant.example/ucp"
+  },
+  "actor": "did:web:agent.example",
+  "principal": "did:web:user.example",
+  "runtime": "spiffe://agent.example/workload/shopping-agent",
+  "audience": "https://merchant.example/ucp",
+  "input_hash": "sha-256:ap2-ucp-commerce-input",
+  "constraints": {
+    "max_amount": {
+      "currency": "JPY",
+      "value": "15000"
+    },
+    "expected_runtime": "spiffe://agent.example/workload/shopping-agent",
+    "payment": {
+      "mandate_id": "ap2mand-20260507-001",
+      "checkout_session_id": "ucpchk-20260507-001",
+      "merchant": "merchant.example",
+      "psp_audience": "https://psp.example/ap2"
+    }
+  },
+  "correlation": {
+    "a2a_context_id": "ctx-commerce-20260507-001",
+    "a2a_task_id": "task-commerce-20260507-001"
+  },
+  "evidence_refs": [
+    {
+      "type": "ap2_mandate",
+      "uri": "examples/interop/ap2-ucp-to-vate/ap2-mandate.example.json",
+      "media_type": "application/ap2-mandate+json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "ap2-mandate-digest"
+      }
+    },
+    {
+      "type": "ucp_checkout_session",
+      "uri": "examples/interop/ap2-ucp-to-vate/ucp-checkout-session.example.json",
+      "media_type": "application/ucp-checkout-session+json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "ucp-checkout-session-digest"
+      }
+    }
+  ]
+}

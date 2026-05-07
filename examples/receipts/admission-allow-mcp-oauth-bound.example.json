@@ -1,0 +1,105 @@
+{
+  "version": "vate-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-20260507-mcp-oauth-001",
+  "issued_at": "2026-05-07T09:00:08Z",
+  "expires_at": "2026-05-07T09:05:00Z",
+  "verifier": {
+    "id": "did:web:verifier.example",
+    "key_id": "did:web:verifier.example#key-1"
+  },
+  "request": {
+    "request_id": "areq-20260507-mcp-oauth-001",
+    "transaction_id": "txn-20260507-mcp-oauth-001",
+    "action": "crm.case.update",
+    "input_hash": "sha-256:base64url-mcp-tool-call-input-digest",
+    "audience": "https://mcp.crm.example",
+    "target_audience": "https://mcp.crm.example",
+    "transport": {
+      "protocol": "mcp",
+      "oauth": {
+        "issuer": "https://auth.example",
+        "audience": "https://mcp.crm.example",
+        "resource": "mcp://crm.example/tools/cases.update",
+        "proof_of_possession": "dpop-jkt:base64url-thumbprint"
+      },
+      "openid": {
+        "issuer": "https://auth.example",
+        "subject": "did:web:user.example",
+        "client_id": "did:web:agent.example"
+      }
+    }
+  },
+  "subject": {
+    "principal": "did:web:user.example",
+    "actor": "did:web:agent.example",
+    "runtime": "spiffe://agent.example/workload/case-agent"
+  },
+  "evidence": [
+    {
+      "type": "oauth_access_token",
+      "protocol_hint": "mcp-oauth",
+      "uri": "https://auth.example/token-introspection/tok-20260507-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-oauth-introspection-digest"
+      },
+      "verification": {
+        "result": "verified",
+        "checked_at": "2026-05-07T09:00:01Z",
+        "method": "oauth-token-introspection",
+        "status_result": "active"
+      }
+    },
+    {
+      "type": "openid_subject",
+      "protocol_hint": "openid-connect",
+      "uri": "https://auth.example/openid/session/sub-20260507-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-openid-claims-digest"
+      },
+      "verification": {
+        "result": "verified",
+        "checked_at": "2026-05-07T09:00:02Z",
+        "method": "openid-claims-binding",
+        "status_result": "active"
+      }
+    },
+    {
+      "type": "runtime_attestation",
+      "protocol_hint": "spiffe",
+      "uri": "https://agent.example/attestations/runtime/rp-mcp-oauth-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-runtime-attestation-digest"
+      },
+      "verification": {
+        "result": "verified",
+        "checked_at": "2026-05-07T09:00:03Z",
+        "method": "workload-attestation",
+        "status_result": "active"
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "al2-mcp-crm-case-update",
+    "policy_version": "2026-05-07.1",
+    "policy_ref": "https://verifier.example/policies/al2-mcp-crm-case-update/2026-05-07.1"
+  },
+  "decision": {
+    "outcome": "allow",
+    "reason_codes": [
+      "EVIDENCE_VERIFIED",
+      "POLICY_MATCH"
+    ],
+    "human_readable_summary": "The MCP tool invocation is allowed because OAuth audience, OpenID subject, runtime, and local policy checks match."
+  },
+  "proof": {
+    "format": "detached_jws",
+    "alg": "ES256",
+    "kid": "did:web:verifier.example#key-1",
+    "signature_ref": "https://verifier.example/vate/signatures/admrec-20260507-mcp-oauth-001.jws"
+  }
+}

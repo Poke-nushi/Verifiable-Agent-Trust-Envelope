@@ -1,0 +1,71 @@
+{
+  "version": "vate-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-ap2-ucp-interop-20260507-001",
+  "issued_at": "2026-05-07T10:00:08Z",
+  "expires_at": "2026-05-07T10:05:00Z",
+  "verifier": {
+    "id": "did:web:verifier.example"
+  },
+  "request": {
+    "request_id": "areq-ap2-ucp-interop-20260507-001",
+    "transaction_id": "txn-ap2-ucp-interop-20260507-001",
+    "a2a_context_id": "ctx-commerce-20260507-001",
+    "a2a_task_id": "task-commerce-20260507-001",
+    "action": "commerce.purchase",
+    "input_hash": "sha-256:ap2-ucp-commerce-input",
+    "audience": "https://merchant.example/ucp",
+    "target_audience": "https://merchant.example/ucp"
+  },
+  "subject": {
+    "principal": "did:web:user.example",
+    "actor": "did:web:agent.example",
+    "runtime": "spiffe://agent.example/workload/shopping-agent"
+  },
+  "evidence": [
+    {
+      "type": "ap2_mandate",
+      "protocol_hint": "ap2",
+      "uri": "examples/interop/ap2-ucp-to-vate/ap2-mandate.example.json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "ap2-mandate-digest"
+      },
+      "verification": {
+        "result": "verified",
+        "checked_at": "2026-05-07T10:00:06Z",
+        "method": "adjacent-payment-mandate-verification",
+        "status_result": "active"
+      }
+    },
+    {
+      "type": "ucp_checkout_session",
+      "protocol_hint": "ucp",
+      "uri": "examples/interop/ap2-ucp-to-vate/ucp-checkout-session.example.json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "ucp-checkout-session-digest"
+      },
+      "verification": {
+        "result": "verified",
+        "checked_at": "2026-05-07T10:00:07Z",
+        "method": "adjacent-commerce-session-verification",
+        "status_result": "active"
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "al2-commerce-purchase",
+    "policy_version": "2026-05-07.1",
+    "policy_ref": "https://verifier.example/policies/al2-commerce-purchase/2026-05-07.1"
+  },
+  "decision": {
+    "outcome": "allow",
+    "reason_codes": [
+      "EVIDENCE_VERIFIED",
+      "POLICY_MATCH"
+    ],
+    "human_readable_summary": "The verifier accepted AP2 mandate and UCP checkout session evidence, bound them to actor, principal, runtime, merchant audience, and local commerce policy, and admitted the purchase action."
+  }
+}

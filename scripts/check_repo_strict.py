@@ -21,6 +21,7 @@ EXAMPLE_PAIRS = [
     ("examples/artifact-reference.example.json", "schemas/artifact-reference.schema.json"),
     ("examples/evidence-reference.example.json", "schemas/evidence-reference.schema.json"),
     ("examples/admission-request.example.json", "schemas/admission-request.schema.json"),
+    ("examples/transport/mcp-oauth-admission-request.example.json", "schemas/admission-request.schema.json"),
     ("examples/a2a/metadata-admission-requested.json", "schemas/a2a-vate-metadata.schema.json"),
     ("examples/a2a/metadata-admission-issued.json", "schemas/a2a-vate-metadata.schema.json"),
     ("examples/a2a/metadata-post-execution-issued.json", "schemas/a2a-vate-metadata.schema.json"),
@@ -74,6 +75,7 @@ EXAMPLE_PAIRS = [
     ),
     ("examples/trust-bundle.example.json", "schemas/trust-bundle.schema.json"),
     ("examples/conformance-report.example.json", "schemas/conformance-report.schema.json"),
+    ("examples/implementation-report.example.json", "schemas/implementation-report.schema.json"),
 ]
 
 
