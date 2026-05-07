@@ -25,7 +25,7 @@ The index contains:
 - corpus root and case schema path
 - case count and category counts
 - a digest basis for snapshot comparison
-- a sorted case list with expected outcome and reason codes
+- a sorted case list with expected outcome, execution gate, and reason codes
 - a manifest of case files and referenced artifacts with raw SHA-256 digests
 - runner commands for reproducing the index and a conformance report
 
@@ -47,6 +47,35 @@ Each manifest entry records:
 
 The digest value is the SHA-256 of canonical JSON bytes for the manifest array.
 The current reference canonicalization sorts object keys and removes insignificant whitespace.
+
+This is a v0.2 fixture digest basis, not a production canonicalization profile.
+It keeps the dependency-free corpus reproducible, but it does not define
+duplicate-key rejection, Unicode normalization, floating-point number
+normalization, streaming payload handling, or a general signed-JSON profile.
+
+Until a production profile is selected, fixture artifacts SHOULD avoid:
+
+- JSON numbers that require floating-point normalization
+- duplicate object keys
+- semantically significant Unicode normalization choices
+- digest comparisons over bytes whose encoding is not named by the case
+
+Future production-oriented profiles should either name a standard JSON
+canonicalization profile, such as RFC 8785 / JCS, or bind signatures and digests
+to exact media bytes without reserializing JSON.
+
+## Runner Boundary
+
+The reference runner has two distinct roles:
+
+- `run` checks the repository fixture artifacts and emits the reference report
+  shape for one corpus snapshot.
+- `compare` checks an external SUT result file against the same corpus snapshot.
+
+`run` is useful for fixture integrity and reference behavior. It is not, by
+itself, evidence that an independent implementation passed the corpus. External
+implementation review should use `compare` with a SUT result file matching
+`schemas/sut-result.schema.json`.
 
 ## Implementation Flow
 

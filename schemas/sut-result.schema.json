@@ -101,6 +101,7 @@
           "case_id",
           "status",
           "outcome",
+          "should_execute",
           "reason_codes"
         ],
         "properties": {
@@ -119,6 +120,9 @@
           "outcome": {
             "type": "string",
             "minLength": 1
+          },
+          "should_execute": {
+            "type": "boolean"
           },
           "reason_codes": {
             "type": "array",

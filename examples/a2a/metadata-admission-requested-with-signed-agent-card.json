@@ -26,10 +26,8 @@
         "canonicalization": "RFC8785",
         "required_headers": [
           "alg",
+          "typ",
           "kid"
-        ],
-        "recommended_headers": [
-          "typ"
         ]
       }
     }

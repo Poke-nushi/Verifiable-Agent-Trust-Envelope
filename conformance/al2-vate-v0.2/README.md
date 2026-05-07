@@ -107,6 +107,19 @@ For this dependency-free fixture runner, digest checks use canonical JSON bytes 
 The digest value is encoded as lowercase hexadecimal in the policy snapshot fixtures.
 Future profiles may replace this with a named external canonicalization scheme, but conformance cases must state which digest basis they use.
 
+This v0.2 digest basis is limited to fixtures. It does not define duplicate-key
+handling, Unicode normalization, floating-point normalization, or a production
+signed-JSON profile.
+
+## Runner Boundary
+
+`python3 scripts/vate_conformance.py run` checks the committed fixture artifacts
+with the reference runner.
+
+`python3 scripts/vate_conformance.py compare` checks an external SUT result file
+against the same corpus snapshot. Independent implementation review should use
+`compare`, not `run` alone.
+
 ## Detached JWS Fixture Checks
 
 The `jose_checks` cases do not perform production signature verification.
@@ -125,6 +138,9 @@ A verifier implementation should be able to load each case, resolve the referenc
 
 The `expected.admission_decision` value is limited to `allow`, `attenuate`, or `deny`.
 Post-execution cases use `expected.post_execution_outcome` so execution results do not expand the admission decision vocabulary.
+`expected.should_execute` records the execution gate separately from the admission
+decision, so an attenuated case can still be non-executable when a fresh permit
+is required.
 
 This is deliberately smaller than the existing `conformance/al2-http/` corpus.
 It focuses on the profile semantics that matter for A2A-adjacent admission and receipt handling.

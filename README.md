@@ -33,6 +33,11 @@ The current repository makes that boundary concrete through a verifier-centered 
 
 `status -> identity -> runtime -> permit -> policy`
 
+That sequence is the semantic decision basis. An implementation still needs to
+perform structural parsing, digest checks, proof / trust-anchor checks, and
+freshness checks before it treats any input as authoritative or runs expensive
+policy evaluation.
+
 and returns:
 
 `allow / attenuate / deny`
@@ -127,7 +132,8 @@ If you want the shortest list of unresolved issues, read [docs/known-gaps.md](do
 The most useful feedback for this draft is currently:
 
 - is the verifier-side boundary clear enough
-- is the `status -> identity -> runtime -> permit -> policy` ordering sound
+- is the semantic `status -> identity -> runtime -> permit -> policy` ordering
+  sound once proof, digest, trust, and freshness gates have failed closed
 - are permit, receipt, status, and attenuation semantics coherent together
 - is the difference from close adjacent work stated honestly and precisely enough
 - what should remain core versus move into profiles or extensions

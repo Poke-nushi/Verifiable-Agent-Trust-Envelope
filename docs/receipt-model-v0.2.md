@@ -73,6 +73,11 @@ It records:
 A post-execution receipt must not silently change the admitted request.
 The `effective_request_hash` should match the request admitted by the admission receipt.
 
+An attenuated admission receipt can still be non-executable. In particular,
+`attenuation.require_new_permit: true` means the verifier found a narrower or
+fresh-permit path, but execution should not proceed until that new permit is
+available.
+
 ## Attenuation
 
 When the decision is `attenuate`, the admission receipt should include a machine-readable attenuation object.

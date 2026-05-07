@@ -2,7 +2,7 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "7212d24e46ef20a3e02af56f24d013b0443704aba2e5f5b41cca8f9b828584a6"
+      "value": "7f7e4a800aeefc568b2d8594a87fe3f06e0c3c46c76fc8e23444aad58d93edda"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.2"
   },
@@ -46,6 +46,7 @@
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
       ],
+      "should_execute": true,
       "status": "completed"
     },
     {
@@ -69,6 +70,7 @@
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
       ],
+      "should_execute": true,
       "status": "completed"
     },
     {
@@ -112,6 +114,7 @@
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
       ],
+      "should_execute": true,
       "status": "completed"
     },
     {
@@ -135,6 +138,7 @@
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
       ],
+      "should_execute": true,
       "status": "completed"
     },
     {
@@ -154,6 +158,7 @@
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
       ],
+      "should_execute": true,
       "status": "completed"
     },
     {
@@ -173,6 +178,7 @@
         "POLICY_SNAPSHOT_MATCH",
         "POLICY_MATCH"
       ],
+      "should_execute": true,
       "status": "completed"
     },
     {
@@ -192,6 +198,7 @@
         "STATUS_FRESH",
         "POLICY_MATCH"
       ],
+      "should_execute": true,
       "status": "completed"
     },
     {
@@ -219,6 +226,7 @@
         "PAYMENT_TOKEN_LIMIT",
         "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
       ],
+      "should_execute": true,
       "status": "completed"
     },
     {
@@ -250,6 +258,7 @@
         "PAYMENT_TOKEN_LIMIT",
         "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
       ],
+      "should_execute": true,
       "status": "completed"
     },
     {
@@ -268,6 +277,7 @@
       "reason_codes": [
         "NEW_PERMIT_REQUIRED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -290,6 +300,7 @@
       "reason_codes": [
         "TARGET_SCOPE_NARROWED"
       ],
+      "should_execute": true,
       "status": "completed"
     },
     {
@@ -309,6 +320,7 @@
         "ALG_NOT_ALLOWED",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -328,6 +340,7 @@
         "SCHEMA_INVALID",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -347,6 +360,7 @@
         "REPLAY_DETECTED",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -366,6 +380,7 @@
         "PERMIT_EXPIRED",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -389,6 +404,7 @@
         "AUDIENCE_MISMATCH",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -408,6 +424,7 @@
         "DIGEST_MISMATCH",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -427,6 +444,7 @@
         "ISSUER_NOT_AUTHORIZED",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -450,6 +468,7 @@
         "PERMIT_EXPIRED",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -469,6 +488,7 @@
         "ALG_NOT_ALLOWED",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -488,6 +508,7 @@
         "SCHEMA_INVALID",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -507,6 +528,7 @@
         "DIGEST_MISMATCH",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -526,6 +548,7 @@
         "UNKNOWN_TRUST_ANCHOR",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -545,6 +568,7 @@
         "PERMIT_NOT_YET_VALID",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -568,6 +592,7 @@
         "POLICY_SNAPSHOT_MISMATCH",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -587,6 +612,7 @@
         "REPLAY_DETECTED",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -606,6 +632,7 @@
         "RUNTIME_MISMATCH",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -625,6 +652,7 @@
         "SIGNATURE_INVALID",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -644,6 +672,7 @@
         "STATUS_REVOKED",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -663,6 +692,7 @@
         "STATUS_STALE",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -682,6 +712,7 @@
         "TRUST_ANCHOR_EXPIRED",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -701,6 +732,7 @@
         "TRUST_ANCHOR_NOT_YET_VALID",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -720,6 +752,7 @@
         "TRUST_ANCHOR_REVOKED",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -739,6 +772,7 @@
         "UNKNOWN_TRUST_ANCHOR",
         "FAIL_CLOSED"
       ],
+      "should_execute": false,
       "status": "completed"
     },
     {
@@ -770,6 +804,7 @@
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
       ],
+      "should_execute": true,
       "status": "completed"
     },
     {
@@ -793,6 +828,7 @@
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
       ],
+      "should_execute": true,
       "status": "completed"
     },
     {
@@ -821,6 +857,7 @@
         "EFFECTIVE_REQUEST_HASH_MATCH",
         "NO_POLICY_VIOLATIONS"
       ],
+      "should_execute": true,
       "status": "completed"
     },
     {
@@ -839,6 +876,7 @@
       "reason_codes": [
         "POST_EXEC_LINKAGE_MISMATCH"
       ],
+      "should_execute": true,
       "status": "completed"
     },
     {
@@ -867,6 +905,7 @@
         "EFFECTIVE_REQUEST_HASH_MATCH",
         "NO_POLICY_VIOLATIONS"
       ],
+      "should_execute": true,
       "status": "completed"
     }
   ],

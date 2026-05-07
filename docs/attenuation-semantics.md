@@ -44,6 +44,11 @@ If post-execution evidence references the original request hash or a different e
 - `require_new_permit` - execution may not proceed until a fresh or narrower permit is issued
 - `deny_if_not_accepted` - the verifier can proceed only if the runtime accepts the effective constraints
 
+When `require_new_permit` is `true`, an AL2 conformance case should report
+`should_execute: false` even if the admission decision remains `attenuate`.
+The decision records that the verifier found a possible narrower path; the
+execution gate remains closed until a fresh permit is presented.
+
 ## Conformance Expectations
 
 The runnable conformance corpus checks that an attenuated receipt includes:

@@ -120,7 +120,9 @@
           "case_id",
           "path",
           "category",
-          "expected_outcome"
+          "expected_outcome",
+          "expected_should_execute",
+          "expected_reason_codes"
         ],
         "properties": {
           "case_id": {
@@ -142,6 +144,9 @@
           "expected_outcome": {
             "type": "string",
             "minLength": 1
+          },
+          "expected_should_execute": {
+            "type": "boolean"
           },
           "expected_reason_codes": {
             "type": "array",

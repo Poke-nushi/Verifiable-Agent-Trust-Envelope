@@ -33,7 +33,12 @@ An implementation that claims compatibility with this profile MUST:
 - treat A2A metadata as untrusted references, not authority
 - verify digest-bound references when a fixture explicitly requires an integrity check
 - resolve evidence references according to local verifier policy or the test trust bundle
+- fail closed on malformed proofs, digest mismatches, untrusted keys, stale
+  evidence, and replay before running local policy or attenuation evaluation
 - evaluate actor, principal, runtime, audience, permit window, status, and policy checks before execution
+- apply VATE permits and attenuation only as an additional narrowing layer over
+  transport authorization; VATE MUST NOT expand MCP, OAuth, A2A, or other
+  upstream authority
 - return exactly one admission decision: `allow`, `attenuate`, or `deny`
 - return canonical reason codes from `docs/reason-codes.md`
 - fail closed for stale status, revoked status, unknown trust anchors, replay, digest mismatch, and semantic binding mismatch unless a fixture explicitly states otherwise
@@ -58,11 +63,16 @@ The canonical outcome fields are:
 
 - `expected_outcome`
 - `actual_outcome`
+- `expected_should_execute`
+- `actual_should_execute`
 - `expected_reason_codes`
 - `actual_reason_codes`
 - `pass`
 
 The canonical reason code spelling is `SCREAMING_SNAKE_CASE`.
+`should_execute` is separate from the admission outcome. An attenuated decision
+can still have `should_execute: false` when a fresh or narrower permit is
+required before execution.
 
 Conformance reports MUST be machine-readable JSON and SHOULD validate against `schemas/conformance-report.schema.json`.
 

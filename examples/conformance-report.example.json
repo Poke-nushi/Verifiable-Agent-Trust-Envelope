@@ -14,6 +14,8 @@
       "category": "positive",
       "expected_outcome": "allow",
       "actual_outcome": "allow",
+      "expected_should_execute": true,
+      "actual_should_execute": true,
       "expected_reason_codes": [
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
@@ -30,6 +32,8 @@
       "category": "negative",
       "expected_outcome": "deny",
       "actual_outcome": "deny",
+      "expected_should_execute": false,
+      "actual_should_execute": false,
       "expected_reason_codes": [
         "PERMIT_EXPIRED",
         "FAIL_CLOSED"

@@ -37,6 +37,7 @@ Each result entry represents one corpus case:
 - `case_id`
 - `status` - `completed`, `skipped`, or `error`
 - `outcome` - the verifier's observed outcome
+- `should_execute` - whether the verifier result permits immediate execution
 - `reason_codes` - the verifier's machine-readable reason codes in order
 - optional `checks` - case-specific check names with `pass: true` when the expected check was satisfied
 - optional `limitations`
@@ -65,7 +66,7 @@ It exits non-zero when:
 - a case is missing
 - a case id is duplicated or unknown
 - a case is skipped or errored
-- outcome, reason codes, or required checks do not match the corpus expectation
+- outcome, `should_execute`, reason codes, or required checks do not match the corpus expectation
 
 ## Check Semantics
 
@@ -85,6 +86,10 @@ then a SUT result should report:
 
 The SUT does not need to reproduce the reference runner's internal boolean model.
 It only needs to state whether the named expected check was satisfied.
+
+`should_execute` is separate from `outcome`. A case can have
+`outcome: "attenuate"` while `should_execute: false` when the attenuation
+requires a fresh permit before execution can proceed.
 
 ## Claim Boundary
 

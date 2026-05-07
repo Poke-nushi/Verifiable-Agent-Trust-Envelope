@@ -138,6 +138,18 @@ Use this draft to complement MCP authorization and tool access with stronger cal
 
 This draft should not require every MCP tool or server to understand new transport primitives before basic interoperability is possible.
 
+VATE must not expand MCP or OAuth authority. The effective authority for a tool
+call is the intersection of:
+
+- the MCP server's tool and resource authorization
+- the OAuth or OpenID token audience, subject, client, and resource constraints
+- the VATE permit, runtime, status, attenuation, and local verifier policy
+
+If the VATE effective request exceeds any upstream authorization boundary, the
+verifier should deny or fail closed. An `allow` VATE admission only means the
+request passed VATE's additional gate; it is not a union with, or replacement
+for, MCP/OAuth authorization.
+
 ### AL2 transport-bound fixture
 
 The `v0.2` conformance corpus includes one MCP-shaped fixture:

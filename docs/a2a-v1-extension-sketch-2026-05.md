@@ -112,6 +112,10 @@ A signed Agent Card can help bind an agent's advertised identity, endpoints, and
 extension support to an integrity-protected discovery artifact. It does not, by
 itself, authorize a risky external write.
 
+When the evidence is an A2A Agent Card signature, the referenced signature
+material should follow A2A v1.0 Agent Card signing rules. In particular, the
+protected JWS header is expected to carry `alg`, `typ`, and `kid`.
+
 VATE should consume signed Agent Card material only as evidence:
 
 - as an `evidence_refs[]` item with `type: "signed_agent_card"`;
@@ -119,6 +123,10 @@ VATE should consume signed Agent Card material only as evidence:
   Agent Card artifact;
 - with local verifier policy deciding whether the Agent Card issuer, signature
   key, extension declaration, endpoint, and freshness are acceptable.
+
+This sketch does not make A2A Agent Card signature verification a VATE core
+operation. A verifier may either validate the signed Agent Card itself or consume
+an A2A-compliant validation result as adjacent evidence.
 
 The verifier must still evaluate the VATE admission request, trust bundle,
 runtime binding, permit window, status freshness, replay protection, local

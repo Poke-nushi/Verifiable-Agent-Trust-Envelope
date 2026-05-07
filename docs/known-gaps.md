@@ -122,6 +122,101 @@ Remaining work includes:
 The v0.2 examples use repository-hosted draft URIs.
 A future draft may move schema and extension identifiers to a persistent namespace such as `w3id.org`, but only after the namespace is controlled and documented.
 
+### 11. Digest And Canonicalization Need A Stable Profile
+
+The v0.2 runner uses dependency-free JSON canonical bytes produced by sorting
+object keys and removing insignificant whitespace before SHA-256 hashing.
+That is sufficient for current fixtures, but it is not a full production
+canonicalization profile.
+
+Remaining work includes:
+
+- deciding whether production profiles use RFC 8785 / JCS or a different named
+  byte basis
+- avoiding floats, duplicate object keys, and ambiguous Unicode normalization
+  until the byte basis is fixed
+- aligning digest descriptor shape and encoding across artifact references,
+  request hashes, attenuation hashes, receipts, policy snapshots, and A2A
+  metadata references
+
+### 12. Execution Semantics Need Sharper Production Semantics
+
+The conformance runner now treats `should_execute` as a first-class comparison
+field, and `require_new_permit` fixtures use `should_execute: false`. Production
+profiles still need a sharper execution gate model so "admitted with
+attenuation" is never misread as unconditional execution approval.
+
+Remaining work includes:
+
+- deciding whether future profiles keep `require_new_permit` as an `attenuate`
+  outcome with `should_execute: false`, or introduce a deny/defer-style outcome
+- extending execution-gate checks beyond fixture-level admission receipts into
+  adapter behavior and post-execution receipt validation
+- adding more fixtures where an admission decision exists but execution must not
+  proceed
+- adding transport-bound fixtures that prove VATE never widens MCP/OAuth
+  authority beyond the intersection of upstream authorization and local verifier
+  policy
+
+### 13. Post-Execution Linkage Is Still Too Narrow
+
+The runner checks the admission receipt id and admitted effective request hash,
+but stronger linkage is needed before claiming broad conformance readiness.
+
+Remaining work includes negative fixtures and checks for:
+
+- admission receipt digest mismatch
+- transaction id mismatch
+- runtime mismatch
+- post-execution receipt after deny
+- post-execution receipt after admission expiry
+- side effects that exceed attenuated effective constraints
+- policy snapshot digest mismatch after an otherwise matching effective request
+
+### 14. Status, Replay, And Runtime Binding Need Minimum AL2 Context
+
+The draft already names stale status, revoked status, replay, and runtime
+mismatch as fail-closed cases, but the minimum AL2 verification context is not
+yet explicit enough.
+
+Remaining work includes:
+
+- status source, checked time, freshness window, result, and fail behavior
+- replay key, nonce or equivalent uniqueness input, window, and idempotent retry
+  behavior
+- runtime proof freshness, audience, subject, and bound request hash
+- boundary fixtures for status freshness and replay behavior
+- explicit evaluation-order fixtures showing that malformed proof, stale proof,
+  replay, and digest mismatch fail closed before policy or attenuation can allow
+  execution
+- algorithm-confusion fixtures beyond `alg=none`, such as symmetric/asymmetric
+  downgrade attempts
+- attenuation boundary fixtures for malicious paths and schema type edges
+
+### 15. Evidence Type Vocabulary Is Still Informal
+
+The repo has canonical reason codes, but evidence type strings are currently
+spread across schemas, fixtures, and interop notes.
+
+Remaining work includes:
+
+- creating a small evidence type registry
+- separating generic evidence types from protocol-specific hints
+- defining naming and extension rules for adjacent protocols
+- ensuring trust bundles and policy snapshots refer to the same vocabulary
+
+### 16. Report Integrity Is Not Yet Defined
+
+The SUT result and implementation report schemas carry corpus digests, but they
+do not yet define how a third-party report is authenticated or published.
+
+Remaining work includes:
+
+- documenting how implementation reports should be hosted under an implementer
+  controlled origin
+- deciding whether report proofs should use detached JWS references
+- clarifying what can and cannot be inferred from a passing report
+
 ## Practical Reading Of These Gaps
 
 These gaps do **not** mean the current repo is empty.

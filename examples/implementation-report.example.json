@@ -50,12 +50,16 @@
       "case_id": "allow-valid-admission",
       "expected_outcome": "allow",
       "actual_outcome": "allow",
+      "expected_should_execute": true,
+      "actual_should_execute": true,
       "pass": true
     },
     {
       "case_id": "deny-expired-permit",
       "expected_outcome": "deny",
       "actual_outcome": "deny",
+      "expected_should_execute": false,
+      "actual_should_execute": false,
       "pass": true
     }
   ],

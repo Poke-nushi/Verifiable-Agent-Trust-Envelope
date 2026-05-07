@@ -61,6 +61,8 @@
           "category",
           "expected_outcome",
           "actual_outcome",
+          "expected_should_execute",
+          "actual_should_execute",
           "expected_reason_codes",
           "actual_reason_codes",
           "pass"
@@ -81,6 +83,15 @@
           "actual_outcome": {
             "type": "string",
             "minLength": 1
+          },
+          "expected_should_execute": {
+            "type": "boolean"
+          },
+          "actual_should_execute": {
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "expected_reason_codes": {
             "type": "array",

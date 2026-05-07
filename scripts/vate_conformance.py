@@ -163,6 +163,7 @@ def case_index_entry(case_path: Path) -> dict[str, Any]:
         "category": case["category"],
         "title": case.get("title", case["case_id"]),
         "expected_outcome": expected_outcome_value,
+        "expected_should_execute": expected_should_execute(case),
         "expected_reason_codes": expected.get("reason_codes", []),
         "validation_focus": case.get("validation_focus", []),
         "artifacts": case.get("artifacts", {}),
@@ -248,6 +249,21 @@ def actual_reason_codes(admission_receipt: dict[str, Any] | None) -> list[str]:
         return []
     codes = admission_receipt.get("decision", {}).get("reason_codes", [])
     return [str(code) for code in codes]
+
+
+def expected_should_execute(case: dict[str, Any]) -> bool:
+    return bool(case.get("expected", {}).get("should_execute", False))
+
+
+def actual_should_execute(admission_receipt: dict[str, Any] | None) -> bool:
+    if admission_receipt is None:
+        return False
+    outcome = admission_receipt.get("decision", {}).get("outcome")
+    if outcome == "deny":
+        return False
+    if outcome == "attenuate" and admission_receipt.get("attenuation", {}).get("require_new_permit") is True:
+        return False
+    return outcome in {"allow", "attenuate"}
 
 
 def actual_linkage_reason_codes(
@@ -740,11 +756,15 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
         actual_codes = actual_reason_codes(admission)
     expected = expected_outcome(case)
     actual = observed_outcome(case, admission, post_execution)
+    expected_execute = expected_should_execute(case)
+    actual_execute = actual_should_execute(admission)
     jose_results, jose_failures = evaluate_jose_checks(case)
 
     failures: list[str] = []
     if actual != expected:
         failures.append(f"outcome: expected {expected} actual {actual}")
+    if actual_execute != expected_execute:
+        failures.append(f"should_execute: expected {expected_execute} actual {actual_execute}")
     if actual_codes != expected_codes:
         failures.append(f"reason_codes: expected {expected_codes} actual {actual_codes}")
 
@@ -771,6 +791,8 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
         "category": case["category"],
         "expected_outcome": expected,
         "actual_outcome": actual,
+        "expected_should_execute": expected_execute,
+        "actual_should_execute": actual_execute,
         "expected_reason_codes": expected_codes,
         "actual_reason_codes": actual_codes,
         "pass": not failures,
@@ -808,6 +830,7 @@ def load_case_expectations(corpus_root: Path) -> list[dict[str, Any]]:
                 "case_id": case["case_id"],
                 "category": case["category"],
                 "expected_outcome": expected_outcome(case),
+                "expected_should_execute": expected_should_execute(case),
                 "expected_reason_codes": [str(code) for code in case["expected"]["reason_codes"]],
                 "expected_checks": [
                     {
@@ -880,10 +903,22 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
         failures: list[str] = []
         if result is None:
             actual_outcome = "missing"
+            actual_should_execute_value = None
             actual_reason_codes: list[str] = []
             failures.append("sut result missing")
         else:
             actual_outcome = str(result.get("outcome", "missing"))
+            raw_should_execute = result.get("should_execute")
+            if isinstance(raw_should_execute, bool):
+                actual_should_execute_value = raw_should_execute
+                if actual_should_execute_value != expected["expected_should_execute"]:
+                    failures.append(
+                        "should_execute: "
+                        f"expected {expected['expected_should_execute']} actual {actual_should_execute_value}"
+                    )
+            else:
+                actual_should_execute_value = None
+                failures.append("should_execute: expected boolean")
             raw_reason_codes = result.get("reason_codes", [])
             if not isinstance(raw_reason_codes, list):
                 actual_reason_codes = []
@@ -926,6 +961,8 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
                 "category": expected["category"],
                 "expected_outcome": expected["expected_outcome"],
                 "actual_outcome": actual_outcome,
+                "expected_should_execute": expected["expected_should_execute"],
+                "actual_should_execute": actual_should_execute_value,
                 "expected_reason_codes": expected["expected_reason_codes"],
                 "actual_reason_codes": actual_reason_codes,
                 "pass": not failures,
@@ -1007,6 +1044,8 @@ def make_implementation_report(args: argparse.Namespace, conformance_report: dic
                 "case_id": case["case_id"],
                 "expected_outcome": case["expected_outcome"],
                 "actual_outcome": case["actual_outcome"],
+                "expected_should_execute": case["expected_should_execute"],
+                "actual_should_execute": case["actual_should_execute"],
                 "pass": case["pass"],
             }
             for case in conformance_report["cases"]
@@ -1019,9 +1058,9 @@ def make_implementation_report(args: argparse.Namespace, conformance_report: dic
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run the VATE AL2 v0.2 conformance corpus")
+    parser = argparse.ArgumentParser(description="Check VATE AL2 v0.2 fixture artifacts or compare external SUT results")
     subparsers = parser.add_subparsers(dest="command", required=True)
-    run = subparsers.add_parser("run", help="run a conformance corpus")
+    run = subparsers.add_parser("run", help="check repository fixture artifacts with the reference runner")
     run.add_argument("--corpus-root", required=True, help="corpus root containing cases/")
     run.add_argument("--report", required=True, help="path to write the machine-readable report")
     run.add_argument("--implementation-report", help="optional path to write an implementation report")
@@ -1036,7 +1075,7 @@ def parse_args() -> argparse.Namespace:
     index = subparsers.add_parser("index", help="write a language-neutral corpus index")
     index.add_argument("--corpus-root", required=True, help="corpus root containing cases/")
     index.add_argument("--out", required=True, help="path to write the corpus index")
-    compare = subparsers.add_parser("compare", help="compare SUT results against a corpus")
+    compare = subparsers.add_parser("compare", help="compare external SUT results against a corpus snapshot")
     compare.add_argument("--corpus-root", required=True, help="corpus root containing cases/")
     compare.add_argument("--sut-results", required=True, help="path to SUT result JSON")
     compare.add_argument("--report", required=True, help="path to write the comparison report")

@@ -10,7 +10,7 @@
   },
   "expected": {
     "admission_decision": "attenuate",
-    "should_execute": true,
+    "should_execute": false,
     "reason_codes": [
       "NEW_PERMIT_REQUIRED"
     ],

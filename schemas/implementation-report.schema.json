@@ -234,6 +234,15 @@
             "type": "string",
             "minLength": 1
           },
+          "expected_should_execute": {
+            "type": "boolean"
+          },
+          "actual_should_execute": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
           "pass": {
             "type": "boolean"
           }

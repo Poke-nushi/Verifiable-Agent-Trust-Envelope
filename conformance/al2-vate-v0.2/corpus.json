@@ -14,6 +14,7 @@
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
       ],
+      "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/allow-ap2-hnp-preauthorized-mandate.json",
       "title": "Allow a pre-authorized AP2 Human Not Present mandate",
       "validation_focus": [
@@ -36,6 +37,7 @@
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
       ],
+      "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/allow-jose-detached-runtime-attestation.json",
       "title": "Allow byte-bound detached JWS runtime attestation fixture",
       "validation_focus": [
@@ -56,6 +58,7 @@
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
       ],
+      "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/allow-mcp-oauth-transport-bound.json",
       "title": "Allow an MCP OAuth-bound tool invocation",
       "validation_focus": [
@@ -76,6 +79,7 @@
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
       ],
+      "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/allow-valid-admission.json",
       "title": "Allow a valid AL2 admission receipt",
       "validation_focus": [
@@ -96,6 +100,7 @@
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
       ],
+      "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/allow-valid-basic-external-write.json",
       "title": "Allow a valid basic external write",
       "validation_focus": [
@@ -115,6 +120,7 @@
         "POLICY_SNAPSHOT_MATCH",
         "POLICY_MATCH"
       ],
+      "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/allow-valid-with-policy-snapshot.json",
       "title": "Allow with digest-bound policy snapshot",
       "validation_focus": [
@@ -133,6 +139,7 @@
         "STATUS_FRESH",
         "POLICY_MATCH"
       ],
+      "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/allow-valid-with-status-fresh.json",
       "title": "Allow with fresh status evidence",
       "validation_focus": [
@@ -153,6 +160,7 @@
         "PAYMENT_TOKEN_LIMIT",
         "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
       ],
+      "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/attenuate-ap2-hnp-amount-overrun.json",
       "title": "Attenuate an AP2 Human Not Present amount overrun",
       "validation_focus": [
@@ -174,6 +182,7 @@
         "PAYMENT_TOKEN_LIMIT",
         "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
       ],
+      "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/attenuate-max-amount.json",
       "title": "Attenuate a payment-adjacent request by max amount",
       "validation_focus": [
@@ -194,6 +203,7 @@
       "expected_reason_codes": [
         "NEW_PERMIT_REQUIRED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/attenuate-requires-new-permit.json",
       "title": "Attenuate by requiring a fresh permit",
       "validation_focus": [
@@ -211,6 +221,7 @@
       "expected_reason_codes": [
         "TARGET_SCOPE_NARROWED"
       ],
+      "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/attenuate-target-scope.json",
       "title": "Attenuate target resource scope",
       "validation_focus": [
@@ -230,6 +241,7 @@
         "ALG_NOT_ALLOWED",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-alg-not-allowed.json",
       "title": "Deny a disallowed proof algorithm",
       "validation_focus": [
@@ -250,6 +262,7 @@
         "SCHEMA_INVALID",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-ambiguous-trust-anchor.json",
       "title": "Deny an ambiguous trust anchor",
       "validation_focus": [
@@ -271,6 +284,7 @@
         "REPLAY_DETECTED",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-ap2-hnp-replay.json",
       "title": "Deny a replayed AP2 Human Not Present mandate",
       "validation_focus": [
@@ -292,6 +306,7 @@
         "PERMIT_EXPIRED",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-ap2-hnp-stale-mandate.json",
       "title": "Deny an expired AP2 Human Not Present mandate",
       "validation_focus": [
@@ -318,6 +333,7 @@
         "AUDIENCE_MISMATCH",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-audience-mismatch.json",
       "title": "Deny an audience mismatch before execution",
       "validation_focus": [
@@ -338,6 +354,7 @@
         "DIGEST_MISMATCH",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-digest-mismatch.json",
       "title": "Deny a digest mismatch",
       "validation_focus": [
@@ -357,6 +374,7 @@
         "ISSUER_NOT_AUTHORIZED",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-evidence-type-not-allowed.json",
       "title": "Deny an unauthorized evidence type",
       "validation_focus": [
@@ -376,6 +394,7 @@
         "PERMIT_EXPIRED",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-expired-permit.json",
       "title": "Deny an expired task-scoped permit",
       "validation_focus": [
@@ -399,6 +418,7 @@
         "ALG_NOT_ALLOWED",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-jose-alg-none.json",
       "title": "Deny detached JWS fixture using alg none",
       "validation_focus": [
@@ -421,6 +441,7 @@
         "SCHEMA_INVALID",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-jose-crit-unsupported.json",
       "title": "Deny detached JWS fixture with unsupported critical header",
       "validation_focus": [
@@ -443,6 +464,7 @@
         "DIGEST_MISMATCH",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-jose-payload-digest-mismatch.json",
       "title": "Deny detached JWS fixture with payload digest mismatch",
       "validation_focus": [
@@ -463,6 +485,7 @@
         "UNKNOWN_TRUST_ANCHOR",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-kid-mismatch.json",
       "title": "Deny a key id mismatch",
       "validation_focus": [
@@ -482,6 +505,7 @@
         "PERMIT_NOT_YET_VALID",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-not-yet-valid-permit.json",
       "title": "Deny a permit before its validity window",
       "validation_focus": [
@@ -501,6 +525,7 @@
         "POLICY_SNAPSHOT_MISMATCH",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-policy-snapshot-mismatch.json",
       "title": "Deny when policy snapshot digest does not match",
       "validation_focus": [
@@ -520,6 +545,7 @@
         "REPLAY_DETECTED",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-replay-detected.json",
       "title": "Deny a replayed admission request",
       "validation_focus": [
@@ -538,6 +564,7 @@
         "RUNTIME_MISMATCH",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-runtime-mismatch.json",
       "title": "Deny a runtime binding mismatch",
       "validation_focus": [
@@ -556,6 +583,7 @@
         "SIGNATURE_INVALID",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-signature-tampered.json",
       "title": "Deny tampered signed evidence",
       "validation_focus": [
@@ -574,6 +602,7 @@
         "STATUS_REVOKED",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-status-revoked.json",
       "title": "Deny revoked status",
       "validation_focus": [
@@ -592,6 +621,7 @@
         "STATUS_STALE",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-status-stale-fail-closed.json",
       "title": "Deny stale status under fail-closed policy",
       "validation_focus": [
@@ -611,6 +641,7 @@
         "TRUST_ANCHOR_EXPIRED",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-trust-anchor-expired.json",
       "title": "Deny an expired trust anchor",
       "validation_focus": [
@@ -631,6 +662,7 @@
         "TRUST_ANCHOR_NOT_YET_VALID",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-trust-anchor-not-yet-valid.json",
       "title": "Deny a trust anchor before its validity window",
       "validation_focus": [
@@ -651,6 +683,7 @@
         "TRUST_ANCHOR_REVOKED",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-trust-anchor-revoked.json",
       "title": "Deny a revoked trust anchor",
       "validation_focus": [
@@ -671,6 +704,7 @@
         "UNKNOWN_TRUST_ANCHOR",
         "FAIL_CLOSED"
       ],
+      "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/deny-unknown-trust-anchor.json",
       "title": "Deny an unknown trust anchor",
       "validation_focus": [
@@ -690,6 +724,7 @@
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
       ],
+      "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/interop-ap2-ucp-commerce-evidence.json",
       "title": "Consume AP2 mandate and UCP checkout evidence",
       "validation_focus": [
@@ -711,6 +746,7 @@
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
       ],
+      "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/interop-oap-decision-evidence.json",
       "title": "Consume OAP decision evidence",
       "validation_focus": [
@@ -733,6 +769,7 @@
         "EFFECTIVE_REQUEST_HASH_MATCH",
         "NO_POLICY_VIOLATIONS"
       ],
+      "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/post-execution-ap2-hnp-linkage-success.json",
       "title": "Link AP2 Human Not Present execution back to admission",
       "validation_focus": [
@@ -752,6 +789,7 @@
       "expected_reason_codes": [
         "POST_EXEC_LINKAGE_MISMATCH"
       ],
+      "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/post-execution-linkage-mismatch.json",
       "title": "Reject post-execution linkage mismatch",
       "validation_focus": [
@@ -773,6 +811,7 @@
         "EFFECTIVE_REQUEST_HASH_MATCH",
         "NO_POLICY_VIOLATIONS"
       ],
+      "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/post-execution-linkage-success.json",
       "title": "Link post-execution receipt to the admitted effective request",
       "validation_focus": [
@@ -786,7 +825,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "7212d24e46ef20a3e02af56f24d013b0443704aba2e5f5b41cca8f9b828584a6"
+    "value": "7f7e4a800aeefc568b2d8594a87fe3f06e0c3c46c76fc8e23444aad58d93edda"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -839,7 +878,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/attenuate-requires-new-permit.json",
-      "sha256": "9679eac6756e8bf69a8a0bd23bed3346741e3e7c7352d4a7ae51598b9a63d817"
+      "sha256": "51080353ccaa890a10efe69651ea123c67ce6900e473e365a77a13ed8058cefc"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/attenuate-target-scope.json",

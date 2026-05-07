@@ -43,6 +43,8 @@ For implementations that do not use the reference runner directly, publish a SUT
 - `docs/conformance/sut-adapter-contract.md`
 
 The reference runner can compare that SUT result file against the corpus and emit a standard conformance report.
+Use `compare` for external SUT review. Use `run` to check the repository's own
+fixture artifacts and reference runner behavior.
 
 ## Reference Runner Command
 
@@ -74,6 +76,7 @@ The committed `corpus.json` uses the same manifest and digest basis.
 For early interop review, a useful report should answer:
 
 - did the implementation produce the expected `allow / attenuate / deny` outcomes
+- did it expose the expected execution gate through `should_execute`
 - did it emit the expected reason codes
 - did it preserve machine-readable attenuation fields
 - did it fail closed for stale, revoked, replayed, mismatched, or untrusted inputs
