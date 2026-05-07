@@ -76,6 +76,8 @@ EXAMPLE_PAIRS = [
     ("examples/trust-bundle.example.json", "schemas/trust-bundle.schema.json"),
     ("examples/conformance-report.example.json", "schemas/conformance-report.schema.json"),
     ("examples/implementation-report.example.json", "schemas/implementation-report.schema.json"),
+    ("examples/policies/merchant-purchase-al2-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),
+    ("examples/policies/al2-repo-merge-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),
 ]
 
 
@@ -88,6 +90,10 @@ def iter_example_pairs() -> list[tuple[str, str]]:
     pairs.extend(
         (str(path.relative_to(ROOT)), "schemas/post-execution-receipt.schema.json")
         for path in sorted((ROOT / "examples" / "receipts").glob("post-execution*.example.json"))
+    )
+    pairs.extend(
+        (str(path.relative_to(ROOT)), "schemas/policy-snapshot.schema.json")
+        for path in sorted((ROOT / "examples" / "policies").glob("*.example.json"))
     )
     pairs.extend(
         (str(path.relative_to(ROOT)), "schemas/admission-request.schema.json")

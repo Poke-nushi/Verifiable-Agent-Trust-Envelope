@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:policy-snapshot:0.2",
+  "title": "VATE Policy Snapshot",
+  "description": "Digest-bound verifier policy snapshot used as the audit basis for an admission decision.",
+  "type": "object",
+  "required": [
+    "version",
+    "type",
+    "policy_id",
+    "policy_version",
+    "issued_at",
+    "issuer",
+    "rules"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "vate-0.2"
+    },
+    "type": {
+      "type": "string",
+      "const": "policy_snapshot"
+    },
+    "policy_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policy_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "issuer": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "key_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "proof": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

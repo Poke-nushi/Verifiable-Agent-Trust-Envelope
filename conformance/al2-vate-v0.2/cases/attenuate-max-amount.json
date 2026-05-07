@@ -7,7 +7,8 @@
   "purpose": "A verifier should admit a narrower effective request when local policy or payment authority does not support the original requested amount.",
   "artifacts": {
     "a2a_metadata": "examples/a2a/metadata-admission-issued.json",
-    "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json"
+    "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+    "policy_snapshot": "examples/policies/merchant-purchase-al2-policy-snapshot.example.json"
   },
   "expected": {
     "admission_decision": "attenuate",
@@ -45,5 +46,26 @@
     "digest-bound A2A receipt reference",
     "optional policy snapshot reference",
     "generic payment evidence type with optional protocol hint"
+  ],
+  "policy_snapshot_checks": [
+    {
+      "artifact": "policy_snapshot",
+      "expect_match": true,
+      "reference_paths": [
+        {
+          "artifact": "admission_receipt",
+          "path": "policy.policy_snapshot"
+        },
+        {
+          "artifact": "a2a_metadata",
+          "path": "policy_snapshot"
+        }
+      ],
+      "compare_fields": [
+        "uri",
+        "media_type",
+        "digest"
+      ]
+    }
   ]
 }

@@ -1,0 +1,24 @@
+{
+  "version": "vate-0.2",
+  "type": "policy_snapshot",
+  "policy_id": "al2-repo-merge",
+  "policy_version": "2026-07-01.1",
+  "issued_at": "2026-07-01T00:01:00Z",
+  "issuer": {
+    "id": "did:web:verifier.example"
+  },
+  "rules": {
+    "allowed_actions": [
+      "repo.pull_request.merge"
+    ],
+    "target_audiences": [
+      "https://repo.example/a2a"
+    ],
+    "required_evidence_types": [
+      "mission_permit"
+    ],
+    "requires_human_approval": true,
+    "status_freshness_seconds": 300,
+    "fail_closed": true
+  }
+}

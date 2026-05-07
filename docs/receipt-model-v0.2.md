@@ -37,6 +37,7 @@ It records:
 - actor, principal, and runtime binding
 - evidence references and verification results
 - policy id and policy version
+- optional digest-bound policy snapshot reference for audit-heavy deployments
 - decision outcome
 - reason codes
 - expiration
@@ -50,6 +51,7 @@ Allowed decision outcomes:
 
 An admission receipt with `deny` is still useful.
 It records why execution did not proceed.
+If a referenced policy snapshot digest does not match the policy artifact used as the decision basis, the verifier should deny or fail closed with `POLICY_SNAPSHOT_MISMATCH`.
 
 ## Post-Execution Receipt
 
@@ -134,4 +136,3 @@ This keeps receipts useful for audit and debugging without requiring VATE to red
 - `examples/receipts/admission-attenuate-max-amount.example.json`
 - `examples/receipts/admission-deny-expired-permit.example.json`
 - `examples/receipts/post-execution-success.example.json`
-

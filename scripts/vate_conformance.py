@@ -80,6 +80,8 @@ def referenced_paths(case: dict[str, Any]) -> list[Path]:
         paths.append(resolve_artifact_path(case, check["artifact"]))
     for check in case.get("trust_checks", []):
         paths.append(resolve_artifact_path(case, check["trust_bundle"]))
+    for check in case.get("policy_snapshot_checks", []):
+        paths.append(resolve_artifact_path(case, check["artifact"]))
     return paths
 
 
@@ -307,6 +309,66 @@ def evaluate_linkage_checks(
     return failures
 
 
+def evaluate_policy_snapshot_checks(
+    case: dict[str, Any],
+    admission: dict[str, Any] | None,
+    a2a_metadata: dict[str, Any] | None,
+) -> list[str]:
+    failures: list[str] = []
+    for check in case.get("policy_snapshot_checks", []):
+        artifact = read_json(resolve_artifact_path(case, check["artifact"]))
+        artifact_digest = {
+            "alg": "sha-256",
+            "value": sha256_value(artifact),
+        }
+        expect_match = bool(check.get("expect_match", True))
+        reference_paths = check.get(
+            "reference_paths",
+            [
+                {
+                    "artifact": "admission_receipt",
+                    "path": "policy.policy_snapshot",
+                }
+            ],
+        )
+
+        references: list[tuple[str, dict[str, Any]]] = []
+        for reference in reference_paths:
+            artifact_name = reference["artifact"]
+            if artifact_name == "admission_receipt":
+                source = admission
+            elif artifact_name == "a2a_metadata":
+                source = a2a_metadata
+            else:
+                failures.append(f"policy_snapshot {artifact_name}: unsupported reference artifact")
+                continue
+            if source is None:
+                failures.append(f"policy_snapshot {artifact_name}: artifact missing")
+                continue
+            try:
+                snapshot_ref = get_path(source, reference["path"])
+            except (KeyError, IndexError, TypeError, ValueError):
+                failures.append(f"policy_snapshot {artifact_name}: reference path missing")
+                continue
+            references.append((artifact_name, snapshot_ref))
+
+            digest_matches = snapshot_ref.get("digest") == artifact_digest
+            if digest_matches != expect_match:
+                failures.append(
+                    f"policy_snapshot {artifact_name}: expected digest match={expect_match} actual match={digest_matches}"
+                )
+
+        if len(references) < 2:
+            continue
+
+        first_name, first_ref = references[0]
+        for name, snapshot_ref in references[1:]:
+            for field in check.get("compare_fields", ["uri", "media_type", "digest"]):
+                if first_ref.get(field) != snapshot_ref.get(field):
+                    failures.append(f"policy_snapshot {first_name}/{name}: field {field} mismatch")
+    return failures
+
+
 def evaluate_case(case_path: Path) -> dict[str, Any]:
     case = read_json(case_path)
     admission = load_artifact(case, "admission_receipt")
@@ -340,6 +402,7 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
     failures.extend(evaluate_integrity_checks(case))
     failures.extend(evaluate_trust_checks(case))
     failures.extend(evaluate_linkage_checks(case, admission, post_execution))
+    failures.extend(evaluate_policy_snapshot_checks(case, admission, a2a_metadata))
 
     return {
         "case_id": case["case_id"],

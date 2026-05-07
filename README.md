@@ -138,7 +138,7 @@ The most useful feedback for this draft is currently:
 - **Primary language**: English
 - **Research refresh date**: 2026-05-04
 - **Primary battlefield**: `AL2` external digital write
-- **Implemented now**: payload schemas, examples, verifier guidance, reference demos, verifier policy example, AL2 HTTP conformance corpus, runnable v0.2 AL2 conformance corpus, implementation report schema, MCP/OAuth transport-bound fixture, AP2/UCP commerce crosswalk fixture, v0.2 AL2 verifier admission profile draft, AL2 admission interop profile, dependency-free verifier core, A2A metadata adapter demo
+- **Implemented now**: payload schemas, examples, verifier guidance, reference demos, verifier policy example, policy snapshot schema, AL2 HTTP conformance corpus, runnable v0.2 AL2 conformance corpus, implementation report schema, MCP/OAuth transport-bound fixture, AP2/UCP commerce crosswalk fixture, v0.2 AL2 verifier admission profile draft, AL2 admission interop profile, dependency-free verifier core, A2A metadata adapter demo
 - **Planned later**: pairwise presentation profile, richer capability registry, formal `AID`, physical `ABS` profiles
 
 ## Repository Map

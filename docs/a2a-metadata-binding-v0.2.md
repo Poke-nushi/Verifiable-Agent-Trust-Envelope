@@ -100,6 +100,9 @@ At minimum:
 
 For `admission_issued`, the required decision digest is the `admission_receipt.digest`.
 An optional `policy_snapshot.digest` can be added when the verifier wants consumers or auditors to reconstruct the policy basis for the decision.
+When both the admission receipt and A2A metadata carry `policy_snapshot`, the `uri`, `media_type`, and `digest` values should match.
+The digest should cover the canonical policy snapshot artifact, not a human-readable policy label or mutable policy URL.
+The current conformance fixtures use SHA-256 over sorted-key compact JSON and encode the digest value as lowercase hexadecimal.
 
 The verifier must not treat an A2A Agent Card as sufficient proof of current task authority.
 The verifier must evaluate the referenced artifacts against local policy before accepting a risky external write.

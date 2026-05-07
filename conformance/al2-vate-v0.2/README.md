@@ -29,6 +29,7 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/deny-not-yet-valid-permit.json`
 - `cases/deny-audience-mismatch.json`
 - `cases/deny-digest-mismatch.json`
+- `cases/deny-policy-snapshot-mismatch.json`
 - `cases/deny-signature-tampered.json`
 - `cases/deny-unknown-trust-anchor.json`
 - `cases/deny-runtime-mismatch.json`
@@ -68,6 +69,12 @@ python3 scripts/vate_conformance.py run \
 The implementation report follows:
 
 - `schemas/implementation-report.schema.json`
+
+## Digest Canonicalization
+
+For this dependency-free fixture runner, digest checks use canonical JSON bytes produced by sorting object keys and removing insignificant whitespace before applying SHA-256.
+The digest value is encoded as lowercase hexadecimal in the policy snapshot fixtures.
+Future profiles may replace this with a named external canonicalization scheme, but conformance cases must state which digest basis they use.
 
 ## Intent
 

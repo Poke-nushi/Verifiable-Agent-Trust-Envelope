@@ -1,0 +1,29 @@
+{
+  "version": "vate-0.2",
+  "type": "policy_snapshot",
+  "policy_id": "merchant-purchase-al2",
+  "policy_version": "2026-05-04.1",
+  "issued_at": "2026-05-04T03:00:00Z",
+  "issuer": {
+    "id": "did:web:verifier.example",
+    "key_id": "did:web:verifier.example#key-1"
+  },
+  "rules": {
+    "allowed_actions": [
+      "commerce.purchase"
+    ],
+    "target_audiences": [
+      "https://agent.example/a2a"
+    ],
+    "max_amount": {
+      "currency": "USD",
+      "value": "25.00"
+    },
+    "required_evidence_types": [
+      "agent_card",
+      "delegated_payment_token"
+    ],
+    "status_freshness_seconds": 300,
+    "fail_closed": true
+  }
+}

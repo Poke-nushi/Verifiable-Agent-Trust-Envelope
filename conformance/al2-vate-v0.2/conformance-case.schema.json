@@ -58,6 +58,10 @@
           "type": "string",
           "minLength": 1
         },
+        "policy_snapshot": {
+          "type": "string",
+          "minLength": 1
+        },
         "post_execution_receipt": {
           "type": "string",
           "minLength": 1
@@ -144,6 +148,57 @@
       "items": {
         "type": "string",
         "minLength": 1
+      }
+    },
+    "policy_snapshot_checks": {
+      "type": "array",
+      "description": "Checks that a policy snapshot artifact digest matches or intentionally does not match the digest-bound references in receipts or metadata.",
+      "items": {
+        "type": "object",
+        "required": [
+          "artifact"
+        ],
+        "properties": {
+          "artifact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expect_match": {
+            "type": "boolean"
+          },
+          "reference_paths": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "artifact",
+                "path"
+              ],
+              "properties": {
+                "artifact": {
+                  "type": "string",
+                  "enum": [
+                    "admission_receipt",
+                    "a2a_metadata"
+                  ]
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": true
+            }
+          },
+          "compare_fields": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "additionalProperties": true
       }
     }
   },

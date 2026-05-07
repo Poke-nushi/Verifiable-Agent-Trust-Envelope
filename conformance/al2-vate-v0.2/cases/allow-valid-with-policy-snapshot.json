@@ -6,7 +6,8 @@
   "category": "positive",
   "purpose": "A verifier should preserve the policy snapshot reference used as the audit basis for an allow decision.",
   "artifacts": {
-    "admission_receipt": "examples/receipts/admission-allow-policy-snapshot.example.json"
+    "admission_receipt": "examples/receipts/admission-allow-policy-snapshot.example.json",
+    "policy_snapshot": "examples/policies/al2-repo-merge-policy-snapshot.example.json"
   },
   "expected": {
     "admission_decision": "allow",
@@ -29,5 +30,17 @@
   "validation_focus": [
     "policy snapshot reference",
     "audit basis"
+  ],
+  "policy_snapshot_checks": [
+    {
+      "artifact": "policy_snapshot",
+      "expect_match": true,
+      "reference_paths": [
+        {
+          "artifact": "admission_receipt",
+          "path": "policy.policy_snapshot"
+        }
+      ]
+    }
   ]
 }

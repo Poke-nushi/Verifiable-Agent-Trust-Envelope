@@ -19,7 +19,7 @@
     "media_type": "application/vate-policy-snapshot+json",
     "digest": {
       "alg": "sha-256",
-      "value": "base64url-policy-snapshot-digest"
+      "value": "eda9c4cb303c03cbbb7cdc5859d4ce9e9008e2f13d708a3e07540dd38f99d7e0"
     }
   },
   "issuer": "did:web:verifier.example",
