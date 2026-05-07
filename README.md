@@ -138,7 +138,7 @@ The most useful feedback for this draft is currently:
 - **Primary language**: English
 - **Research refresh date**: 2026-05-04
 - **Primary battlefield**: `AL2` external digital write
-- **Implemented now**: payload schemas, examples, verifier guidance, reference demos, verifier policy example, policy snapshot schema, trust-bundle hardening checks, AL2 HTTP conformance corpus, runnable v0.2 AL2 conformance corpus, implementation report schema, MCP/OAuth transport-bound fixture, AP2/UCP commerce crosswalk fixture, v0.2 AL2 verifier admission profile draft, AL2 admission interop profile, dependency-free verifier core, A2A metadata adapter demo
+- **Implemented now**: payload schemas, examples, verifier guidance, reference demos, verifier policy example, policy snapshot schema, trust-bundle hardening checks, AL2 HTTP conformance corpus, runnable v0.2 AL2 conformance corpus, language-neutral corpus index, implementation report schema, MCP/OAuth transport-bound fixture, AP2/UCP commerce crosswalk fixture, v0.2 AL2 verifier admission profile draft, AL2 admission interop profile, dependency-free verifier core, A2A metadata adapter demo
 - **Planned later**: pairwise presentation profile, richer capability registry, formal `AID`, physical `ABS` profiles
 
 ## Repository Map
@@ -173,6 +173,10 @@ The most useful feedback for this draft is currently:
   v0.2 split between admission receipts and post-execution receipts
 - [docs/trust-bundle-hardening.md](docs/trust-bundle-hardening.md)
   Trust-bundle checks for issuer, key, algorithm, evidence type, status, and validity windows
+- [docs/conformance/corpus-format.md](docs/conformance/corpus-format.md)
+  Language-neutral corpus index and digest rules for non-reference implementations
+- [docs/profiles/vate-jose-proof-profile-notes-2026-07.md](docs/profiles/vate-jose-proof-profile-notes-2026-07.md)
+  Production JOSE proof profile notes beyond the current fixture runner
 - [conformance/al2-vate-v0.2/README.md](conformance/al2-vate-v0.2/README.md)
   Runnable conformance corpus for v0.2 admission and receipt semantics
 - [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)

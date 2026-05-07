@@ -30,6 +30,13 @@ The report has four important blocks:
 - `conformance_report` - URI, media type, and digest of the runner output
 - `summary` and `case_results` - the result surface a reviewer can compare across implementations
 
+The portable corpus shape is published separately as:
+
+- `conformance/al2-vate-v0.2/corpus.json`
+- `schemas/conformance-corpus.schema.json`
+
+Non-reference implementations should use the corpus index to discover cases and artifacts, then publish their own conformance and implementation reports.
+
 ## Reference Runner Command
 
 ```bash
@@ -53,6 +60,7 @@ The runner writes:
 The implementation report includes a digest of the conformance report and a digest of the corpus snapshot.
 The corpus digest is computed over the sorted `corpus.manifest` array.
 Each manifest entry records a repository-relative artifact path and the artifact's raw file SHA-256 digest.
+The committed `corpus.json` uses the same manifest and digest basis.
 
 ## Review Use
 

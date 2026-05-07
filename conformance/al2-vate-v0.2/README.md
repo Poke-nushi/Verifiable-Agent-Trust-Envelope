@@ -17,6 +17,7 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 ## Files
 
 - `conformance-case.schema.json` - common shape for the case files
+- `corpus.json` - language-neutral corpus index for non-reference implementations
 - `cases/allow-valid-admission.json`
 - `cases/allow-valid-basic-external-write.json`
 - `cases/allow-mcp-oauth-transport-bound.json`
@@ -76,6 +77,18 @@ python3 scripts/vate_conformance.py run \
 The implementation report follows:
 
 - `schemas/implementation-report.schema.json`
+
+To regenerate the language-neutral corpus index:
+
+```bash
+python3 scripts/vate_conformance.py index \
+  --corpus-root conformance/al2-vate-v0.2 \
+  --out conformance/al2-vate-v0.2/corpus.json
+```
+
+The corpus index follows:
+
+- `schemas/conformance-corpus.schema.json`
 
 ## Digest Canonicalization
 

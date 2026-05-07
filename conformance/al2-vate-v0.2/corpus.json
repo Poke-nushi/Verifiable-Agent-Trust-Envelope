@@ -1,0 +1,908 @@
+{
+  "case_schema": "conformance/al2-vate-v0.2/conformance-case.schema.json",
+  "cases": [
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-allow-mcp-oauth-bound.example.json",
+        "admission_request": "examples/transport/mcp-oauth-admission-request.example.json"
+      },
+      "case_id": "allow-mcp-oauth-transport-bound",
+      "category": "positive",
+      "expected_outcome": "allow",
+      "expected_reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/allow-mcp-oauth-transport-bound.json",
+      "title": "Allow an MCP OAuth-bound tool invocation",
+      "validation_focus": [
+        "MCP transport binding",
+        "OAuth audience binding",
+        "OpenID subject binding",
+        "runtime binding"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-allow.example.json"
+      },
+      "case_id": "allow-valid-admission",
+      "category": "positive",
+      "expected_outcome": "allow",
+      "expected_reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/allow-valid-admission.json",
+      "title": "Allow a valid AL2 admission receipt",
+      "validation_focus": [
+        "admission receipt shape",
+        "allow decision",
+        "evidence verification results",
+        "policy versioning"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-allow.example.json"
+      },
+      "case_id": "allow-valid-basic-external-write",
+      "category": "positive",
+      "expected_outcome": "allow",
+      "expected_reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/allow-valid-basic-external-write.json",
+      "title": "Allow a valid basic external write",
+      "validation_focus": [
+        "allow decision",
+        "external write admission"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-allow-policy-snapshot.example.json",
+        "policy_snapshot": "examples/policies/al2-repo-merge-policy-snapshot.example.json"
+      },
+      "case_id": "allow-valid-with-policy-snapshot",
+      "category": "positive",
+      "expected_outcome": "allow",
+      "expected_reason_codes": [
+        "POLICY_SNAPSHOT_MATCH",
+        "POLICY_MATCH"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/allow-valid-with-policy-snapshot.json",
+      "title": "Allow with digest-bound policy snapshot",
+      "validation_focus": [
+        "policy snapshot reference",
+        "audit basis"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-allow-status-fresh.example.json"
+      },
+      "case_id": "allow-valid-with-status-fresh",
+      "category": "positive",
+      "expected_outcome": "allow",
+      "expected_reason_codes": [
+        "STATUS_FRESH",
+        "POLICY_MATCH"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/allow-valid-with-status-fresh.json",
+      "title": "Allow with fresh status evidence",
+      "validation_focus": [
+        "status freshness",
+        "allow decision"
+      ]
+    },
+    {
+      "artifacts": {
+        "a2a_metadata": "examples/a2a/metadata-admission-issued.json",
+        "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+        "policy_snapshot": "examples/policies/merchant-purchase-al2-policy-snapshot.example.json"
+      },
+      "case_id": "attenuate-max-amount",
+      "category": "positive",
+      "expected_outcome": "attenuate",
+      "expected_reason_codes": [
+        "PAYMENT_TOKEN_LIMIT",
+        "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/attenuate-max-amount.json",
+      "title": "Attenuate a payment-adjacent request by max amount",
+      "validation_focus": [
+        "attenuate decision",
+        "machine-readable attenuation",
+        "digest-bound A2A receipt reference",
+        "optional policy snapshot reference",
+        "generic payment evidence type with optional protocol hint"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-attenuate-requires-new-permit.example.json"
+      },
+      "case_id": "attenuate-requires-new-permit",
+      "category": "positive",
+      "expected_outcome": "attenuate",
+      "expected_reason_codes": [
+        "NEW_PERMIT_REQUIRED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/attenuate-requires-new-permit.json",
+      "title": "Attenuate by requiring a fresh permit",
+      "validation_focus": [
+        "fresh permit requirement",
+        "machine-readable attenuation"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-attenuate-target-scope.example.json"
+      },
+      "case_id": "attenuate-target-scope",
+      "category": "positive",
+      "expected_outcome": "attenuate",
+      "expected_reason_codes": [
+        "TARGET_SCOPE_NARROWED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/attenuate-target-scope.json",
+      "title": "Attenuate target resource scope",
+      "validation_focus": [
+        "target attenuation",
+        "effective constraints"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-alg-not-allowed.example.json",
+        "trust_bundle": "examples/trust-bundle.example.json"
+      },
+      "case_id": "deny-alg-not-allowed",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "ALG_NOT_ALLOWED",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-alg-not-allowed.json",
+      "title": "Deny a disallowed proof algorithm",
+      "validation_focus": [
+        "trust bundle",
+        "algorithm allowlist",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-ambiguous-trust-anchor.example.json",
+        "trust_bundle": "examples/trust-bundle-ambiguous.example.json"
+      },
+      "case_id": "deny-ambiguous-trust-anchor",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "SCHEMA_INVALID",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-ambiguous-trust-anchor.json",
+      "title": "Deny an ambiguous trust anchor",
+      "validation_focus": [
+        "trust bundle",
+        "ambiguous issuer key binding",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-audience-mismatch.example.json",
+        "base_artifact": "examples/admission-request.example.json",
+        "mutation": {
+          "from": "https://agent.example/a2a",
+          "op": "replace",
+          "path": "/audience",
+          "to": "https://unexpected.example/a2a"
+        }
+      },
+      "case_id": "deny-audience-mismatch",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "AUDIENCE_MISMATCH",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-audience-mismatch.json",
+      "title": "Deny an audience mismatch before execution",
+      "validation_focus": [
+        "audience binding",
+        "target resource binding",
+        "semantic rejection despite valid JSON shape"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-digest-mismatch.example.json",
+        "base_artifact": "examples/admission-request.example.json"
+      },
+      "case_id": "deny-digest-mismatch",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "DIGEST_MISMATCH",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-digest-mismatch.json",
+      "title": "Deny a digest mismatch",
+      "validation_focus": [
+        "digest-bound reference",
+        "semantic rejection"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-evidence-type-not-allowed.example.json",
+        "trust_bundle": "examples/trust-bundle.example.json"
+      },
+      "case_id": "deny-evidence-type-not-allowed",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "ISSUER_NOT_AUTHORIZED",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-evidence-type-not-allowed.json",
+      "title": "Deny an unauthorized evidence type",
+      "validation_focus": [
+        "trust bundle",
+        "evidence type authorization",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-expired-permit.example.json"
+      },
+      "case_id": "deny-expired-permit",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "PERMIT_EXPIRED",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-expired-permit.json",
+      "title": "Deny an expired task-scoped permit",
+      "validation_focus": [
+        "deny decision",
+        "expired authority",
+        "fail-closed behavior",
+        "no execution after denial"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-kid-mismatch.example.json",
+        "trust_bundle": "examples/trust-bundle.example.json"
+      },
+      "case_id": "deny-kid-mismatch",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "UNKNOWN_TRUST_ANCHOR",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-kid-mismatch.json",
+      "title": "Deny a key id mismatch",
+      "validation_focus": [
+        "trust bundle",
+        "key id binding",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-not-yet-valid-permit.example.json"
+      },
+      "case_id": "deny-not-yet-valid-permit",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "PERMIT_NOT_YET_VALID",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-not-yet-valid-permit.json",
+      "title": "Deny a permit before its validity window",
+      "validation_focus": [
+        "permit validity window",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-policy-snapshot-mismatch.example.json",
+        "policy_snapshot": "examples/policies/al2-repo-merge-policy-snapshot.example.json"
+      },
+      "case_id": "deny-policy-snapshot-mismatch",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "POLICY_SNAPSHOT_MISMATCH",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-policy-snapshot-mismatch.json",
+      "title": "Deny when policy snapshot digest does not match",
+      "validation_focus": [
+        "policy snapshot digest mismatch",
+        "audit basis",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-replay-detected.example.json"
+      },
+      "case_id": "deny-replay-detected",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "REPLAY_DETECTED",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-replay-detected.json",
+      "title": "Deny a replayed admission request",
+      "validation_focus": [
+        "replay detection",
+        "one-time use"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-runtime-mismatch.example.json"
+      },
+      "case_id": "deny-runtime-mismatch",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "RUNTIME_MISMATCH",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-runtime-mismatch.json",
+      "title": "Deny a runtime binding mismatch",
+      "validation_focus": [
+        "runtime binding",
+        "semantic rejection"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-signature-tampered.example.json"
+      },
+      "case_id": "deny-signature-tampered",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "SIGNATURE_INVALID",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-signature-tampered.json",
+      "title": "Deny tampered signed evidence",
+      "validation_focus": [
+        "proof integrity",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-status-revoked.example.json"
+      },
+      "case_id": "deny-status-revoked",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "STATUS_REVOKED",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-status-revoked.json",
+      "title": "Deny revoked status",
+      "validation_focus": [
+        "revocation",
+        "status check"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-status-stale.example.json"
+      },
+      "case_id": "deny-status-stale-fail-closed",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "STATUS_STALE",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-status-stale-fail-closed.json",
+      "title": "Deny stale status under fail-closed policy",
+      "validation_focus": [
+        "status freshness",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-trust-anchor-expired.example.json",
+        "trust_bundle": "examples/trust-bundle.example.json"
+      },
+      "case_id": "deny-trust-anchor-expired",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "TRUST_ANCHOR_EXPIRED",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-trust-anchor-expired.json",
+      "title": "Deny an expired trust anchor",
+      "validation_focus": [
+        "trust bundle",
+        "trust anchor expiry",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-trust-anchor-not-yet-valid.example.json",
+        "trust_bundle": "examples/trust-bundle.example.json"
+      },
+      "case_id": "deny-trust-anchor-not-yet-valid",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "TRUST_ANCHOR_NOT_YET_VALID",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-trust-anchor-not-yet-valid.json",
+      "title": "Deny a trust anchor before its validity window",
+      "validation_focus": [
+        "trust bundle",
+        "trust anchor validity window",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-trust-anchor-revoked.example.json",
+        "trust_bundle": "examples/trust-bundle.example.json"
+      },
+      "case_id": "deny-trust-anchor-revoked",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "TRUST_ANCHOR_REVOKED",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-trust-anchor-revoked.json",
+      "title": "Deny a revoked trust anchor",
+      "validation_focus": [
+        "trust bundle",
+        "revoked trust anchor",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-unknown-trust-anchor.example.json",
+        "trust_bundle": "examples/trust-bundle.example.json"
+      },
+      "case_id": "deny-unknown-trust-anchor",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "UNKNOWN_TRUST_ANCHOR",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-unknown-trust-anchor.json",
+      "title": "Deny an unknown trust anchor",
+      "validation_focus": [
+        "trust bundle",
+        "unknown issuer"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/interop/ap2-ucp-to-vate/vate-admission-receipt-from-ap2-ucp.example.json",
+        "admission_request": "examples/interop/ap2-ucp-to-vate/vate-admission-request-from-ap2-ucp.example.json"
+      },
+      "case_id": "interop-ap2-ucp-commerce-evidence",
+      "category": "positive",
+      "expected_outcome": "allow",
+      "expected_reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/interop-ap2-ucp-commerce-evidence.json",
+      "title": "Consume AP2 mandate and UCP checkout evidence",
+      "validation_focus": [
+        "agentic commerce evidence",
+        "AP2 mandate crosswalk",
+        "UCP checkout session crosswalk",
+        "VATE admission receipt"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/interop/oap-to-vate/vate-admission-receipt-from-oap.example.json",
+        "admission_request": "examples/interop/oap-to-vate/vate-admission-request-from-oap.example.json"
+      },
+      "case_id": "interop-oap-decision-evidence",
+      "category": "positive",
+      "expected_outcome": "allow",
+      "expected_reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/interop-oap-decision-evidence.json",
+      "title": "Consume OAP decision evidence",
+      "validation_focus": [
+        "adjacent evidence",
+        "OAP/APort crosswalk",
+        "VATE admission receipt"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+        "post_execution_receipt": "examples/receipts/post-execution-linkage-mismatch.example.json"
+      },
+      "case_id": "post-execution-linkage-mismatch",
+      "category": "linkage",
+      "expected_outcome": "failed",
+      "expected_reason_codes": [
+        "POST_EXEC_LINKAGE_MISMATCH"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-linkage-mismatch.json",
+      "title": "Reject post-execution linkage mismatch",
+      "validation_focus": [
+        "post-execution linkage",
+        "effective request hash mismatch"
+      ]
+    },
+    {
+      "artifacts": {
+        "a2a_metadata": "examples/a2a/metadata-post-execution-issued.json",
+        "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+        "post_execution_receipt": "examples/receipts/post-execution-success.example.json"
+      },
+      "case_id": "post-execution-linkage-success",
+      "category": "linkage",
+      "expected_outcome": "attenuate",
+      "expected_reason_codes": [
+        "ADMISSION_RECEIPT_LINKED",
+        "EFFECTIVE_REQUEST_HASH_MATCH",
+        "NO_POLICY_VIOLATIONS"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-linkage-success.json",
+      "title": "Link post-execution receipt to the admitted effective request",
+      "validation_focus": [
+        "post-execution receipt linkage",
+        "effective request hash continuity",
+        "side-effect audit record",
+        "digest-bound A2A post-execution reference"
+      ]
+    }
+  ],
+  "conformance_report_schema": "schemas/conformance-report.schema.json",
+  "digest": {
+    "alg": "sha-256",
+    "value": "8ab9a9f4601605e6de8987c7fdc0dbcee561437ef411fd317a467cd163df4e5b"
+  },
+  "digest_basis": {
+    "alg": "sha-256",
+    "canonicalization": "JSON objects are sorted by key with insignificant whitespace removed before hashing.",
+    "manifest_excludes": [
+      "conformance/al2-vate-v0.2/corpus.json"
+    ]
+  },
+  "implementation_report_schema": "schemas/implementation-report.schema.json",
+  "limitations": [
+    "This corpus index is an implementation aid, not a certification statement.",
+    "Passing the listed cases does not imply production readiness or endorsement."
+  ],
+  "manifest": [
+    {
+      "path": "conformance/al2-vate-v0.2/cases/allow-mcp-oauth-transport-bound.json",
+      "sha256": "fa080865a3396860d70dfcbd1c987e875d886fba82b1d64af9bd4a1beae8f09b"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/allow-valid-admission.json",
+      "sha256": "f25e0b5101c59f82e895749b96d626db42f49c8e76b464485075ee73144ec4e7"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/allow-valid-basic-external-write.json",
+      "sha256": "74de1a18dada9cc073f36b6a44993dbe400f2cb283511c7a752925a1115dbc11"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/allow-valid-with-policy-snapshot.json",
+      "sha256": "83aec4936ab7500fa3bbc145a437fc2c906cd6bf5fe5b3eaca1b1021018d25f2"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/allow-valid-with-status-fresh.json",
+      "sha256": "bb663d3b9d904171adae4f9907396ea5831813835f981993006843b29bb6fdef"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/attenuate-max-amount.json",
+      "sha256": "c044ba639cec8af29d21856d07402e581e667daf443bf6f81d0af4c506fc47d3"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/attenuate-requires-new-permit.json",
+      "sha256": "9679eac6756e8bf69a8a0bd23bed3346741e3e7c7352d4a7ae51598b9a63d817"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/attenuate-target-scope.json",
+      "sha256": "981b270f35a21bcda594e359376bb85d6e918ed815ce48e660944b211330109f"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-alg-not-allowed.json",
+      "sha256": "28856703ee0ec370754cdded4410272aea417bf85f2fc8a78323d7403c79e9e6"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-ambiguous-trust-anchor.json",
+      "sha256": "7323da7a608b352f668ec168271ba84d209fd64d9bb61b761349734fac08ff46"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-audience-mismatch.json",
+      "sha256": "a611eff842b61c03ab689d2bac564cebb2a4d32d21556b5df47aba4d0e8b351b"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-digest-mismatch.json",
+      "sha256": "fcc708376f902521ac44722623c07088aeee8850896c15ac63cd6b36b3d5656e"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-evidence-type-not-allowed.json",
+      "sha256": "54d03d091e6c25ffe1b0a2f173e158cae0dce75f4b1165a433936b0174964e73"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-expired-permit.json",
+      "sha256": "19053df5b1ff5a0416367b4c6cd12886d9dca3f206595abe6a10be54ba9bc07f"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-kid-mismatch.json",
+      "sha256": "e46631957b5535443560d4241b5a2ae0dd60b389989b46869bfcaee6f5d2af8c"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-not-yet-valid-permit.json",
+      "sha256": "ffbee3aa2a9c05b5efb5232e25bca30ccee4f4ff8321860a12eb427d1feb5977"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-policy-snapshot-mismatch.json",
+      "sha256": "12ce72368255bdf442bb0d36c4cbfd8f7e044aef702a420d5005258cae777c66"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-replay-detected.json",
+      "sha256": "7cc42ebc243728205f8a7931e1d56fea437d01dde885c3990ae8faf61cff5414"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-runtime-mismatch.json",
+      "sha256": "5c00a611f211baa3192bebb85a22443e121286e382956b19eb08423965dea6ca"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-signature-tampered.json",
+      "sha256": "29c729bea7c14ffd2f943f39d0b90d26c5b5e900a492fc678bd6d94aae358d0c"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-status-revoked.json",
+      "sha256": "3ad040ace9fb3d314aef72ae6441c04e760f6db34b951e4c2308ea95b0d47d40"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-status-stale-fail-closed.json",
+      "sha256": "8799b8f8108cde537185d387c4426e49e54ef630a26ae70beb3c49cb485fed7b"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-trust-anchor-expired.json",
+      "sha256": "c31de0291a0eae56826b4aecadf8c8025f0bbd9998de83c7c1c8bf6eb366e222"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-trust-anchor-not-yet-valid.json",
+      "sha256": "fd6951715e1217ca97d0b51515933c0400aa143ff4c09cfd9f3e7ba39a08dbf6"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-trust-anchor-revoked.json",
+      "sha256": "d59ae48d9ab7fb09e7ba4f3f6e54233fd4ef103eb566478a6dc02569963ce7ce"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-unknown-trust-anchor.json",
+      "sha256": "397e6466dc4047f99c7657a5fa9f449d7c5d8050da19ef722d3ee2eeb0df4e9f"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/interop-ap2-ucp-commerce-evidence.json",
+      "sha256": "bd57a33c13318ac235e092af55375db269b697b056df0318d1bf490b84db34b7"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/interop-oap-decision-evidence.json",
+      "sha256": "a96479a54fd39b28b0443bd378d2a54bf85247c353fc8406e8eb1378680eec1d"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-linkage-mismatch.json",
+      "sha256": "56293504f3887e436dc8c42263f60bee83a7d7308cfaa0da7b2211241016e94b"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-linkage-success.json",
+      "sha256": "42f0d9d4f562a5ce5db8575eec75f933359dd7d62d8adb6724a949f4440aff42"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/conformance-case.schema.json",
+      "sha256": "cf5198b215aa0bccc021b2beb87013cf190044a72a6a7d468883fa4af865cb07"
+    },
+    {
+      "path": "examples/a2a/metadata-admission-issued.json",
+      "sha256": "a625b13a81ebbc84e8fbcfe3c7c80d2af06141915fda622a1a3e68deb94459b1"
+    },
+    {
+      "path": "examples/a2a/metadata-post-execution-issued.json",
+      "sha256": "03a1d8b0ebe50265b1ac2eac2d2a626e0913e8dc356855773d195650dd3d5207"
+    },
+    {
+      "path": "examples/admission-request.example.json",
+      "sha256": "164af2eab9bf7d88b76043776b07781859757f0c6453a8a6c4cb1562368d55ce"
+    },
+    {
+      "path": "examples/interop/ap2-ucp-to-vate/vate-admission-receipt-from-ap2-ucp.example.json",
+      "sha256": "537fc9273cb3ce04806a7a458a986154bd20bd10ce92e5aae4620d889c3a4fca"
+    },
+    {
+      "path": "examples/interop/ap2-ucp-to-vate/vate-admission-request-from-ap2-ucp.example.json",
+      "sha256": "dbcf79074417fb01e65fa031c77f661135e444eb81aa0d9925a41bd1edc8619e"
+    },
+    {
+      "path": "examples/interop/oap-to-vate/vate-admission-receipt-from-oap.example.json",
+      "sha256": "e00521d8b961f9b70f6637d3c107e1e9e383fa2d95a849b200cec8ea9b753ab3"
+    },
+    {
+      "path": "examples/interop/oap-to-vate/vate-admission-request-from-oap.example.json",
+      "sha256": "2a311834ac37bb6e9ada0d7f7c8caddafccf8d5d85387f7d5b6cc952f1db72fd"
+    },
+    {
+      "path": "examples/policies/al2-repo-merge-policy-snapshot.example.json",
+      "sha256": "fd0cfabe6c92f5295e8fa83efdb4de94452743acae989c6ba190a09685ee03a5"
+    },
+    {
+      "path": "examples/policies/merchant-purchase-al2-policy-snapshot.example.json",
+      "sha256": "f5388e13571f9fbf78c809177f5b2ef84f681edd55c052eaf84f5b28e627171d"
+    },
+    {
+      "path": "examples/receipts/admission-allow-mcp-oauth-bound.example.json",
+      "sha256": "36875d1b9df504dd93b2535e4553ca44022d825bbcd84d81dd7e9f080066994e"
+    },
+    {
+      "path": "examples/receipts/admission-allow-policy-snapshot.example.json",
+      "sha256": "77df4abb7b31723c73cbc41fa7aa7a2fb3b3e2ea761e0a9fe3fff6fc27c4c57f"
+    },
+    {
+      "path": "examples/receipts/admission-allow-status-fresh.example.json",
+      "sha256": "950a1f5797d13e9ba1e35be9dd1554718bb44dd814bb109a3b0be99256d32c98"
+    },
+    {
+      "path": "examples/receipts/admission-allow.example.json",
+      "sha256": "4b8f21edfb634b3e325ce40c8a866d9a41e5ce647479c047f19e4cae3c62e715"
+    },
+    {
+      "path": "examples/receipts/admission-attenuate-max-amount.example.json",
+      "sha256": "63e1905b081e9964e6c53cba769657c21d72e71c07f4cd8630e59fe97350e035"
+    },
+    {
+      "path": "examples/receipts/admission-attenuate-requires-new-permit.example.json",
+      "sha256": "81a6942898f9391f427a7112cdb72a9eb0ffef4d9d67dd28443c3857d54ce202"
+    },
+    {
+      "path": "examples/receipts/admission-attenuate-target-scope.example.json",
+      "sha256": "780acd142aa111d7ccb6adb4d804958795f5ac6b07d1f52129cc7ac49f4ef7b0"
+    },
+    {
+      "path": "examples/receipts/admission-deny-alg-not-allowed.example.json",
+      "sha256": "b1461805980cd1596894d51aad9f638aa28962357566a30a28af5d945a7e6594"
+    },
+    {
+      "path": "examples/receipts/admission-deny-ambiguous-trust-anchor.example.json",
+      "sha256": "405e5cf81a8fe1e8ffe60141ab8466300bea2cb572d9e4067416d1bdb54af69f"
+    },
+    {
+      "path": "examples/receipts/admission-deny-audience-mismatch.example.json",
+      "sha256": "618b22cafb1901ea359b7916fd0e739d91b851c22cc0d47dab391644c941a332"
+    },
+    {
+      "path": "examples/receipts/admission-deny-digest-mismatch.example.json",
+      "sha256": "b090a1cb46ecefa29b3d8e6a62f42493636fd0c81fe77cfae17c2c4943303b05"
+    },
+    {
+      "path": "examples/receipts/admission-deny-evidence-type-not-allowed.example.json",
+      "sha256": "3c8aac1aa2e9163808961415f6635f3f79f5373f12465e7220eba06d6f8cee9b"
+    },
+    {
+      "path": "examples/receipts/admission-deny-expired-permit.example.json",
+      "sha256": "4579ca41a32e7589418fcf9a2756958340ac3ca559d60ef1c18a2b8f0311b515"
+    },
+    {
+      "path": "examples/receipts/admission-deny-kid-mismatch.example.json",
+      "sha256": "f05c43e4e94576d9ed3a08bbb04bef6bab8adbe2f8ba80886b472fd76b82e451"
+    },
+    {
+      "path": "examples/receipts/admission-deny-not-yet-valid-permit.example.json",
+      "sha256": "ba2910116cda5a1fc6241ae26b1b719eecc29a2a7c0dd812be9540c4fbb8f4e0"
+    },
+    {
+      "path": "examples/receipts/admission-deny-policy-snapshot-mismatch.example.json",
+      "sha256": "2616566cab756125d57800271df050d728dc901f16112a62279df0c521b63e24"
+    },
+    {
+      "path": "examples/receipts/admission-deny-replay-detected.example.json",
+      "sha256": "059dfdf0942980402c74f90a98ed6f284db59cff70cdd4c15ce824288130169a"
+    },
+    {
+      "path": "examples/receipts/admission-deny-runtime-mismatch.example.json",
+      "sha256": "00fd45665fc1ac64844265a674aa6ba4c5b0f2ebb9cad3d261e5c59a9175397a"
+    },
+    {
+      "path": "examples/receipts/admission-deny-signature-tampered.example.json",
+      "sha256": "4cd4b3bfc578af145824e7a9835d99820f597d8e2bec446513993e0f28a873f8"
+    },
+    {
+      "path": "examples/receipts/admission-deny-status-revoked.example.json",
+      "sha256": "195b280719a2696f790e065a39a1d14f5d43fac351a3b72b7d4f2c2403d17b62"
+    },
+    {
+      "path": "examples/receipts/admission-deny-status-stale.example.json",
+      "sha256": "0fe34821443b49e74c23e102efcaff6d1ff610a14108652ee6fbd38e87922b88"
+    },
+    {
+      "path": "examples/receipts/admission-deny-trust-anchor-expired.example.json",
+      "sha256": "421f605a29b9d37ce59ecb10465e5e7b618cd692a6700e14d3e96670ef421d2a"
+    },
+    {
+      "path": "examples/receipts/admission-deny-trust-anchor-not-yet-valid.example.json",
+      "sha256": "4d5f72cf4d3e9b17d7ee7f6e43c08e549bc6f83d9d180262481d813058b51d33"
+    },
+    {
+      "path": "examples/receipts/admission-deny-trust-anchor-revoked.example.json",
+      "sha256": "f6d73b3cf93f5311410010c49e9e942fcd1859e6588582295696b038544d2beb"
+    },
+    {
+      "path": "examples/receipts/admission-deny-unknown-trust-anchor.example.json",
+      "sha256": "604a80da197e382dedf90db3360046ed24281a22db242beb36af43887545bf1f"
+    },
+    {
+      "path": "examples/receipts/post-execution-linkage-mismatch.example.json",
+      "sha256": "07d6844fed65dbd2206a5aa98ac2e904aff2ee5dd1ca72a89ec8173882d82528"
+    },
+    {
+      "path": "examples/receipts/post-execution-success.example.json",
+      "sha256": "bc08f29e7e221537e513bdc0c9cf7bf768ba7e28e74fd4fbf64b25ca5330a910"
+    },
+    {
+      "path": "examples/transport/mcp-oauth-admission-request.example.json",
+      "sha256": "9f28bd454acc48df855eba59a0f325e33a8d8b0026fe8d7a9c18cbec9fbb3dd6"
+    },
+    {
+      "path": "examples/trust-bundle-ambiguous.example.json",
+      "sha256": "a7fa6a2d307c78128e98113cd0e4961fa0132a6d1c4a8b0a6a17c4b17268b38f"
+    },
+    {
+      "path": "examples/trust-bundle.example.json",
+      "sha256": "48094e17ffa90464a626edc01ed1eef37e48acfa95659d26460f1ff1926b7e9c"
+    }
+  ],
+  "name": "al2-vate-v0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "root": "conformance/al2-vate-v0.2",
+  "runner": {
+    "command": "python3 scripts/vate_conformance.py run --corpus-root conformance/al2-vate-v0.2 --report /tmp/vate-conformance-report.json",
+    "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.2 --out conformance/al2-vate-v0.2/corpus.json"
+  },
+  "summary": {
+    "artifact_count": 70,
+    "case_count": 30,
+    "category_counts": {
+      "linkage": 2,
+      "negative": 18,
+      "positive": 10
+    }
+  },
+  "version": "vate-conformance-corpus-2026-07"
+}

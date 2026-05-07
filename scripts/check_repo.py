@@ -49,6 +49,7 @@ EXAMPLE_PAIRS = [
     ("examples/trust-bundle.example.json", "schemas/trust-bundle.schema.json"),
     ("examples/conformance-report.example.json", "schemas/conformance-report.schema.json"),
     ("examples/implementation-report.example.json", "schemas/implementation-report.schema.json"),
+    ("conformance/al2-vate-v0.2/corpus.json", "schemas/conformance-corpus.schema.json"),
     ("examples/policies/merchant-purchase-al2-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),
     ("examples/policies/al2-repo-merge-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),
     ("examples/status-bundle.example.json", "schemas/status-bundle.schema.json"),
@@ -223,6 +224,13 @@ def wait_for_health(url: str, timeout: float = 10.0) -> None:
     raise RuntimeError(f"status service did not become healthy: {url}")
 
 
+def assert_json_matches(actual_path: Path, expected_path: Path) -> None:
+    actual = json.loads(actual_path.read_text(encoding="utf-8"))
+    expected = json.loads(expected_path.read_text(encoding="utf-8"))
+    if actual != expected:
+        raise RuntimeError(f"{expected_path.relative_to(ROOT)} is stale; regenerate it with scripts/vate_conformance.py index")
+
+
 def validate_examples() -> None:
     for example_rel, schema_rel in iter_example_pairs():
         example = json.loads((ROOT / example_rel).read_text())
@@ -326,6 +334,19 @@ def main() -> int:
                 "Python 3 standard library",
             ]
         )
+        generated_corpus_index = tmp_dir / "vate-corpus-index.json"
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "index",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.2"),
+                "--out",
+                str(generated_corpus_index),
+            ]
+        )
+        assert_json_matches(generated_corpus_index, ROOT / "conformance" / "al2-vate-v0.2" / "corpus.json")
         run([sys.executable, str(VATE_CORE), "self-test"])
         subprocess.run(
             [sys.executable, str(A2A_ADAPTER), "run-demo"],

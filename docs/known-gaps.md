@@ -103,8 +103,9 @@ The repo now includes two machine-readable conformance corpora:
 
 - an `AL2` HTTP corpus for the reference verifier demo
 - a runnable `v0.2` AL2 corpus for admission decisions, attenuation, A2A metadata references, negative cases, adjacent evidence, and post-execution linkage
+- a language-neutral `corpus.json` index for the `v0.2` AL2 corpus
 
-Those corpora make the draft easier to inspect and replay, but they are not yet a cross-language, multi-implementation certification suite.
+Those corpora make the draft easier to inspect and replay, but they are not yet a multi-implementation certification suite.
 
 Remaining work includes:
 

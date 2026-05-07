@@ -21,6 +21,8 @@ ROOT = Path(__file__).resolve().parents[1]
 PROFILE = "VATE-AL2-Verifier-Admission-v0.2"
 CONFORMANCE_REPORT_VERSION = "vate-conformance-report-2026-07"
 IMPLEMENTATION_REPORT_VERSION = "vate-implementation-report-2026-07"
+CORPUS_INDEX_VERSION = "vate-conformance-corpus-2026-07"
+CORPUS_INDEX_FILENAME = "corpus.json"
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -99,7 +101,12 @@ def referenced_paths(case: dict[str, Any]) -> list[Path]:
 
 
 def corpus_manifest(corpus_root: Path) -> tuple[list[dict[str, str]], dict[str, str]]:
-    paths: set[Path] = set(path.resolve() for path in corpus_root.rglob("*.json"))
+    corpus_index_path = (corpus_root / CORPUS_INDEX_FILENAME).resolve()
+    paths: set[Path] = set(
+        path.resolve()
+        for path in corpus_root.rglob("*.json")
+        if path.resolve() != corpus_index_path
+    )
     for case_path in sorted((corpus_root / "cases").glob("*.json")):
         case = read_json(case_path)
         for path in referenced_paths(case):
@@ -114,6 +121,70 @@ def corpus_manifest(corpus_root: Path) -> tuple[list[dict[str, str]], dict[str, 
         for path in sorted(paths, key=display_path)
     ]
     return manifest, {"alg": "sha-256", "value": sha256_value(manifest)}
+
+
+def case_index_entry(case_path: Path) -> dict[str, Any]:
+    case = read_json(case_path)
+    expected = case.get("expected", {})
+    expected_outcome_value = str(
+        expected.get("admission_decision", expected.get("post_execution_outcome", "missing"))
+    )
+    return {
+        "case_id": case["case_id"],
+        "path": display_path(case_path.resolve()),
+        "category": case["category"],
+        "title": case.get("title", case["case_id"]),
+        "expected_outcome": expected_outcome_value,
+        "expected_reason_codes": expected.get("reason_codes", []),
+        "validation_focus": case.get("validation_focus", []),
+        "artifacts": case.get("artifacts", {}),
+    }
+
+
+def category_counts(cases: list[dict[str, Any]]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for case in cases:
+        category = str(case["category"])
+        counts[category] = counts.get(category, 0) + 1
+    return dict(sorted(counts.items()))
+
+
+def make_corpus_index(corpus_root: Path) -> dict[str, Any]:
+    case_paths = sorted((corpus_root / "cases").glob("*.json"))
+    cases = [case_index_entry(path) for path in case_paths]
+    manifest, digest = corpus_manifest(corpus_root)
+    return {
+        "version": CORPUS_INDEX_VERSION,
+        "profile": PROFILE,
+        "name": corpus_root.name,
+        "root": display_path(corpus_root.resolve()),
+        "case_schema": display_path((corpus_root / "conformance-case.schema.json").resolve()),
+        "conformance_report_schema": "schemas/conformance-report.schema.json",
+        "implementation_report_schema": "schemas/implementation-report.schema.json",
+        "digest_basis": {
+            "alg": "sha-256",
+            "canonicalization": "JSON objects are sorted by key with insignificant whitespace removed before hashing.",
+            "manifest_excludes": [
+                display_path((corpus_root / CORPUS_INDEX_FILENAME).resolve())
+            ],
+        },
+        "summary": {
+            "case_count": len(cases),
+            "category_counts": category_counts(cases),
+            "artifact_count": len(manifest),
+        },
+        "digest": digest,
+        "cases": cases,
+        "manifest": manifest,
+        "runner": {
+            "command": "python3 scripts/vate_conformance.py run --corpus-root conformance/al2-vate-v0.2 --report /tmp/vate-conformance-report.json",
+            "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.2 --out conformance/al2-vate-v0.2/corpus.json",
+        },
+        "limitations": [
+            "This corpus index is an implementation aid, not a certification statement.",
+            "Passing the listed cases does not imply production readiness or endorsement.",
+        ],
+    }
 
 
 def get_path(value: Any, dotted_path: str) -> Any:
@@ -603,6 +674,9 @@ def parse_args() -> argparse.Namespace:
     run.add_argument("--implementation-commit")
     run.add_argument("--environment")
     run.add_argument("--conformance-report-uri")
+    index = subparsers.add_parser("index", help="write a language-neutral corpus index")
+    index.add_argument("--corpus-root", required=True, help="corpus root containing cases/")
+    index.add_argument("--out", required=True, help="path to write the corpus index")
     return parser.parse_args()
 
 
@@ -615,6 +689,9 @@ def main() -> int:
             write_json(Path(args.implementation_report), make_implementation_report(args, report))
         if report.get("fatal_errors") or report["summary"]["failed"]:
             return 1
+        return 0
+    if args.command == "index":
+        write_json(Path(args.out), make_corpus_index(Path(args.corpus_root)))
         return 0
     raise RuntimeError(f"unsupported command {args.command}")
 
