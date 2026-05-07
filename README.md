@@ -136,9 +136,9 @@ The most useful feedback for this draft is currently:
 - **Repository type**: protocol discussion draft
 - **Document maturity**: early draft
 - **Primary language**: English
-- **Research refresh date**: 2026-05-04
+- **Research refresh date**: 2026-05-07
 - **Primary battlefield**: `AL2` external digital write
-- **Implemented now**: payload schemas, examples, verifier guidance, reference demos, verifier policy example, policy snapshot schema, trust-bundle hardening checks, detached JOSE fixture checks, AL2 HTTP conformance corpus, runnable v0.2 AL2 conformance corpus, language-neutral corpus index, SUT result comparison contract, implementation report schema, MCP/OAuth transport-bound fixture, AP2/UCP commerce crosswalk fixture, v0.2 AL2 verifier admission profile draft, AL2 admission interop profile, dependency-free verifier core, A2A metadata adapter demo
+- **Implemented now**: payload schemas, examples, verifier guidance, reference demos, verifier policy example, policy snapshot schema, trust-bundle hardening checks, detached JOSE fixture checks, AL2 HTTP conformance corpus, runnable v0.2 AL2 conformance corpus, language-neutral corpus index, SUT result comparison contract, implementation report schema, MCP/OAuth transport-bound fixture, AP2/UCP commerce crosswalk fixture, AP2 Human Not Present evidence fixtures, v0.2 AL2 verifier admission profile draft, AL2 admission interop profile, dependency-free verifier core, A2A metadata adapter demo
 - **Planned later**: pairwise presentation profile, richer capability registry, formal `AID`, physical `ABS` profiles
 
 ## Repository Map
@@ -169,6 +169,8 @@ The most useful feedback for this draft is currently:
   Short A2A-adjacent issue update draft after the runnable v0.2 artifacts
 - [docs/a2a-metadata-binding-v0.2.md](docs/a2a-metadata-binding-v0.2.md)
   Reference-only A2A metadata binding for VATE admission and receipt artifacts
+- [docs/ecosystem-positioning-2026-05.md](docs/ecosystem-positioning-2026-05.md)
+  Current VATE boundary relative to MCP/OAuth, A2A, AP2, ACP/UCP, and x402
 - [docs/receipt-model-v0.2.md](docs/receipt-model-v0.2.md)
   v0.2 split between admission receipts and post-execution receipts
 - [docs/trust-bundle-hardening.md](docs/trust-bundle-hardening.md)
@@ -191,6 +193,8 @@ The most useful feedback for this draft is currently:
   OAP / APort decision evidence crosswalk for VATE admission receipts
 - [docs/interop/ap2-ucp-commerce-crosswalk.md](docs/interop/ap2-ucp-commerce-crosswalk.md)
   AP2 / UCP commerce evidence crosswalk for VATE admission receipts
+- [docs/interop/ap2-human-not-present-evidence.md](docs/interop/ap2-human-not-present-evidence.md)
+  AP2 Human Not Present payment-authority evidence fixtures
 - [docs/known-gaps.md](docs/known-gaps.md)
   Current unresolved design gaps
 - [reference/minimal-al2-demo/README.md](reference/minimal-al2-demo/README.md)

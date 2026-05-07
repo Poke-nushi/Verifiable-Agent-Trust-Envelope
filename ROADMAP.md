@@ -14,13 +14,15 @@ Focus:
 - treat A2A, MCP, OAuth, VC, DID, OID4VP, Web Bot Auth, AP2, x402, ACP, and payment tokens as adjacent evidence or transport layers
 - add examples and schema validation for v0.2 admission requests, A2A references, and receipts
 - add a maintainer brief and mini conformance corpus for early A2A-adjacent review
+- keep the May 2026 ecosystem boundary explicit: VATE consumes MCP/OAuth, A2A, AP2, ACP/UCP, and x402 artifacts as adjacent evidence rather than replacing them
 - publish `v0.2.0` as a discussion-draft pre-release
 
 ## Next
 
 - collect independent implementation reports using `schemas/implementation-report.schema.json`
 - prepare A2A-adjacent review updates from `docs/a2a-issue-update-2026-05.md`
-- add additional transport-bound fixtures beyond the initial MCP/OAuth and AP2/UCP examples
+- add additional transport-bound fixtures beyond the initial MCP/OAuth, AP2/UCP, and AP2 Human Not Present examples
+- sketch an A2A v1.0 extension note that uses signed Agent Card identity plus digest-bound VATE admission and receipt references
 - expand policy snapshot digest fixtures beyond the initial positive and mismatch cases
 - refine pairwise presentation guidance
 - add clearer MCP / OAuth / OpenID binding notes and transport-bound examples
@@ -43,6 +45,7 @@ Completion means:
 - detached JOSE fixture checks that separate byte-level proof binding from production signature verification
 - language-neutral corpus guidance and a committed corpus index for non-reference implementations
 - SUT result comparison contract for non-reference implementation reports
+- AP2 Human Not Present evidence cases for pre-authorization, stale authority, amount overrun, replay, and post-execution linkage
 - an A2A-adjacent review package that does not require A2A core changes
 
 ## Later

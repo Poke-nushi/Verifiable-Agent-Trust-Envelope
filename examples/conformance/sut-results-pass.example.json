@@ -2,7 +2,7 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "f2788913771138cda568cb04ef0f05f03ef833f3551aab85acb16258f2633abe"
+      "value": "7212d24e46ef20a3e02af56f24d013b0443704aba2e5f5b41cca8f9b828584a6"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.2"
   },
@@ -16,10 +16,38 @@
     "version": "0.1.0"
   },
   "limitations": [
-    "Example fixture generated from corpus expectations; not an independent implementation."
+    "This is a passing example file for the public fixture corpus, not an independent implementation result.",
+    "It must be regenerated whenever the corpus digest changes."
   ],
   "profile": "VATE-AL2-Verifier-Admission-v0.2",
   "results": [
+    {
+      "case_id": "allow-ap2-hnp-preauthorized-mandate",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "request.audience",
+          "pass": true
+        },
+        {
+          "name": "evidence[0].protocol_hint",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.result",
+          "pass": true
+        }
+      ],
+      "outcome": "allow",
+      "reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "status": "completed"
+    },
     {
       "case_id": "allow-jose-detached-runtime-attestation",
       "checks": [
@@ -167,6 +195,33 @@
       "status": "completed"
     },
     {
+      "case_id": "attenuate-ap2-hnp-amount-overrun",
+      "checks": [
+        {
+          "name": "attenuation.original_request_hash",
+          "pass": true
+        },
+        {
+          "name": "attenuation.effective_request_hash",
+          "pass": true
+        },
+        {
+          "name": "attenuation.changes[0].path",
+          "pass": true
+        },
+        {
+          "name": "attenuation.effective_constraints.max_amount.value",
+          "pass": true
+        }
+      ],
+      "outcome": "attenuate",
+      "reason_codes": [
+        "PAYMENT_TOKEN_LIMIT",
+        "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+      ],
+      "status": "completed"
+    },
+    {
       "case_id": "attenuate-max-amount",
       "checks": [
         {
@@ -271,6 +326,44 @@
       "outcome": "deny",
       "reason_codes": [
         "SCHEMA_INVALID",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-ap2-hnp-replay",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "REPLAY_DETECTED",
+        "FAIL_CLOSED"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-ap2-hnp-stale-mandate",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "PERMIT_EXPIRED",
         "FAIL_CLOSED"
       ],
       "status": "completed"
@@ -699,6 +792,34 @@
       "reason_codes": [
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "post-execution-ap2-hnp-linkage-success",
+      "checks": [
+        {
+          "name": "post_execution.admission.digest",
+          "pass": true
+        },
+        {
+          "name": "post_execution.execution.effective_request_hash",
+          "pass": true
+        },
+        {
+          "name": "post_execution.result.policy_violations",
+          "pass": true
+        },
+        {
+          "name": "post_execution.result.side_effects[0].payment_authority_ref",
+          "pass": true
+        }
+      ],
+      "outcome": "success",
+      "reason_codes": [
+        "ADMISSION_RECEIPT_LINKED",
+        "EFFECTIVE_REQUEST_HASH_MATCH",
+        "NO_POLICY_VIOLATIONS"
       ],
       "status": "completed"
     },

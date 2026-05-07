@@ -151,9 +151,12 @@ def corpus_manifest(corpus_root: Path) -> tuple[list[dict[str, str]], dict[str, 
 def case_index_entry(case_path: Path) -> dict[str, Any]:
     case = read_json(case_path)
     expected = case.get("expected", {})
-    expected_outcome_value = str(
-        expected.get("admission_decision", expected.get("post_execution_outcome", "missing"))
-    )
+    if case["category"] == "linkage":
+        expected_outcome_value = str(expected.get("post_execution_outcome", "missing"))
+    else:
+        expected_outcome_value = str(
+            expected.get("admission_decision", expected.get("post_execution_outcome", "missing"))
+        )
     return {
         "case_id": case["case_id"],
         "path": display_path(case_path.resolve()),
@@ -681,8 +684,51 @@ def evaluate_policy_snapshot_checks(
     return failures
 
 
+def evaluate_artifact_reference_checks(
+    case: dict[str, Any],
+    admission_request: dict[str, Any] | None,
+    admission: dict[str, Any] | None,
+    post_execution: dict[str, Any] | None,
+    a2a_metadata: dict[str, Any] | None,
+) -> list[str]:
+    failures: list[str] = []
+    sources = {
+        "admission_request": admission_request,
+        "admission_receipt": admission,
+        "post_execution_receipt": post_execution,
+        "a2a_metadata": a2a_metadata,
+    }
+    for check in case.get("artifact_reference_checks", []):
+        artifact_name = check["artifact"]
+        artifact = read_json(resolve_artifact_path(case, artifact_name))
+        artifact_digest = {
+            "alg": "sha-256",
+            "value": sha256_value(artifact),
+        }
+        expect_match = bool(check.get("expect_match", True))
+        for reference in check.get("reference_paths", []):
+            source_name = reference["artifact"]
+            source = sources.get(source_name)
+            if source is None:
+                failures.append(f"artifact_ref {artifact_name}/{source_name}: artifact missing")
+                continue
+            try:
+                reference_digest = get_path(source, reference["path"])
+            except (KeyError, IndexError, TypeError, ValueError):
+                failures.append(f"artifact_ref {artifact_name}/{source_name}: reference path missing")
+                continue
+            digest_matches = reference_digest == artifact_digest
+            if digest_matches != expect_match:
+                failures.append(
+                    f"artifact_ref {artifact_name}/{source_name}: "
+                    f"expected digest match={expect_match} actual match={digest_matches}"
+                )
+    return failures
+
+
 def evaluate_case(case_path: Path) -> dict[str, Any]:
     case = read_json(case_path)
+    admission_request = load_artifact(case, "admission_request")
     admission = load_artifact(case, "admission_receipt")
     post_execution = load_artifact(case, "post_execution_receipt")
     a2a_metadata = load_artifact(case, "a2a_metadata")
@@ -718,6 +764,7 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
     failures.extend(jose_failures)
     failures.extend(evaluate_linkage_checks(case, admission, post_execution))
     failures.extend(evaluate_policy_snapshot_checks(case, admission, a2a_metadata))
+    failures.extend(evaluate_artifact_reference_checks(case, admission_request, admission, post_execution, a2a_metadata))
 
     return {
         "case_id": case["case_id"],

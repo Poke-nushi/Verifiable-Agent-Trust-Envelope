@@ -13,6 +13,7 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - deny an expired permit
 - deny an audience mismatch
 - deny stale, revoked, replayed, tampered, mismatched, and untrusted inputs
+- consume AP2 Human Not Present payment-authority evidence without redefining AP2
 - link a post-execution receipt back to the admitted effective request
 
 ## Files
@@ -50,6 +51,11 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/deny-status-stale-fail-closed.json`
 - `cases/deny-replay-detected.json`
 - `cases/interop-ap2-ucp-commerce-evidence.json`
+- `cases/allow-ap2-hnp-preauthorized-mandate.json`
+- `cases/deny-ap2-hnp-stale-mandate.json`
+- `cases/attenuate-ap2-hnp-amount-overrun.json`
+- `cases/deny-ap2-hnp-replay.json`
+- `cases/post-execution-ap2-hnp-linkage-success.json`
 - `cases/interop-oap-decision-evidence.json`
 - `cases/post-execution-linkage-success.json`
 - `cases/post-execution-linkage-mismatch.json`

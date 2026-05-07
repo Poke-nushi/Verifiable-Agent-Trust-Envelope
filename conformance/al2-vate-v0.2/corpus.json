@@ -3,6 +3,27 @@
   "cases": [
     {
       "artifacts": {
+        "admission_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-valid.example.json",
+        "admission_request": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-valid.example.json",
+        "ap2_mandate": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-valid.example.json"
+      },
+      "case_id": "allow-ap2-hnp-preauthorized-mandate",
+      "category": "positive",
+      "expected_outcome": "allow",
+      "expected_reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/allow-ap2-hnp-preauthorized-mandate.json",
+      "title": "Allow a pre-authorized AP2 Human Not Present mandate",
+      "validation_focus": [
+        "AP2 Human Not Present",
+        "payment authority evidence",
+        "bounded delegated commerce"
+      ]
+    },
+    {
+      "artifacts": {
         "admission_receipt": "examples/receipts/admission-allow.example.json",
         "detached_payload": "examples/jose/detached-runtime-attestation-payload.json",
         "jose_proof": "examples/jose/jose-detached-runtime-attestation-valid.example.json",
@@ -121,6 +142,27 @@
     },
     {
       "artifacts": {
+        "admission_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-overrun.example.json",
+        "admission_request": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-overrun.example.json",
+        "ap2_mandate": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-overrun.example.json"
+      },
+      "case_id": "attenuate-ap2-hnp-amount-overrun",
+      "category": "positive",
+      "expected_outcome": "attenuate",
+      "expected_reason_codes": [
+        "PAYMENT_TOKEN_LIMIT",
+        "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/attenuate-ap2-hnp-amount-overrun.json",
+      "title": "Attenuate an AP2 Human Not Present amount overrun",
+      "validation_focus": [
+        "AP2 Human Not Present",
+        "amount limit",
+        "machine-readable attenuation"
+      ]
+    },
+    {
+      "artifacts": {
         "a2a_metadata": "examples/a2a/metadata-admission-issued.json",
         "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
         "policy_snapshot": "examples/policies/merchant-purchase-al2-policy-snapshot.example.json"
@@ -213,6 +255,48 @@
       "validation_focus": [
         "trust bundle",
         "ambiguous issuer key binding",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-replay.example.json",
+        "admission_request": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-replay.example.json",
+        "ap2_mandate": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-replay.example.json"
+      },
+      "case_id": "deny-ap2-hnp-replay",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "REPLAY_DETECTED",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-ap2-hnp-replay.json",
+      "title": "Deny a replayed AP2 Human Not Present mandate",
+      "validation_focus": [
+        "AP2 Human Not Present",
+        "one-time use",
+        "replay detection"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-stale.example.json",
+        "admission_request": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-stale.example.json",
+        "ap2_mandate": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-stale.example.json"
+      },
+      "case_id": "deny-ap2-hnp-stale-mandate",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "PERMIT_EXPIRED",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-ap2-hnp-stale-mandate.json",
+      "title": "Deny an expired AP2 Human Not Present mandate",
+      "validation_focus": [
+        "AP2 Human Not Present",
+        "expired payment authority",
         "fail closed"
       ]
     },
@@ -637,6 +721,28 @@
     },
     {
       "artifacts": {
+        "admission_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-valid.example.json",
+        "ap2_mandate": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-valid.example.json",
+        "post_execution_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-post-execution-receipt-ap2-hnp-valid.example.json"
+      },
+      "case_id": "post-execution-ap2-hnp-linkage-success",
+      "category": "linkage",
+      "expected_outcome": "success",
+      "expected_reason_codes": [
+        "ADMISSION_RECEIPT_LINKED",
+        "EFFECTIVE_REQUEST_HASH_MATCH",
+        "NO_POLICY_VIOLATIONS"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-ap2-hnp-linkage-success.json",
+      "title": "Link AP2 Human Not Present execution back to admission",
+      "validation_focus": [
+        "AP2 Human Not Present",
+        "post-execution receipt linkage",
+        "side-effect audit record"
+      ]
+    },
+    {
+      "artifacts": {
         "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
         "post_execution_receipt": "examples/receipts/post-execution-linkage-mismatch.example.json"
       },
@@ -661,7 +767,7 @@
       },
       "case_id": "post-execution-linkage-success",
       "category": "linkage",
-      "expected_outcome": "attenuate",
+      "expected_outcome": "success",
       "expected_reason_codes": [
         "ADMISSION_RECEIPT_LINKED",
         "EFFECTIVE_REQUEST_HASH_MATCH",
@@ -680,7 +786,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "f2788913771138cda568cb04ef0f05f03ef833f3551aab85acb16258f2633abe"
+    "value": "7212d24e46ef20a3e02af56f24d013b0443704aba2e5f5b41cca8f9b828584a6"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -695,6 +801,10 @@
     "Passing the listed cases does not imply production readiness or endorsement."
   ],
   "manifest": [
+    {
+      "path": "conformance/al2-vate-v0.2/cases/allow-ap2-hnp-preauthorized-mandate.json",
+      "sha256": "454bd4764714b085496a74c40d86a48e0f8a672db803a90c7d65ca33ae9a493b"
+    },
     {
       "path": "conformance/al2-vate-v0.2/cases/allow-jose-detached-runtime-attestation.json",
       "sha256": "839be428e497132001a001b0ce3d9b1347c0c7a766e3bacb49c0c96132533a23"
@@ -720,6 +830,10 @@
       "sha256": "bb663d3b9d904171adae4f9907396ea5831813835f981993006843b29bb6fdef"
     },
     {
+      "path": "conformance/al2-vate-v0.2/cases/attenuate-ap2-hnp-amount-overrun.json",
+      "sha256": "761f246fd4d2dabd38200fc9ddfd9688e1859c42251ebb173e628da9c9115ed7"
+    },
+    {
       "path": "conformance/al2-vate-v0.2/cases/attenuate-max-amount.json",
       "sha256": "c044ba639cec8af29d21856d07402e581e667daf443bf6f81d0af4c506fc47d3"
     },
@@ -738,6 +852,14 @@
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-ambiguous-trust-anchor.json",
       "sha256": "7323da7a608b352f668ec168271ba84d209fd64d9bb61b761349734fac08ff46"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-ap2-hnp-replay.json",
+      "sha256": "f4fafd611ebcb6b1412eeaf3df159579a8a619f84be08f77756e045962501372"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-ap2-hnp-stale-mandate.json",
+      "sha256": "bc2153531400313925b03f68713bd1b58aae27e5847d5c759800ec1ffba23329"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-audience-mismatch.json",
@@ -824,6 +946,10 @@
       "sha256": "a96479a54fd39b28b0443bd378d2a54bf85247c353fc8406e8eb1378680eec1d"
     },
     {
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-ap2-hnp-linkage-success.json",
+      "sha256": "3e89edc2dffed5b4ddbdb1b0cb7c2dce497eb08baaa286395c50c668a69ef9c4"
+    },
+    {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-linkage-mismatch.json",
       "sha256": "56293504f3887e436dc8c42263f60bee83a7d7308cfaa0da7b2211241016e94b"
     },
@@ -833,7 +959,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.2/conformance-case.schema.json",
-      "sha256": "8d1207bec466351d4c46e261852dc9a3efcba3cb3546fdc9540514170d8267d1"
+      "sha256": "12e721b6b4d8b63825da6a9f9020319c032b34290775a6e3263ee7039c86f7a8"
     },
     {
       "path": "examples/a2a/metadata-admission-issued.json",
@@ -846,6 +972,58 @@
     {
       "path": "examples/admission-request.example.json",
       "sha256": "164af2eab9bf7d88b76043776b07781859757f0c6453a8a6c4cb1562368d55ce"
+    },
+    {
+      "path": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-overrun.example.json",
+      "sha256": "d36f54d452131a0280eec04dc85b6132d70dbd35a7d378e14c5b89a39c9d2351"
+    },
+    {
+      "path": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-replay.example.json",
+      "sha256": "e39a66fa10d723442b888f1019eb741015d7976f5bdcb98c9d8951e738c3b197"
+    },
+    {
+      "path": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-stale.example.json",
+      "sha256": "3448d1900326b458f630e7a53f33e9e59d9c9cdb7808ba684a5a64298f866049"
+    },
+    {
+      "path": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-valid.example.json",
+      "sha256": "22abc3d0905eee01449327a56a384359c0701e753719bfc2b5cb500da62d0e72"
+    },
+    {
+      "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-overrun.example.json",
+      "sha256": "4c3ba446cf08fea31e3d7f6ee007b63d5989899d0891ff468e59a2a70ddc7be6"
+    },
+    {
+      "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-replay.example.json",
+      "sha256": "eb201131518a1389bef9b79bcb50f7e68db547872f307e18dc2ffc8cae04787f"
+    },
+    {
+      "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-stale.example.json",
+      "sha256": "2825cf59ce31dba6115287c7033f6d488a1b7e17f517971d68fc9dd0b8b5f995"
+    },
+    {
+      "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-valid.example.json",
+      "sha256": "cb4203fbc2c9c8c818d6c58f5919bc30562bf9e9880d6d6aa949fa25493cd260"
+    },
+    {
+      "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-overrun.example.json",
+      "sha256": "0f1c70ad54608ab17cfd7bc3dd61b216bfb45e1503567174dea147cec105fa10"
+    },
+    {
+      "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-replay.example.json",
+      "sha256": "892e7e1b41e16ae1fe405e9e346d4ba1e211f47ef40475143a9c7f5cfd18e4ec"
+    },
+    {
+      "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-stale.example.json",
+      "sha256": "f8d82fe92977533468349b2e3aa7d8841f73c3b7b48bca2399b5f426f10a35d8"
+    },
+    {
+      "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-valid.example.json",
+      "sha256": "a873c6302d31383ba9300e316790009b99e613b4ec4e13c01c744e3d26723651"
+    },
+    {
+      "path": "examples/interop/ap2-human-not-present-to-vate/vate-post-execution-receipt-ap2-hnp-valid.example.json",
+      "sha256": "c47075bd0abe35c16d43285c4d15360a3cff653f27c1242109e732f911231258"
     },
     {
       "path": "examples/interop/ap2-ucp-to-vate/vate-admission-receipt-from-ap2-ucp.example.json",
@@ -1032,12 +1210,12 @@
     "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.2 --out conformance/al2-vate-v0.2/corpus.json"
   },
   "summary": {
-    "artifact_count": 82,
-    "case_count": 34,
+    "artifact_count": 100,
+    "case_count": 39,
     "category_counts": {
-      "linkage": 2,
-      "negative": 21,
-      "positive": 11
+      "linkage": 3,
+      "negative": 23,
+      "positive": 13
     }
   },
   "version": "vate-conformance-corpus-2026-07"

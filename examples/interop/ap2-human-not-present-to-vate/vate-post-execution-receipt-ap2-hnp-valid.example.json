@@ -1,0 +1,47 @@
+{
+  "admission": {
+    "decision": "allow",
+    "digest": {
+      "alg": "sha-256",
+      "value": "02828bdeaa390e43ee06b2aaa3e0d5aed90e9a59f219bc4bf3b9cbf6af0fd282"
+    },
+    "receipt_id": "admrec-ap2hnp-valid-20260507-001",
+    "uri": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-valid.example.json"
+  },
+  "execution": {
+    "a2a_context_id": "ctx-ap2hnp-valid-20260507-001",
+    "a2a_task_id": "task-ap2hnp-valid-20260507-001",
+    "effective_request_hash": "sha-256:ap2hnp-valid-input",
+    "finished_at": "2026-05-07T10:02:28Z",
+    "runtime": "spiffe://agent.example/workload/ticket-agent",
+    "started_at": "2026-05-07T10:01:02Z",
+    "transaction_id": "txn-ap2hnp-valid-20260507-001"
+  },
+  "issued_at": "2026-05-07T10:02:31Z",
+  "issuer": {
+    "id": "did:web:agent.example",
+    "key_id": "did:web:agent.example#runtime-key-1",
+    "role": "runtime"
+  },
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "receipt_id": "postrec-ap2hnp-valid-20260507-001",
+  "receipt_type": "post_execution",
+  "result": {
+    "outcome": "success",
+    "output_hash": "sha-256:ap2hnp-valid-output",
+    "policy_violations": [],
+    "side_effects": [
+      {
+        "amount": {
+          "currency": "USD",
+          "value": "45.00"
+        },
+        "confirmation_reference": "https://tickets.example/orders/order-ap2hnp-20260507-001",
+        "merchant": "tickets.example",
+        "payment_authority_ref": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-valid.example.json",
+        "type": "commerce.purchase"
+      }
+    ]
+  },
+  "version": "vate-0.2"
+}
