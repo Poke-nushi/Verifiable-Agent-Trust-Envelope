@@ -38,7 +38,8 @@ new adjacent profiles.
 ### P1 Before Adjacent Maintainer Outreach
 
 - define reason-code ordering or compare reason-code sets with a primary reason
-  code
+  code; terminal marker ordering is now documented and enforced in `run` and
+  `compare`
 - strengthen post-execution linkage checks beyond presence checks, including
   receipt id, receipt digest, transaction, runtime, admitted effective request
   hash, decision, and expiry semantics

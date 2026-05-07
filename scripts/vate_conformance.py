@@ -251,6 +251,28 @@ def actual_reason_codes(admission_receipt: dict[str, Any] | None) -> list[str]:
     return [str(code) for code in codes]
 
 
+def reason_code_order_failures(codes: list[str], outcome: str, *, label: str) -> list[str]:
+    failures: list[str] = []
+    if len(codes) != len(set(codes)):
+        failures.append(f"{label}: duplicate reason codes are not allowed")
+
+    if "FAIL_CLOSED" in codes:
+        if outcome != "deny":
+            failures.append(f"{label}: FAIL_CLOSED requires deny outcome")
+        if codes[-1] != "FAIL_CLOSED":
+            failures.append(f"{label}: FAIL_CLOSED must be last")
+        if len(codes) == 1:
+            failures.append(f"{label}: FAIL_CLOSED must follow a primary denial reason")
+
+    if "POLICY_MATCH" in codes:
+        if outcome != "allow":
+            failures.append(f"{label}: POLICY_MATCH requires allow outcome")
+        if codes[-1] != "POLICY_MATCH":
+            failures.append(f"{label}: POLICY_MATCH must be last for allow outcomes")
+
+    return failures
+
+
 def expected_should_execute(case: dict[str, Any]) -> bool:
     return bool(case.get("expected", {}).get("should_execute", False))
 
@@ -767,6 +789,8 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
         failures.append(f"should_execute: expected {expected_execute} actual {actual_execute}")
     if actual_codes != expected_codes:
         failures.append(f"reason_codes: expected {expected_codes} actual {actual_codes}")
+    failures.extend(reason_code_order_failures(expected_codes, expected, label="expected_reason_codes"))
+    failures.extend(reason_code_order_failures(actual_codes, actual, label="actual_reason_codes"))
 
     for check in case["expected"].get("checks", []):
         if not evaluate_expected_check(
@@ -935,6 +959,20 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
                 failures.append(f"outcome: expected {expected['expected_outcome']} actual {actual_outcome}")
             if actual_reason_codes != expected["expected_reason_codes"]:
                 failures.append(f"reason_codes: expected {expected['expected_reason_codes']} actual {actual_reason_codes}")
+            failures.extend(
+                reason_code_order_failures(
+                    expected["expected_reason_codes"],
+                    expected["expected_outcome"],
+                    label="expected_reason_codes",
+                )
+            )
+            failures.extend(
+                reason_code_order_failures(
+                    actual_reason_codes,
+                    actual_outcome,
+                    label="actual_reason_codes",
+                )
+            )
 
             raw_checks = result.get("checks", [])
             if raw_checks is None:

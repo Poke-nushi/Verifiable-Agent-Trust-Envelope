@@ -76,4 +76,14 @@ Implementations MAY include additional profile-specific reason codes, but the ca
 
 ## Conformance Rule
 
-When a conformance fixture specifies `expected.reason_codes`, an implementation report must include the same codes in the same order unless the fixture explicitly allows a superset.
+When a conformance fixture specifies `expected.reason_codes`, an implementation report MUST include the same codes in the same order unless the fixture explicitly allows a superset.
+
+Reason-code order is part of the machine-readable decision surface:
+
+- the first non-terminal code is the primary reason for the outcome
+- supporting codes follow in verifier evaluation order
+- duplicate codes MUST NOT appear in one decision
+- `POLICY_MATCH` is a terminal success marker; it MUST only appear on `allow` outcomes and MUST be last
+- `FAIL_CLOSED` is a terminal denial marker; it MUST only appear on `deny` outcomes, MUST be last, and MUST follow a primary denial reason
+
+The v0.2 conformance runner enforces the terminal-marker rules above for both repository fixture checks and external SUT comparison reports.

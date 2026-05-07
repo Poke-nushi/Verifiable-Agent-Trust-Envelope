@@ -115,6 +115,8 @@ Remaining work includes:
 - transport-bound SUT adapters beyond the generic result comparison contract
 - production signature verification fixtures
 - cross-implementation report comparison
+- richer reason-code ordering beyond the current exact-order and terminal-marker
+  checks
 - formal conformance claim wording, if a future governance path justifies it
 
 ### 10. Persistent Namespace Is Not Yet Chosen
