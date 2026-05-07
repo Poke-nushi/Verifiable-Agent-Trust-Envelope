@@ -1,0 +1,27 @@
+{
+  "version": "vate-jose-proof-fixture-2026-07",
+  "proof_type": "detached_jws",
+  "payload_canonicalization": "json-sorted-no-whitespace",
+  "evidence_type": "runtime_attestation",
+  "issuer": "did:web:agent.example",
+  "protected": {
+    "alg": "ES256",
+    "crit": [
+      "vate-exp"
+    ],
+    "kid": "did:web:agent.example#runtime-key-1",
+    "typ": "vate-evidence+jws",
+    "vate-exp": "required"
+  },
+  "protected_b64u": "eyJhbGciOiJFUzI1NiIsImNyaXQiOlsidmF0ZS1leHAiXSwia2lkIjoiZGlkOndlYjphZ2VudC5leGFtcGxlI3J1bnRpbWUta2V5LTEiLCJ0eXAiOiJ2YXRlLWV2aWRlbmNlK2p3cyIsInZhdGUtZXhwIjoicmVxdWlyZWQifQ",
+  "detached_payload_b64u": "eyJhcnRpZmFjdF9kaWdlc3QiOnsiYWxnIjoic2hhLTI1NiIsInZhbHVlIjoiYmFzZTY0dXJsLXJ1bnRpbWUtYXR0ZXN0YXRpb24tZGlnZXN0In0sImF1ZGllbmNlIjoiaHR0cHM6Ly92ZXJpZmllci5leGFtcGxlL2EyYSIsImV2aWRlbmNlX3R5cGUiOiJydW50aW1lX2F0dGVzdGF0aW9uIiwiZXhwaXJlc19hdCI6IjIwMjYtMDctMDFUMDA6MjA6MDBaIiwiaXNzdWVkX2F0IjoiMjAyNi0wNy0wMVQwMDoxNTowMFoiLCJpc3N1ZXIiOiJkaWQ6d2ViOmFnZW50LmV4YW1wbGUiLCJub25jZSI6Im5vbmNlLWpvc2UtZGV0YWNoZWQtMDAxIiwicHJvZmlsZSI6IlZBVEUtQUwyLVZlcmlmaWVyLUFkbWlzc2lvbi12MC4yIiwic3ViamVjdCI6eyJhY3RvciI6ImRpZDp3ZWI6YWdlbnQuZXhhbXBsZSIsInJ1bnRpbWUiOiJzcGlmZmU6Ly9hZ2VudC5leGFtcGxlL3dvcmtsb2FkL2Nhc2UtYWdlbnQifSwidmVyc2lvbiI6InZhdGUtam9zZS1wcm9vZi1maXh0dXJlLTIwMjYtMDcifQ",
+  "detached_payload_sha256": {
+    "alg": "sha-256",
+    "value": "9da4d895badba8e9d11948309ba6ce60b0c2fb49c5ef1a8d0d0cab4de7bada5d"
+  },
+  "signature_b64u": "Zml4dHVyZS1zaWduYXR1cmUtaW52YWxpZA",
+  "signing_input_sha256": {
+    "alg": "sha-256",
+    "value": "874825013a4630e9c7814503633dfed1e817a3931a3a38559475cf828ed4f634"
+  }
+}

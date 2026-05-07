@@ -248,6 +248,49 @@
         },
         "additionalProperties": true
       }
+    },
+    "jose_checks": {
+      "type": "array",
+      "description": "Checks dependency-free detached JWS fixture behavior for protected headers, payload bytes, signing input, and trust-bundle binding.",
+      "items": {
+        "type": "object",
+        "required": [
+          "proof_package",
+          "detached_payload",
+          "trust_bundle",
+          "expect_valid"
+        ],
+        "properties": {
+          "proof_package": {
+            "type": "string",
+            "minLength": 1
+          },
+          "detached_payload": {
+            "type": "string",
+            "minLength": 1
+          },
+          "trust_bundle": {
+            "type": "string",
+            "minLength": 1
+          },
+          "checked_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expected_typ": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expect_valid": {
+            "type": "boolean"
+          },
+          "expected_failure_reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true
+      }
     }
   },
   "allOf": [

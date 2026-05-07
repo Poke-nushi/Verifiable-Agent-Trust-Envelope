@@ -5,7 +5,7 @@
 This note records production JOSE profile constraints that should be resolved before VATE claims production-grade proof verification.
 
 It is not yet a normative VATE profile.
-The current v0.2 AL2 conformance corpus checks trust-bundle admission semantics and treats proof verification as a hook.
+The current v0.2 AL2 conformance corpus includes dependency-free detached JWS fixture checks, but still treats cryptographic signature verification as a hook.
 
 ## Standards Basis
 
@@ -99,6 +99,21 @@ For AL2 admission this means at minimum:
 The conformance corpus currently checks digest-bound references at the artifact level.
 A production JOSE profile should define the exact payload bytes that are signed and how those bytes are compared to digest references.
 
+## Current Fixture Coverage
+
+The v0.2 AL2 corpus now includes detached JWS fixture checks for:
+
+- protected header canonical bytes and base64url encoding
+- detached payload canonical bytes and base64url encoding
+- detached payload SHA-256 digest
+- signing input digest over `BASE64URL(protected) || "." || BASE64URL(payload)`
+- `alg=none` rejection
+- unsupported `crit` rejection
+- trust-bundle binding for issuer, key id, algorithm, and evidence type
+
+These checks are intentionally byte-level and dependency-free.
+They do not claim that a real ECDSA or EdDSA signature was verified.
+
 ## Failure Reason Mapping
 
 JOSE verification failures should map to existing canonical reason codes where possible:
@@ -125,4 +140,4 @@ These decisions should remain outside v0.2 fixture conformance:
 - formal media types for every payload packaging
 - library-specific API requirements
 
-The next concrete step is to add a small detached JWS fixture only after the byte-level signing basis is fixed.
+The next concrete step is to add a production-signature fixture after the repository accepts a maintained JOSE verification dependency or a separate implementation report from a verifier that already uses one.

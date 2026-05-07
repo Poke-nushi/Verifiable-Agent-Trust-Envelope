@@ -10,6 +10,8 @@ trust-bundle lookups, and post-execution linkage.
 from __future__ import annotations
 
 import argparse
+import base64
+import binascii
 import hashlib
 import json
 import sys
@@ -55,6 +57,24 @@ def canonical_bytes(value: Any) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
 
+def b64url_encode_bytes(value: bytes) -> str:
+    return base64.urlsafe_b64encode(value).decode("ascii").rstrip("=")
+
+
+def b64url_decode_text(value: Any) -> bytes | None:
+    if not isinstance(value, str) or not value:
+        return None
+    if len(value) % 4 == 1:
+        return None
+    if any(char not in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_" for char in value):
+        return None
+    padding = "=" * (-len(value) % 4)
+    try:
+        return base64.urlsafe_b64decode(value + padding)
+    except (binascii.Error, ValueError):
+        return None
+
+
 def sha256_value(value: Any) -> str:
     return hashlib.sha256(canonical_bytes(value)).hexdigest()
 
@@ -95,6 +115,10 @@ def referenced_paths(case: dict[str, Any]) -> list[Path]:
         paths.append(resolve_artifact_path(case, check["artifact"]))
     for check in case.get("trust_checks", []):
         paths.append(resolve_artifact_path(case, check["trust_bundle"]))
+    for check in case.get("jose_checks", []):
+        for key in ("proof_package", "detached_payload", "trust_bundle"):
+            if key in check:
+                paths.append(resolve_artifact_path(case, check[key]))
     for check in case.get("policy_snapshot_checks", []):
         paths.append(resolve_artifact_path(case, check["artifact"]))
     return paths
@@ -271,7 +295,10 @@ def bool_for_named_check(
     admission: dict[str, Any] | None,
     post_execution: dict[str, Any] | None,
     a2a_metadata: dict[str, Any] | None,
+    jose_results: dict[str, bool] | None,
 ) -> bool:
+    if name.startswith("jose."):
+        return bool(jose_results and jose_results.get(name))
     if name == "decision.outcome":
         return admission is not None and actual_decision(admission) in {"allow", "attenuate"}
     if name == "evidence.verification.result":
@@ -319,12 +346,14 @@ def evaluate_expected_check(
     admission: dict[str, Any] | None,
     post_execution: dict[str, Any] | None,
     a2a_metadata: dict[str, Any] | None,
+    jose_results: dict[str, bool] | None,
 ) -> bool:
     value = bool_for_named_check(
         name=name,
         admission=admission,
         post_execution=post_execution,
         a2a_metadata=a2a_metadata,
+        jose_results=jose_results,
     )
     if expected == "pass":
         return value
@@ -456,6 +485,122 @@ def evaluate_trust_check(bundle: dict[str, Any], check: dict[str, Any]) -> tuple
     return True, None
 
 
+def evaluate_jose_checks(case: dict[str, Any]) -> tuple[dict[str, bool], list[str]]:
+    aggregate_results: dict[str, bool] = {}
+    failures: list[str] = []
+    for check in case.get("jose_checks", []):
+        proof = read_json(resolve_artifact_path(case, check["proof_package"]))
+        detached_payload = read_json(resolve_artifact_path(case, check["detached_payload"]))
+        trust_bundle = read_json(resolve_artifact_path(case, check["trust_bundle"]))
+        valid, failure_reason, check_results = evaluate_jose_check(proof, detached_payload, trust_bundle, check)
+        for name, result in check_results.items():
+            aggregate_results[name] = aggregate_results.get(name, True) and result
+
+        expect_valid = bool(check.get("expect_valid", True))
+        if valid != expect_valid:
+            failures.append(f"jose {check['proof_package']}: expected valid={expect_valid} actual valid={valid}")
+        expected_failure = check.get("expected_failure_reason")
+        if expected_failure and failure_reason != expected_failure:
+            failures.append(
+                f"jose {check['proof_package']}: expected failure={expected_failure} actual failure={failure_reason}"
+            )
+    return aggregate_results, failures
+
+
+def evaluate_jose_check(
+    proof: dict[str, Any],
+    detached_payload: dict[str, Any],
+    trust_bundle: dict[str, Any],
+    check: dict[str, Any],
+) -> tuple[bool, str | None, dict[str, bool]]:
+    check_results = {
+        "jose.protected_header": False,
+        "jose.detached_payload_digest": False,
+        "jose.signing_input": False,
+    }
+
+    if proof.get("proof_type") != "detached_jws":
+        return False, "SCHEMA_INVALID", check_results
+    if proof.get("payload_canonicalization") != "json-sorted-no-whitespace":
+        return False, "SCHEMA_INVALID", check_results
+
+    protected = proof.get("protected")
+    if not isinstance(protected, dict):
+        return False, "SCHEMA_INVALID", check_results
+
+    protected_b64u = proof.get("protected_b64u")
+    expected_protected_b64u = b64url_encode_bytes(canonical_bytes(protected))
+    decoded_protected = b64url_decode_text(protected_b64u)
+    if decoded_protected is None:
+        return False, "SCHEMA_INVALID", check_results
+    try:
+        decoded_protected_json = json.loads(decoded_protected.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return False, "SCHEMA_INVALID", check_results
+    if protected_b64u != expected_protected_b64u or decoded_protected_json != protected:
+        return False, "SCHEMA_INVALID", check_results
+    check_results["jose.protected_header"] = True
+
+    payload_b64u = proof.get("detached_payload_b64u")
+    expected_payload_b64u = b64url_encode_bytes(canonical_bytes(detached_payload))
+    payload_digest = {
+        "alg": "sha-256",
+        "value": sha256_value(detached_payload),
+    }
+    if payload_b64u != expected_payload_b64u or proof.get("detached_payload_sha256") != payload_digest:
+        return False, "DIGEST_MISMATCH", check_results
+    check_results["jose.detached_payload_digest"] = True
+
+    signing_input = f"{protected_b64u}.{payload_b64u}".encode("ascii")
+    signing_input_digest = {
+        "alg": "sha-256",
+        "value": hashlib.sha256(signing_input).hexdigest(),
+    }
+    if proof.get("signing_input_sha256") != signing_input_digest:
+        return False, "SIGNATURE_INVALID", check_results
+    check_results["jose.signing_input"] = True
+
+    alg = protected.get("alg")
+    kid = protected.get("kid")
+    typ = protected.get("typ")
+    if not isinstance(alg, str) or not alg or not isinstance(kid, str) or not kid or not isinstance(typ, str) or not typ:
+        return False, "SCHEMA_INVALID", check_results
+    if alg == "none":
+        return False, "ALG_NOT_ALLOWED", check_results
+    expected_typ = check.get("expected_typ")
+    if expected_typ and typ != expected_typ:
+        return False, "SCHEMA_INVALID", check_results
+
+    if protected.get("crit", []):
+        return False, "SCHEMA_INVALID", check_results
+
+    if b64url_decode_text(proof.get("signature_b64u")) is None:
+        return False, "SIGNATURE_INVALID", check_results
+
+    evidence_type = proof.get("evidence_type")
+    issuer = proof.get("issuer")
+    if not isinstance(evidence_type, str) or not evidence_type or not isinstance(issuer, str) or not issuer:
+        return False, "SCHEMA_INVALID", check_results
+    if detached_payload.get("evidence_type") != evidence_type or detached_payload.get("issuer") != issuer:
+        return False, "SCHEMA_INVALID", check_results
+    trust_check = {
+        "issuer_id": issuer,
+        "kid": kid,
+        "alg": alg,
+        "evidence_type": evidence_type,
+    }
+    if "checked_at" in check:
+        trust_check["checked_at"] = check.get("checked_at")
+    trusted, failure_reason = evaluate_trust_check(
+        trust_bundle,
+        trust_check,
+    )
+    if not trusted:
+        return False, failure_reason, check_results
+
+    return True, None, check_results
+
+
 def evaluate_linkage_checks(
     case: dict[str, Any],
     admission: dict[str, Any] | None,
@@ -548,6 +693,7 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
         actual_codes = actual_reason_codes(admission)
     expected = expected_outcome(case)
     actual = observed_outcome(case, admission, post_execution)
+    jose_results, jose_failures = evaluate_jose_checks(case)
 
     failures: list[str] = []
     if actual != expected:
@@ -562,11 +708,13 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
             admission=admission,
             post_execution=post_execution,
             a2a_metadata=a2a_metadata,
+            jose_results=jose_results,
         ):
             failures.append(f"check {check['name']}: expected {check['expected']}")
 
     failures.extend(evaluate_integrity_checks(case))
     failures.extend(evaluate_trust_checks(case))
+    failures.extend(jose_failures)
     failures.extend(evaluate_linkage_checks(case, admission, post_execution))
     failures.extend(evaluate_policy_snapshot_checks(case, admission, a2a_metadata))
 

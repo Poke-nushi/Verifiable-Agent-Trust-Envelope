@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:jose-proof-fixture:2026-07",
+  "title": "VATE JOSE Proof Fixture",
+  "description": "Dependency-free fixture shape for byte-level detached JWS proof checks.",
+  "type": "object",
+  "required": [
+    "version",
+    "proof_type",
+    "payload_canonicalization",
+    "evidence_type",
+    "issuer",
+    "protected",
+    "protected_b64u",
+    "detached_payload_b64u",
+    "detached_payload_sha256",
+    "signature_b64u",
+    "signing_input_sha256"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "vate-jose-proof-fixture-2026-07"
+    },
+    "proof_type": {
+      "type": "string",
+      "const": "detached_jws"
+    },
+    "payload_canonicalization": {
+      "type": "string",
+      "const": "json-sorted-no-whitespace"
+    },
+    "evidence_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issuer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "protected": {
+      "type": "object",
+      "required": [
+        "alg",
+        "kid",
+        "typ"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kid": {
+          "type": "string",
+          "minLength": 1
+        },
+        "typ": {
+          "type": "string",
+          "minLength": 1
+        },
+        "crit": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "protected_b64u": {
+      "type": "string",
+      "minLength": 1
+    },
+    "detached_payload_b64u": {
+      "type": "string",
+      "minLength": 1
+    },
+    "detached_payload_sha256": {
+      "type": "object",
+      "required": [
+        "alg",
+        "value"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "const": "sha-256"
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "signature_b64u": {
+      "type": "string",
+      "minLength": 1
+    },
+    "signing_input_sha256": {
+      "type": "object",
+      "required": [
+        "alg",
+        "value"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "const": "sha-256"
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

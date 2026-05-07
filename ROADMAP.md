@@ -26,7 +26,7 @@ Focus:
 - add clearer MCP / OAuth / OpenID binding notes and transport-bound examples
 - improve comparison material around close adjacent work where interoperability questions remain
 - keep the language-neutral conformance corpus index current as cases change
-- turn production JOSE profile notes into byte-level detached JWS fixtures after the signing basis is fixed
+- add production-signature fixtures after the detached JWS byte-level basis and dependency policy are fixed
 
 ## June 2026 Target
 
@@ -39,7 +39,7 @@ Completion means:
 - transport-bound fixtures for the most important adjacent paths
 - policy snapshot digest checks across receipts, metadata references, and fixtures
 - trust-bundle hardening checks for issuer, key id, algorithm, evidence type, status, and validity windows
-- production JOSE profile notes that separate fixture semantics from proof verification
+- detached JOSE fixture checks that separate byte-level proof binding from production signature verification
 - language-neutral corpus guidance and a committed corpus index for non-reference implementations
 - an A2A-adjacent review package that does not require A2A core changes
 

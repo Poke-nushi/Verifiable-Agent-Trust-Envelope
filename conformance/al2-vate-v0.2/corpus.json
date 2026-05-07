@@ -3,6 +3,28 @@
   "cases": [
     {
       "artifacts": {
+        "admission_receipt": "examples/receipts/admission-allow.example.json",
+        "detached_payload": "examples/jose/detached-runtime-attestation-payload.json",
+        "jose_proof": "examples/jose/jose-detached-runtime-attestation-valid.example.json",
+        "trust_bundle": "examples/trust-bundle.example.json"
+      },
+      "case_id": "allow-jose-detached-runtime-attestation",
+      "category": "positive",
+      "expected_outcome": "allow",
+      "expected_reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/allow-jose-detached-runtime-attestation.json",
+      "title": "Allow byte-bound detached JWS runtime attestation fixture",
+      "validation_focus": [
+        "detached JWS fixture",
+        "byte-level payload binding",
+        "trust bundle"
+      ]
+    },
+    {
+      "artifacts": {
         "admission_receipt": "examples/receipts/admission-allow-mcp-oauth-bound.example.json",
         "admission_request": "examples/transport/mcp-oauth-admission-request.example.json"
       },
@@ -277,6 +299,72 @@
         "expired authority",
         "fail-closed behavior",
         "no execution after denial"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-jose-alg-none.example.json",
+        "detached_payload": "examples/jose/detached-runtime-attestation-payload.json",
+        "jose_proof": "examples/jose/jose-detached-runtime-attestation-alg-none.example.json",
+        "trust_bundle": "examples/trust-bundle.example.json"
+      },
+      "case_id": "deny-jose-alg-none",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "ALG_NOT_ALLOWED",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-jose-alg-none.json",
+      "title": "Deny detached JWS fixture using alg none",
+      "validation_focus": [
+        "detached JWS fixture",
+        "algorithm policy",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-jose-crit-unsupported.example.json",
+        "detached_payload": "examples/jose/detached-runtime-attestation-payload.json",
+        "jose_proof": "examples/jose/jose-detached-runtime-attestation-crit-unsupported.example.json",
+        "trust_bundle": "examples/trust-bundle.example.json"
+      },
+      "case_id": "deny-jose-crit-unsupported",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "SCHEMA_INVALID",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-jose-crit-unsupported.json",
+      "title": "Deny detached JWS fixture with unsupported critical header",
+      "validation_focus": [
+        "detached JWS fixture",
+        "critical header policy",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-jose-payload-digest-mismatch.example.json",
+        "detached_payload": "examples/jose/detached-runtime-attestation-payload.json",
+        "jose_proof": "examples/jose/jose-detached-runtime-attestation-payload-digest-mismatch.example.json",
+        "trust_bundle": "examples/trust-bundle.example.json"
+      },
+      "case_id": "deny-jose-payload-digest-mismatch",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "DIGEST_MISMATCH",
+        "FAIL_CLOSED"
+      ],
+      "path": "conformance/al2-vate-v0.2/cases/deny-jose-payload-digest-mismatch.json",
+      "title": "Deny detached JWS fixture with payload digest mismatch",
+      "validation_focus": [
+        "detached JWS fixture",
+        "payload digest binding",
+        "fail closed"
       ]
     },
     {
@@ -592,7 +680,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "8ab9a9f4601605e6de8987c7fdc0dbcee561437ef411fd317a467cd163df4e5b"
+    "value": "f2788913771138cda568cb04ef0f05f03ef833f3551aab85acb16258f2633abe"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -607,6 +695,10 @@
     "Passing the listed cases does not imply production readiness or endorsement."
   ],
   "manifest": [
+    {
+      "path": "conformance/al2-vate-v0.2/cases/allow-jose-detached-runtime-attestation.json",
+      "sha256": "839be428e497132001a001b0ce3d9b1347c0c7a766e3bacb49c0c96132533a23"
+    },
     {
       "path": "conformance/al2-vate-v0.2/cases/allow-mcp-oauth-transport-bound.json",
       "sha256": "fa080865a3396860d70dfcbd1c987e875d886fba82b1d64af9bd4a1beae8f09b"
@@ -662,6 +754,18 @@
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-expired-permit.json",
       "sha256": "19053df5b1ff5a0416367b4c6cd12886d9dca3f206595abe6a10be54ba9bc07f"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-jose-alg-none.json",
+      "sha256": "212598fd15e3848c479627c83487a87157675be4bfb77ef798c0a6ab6209600c"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-jose-crit-unsupported.json",
+      "sha256": "3e6e6c3e3254696a3dd751894a2e1645d702faee7791cd51ab8a5bfa5941163b"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-jose-payload-digest-mismatch.json",
+      "sha256": "fe07910a620603b850ee9a9e8eac015157bc82ec16383755ceec14c9fcb998bb"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-kid-mismatch.json",
@@ -729,7 +833,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.2/conformance-case.schema.json",
-      "sha256": "cf5198b215aa0bccc021b2beb87013cf190044a72a6a7d468883fa4af865cb07"
+      "sha256": "8d1207bec466351d4c46e261852dc9a3efcba3cb3546fdc9540514170d8267d1"
     },
     {
       "path": "examples/a2a/metadata-admission-issued.json",
@@ -758,6 +862,26 @@
     {
       "path": "examples/interop/oap-to-vate/vate-admission-request-from-oap.example.json",
       "sha256": "2a311834ac37bb6e9ada0d7f7c8caddafccf8d5d85387f7d5b6cc952f1db72fd"
+    },
+    {
+      "path": "examples/jose/detached-runtime-attestation-payload.json",
+      "sha256": "ab7261ffbb16e8a093250e71cf5f4c36f923c761099a893866669eaf7952933d"
+    },
+    {
+      "path": "examples/jose/jose-detached-runtime-attestation-alg-none.example.json",
+      "sha256": "f579ae47031d07dff0814a51b487fa510d463b945b9cbc69c7166404179e1ee6"
+    },
+    {
+      "path": "examples/jose/jose-detached-runtime-attestation-crit-unsupported.example.json",
+      "sha256": "c6ebeade970a3b3528637bc4089b326778e84c0ed8f4b34e0586f72b1fbacdda"
+    },
+    {
+      "path": "examples/jose/jose-detached-runtime-attestation-payload-digest-mismatch.example.json",
+      "sha256": "0462deb7354478d3ae8e39300d2b210d9e61dae37457d438983afcf4825e0abb"
+    },
+    {
+      "path": "examples/jose/jose-detached-runtime-attestation-valid.example.json",
+      "sha256": "355d6376b15c1cc38bca8cae8129f89071dc7c0245b13320488a8065d55b496a"
     },
     {
       "path": "examples/policies/al2-repo-merge-policy-snapshot.example.json",
@@ -818,6 +942,18 @@
     {
       "path": "examples/receipts/admission-deny-expired-permit.example.json",
       "sha256": "4579ca41a32e7589418fcf9a2756958340ac3ca559d60ef1c18a2b8f0311b515"
+    },
+    {
+      "path": "examples/receipts/admission-deny-jose-alg-none.example.json",
+      "sha256": "8797575c8a10851e5fbe26351aefbb3766623695c6144dd2ea9d098294af9a55"
+    },
+    {
+      "path": "examples/receipts/admission-deny-jose-crit-unsupported.example.json",
+      "sha256": "509931ec417f24fa31cb5c3a2375f9d1ae83407f7d824fa502f2608a463b6f73"
+    },
+    {
+      "path": "examples/receipts/admission-deny-jose-payload-digest-mismatch.example.json",
+      "sha256": "40cc2025fed1d789b620ffb1e41e3d6fdd8c29efe78166d64ba5dfcd6632887f"
     },
     {
       "path": "examples/receipts/admission-deny-kid-mismatch.example.json",
@@ -896,12 +1032,12 @@
     "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.2 --out conformance/al2-vate-v0.2/corpus.json"
   },
   "summary": {
-    "artifact_count": 70,
-    "case_count": 30,
+    "artifact_count": 82,
+    "case_count": 34,
     "category_counts": {
       "linkage": 2,
-      "negative": 18,
-      "positive": 10
+      "negative": 21,
+      "positive": 11
     }
   },
   "version": "vate-conformance-corpus-2026-07"

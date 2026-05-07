@@ -29,8 +29,10 @@ The repo currently uses decoded JSON payloads plus compact JWS demo packaging.
 What is still open:
 
 - VC-native packaging profiles
-- final JOSE profile choices
+- production JOSE signature verification profile choices
 - selective-disclosure presentation approach
+
+The v0.2 AL2 corpus now includes detached JWS byte-level fixtures, but those fixtures do not perform production cryptographic signature verification.
 
 ### 2. Pairwise Presentation Guidance Is Still Early
 
@@ -111,7 +113,7 @@ Remaining work includes:
 
 - independent implementation reports
 - transport-bound SUT adapters
-- stronger proof packaging fixtures
+- production signature verification fixtures
 - cross-implementation report comparison
 - certification language, if a future governance path justifies it
 

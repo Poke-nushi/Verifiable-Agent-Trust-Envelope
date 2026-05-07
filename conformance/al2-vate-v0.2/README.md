@@ -8,6 +8,7 @@ It is an interoperability review and implementation aid.
 The corpus makes the v0.2 draft easier to evaluate by naming the minimum expected verifier outcomes:
 
 - admit a valid request
+- accept a byte-bound detached JWS fixture
 - narrow a request with machine-readable attenuation
 - deny an expired permit
 - deny an audience mismatch
@@ -23,6 +24,7 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/allow-mcp-oauth-transport-bound.json`
 - `cases/allow-valid-with-status-fresh.json`
 - `cases/allow-valid-with-policy-snapshot.json`
+- `cases/allow-jose-detached-runtime-attestation.json`
 - `cases/attenuate-max-amount.json`
 - `cases/attenuate-target-scope.json`
 - `cases/attenuate-requires-new-permit.json`
@@ -30,6 +32,9 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/deny-not-yet-valid-permit.json`
 - `cases/deny-audience-mismatch.json`
 - `cases/deny-digest-mismatch.json`
+- `cases/deny-jose-alg-none.json`
+- `cases/deny-jose-crit-unsupported.json`
+- `cases/deny-jose-payload-digest-mismatch.json`
 - `cases/deny-policy-snapshot-mismatch.json`
 - `cases/deny-ambiguous-trust-anchor.json`
 - `cases/deny-alg-not-allowed.json`
@@ -95,6 +100,18 @@ The corpus index follows:
 For this dependency-free fixture runner, digest checks use canonical JSON bytes produced by sorting object keys and removing insignificant whitespace before applying SHA-256.
 The digest value is encoded as lowercase hexadecimal in the policy snapshot fixtures.
 Future profiles may replace this with a named external canonicalization scheme, but conformance cases must state which digest basis they use.
+
+## Detached JWS Fixture Checks
+
+The `jose_checks` cases do not perform production signature verification.
+They fix the byte-level detached JWS basis that a production verifier must preserve before signature verification:
+
+- protected header canonical bytes and base64url encoding
+- detached payload canonical bytes and base64url encoding
+- detached payload SHA-256 digest
+- signing input digest over `BASE64URL(protected) || "." || BASE64URL(payload)`
+- protected header `alg`, `kid`, `typ`, and `crit` rejection behavior
+- trust-bundle binding for issuer, key id, algorithm, and evidence type
 
 ## Intent
 
