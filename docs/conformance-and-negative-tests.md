@@ -2,7 +2,7 @@
 
 This note sketches how implementations of this draft can move from examples to repeatable interoperability checks.
 
-The immediate goal is not a formal certification program.
+The immediate goal is not a formal production endorsement program.
 The immediate goal is to make it possible for different implementations to prove that they interpret the same artifact relationships and failure cases in comparable ways.
 
 ## Why Conformance Matters Early
@@ -96,7 +96,7 @@ The `reference/minimal-al2-demo` directory now includes:
 - a status service with pull, stapled, and push delivery modes
 - negative test bundles that intentionally fail selected checks
 
-This is still not a language-neutral certification program.
+This is still not a language-neutral endorsement program.
 But it now includes a concrete verifier-centered wedge and a machine-readable corpus under `conformance/al2-http/`.
 
 The better question is "does the verifier fail for the right reason?"
@@ -165,5 +165,5 @@ The repository now includes a small v0.2 profile corpus under:
 
 - `conformance/al2-vate-v0.2/`
 
-That corpus is not a certification suite.
+That corpus is not a production endorsement suite.
 It is the first reviewable shape for expected v0.2 admission decisions and post-execution outcomes.

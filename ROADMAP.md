@@ -22,7 +22,7 @@ Focus:
 - collect independent implementation reports using `schemas/implementation-report.schema.json`
 - prepare A2A-adjacent review updates from `docs/a2a-issue-update-2026-05.md`
 - add additional transport-bound fixtures beyond the initial MCP/OAuth, AP2/UCP, and AP2 Human Not Present examples
-- sketch an A2A v1.0 extension note that uses signed Agent Card identity plus digest-bound VATE admission and receipt references
+- validate the A2A v1.0 extension sketch against external A2A feedback and, later, the official SDK surface
 - expand policy snapshot digest fixtures beyond the initial positive and mismatch cases
 - refine pairwise presentation guidance
 - add clearer MCP / OAuth / OpenID binding notes and transport-bound examples
@@ -46,7 +46,7 @@ Completion means:
 - language-neutral corpus guidance and a committed corpus index for non-reference implementations
 - SUT result comparison contract for non-reference implementation reports
 - AP2 Human Not Present evidence cases for pre-authorization, stale authority, amount overrun, replay, and post-execution linkage
-- an A2A-adjacent review package that does not require A2A core changes
+- an A2A-adjacent review package that does not require A2A core changes, including an A2A v1.0-shaped extension sketch
 
 ## Later
 

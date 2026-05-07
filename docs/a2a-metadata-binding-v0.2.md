@@ -26,6 +26,11 @@ https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2
 This URI is a draft namespace.
 A future profile may move to a persistent namespace such as `w3id.org` after that namespace is controlled and documented.
 
+For an A2A v1.0-shaped extension sketch using `supportedInterfaces[]`,
+`capabilities.extensions`, optional `A2A-Extensions` activation, and signed
+Agent Card evidence references, see
+`docs/a2a-v1-extension-sketch-2026-05.md`.
+
 ## Agent Card Declaration
 
 An A2A agent that understands this binding may declare the extension in its Agent Card:
@@ -112,8 +117,10 @@ The verifier must evaluate the referenced artifacts against local policy before 
 Example files:
 
 - `examples/a2a/metadata-admission-requested.json`
+- `examples/a2a/metadata-admission-requested-with-signed-agent-card.json`
 - `examples/a2a/metadata-admission-issued.json`
 - `examples/a2a/metadata-post-execution-issued.json`
+- `examples/a2a/agent-card-v1-vate-extension.example.json`
 
 ## Compatibility Notes
 

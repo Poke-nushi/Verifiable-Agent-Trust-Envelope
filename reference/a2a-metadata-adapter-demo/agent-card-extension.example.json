@@ -13,6 +13,11 @@
       "admission_requested",
       "admission_issued",
       "post_execution_receipt_issued"
-    ]
+    ],
+    "signed_agent_card_binding": {
+      "mode": "digest_bound_reference",
+      "evidence_type": "signed_agent_card",
+      "required": false
+    }
   }
 }

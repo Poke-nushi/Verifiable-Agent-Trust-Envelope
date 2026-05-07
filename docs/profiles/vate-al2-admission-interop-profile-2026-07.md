@@ -5,7 +5,7 @@
 This is a narrow interoperability profile for the `VATE-AL2-Verifier-Admission-v0.2` discussion draft.
 
 It is intended to make conformance fixtures and reference verifier behavior comparable across implementations.
-Passing this profile does not imply production readiness, certification, or any right to make a conformance claim beyond the specific fixture result.
+Passing this profile does not imply production readiness, production endorsement, or any right to make a conformance claim beyond the specific fixture result.
 
 ## Scope
 
@@ -91,4 +91,4 @@ The verifier MUST dereference or otherwise obtain the referenced artifacts and e
 For July 2026 interop, a profile-compatible implementation is expected to pass the runnable corpus under `conformance/al2-vate-v0.2/`.
 
 Passing that corpus means the implementation is fixture-compatible for this draft.
-It does not imply production readiness or certification.
+It does not imply production readiness or production endorsement.

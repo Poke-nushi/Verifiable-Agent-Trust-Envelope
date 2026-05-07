@@ -26,6 +26,10 @@ HTTP_DEMO = ROOT / "reference" / "http-verifier-demo" / "http_verifier_demo.py"
 VATE_CONFORMANCE = ROOT / "scripts" / "vate_conformance.py"
 VATE_CORE = ROOT / "reference" / "vate-verifier-core" / "vate_verifier_core.py"
 A2A_ADAPTER = ROOT / "reference" / "a2a-metadata-adapter-demo" / "a2a_metadata_adapter_demo.py"
+JSON_ONLY_FILES = [
+    "reference/a2a-metadata-adapter-demo/agent-card-extension.example.json",
+    "examples/a2a/agent-card-v1-vate-extension.example.json",
+]
 EXAMPLE_PAIRS = [
     ("examples/passport-credential.example.json", "schemas/passport-credential.schema.json"),
     ("examples/runtime-proof.example.json", "schemas/runtime-proof.schema.json"),
@@ -36,6 +40,10 @@ EXAMPLE_PAIRS = [
     ("examples/admission-request.example.json", "schemas/admission-request.schema.json"),
     ("examples/transport/mcp-oauth-admission-request.example.json", "schemas/admission-request.schema.json"),
     ("examples/a2a/metadata-admission-requested.json", "schemas/a2a-vate-metadata.schema.json"),
+    (
+        "examples/a2a/metadata-admission-requested-with-signed-agent-card.json",
+        "schemas/a2a-vate-metadata.schema.json",
+    ),
     ("examples/a2a/metadata-admission-issued.json", "schemas/a2a-vate-metadata.schema.json"),
     ("examples/a2a/metadata-post-execution-issued.json", "schemas/a2a-vate-metadata.schema.json"),
     ("examples/receipts/admission-allow.example.json", "schemas/admission-receipt.schema.json"),
@@ -248,6 +256,8 @@ def validate_examples() -> None:
         if errors:
             joined = "\n".join(errors)
             raise RuntimeError(f"{example_rel} failed validation:\n{joined}")
+    for json_rel in JSON_ONLY_FILES:
+        json.loads((ROOT / json_rel).read_text(encoding="utf-8"))
 
 
 def main() -> int:

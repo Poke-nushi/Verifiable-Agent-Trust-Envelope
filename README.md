@@ -109,13 +109,14 @@ If you are new to the repo, the fastest path is:
 2. [docs/v0.2-in-5-minutes.md](docs/v0.2-in-5-minutes.md)
 3. [docs/profiles/vate-al2-verifier-admission-profile-v0.2.md](docs/profiles/vate-al2-verifier-admission-profile-v0.2.md)
 4. [docs/a2a-metadata-binding-v0.2.md](docs/a2a-metadata-binding-v0.2.md)
-5. [docs/receipt-model-v0.2.md](docs/receipt-model-v0.2.md)
-6. [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md)
-7. [docs/profiles/vate-al2-admission-interop-profile-2026-07.md](docs/profiles/vate-al2-admission-interop-profile-2026-07.md)
-8. [conformance/al2-vate-v0.2/README.md](conformance/al2-vate-v0.2/README.md)
-9. [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)
-10. section `0` and section `1` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md)
-11. [reference/http-verifier-demo/README.md](reference/http-verifier-demo/README.md)
+5. [docs/a2a-v1-extension-sketch-2026-05.md](docs/a2a-v1-extension-sketch-2026-05.md)
+6. [docs/receipt-model-v0.2.md](docs/receipt-model-v0.2.md)
+7. [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md)
+8. [docs/profiles/vate-al2-admission-interop-profile-2026-07.md](docs/profiles/vate-al2-admission-interop-profile-2026-07.md)
+9. [conformance/al2-vate-v0.2/README.md](conformance/al2-vate-v0.2/README.md)
+10. [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)
+11. section `0` and section `1` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md)
+12. [reference/http-verifier-demo/README.md](reference/http-verifier-demo/README.md)
 
 If you want the visual system view, see section `11` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md).
 
@@ -138,7 +139,7 @@ The most useful feedback for this draft is currently:
 - **Primary language**: English
 - **Research refresh date**: 2026-05-07
 - **Primary battlefield**: `AL2` external digital write
-- **Implemented now**: payload schemas, examples, verifier guidance, reference demos, verifier policy example, policy snapshot schema, trust-bundle hardening checks, detached JOSE fixture checks, AL2 HTTP conformance corpus, runnable v0.2 AL2 conformance corpus, language-neutral corpus index, SUT result comparison contract, implementation report schema, MCP/OAuth transport-bound fixture, AP2/UCP commerce crosswalk fixture, AP2 Human Not Present evidence fixtures, v0.2 AL2 verifier admission profile draft, AL2 admission interop profile, dependency-free verifier core, A2A metadata adapter demo
+- **Implemented now**: payload schemas, examples, verifier guidance, reference demos, verifier policy example, policy snapshot schema, trust-bundle hardening checks, detached JOSE fixture checks, AL2 HTTP conformance corpus, runnable v0.2 AL2 conformance corpus, language-neutral corpus index, SUT result comparison contract, implementation report schema, MCP/OAuth transport-bound fixture, AP2/UCP commerce crosswalk fixture, AP2 Human Not Present evidence fixtures, v0.2 AL2 verifier admission profile draft, AL2 admission interop profile, dependency-free verifier core, A2A metadata adapter demo, A2A v1.0 extension sketch
 - **Planned later**: pairwise presentation profile, richer capability registry, formal `AID`, physical `ABS` profiles
 
 ## Repository Map
@@ -169,6 +170,8 @@ The most useful feedback for this draft is currently:
   Short A2A-adjacent issue update draft after the runnable v0.2 artifacts
 - [docs/a2a-metadata-binding-v0.2.md](docs/a2a-metadata-binding-v0.2.md)
   Reference-only A2A metadata binding for VATE admission and receipt artifacts
+- [docs/a2a-v1-extension-sketch-2026-05.md](docs/a2a-v1-extension-sketch-2026-05.md)
+  A2A v1.0-shaped extension sketch using optional activation, signed Agent Card evidence, and digest-bound VATE references
 - [docs/ecosystem-positioning-2026-05.md](docs/ecosystem-positioning-2026-05.md)
   Current VATE boundary relative to MCP/OAuth, A2A, AP2, ACP/UCP, and x402
 - [docs/receipt-model-v0.2.md](docs/receipt-model-v0.2.md)
@@ -237,6 +240,7 @@ python3 scripts/check_repo_strict.py
 - [docs/delegated-identity-composition-example.md](docs/delegated-identity-composition-example.md)
 - [docs/transport-bindings.md](docs/transport-bindings.md)
 - [docs/a2a-metadata-binding-v0.2.md](docs/a2a-metadata-binding-v0.2.md)
+- [docs/a2a-v1-extension-sketch-2026-05.md](docs/a2a-v1-extension-sketch-2026-05.md)
 - [docs/receipt-model-v0.2.md](docs/receipt-model-v0.2.md)
 - [docs/jws-packaging-and-status-delivery.md](docs/jws-packaging-and-status-delivery.md)
 - [docs/threat-model.md](docs/threat-model.md)

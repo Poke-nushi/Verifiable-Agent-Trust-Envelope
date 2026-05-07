@@ -293,7 +293,7 @@ The signed credential that represents the agent passport itself.
 - self_declared
 - verified
 - observed
-- regulatory / certification bound
+- regulatory / assurance bound
 - hardware-bound capability
 
 ### 7.3 ARP - Agent Runtime Proof

@@ -2,7 +2,7 @@
 
 This directory contains a runnable machine-readable corpus for the `VATE AL2 Verifier Admission Profile v0.2`.
 
-It is not a certification suite.
+It is not a production endorsement suite.
 It is an interoperability review and implementation aid.
 
 The corpus makes the v0.2 draft easier to evaluate by naming the minimum expected verifier outcomes:

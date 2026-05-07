@@ -4,7 +4,7 @@
 
 This note defines the language-neutral shape of the `VATE AL2 Verifier Admission v0.2` conformance corpus.
 
-It is an implementation aid, not a certification program.
+It is an implementation aid, not a production endorsement program.
 It lets non-Python implementations discover cases, resolve artifacts, and publish comparable reports without depending on the reference runner internals.
 
 ## Corpus Index

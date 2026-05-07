@@ -13,6 +13,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+JSON_ONLY_FILES = [
+    "reference/a2a-metadata-adapter-demo/agent-card-extension.example.json",
+    "examples/a2a/agent-card-v1-vate-extension.example.json",
+]
 EXAMPLE_PAIRS = [
     ("examples/passport-credential.example.json", "schemas/passport-credential.schema.json"),
     ("examples/runtime-proof.example.json", "schemas/runtime-proof.schema.json"),
@@ -23,6 +27,10 @@ EXAMPLE_PAIRS = [
     ("examples/admission-request.example.json", "schemas/admission-request.schema.json"),
     ("examples/transport/mcp-oauth-admission-request.example.json", "schemas/admission-request.schema.json"),
     ("examples/a2a/metadata-admission-requested.json", "schemas/a2a-vate-metadata.schema.json"),
+    (
+        "examples/a2a/metadata-admission-requested-with-signed-agent-card.json",
+        "schemas/a2a-vate-metadata.schema.json",
+    ),
     ("examples/a2a/metadata-admission-issued.json", "schemas/a2a-vate-metadata.schema.json"),
     ("examples/a2a/metadata-post-execution-issued.json", "schemas/a2a-vate-metadata.schema.json"),
     ("examples/receipts/admission-allow.example.json", "schemas/admission-receipt.schema.json"),
@@ -144,6 +152,9 @@ def main() -> int:
             first = errors[0]
             path = ".".join(str(part) for part in first.path) or "root"
             raise SystemExit(f"{example_rel} failed strict validation at {path}: {first.message}")
+
+    for json_rel in JSON_ONLY_FILES:
+        load_json(ROOT / json_rel)
 
     print("app draft strict schema validation: ok")
     return 0

@@ -797,7 +797,7 @@
   },
   "implementation_report_schema": "schemas/implementation-report.schema.json",
   "limitations": [
-    "This corpus index is an implementation aid, not a certification statement.",
+    "This corpus index is an implementation aid, not a production endorsement statement.",
     "Passing the listed cases does not imply production readiness or endorsement."
   ],
   "manifest": [

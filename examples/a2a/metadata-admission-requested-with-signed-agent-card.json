@@ -1,0 +1,40 @@
+{
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "phase": "admission_requested",
+  "transaction_id": "txn-20260507-a2a-v1-001",
+  "assurance_level": "AL2",
+  "admission_request": {
+    "type": "admission_request",
+    "uri": "https://verifier.example/vate/admission-requests/areq-20260507-a2a-v1-001",
+    "media_type": "application/vate-admission-request+json",
+    "digest": {
+      "alg": "sha-256",
+      "value": "base64url-admission-request-digest"
+    }
+  },
+  "evidence_refs": [
+    {
+      "type": "signed_agent_card",
+      "uri": "https://agent.example/.well-known/agent-card.json",
+      "media_type": "application/json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-signed-agent-card-digest"
+      },
+      "signature_profile": {
+        "format": "A2A AgentCard.signatures JWS",
+        "canonicalization": "RFC8785",
+        "required_headers": [
+          "alg",
+          "kid"
+        ],
+        "recommended_headers": [
+          "typ"
+        ]
+      }
+    }
+  ],
+  "issuer": "did:web:client.example",
+  "issued_at": "2026-05-07T03:00:00Z",
+  "expires_at": "2026-05-07T03:05:00Z"
+}

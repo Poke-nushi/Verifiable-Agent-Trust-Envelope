@@ -73,4 +73,4 @@ Implementations must not assume that `protocol_hint` alone proves authority; loc
 - no broad commerce profile
 - no PSP or wallet integration
 - no merchant order lifecycle model
-- no certification claim
+- no production endorsement claim

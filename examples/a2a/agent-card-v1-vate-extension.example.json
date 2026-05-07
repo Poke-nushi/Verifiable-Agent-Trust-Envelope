@@ -1,0 +1,72 @@
+{
+  "name": "Example VATE-aware A2A Agent",
+  "description": "A2A v1.0-shaped example agent that advertises digest-bound VATE admission metadata support.",
+  "supportedInterfaces": [
+    {
+      "url": "https://agent.example/a2a/v1",
+      "protocolBinding": "HTTP+JSON",
+      "protocolVersion": "1.0"
+    }
+  ],
+  "provider": {
+    "organization": "Example Agent Provider",
+    "url": "https://agent.example"
+  },
+  "version": "0.1.0",
+  "documentationUrl": "https://agent.example/docs/vate-a2a-extension",
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": true,
+    "extendedAgentCard": true,
+    "extensions": [
+      {
+        "uri": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2",
+        "description": "Carries digest-bound VATE admission and receipt references in A2A metadata.",
+        "required": false,
+        "params": {
+          "profiles": [
+            "VATE-AL2-Verifier-Admission-v0.2"
+          ],
+          "accepted_reference_modes": [
+            "reference_plus_digest"
+          ],
+          "supported_phases": [
+            "admission_requested",
+            "admission_issued",
+            "post_execution_receipt_issued"
+          ],
+          "signed_agent_card_binding": {
+            "mode": "digest_bound_reference",
+            "evidence_type": "signed_agent_card",
+            "required": false
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "application/json",
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "external-write-admission",
+      "name": "External Write Admission",
+      "description": "Accepts external digital action requests that may require VATE AL2 admission before execution.",
+      "tags": [
+        "vate",
+        "admission",
+        "external-write"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    }
+  ]
+}

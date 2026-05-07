@@ -209,7 +209,7 @@ def make_corpus_index(corpus_root: Path) -> dict[str, Any]:
             "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.2 --out conformance/al2-vate-v0.2/corpus.json",
         },
         "limitations": [
-            "This corpus index is an implementation aid, not a certification statement.",
+            "This corpus index is an implementation aid, not a production endorsement statement.",
             "Passing the listed cases does not imply production readiness or endorsement.",
         ],
     }
