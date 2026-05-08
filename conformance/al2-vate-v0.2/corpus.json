@@ -10,6 +10,7 @@
       "case_id": "allow-ap2-hnp-preauthorized-mandate",
       "category": "positive",
       "expected_outcome": "allow",
+      "expected_primary_reason_code": "EVIDENCE_VERIFIED",
       "expected_reason_codes": [
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
@@ -33,6 +34,7 @@
       "case_id": "allow-jose-detached-runtime-attestation",
       "category": "positive",
       "expected_outcome": "allow",
+      "expected_primary_reason_code": "EVIDENCE_VERIFIED",
       "expected_reason_codes": [
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
@@ -54,6 +56,7 @@
       "case_id": "allow-mcp-oauth-transport-bound",
       "category": "positive",
       "expected_outcome": "allow",
+      "expected_primary_reason_code": "EVIDENCE_VERIFIED",
       "expected_reason_codes": [
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
@@ -76,6 +79,7 @@
       "case_id": "allow-valid-admission",
       "category": "positive",
       "expected_outcome": "allow",
+      "expected_primary_reason_code": "EVIDENCE_VERIFIED",
       "expected_reason_codes": [
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
@@ -97,6 +101,7 @@
       "case_id": "allow-valid-basic-external-write",
       "category": "positive",
       "expected_outcome": "allow",
+      "expected_primary_reason_code": "EVIDENCE_VERIFIED",
       "expected_reason_codes": [
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
@@ -117,6 +122,7 @@
       "case_id": "allow-valid-with-policy-snapshot",
       "category": "positive",
       "expected_outcome": "allow",
+      "expected_primary_reason_code": "POLICY_SNAPSHOT_MATCH",
       "expected_reason_codes": [
         "POLICY_SNAPSHOT_MATCH",
         "POLICY_MATCH"
@@ -137,6 +143,7 @@
       "case_id": "allow-valid-with-status-fresh",
       "category": "positive",
       "expected_outcome": "allow",
+      "expected_primary_reason_code": "STATUS_FRESH",
       "expected_reason_codes": [
         "STATUS_FRESH",
         "POLICY_MATCH"
@@ -158,6 +165,7 @@
       "case_id": "attenuate-ap2-hnp-amount-overrun",
       "category": "positive",
       "expected_outcome": "attenuate",
+      "expected_primary_reason_code": "PAYMENT_TOKEN_LIMIT",
       "expected_reason_codes": [
         "PAYMENT_TOKEN_LIMIT",
         "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
@@ -180,6 +188,7 @@
       "case_id": "attenuate-max-amount",
       "category": "positive",
       "expected_outcome": "attenuate",
+      "expected_primary_reason_code": "PAYMENT_TOKEN_LIMIT",
       "expected_reason_codes": [
         "PAYMENT_TOKEN_LIMIT",
         "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
@@ -202,6 +211,7 @@
       "case_id": "attenuate-requires-new-permit",
       "category": "positive",
       "expected_outcome": "attenuate",
+      "expected_primary_reason_code": "NEW_PERMIT_REQUIRED",
       "expected_reason_codes": [
         "NEW_PERMIT_REQUIRED"
       ],
@@ -220,6 +230,7 @@
       "case_id": "attenuate-target-scope",
       "category": "positive",
       "expected_outcome": "attenuate",
+      "expected_primary_reason_code": "TARGET_SCOPE_NARROWED",
       "expected_reason_codes": [
         "TARGET_SCOPE_NARROWED"
       ],
@@ -239,6 +250,7 @@
       "case_id": "deny-alg-not-allowed",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "ALG_NOT_ALLOWED",
       "expected_reason_codes": [
         "ALG_NOT_ALLOWED",
         "FAIL_CLOSED"
@@ -260,6 +272,7 @@
       "case_id": "deny-ambiguous-trust-anchor",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "SCHEMA_INVALID",
       "expected_reason_codes": [
         "SCHEMA_INVALID",
         "FAIL_CLOSED"
@@ -282,6 +295,7 @@
       "case_id": "deny-ap2-hnp-replay",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "REPLAY_DETECTED",
       "expected_reason_codes": [
         "REPLAY_DETECTED",
         "FAIL_CLOSED"
@@ -304,6 +318,7 @@
       "case_id": "deny-ap2-hnp-stale-mandate",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "PERMIT_EXPIRED",
       "expected_reason_codes": [
         "PERMIT_EXPIRED",
         "FAIL_CLOSED"
@@ -325,6 +340,7 @@
       "case_id": "deny-attenuation-max-amount-type-edge",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "SCHEMA_INVALID",
       "expected_reason_codes": [
         "SCHEMA_INVALID",
         "FAIL_CLOSED"
@@ -346,6 +362,7 @@
       "case_id": "deny-attenuation-unsafe-path",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "SCHEMA_INVALID",
       "expected_reason_codes": [
         "SCHEMA_INVALID",
         "FAIL_CLOSED"
@@ -373,6 +390,7 @@
       "case_id": "deny-audience-mismatch",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "AUDIENCE_MISMATCH",
       "expected_reason_codes": [
         "AUDIENCE_MISMATCH",
         "FAIL_CLOSED"
@@ -394,6 +412,7 @@
       "case_id": "deny-digest-mismatch",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "DIGEST_MISMATCH",
       "expected_reason_codes": [
         "DIGEST_MISMATCH",
         "FAIL_CLOSED"
@@ -414,6 +433,7 @@
       "case_id": "deny-evidence-type-not-allowed",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "ISSUER_NOT_AUTHORIZED",
       "expected_reason_codes": [
         "ISSUER_NOT_AUTHORIZED",
         "FAIL_CLOSED"
@@ -434,6 +454,7 @@
       "case_id": "deny-expired-permit",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "PERMIT_EXPIRED",
       "expected_reason_codes": [
         "PERMIT_EXPIRED",
         "FAIL_CLOSED"
@@ -458,6 +479,7 @@
       "case_id": "deny-jose-alg-none",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "ALG_NOT_ALLOWED",
       "expected_reason_codes": [
         "ALG_NOT_ALLOWED",
         "FAIL_CLOSED"
@@ -481,6 +503,7 @@
       "case_id": "deny-jose-crit-unsupported",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "SCHEMA_INVALID",
       "expected_reason_codes": [
         "SCHEMA_INVALID",
         "FAIL_CLOSED"
@@ -504,6 +527,7 @@
       "case_id": "deny-jose-hs256-downgrade",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "ALG_NOT_ALLOWED",
       "expected_reason_codes": [
         "ALG_NOT_ALLOWED",
         "FAIL_CLOSED"
@@ -528,6 +552,7 @@
       "case_id": "deny-jose-payload-digest-mismatch",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "DIGEST_MISMATCH",
       "expected_reason_codes": [
         "DIGEST_MISMATCH",
         "FAIL_CLOSED"
@@ -549,6 +574,7 @@
       "case_id": "deny-kid-mismatch",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "UNKNOWN_TRUST_ANCHOR",
       "expected_reason_codes": [
         "UNKNOWN_TRUST_ANCHOR",
         "FAIL_CLOSED"
@@ -570,6 +596,7 @@
       "case_id": "deny-mcp-oauth-overscope",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "TARGET_NOT_PERMITTED",
       "expected_reason_codes": [
         "TARGET_NOT_PERMITTED",
         "FAIL_CLOSED"
@@ -591,6 +618,7 @@
       "case_id": "deny-not-yet-valid-permit",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "PERMIT_NOT_YET_VALID",
       "expected_reason_codes": [
         "PERMIT_NOT_YET_VALID",
         "FAIL_CLOSED"
@@ -611,6 +639,7 @@
       "case_id": "deny-policy-snapshot-mismatch",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "POLICY_SNAPSHOT_MISMATCH",
       "expected_reason_codes": [
         "POLICY_SNAPSHOT_MISMATCH",
         "FAIL_CLOSED"
@@ -632,6 +661,7 @@
       "case_id": "deny-replay-detected",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "REPLAY_DETECTED",
       "expected_reason_codes": [
         "REPLAY_DETECTED",
         "FAIL_CLOSED"
@@ -652,6 +682,7 @@
       "case_id": "deny-runtime-mismatch",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "RUNTIME_MISMATCH",
       "expected_reason_codes": [
         "RUNTIME_MISMATCH",
         "FAIL_CLOSED"
@@ -673,6 +704,7 @@
       "case_id": "deny-runtime-proof-stale",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "RUNTIME_PROOF_STALE",
       "expected_reason_codes": [
         "RUNTIME_PROOF_STALE",
         "FAIL_CLOSED"
@@ -694,6 +726,7 @@
       "case_id": "deny-signature-tampered",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "SIGNATURE_INVALID",
       "expected_reason_codes": [
         "SIGNATURE_INVALID",
         "FAIL_CLOSED"
@@ -713,6 +746,7 @@
       "case_id": "deny-status-revoked",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "STATUS_REVOKED",
       "expected_reason_codes": [
         "STATUS_REVOKED",
         "FAIL_CLOSED"
@@ -733,6 +767,7 @@
       "case_id": "deny-status-stale-fail-closed",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "STATUS_STALE",
       "expected_reason_codes": [
         "STATUS_STALE",
         "FAIL_CLOSED"
@@ -753,6 +788,7 @@
       "case_id": "deny-trust-anchor-expired",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "TRUST_ANCHOR_EXPIRED",
       "expected_reason_codes": [
         "TRUST_ANCHOR_EXPIRED",
         "FAIL_CLOSED"
@@ -774,6 +810,7 @@
       "case_id": "deny-trust-anchor-not-yet-valid",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "TRUST_ANCHOR_NOT_YET_VALID",
       "expected_reason_codes": [
         "TRUST_ANCHOR_NOT_YET_VALID",
         "FAIL_CLOSED"
@@ -795,6 +832,7 @@
       "case_id": "deny-trust-anchor-revoked",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "TRUST_ANCHOR_REVOKED",
       "expected_reason_codes": [
         "TRUST_ANCHOR_REVOKED",
         "FAIL_CLOSED"
@@ -816,6 +854,7 @@
       "case_id": "deny-unknown-trust-anchor",
       "category": "negative",
       "expected_outcome": "deny",
+      "expected_primary_reason_code": "UNKNOWN_TRUST_ANCHOR",
       "expected_reason_codes": [
         "UNKNOWN_TRUST_ANCHOR",
         "FAIL_CLOSED"
@@ -836,6 +875,7 @@
       "case_id": "interop-ap2-ucp-commerce-evidence",
       "category": "positive",
       "expected_outcome": "allow",
+      "expected_primary_reason_code": "EVIDENCE_VERIFIED",
       "expected_reason_codes": [
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
@@ -858,6 +898,7 @@
       "case_id": "interop-oap-decision-evidence",
       "category": "positive",
       "expected_outcome": "allow",
+      "expected_primary_reason_code": "EVIDENCE_VERIFIED",
       "expected_reason_codes": [
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
@@ -879,6 +920,7 @@
       "case_id": "post-execution-admission-digest-mismatch",
       "category": "linkage",
       "expected_outcome": "failed",
+      "expected_primary_reason_code": "POST_EXEC_ADMISSION_DIGEST_MISMATCH",
       "expected_reason_codes": [
         "POST_EXEC_ADMISSION_DIGEST_MISMATCH"
       ],
@@ -898,6 +940,7 @@
       "case_id": "post-execution-after-admission-expiry",
       "category": "linkage",
       "expected_outcome": "failed",
+      "expected_primary_reason_code": "POST_EXEC_ADMISSION_EXPIRED",
       "expected_reason_codes": [
         "POST_EXEC_ADMISSION_EXPIRED"
       ],
@@ -917,6 +960,7 @@
       "case_id": "post-execution-after-deny",
       "category": "linkage",
       "expected_outcome": "failed",
+      "expected_primary_reason_code": "POST_EXEC_ADMISSION_DENIED",
       "expected_reason_codes": [
         "POST_EXEC_ADMISSION_DENIED"
       ],
@@ -937,6 +981,7 @@
       "case_id": "post-execution-ap2-hnp-linkage-success",
       "category": "linkage",
       "expected_outcome": "success",
+      "expected_primary_reason_code": "ADMISSION_RECEIPT_LINKED",
       "expected_reason_codes": [
         "ADMISSION_RECEIPT_LINKED",
         "EFFECTIVE_REQUEST_HASH_MATCH",
@@ -959,6 +1004,7 @@
       "case_id": "post-execution-effective-constraints-exceeded",
       "category": "linkage",
       "expected_outcome": "failed",
+      "expected_primary_reason_code": "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED",
       "expected_reason_codes": [
         "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
       ],
@@ -979,6 +1025,7 @@
       "case_id": "post-execution-linkage-mismatch",
       "category": "linkage",
       "expected_outcome": "failed",
+      "expected_primary_reason_code": "POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH",
       "expected_reason_codes": [
         "POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH"
       ],
@@ -999,6 +1046,7 @@
       "case_id": "post-execution-linkage-success",
       "category": "linkage",
       "expected_outcome": "success",
+      "expected_primary_reason_code": "ADMISSION_RECEIPT_LINKED",
       "expected_reason_codes": [
         "ADMISSION_RECEIPT_LINKED",
         "EFFECTIVE_REQUEST_HASH_MATCH",
@@ -1022,6 +1070,7 @@
       "case_id": "post-execution-runtime-mismatch",
       "category": "linkage",
       "expected_outcome": "failed",
+      "expected_primary_reason_code": "POST_EXEC_RUNTIME_MISMATCH",
       "expected_reason_codes": [
         "POST_EXEC_RUNTIME_MISMATCH"
       ],
@@ -1041,6 +1090,7 @@
       "case_id": "post-execution-transaction-mismatch",
       "category": "linkage",
       "expected_outcome": "failed",
+      "expected_primary_reason_code": "POST_EXEC_TRANSACTION_MISMATCH",
       "expected_reason_codes": [
         "POST_EXEC_TRANSACTION_MISMATCH"
       ],

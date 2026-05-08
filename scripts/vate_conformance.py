@@ -32,6 +32,7 @@ SUT_RESULTS_VERSION = "vate-sut-results-2026-07"
 EVIDENCE_VOCABULARY_VERSION = "vate-evidence-vocabulary-2026-07"
 SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 EVIDENCE_VOCABULARY_PATH = ROOT / "registries" / "evidence-vocabulary.v0.2.json"
+TERMINAL_REASON_CODES = {"FAIL_CLOSED", "POLICY_MATCH"}
 
 
 def load_evidence_vocabulary() -> tuple[frozenset[str], frozenset[str], dict[str, frozenset[str]]]:
@@ -236,6 +237,7 @@ def corpus_manifest(corpus_root: Path) -> tuple[list[dict[str, str]], dict[str, 
 def case_index_entry(case_path: Path) -> dict[str, Any]:
     case = read_json(case_path)
     expected = case.get("expected", {})
+    expected_reason_codes = [str(code) for code in expected.get("reason_codes", [])]
     if case["category"] == "linkage":
         expected_outcome_value = str(expected.get("post_execution_outcome", "missing"))
     else:
@@ -249,7 +251,8 @@ def case_index_entry(case_path: Path) -> dict[str, Any]:
         "title": case.get("title", case["case_id"]),
         "expected_outcome": expected_outcome_value,
         "expected_should_execute": expected_should_execute(case),
-        "expected_reason_codes": expected.get("reason_codes", []),
+        "expected_primary_reason_code": primary_reason_code(expected_reason_codes),
+        "expected_reason_codes": expected_reason_codes,
         "validation_focus": case.get("validation_focus", []),
         "artifacts": case.get("artifacts", {}),
     }
@@ -334,6 +337,13 @@ def actual_reason_codes(admission_receipt: dict[str, Any] | None) -> list[str]:
         return []
     codes = admission_receipt.get("decision", {}).get("reason_codes", [])
     return [str(code) for code in codes]
+
+
+def primary_reason_code(reason_codes: list[str]) -> str | None:
+    for code in reason_codes:
+        if code not in TERMINAL_REASON_CODES:
+            return code
+    return None
 
 
 def reason_code_order_failures(codes: list[str], outcome: str, *, label: str) -> list[str]:
@@ -1483,6 +1493,8 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
         "actual_outcome": actual,
         "expected_should_execute": expected_execute,
         "actual_should_execute": actual_execute,
+        "expected_primary_reason_code": primary_reason_code(expected_codes),
+        "actual_primary_reason_code": primary_reason_code(actual_codes),
         "expected_reason_codes": expected_codes,
         "actual_reason_codes": actual_codes,
         "pass": not failures,
@@ -1522,13 +1534,15 @@ def load_case_expectations(corpus_root: Path) -> list[dict[str, Any]]:
     expectations: list[dict[str, Any]] = []
     for case_path in sorted((corpus_root / "cases").glob("*.json")):
         case = read_json(case_path)
+        expected_reason_codes = [str(code) for code in case["expected"]["reason_codes"]]
         expectations.append(
             {
                 "case_id": case["case_id"],
                 "category": case["category"],
                 "expected_outcome": expected_outcome(case),
                 "expected_should_execute": expected_should_execute(case),
-                "expected_reason_codes": [str(code) for code in case["expected"]["reason_codes"]],
+                "expected_primary_reason_code": primary_reason_code(expected_reason_codes),
+                "expected_reason_codes": expected_reason_codes,
                 "expected_checks": [
                     {
                         "name": check["name"],
@@ -2081,6 +2095,12 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
                 failures.append(f"outcome: expected {expected['expected_outcome']} actual {actual_outcome}")
             if actual_reason_codes != expected["expected_reason_codes"]:
                 failures.append(f"reason_codes: expected {expected['expected_reason_codes']} actual {actual_reason_codes}")
+            if primary_reason_code(actual_reason_codes) != expected["expected_primary_reason_code"]:
+                failures.append(
+                    "primary_reason_code: "
+                    f"expected {expected['expected_primary_reason_code']} "
+                    f"actual {primary_reason_code(actual_reason_codes)}"
+                )
             failures.extend(
                 reason_code_order_failures(
                     expected["expected_reason_codes"],
@@ -2124,6 +2144,8 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
                 "actual_outcome": actual_outcome,
                 "expected_should_execute": expected["expected_should_execute"],
                 "actual_should_execute": actual_should_execute_value,
+                "expected_primary_reason_code": expected["expected_primary_reason_code"],
+                "actual_primary_reason_code": primary_reason_code(actual_reason_codes),
                 "expected_reason_codes": expected["expected_reason_codes"],
                 "actual_reason_codes": actual_reason_codes,
                 "pass": not failures,
@@ -2209,6 +2231,8 @@ def implementation_case_results_match(
             "actual_outcome": case.get("actual_outcome"),
             "expected_should_execute": case.get("expected_should_execute"),
             "actual_should_execute": case.get("actual_should_execute"),
+            "expected_primary_reason_code": case.get("expected_primary_reason_code"),
+            "actual_primary_reason_code": case.get("actual_primary_reason_code"),
             "pass": case.get("pass"),
         }
         for case in conformance_cases
@@ -2554,6 +2578,8 @@ def make_implementation_report(args: argparse.Namespace, conformance_report: dic
                 "actual_outcome": case["actual_outcome"],
                 "expected_should_execute": case["expected_should_execute"],
                 "actual_should_execute": case["actual_should_execute"],
+                "expected_primary_reason_code": case["expected_primary_reason_code"],
+                "actual_primary_reason_code": case["actual_primary_reason_code"],
                 "pass": case["pass"],
             }
             for case in conformance_report["cases"]

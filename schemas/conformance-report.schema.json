@@ -117,6 +117,8 @@
           "actual_outcome",
           "expected_should_execute",
           "actual_should_execute",
+          "expected_primary_reason_code",
+          "actual_primary_reason_code",
           "expected_reason_codes",
           "actual_reason_codes",
           "pass"
@@ -146,6 +148,22 @@
               "boolean",
               "null"
             ]
+          },
+          "expected_primary_reason_code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The first non-terminal expected reason code, excluding POLICY_MATCH and FAIL_CLOSED.",
+            "minLength": 1
+          },
+          "actual_primary_reason_code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The first non-terminal actual reason code, excluding POLICY_MATCH and FAIL_CLOSED.",
+            "minLength": 1
           },
           "expected_reason_codes": {
             "type": "array",

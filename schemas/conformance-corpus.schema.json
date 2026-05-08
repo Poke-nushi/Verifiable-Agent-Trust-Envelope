@@ -122,6 +122,7 @@
           "category",
           "expected_outcome",
           "expected_should_execute",
+          "expected_primary_reason_code",
           "expected_reason_codes"
         ],
         "properties": {
@@ -147,6 +148,14 @@
           },
           "expected_should_execute": {
             "type": "boolean"
+          },
+          "expected_primary_reason_code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The first non-terminal expected reason code, excluding POLICY_MATCH and FAIL_CLOSED.",
+            "minLength": 1
           },
           "expected_reason_codes": {
             "type": "array",

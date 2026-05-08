@@ -25,6 +25,8 @@
       "actual_outcome": "allow",
       "expected_should_execute": true,
       "actual_should_execute": true,
+      "expected_primary_reason_code": "EVIDENCE_VERIFIED",
+      "actual_primary_reason_code": "EVIDENCE_VERIFIED",
       "expected_reason_codes": [
         "EVIDENCE_VERIFIED",
         "POLICY_MATCH"
@@ -43,6 +45,8 @@
       "actual_outcome": "deny",
       "expected_should_execute": false,
       "actual_should_execute": false,
+      "expected_primary_reason_code": "PERMIT_EXPIRED",
+      "actual_primary_reason_code": "PERMIT_EXPIRED",
       "expected_reason_codes": [
         "PERMIT_EXPIRED",
         "FAIL_CLOSED"

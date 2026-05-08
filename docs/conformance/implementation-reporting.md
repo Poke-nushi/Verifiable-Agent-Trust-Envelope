@@ -127,7 +127,7 @@ For early interop review, a useful report should answer:
 
 - did the implementation produce the expected `allow / attenuate / deny` outcomes
 - did it expose the expected execution gate through `should_execute`
-- did it emit the expected reason codes
+- did it emit the expected ordered reason codes and primary reason projection
 - did it preserve machine-readable attenuation fields
 - did it fail closed for stale, revoked, replayed, mismatched, or untrusted inputs
 - did it validate post-execution linkage
@@ -142,7 +142,7 @@ Two reports are comparable only when they use the same:
 - `profile`
 - corpus digest
 - case set
-- expected reason code vocabulary
+- expected reason code vocabulary and primary reason projection rules
 - publication package when comparing independently published implementation reports
 
 If the corpus changes, publish a new report rather than editing the old result in place.

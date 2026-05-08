@@ -36,7 +36,8 @@ The index contains:
 - corpus root and case schema path
 - case count and category counts
 - a digest basis for snapshot comparison
-- a sorted case list with expected outcome, execution gate, and reason codes
+- a sorted case list with expected outcome, execution gate, primary reason
+  projection, and reason codes
 - a manifest of case files and referenced artifacts with raw SHA-256 digests
 - runner commands for reproducing the index and a conformance report
 

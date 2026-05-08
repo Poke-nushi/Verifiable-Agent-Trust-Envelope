@@ -95,6 +95,13 @@ Reason-code order is part of the machine-readable decision surface:
 
 The v0.2 conformance runner enforces the terminal-marker rules above for both repository fixture checks and external SUT comparison reports.
 
+Conformance reports expose derived `expected_primary_reason_code` and
+`actual_primary_reason_code` fields. Corpus indexes expose
+`expected_primary_reason_code` for each case. These fields are the first
+non-terminal reason code after excluding `POLICY_MATCH` and `FAIL_CLOSED`.
+They are report and index projections; they do not relax the ordered
+`reason_codes` comparison in the v0.2 corpus.
+
 ## Post-Execution Policy Violation Tokens
 
 Post-execution receipts also carry `result.policy_violations[]`.

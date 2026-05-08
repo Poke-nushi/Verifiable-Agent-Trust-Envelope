@@ -288,6 +288,26 @@ def assert_json_matches(actual_path: Path, expected_path: Path) -> None:
         raise RuntimeError(f"{expected_path.relative_to(ROOT)} is stale; regenerate it with scripts/vate_conformance.py index")
 
 
+def primary_reason_code(reason_codes: list) -> str | None:
+    for code in reason_codes:
+        if code not in {"POLICY_MATCH", "FAIL_CLOSED"}:
+            return str(code)
+    return None
+
+
+def assert_primary_reason_codes(report_path: Path) -> None:
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    for case in report.get("cases", []):
+        expected_primary = primary_reason_code(case.get("expected_reason_codes", []))
+        case_id = case.get("case_id", "unknown")
+        if case.get("expected_primary_reason_code") != expected_primary:
+            raise RuntimeError(f"{report_path}: {case_id} missing or incorrect expected_primary_reason_code")
+        if "actual_reason_codes" in case:
+            actual_primary = primary_reason_code(case.get("actual_reason_codes", []))
+            if case.get("actual_primary_reason_code") != actual_primary:
+                raise RuntimeError(f"{report_path}: {case_id} missing or incorrect actual_primary_reason_code")
+
+
 def validate_examples() -> None:
     for example_rel, schema_rel in iter_example_pairs():
         example = json.loads((ROOT / example_rel).read_text())
@@ -474,6 +494,7 @@ def main() -> int:
                 "Python 3 standard library",
             ]
         )
+        assert_primary_reason_codes(tmp_dir / "vate-conformance-report.json")
         generated_corpus_index = tmp_dir / "vate-corpus-index.json"
         run(
             [
@@ -487,6 +508,7 @@ def main() -> int:
             ]
         )
         assert_json_matches(generated_corpus_index, ROOT / "conformance" / "al2-vate-v0.2" / "corpus.json")
+        assert_primary_reason_codes(generated_corpus_index)
         run(
             [
                 sys.executable,
@@ -506,6 +528,7 @@ def main() -> int:
                 str(tmp_dir / "vate-sut-implementation-report.json"),
             ]
         )
+        assert_primary_reason_codes(tmp_dir / "vate-sut-compare-report.json")
         missing_jose_proofs = tmp_dir / "sut-results-missing-jose-proof-artifacts.json"
         write_sut_result_without_jose_proof_artifacts(missing_jose_proofs)
         run_expect_failure(

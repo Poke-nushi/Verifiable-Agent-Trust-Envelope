@@ -42,7 +42,9 @@ Each result entry represents one corpus case:
 - `status` - `completed`, `skipped`, or `error`
 - `outcome` - the verifier's observed outcome
 - `should_execute` - whether the verifier result permits immediate execution
-- `reason_codes` - the verifier's machine-readable reason codes in order
+- `reason_codes` - the verifier's machine-readable reason codes in order; the
+  comparison report derives `actual_primary_reason_code` from the first
+  non-terminal code
 - optional `checks` - case-specific check names with `pass: true` when the expected check was satisfied
 - required `artifacts` when the corpus case depends on receipt or context artifacts
 - optional `limitations`
