@@ -231,7 +231,8 @@
         "kind",
         "case_artifact",
         "uri",
-        "digest"
+        "digest",
+        "context_bindings"
       ],
       "properties": {
         "kind": {
@@ -252,8 +253,116 @@
         },
         "digest": {
           "$ref": "#/$defs/digest"
+        },
+        "context_bindings": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/contextBinding"
+          }
         }
       },
+      "additionalProperties": true
+    },
+    "contextBinding": {
+      "type": "object",
+      "required": [
+        "role",
+        "source_artifact"
+      ],
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": [
+            "admission_receipt",
+            "admission_request",
+            "transaction_id",
+            "runtime",
+            "evidence"
+          ]
+        },
+        "source_artifact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "role": {
+                "enum": [
+                  "admission_receipt",
+                  "admission_request"
+                ]
+              }
+            },
+            "required": [
+              "role"
+            ]
+          },
+          "then": {
+            "required": [
+              "digest"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "role": {
+                "enum": [
+                  "transaction_id",
+                  "runtime"
+                ]
+              }
+            },
+            "required": [
+              "role"
+            ]
+          },
+          "then": {
+            "required": [
+              "path",
+              "value"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "role": {
+                "const": "evidence"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          },
+          "then": {
+            "required": [
+              "path",
+              "evidence_type",
+              "digest"
+            ]
+          }
+        }
+      ],
       "additionalProperties": true
     },
     "proofArtifactRef": {

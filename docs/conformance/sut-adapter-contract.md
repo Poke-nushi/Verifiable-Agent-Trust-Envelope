@@ -73,6 +73,17 @@ include `artifacts.verification_context[]` entries with:
 - `uri`
 - `digest.alg` set to `sha-256`
 - `digest.value` as lowercase SHA-256 hex
+- `context_bindings[]` - the receipt, request, transaction, runtime, and
+  evidence objects that the context check was evaluated against
+
+Each `context_bindings[]` entry names a `role` and `source_artifact`.
+Artifact roles such as `admission_receipt` and `admission_request` carry the raw
+artifact SHA-256 digest. Value roles such as `transaction_id` and `runtime`
+carry the source path and observed value. Evidence roles carry the source path,
+evidence type, and canonical JSON digest of the evidence object embedded in the
+source artifact. This lets `compare` detect SUT reports that cite a context
+fixture without binding it back to the request, receipt, transaction, runtime,
+or evidence it was supposed to validate.
 
 When the corpus case includes `jose_checks`, the result entry must include
 `artifacts.proof_artifacts[]` entries for each referenced `proof_package`,

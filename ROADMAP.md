@@ -46,7 +46,7 @@ adding new adjacent profiles.
   policy-violation token mapping, and strict negative schema tests
 - [x] require report corpus/manifest integrity fields, lowercase SHA-256 digest
   descriptors, and top-level report-bundle verification status
-- [ ] bind AL2 context checks to request, transaction, evidence, and receipt
+- [x] bind AL2 context checks to request, transaction, evidence, and receipt
   artifacts so external SUT comparison can evaluate freshness, replay, and
   runtime-binding behavior
 - [ ] move evidence type and protocol hint vocabulary toward a single

@@ -192,6 +192,38 @@
         "verification_context": [
           {
             "case_artifact": "runtime_context",
+            "context_bindings": [
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "4b8f21edfb634b3e325ce40c8a866d9a41e5ce647479c047f19e4cae3c62e715"
+                },
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt"
+              },
+              {
+                "path": "request.transaction_id",
+                "role": "transaction_id",
+                "source_artifact": "admission_receipt",
+                "value": "txn-20260504-allow-001"
+              },
+              {
+                "path": "subject.runtime",
+                "role": "runtime",
+                "source_artifact": "admission_receipt",
+                "value": "spiffe://agent.example/workload/case-agent"
+              },
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "3d6db9efde181f76f0762d202b89895eddeea5534eaaf1c76834e12be3a90014"
+                },
+                "evidence_type": "runtime_attestation",
+                "path": "evidence[1]",
+                "role": "evidence",
+                "source_artifact": "admission_receipt"
+              }
+            ],
             "digest": {
               "alg": "sha-256",
               "value": "6d2ce8f39cf1ebc56a893f01abb83f586cc9a851ac2cdb854064d2b391e361db"
@@ -298,6 +330,32 @@
         "verification_context": [
           {
             "case_artifact": "status_context",
+            "context_bindings": [
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "950a1f5797d13e9ba1e35be9dd1554718bb44dd814bb109a3b0be99256d32c98"
+                },
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt"
+              },
+              {
+                "path": "request.transaction_id",
+                "role": "transaction_id",
+                "source_artifact": "admission_receipt",
+                "value": "txn-20260701-status-fresh-001"
+              },
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "a3489b21548eafd91b6886567b0e184653a1d7f95ce1ddfb5b5d393cf1fa1e82"
+                },
+                "evidence_type": "status_bundle",
+                "path": "evidence[0]",
+                "role": "evidence",
+                "source_artifact": "admission_receipt"
+              }
+            ],
             "digest": {
               "alg": "sha-256",
               "value": "4967a00c0be2429cd16b2f5152c278d970efdf2f17c78bbb8fa5442f64a47f1c"
@@ -1186,6 +1244,32 @@
         "verification_context": [
           {
             "case_artifact": "replay_context",
+            "context_bindings": [
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "059dfdf0942980402c74f90a98ed6f284db59cff70cdd4c15ce824288130169a"
+                },
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt"
+              },
+              {
+                "path": "request.transaction_id",
+                "role": "transaction_id",
+                "source_artifact": "admission_receipt",
+                "value": "txn-20260701-replay-detected-001"
+              },
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "a98fb600ee86faa19c6fb9da9b6502ad3243e7740eb22986aa1edd3cec09763e"
+                },
+                "evidence_type": "admission_request",
+                "path": "evidence[0]",
+                "role": "evidence",
+                "source_artifact": "admission_receipt"
+              }
+            ],
             "digest": {
               "alg": "sha-256",
               "value": "a79e527cef82e84ba918128b96a9a85d8284a45ffc3b2fa7b78a07fc862d9c87"
@@ -1228,6 +1312,38 @@
         "verification_context": [
           {
             "case_artifact": "runtime_context",
+            "context_bindings": [
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "00fd45665fc1ac64844265a674aa6ba4c5b0f2ebb9cad3d261e5c59a9175397a"
+                },
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt"
+              },
+              {
+                "path": "request.transaction_id",
+                "role": "transaction_id",
+                "source_artifact": "admission_receipt",
+                "value": "txn-20260701-runtime-mismatch-001"
+              },
+              {
+                "path": "subject.runtime",
+                "role": "runtime",
+                "source_artifact": "admission_receipt",
+                "value": "spiffe://agent.example/workload/unexpected-runtime"
+              },
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "a49d33d99d3bf2c69c3d239020dec965067c181d7f60b92eea51c74d868801d8"
+                },
+                "evidence_type": "runtime_attestation",
+                "path": "evidence[0]",
+                "role": "evidence",
+                "source_artifact": "admission_receipt"
+              }
+            ],
             "digest": {
               "alg": "sha-256",
               "value": "a7e503305bf0e954fff018fbb15ca9c4369fe69406b95975f7945ea21f25125d"
@@ -1270,6 +1386,50 @@
         "verification_context": [
           {
             "case_artifact": "runtime_context",
+            "context_bindings": [
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "a0de52b2ffdfb6397cde3fd6f205b5a2b2b2d03507d0d7a4e328b7495727332c"
+                },
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt"
+              },
+              {
+                "path": "request.transaction_id",
+                "role": "transaction_id",
+                "source_artifact": "admission_receipt",
+                "value": "txn-20260701-runtime-proof-stale-001"
+              },
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "d671f1acf701356d1dd0389338f017aada21bb08cf357edd849b8e7939694eda"
+                },
+                "role": "admission_request",
+                "source_artifact": "admission_request"
+              },
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "ee1a96d152c609b272b62e0adec21cefcd797b71f39926b07fa3e09cad63247a"
+                },
+                "evidence_type": "runtime_attestation",
+                "path": "evidence[0]",
+                "role": "evidence",
+                "source_artifact": "admission_receipt"
+              },
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "1871eb865b1c933943d3089a6b303d633a9e431ea6242bd845e6e350f1504c11"
+                },
+                "evidence_type": "runtime_attestation",
+                "path": "evidence_refs[0]",
+                "role": "evidence",
+                "source_artifact": "admission_request"
+              }
+            ],
             "digest": {
               "alg": "sha-256",
               "value": "ac6f623b99c398b459cf6f4e2ca2c9c59e1dac4a7fa8de398578dc4205df099d"
@@ -1380,6 +1540,32 @@
         "verification_context": [
           {
             "case_artifact": "status_context",
+            "context_bindings": [
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "0fe34821443b49e74c23e102efcaff6d1ff610a14108652ee6fbd38e87922b88"
+                },
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt"
+              },
+              {
+                "path": "request.transaction_id",
+                "role": "transaction_id",
+                "source_artifact": "admission_receipt",
+                "value": "txn-20260701-status-stale-001"
+              },
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "a70e7f4bf92035c4f3574cda29230d9e9aa0f52b6ff67437873d6b7703a166a5"
+                },
+                "evidence_type": "status_bundle",
+                "path": "evidence[0]",
+                "role": "evidence",
+                "source_artifact": "admission_receipt"
+              }
+            ],
             "digest": {
               "alg": "sha-256",
               "value": "32464bac060eac870231d0ac4371327836c26a331ab48a57d85f355f4de30ba8"

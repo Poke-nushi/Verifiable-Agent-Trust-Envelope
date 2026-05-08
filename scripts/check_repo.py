@@ -244,6 +244,21 @@ def write_sut_result_without_jose_proof_artifacts(path: Path) -> None:
     path.write_text(json.dumps(sut_results, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def write_sut_result_without_context_bindings(path: Path) -> None:
+    sut_results = json.loads((ROOT / "examples" / "conformance" / "sut-results-pass.example.json").read_text())
+    for result in sut_results.get("results", []):
+        artifacts = result.get("artifacts")
+        if not isinstance(artifacts, dict):
+            continue
+        contexts = artifacts.get("verification_context")
+        if not isinstance(contexts, list):
+            continue
+        for context in contexts:
+            if isinstance(context, dict):
+                context.pop("context_bindings", None)
+    path.write_text(json.dumps(sut_results, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
 def find_free_port() -> int:
     with socket.socket() as sock:
         sock.bind(("127.0.0.1", 0))
@@ -419,6 +434,21 @@ def main() -> int:
                 str(missing_jose_proofs),
                 "--report",
                 str(tmp_dir / "vate-sut-missing-jose-proof-artifacts-report.json"),
+            ]
+        )
+        missing_context_bindings = tmp_dir / "sut-results-missing-context-bindings.json"
+        write_sut_result_without_context_bindings(missing_context_bindings)
+        run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.2"),
+                "--sut-results",
+                str(missing_context_bindings),
+                "--report",
+                str(tmp_dir / "vate-sut-missing-context-bindings-report.json"),
             ]
         )
         run(

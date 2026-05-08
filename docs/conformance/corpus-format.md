@@ -109,6 +109,8 @@ block. For the AL2 v0.2 corpus:
   transaction, runtime, effective request hash, validity window, and side-effect
   constraints
 - `al2_context_checks` validate minimum freshness, replay, and binding context
+  and require external SUT reports to bind that context back to request, receipt,
+  transaction, runtime, and evidence inputs
 - evidence vocabulary checks require canonical generic `type` values and
   registered protocol hints on admission request references and receipt evidence
 

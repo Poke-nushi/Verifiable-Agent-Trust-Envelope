@@ -1545,6 +1545,7 @@ def required_sut_artifacts(case: dict[str, Any]) -> dict[str, Any]:
                     "case_artifact": artifact_name,
                     "kind": kind,
                     "expected_digest": sha256_file(resolve_artifact_path(case, artifact_name)),
+                    "context_bindings": required_context_bindings(case, check),
                 }
             )
 
@@ -1573,6 +1574,108 @@ def required_sut_artifacts(case: dict[str, Any]) -> dict[str, Any]:
         "verification_context": context_artifacts,
         "proof_artifacts": proof_artifacts,
     }
+
+
+def artifact_file_binding(case: dict[str, Any], role: str, source_artifact: str) -> dict[str, Any]:
+    return {
+        "role": role,
+        "source_artifact": source_artifact,
+        "digest": {
+            "alg": "sha-256",
+            "value": sha256_file(resolve_artifact_path(case, source_artifact)),
+        },
+    }
+
+
+def value_binding(artifact: dict[str, Any], role: str, source_artifact: str, path: str) -> dict[str, Any] | None:
+    try:
+        value = get_path(artifact, path)
+    except (KeyError, IndexError, TypeError, ValueError):
+        return None
+    if not isinstance(value, str) or not value:
+        return None
+    return {
+        "role": role,
+        "source_artifact": source_artifact,
+        "path": path,
+        "value": value,
+    }
+
+
+def evidence_bindings(artifact: dict[str, Any], source_artifact: str, path: str, evidence_type: str) -> list[dict[str, Any]]:
+    try:
+        items = get_path(artifact, path)
+    except (KeyError, IndexError, TypeError, ValueError):
+        return []
+    if not isinstance(items, list):
+        return []
+    bindings: list[dict[str, Any]] = []
+    for index, item in enumerate(items):
+        if not isinstance(item, dict) or item.get("type") != evidence_type:
+            continue
+        bindings.append(
+            {
+                "role": "evidence",
+                "source_artifact": source_artifact,
+                "path": f"{path}[{index}]",
+                "evidence_type": evidence_type,
+                "digest": digest_descriptor(item),
+            }
+        )
+    return bindings
+
+
+def context_evidence_type(context_artifact: dict[str, Any], check_kind: Any) -> str | None:
+    source = context_artifact.get("source")
+    if source in {"runtime_attestation", "status_bundle"}:
+        return source
+    if check_kind == "binding" and context_artifact.get("binding") == "runtime":
+        return "runtime_attestation"
+    if check_kind == "replay":
+        return "admission_request"
+    return None
+
+
+def append_binding_once(bindings: list[dict[str, Any]], binding: dict[str, Any] | None) -> None:
+    if binding is not None and binding not in bindings:
+        bindings.append(binding)
+
+
+def required_context_bindings(case: dict[str, Any], check: dict[str, Any]) -> list[dict[str, Any]]:
+    bindings: list[dict[str, Any]] = []
+    artifacts = case.get("artifacts", {})
+
+    admission_receipt = load_artifact(case, "admission_receipt")
+    admission_request = load_artifact(case, "admission_request")
+    if isinstance(artifacts, dict) and "admission_receipt" in artifacts and admission_receipt is not None:
+        append_binding_once(bindings, artifact_file_binding(case, "admission_receipt", "admission_receipt"))
+        append_binding_once(
+            bindings,
+            value_binding(admission_receipt, "transaction_id", "admission_receipt", "request.transaction_id"),
+        )
+    if isinstance(artifacts, dict) and "admission_request" in artifacts and admission_request is not None:
+        append_binding_once(bindings, artifact_file_binding(case, "admission_request", "admission_request"))
+
+    context_artifact_name = check.get("artifact")
+    context_artifact = (
+        read_json(resolve_artifact_path(case, context_artifact_name))
+        if isinstance(context_artifact_name, str) and context_artifact_name
+        else {}
+    )
+    if check.get("kind") == "binding" and admission_receipt is not None:
+        append_binding_once(
+            bindings,
+            value_binding(admission_receipt, "runtime", "admission_receipt", "subject.runtime"),
+        )
+
+    evidence_type = context_evidence_type(context_artifact, check.get("kind"))
+    if evidence_type and admission_receipt is not None:
+        for binding in evidence_bindings(admission_receipt, "admission_receipt", "evidence", evidence_type):
+            append_binding_once(bindings, binding)
+    if evidence_type and admission_request is not None:
+        for binding in evidence_bindings(admission_request, "admission_request", "evidence_refs", evidence_type):
+            append_binding_once(bindings, binding)
+    return bindings
 
 
 def digest_descriptor_failures(value: Any, label: str) -> list[str]:
@@ -1627,6 +1730,80 @@ def sut_verification_context_failures(value: Any, label: str) -> list[str]:
     case_artifact = value.get("case_artifact")
     if not isinstance(case_artifact, str) or not case_artifact:
         failures.append(f"{label}.case_artifact: expected non-empty string")
+    raw_bindings = value.get("context_bindings")
+    if not isinstance(raw_bindings, list) or not raw_bindings:
+        failures.append(f"{label}.context_bindings: expected non-empty array")
+    else:
+        for index, binding in enumerate(raw_bindings):
+            failures.extend(context_binding_shape_failures(binding, f"{label}.context_bindings[{index}]"))
+    return failures
+
+
+def context_binding_shape_failures(value: Any, label: str) -> list[str]:
+    failures: list[str] = []
+    if not isinstance(value, dict):
+        return [f"{label}: expected object"]
+    role = value.get("role")
+    if role not in {"admission_receipt", "admission_request", "transaction_id", "runtime", "evidence"}:
+        failures.append(f"{label}.role: expected known context binding role")
+    source_artifact = value.get("source_artifact")
+    if not isinstance(source_artifact, str) or not source_artifact:
+        failures.append(f"{label}.source_artifact: expected non-empty string")
+
+    if role in {"admission_receipt", "admission_request", "evidence"}:
+        failures.extend(digest_descriptor_failures(value.get("digest"), f"{label}.digest"))
+    if role in {"transaction_id", "runtime", "evidence"}:
+        path = value.get("path")
+        if not isinstance(path, str) or not path:
+            failures.append(f"{label}.path: expected non-empty string")
+    if role in {"transaction_id", "runtime"}:
+        bound_value = value.get("value")
+        if not isinstance(bound_value, str) or not bound_value:
+            failures.append(f"{label}.value: expected non-empty string")
+    if role == "evidence":
+        evidence_type = value.get("evidence_type")
+        if not isinstance(evidence_type, str) or not evidence_type:
+            failures.append(f"{label}.evidence_type: expected non-empty string")
+    return failures
+
+
+def context_binding_key(binding: dict[str, Any]) -> tuple[Any, Any, Any, Any]:
+    return (
+        binding.get("role"),
+        binding.get("source_artifact"),
+        binding.get("path"),
+        binding.get("evidence_type"),
+    )
+
+
+def context_binding_match_failures(
+    actual_bindings: Any,
+    expected_bindings: list[dict[str, Any]],
+    label: str,
+) -> list[str]:
+    if not expected_bindings:
+        return []
+    if not isinstance(actual_bindings, list):
+        return [f"{label}: expected context binding array"]
+
+    actual_by_key: dict[tuple[Any, Any, Any, Any], dict[str, Any]] = {
+        context_binding_key(binding): binding
+        for binding in actual_bindings
+        if isinstance(binding, dict)
+    }
+    failures: list[str] = []
+    for expected in expected_bindings:
+        key = context_binding_key(expected)
+        actual = actual_by_key.get(key)
+        if actual is None:
+            failures.append(
+                f"{label}: missing role={key[0]} source_artifact={key[1]} path={key[2]} evidence_type={key[3]}"
+            )
+            continue
+        if "digest" in expected and actual.get("digest") != expected.get("digest"):
+            failures.append(f"{label}: digest mismatch for role={key[0]} source_artifact={key[1]} path={key[2]}")
+        if "value" in expected and actual.get("value") != expected.get("value"):
+            failures.append(f"{label}: value mismatch for role={key[0]} source_artifact={key[1]} path={key[2]}")
     return failures
 
 
@@ -1715,6 +1892,17 @@ def sut_result_artifact_failures(result: dict[str, Any], requirements: dict[str,
                     context_ref,
                     f"artifacts.verification_context case_artifact={key[0]} kind={key[1]}",
                     expected_context.get("expected_digest"),
+                )
+            )
+            failures.extend(
+                context_binding_match_failures(
+                    context_ref.get("context_bindings"),
+                    [
+                        binding
+                        for binding in expected_context.get("context_bindings", [])
+                        if isinstance(binding, dict)
+                    ],
+                    f"artifacts.verification_context case_artifact={key[0]} kind={key[1]}.context_bindings",
                 )
             )
     elif raw_contexts is not None:
