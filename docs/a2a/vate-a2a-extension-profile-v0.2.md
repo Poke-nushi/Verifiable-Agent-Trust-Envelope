@@ -208,6 +208,11 @@ Dereferencing artifacts must be safe for the verifier environment. A URL in A2A
 metadata is untrusted input until scheme, host, media type, digest, size, and
 policy constraints have been applied.
 
+If a deployment uses JOSE/JCS proof packaging, the production proof boundary is
+defined separately in
+[VATE JOSE/JCS Proof Profile v0.2](../profiles/vate-proof-profile-jose-jcs-v0.2.md).
+The current AL2 corpus still uses dependency-free byte-level proof fixtures.
+
 ## Examples
 
 Agent Card and metadata examples:

@@ -180,6 +180,8 @@ compatibility claim.
   Narrow v0.2 profile for verifier-side AL2 admission decisions
 - [docs/profiles/vate-al2-admission-interop-profile-2026-07.md](docs/profiles/vate-al2-admission-interop-profile-2026-07.md)
   Narrow conformance-facing AL2 admission interop profile
+- [docs/profiles/vate-proof-profile-jose-jcs-v0.2.md](docs/profiles/vate-proof-profile-jose-jcs-v0.2.md)
+  Review boundary for future JOSE/JCS production proof verification
 - [docs/reason-codes.md](docs/reason-codes.md)
   Canonical machine-readable reason codes for AL2 conformance
 - [docs/evidence-types.md](docs/evidence-types.md)

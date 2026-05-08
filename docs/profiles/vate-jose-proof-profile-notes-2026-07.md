@@ -7,6 +7,9 @@ This note records production JOSE profile constraints that should be resolved be
 It is not yet a normative VATE profile.
 The current v0.2 AL2 conformance corpus includes dependency-free detached JWS fixture checks, but still treats cryptographic signature verification as a hook.
 
+For the reviewable production proof boundary, see
+`docs/profiles/vate-proof-profile-jose-jcs-v0.2.md`.
+
 ## v0.2 Decision
 
 The v0.2 decision is to keep byte-level detached proof fixtures in the public

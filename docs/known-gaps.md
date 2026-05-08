@@ -36,6 +36,9 @@ The v0.2 AL2 corpus now includes detached JWS byte-level fixtures, but those fix
 The v0.2 decision is to avoid adding a JOSE dependency until a production proof
 profile is ready or an independent implementation report demonstrates the
 signature-verification boundary.
+A review boundary for that future work is now documented in
+`docs/profiles/vate-proof-profile-jose-jcs-v0.2.md`; it does not change the
+current dependency-free fixture claim.
 
 ### 2. Pairwise Presentation Guidance Is Still Early
 
@@ -145,6 +148,8 @@ Remaining work includes:
 - aligning digest descriptor shape and encoding across artifact references,
   request hashes, attenuation hashes, receipts, policy snapshots, and A2A
   metadata references
+The draft JOSE/JCS proof profile records the intended production direction, but
+the reference runner still uses the dependency-free v0.2 fixture byte basis.
 
 ### 12. Execution Semantics Need Sharper Production Semantics
 

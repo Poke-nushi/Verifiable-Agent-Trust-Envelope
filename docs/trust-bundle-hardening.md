@@ -7,6 +7,10 @@ This note describes the minimal trust-bundle checks used by the `VATE AL2 Admiss
 It does not define production JOSE, PKI, DID resolution, certificate path building, or key rotation protocols.
 Those remain deployment choices.
 
+For the future JOSE/JCS production proof verification boundary, see
+`docs/profiles/vate-proof-profile-jose-jcs-v0.2.md`. The current corpus keeps
+trust-bundle and proof checks dependency-free.
+
 ## Conformance Boundary
 
 The dependency-free runner verifies local trust-bundle semantics that are useful before adding full production proof verification:
