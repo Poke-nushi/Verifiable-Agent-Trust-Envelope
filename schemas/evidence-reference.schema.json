@@ -15,20 +15,31 @@
       "type": "string",
       "enum": [
         "agent_card",
+        "signed_agent_card",
         "oauth_access_token",
         "oauth_transaction_token",
+        "openid_subject",
         "oid4vp_presentation",
         "verifiable_credential",
         "vc_status",
         "did_document",
         "web_bot_auth_signature",
         "http_message_signature",
+        "mission_permit",
         "payment_mandate",
         "payment_required_state",
         "delegated_payment_token",
         "payment_authority",
         "runtime_attestation",
         "runtime_disclosure",
+        "status_bundle",
+        "admission_request",
+        "admission_receipt",
+        "post_execution_receipt",
+        "policy_snapshot",
+        "attenuation_candidate",
+        "oap_decision",
+        "ucp_checkout_session",
         "local_policy"
       ]
     },
@@ -38,8 +49,18 @@
     },
     "protocol_hint": {
       "type": "string",
-      "description": "Optional informative hint for the concrete source protocol, such as ap2_mandate, x402, acp_payment_token, or stripe_spt. Verifiers must not depend on this field without local policy.",
-      "minLength": 1
+      "description": "Optional informative hint for the concrete source protocol. Verifiers must not infer authority from this field without local policy.",
+      "enum": [
+        "ap2",
+        "ap2_human_not_present",
+        "mcp-oauth",
+        "oap_aport",
+        "openid-connect",
+        "spiffe",
+        "stripe_spt",
+        "ucp",
+        "x402"
+      ]
     },
     "digest": {
       "type": "object",

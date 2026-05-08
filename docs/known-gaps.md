@@ -192,17 +192,18 @@ Remaining work includes:
 - more attenuation boundary fixtures beyond the initial unsafe-path and
   max-amount type-edge cases
 
-### 15. Evidence Type Vocabulary Is Still Informal
+### 15. Evidence Type Vocabulary Needs Wider Implementation Coverage
 
-The repo has canonical reason codes, but evidence type strings are currently
-spread across schemas, fixtures, and interop notes.
+The repo now has a canonical evidence type registry and protocol hint registry
+for AL2 admission fixtures. The conformance runner checks admission request
+references and admission receipt evidence against that vocabulary.
 
 Remaining work includes:
 
-- creating a small evidence type registry
-- separating generic evidence types from protocol-specific hints
-- defining naming and extension rules for adjacent protocols
+- carrying the same vocabulary into independent verifier implementations
+- deciding how extension evidence types are registered after v0.2
 - ensuring trust bundles and policy snapshots refer to the same vocabulary
+- adding more negative fixtures for unknown or malformed protocol hints
 
 ### 16. Report Integrity Is Not Yet Defined
 

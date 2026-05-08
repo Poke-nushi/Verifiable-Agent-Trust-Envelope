@@ -166,6 +166,8 @@ The most useful feedback for this draft is currently:
   Narrow conformance-facing AL2 admission interop profile
 - [docs/reason-codes.md](docs/reason-codes.md)
   Canonical machine-readable reason codes for AL2 conformance
+- [docs/evidence-types.md](docs/evidence-types.md)
+  Canonical evidence type and protocol hint vocabulary for AL2 conformance
 - [docs/attenuation-semantics.md](docs/attenuation-semantics.md)
   Machine-readable attenuation semantics for AL2 conformance
 - [docs/v0.2-in-5-minutes.md](docs/v0.2-in-5-minutes.md)

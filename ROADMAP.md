@@ -59,7 +59,7 @@ new adjacent profiles.
 - add minimum AL2 verification context for status freshness, replay protection,
   and runtime binding; first `al2_context_checks` fixtures added
 - add an evidence type vocabulary for generic evidence types and
-  protocol-specific hints
+  protocol-specific hints; initial registry and runner checks added
 - keep the language-neutral conformance corpus index current as cases change
 
 ### P2 Before Independent Implementation Collection

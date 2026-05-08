@@ -25,8 +25,8 @@ VATE's narrower role is:
 
 | AgentROA concept | VATE field |
 |---|---|
-| ROA envelope | `evidence_refs[type=route_authorization]` |
-| ARA per-hop receipt | `evidence_refs[type=per_hop_receipt]` |
+| ROA envelope | `evidence_refs[type=mission_permit]` when consumed as bounded route authority |
+| ARA per-hop receipt | `evidence_refs[type=admission_receipt]` or post-execution receipt evidence |
 | AER execution receipt | `post_execution_receipt` |
 | Monotonic scope narrowing | `attenuation.changes` and `effective_constraints` |
 | Boundary enforcement | verifier-side admission decision |

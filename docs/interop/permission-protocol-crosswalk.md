@@ -25,10 +25,10 @@ VATE's narrower role is:
 
 | Permission Protocol / APP concept | VATE field |
 |---|---|
-| Permission proof | `evidence_refs[type=permission_proof]` |
+| Permission proof | `evidence_refs[type=mission_permit]` when consumed as task-scoped authority |
 | Tool gate | admission request `action` and `target` |
 | Runtime checkpoint | `runtime` and runtime evidence |
-| Signed receipt | `evidence_refs[type=permission_receipt]` or post-execution receipt evidence |
+| Signed receipt | `evidence_refs[type=admission_receipt]` or post-execution receipt evidence |
 | Fail-closed result | `decision.outcome=deny` with `FAIL_CLOSED` |
 
 ## Near-Term Decision

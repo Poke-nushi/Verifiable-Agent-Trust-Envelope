@@ -28,7 +28,7 @@ VATE's narrower role is:
 
 | OAP / APort concept | VATE field |
 |---|---|
-| Passport | `evidence_refs[type=passport]` |
+| Passport | `evidence_refs[type=verifiable_credential, protocol_hint=oap_aport]` when consumed as credential evidence |
 | Decision object | `evidence_refs[type=oap_decision]` |
 | Policy pack | `policy.policy_ref` or `policy.policy_snapshot` |
 | Decision TTL | admission request `expires_at` and admission receipt `expires_at` |

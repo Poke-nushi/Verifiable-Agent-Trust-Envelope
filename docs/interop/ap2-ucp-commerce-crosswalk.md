@@ -36,7 +36,7 @@ VATE's narrower role is:
 
 | AP2 / UCP concept | VATE field |
 |---|---|
-| User intent / mandate | `evidence_refs[type=ap2_mandate]` |
+| User intent / mandate | `evidence_refs[type=payment_mandate, protocol_hint=ap2]` |
 | Cart or checkout session | `evidence_refs[type=ucp_checkout_session]` |
 | Merchant / checkout endpoint | `target.resource` |
 | Merchant or PSP audience | `target.audience` and `audience` |
@@ -46,6 +46,10 @@ VATE's narrower role is:
 | Payment amount or spending limit | `constraints.max_amount` and optional attenuation |
 | Order or payment status | admission receipt `evidence[].verification.status_result` and later post-execution receipt |
 | A2A task or context | admission request `correlation` and admission receipt `request` |
+
+The native AP2 mandate fixture may still use its source protocol field
+`type=ap2_mandate`. VATE records that artifact as generic
+`payment_mandate` evidence with `protocol_hint=ap2`.
 
 ## PoC Fixture
 

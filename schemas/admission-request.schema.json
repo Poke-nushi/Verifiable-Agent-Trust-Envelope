@@ -4,6 +4,54 @@
   "title": "VATE Admission Request",
   "description": "Draft v0.2 verifier admission request for AL2 external digital actions.",
   "type": "object",
+  "$defs": {
+    "evidenceType": {
+      "type": "string",
+      "enum": [
+        "admission_receipt",
+        "admission_request",
+        "agent_card",
+        "attenuation_candidate",
+        "delegated_payment_token",
+        "did_document",
+        "http_message_signature",
+        "local_policy",
+        "mission_permit",
+        "oap_decision",
+        "oauth_access_token",
+        "oauth_transaction_token",
+        "oid4vp_presentation",
+        "openid_subject",
+        "payment_authority",
+        "payment_mandate",
+        "payment_required_state",
+        "policy_snapshot",
+        "post_execution_receipt",
+        "runtime_attestation",
+        "runtime_disclosure",
+        "signed_agent_card",
+        "status_bundle",
+        "ucp_checkout_session",
+        "vc_status",
+        "verifiable_credential",
+        "web_bot_auth_signature"
+      ]
+    },
+    "protocolHint": {
+      "type": "string",
+      "enum": [
+        "ap2",
+        "ap2_human_not_present",
+        "mcp-oauth",
+        "oap_aport",
+        "openid-connect",
+        "spiffe",
+        "stripe_spt",
+        "ucp",
+        "x402"
+      ]
+    }
+  },
   "required": [
     "version",
     "profile",
@@ -107,8 +155,7 @@
         ],
         "properties": {
           "type": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/$defs/evidenceType"
           },
           "uri": {
             "type": "string",
@@ -117,6 +164,10 @@
           "media_type": {
             "type": "string",
             "minLength": 1
+          },
+          "protocol_hint": {
+            "$ref": "#/$defs/protocolHint",
+            "description": "Optional informative hint for the concrete source protocol. Verifiers must not infer authority from this field without local policy."
           },
           "digest": {
             "type": "object",
@@ -143,4 +194,3 @@
   },
   "additionalProperties": true
 }
-

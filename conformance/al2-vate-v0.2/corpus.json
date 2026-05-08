@@ -1056,7 +1056,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "15d36000189c57dc48d868b59f460938676a0aa1dcb052064883c01983d3fdfe"
+    "value": "620c739ee32d6386d505f952724465f623e8c045e5243a5ff2669d73f45bee59"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -1377,11 +1377,11 @@
     },
     {
       "path": "examples/interop/ap2-ucp-to-vate/vate-admission-receipt-from-ap2-ucp.example.json",
-      "sha256": "537fc9273cb3ce04806a7a458a986154bd20bd10ce92e5aae4620d889c3a4fca"
+      "sha256": "2235b60392e36942ee7501a91947e9f2a9634fefa4c8fe9503bdc5284debd0ba"
     },
     {
       "path": "examples/interop/ap2-ucp-to-vate/vate-admission-request-from-ap2-ucp.example.json",
-      "sha256": "dbcf79074417fb01e65fa031c77f661135e444eb81aa0d9925a41bd1edc8619e"
+      "sha256": "c1e91079b86d5a9077f69cd2ab398ce90f1a757dd336ff6ef659f490dc401916"
     },
     {
       "path": "examples/interop/oap-to-vate/vate-admission-receipt-from-oap.example.json",

@@ -27,6 +27,46 @@ IMPLEMENTATION_REPORT_VERSION = "vate-implementation-report-2026-07"
 CORPUS_INDEX_VERSION = "vate-conformance-corpus-2026-07"
 CORPUS_INDEX_FILENAME = "corpus.json"
 SUT_RESULTS_VERSION = "vate-sut-results-2026-07"
+CANONICAL_EVIDENCE_TYPES = {
+    "admission_receipt",
+    "admission_request",
+    "agent_card",
+    "attenuation_candidate",
+    "delegated_payment_token",
+    "did_document",
+    "http_message_signature",
+    "local_policy",
+    "mission_permit",
+    "oap_decision",
+    "oauth_access_token",
+    "oauth_transaction_token",
+    "oid4vp_presentation",
+    "openid_subject",
+    "payment_authority",
+    "payment_mandate",
+    "payment_required_state",
+    "policy_snapshot",
+    "post_execution_receipt",
+    "runtime_attestation",
+    "runtime_disclosure",
+    "signed_agent_card",
+    "status_bundle",
+    "ucp_checkout_session",
+    "vc_status",
+    "verifiable_credential",
+    "web_bot_auth_signature",
+}
+CANONICAL_PROTOCOL_HINTS = {
+    "ap2",
+    "ap2_human_not_present",
+    "mcp-oauth",
+    "oap_aport",
+    "openid-connect",
+    "spiffe",
+    "stripe_spt",
+    "ucp",
+    "x402",
+}
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -755,6 +795,8 @@ def evaluate_trust_check(bundle: dict[str, Any], check: dict[str, Any]) -> tuple
     evidence_type = check.get("evidence_type")
     if not isinstance(evidence_type, str) or not evidence_type:
         return False, "SCHEMA_INVALID"
+    if evidence_type not in CANONICAL_EVIDENCE_TYPES:
+        return False, "SCHEMA_INVALID"
 
     allowed_evidence_types = issuer.get("allowed_evidence_types")
     if (
@@ -864,6 +906,8 @@ def evaluate_jose_check(
     evidence_type = proof.get("evidence_type")
     issuer = proof.get("issuer")
     if not isinstance(evidence_type, str) or not evidence_type or not isinstance(issuer, str) or not issuer:
+        return False, "SCHEMA_INVALID", check_results
+    if evidence_type not in CANONICAL_EVIDENCE_TYPES:
         return False, "SCHEMA_INVALID", check_results
     if detached_payload.get("evidence_type") != evidence_type or detached_payload.get("issuer") != issuer:
         return False, "SCHEMA_INVALID", check_results
@@ -1042,6 +1086,55 @@ def evaluate_attenuation_checks(case: dict[str, Any], admission: dict[str, Any] 
     return failures
 
 
+def evaluate_evidence_vocabulary_checks(
+    admission_request: dict[str, Any] | None,
+    admission: dict[str, Any] | None,
+) -> list[str]:
+    failures: list[str] = []
+    if admission_request is not None:
+        evidence_refs = admission_request.get("evidence_refs", [])
+        if not isinstance(evidence_refs, list):
+            failures.append("admission_request.evidence_refs: expected array")
+        for index, evidence_ref in enumerate(evidence_refs if isinstance(evidence_refs, list) else []):
+            failures.extend(
+                validate_evidence_vocab_object(
+                    evidence_ref,
+                    label=f"admission_request.evidence_refs[{index}]",
+                )
+            )
+    if admission is not None:
+        evidence_items = admission.get("evidence", [])
+        if not isinstance(evidence_items, list):
+            failures.append("admission_receipt.evidence: expected array")
+        for index, evidence in enumerate(evidence_items if isinstance(evidence_items, list) else []):
+            failures.extend(
+                validate_evidence_vocab_object(
+                    evidence,
+                    label=f"admission_receipt.evidence[{index}]",
+                )
+            )
+    return failures
+
+
+def validate_evidence_vocab_object(value: Any, *, label: str) -> list[str]:
+    if not isinstance(value, dict):
+        return [f"{label}: expected object"]
+    failures: list[str] = []
+    evidence_type = value.get("type")
+    if not isinstance(evidence_type, str) or not evidence_type:
+        failures.append(f"{label}.type must be a non-empty string")
+    elif evidence_type not in CANONICAL_EVIDENCE_TYPES:
+        failures.append(f"{label}.type is not in the canonical evidence type registry")
+
+    protocol_hint = value.get("protocol_hint")
+    if protocol_hint is not None:
+        if not isinstance(protocol_hint, str) or not protocol_hint:
+            failures.append(f"{label}.protocol_hint must be a non-empty string")
+        elif protocol_hint not in CANONICAL_PROTOCOL_HINTS:
+            failures.append(f"{label}.protocol_hint is not in the canonical protocol hint registry")
+    return failures
+
+
 def evaluate_al2_context_checks(case: dict[str, Any]) -> list[str]:
     failures: list[str] = []
     for check in case.get("al2_context_checks", []):
@@ -1166,6 +1259,7 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
     failures.extend(evaluate_policy_snapshot_checks(case, admission, a2a_metadata))
     failures.extend(evaluate_artifact_reference_checks(case, admission_request, admission, post_execution, a2a_metadata))
     failures.extend(evaluate_attenuation_checks(case, admission))
+    failures.extend(evaluate_evidence_vocabulary_checks(admission_request, admission))
     failures.extend(evaluate_al2_context_checks(case))
 
     return {

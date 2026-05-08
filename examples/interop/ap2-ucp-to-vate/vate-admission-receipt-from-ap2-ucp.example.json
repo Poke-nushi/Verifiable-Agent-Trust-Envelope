@@ -25,7 +25,7 @@
   },
   "evidence": [
     {
-      "type": "ap2_mandate",
+      "type": "payment_mandate",
       "protocol_hint": "ap2",
       "uri": "examples/interop/ap2-ucp-to-vate/ap2-mandate.example.json",
       "digest": {

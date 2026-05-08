@@ -105,6 +105,8 @@ block. For the AL2 v0.2 corpus:
   verification
 - `attenuation_checks` validate machine-readable attenuation boundaries
 - `al2_context_checks` validate minimum freshness, replay, and binding context
+- evidence vocabulary checks require canonical generic `type` values and
+  registered protocol hints on admission request references and receipt evidence
 
 An external implementation should treat those arrays as part of the case
 contract, not as optional comments.
