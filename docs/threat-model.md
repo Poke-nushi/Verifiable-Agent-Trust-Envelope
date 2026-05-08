@@ -140,6 +140,234 @@ Draft response:
 Residual risk:
 Operational deployment choices can still create correlation even if the object model allows privacy-preserving identifiers.
 
+## A2A Metadata And Proof-Binding Threats
+
+The A2A-facing profile adds a specific risk surface: metadata can point to
+VATE artifacts, but the metadata is not itself proof of authority.
+
+### 7. A2A Metadata Substitution
+
+Threat:
+An intermediary replaces the VATE metadata object or moves it from one task to
+another.
+
+Draft response:
+
+- bind metadata references to `transaction_id`
+- require digest-bound artifact references
+- verify the dereferenced admission receipt before execution
+
+Residual risk:
+If an implementation treats metadata presence as approval, substitution can
+still bypass the verifier decision.
+
+### 8. Artifact URI Swap
+
+Threat:
+An attacker keeps the same metadata shape but changes a receipt or evidence URI.
+
+Draft response:
+
+- require `uri`, `media_type`, and `digest`
+- verify the digest before semantic use
+- pin expected artifact type and phase
+
+Residual risk:
+Mutable URLs remain risky when consumers log or display them without checking
+the digest-bound artifact.
+
+### 9. Digest Mismatch Bypass
+
+Threat:
+A verifier detects a digest mismatch but continues with policy evaluation or
+execution.
+
+Draft response:
+
+- fail closed on digest mismatch before local policy can allow execution
+- emit `DIGEST_MISMATCH` and `FAIL_CLOSED`
+- keep digest mismatch cases in the runnable corpus
+
+Residual risk:
+Adapters that perform partial validation outside the reference comparison path
+can still make unsafe local decisions.
+
+### 10. Stale Receipt Replay
+
+Threat:
+A previously valid admission receipt is replayed for a new request or after its
+validity window.
+
+Draft response:
+
+- bind admission receipts to transaction id and effective request hash
+- include expiration windows
+- check replay state where the profile requires it
+
+Residual risk:
+Replay protection remains deployment-specific unless the verifier stores or can
+query replay state consistently.
+
+### 11. Policy Snapshot Downgrade
+
+Threat:
+An attacker points to an older or weaker policy snapshot while presenting a
+current-looking receipt.
+
+Draft response:
+
+- include digest-bound `policy_snapshot` references
+- compare the receipt policy snapshot to the artifact used as decision basis
+- fail closed with `POLICY_SNAPSHOT_MISMATCH` when the basis differs
+
+Residual risk:
+VATE records the policy basis, but it does not prove the policy was wise or
+sufficient for a domain.
+
+### 12. Extension Activation Downgrade
+
+Threat:
+A client or intermediary strips extension activation so VATE metadata is
+ignored or treated as optional advisory data.
+
+Draft response:
+
+- keep extension activation as A2A capability behavior
+- keep VATE admission failures as VATE outcomes
+- require deployments to decide whether risky writes require VATE metadata
+
+Residual risk:
+If a relying party allows risky writes without requiring the profile, the A2A
+extension cannot protect that local policy choice.
+
+### 13. Malicious Agent Card Extension Declaration
+
+Threat:
+An agent declares VATE extension support in its Agent Card to appear more
+trustworthy than it is.
+
+Draft response:
+
+- treat Agent Card declarations as evidence only
+- require verifier policy to evaluate issuer, key, endpoint, freshness, and
+  task authority
+- keep signed Agent Card evidence separate from admission authority
+
+Residual risk:
+User interfaces or logs may overstate the meaning of extension support if they
+display it without the verifier decision.
+
+### 14. Signed Agent Card Treated As Sufficient Authority
+
+Threat:
+An implementation accepts a signed Agent Card as permission to perform the
+requested write.
+
+Draft response:
+
+- document that signed Agent Cards are adjacent evidence
+- require admission request, status, replay, runtime, permit, and policy checks
+- keep A2A signed Agent Card corpus coverage byte-level and bounded
+
+Residual risk:
+This remains an integration risk outside the VATE runner if middleware short
+circuits the admission decision.
+
+### 15. Verifier Dereference SSRF
+
+Threat:
+An artifact URI causes the verifier to fetch internal network resources or
+large unsafe payloads.
+
+Draft response:
+
+- treat every URI as untrusted input
+- apply scheme, host, redirect, timeout, size, media type, and digest policy
+- prefer pre-fetched or allowlisted artifacts for high-risk deployments
+
+Residual risk:
+The v0.2 reference runner does not implement a production network dereferencer.
+Deployment gateways must enforce their own network policy.
+
+### 16. Cross-Tenant Receipt Correlation
+
+Threat:
+Stable receipt identifiers or metadata let observers correlate the same agent,
+principal, or workflow across tenants.
+
+Draft response:
+
+- minimize metadata fields carried through A2A
+- use digest-bound references instead of embedding full evidence
+- allow pairwise identifiers where deployments support them
+
+Residual risk:
+Operational logging, analytics, and shared receipt stores can still create
+linkability.
+
+### 17. Post-Execution Admission Linkage Forgery
+
+Threat:
+A post-execution receipt claims to link to an admission receipt that did not
+authorize the observed action.
+
+Draft response:
+
+- bind admission receipt id and digest
+- bind transaction id, runtime id, decision, expiry, and effective request hash
+- emit specific post-execution reason codes for mismatches
+
+Residual risk:
+Receipts can describe what was claimed; they do not prove that the underlying
+side effect was desirable or legally sufficient.
+
+### 18. Runtime Attestation Freshness Forgery
+
+Threat:
+A runtime presents stale or copied attestation evidence as current.
+
+Draft response:
+
+- require freshness windows and checked-at timestamps
+- bind runtime evidence to request, transaction, and receipt artifacts
+- fail closed for stale runtime proof in AL2 fixtures
+
+Residual risk:
+The strength of runtime assurance still varies by environment and attestation
+technology.
+
+### 19. OAuth Audience Confusion
+
+Threat:
+An OAuth token intended for one resource or audience is treated as authority for
+another action.
+
+Draft response:
+
+- treat OAuth artifacts as evidence, not VATE admission
+- check audience, resource, scope, and local policy intersection
+- deny when upstream authorization is absent or overscoped for the requested
+  write
+
+Residual risk:
+OAuth server behavior and token introspection semantics remain outside VATE.
+
+### 20. AP2 Mandate Scope Confusion
+
+Threat:
+An AP2 or payment mandate is interpreted as broader authority than it actually
+grants.
+
+Draft response:
+
+- consume AP2 mandate material as evidence
+- bind amount, merchant, time window, and replay constraints into admission and
+  post-execution checks
+- attenuate or deny when requested action exceeds mandate constraints
+
+Residual risk:
+VATE does not replace AP2 validation or payment network rules.
+
 ## Recommended Mitigation Priorities
 
 For near-term implementations of this draft, the highest-value controls are:
@@ -156,7 +384,7 @@ These matter more than cosmetic wire-format decisions.
 
 The reference demo now exercises:
 
-- compact JWS verification
+- demo-level compact JWS verification
 - trust-bundle based signer lookup
 - runtime / permit / receipt binding checks
 - pull, stapled, and push status delivery

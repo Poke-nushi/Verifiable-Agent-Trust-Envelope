@@ -176,6 +176,23 @@ authority unless a profile registers and validates it.
 - lets an implementation link observed execution evidence back to the
   admission decision.
 
+## Attenuation Example
+
+`attenuate` is the main reason to carry admission receipt references instead of
+only a yes/no status.
+
+Example:
+
+```text
+requested: transfer USD 10000
+admitted: max USD 500, approval required above USD 100, expires in 10 minutes
+receipt records: original_request_hash, effective_request_hash, evidence_refs,
+policy_snapshot.digest, reason_codes
+```
+
+A2A metadata should still carry only the digest-bound admission receipt
+reference. The full attenuation object belongs in the VATE admission receipt.
+
 ## Failure Mapping
 
 VATE verification failures should not become new A2A task states.

@@ -73,6 +73,12 @@ It is strongest on the following boundary:
 - separating verifier-signed **admission receipts** from later **post-execution receipts** where later evidence matters
 - defining a reference-only **A2A metadata binding** for VATE admission and receipt artifacts
 
+Attenuation is a first-class outcome. For example, a verifier can record that a
+request for a USD 10000 transfer was admitted only with a USD 500 maximum,
+approval above USD 100, and a short execution window. The receipt records both
+the original request hash and the effective request hash so later execution
+evidence can be checked against the narrowed authority.
+
 ## What This Draft Does Not Replace
 
 This draft is not trying to become:

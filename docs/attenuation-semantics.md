@@ -7,6 +7,33 @@ This note fixes the machine-readable attenuation surface for the `VATE AL2 Admis
 Attenuation is an admission decision.
 It is not a human note such as "restricted".
 
+## Short Walk-Through
+
+Requested action:
+
+```text
+transfer USD 10000 from account A to account B
+```
+
+Verifier decision:
+
+```text
+attenuate
+```
+
+Effective constraints:
+
+```text
+max_amount: USD 500
+approval_required_above: USD 100
+expires_at: 2026-05-09T00:10:00Z
+```
+
+The admission receipt records the original request hash, the effective request
+hash, evidence references, policy snapshot digest, and reason codes. The
+post-execution receipt must link back to the effective request hash, not merely
+the broader original request.
+
 ## Required Shape
 
 When an admission decision is `attenuate`, the admission receipt MUST include an `attenuation` object with:

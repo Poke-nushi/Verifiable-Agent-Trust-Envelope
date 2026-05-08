@@ -111,6 +111,12 @@ Each change should identify:
 This is stricter than a human note such as "restricted".
 It lets another verifier, auditor, or runtime see exactly which authority was narrowed.
 
+For example, a verifier can record that a request for a USD 10000 transfer was
+admitted only as an effective USD 500 maximum, with human approval required
+above USD 100 and a 10-minute execution window. The receipt needs both hashes:
+the original request hash explains what was requested, and the effective request
+hash explains what was actually admitted.
+
 ## Proof And Packaging
 
 The semantic receipt schemas do not define a new signature scheme.
