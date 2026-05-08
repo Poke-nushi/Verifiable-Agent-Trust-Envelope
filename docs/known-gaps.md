@@ -183,7 +183,9 @@ profile.
 
 Remaining work includes:
 
-- boundary fixtures for status freshness and replay behavior
+- additional boundary fixtures for status freshness and replay behavior; the
+  exact status freshness max-age boundary is covered by
+  `allow-status-fresh-at-boundary`
 - more explicit evaluation-order fixtures showing that malformed proof, replay,
   and digest mismatch fail closed before policy or attenuation can allow
   execution; the first stale runtime proof fixture is

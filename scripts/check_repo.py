@@ -488,12 +488,33 @@ def check_transport_bound_fixture_coverage() -> None:
         raise RuntimeError("deny-mcp-oauth-upstream-denied must record an OAuth scope_missing verification result")
 
 
+def check_status_freshness_boundary_coverage() -> None:
+    case_path = ROOT / "conformance" / "al2-vate-v0.2" / "cases" / "allow-status-fresh-at-boundary.json"
+    if not case_path.exists():
+        raise RuntimeError(
+            "status freshness coverage is missing allow-status-fresh-at-boundary: "
+            "AL2 context checks must prove that the exact max_age_seconds boundary "
+            "is still fresh."
+        )
+    case = json.loads(case_path.read_text(encoding="utf-8"))
+    context_path = ROOT / case["artifacts"]["status_context"]
+    context = json.loads(context_path.read_text(encoding="utf-8"))
+    checked_at = datetime.fromisoformat(context["checked_at"].replace("Z", "+00:00"))
+    source_issued_at = datetime.fromisoformat(context["source_issued_at"].replace("Z", "+00:00"))
+    max_age_seconds = context.get("max_age_seconds")
+    if (checked_at - source_issued_at).total_seconds() != max_age_seconds:
+        raise RuntimeError("allow-status-fresh-at-boundary must exercise the exact max_age_seconds boundary")
+    if case.get("expected", {}).get("admission_decision") != "allow":
+        raise RuntimeError("allow-status-fresh-at-boundary must allow the exact freshness boundary")
+
+
 def main() -> int:
     validate_examples()
     check_evidence_vocabulary_registry()
     check_artifact_versioning_docs()
     check_post_execution_linkage_kind_coverage()
     check_transport_bound_fixture_coverage()
+    check_status_freshness_boundary_coverage()
     run([sys.executable, "-m", "py_compile", str(DEMO)])
     run([sys.executable, "-m", "py_compile", str(HTTP_DEMO)])
     run([sys.executable, "-m", "py_compile", str(VATE_CONFORMANCE)])

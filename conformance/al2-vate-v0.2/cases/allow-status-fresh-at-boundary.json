@@ -1,0 +1,42 @@
+{
+  "version": "vate-conformance-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "case_id": "allow-status-fresh-at-boundary",
+  "title": "Allow status evidence at the freshness boundary",
+  "category": "positive",
+  "purpose": "A verifier should treat status evidence as fresh when checked_at is exactly max_age_seconds after source_issued_at.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-allow-status-boundary.example.json",
+    "status_context": "conformance/al2-vate-v0.2/fixtures/status-boundary-context.json"
+  },
+  "al2_context_checks": [
+    {
+      "kind": "freshness",
+      "artifact": "status_context",
+      "expect_fresh": true
+    }
+  ],
+  "expected": {
+    "admission_decision": "allow",
+    "should_execute": true,
+    "reason_codes": [
+      "STATUS_FRESH",
+      "POLICY_MATCH"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "pass"
+      },
+      {
+        "name": "evidence.verification.result",
+        "expected": "pass"
+      }
+    ]
+  },
+  "validation_focus": [
+    "status freshness",
+    "boundary condition",
+    "allow decision"
+  ]
+}

@@ -79,7 +79,8 @@ adding new adjacent profiles.
 - strengthen post-execution linkage checks beyond presence checks; digest,
   transaction, runtime, denial, expiry, and effective-constraint fixtures added
 - add minimum AL2 verification context for status freshness, replay protection,
-  and runtime binding; first `al2_context_checks` fixtures added
+  and runtime binding; first `al2_context_checks` fixtures and an exact
+  status-freshness boundary fixture added
 - add an evidence type vocabulary for generic evidence types and
   protocol-specific hints; machine-readable registry, drift checks, and
   type/hint pair checks added

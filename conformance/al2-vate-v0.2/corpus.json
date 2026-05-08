@@ -73,6 +73,28 @@
     },
     {
       "artifacts": {
+        "admission_receipt": "examples/receipts/admission-allow-status-boundary.example.json",
+        "status_context": "conformance/al2-vate-v0.2/fixtures/status-boundary-context.json"
+      },
+      "case_id": "allow-status-fresh-at-boundary",
+      "category": "positive",
+      "expected_outcome": "allow",
+      "expected_primary_reason_code": "STATUS_FRESH",
+      "expected_reason_codes": [
+        "STATUS_FRESH",
+        "POLICY_MATCH"
+      ],
+      "expected_should_execute": true,
+      "path": "conformance/al2-vate-v0.2/cases/allow-status-fresh-at-boundary.json",
+      "title": "Allow status evidence at the freshness boundary",
+      "validation_focus": [
+        "status freshness",
+        "boundary condition",
+        "allow decision"
+      ]
+    },
+    {
+      "artifacts": {
         "admission_receipt": "examples/receipts/admission-allow.example.json",
         "runtime_context": "conformance/al2-vate-v0.2/fixtures/runtime-binding-match-context.json"
       },
@@ -1129,7 +1151,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "dd29289633e4bd351c7802c4b01162d904eef36667e4d9e37d4fd4298eafb809"
+    "value": "e4c5449e9b560d6cb95a09850334590ca707734081c58714fa9dab15997ca322"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -1155,6 +1177,10 @@
     {
       "path": "conformance/al2-vate-v0.2/cases/allow-mcp-oauth-transport-bound.json",
       "sha256": "fa080865a3396860d70dfcbd1c987e875d886fba82b1d64af9bd4a1beae8f09b"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/allow-status-fresh-at-boundary.json",
+      "sha256": "8fb8c1f9dd9450e65263bf845f3cabca6ca9f3e942991175234d23f8f0bd0259"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/allow-valid-admission.json",
@@ -1377,6 +1403,10 @@
       "sha256": "ac6f623b99c398b459cf6f4e2ca2c9c59e1dac4a7fa8de398578dc4205df099d"
     },
     {
+      "path": "conformance/al2-vate-v0.2/fixtures/status-boundary-context.json",
+      "sha256": "a90c4d2142135eb9a901a444660f08ea69cc900edab192141de4c1f4320a4a1c"
+    },
+    {
       "path": "conformance/al2-vate-v0.2/fixtures/status-fresh-context.json",
       "sha256": "4967a00c0be2429cd16b2f5152c278d970efdf2f17c78bbb8fa5442f64a47f1c"
     },
@@ -1507,6 +1537,10 @@
     {
       "path": "examples/receipts/admission-allow-policy-snapshot.example.json",
       "sha256": "77df4abb7b31723c73cbc41fa7aa7a2fb3b3e2ea761e0a9fe3fff6fc27c4c57f"
+    },
+    {
+      "path": "examples/receipts/admission-allow-status-boundary.example.json",
+      "sha256": "a39b3281bc0b98facb56ad48ff7309f6c9bd7d3e88b788505841c5db24b17f0f"
     },
     {
       "path": "examples/receipts/admission-allow-status-fresh.example.json",
@@ -1697,12 +1731,12 @@
     "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.2 --out conformance/al2-vate-v0.2/corpus.json"
   },
   "summary": {
-    "artifact_count": 136,
-    "case_count": 51,
+    "artifact_count": 139,
+    "case_count": 52,
     "category_counts": {
       "linkage": 9,
       "negative": 29,
-      "positive": 13
+      "positive": 14
     }
   },
   "version": "vate-conformance-corpus-2026-07"
