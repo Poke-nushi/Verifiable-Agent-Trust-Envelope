@@ -1,0 +1,111 @@
+{
+  "version": "vate-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-20260507-mcp-oauth-upstream-denied-001",
+  "issued_at": "2026-05-07T09:20:08Z",
+  "expires_at": "2026-05-07T09:25:00Z",
+  "verifier": {
+    "id": "did:web:verifier.example",
+    "key_id": "did:web:verifier.example#key-1"
+  },
+  "request": {
+    "request_id": "areq-20260507-mcp-oauth-upstream-denied-001",
+    "transaction_id": "txn-20260507-mcp-oauth-upstream-denied-001",
+    "action": "crm.case.update",
+    "input_hash": "sha-256:base64url-mcp-upstream-denied-tool-call-input-digest",
+    "audience": "https://mcp.crm.example",
+    "target_audience": "https://mcp.crm.example",
+    "target_resource": "mcp://crm.example/tools/cases.update",
+    "transport": {
+      "protocol": "mcp",
+      "oauth": {
+        "issuer": "https://auth.example",
+        "audience": "https://mcp.crm.example",
+        "resource": "mcp://crm.example/tools/cases.update",
+        "proof_of_possession": "dpop-jkt:base64url-thumbprint",
+        "scopes": [
+          "crm.case.read"
+        ],
+        "required_scope": "crm.case.update"
+      },
+      "openid": {
+        "issuer": "https://auth.example",
+        "subject": "did:web:user.example",
+        "client_id": "did:web:agent.example"
+      }
+    }
+  },
+  "subject": {
+    "principal": "did:web:user.example",
+    "actor": "did:web:agent.example",
+    "runtime": "spiffe://agent.example/workload/case-agent"
+  },
+  "evidence": [
+    {
+      "type": "oauth_access_token",
+      "protocol_hint": "mcp-oauth",
+      "uri": "https://auth.example/token-introspection/tok-20260507-upstream-denied-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-oauth-upstream-denied-introspection-digest"
+      },
+      "verification": {
+        "result": "failed",
+        "checked_at": "2026-05-07T09:20:01Z",
+        "method": "oauth-scope-boundary-check",
+        "status_result": "scope_missing",
+        "failure_reason": "The OAuth access token does not contain the required scope for crm.case.update; VATE cannot widen upstream authorization."
+      }
+    },
+    {
+      "type": "openid_subject",
+      "protocol_hint": "openid-connect",
+      "uri": "https://auth.example/openid/session/sub-20260507-upstream-denied-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-openid-upstream-denied-claims-digest"
+      },
+      "verification": {
+        "result": "verified",
+        "checked_at": "2026-05-07T09:20:02Z",
+        "method": "openid-claims-binding",
+        "status_result": "active"
+      }
+    },
+    {
+      "type": "runtime_attestation",
+      "protocol_hint": "spiffe",
+      "uri": "https://agent.example/attestations/runtime/rp-mcp-oauth-upstream-denied-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-runtime-upstream-denied-attestation-digest"
+      },
+      "verification": {
+        "result": "verified",
+        "checked_at": "2026-05-07T09:20:03Z",
+        "method": "workload-attestation",
+        "status_result": "active"
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "al2-mcp-crm-case-update",
+    "policy_version": "2026-05-07.1",
+    "policy_ref": "https://verifier.example/policies/al2-mcp-crm-case-update/2026-05-07.1"
+  },
+  "decision": {
+    "outcome": "deny",
+    "reason_codes": [
+      "ACTION_NOT_PERMITTED",
+      "FAIL_CLOSED"
+    ],
+    "human_readable_summary": "The request is denied because the OAuth token lacks the scope required for the MCP tool action, even though the local tool request shape is otherwise stable."
+  },
+  "proof": {
+    "format": "detached_jws",
+    "alg": "ES256",
+    "kid": "did:web:verifier.example#key-1",
+    "signature_ref": "https://verifier.example/vate/signatures/admrec-20260507-mcp-oauth-upstream-denied-001.jws"
+  }
+}

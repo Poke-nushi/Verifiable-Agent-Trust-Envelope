@@ -159,11 +159,18 @@ The `v0.2` conformance corpus includes one MCP-shaped fixture:
 - `conformance/al2-vate-v0.2/cases/allow-mcp-oauth-transport-bound.json`
 
 It also includes a negative fixture proving that VATE cannot widen upstream MCP
-or OAuth authority:
+or OAuth authority by changing the requested tool beyond the token resource:
 
 - `examples/transport/mcp-oauth-overscope-admission-request.example.json`
 - `examples/receipts/admission-deny-mcp-oauth-overscope.example.json`
 - `conformance/al2-vate-v0.2/cases/deny-mcp-oauth-overscope.json`
+
+The companion negative fixture keeps the requested MCP tool stable but denies
+the request when the OAuth token lacks the action scope:
+
+- `examples/transport/mcp-oauth-upstream-denied-admission-request.example.json`
+- `examples/receipts/admission-deny-mcp-oauth-upstream-denied.example.json`
+- `conformance/al2-vate-v0.2/cases/deny-mcp-oauth-upstream-denied.json`
 
 The fixture treats OAuth and OpenID artifacts as verifier evidence.
 It does not define a new MCP authorization flow.

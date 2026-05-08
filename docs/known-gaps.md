@@ -158,7 +158,8 @@ Remaining work includes:
   proceed
 - adding more transport-bound fixtures that prove VATE never widens MCP/OAuth
   authority beyond the intersection of upstream authorization and local verifier
-  policy; the first overscope denial fixture is `deny-mcp-oauth-overscope`
+  policy; the initial MCP/OAuth denial fixtures are
+  `deny-mcp-oauth-overscope` and `deny-mcp-oauth-upstream-denied`
 
 ### 13. Post-Execution Linkage Needs Independent Implementation Evidence
 

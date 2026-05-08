@@ -1,0 +1,60 @@
+{
+  "version": "vate-conformance-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "case_id": "deny-mcp-oauth-upstream-denied",
+  "title": "Deny an MCP OAuth request with insufficient upstream authority",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when the requested MCP tool and local policy shape are stable but OAuth evidence does not carry the scope required for the action.",
+  "artifacts": {
+    "admission_request": "examples/transport/mcp-oauth-upstream-denied-admission-request.example.json",
+    "admission_receipt": "examples/receipts/admission-deny-mcp-oauth-upstream-denied.example.json"
+  },
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "ACTION_NOT_PERMITTED",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "request.transport.oauth.resource",
+        "expected": "present"
+      },
+      {
+        "name": "request.transport.oauth.scopes",
+        "expected": "present"
+      },
+      {
+        "name": "request.transport.oauth.required_scope",
+        "expected": "present"
+      },
+      {
+        "name": "request.target_resource",
+        "expected": "present"
+      },
+      {
+        "name": "evidence[0].protocol_hint",
+        "expected": "present"
+      },
+      {
+        "name": "evidence.verification.result",
+        "expected": "fail"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "MCP transport binding",
+    "OAuth scope boundary",
+    "authority intersection",
+    "fail closed"
+  ]
+}

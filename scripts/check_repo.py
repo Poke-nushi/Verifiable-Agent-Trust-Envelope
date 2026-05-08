@@ -45,6 +45,7 @@ EXAMPLE_PAIRS = [
     ("examples/admission-request-runtime-proof-stale.example.json", "schemas/admission-request.schema.json"),
     ("examples/transport/mcp-oauth-admission-request.example.json", "schemas/admission-request.schema.json"),
     ("examples/transport/mcp-oauth-overscope-admission-request.example.json", "schemas/admission-request.schema.json"),
+    ("examples/transport/mcp-oauth-upstream-denied-admission-request.example.json", "schemas/admission-request.schema.json"),
     ("examples/a2a/metadata-admission-requested.json", "schemas/a2a-vate-metadata.schema.json"),
     (
         "examples/a2a/metadata-admission-requested-with-signed-agent-card.json",
@@ -446,11 +447,53 @@ def check_post_execution_linkage_kind_coverage() -> None:
         raise RuntimeError("admission_decision linkage kind did not detect a mismatched admission decision")
 
 
+def check_transport_bound_fixture_coverage() -> None:
+    case_dir = ROOT / "conformance" / "al2-vate-v0.2" / "cases"
+    case_path = case_dir / "deny-mcp-oauth-upstream-denied.json"
+    if not case_path.exists():
+        raise RuntimeError(
+            "transport-bound fixture coverage is missing deny-mcp-oauth-upstream-denied: "
+            "MCP/OAuth coverage must include a denial where the requested VATE-local "
+            "action stays stable but upstream OAuth authority is insufficient."
+        )
+
+    case = json.loads(case_path.read_text(encoding="utf-8"))
+    artifacts = case.get("artifacts", {})
+    admission_request = json.loads((ROOT / artifacts["admission_request"]).read_text(encoding="utf-8"))
+    admission_receipt = json.loads((ROOT / artifacts["admission_receipt"]).read_text(encoding="utf-8"))
+
+    request_action = admission_request.get("action")
+    receipt_action = admission_receipt.get("request", {}).get("action")
+    requested_tool = admission_request.get("constraints", {}).get("requested_tool")
+    tool_allowlist = admission_request.get("constraints", {}).get("tool_allowlist", [])
+    oauth = admission_request.get("constraints", {}).get("transport", {}).get("oauth", {})
+    required_scope = oauth.get("required_scope")
+    scopes = oauth.get("scopes", [])
+    reason_codes = admission_receipt.get("decision", {}).get("reason_codes")
+    evidence_results = [
+        item.get("verification", {}).get("status_result")
+        for item in admission_receipt.get("evidence", [])
+        if item.get("type") == "oauth_access_token"
+    ]
+
+    if request_action != "crm.case.update" or receipt_action != request_action:
+        raise RuntimeError("deny-mcp-oauth-upstream-denied must keep the requested action stable")
+    if requested_tool != "cases.update" or requested_tool not in tool_allowlist:
+        raise RuntimeError("deny-mcp-oauth-upstream-denied must keep the requested MCP tool locally allowed")
+    if not isinstance(scopes, list) or required_scope in scopes:
+        raise RuntimeError("deny-mcp-oauth-upstream-denied must make the OAuth required_scope absent from scopes")
+    if reason_codes != ["ACTION_NOT_PERMITTED", "FAIL_CLOSED"]:
+        raise RuntimeError("deny-mcp-oauth-upstream-denied must deny with ACTION_NOT_PERMITTED then FAIL_CLOSED")
+    if "scope_missing" not in evidence_results:
+        raise RuntimeError("deny-mcp-oauth-upstream-denied must record an OAuth scope_missing verification result")
+
+
 def main() -> int:
     validate_examples()
     check_evidence_vocabulary_registry()
     check_artifact_versioning_docs()
     check_post_execution_linkage_kind_coverage()
+    check_transport_bound_fixture_coverage()
     run([sys.executable, "-m", "py_compile", str(DEMO)])
     run([sys.executable, "-m", "py_compile", str(HTTP_DEMO)])
     run([sys.executable, "-m", "py_compile", str(VATE_CONFORMANCE)])

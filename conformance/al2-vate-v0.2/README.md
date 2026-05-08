@@ -39,6 +39,7 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/deny-not-yet-valid-permit.json`
 - `cases/deny-audience-mismatch.json`
 - `cases/deny-mcp-oauth-overscope.json`
+- `cases/deny-mcp-oauth-upstream-denied.json`
 - `cases/deny-digest-mismatch.json`
 - `cases/deny-jose-alg-none.json`
 - `cases/deny-jose-hs256-downgrade.json`

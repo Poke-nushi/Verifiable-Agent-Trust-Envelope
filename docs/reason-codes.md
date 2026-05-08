@@ -64,8 +64,8 @@ Implementations MAY include additional profile-specific reason codes, but the ca
 
 ### Policy And Execution
 
-- `ACTION_NOT_PERMITTED` - requested action exceeded the permit or local policy
-- `TARGET_NOT_PERMITTED` - target resource exceeded the permit or local policy
+- `ACTION_NOT_PERMITTED` - requested action exceeded the permit, upstream authorization evidence, or local policy
+- `TARGET_NOT_PERMITTED` - target resource exceeded the permit, upstream authorization evidence, or local policy
 - `POLICY_DENIED` - local verifier policy denied the request
 - `POLICY_SNAPSHOT_MISMATCH` - policy snapshot digest did not match the referenced policy basis
 - `POST_EXEC_LINKAGE_MISMATCH` - post-execution receipt did not link to the admitted effective request

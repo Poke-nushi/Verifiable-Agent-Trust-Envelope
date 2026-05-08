@@ -1,0 +1,79 @@
+{
+  "version": "vate-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "request_id": "areq-20260507-mcp-oauth-upstream-denied-001",
+  "transaction_id": "txn-20260507-mcp-oauth-upstream-denied-001",
+  "issued_at": "2026-05-07T09:20:00Z",
+  "expires_at": "2026-05-07T09:25:00Z",
+  "action": "crm.case.update",
+  "target": {
+    "resource": "mcp://crm.example/tools/cases.update",
+    "audience": "https://mcp.crm.example"
+  },
+  "actor": "did:web:agent.example",
+  "principal": "did:web:user.example",
+  "runtime": "spiffe://agent.example/workload/case-agent",
+  "audience": "https://mcp.crm.example",
+  "input_hash": "sha-256:base64url-mcp-upstream-denied-tool-call-input-digest",
+  "constraints": {
+    "transport": {
+      "protocol": "mcp",
+      "oauth": {
+        "issuer": "https://auth.example",
+        "audience": "https://mcp.crm.example",
+        "resource": "mcp://crm.example/tools/cases.update",
+        "proof_of_possession": "dpop-jkt:base64url-thumbprint",
+        "scopes": [
+          "crm.case.read"
+        ],
+        "required_scope": "crm.case.update"
+      },
+      "openid": {
+        "issuer": "https://auth.example",
+        "subject": "did:web:user.example",
+        "client_id": "did:web:agent.example"
+      }
+    },
+    "expected_runtime": "spiffe://agent.example/workload/case-agent",
+    "tool_allowlist": [
+      "cases.update"
+    ],
+    "requested_tool": "cases.update"
+  },
+  "correlation": {
+    "mcp_session_id": "mcp-session-20260507-upstream-denied-001",
+    "mcp_request_id": "mcp-req-20260507-upstream-denied-001"
+  },
+  "evidence_refs": [
+    {
+      "type": "oauth_access_token",
+      "protocol_hint": "mcp-oauth",
+      "uri": "https://auth.example/token-introspection/tok-20260507-upstream-denied-001",
+      "media_type": "application/oauth-token-introspection+json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-oauth-upstream-denied-introspection-digest"
+      }
+    },
+    {
+      "type": "openid_subject",
+      "protocol_hint": "openid-connect",
+      "uri": "https://auth.example/openid/session/sub-20260507-upstream-denied-001",
+      "media_type": "application/openid-connect-claims+json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-openid-upstream-denied-claims-digest"
+      }
+    },
+    {
+      "type": "runtime_attestation",
+      "protocol_hint": "spiffe",
+      "uri": "https://agent.example/attestations/runtime/rp-mcp-oauth-upstream-denied-001",
+      "media_type": "application/vnd.spiffe.svid+jwt",
+      "digest": {
+        "alg": "sha-256",
+        "value": "base64url-runtime-upstream-denied-attestation-digest"
+      }
+    }
+  ]
+}

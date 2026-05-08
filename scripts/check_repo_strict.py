@@ -27,6 +27,8 @@ EXAMPLE_PAIRS = [
     ("examples/evidence-reference.example.json", "schemas/evidence-reference.schema.json"),
     ("examples/admission-request.example.json", "schemas/admission-request.schema.json"),
     ("examples/transport/mcp-oauth-admission-request.example.json", "schemas/admission-request.schema.json"),
+    ("examples/transport/mcp-oauth-overscope-admission-request.example.json", "schemas/admission-request.schema.json"),
+    ("examples/transport/mcp-oauth-upstream-denied-admission-request.example.json", "schemas/admission-request.schema.json"),
     ("examples/a2a/metadata-admission-requested.json", "schemas/a2a-vate-metadata.schema.json"),
     (
         "examples/a2a/metadata-admission-requested-with-signed-agent-card.json",

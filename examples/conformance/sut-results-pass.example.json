@@ -2,7 +2,7 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "2f43566b2997e89993f6ab2bf3b5f8846652e9d81dd8e20b478a2270f0323e96"
+      "value": "dd29289633e4bd351c7802c4b01162d904eef36667e4d9e37d4fd4298eafb809"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.2"
   },
@@ -1162,6 +1162,60 @@
       "outcome": "deny",
       "reason_codes": [
         "TARGET_NOT_PERMITTED",
+        "FAIL_CLOSED"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
+            "value": "577356dda74c46ed4b6dd0aebbd434092fbc09a49be3cb9ab55b14cdb6eac390"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-deny-mcp-oauth-upstream-denied.example.json"
+        }
+      },
+      "case_id": "deny-mcp-oauth-upstream-denied",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "request.transport.oauth.resource",
+          "pass": true
+        },
+        {
+          "name": "request.transport.oauth.scopes",
+          "pass": true
+        },
+        {
+          "name": "request.transport.oauth.required_scope",
+          "pass": true
+        },
+        {
+          "name": "request.target_resource",
+          "pass": true
+        },
+        {
+          "name": "evidence[0].protocol_hint",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.result",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "ACTION_NOT_PERMITTED",
         "FAIL_CLOSED"
       ],
       "should_execute": false,
