@@ -172,7 +172,9 @@ compatibility claim.
 - [docs/reason-codes.md](docs/reason-codes.md)
   Canonical machine-readable reason codes for AL2 conformance
 - [docs/evidence-types.md](docs/evidence-types.md)
-  Canonical evidence type and protocol hint vocabulary for AL2 conformance
+  Human-readable evidence type and protocol hint vocabulary for AL2 conformance
+- [registries/evidence-vocabulary.v0.2.json](registries/evidence-vocabulary.v0.2.json)
+  Canonical machine-readable evidence vocabulary registry, including allowed type/hint pairs
 - [docs/attenuation-semantics.md](docs/attenuation-semantics.md)
   Machine-readable attenuation semantics for AL2 conformance
 - [docs/v0.2-in-5-minutes.md](docs/v0.2-in-5-minutes.md)

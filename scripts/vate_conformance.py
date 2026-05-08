@@ -29,47 +29,64 @@ BUNDLE_VERIFICATION_VERSION = "vate-report-bundle-verification-2026-07"
 CORPUS_INDEX_VERSION = "vate-conformance-corpus-2026-07"
 CORPUS_INDEX_FILENAME = "corpus.json"
 SUT_RESULTS_VERSION = "vate-sut-results-2026-07"
+EVIDENCE_VOCABULARY_VERSION = "vate-evidence-vocabulary-2026-07"
 SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
-CANONICAL_EVIDENCE_TYPES = {
-    "admission_receipt",
-    "admission_request",
-    "agent_card",
-    "attenuation_candidate",
-    "delegated_payment_token",
-    "did_document",
-    "http_message_signature",
-    "local_policy",
-    "mission_permit",
-    "oap_decision",
-    "oauth_access_token",
-    "oauth_transaction_token",
-    "oid4vp_presentation",
-    "openid_subject",
-    "payment_authority",
-    "payment_mandate",
-    "payment_required_state",
-    "policy_snapshot",
-    "post_execution_receipt",
-    "runtime_attestation",
-    "runtime_disclosure",
-    "signed_agent_card",
-    "status_bundle",
-    "ucp_checkout_session",
-    "vc_status",
-    "verifiable_credential",
-    "web_bot_auth_signature",
-}
-CANONICAL_PROTOCOL_HINTS = {
-    "ap2",
-    "ap2_human_not_present",
-    "mcp-oauth",
-    "oap_aport",
-    "openid-connect",
-    "spiffe",
-    "stripe_spt",
-    "ucp",
-    "x402",
-}
+EVIDENCE_VOCABULARY_PATH = ROOT / "registries" / "evidence-vocabulary.v0.2.json"
+
+
+def load_evidence_vocabulary() -> tuple[frozenset[str], frozenset[str], dict[str, frozenset[str]]]:
+    registry = json.loads(EVIDENCE_VOCABULARY_PATH.read_text(encoding="utf-8"))
+    if registry.get("version") != EVIDENCE_VOCABULARY_VERSION:
+        raise RuntimeError("evidence vocabulary registry version does not match the runner")
+    if registry.get("profile") != PROFILE:
+        raise RuntimeError("evidence vocabulary registry profile does not match the runner")
+    evidence_type_items = registry.get("evidence_types")
+    protocol_hint_items = registry.get("protocol_hints")
+    if not isinstance(evidence_type_items, list) or not isinstance(protocol_hint_items, list):
+        raise RuntimeError("evidence vocabulary registry must define evidence_types and protocol_hints arrays")
+
+    evidence_types: set[str] = set()
+    allowed_hints_by_type: dict[str, frozenset[str]] = {}
+    for item in evidence_type_items:
+        if not isinstance(item, dict):
+            raise RuntimeError("evidence vocabulary evidence_types entries must be objects")
+        evidence_type = item.get("id")
+        allowed_hints = item.get("allowed_protocol_hints")
+        if not isinstance(evidence_type, str) or not evidence_type:
+            raise RuntimeError("evidence vocabulary evidence type entries must have non-empty id values")
+        if evidence_type in evidence_types:
+            raise RuntimeError(f"duplicate evidence type id in evidence vocabulary registry: {evidence_type}")
+        if not isinstance(allowed_hints, list) or not all(isinstance(hint, str) and hint for hint in allowed_hints):
+            raise RuntimeError(f"evidence type {evidence_type} must define allowed_protocol_hints")
+        evidence_types.add(evidence_type)
+        allowed_hints_by_type[evidence_type] = frozenset(allowed_hints)
+
+    protocol_hints: set[str] = set()
+    for item in protocol_hint_items:
+        if not isinstance(item, dict):
+            raise RuntimeError("evidence vocabulary protocol_hints entries must be objects")
+        protocol_hint = item.get("id")
+        if not isinstance(protocol_hint, str) or not protocol_hint:
+            raise RuntimeError("evidence vocabulary protocol hint entries must have non-empty id values")
+        if protocol_hint in protocol_hints:
+            raise RuntimeError(f"duplicate protocol hint id in evidence vocabulary registry: {protocol_hint}")
+        protocol_hints.add(protocol_hint)
+
+    for evidence_type, allowed_hints in allowed_hints_by_type.items():
+        unknown_hints = allowed_hints - protocol_hints
+        if unknown_hints:
+            raise RuntimeError(
+                f"evidence type {evidence_type} allows unknown protocol hints: {sorted(unknown_hints)}"
+            )
+
+    return frozenset(evidence_types), frozenset(protocol_hints), allowed_hints_by_type
+
+
+(
+    CANONICAL_EVIDENCE_TYPES,
+    CANONICAL_PROTOCOL_HINTS,
+    ALLOWED_PROTOCOL_HINTS_BY_TYPE,
+) = load_evidence_vocabulary()
 LINKAGE_REASON_CODES_BY_KIND = {
     "admission_digest": "POST_EXEC_ADMISSION_DIGEST_MISMATCH",
     "admission_executable": "POST_EXEC_ADMISSION_DENIED",
@@ -1324,6 +1341,10 @@ def validate_evidence_vocab_object(value: Any, *, label: str) -> list[str]:
             failures.append(f"{label}.protocol_hint must be a non-empty string")
         elif protocol_hint not in CANONICAL_PROTOCOL_HINTS:
             failures.append(f"{label}.protocol_hint is not in the canonical protocol hint registry")
+        elif evidence_type in CANONICAL_EVIDENCE_TYPES:
+            allowed_hints = ALLOWED_PROTOCOL_HINTS_BY_TYPE.get(evidence_type, frozenset())
+            if protocol_hint not in allowed_hints:
+                failures.append(f"{label}.protocol_hint is not allowed for evidence type {evidence_type}")
     return failures
 
 

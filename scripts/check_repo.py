@@ -10,6 +10,7 @@ scripts/check_repo_strict.py when jsonschema is available locally.
 from __future__ import annotations
 
 import json
+import importlib.util
 import shutil
 import socket
 import subprocess
@@ -26,11 +27,13 @@ HTTP_DEMO = ROOT / "reference" / "http-verifier-demo" / "http_verifier_demo.py"
 VATE_CONFORMANCE = ROOT / "scripts" / "vate_conformance.py"
 VATE_CORE = ROOT / "reference" / "vate-verifier-core" / "vate_verifier_core.py"
 A2A_ADAPTER = ROOT / "reference" / "a2a-metadata-adapter-demo" / "a2a_metadata_adapter_demo.py"
+EVIDENCE_VOCABULARY = ROOT / "registries" / "evidence-vocabulary.v0.2.json"
 JSON_ONLY_FILES = [
     "reference/a2a-metadata-adapter-demo/agent-card-extension.example.json",
     "examples/a2a/agent-card-v1-vate-extension.example.json",
 ]
 EXAMPLE_PAIRS = [
+    ("registries/evidence-vocabulary.v0.2.json", "schemas/evidence-vocabulary.schema.json"),
     ("examples/passport-credential.example.json", "schemas/passport-credential.schema.json"),
     ("examples/runtime-proof.example.json", "schemas/runtime-proof.schema.json"),
     ("examples/mission-permit.example.json", "schemas/mission-permit.schema.json"),
@@ -296,8 +299,68 @@ def validate_examples() -> None:
         json.loads((ROOT / json_rel).read_text(encoding="utf-8"))
 
 
+def load_vate_conformance_module():
+    spec = importlib.util.spec_from_file_location("vate_conformance", VATE_CONFORMANCE)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("could not load scripts/vate_conformance.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def check_evidence_vocabulary_registry() -> None:
+    registry = json.loads(EVIDENCE_VOCABULARY.read_text(encoding="utf-8"))
+    evidence_types = registry.get("evidence_types")
+    protocol_hints = registry.get("protocol_hints")
+    if not isinstance(evidence_types, list) or not evidence_types:
+        raise RuntimeError("evidence vocabulary registry must define evidence_types")
+    if not isinstance(protocol_hints, list) or not protocol_hints:
+        raise RuntimeError("evidence vocabulary registry must define protocol_hints")
+
+    evidence_type_ids = {item.get("id") for item in evidence_types if isinstance(item, dict)}
+    protocol_hint_ids = {item.get("id") for item in protocol_hints if isinstance(item, dict)}
+    if len(evidence_type_ids) != len(evidence_types) or not all(isinstance(item, str) for item in evidence_type_ids):
+        raise RuntimeError("evidence vocabulary registry has missing or duplicate evidence type ids")
+    if len(protocol_hint_ids) != len(protocol_hints) or not all(isinstance(item, str) for item in protocol_hint_ids):
+        raise RuntimeError("evidence vocabulary registry has missing or duplicate protocol hint ids")
+
+    for item in evidence_types:
+        allowed_hints = item.get("allowed_protocol_hints")
+        if not isinstance(allowed_hints, list):
+            raise RuntimeError(f"evidence type {item.get('id')} must define allowed_protocol_hints")
+        unknown_hints = set(allowed_hints) - protocol_hint_ids
+        if unknown_hints:
+            raise RuntimeError(f"evidence type {item.get('id')} allows unknown protocol hints: {sorted(unknown_hints)}")
+
+    for schema_rel in ("schemas/admission-request.schema.json", "schemas/admission-receipt.schema.json"):
+        schema = json.loads((ROOT / schema_rel).read_text(encoding="utf-8"))
+        schema_evidence_types = set(schema["$defs"]["evidenceType"]["enum"])
+        schema_protocol_hints = set(schema["$defs"]["protocolHint"]["enum"])
+        if schema_evidence_types != evidence_type_ids:
+            raise RuntimeError(f"{schema_rel} evidence type enum does not match evidence vocabulary registry")
+        if schema_protocol_hints != protocol_hint_ids:
+            raise RuntimeError(f"{schema_rel} protocol hint enum does not match evidence vocabulary registry")
+
+    evidence_ref_schema = json.loads((ROOT / "schemas/evidence-reference.schema.json").read_text(encoding="utf-8"))
+    evidence_ref_types = set(evidence_ref_schema["properties"]["type"]["enum"])
+    evidence_ref_hints = set(evidence_ref_schema["properties"]["protocol_hint"]["enum"])
+    if evidence_ref_types != evidence_type_ids:
+        raise RuntimeError("schemas/evidence-reference.schema.json type enum does not match evidence vocabulary registry")
+    if evidence_ref_hints != protocol_hint_ids:
+        raise RuntimeError(
+            "schemas/evidence-reference.schema.json protocol_hint enum does not match evidence vocabulary registry"
+        )
+
+    conformance = load_vate_conformance_module()
+    invalid_pair = {"type": "runtime_attestation", "protocol_hint": "ap2"}
+    failures = conformance.validate_evidence_vocab_object(invalid_pair, label="negative evidence vocabulary pair")
+    if not failures:
+        raise RuntimeError("runner accepted an evidence type/protocol hint pair that is not registered")
+
+
 def main() -> int:
     validate_examples()
+    check_evidence_vocabulary_registry()
     run([sys.executable, "-m", "py_compile", str(DEMO)])
     run([sys.executable, "-m", "py_compile", str(HTTP_DEMO)])
     run([sys.executable, "-m", "py_compile", str(VATE_CONFORMANCE)])

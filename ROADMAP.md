@@ -49,7 +49,7 @@ adding new adjacent profiles.
 - [x] bind AL2 context checks to request, transaction, evidence, and receipt
   artifacts so external SUT comparison can evaluate freshness, replay, and
   runtime-binding behavior
-- [ ] move evidence type and protocol hint vocabulary toward a single
+- [x] move evidence type and protocol hint vocabulary toward a single
   machine-readable source and define allowed type/hint combinations
 - [x] tighten critical report and linkage schema blocks while keeping future
   extension data under explicit extension or annotation fields
@@ -80,7 +80,8 @@ adding new adjacent profiles.
 - add minimum AL2 verification context for status freshness, replay protection,
   and runtime binding; first `al2_context_checks` fixtures added
 - add an evidence type vocabulary for generic evidence types and
-  protocol-specific hints; initial registry and runner checks added
+  protocol-specific hints; machine-readable registry, drift checks, and
+  type/hint pair checks added
 - keep the language-neutral conformance corpus index current as cases change
 
 ### P2 Before Independent Implementation Collection

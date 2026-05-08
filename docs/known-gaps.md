@@ -194,16 +194,18 @@ Remaining work includes:
 
 ### 15. Evidence Type Vocabulary Needs Wider Implementation Coverage
 
-The repo now has a canonical evidence type registry and protocol hint registry
+The repo now has a machine-readable evidence type and protocol hint registry
 for AL2 admission fixtures. The conformance runner checks admission request
-references and admission receipt evidence against that vocabulary.
+references and admission receipt evidence against that vocabulary, including
+allowed evidence type / protocol hint combinations.
 
 Remaining work includes:
 
 - carrying the same vocabulary into independent verifier implementations
 - deciding how extension evidence types are registered after v0.2
 - ensuring trust bundles and policy snapshots refer to the same vocabulary
-- adding more negative fixtures for unknown or malformed protocol hints
+- adding more negative fixtures for unknown, malformed, or unregistered
+  type/hint combinations
 
 ### 16. Report Integrity Needs External Proof Implementation
 

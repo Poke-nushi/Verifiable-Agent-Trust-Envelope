@@ -111,8 +111,9 @@ block. For the AL2 v0.2 corpus:
 - `al2_context_checks` validate minimum freshness, replay, and binding context
   and require external SUT reports to bind that context back to request, receipt,
   transaction, runtime, and evidence inputs
-- evidence vocabulary checks require canonical generic `type` values and
-  registered protocol hints on admission request references and receipt evidence
+- evidence vocabulary checks require canonical generic `type` values, registered
+  protocol hints, and registered type/hint combinations on admission request
+  references and receipt evidence
 
 An external implementation should treat those arrays as part of the case
 contract, not as optional comments.

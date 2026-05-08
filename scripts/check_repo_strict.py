@@ -18,6 +18,7 @@ JSON_ONLY_FILES = [
     "examples/a2a/agent-card-v1-vate-extension.example.json",
 ]
 EXAMPLE_PAIRS = [
+    ("registries/evidence-vocabulary.v0.2.json", "schemas/evidence-vocabulary.schema.json"),
     ("examples/passport-credential.example.json", "schemas/passport-credential.schema.json"),
     ("examples/runtime-proof.example.json", "schemas/runtime-proof.schema.json"),
     ("examples/mission-permit.example.json", "schemas/mission-permit.schema.json"),
