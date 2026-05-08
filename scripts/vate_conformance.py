@@ -1548,9 +1548,30 @@ def required_sut_artifacts(case: dict[str, Any]) -> dict[str, Any]:
                 }
             )
 
+    proof_artifacts: list[dict[str, str]] = []
+    jose_artifact_kinds = {
+        "proof_package": "jose_proof_package",
+        "detached_payload": "jose_detached_payload",
+        "trust_bundle": "jose_trust_bundle",
+    }
+    for check in case.get("jose_checks", []):
+        if not isinstance(check, dict):
+            continue
+        for field, kind in jose_artifact_kinds.items():
+            artifact_name = check.get(field)
+            if isinstance(artifact_name, str) and artifact_name:
+                proof_artifacts.append(
+                    {
+                        "case_artifact": artifact_name,
+                        "kind": kind,
+                        "expected_digest": sha256_file(resolve_artifact_path(case, artifact_name)),
+                    }
+                )
+
     return {
         "receipt_artifacts": receipt_artifacts,
         "verification_context": context_artifacts,
+        "proof_artifacts": proof_artifacts,
     }
 
 
@@ -1609,6 +1630,19 @@ def sut_verification_context_failures(value: Any, label: str) -> list[str]:
     return failures
 
 
+def sut_proof_artifact_failures(value: Any, label: str) -> list[str]:
+    failures = sut_artifact_ref_failures(value, label, require_media_type=True)
+    if not isinstance(value, dict):
+        return failures
+    kind = value.get("kind")
+    if kind not in {"jose_proof_package", "jose_detached_payload", "jose_trust_bundle"}:
+        failures.append(f"{label}.kind: expected JOSE proof artifact kind")
+    case_artifact = value.get("case_artifact")
+    if not isinstance(case_artifact, str) or not case_artifact:
+        failures.append(f"{label}.case_artifact: expected non-empty string")
+    return failures
+
+
 def sut_result_artifact_failures(result: dict[str, Any], requirements: dict[str, Any]) -> list[str]:
     failures: list[str] = []
     required_receipts = [
@@ -1619,7 +1653,11 @@ def sut_result_artifact_failures(result: dict[str, Any], requirements: dict[str,
         context for context in requirements.get("verification_context", [])
         if isinstance(context, dict)
     ]
-    if not required_receipts and not required_contexts:
+    required_proofs = [
+        proof for proof in requirements.get("proof_artifacts", [])
+        if isinstance(proof, dict)
+    ]
+    if not required_receipts and not required_contexts and not required_proofs:
         return failures
 
     artifacts = result.get("artifacts")
@@ -1688,6 +1726,55 @@ def sut_result_artifact_failures(result: dict[str, Any], requirements: dict[str,
                     sut_verification_context_failures(
                         context,
                         f"artifacts.verification_context[{index}]",
+                    )
+                )
+
+    raw_proofs = artifacts.get("proof_artifacts", [])
+    if required_proofs:
+        if not isinstance(raw_proofs, list) or not raw_proofs:
+            failures.append("artifacts.proof_artifacts: required non-empty array for this case")
+            raw_proofs = []
+        elif not all(isinstance(proof, dict) for proof in raw_proofs):
+            failures.append("artifacts.proof_artifacts: expected array of objects")
+            raw_proofs = [proof for proof in raw_proofs if isinstance(proof, dict)]
+        for index, proof in enumerate(raw_proofs):
+            failures.extend(
+                sut_proof_artifact_failures(
+                    proof,
+                    f"artifacts.proof_artifacts[{index}]",
+                )
+            )
+
+        available_proofs: dict[tuple[Any, Any], dict[str, Any]] = {
+            (proof.get("case_artifact"), proof.get("kind")): proof
+            for proof in raw_proofs
+            if isinstance(proof, dict)
+        }
+        for expected_proof in required_proofs:
+            key = (expected_proof.get("case_artifact"), expected_proof.get("kind"))
+            proof_ref = available_proofs.get(key)
+            if proof_ref is None:
+                failures.append(
+                    "artifacts.proof_artifacts: "
+                    f"missing case_artifact={key[0]} kind={key[1]}"
+                )
+                continue
+            failures.extend(
+                sut_artifact_digest_match_failures(
+                    proof_ref,
+                    f"artifacts.proof_artifacts case_artifact={key[0]} kind={key[1]}",
+                    expected_proof.get("expected_digest"),
+                )
+            )
+    elif raw_proofs is not None:
+        if not isinstance(raw_proofs, list):
+            failures.append("artifacts.proof_artifacts: expected array when present")
+        else:
+            for index, proof in enumerate(raw_proofs):
+                failures.extend(
+                    sut_proof_artifact_failures(
+                        proof,
+                        f"artifacts.proof_artifacts[{index}]",
                     )
                 )
 

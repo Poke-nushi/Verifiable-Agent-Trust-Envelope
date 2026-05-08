@@ -102,7 +102,8 @@ block. For the AL2 v0.2 corpus:
 - `trust_checks` bind issuer, key, algorithm, evidence type, and validity-window
   decisions to a trust bundle
 - `jose_checks` bind detached JWS fixture bytes before production signature
-  verification
+  verification; external SUT results must artifact-bind the referenced proof
+  package, detached payload, and trust bundle
 - `attenuation_checks` validate machine-readable attenuation boundaries
 - `linkage_checks` bind post-execution receipts to admission digest,
   transaction, runtime, effective request hash, validity window, and side-effect

@@ -155,6 +155,12 @@
                 "items": {
                   "$ref": "#/$defs/verificationContextRef"
                 }
+              },
+              "proof_artifacts": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/proofArtifactRef"
+                }
               }
             },
             "additionalProperties": true
@@ -231,6 +237,42 @@
         "kind": {
           "type": "string",
           "minLength": 1
+        },
+        "case_artifact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "media_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      },
+      "additionalProperties": true
+    },
+    "proofArtifactRef": {
+      "type": "object",
+      "required": [
+        "kind",
+        "case_artifact",
+        "uri",
+        "media_type",
+        "digest"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "jose_proof_package",
+            "jose_detached_payload",
+            "jose_trust_bundle"
+          ]
         },
         "case_artifact": {
           "type": "string",

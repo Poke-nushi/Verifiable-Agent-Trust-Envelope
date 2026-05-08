@@ -68,7 +68,39 @@
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-allow.example.json"
-        }
+        },
+        "proof_artifacts": [
+          {
+            "case_artifact": "jose_proof",
+            "digest": {
+              "alg": "sha-256",
+              "value": "355d6376b15c1cc38bca8cae8129f89071dc7c0245b13320488a8065d55b496a"
+            },
+            "kind": "jose_proof_package",
+            "media_type": "application/vate-jose-proof-fixture+json",
+            "uri": "examples/jose/jose-detached-runtime-attestation-valid.example.json"
+          },
+          {
+            "case_artifact": "detached_payload",
+            "digest": {
+              "alg": "sha-256",
+              "value": "ab7261ffbb16e8a093250e71cf5f4c36f923c761099a893866669eaf7952933d"
+            },
+            "kind": "jose_detached_payload",
+            "media_type": "application/json",
+            "uri": "examples/jose/detached-runtime-attestation-payload.json"
+          },
+          {
+            "case_artifact": "trust_bundle",
+            "digest": {
+              "alg": "sha-256",
+              "value": "48094e17ffa90464a626edc01ed1eef37e48acfa95659d26460f1ff1926b7e9c"
+            },
+            "kind": "jose_trust_bundle",
+            "media_type": "application/vate-trust-bundle+json",
+            "uri": "examples/trust-bundle.example.json"
+          }
+        ]
       },
       "case_id": "allow-jose-detached-runtime-attestation",
       "checks": [
@@ -754,7 +786,39 @@
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-jose-alg-none.example.json"
-        }
+        },
+        "proof_artifacts": [
+          {
+            "case_artifact": "jose_proof",
+            "digest": {
+              "alg": "sha-256",
+              "value": "f579ae47031d07dff0814a51b487fa510d463b945b9cbc69c7166404179e1ee6"
+            },
+            "kind": "jose_proof_package",
+            "media_type": "application/vate-jose-proof-fixture+json",
+            "uri": "examples/jose/jose-detached-runtime-attestation-alg-none.example.json"
+          },
+          {
+            "case_artifact": "detached_payload",
+            "digest": {
+              "alg": "sha-256",
+              "value": "ab7261ffbb16e8a093250e71cf5f4c36f923c761099a893866669eaf7952933d"
+            },
+            "kind": "jose_detached_payload",
+            "media_type": "application/json",
+            "uri": "examples/jose/detached-runtime-attestation-payload.json"
+          },
+          {
+            "case_artifact": "trust_bundle",
+            "digest": {
+              "alg": "sha-256",
+              "value": "48094e17ffa90464a626edc01ed1eef37e48acfa95659d26460f1ff1926b7e9c"
+            },
+            "kind": "jose_trust_bundle",
+            "media_type": "application/vate-trust-bundle+json",
+            "uri": "examples/trust-bundle.example.json"
+          }
+        ]
       },
       "case_id": "deny-jose-alg-none",
       "checks": [
@@ -784,7 +848,39 @@
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-jose-crit-unsupported.example.json"
-        }
+        },
+        "proof_artifacts": [
+          {
+            "case_artifact": "jose_proof",
+            "digest": {
+              "alg": "sha-256",
+              "value": "c6ebeade970a3b3528637bc4089b326778e84c0ed8f4b34e0586f72b1fbacdda"
+            },
+            "kind": "jose_proof_package",
+            "media_type": "application/vate-jose-proof-fixture+json",
+            "uri": "examples/jose/jose-detached-runtime-attestation-crit-unsupported.example.json"
+          },
+          {
+            "case_artifact": "detached_payload",
+            "digest": {
+              "alg": "sha-256",
+              "value": "ab7261ffbb16e8a093250e71cf5f4c36f923c761099a893866669eaf7952933d"
+            },
+            "kind": "jose_detached_payload",
+            "media_type": "application/json",
+            "uri": "examples/jose/detached-runtime-attestation-payload.json"
+          },
+          {
+            "case_artifact": "trust_bundle",
+            "digest": {
+              "alg": "sha-256",
+              "value": "48094e17ffa90464a626edc01ed1eef37e48acfa95659d26460f1ff1926b7e9c"
+            },
+            "kind": "jose_trust_bundle",
+            "media_type": "application/vate-trust-bundle+json",
+            "uri": "examples/trust-bundle.example.json"
+          }
+        ]
       },
       "case_id": "deny-jose-crit-unsupported",
       "checks": [
@@ -814,7 +910,39 @@
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-jose-hs256-downgrade.example.json"
-        }
+        },
+        "proof_artifacts": [
+          {
+            "case_artifact": "jose_proof",
+            "digest": {
+              "alg": "sha-256",
+              "value": "47779b023ac63d5036659816344f3193c41e5db2fd41acd58c7f5b6871304aaf"
+            },
+            "kind": "jose_proof_package",
+            "media_type": "application/vate-jose-proof-fixture+json",
+            "uri": "examples/jose/jose-detached-runtime-attestation-hs256-downgrade.example.json"
+          },
+          {
+            "case_artifact": "detached_payload",
+            "digest": {
+              "alg": "sha-256",
+              "value": "ab7261ffbb16e8a093250e71cf5f4c36f923c761099a893866669eaf7952933d"
+            },
+            "kind": "jose_detached_payload",
+            "media_type": "application/json",
+            "uri": "examples/jose/detached-runtime-attestation-payload.json"
+          },
+          {
+            "case_artifact": "trust_bundle",
+            "digest": {
+              "alg": "sha-256",
+              "value": "48094e17ffa90464a626edc01ed1eef37e48acfa95659d26460f1ff1926b7e9c"
+            },
+            "kind": "jose_trust_bundle",
+            "media_type": "application/vate-trust-bundle+json",
+            "uri": "examples/trust-bundle.example.json"
+          }
+        ]
       },
       "case_id": "deny-jose-hs256-downgrade",
       "checks": [
@@ -856,7 +984,39 @@
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-jose-payload-digest-mismatch.example.json"
-        }
+        },
+        "proof_artifacts": [
+          {
+            "case_artifact": "jose_proof",
+            "digest": {
+              "alg": "sha-256",
+              "value": "0462deb7354478d3ae8e39300d2b210d9e61dae37457d438983afcf4825e0abb"
+            },
+            "kind": "jose_proof_package",
+            "media_type": "application/vate-jose-proof-fixture+json",
+            "uri": "examples/jose/jose-detached-runtime-attestation-payload-digest-mismatch.example.json"
+          },
+          {
+            "case_artifact": "detached_payload",
+            "digest": {
+              "alg": "sha-256",
+              "value": "ab7261ffbb16e8a093250e71cf5f4c36f923c761099a893866669eaf7952933d"
+            },
+            "kind": "jose_detached_payload",
+            "media_type": "application/json",
+            "uri": "examples/jose/detached-runtime-attestation-payload.json"
+          },
+          {
+            "case_artifact": "trust_bundle",
+            "digest": {
+              "alg": "sha-256",
+              "value": "48094e17ffa90464a626edc01ed1eef37e48acfa95659d26460f1ff1926b7e9c"
+            },
+            "kind": "jose_trust_bundle",
+            "media_type": "application/vate-trust-bundle+json",
+            "uri": "examples/trust-bundle.example.json"
+          }
+        ]
       },
       "case_id": "deny-jose-payload-digest-mismatch",
       "checks": [

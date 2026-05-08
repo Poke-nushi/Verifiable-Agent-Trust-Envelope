@@ -226,6 +226,24 @@ def run(cmd: list[str], *, cwd: Path = ROOT) -> None:
     subprocess.run(cmd, cwd=cwd, check=True)
 
 
+def run_expect_failure(cmd: list[str], *, cwd: Path = ROOT) -> subprocess.CompletedProcess:
+    result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
+    if result.returncode == 0:
+        raise AssertionError(f"expected command to fail: {' '.join(cmd)}")
+    return result
+
+
+def write_sut_result_without_jose_proof_artifacts(path: Path) -> None:
+    sut_results = json.loads((ROOT / "examples" / "conformance" / "sut-results-pass.example.json").read_text())
+    for result in sut_results.get("results", []):
+        case_id = result.get("case_id")
+        if isinstance(case_id, str) and "jose" in case_id:
+            artifacts = result.get("artifacts")
+            if isinstance(artifacts, dict):
+                artifacts.pop("proof_artifacts", None)
+    path.write_text(json.dumps(sut_results, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
 def find_free_port() -> int:
     with socket.socket() as sock:
         sock.bind(("127.0.0.1", 0))
@@ -386,6 +404,21 @@ def main() -> int:
                 str(tmp_dir / "vate-sut-compare-report.json"),
                 "--implementation-report-uri",
                 str(tmp_dir / "vate-sut-implementation-report.json"),
+            ]
+        )
+        missing_jose_proofs = tmp_dir / "sut-results-missing-jose-proof-artifacts.json"
+        write_sut_result_without_jose_proof_artifacts(missing_jose_proofs)
+        run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.2"),
+                "--sut-results",
+                str(missing_jose_proofs),
+                "--report",
+                str(tmp_dir / "vate-sut-missing-jose-proof-artifacts-report.json"),
             ]
         )
         run(

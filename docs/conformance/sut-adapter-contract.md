@@ -49,9 +49,10 @@ The example file is:
 
 ## Artifact References
 
-SUT results must be artifact-backed for cases that depend on concrete receipts
-or AL2 execution context. This keeps the comparison report from becoming a
-bare assertion detached from the evidence the implementation evaluated.
+SUT results must be artifact-backed for cases that depend on concrete receipts,
+AL2 execution context, or JOSE proof-package inputs. This keeps the comparison
+report from becoming a bare assertion detached from the evidence the
+implementation evaluated.
 
 When the corpus case lists an `admission_receipt`, the result entry must include
 `artifacts.admission_receipt`. When it lists a `post_execution_receipt`, the
@@ -70,6 +71,18 @@ include `artifacts.verification_context[]` entries with:
 - `kind` - the context check kind, such as `binding`, `freshness`, or `replay`
 - `case_artifact` - the corpus artifact key used for the context check
 - `uri`
+- `digest.alg` set to `sha-256`
+- `digest.value` as lowercase SHA-256 hex
+
+When the corpus case includes `jose_checks`, the result entry must include
+`artifacts.proof_artifacts[]` entries for each referenced `proof_package`,
+`detached_payload`, and `trust_bundle` artifact:
+
+- `kind` - one of `jose_proof_package`, `jose_detached_payload`, or
+  `jose_trust_bundle`
+- `case_artifact` - the corpus artifact key used by the JOSE check
+- `uri`
+- `media_type`
 - `digest.alg` set to `sha-256`
 - `digest.value` as lowercase SHA-256 hex
 

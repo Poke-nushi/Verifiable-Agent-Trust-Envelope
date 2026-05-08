@@ -36,7 +36,7 @@ adding new adjacent profiles.
   fixture integrity check and `compare` is the external SUT comparison path
 - [x] make the SUT result contract artifact-backed for required admission receipts,
   post-execution receipts, AL2 context artifacts, and digest descriptors
-- [ ] extend artifact-backed SUT results to JOSE proof-package references where
+- [x] extend artifact-backed SUT results to JOSE proof-package references where
   corpus cases require proof provenance
 - [x] add report-bundle verification for the corpus, SUT result, conformance report,
   and implementation report digest chain
