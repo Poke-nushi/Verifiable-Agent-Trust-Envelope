@@ -1,0 +1,7 @@
+{
+  "source": "status_bundle",
+  "source_issued_at": "2026-07-01T00:00:00Z",
+  "checked_at": "2026-07-01T00:05:01Z",
+  "max_age_seconds": 300,
+  "failure_reason": "STATUS_STALE"
+}

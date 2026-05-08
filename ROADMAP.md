@@ -69,17 +69,18 @@ adding new adjacent profiles.
   never unions with upstream authorization; initial fixtures added:
   `deny-mcp-oauth-overscope` and `deny-mcp-oauth-upstream-denied`
 - add evaluation-order and algorithm-confusion fixtures before presenting the
-  corpus as broad security conformance; first stale runtime proof fixture added:
-  `deny-runtime-proof-stale`; first HS256 downgrade fixture added:
-  `deny-jose-hs256-downgrade`
-- add attenuation boundary fixtures for malicious paths and schema type edges;
-  first unsafe-path and max-amount type-edge fixtures added
+  corpus as broad security conformance; stale runtime proof and digest-before-policy
+  fixtures now fail closed before policy admission, and JOSE algorithm confusion
+  now covers `alg=none`, HS256 downgrade, and ES384-not-allowed cases
+- add attenuation boundary fixtures for malicious paths, schema type edges, and
+  amount boundaries; unsafe-path, max-amount type-edge, and negative-amount
+  fixtures added
 - strengthen post-execution linkage checks beyond presence checks; digest,
   transaction, runtime, denial, expiry, and effective-constraint fixtures added
 - add minimum AL2 verification context for status freshness, replay protection,
-  and runtime binding; first `al2_context_checks` fixtures and an exact
-  status-freshness boundary fixture plus an unused replay-key fixture added;
-  replay context state is now fail-closed for unknown values
+  and runtime binding; `al2_context_checks` now cover exact status freshness
+  boundary, just-over stale boundary, unused replay state, consumed replay state,
+  explicit replayed state, runtime binding, and fail-closed unknown replay state
 - add an evidence type vocabulary for generic evidence types and
   protocol-specific hints; machine-readable registry, drift checks, and
   type/hint pair checks added

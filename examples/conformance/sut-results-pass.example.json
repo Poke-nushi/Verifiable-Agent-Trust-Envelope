@@ -2,7 +2,7 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "fdacea6552bb34e165156c8eda784350f2bdd21b846d4aca3aa87d09016981a3"
+      "value": "4a674ba9a1a016fd1caffc848f9b4caf075cd3305abf57f304817c6111ce943f"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.2"
   },
@@ -818,6 +818,36 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
+            "value": "0b71171c03d4e7096815e957e7fd8a8bb02d6ec1911930fb0bb34bf7f9dca075"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-deny-attenuation-negative-amount.example.json"
+        }
+      },
+      "case_id": "deny-attenuation-negative-amount",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "SCHEMA_INVALID",
+        "FAIL_CLOSED"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
             "value": "c2bd1215e7298106acc22c86e5eb6b6dc7c5115986169b1ba46124f333dee5ee"
           },
           "media_type": "application/vate-admission-receipt+json",
@@ -872,6 +902,40 @@
       "outcome": "deny",
       "reason_codes": [
         "AUDIENCE_MISMATCH",
+        "FAIL_CLOSED"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
+            "value": "468538971188da8fa757b92889faafa3674aa8cc4040a81c3e243075f3525f96"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-deny-digest-mismatch-before-policy.example.json"
+        }
+      },
+      "case_id": "deny-digest-mismatch-before-policy",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        },
+        {
+          "name": "policy.policy_version",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "DIGEST_MISMATCH",
         "FAIL_CLOSED"
       ],
       "should_execute": false,
@@ -1090,6 +1154,80 @@
       "outcome": "deny",
       "reason_codes": [
         "SCHEMA_INVALID",
+        "FAIL_CLOSED"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
+            "value": "b0ed6171bf189a4cdbfed58aba75943a19afeff880611d2a40141f05c5111f45"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-deny-jose-es384-not-allowed.example.json"
+        },
+        "proof_artifacts": [
+          {
+            "case_artifact": "jose_proof",
+            "digest": {
+              "alg": "sha-256",
+              "value": "d663e92e154cf7484e3fa8bd48412b33778dbd9f796555c83531577ceec93029"
+            },
+            "kind": "jose_proof_package",
+            "media_type": "application/vate-jose-proof-fixture+json",
+            "uri": "examples/jose/jose-detached-runtime-attestation-es384-not-allowed.example.json"
+          },
+          {
+            "case_artifact": "detached_payload",
+            "digest": {
+              "alg": "sha-256",
+              "value": "ab7261ffbb16e8a093250e71cf5f4c36f923c761099a893866669eaf7952933d"
+            },
+            "kind": "jose_detached_payload",
+            "media_type": "application/json",
+            "uri": "examples/jose/detached-runtime-attestation-payload.json"
+          },
+          {
+            "case_artifact": "trust_bundle",
+            "digest": {
+              "alg": "sha-256",
+              "value": "48094e17ffa90464a626edc01ed1eef37e48acfa95659d26460f1ff1926b7e9c"
+            },
+            "kind": "jose_trust_bundle",
+            "media_type": "application/vate-trust-bundle+json",
+            "uri": "examples/trust-bundle.example.json"
+          }
+        ]
+      },
+      "case_id": "deny-jose-es384-not-allowed",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "jose.protected_header",
+          "pass": true
+        },
+        {
+          "name": "jose.detached_payload_digest",
+          "pass": true
+        },
+        {
+          "name": "jose.signing_input",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "ALG_NOT_ALLOWED",
         "FAIL_CLOSED"
       ],
       "should_execute": false,
@@ -1494,6 +1632,74 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
+            "value": "3dabce93cc28cf014aec07c2ff8441a8fba2417b2ff4f926e7d5ceb912c51939"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-deny-replay-replayed.example.json"
+        },
+        "verification_context": [
+          {
+            "case_artifact": "replay_context",
+            "context_bindings": [
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "3dabce93cc28cf014aec07c2ff8441a8fba2417b2ff4f926e7d5ceb912c51939"
+                },
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt"
+              },
+              {
+                "path": "request.transaction_id",
+                "role": "transaction_id",
+                "source_artifact": "admission_receipt",
+                "value": "txn-20260701-replay-replayed-001"
+              },
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "cc42c20249219482be8f838544e461d2baf417579a5b108b381f82bda951bbc8"
+                },
+                "evidence_type": "admission_request",
+                "path": "evidence[0]",
+                "role": "evidence",
+                "source_artifact": "admission_receipt"
+              }
+            ],
+            "digest": {
+              "alg": "sha-256",
+              "value": "d7252a584395319331a9d51eb8bc3191a481285c6eae65c4ed1e91989e9b5fbc"
+            },
+            "kind": "replay",
+            "media_type": "application/json",
+            "uri": "conformance/al2-vate-v0.2/fixtures/replay-replayed-context.json"
+          }
+        ]
+      },
+      "case_id": "deny-replay-state-replayed",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "REPLAY_DETECTED",
+        "FAIL_CLOSED"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
             "value": "00fd45665fc1ac64844265a674aa6ba4c5b0f2ebb9cad3d261e5c59a9175397a"
           },
           "media_type": "application/vate-admission-receipt+json",
@@ -1767,6 +1973,74 @@
         ]
       },
       "case_id": "deny-status-stale-fail-closed",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "STATUS_STALE",
+        "FAIL_CLOSED"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
+            "value": "66c9890e4c0f833c9007fd9fc0fa3635667e4b7b40436c64e7a022c2dde7b434"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-deny-status-stale-just-over-boundary.example.json"
+        },
+        "verification_context": [
+          {
+            "case_artifact": "status_context",
+            "context_bindings": [
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "66c9890e4c0f833c9007fd9fc0fa3635667e4b7b40436c64e7a022c2dde7b434"
+                },
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt"
+              },
+              {
+                "path": "request.transaction_id",
+                "role": "transaction_id",
+                "source_artifact": "admission_receipt",
+                "value": "txn-20260701-status-stale-boundary-001"
+              },
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "da3ee54a4f0bdb0d1d1e34963a6e99b51f1572dfe24683afcf33ce648fb398f1"
+                },
+                "evidence_type": "status_bundle",
+                "path": "evidence[0]",
+                "role": "evidence",
+                "source_artifact": "admission_receipt"
+              }
+            ],
+            "digest": {
+              "alg": "sha-256",
+              "value": "c1012bedf2d6e0c8d7f0584c239dacd2c7e1ab5d98ea845573f630148cccdf31"
+            },
+            "kind": "freshness",
+            "media_type": "application/json",
+            "uri": "conformance/al2-vate-v0.2/fixtures/status-stale-just-over-boundary-context.json"
+          }
+        ]
+      },
+      "case_id": "deny-status-stale-just-over-boundary",
       "checks": [
         {
           "name": "decision.outcome",

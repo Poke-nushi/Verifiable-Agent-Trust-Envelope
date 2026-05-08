@@ -1,0 +1,51 @@
+{
+  "version": "vate-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-20260701-digest-before-policy-001",
+  "issued_at": "2026-07-01T00:06:08Z",
+  "expires_at": "2026-07-01T00:16:08Z",
+  "verifier": {
+    "id": "did:web:verifier.example"
+  },
+  "request": {
+    "request_id": "areq-20260701-digest-before-policy-001",
+    "transaction_id": "txn-20260701-digest-before-policy-001",
+    "action": "crm.case.update",
+    "input_hash": "sha-256:digest-before-policy-input"
+  },
+  "subject": {
+    "principal": "did:web:user.example",
+    "actor": "did:web:agent.example",
+    "runtime": "spiffe://agent.example/workload/case-agent"
+  },
+  "evidence": [
+    {
+      "type": "admission_request",
+      "uri": "https://verifier.example/vate/admission-requests/digest-before-policy",
+      "digest": {
+        "alg": "sha-256",
+        "value": "intentionally-wrong-digest-before-policy"
+      },
+      "verification": {
+        "result": "failed",
+        "checked_at": "2026-07-01T00:06:05Z",
+        "method": "digest-check",
+        "failure_reason": "The digest-bound request artifact failed before local policy or attenuation evaluation could permit execution."
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "al2-crm-case-update",
+    "policy_version": "2026-07-01.1",
+    "policy_ref": "https://verifier.example/policies/al2-crm-case-update/2026-07-01.1"
+  },
+  "decision": {
+    "outcome": "deny",
+    "reason_codes": [
+      "DIGEST_MISMATCH",
+      "FAIL_CLOSED"
+    ],
+    "human_readable_summary": "The request is denied before execution because a digest-bound artifact mismatch failed ahead of local policy or attenuation."
+  }
+}

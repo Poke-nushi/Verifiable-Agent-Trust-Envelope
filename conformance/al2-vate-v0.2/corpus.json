@@ -400,6 +400,28 @@
     },
     {
       "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-attenuation-negative-amount.example.json",
+        "bad_attenuation": "conformance/al2-vate-v0.2/fixtures/attenuation-negative-amount.json"
+      },
+      "case_id": "deny-attenuation-negative-amount",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_primary_reason_code": "SCHEMA_INVALID",
+      "expected_reason_codes": [
+        "SCHEMA_INVALID",
+        "FAIL_CLOSED"
+      ],
+      "expected_should_execute": false,
+      "path": "conformance/al2-vate-v0.2/cases/deny-attenuation-negative-amount.json",
+      "title": "Deny negative attenuated max amount",
+      "validation_focus": [
+        "attenuation boundary",
+        "amount boundary",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
         "admission_receipt": "examples/receipts/admission-deny-attenuation-unsafe-path.example.json",
         "unsafe_attenuation": "conformance/al2-vate-v0.2/fixtures/attenuation-unsafe-path.json"
       },
@@ -446,6 +468,29 @@
         "audience binding",
         "target resource binding",
         "semantic rejection despite valid JSON shape"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-digest-mismatch-before-policy.example.json",
+        "base_artifact": "examples/admission-request.example.json"
+      },
+      "case_id": "deny-digest-mismatch-before-policy",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_primary_reason_code": "DIGEST_MISMATCH",
+      "expected_reason_codes": [
+        "DIGEST_MISMATCH",
+        "FAIL_CLOSED"
+      ],
+      "expected_should_execute": false,
+      "path": "conformance/al2-vate-v0.2/cases/deny-digest-mismatch-before-policy.json",
+      "title": "Deny a digest mismatch before policy admission",
+      "validation_focus": [
+        "digest-bound reference",
+        "evaluation order",
+        "fail closed before policy allow",
+        "execution gate"
       ]
     },
     {
@@ -558,6 +603,31 @@
       "validation_focus": [
         "detached JWS fixture",
         "critical header policy",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-jose-es384-not-allowed.example.json",
+        "detached_payload": "examples/jose/detached-runtime-attestation-payload.json",
+        "jose_proof": "examples/jose/jose-detached-runtime-attestation-es384-not-allowed.example.json",
+        "trust_bundle": "examples/trust-bundle.example.json"
+      },
+      "case_id": "deny-jose-es384-not-allowed",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_primary_reason_code": "ALG_NOT_ALLOWED",
+      "expected_reason_codes": [
+        "ALG_NOT_ALLOWED",
+        "FAIL_CLOSED"
+      ],
+      "expected_should_execute": false,
+      "path": "conformance/al2-vate-v0.2/cases/deny-jose-es384-not-allowed.json",
+      "title": "Deny detached JWS fixture using ES384 substitution",
+      "validation_focus": [
+        "detached JWS fixture",
+        "algorithm confusion",
+        "algorithm allowlist",
         "fail closed"
       ]
     },
@@ -743,6 +813,28 @@
     },
     {
       "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-replay-replayed.example.json",
+        "replay_context": "conformance/al2-vate-v0.2/fixtures/replay-replayed-context.json"
+      },
+      "case_id": "deny-replay-state-replayed",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_primary_reason_code": "REPLAY_DETECTED",
+      "expected_reason_codes": [
+        "REPLAY_DETECTED",
+        "FAIL_CLOSED"
+      ],
+      "expected_should_execute": false,
+      "path": "conformance/al2-vate-v0.2/cases/deny-replay-state-replayed.json",
+      "title": "Deny an explicitly replayed replay key",
+      "validation_focus": [
+        "replay detection",
+        "one-time use",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
         "admission_receipt": "examples/receipts/admission-deny-runtime-mismatch.example.json",
         "runtime_context": "conformance/al2-vate-v0.2/fixtures/runtime-binding-mismatch-context.json"
       },
@@ -844,6 +936,28 @@
       "title": "Deny stale status under fail-closed policy",
       "validation_focus": [
         "status freshness",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-status-stale-just-over-boundary.example.json",
+        "status_context": "conformance/al2-vate-v0.2/fixtures/status-stale-just-over-boundary-context.json"
+      },
+      "case_id": "deny-status-stale-just-over-boundary",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_primary_reason_code": "STATUS_STALE",
+      "expected_reason_codes": [
+        "STATUS_STALE",
+        "FAIL_CLOSED"
+      ],
+      "expected_should_execute": false,
+      "path": "conformance/al2-vate-v0.2/cases/deny-status-stale-just-over-boundary.json",
+      "title": "Deny status evidence just beyond the freshness boundary",
+      "validation_focus": [
+        "status freshness",
+        "boundary condition",
         "fail closed"
       ]
     },
@@ -1173,7 +1287,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "fdacea6552bb34e165156c8eda784350f2bdd21b846d4aca3aa87d09016981a3"
+    "value": "4a674ba9a1a016fd1caffc848f9b4caf075cd3305abf57f304817c6111ce943f"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -1261,12 +1375,20 @@
       "sha256": "0914dcf0b50ebcd1f1edfe80a9346837394932716a26870299ba9167d45f7ccb"
     },
     {
+      "path": "conformance/al2-vate-v0.2/cases/deny-attenuation-negative-amount.json",
+      "sha256": "9cea216aa127019f536bfa493993020ed2a50851b9da8cad91a51d37135c786f"
+    },
+    {
       "path": "conformance/al2-vate-v0.2/cases/deny-attenuation-unsafe-path.json",
       "sha256": "cbfe23af9a065a9a2ed979a95c05f16fe20bfb8326798b1fe934f1a81f905255"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-audience-mismatch.json",
       "sha256": "a611eff842b61c03ab689d2bac564cebb2a4d32d21556b5df47aba4d0e8b351b"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-digest-mismatch-before-policy.json",
+      "sha256": "86c2dfc400a260cdda2b90374f2a8fa6b8da73d73e8262d15610b44c77749d8b"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-digest-mismatch.json",
@@ -1287,6 +1409,10 @@
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-jose-crit-unsupported.json",
       "sha256": "3e6e6c3e3254696a3dd751894a2e1645d702faee7791cd51ab8a5bfa5941163b"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-jose-es384-not-allowed.json",
+      "sha256": "1bf2e5e52e1f43d2daa33237f82179ba02a7ffb12bd923a64de68ef24cd2ec40"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-jose-hs256-downgrade.json",
@@ -1321,6 +1447,10 @@
       "sha256": "2e6d34606fd2285790cec54eca27c4c5522114a3d2fe25d3a818ccecf19f8417"
     },
     {
+      "path": "conformance/al2-vate-v0.2/cases/deny-replay-state-replayed.json",
+      "sha256": "dcebc56e0eb85b70acf077278dc95a427dfb7931a9b59eb61057610b03ae9ac3"
+    },
+    {
       "path": "conformance/al2-vate-v0.2/cases/deny-runtime-mismatch.json",
       "sha256": "6c09f788cb30fcbb573e902918e2019dedf3aeeb860f8d574f4e3ba46edaa053"
     },
@@ -1339,6 +1469,10 @@
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-status-stale-fail-closed.json",
       "sha256": "00a0e5206a23d75a96869375e4556ab76e57699b4f140b308fd44a9922a80187"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-status-stale-just-over-boundary.json",
+      "sha256": "54e5b27764c4ec0ff490c83a6bc11a628f18c7636543f811d81c5ce23fba3a9e"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-trust-anchor-expired.json",
@@ -1409,12 +1543,20 @@
       "sha256": "7d5a26be5435a16c4c1c510f5342b51258065558ad611965eda752577fe92530"
     },
     {
+      "path": "conformance/al2-vate-v0.2/fixtures/attenuation-negative-amount.json",
+      "sha256": "b51e69fd092711fc2403fa66fede72abd208fa52e1e2405ce854a0ad274e0f49"
+    },
+    {
       "path": "conformance/al2-vate-v0.2/fixtures/attenuation-unsafe-path.json",
       "sha256": "68a4f36d35da78742c0105d1623a94222ddbf98401842a0e663d14d88eeb4703"
     },
     {
       "path": "conformance/al2-vate-v0.2/fixtures/replay-consumed-context.json",
       "sha256": "a79e527cef82e84ba918128b96a9a85d8284a45ffc3b2fa7b78a07fc862d9c87"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/fixtures/replay-replayed-context.json",
+      "sha256": "d7252a584395319331a9d51eb8bc3191a481285c6eae65c4ed1e91989e9b5fbc"
     },
     {
       "path": "conformance/al2-vate-v0.2/fixtures/replay-unused-context.json",
@@ -1443,6 +1585,10 @@
     {
       "path": "conformance/al2-vate-v0.2/fixtures/status-stale-context.json",
       "sha256": "32464bac060eac870231d0ac4371327836c26a331ab48a57d85f355f4de30ba8"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/fixtures/status-stale-just-over-boundary-context.json",
+      "sha256": "c1012bedf2d6e0c8d7f0584c239dacd2c7e1ab5d98ea845573f630148cccdf31"
     },
     {
       "path": "examples/a2a/metadata-admission-issued.json",
@@ -1541,6 +1687,10 @@
       "sha256": "c6ebeade970a3b3528637bc4089b326778e84c0ed8f4b34e0586f72b1fbacdda"
     },
     {
+      "path": "examples/jose/jose-detached-runtime-attestation-es384-not-allowed.example.json",
+      "sha256": "d663e92e154cf7484e3fa8bd48412b33778dbd9f796555c83531577ceec93029"
+    },
+    {
       "path": "examples/jose/jose-detached-runtime-attestation-hs256-downgrade.example.json",
       "sha256": "47779b023ac63d5036659816344f3193c41e5db2fd41acd58c7f5b6871304aaf"
     },
@@ -1609,12 +1759,20 @@
       "sha256": "1104a2652d359801f4e3f46e6e1bcea50dc0d03a724211ed4595b342c4a0f34c"
     },
     {
+      "path": "examples/receipts/admission-deny-attenuation-negative-amount.example.json",
+      "sha256": "0b71171c03d4e7096815e957e7fd8a8bb02d6ec1911930fb0bb34bf7f9dca075"
+    },
+    {
       "path": "examples/receipts/admission-deny-attenuation-unsafe-path.example.json",
       "sha256": "c2bd1215e7298106acc22c86e5eb6b6dc7c5115986169b1ba46124f333dee5ee"
     },
     {
       "path": "examples/receipts/admission-deny-audience-mismatch.example.json",
       "sha256": "618b22cafb1901ea359b7916fd0e739d91b851c22cc0d47dab391644c941a332"
+    },
+    {
+      "path": "examples/receipts/admission-deny-digest-mismatch-before-policy.example.json",
+      "sha256": "468538971188da8fa757b92889faafa3674aa8cc4040a81c3e243075f3525f96"
     },
     {
       "path": "examples/receipts/admission-deny-digest-mismatch.example.json",
@@ -1635,6 +1793,10 @@
     {
       "path": "examples/receipts/admission-deny-jose-crit-unsupported.example.json",
       "sha256": "509931ec417f24fa31cb5c3a2375f9d1ae83407f7d824fa502f2608a463b6f73"
+    },
+    {
+      "path": "examples/receipts/admission-deny-jose-es384-not-allowed.example.json",
+      "sha256": "b0ed6171bf189a4cdbfed58aba75943a19afeff880611d2a40141f05c5111f45"
     },
     {
       "path": "examples/receipts/admission-deny-jose-hs256-downgrade.example.json",
@@ -1669,6 +1831,10 @@
       "sha256": "059dfdf0942980402c74f90a98ed6f284db59cff70cdd4c15ce824288130169a"
     },
     {
+      "path": "examples/receipts/admission-deny-replay-replayed.example.json",
+      "sha256": "3dabce93cc28cf014aec07c2ff8441a8fba2417b2ff4f926e7d5ceb912c51939"
+    },
+    {
       "path": "examples/receipts/admission-deny-runtime-mismatch.example.json",
       "sha256": "00fd45665fc1ac64844265a674aa6ba4c5b0f2ebb9cad3d261e5c59a9175397a"
     },
@@ -1683,6 +1849,10 @@
     {
       "path": "examples/receipts/admission-deny-status-revoked.example.json",
       "sha256": "195b280719a2696f790e065a39a1d14f5d43fac351a3b72b7d4f2c2403d17b62"
+    },
+    {
+      "path": "examples/receipts/admission-deny-status-stale-just-over-boundary.example.json",
+      "sha256": "66c9890e4c0f833c9007fd9fc0fa3635667e4b7b40436c64e7a022c2dde7b434"
     },
     {
       "path": "examples/receipts/admission-deny-status-stale.example.json",
@@ -1765,11 +1935,11 @@
     "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.2 --out conformance/al2-vate-v0.2/corpus.json"
   },
   "summary": {
-    "artifact_count": 142,
-    "case_count": 53,
+    "artifact_count": 156,
+    "case_count": 58,
     "category_counts": {
       "linkage": 9,
-      "negative": 29,
+      "negative": 34,
       "positive": 15
     }
   },

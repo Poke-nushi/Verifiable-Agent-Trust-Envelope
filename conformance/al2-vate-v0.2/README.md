@@ -35,6 +35,7 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/attenuate-max-amount.json`
 - `cases/attenuate-target-scope.json`
 - `cases/attenuate-requires-new-permit.json`
+- `cases/deny-attenuation-negative-amount.json`
 - `cases/deny-attenuation-unsafe-path.json`
 - `cases/deny-attenuation-max-amount-type-edge.json`
 - `cases/deny-expired-permit.json`
@@ -43,8 +44,10 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/deny-mcp-oauth-overscope.json`
 - `cases/deny-mcp-oauth-upstream-denied.json`
 - `cases/deny-digest-mismatch.json`
+- `cases/deny-digest-mismatch-before-policy.json`
 - `cases/deny-jose-alg-none.json`
 - `cases/deny-jose-hs256-downgrade.json`
+- `cases/deny-jose-es384-not-allowed.json`
 - `cases/deny-jose-crit-unsupported.json`
 - `cases/deny-jose-payload-digest-mismatch.json`
 - `cases/deny-policy-snapshot-mismatch.json`
@@ -61,7 +64,9 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/deny-runtime-proof-stale.json`
 - `cases/deny-status-revoked.json`
 - `cases/deny-status-stale-fail-closed.json`
+- `cases/deny-status-stale-just-over-boundary.json`
 - `cases/deny-replay-detected.json`
+- `cases/deny-replay-state-replayed.json`
 - `cases/interop-ap2-ucp-commerce-evidence.json`
 - `cases/allow-ap2-hnp-preauthorized-mandate.json`
 - `cases/deny-ap2-hnp-stale-mandate.json`

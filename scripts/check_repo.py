@@ -534,6 +534,70 @@ def check_replay_boundary_coverage() -> None:
         raise RuntimeError("replay context checks must reject unknown replay states")
 
 
+def check_p1_5_fixture_coverage() -> None:
+    required_cases = {
+        "deny-status-stale-just-over-boundary": ["STATUS_STALE", "FAIL_CLOSED"],
+        "deny-replay-state-replayed": ["REPLAY_DETECTED", "FAIL_CLOSED"],
+        "deny-digest-mismatch-before-policy": ["DIGEST_MISMATCH", "FAIL_CLOSED"],
+        "deny-jose-es384-not-allowed": ["ALG_NOT_ALLOWED", "FAIL_CLOSED"],
+        "deny-attenuation-negative-amount": ["SCHEMA_INVALID", "FAIL_CLOSED"],
+    }
+    case_dir = ROOT / "conformance" / "al2-vate-v0.2" / "cases"
+    for case_id, expected_reason_codes in required_cases.items():
+        case_path = case_dir / f"{case_id}.json"
+        if not case_path.exists():
+            raise RuntimeError(f"P1.5 fixture coverage is missing {case_id}")
+        case = json.loads(case_path.read_text(encoding="utf-8"))
+        if case.get("case_id") != case_id:
+            raise RuntimeError(f"{case_path.relative_to(ROOT)} has mismatched case_id")
+        expected = case.get("expected", {})
+        if expected.get("admission_decision") != "deny":
+            raise RuntimeError(f"{case_id} must be a deny case")
+        if expected.get("should_execute") is not False:
+            raise RuntimeError(f"{case_id} must set expected.should_execute to false")
+        if expected.get("reason_codes") != expected_reason_codes:
+            raise RuntimeError(f"{case_id} must use reason_codes {expected_reason_codes}")
+
+    status_case = json.loads((case_dir / "deny-status-stale-just-over-boundary.json").read_text(encoding="utf-8"))
+    status_context = json.loads((ROOT / status_case["artifacts"]["status_context"]).read_text(encoding="utf-8"))
+    checked_at = datetime.fromisoformat(status_context["checked_at"].replace("Z", "+00:00"))
+    source_issued_at = datetime.fromisoformat(status_context["source_issued_at"].replace("Z", "+00:00"))
+    if (checked_at - source_issued_at).total_seconds() != status_context["max_age_seconds"] + 1:
+        raise RuntimeError("deny-status-stale-just-over-boundary must be exactly one second beyond max_age_seconds")
+
+    replay_case = json.loads((case_dir / "deny-replay-state-replayed.json").read_text(encoding="utf-8"))
+    replay_context = json.loads((ROOT / replay_case["artifacts"]["replay_context"]).read_text(encoding="utf-8"))
+    if replay_context.get("state") != "replayed":
+        raise RuntimeError("deny-replay-state-replayed must exercise an explicit replayed state")
+
+    digest_case = json.loads((case_dir / "deny-digest-mismatch-before-policy.json").read_text(encoding="utf-8"))
+    integrity_checks = digest_case.get("integrity_checks", [])
+    if not integrity_checks or integrity_checks[0].get("expect_match") is not False:
+        raise RuntimeError("deny-digest-mismatch-before-policy must include a failing digest check")
+    if "evaluation order" not in digest_case.get("validation_focus", []):
+        raise RuntimeError("deny-digest-mismatch-before-policy must declare evaluation-order focus")
+
+    jose_case = json.loads((case_dir / "deny-jose-es384-not-allowed.json").read_text(encoding="utf-8"))
+    jose_checks = jose_case.get("jose_checks", [])
+    if not jose_checks:
+        raise RuntimeError("deny-jose-es384-not-allowed must include a jose_checks entry")
+    jose_check = jose_checks[0]
+    proof_package = jose_check.get("proof_package")
+    if not isinstance(proof_package, str) or proof_package not in jose_case.get("artifacts", {}):
+        raise RuntimeError("deny-jose-es384-not-allowed must reference a JOSE proof package artifact")
+    jose_proof = json.loads((ROOT / jose_case["artifacts"][proof_package]).read_text(encoding="utf-8"))
+    if jose_proof.get("protected", {}).get("alg") != "ES384":
+        raise RuntimeError("deny-jose-es384-not-allowed must exercise protected alg ES384")
+    if jose_check.get("expected_failure_reason") != "ALG_NOT_ALLOWED":
+        raise RuntimeError("deny-jose-es384-not-allowed must fail with ALG_NOT_ALLOWED")
+
+    attenuation_case = json.loads((case_dir / "deny-attenuation-negative-amount.json").read_text(encoding="utf-8"))
+    attenuation = json.loads((ROOT / attenuation_case["artifacts"]["bad_attenuation"]).read_text(encoding="utf-8"))
+    amount = attenuation.get("effective_constraints", {}).get("max_amount", {}).get("value")
+    if not isinstance(amount, str) or not amount.startswith("-"):
+        raise RuntimeError("deny-attenuation-negative-amount must exercise a negative max_amount value")
+
+
 def main() -> int:
     validate_examples()
     check_evidence_vocabulary_registry()
@@ -542,6 +606,7 @@ def main() -> int:
     check_transport_bound_fixture_coverage()
     check_status_freshness_boundary_coverage()
     check_replay_boundary_coverage()
+    check_p1_5_fixture_coverage()
     run([sys.executable, "-m", "py_compile", str(DEMO)])
     run([sys.executable, "-m", "py_compile", str(HTTP_DEMO)])
     run([sys.executable, "-m", "py_compile", str(VATE_CONFORMANCE)])

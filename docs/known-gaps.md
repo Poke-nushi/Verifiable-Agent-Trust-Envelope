@@ -183,18 +183,22 @@ profile.
 
 Remaining work includes:
 
-- additional boundary fixtures for status freshness and replay behavior; the
-  exact status freshness max-age boundary is covered by
-  `allow-status-fresh-at-boundary`, and the unused replay-key boundary is
-  covered by `allow-replay-state-unused`
+- more transport-specific status and replay adapters; the corpus now covers the
+  exact status freshness max-age boundary with `allow-status-fresh-at-boundary`,
+  the one-second-over stale boundary with
+  `deny-status-stale-just-over-boundary`, unused replay state with
+  `allow-replay-state-unused`, consumed replay state with `deny-replay-detected`,
+  and explicit replayed state with `deny-replay-state-replayed`
 - more explicit evaluation-order fixtures showing that malformed proof, replay,
   and digest mismatch fail closed before policy or attenuation can allow
-  execution; the first stale runtime proof fixture is
-  `deny-runtime-proof-stale`
-- more algorithm-confusion fixtures beyond `alg=none`; the first
-  symmetric/asymmetric downgrade fixture is `deny-jose-hs256-downgrade`
-- more attenuation boundary fixtures beyond the initial unsafe-path and
-  max-amount type-edge cases
+  execution; the current evaluation-order coverage includes
+  `deny-runtime-proof-stale` and `deny-digest-mismatch-before-policy`
+- more production-signature algorithm-confusion fixtures; the current
+  byte-level JOSE coverage includes `deny-jose-alg-none`,
+  `deny-jose-hs256-downgrade`, and `deny-jose-es384-not-allowed`
+- more domain-specific attenuation boundary fixtures; the current boundary
+  coverage includes unsafe path, max-amount type edge, and negative max-amount
+  cases
 
 ### 15. Evidence Type Vocabulary Needs Wider Implementation Coverage
 

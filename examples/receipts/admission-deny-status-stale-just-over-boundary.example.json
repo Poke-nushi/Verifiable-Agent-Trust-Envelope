@@ -1,0 +1,50 @@
+{
+  "version": "vate-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-20260701-status-stale-boundary-001",
+  "issued_at": "2026-07-01T00:05:08Z",
+  "expires_at": "2026-07-01T00:15:08Z",
+  "verifier": {
+    "id": "did:web:verifier.example"
+  },
+  "request": {
+    "request_id": "areq-20260701-status-stale-boundary-001",
+    "transaction_id": "txn-20260701-status-stale-boundary-001",
+    "action": "crm.case.update",
+    "input_hash": "sha-256:status-stale-boundary-input"
+  },
+  "subject": {
+    "principal": "did:web:user.example",
+    "actor": "did:web:agent.example",
+    "runtime": "spiffe://agent.example/workload/case-agent"
+  },
+  "evidence": [
+    {
+      "type": "status_bundle",
+      "uri": "https://status.example/bundles/status-stale-boundary-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "status-stale-boundary-digest"
+      },
+      "verification": {
+        "result": "stale",
+        "checked_at": "2026-07-01T00:05:01Z",
+        "method": "status-freshness-check",
+        "failure_reason": "Status evidence was one second older than the AL2 freshness window."
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "al2-crm-case-update",
+    "policy_version": "2026-07-01.1",
+    "policy_ref": "https://verifier.example/policies/al2-crm-case-update/2026-07-01.1"
+  },
+  "decision": {
+    "outcome": "deny",
+    "reason_codes": [
+      "STATUS_STALE",
+      "FAIL_CLOSED"
+    ]
+  }
+}

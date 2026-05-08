@@ -1,0 +1,21 @@
+{
+  "mode": "narrow",
+  "original_request_hash": "sha-256:negative-amount-original-request",
+  "effective_request_hash": "sha-256:negative-amount-effective-request",
+  "changes": [
+    {
+      "op": "replace",
+      "path": "/constraints/max_amount/value",
+      "from": "120.00",
+      "to": "-1.00",
+      "reason_code": "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+    }
+  ],
+  "effective_constraints": {
+    "max_amount": {
+      "currency": "USD",
+      "value": "-1.00"
+    }
+  },
+  "require_new_permit": false
+}
