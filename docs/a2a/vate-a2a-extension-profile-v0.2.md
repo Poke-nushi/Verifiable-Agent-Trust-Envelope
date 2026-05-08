@@ -121,6 +121,8 @@ The object contains:
 - optional `expires_at`
 - optional `policy_snapshot` reference
 - optional `evidence_refs`
+- optional `extensions` for registered or deployment-specific extension data
+- optional `annotations` for non-normative debugging or review data
 
 The profile currently defines three phases:
 
@@ -147,6 +149,11 @@ discovery metadata, but it is not enough for AL2 conformance-facing evidence.
 The digest covers the referenced artifact bytes or the profile-defined
 canonical JSON byte basis. It does not cover a mutable URL label or a human
 description of the artifact.
+
+The v0.2 A2A metadata schema keeps the core object closed. Future or
+deployment-specific data belongs under explicit `extensions` or `annotations`
+fields, not beside normative fields. Unknown extension data must not grant
+authority unless a profile registers and validates it.
 
 ## Receipt Phases
 

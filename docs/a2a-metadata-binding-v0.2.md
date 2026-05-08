@@ -79,10 +79,15 @@ The object should contain:
 - `issuer`
 - `issued_at`
 - `expires_at` when the reference is time-bound
+- optional `extensions` for explicitly separated extension data
+- optional `annotations` for non-normative debugging or review data
 
 The metadata object should not contain the full receipt body by default.
 It should also avoid carrying policy semantics directly.
 When audit traceability requires the concrete policy basis, use an optional digest-bound `policy_snapshot` reference rather than embedding policy rules in A2A metadata.
+The v0.2 metadata schema closes the core object; future fields should live under
+explicit `extensions` or `annotations` rather than appearing beside normative
+fields.
 
 ## Phase Values
 
