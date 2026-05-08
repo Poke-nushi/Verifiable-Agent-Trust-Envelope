@@ -248,6 +248,63 @@
         "additionalProperties": true
       }
     },
+    "linkage_checks": {
+      "type": "array",
+      "description": "Post-execution linkage checks that bind an execution receipt back to the admitted request, decision, runtime, time window, and side-effect boundaries.",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "reason_code"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "admission_digest",
+              "admission_executable",
+              "admission_time_window",
+              "effective_constraints",
+              "effective_request_hash",
+              "path_match",
+              "policy_violation",
+              "runtime",
+              "transaction_id"
+            ]
+          },
+          "reason_code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "artifact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "admission_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "post_execution_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expect_match": {
+            "type": "boolean"
+          },
+          "expect_valid": {
+            "type": "boolean"
+          },
+          "expect_present": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
     "attenuation_checks": {
       "type": "array",
       "description": "Checks that an attenuation object is valid or invalid under the AL2 attenuation boundary rules.",
@@ -449,6 +506,9 @@
         ]
       },
       "then": {
+        "required": [
+          "linkage_checks"
+        ],
         "properties": {
           "expected": {
             "required": [

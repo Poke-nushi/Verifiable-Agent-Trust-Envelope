@@ -11,16 +11,24 @@
   },
   "linkage_checks": [
     {
+      "kind": "effective_request_hash",
       "admission_path": "attenuation.effective_request_hash",
       "post_execution_path": "execution.effective_request_hash",
-      "expect_match": false
+      "expect_match": false,
+      "reason_code": "POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH"
+    },
+    {
+      "kind": "policy_violation",
+      "value": "effective_request_hash_mismatch",
+      "expect_present": true,
+      "reason_code": "POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH"
     }
   ],
   "expected": {
     "post_execution_outcome": "failed",
     "should_execute": true,
     "reason_codes": [
-      "POST_EXEC_LINKAGE_MISMATCH"
+      "POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH"
     ],
     "checks": [
       {

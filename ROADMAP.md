@@ -40,7 +40,7 @@ adding new adjacent profiles.
   corpus cases require proof provenance
 - [x] add report-bundle verification for the corpus, SUT result, conformance report,
   and implementation report digest chain
-- [ ] formalize post-execution `linkage_checks` as part of the case contract and
+- [x] formalize post-execution `linkage_checks` as part of the case contract and
   stop collapsing materially different linkage failures into one reason
 - [ ] bind AL2 context checks to request, transaction, evidence, and receipt
   artifacts so external SUT comparison can evaluate freshness, replay, and

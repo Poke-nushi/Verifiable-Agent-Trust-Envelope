@@ -104,6 +104,9 @@ block. For the AL2 v0.2 corpus:
 - `jose_checks` bind detached JWS fixture bytes before production signature
   verification
 - `attenuation_checks` validate machine-readable attenuation boundaries
+- `linkage_checks` bind post-execution receipts to admission digest,
+  transaction, runtime, effective request hash, validity window, and side-effect
+  constraints
 - `al2_context_checks` validate minimum freshness, replay, and binding context
 - evidence vocabulary checks require canonical generic `type` values and
   registered protocol hints on admission request references and receipt evidence

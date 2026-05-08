@@ -75,7 +75,11 @@ The `effective_request_hash` should match the request admitted by the admission 
 For the AL2 conformance corpus, post-execution linkage also binds the admission
 receipt digest, admission decision, transaction id, runtime id, admission expiry,
 and attenuated effective constraints. A mismatch on any of those fields is
-reported as `POST_EXEC_LINKAGE_MISMATCH`.
+reported with the most specific applicable post-execution reason code, such as
+`POST_EXEC_ADMISSION_DIGEST_MISMATCH`,
+`POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH`, `POST_EXEC_RUNTIME_MISMATCH`, or
+`POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED`. `POST_EXEC_LINKAGE_MISMATCH` remains
+a generic fallback for older or underspecified fixtures.
 
 An attenuated admission receipt can still be non-executable. In particular,
 `attenuation.require_new_permit: true` means the verifier found a narrower or

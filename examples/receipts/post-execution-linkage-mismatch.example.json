@@ -13,14 +13,14 @@
     "uri": "https://verifier.example/vate/admission-receipts/admrec-20260504-attenuate-001",
     "digest": {
       "alg": "sha-256",
-      "value": "base64url-admission-receipt-digest"
+      "value": "63b7b3c8e7209994eecaa44b2618c7530b74b38f63487312e193a9b4f7ec3997"
     },
     "decision": "attenuate"
   },
   "execution": {
     "transaction_id": "txn-20260504-001",
-    "started_at": "2026-07-01T00:12:02Z",
-    "finished_at": "2026-07-01T00:12:28Z",
+    "started_at": "2026-05-04T03:01:02Z",
+    "finished_at": "2026-05-04T03:02:28Z",
     "effective_request_hash": "sha-256:unexpected-effective-request-digest",
     "runtime": "spiffe://agent.example/workload/purchase-agent"
   },

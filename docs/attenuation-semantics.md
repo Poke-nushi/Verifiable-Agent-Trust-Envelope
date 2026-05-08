@@ -36,7 +36,9 @@ Each change SHOULD include:
 `effective_request_hash` identifies the authority the verifier admitted after narrowing.
 
 The post-execution receipt MUST link to the admitted effective request hash.
-If post-execution evidence references the original request hash or a different effective request hash, the verifier or auditor SHOULD return `POST_EXEC_LINKAGE_MISMATCH`.
+If post-execution evidence references the original request hash or a different
+effective request hash, the verifier or auditor SHOULD return
+`POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH`.
 
 ## Common Modes
 

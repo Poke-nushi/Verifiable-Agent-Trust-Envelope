@@ -13,7 +13,7 @@
     "post_execution_outcome": "failed",
     "should_execute": false,
     "reason_codes": [
-      "POST_EXEC_LINKAGE_MISMATCH"
+      "POST_EXEC_ADMISSION_DENIED"
     ],
     "checks": [
       {
@@ -29,5 +29,18 @@
   "validation_focus": [
     "post-execution linkage",
     "denied admission cannot execute"
+  ],
+  "linkage_checks": [
+    {
+      "kind": "admission_executable",
+      "expect_valid": false,
+      "reason_code": "POST_EXEC_ADMISSION_DENIED"
+    },
+    {
+      "kind": "policy_violation",
+      "value": "admission_was_denied",
+      "expect_present": true,
+      "reason_code": "POST_EXEC_ADMISSION_DENIED"
+    }
   ]
 }

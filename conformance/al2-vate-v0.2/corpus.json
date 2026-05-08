@@ -880,7 +880,7 @@
       "category": "linkage",
       "expected_outcome": "failed",
       "expected_reason_codes": [
-        "POST_EXEC_LINKAGE_MISMATCH"
+        "POST_EXEC_ADMISSION_DIGEST_MISMATCH"
       ],
       "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/post-execution-admission-digest-mismatch.json",
@@ -899,7 +899,7 @@
       "category": "linkage",
       "expected_outcome": "failed",
       "expected_reason_codes": [
-        "POST_EXEC_LINKAGE_MISMATCH"
+        "POST_EXEC_ADMISSION_EXPIRED"
       ],
       "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/post-execution-after-admission-expiry.json",
@@ -918,7 +918,7 @@
       "category": "linkage",
       "expected_outcome": "failed",
       "expected_reason_codes": [
-        "POST_EXEC_LINKAGE_MISMATCH"
+        "POST_EXEC_ADMISSION_DENIED"
       ],
       "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.2/cases/post-execution-after-deny.json",
@@ -960,7 +960,7 @@
       "category": "linkage",
       "expected_outcome": "failed",
       "expected_reason_codes": [
-        "POST_EXEC_LINKAGE_MISMATCH"
+        "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
       ],
       "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/post-execution-effective-constraints-exceeded.json",
@@ -980,7 +980,7 @@
       "category": "linkage",
       "expected_outcome": "failed",
       "expected_reason_codes": [
-        "POST_EXEC_LINKAGE_MISMATCH"
+        "POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH"
       ],
       "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/post-execution-linkage-mismatch.json",
@@ -1023,7 +1023,7 @@
       "category": "linkage",
       "expected_outcome": "failed",
       "expected_reason_codes": [
-        "POST_EXEC_LINKAGE_MISMATCH"
+        "POST_EXEC_RUNTIME_MISMATCH"
       ],
       "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/post-execution-runtime-mismatch.json",
@@ -1042,7 +1042,7 @@
       "category": "linkage",
       "expected_outcome": "failed",
       "expected_reason_codes": [
-        "POST_EXEC_LINKAGE_MISMATCH"
+        "POST_EXEC_TRANSACTION_MISMATCH"
       ],
       "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.2/cases/post-execution-transaction-mismatch.json",
@@ -1056,7 +1056,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "620c739ee32d6386d505f952724465f623e8c045e5243a5ff2669d73f45bee59"
+    "value": "11255d7bed1d26b1e175205a9b5da59a73b611db62f7953af4c4ff0308d0daff"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -1237,43 +1237,43 @@
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-admission-digest-mismatch.json",
-      "sha256": "e058927cf7797a39cc43a43c71d84d3f4ca26af0ca75479575479bd870dc91ec"
+      "sha256": "fdd684d34adbf9727ff5c7a117e915696b35bb35c1e05609a8953594cc8ed767"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-after-admission-expiry.json",
-      "sha256": "d89a9da47bd2ecc2f4115a145d3a30f0442a7bbe76831e5402c978927140e506"
+      "sha256": "70be8f4574bdc9853fb3640f28ca2430c59ae33e2cfc38001b5031ba98488494"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-after-deny.json",
-      "sha256": "32fb9aff72b7551d1bcf3020230e4f40896def3b825c861fcd05bea6fdcc33d1"
+      "sha256": "ffe65cc65bb865ec5784406e84fe6d54084040a49d84bcd4434e255e323be803"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-ap2-hnp-linkage-success.json",
-      "sha256": "3e89edc2dffed5b4ddbdb1b0cb7c2dce497eb08baaa286395c50c668a69ef9c4"
+      "sha256": "4d619122365abbc2a005d79ac342d2347a363c73ebd17bbc14833f521e88af7e"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-effective-constraints-exceeded.json",
-      "sha256": "f63fad63fd3f3541729787a36c3de18d984b6309ade8e2f1ddaedd41a8444091"
+      "sha256": "0e0aedfdc5ea3956d15d8ae1a2e3f6488fc320d8f4d7ea23248487ef78d1dd34"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-linkage-mismatch.json",
-      "sha256": "56293504f3887e436dc8c42263f60bee83a7d7308cfaa0da7b2211241016e94b"
+      "sha256": "bde8f0ff7c5d26156843340570fbcedee78985999f2580de42764ae3539e8dd6"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-linkage-success.json",
-      "sha256": "9dec0817b769d61e1ec21ab5101a6236b084ec29d5eb0a10efb27777a83a29ba"
+      "sha256": "a3afbfec625e4c5194c99d19e5248cd43deda18675b3751cf27fde8de7498767"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-runtime-mismatch.json",
-      "sha256": "9f884a3b6186b4869c95935a65b9f27c2c88ee10df50076a66ff235aac31aa30"
+      "sha256": "d8c5942885820b3b121fdb899c5e4895a77258f8664a07398c93a7e8d25c89a6"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-transaction-mismatch.json",
-      "sha256": "2387e3d42e50b07659ba810b3d41030853bc2fe89571924f205209663c7d4e81"
+      "sha256": "cda31139df8847571a9591be386f7ee7b6079a8d55c9dcd42ee2dc5c4bb374a7"
     },
     {
       "path": "conformance/al2-vate-v0.2/conformance-case.schema.json",
-      "sha256": "c86349da785501ab384cc93bef3a9d1a4a6f2fb749c377f8ec5d316191d9500f"
+      "sha256": "09e369d909eda018d0f415c43da39b91b1aaf1527969ad9a56342981f0c4ed63"
     },
     {
       "path": "conformance/al2-vate-v0.2/fixtures/attenuation-max-amount-type-edge.json",
@@ -1573,7 +1573,7 @@
     },
     {
       "path": "examples/receipts/post-execution-linkage-mismatch.example.json",
-      "sha256": "07d6844fed65dbd2206a5aa98ac2e904aff2ee5dd1ca72a89ec8173882d82528"
+      "sha256": "7336a4b9d04c03339debc427847fd33c052b576b6192a23cb0ab78b7c9fa728e"
     },
     {
       "path": "examples/receipts/post-execution-runtime-mismatch.example.json",

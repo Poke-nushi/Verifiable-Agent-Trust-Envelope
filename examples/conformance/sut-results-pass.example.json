@@ -2,7 +2,7 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "620c739ee32d6386d505f952724465f623e8c045e5243a5ff2669d73f45bee59"
+      "value": "11255d7bed1d26b1e175205a9b5da59a73b611db62f7953af4c4ff0308d0daff"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.2"
   },
@@ -1477,7 +1477,7 @@
       ],
       "outcome": "failed",
       "reason_codes": [
-        "POST_EXEC_LINKAGE_MISMATCH"
+        "POST_EXEC_ADMISSION_DIGEST_MISMATCH"
       ],
       "should_execute": true,
       "status": "completed"
@@ -1514,7 +1514,7 @@
       ],
       "outcome": "failed",
       "reason_codes": [
-        "POST_EXEC_LINKAGE_MISMATCH"
+        "POST_EXEC_ADMISSION_EXPIRED"
       ],
       "should_execute": true,
       "status": "completed"
@@ -1551,7 +1551,7 @@
       ],
       "outcome": "failed",
       "reason_codes": [
-        "POST_EXEC_LINKAGE_MISMATCH"
+        "POST_EXEC_ADMISSION_DENIED"
       ],
       "should_execute": false,
       "status": "completed"
@@ -1635,7 +1635,7 @@
       ],
       "outcome": "failed",
       "reason_codes": [
-        "POST_EXEC_LINKAGE_MISMATCH"
+        "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
       ],
       "should_execute": true,
       "status": "completed"
@@ -1653,7 +1653,7 @@
         "post_execution_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "07d6844fed65dbd2206a5aa98ac2e904aff2ee5dd1ca72a89ec8173882d82528"
+            "value": "7336a4b9d04c03339debc427847fd33c052b576b6192a23cb0ab78b7c9fa728e"
           },
           "media_type": "application/vate-post-execution-receipt+json",
           "uri": "examples/receipts/post-execution-linkage-mismatch.example.json"
@@ -1672,7 +1672,7 @@
       ],
       "outcome": "failed",
       "reason_codes": [
-        "POST_EXEC_LINKAGE_MISMATCH"
+        "POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH"
       ],
       "should_execute": true,
       "status": "completed"
@@ -1756,7 +1756,7 @@
       ],
       "outcome": "failed",
       "reason_codes": [
-        "POST_EXEC_LINKAGE_MISMATCH"
+        "POST_EXEC_RUNTIME_MISMATCH"
       ],
       "should_execute": true,
       "status": "completed"
@@ -1793,7 +1793,7 @@
       ],
       "outcome": "failed",
       "reason_codes": [
-        "POST_EXEC_LINKAGE_MISMATCH"
+        "POST_EXEC_TRANSACTION_MISMATCH"
       ],
       "should_execute": true,
       "status": "completed"

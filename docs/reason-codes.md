@@ -69,6 +69,13 @@ Implementations MAY include additional profile-specific reason codes, but the ca
 - `POLICY_DENIED` - local verifier policy denied the request
 - `POLICY_SNAPSHOT_MISMATCH` - policy snapshot digest did not match the referenced policy basis
 - `POST_EXEC_LINKAGE_MISMATCH` - post-execution receipt did not link to the admitted effective request
+- `POST_EXEC_ADMISSION_DIGEST_MISMATCH` - post-execution receipt referenced an admission receipt digest that did not match the admitted receipt artifact
+- `POST_EXEC_ADMISSION_DENIED` - post-execution evidence attempted to link execution to an admission decision that denied execution
+- `POST_EXEC_ADMISSION_EXPIRED` - execution started outside the admitted receipt validity window
+- `POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED` - observed side effects exceeded the admitted effective constraints
+- `POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH` - observed execution did not use the admitted effective request hash
+- `POST_EXEC_RUNTIME_MISMATCH` - observed execution runtime did not match the admitted runtime binding
+- `POST_EXEC_TRANSACTION_MISMATCH` - observed execution transaction did not match the admitted transaction binding
 
 ### Fail Closed
 

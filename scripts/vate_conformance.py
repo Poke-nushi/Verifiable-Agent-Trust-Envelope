@@ -484,11 +484,26 @@ def actual_should_execute(admission_receipt: dict[str, Any] | None) -> bool:
     return outcome in {"allow", "attenuate"}
 
 
+def append_unique(items: list[str], item: str) -> None:
+    if item not in items:
+        items.append(item)
+
+
 def actual_linkage_reason_codes(
+    case: dict[str, Any],
     admission_receipt: dict[str, Any] | None,
     post_execution_receipt: dict[str, Any] | None,
 ) -> list[str]:
-    if post_execution_linkage_failures(admission_receipt, post_execution_receipt):
+    violation_codes: list[str] = []
+    for check in case.get("linkage_checks", []):
+        violation, failure = linkage_check_violation(case, check, admission_receipt, post_execution_receipt)
+        reason_code = check.get("reason_code")
+        if (violation or failure) and isinstance(reason_code, str) and reason_code:
+            append_unique(violation_codes, reason_code)
+    if violation_codes:
+        return violation_codes
+
+    if not case.get("linkage_checks") and post_execution_linkage_failures(admission_receipt, post_execution_receipt):
         return ["POST_EXEC_LINKAGE_MISMATCH"]
 
     codes = ["ADMISSION_RECEIPT_LINKED", "EFFECTIVE_REQUEST_HASH_MATCH"]
@@ -599,6 +614,91 @@ def post_execution_side_effect_failures(
         if Decimal(str(value)) > max_decimal:
             failures.append(f"side_effects[{index}].amount exceeds admitted max_amount")
     return failures
+
+
+def admission_executable_for_post_execution(admission_receipt: dict[str, Any]) -> bool:
+    admission_decision = actual_decision(admission_receipt)
+    if admission_decision not in {"allow", "attenuate"}:
+        return False
+    return not (
+        admission_decision == "attenuate"
+        and admission_receipt.get("attenuation", {}).get("require_new_permit") is True
+    )
+
+
+def admission_time_window_valid(
+    admission_receipt: dict[str, Any],
+    post_execution_receipt: dict[str, Any],
+) -> tuple[bool, str | None]:
+    execution = post_execution_receipt.get("execution", {})
+    if not isinstance(execution, dict):
+        return False, "execution block missing"
+    started_at = try_parse_time(execution.get("started_at"))
+    finished_at = try_parse_time(execution.get("finished_at"))
+    admission_issued_at = try_parse_time(admission_receipt.get("issued_at"))
+    admission_expires_at = try_parse_time(admission_receipt.get("expires_at"))
+    if started_at is None or finished_at is None:
+        return False, "execution timestamps must be valid"
+    if finished_at < started_at:
+        return False, "execution finished before it started"
+    if admission_issued_at is not None and started_at < admission_issued_at:
+        return False, "execution started before admission was issued"
+    if admission_expires_at is not None and started_at > admission_expires_at:
+        return False, "execution started after admission expiry"
+    return True, None
+
+
+def linkage_check_violation(
+    case: dict[str, Any],
+    check: dict[str, Any],
+    admission: dict[str, Any] | None,
+    post_execution: dict[str, Any] | None,
+) -> tuple[bool, str | None]:
+    if admission is None or post_execution is None:
+        return True, "admission or post-execution artifact missing"
+
+    kind = check.get("kind")
+    try:
+        if kind in {"transaction_id", "runtime", "effective_request_hash", "path_match"}:
+            left = get_path(admission, check["admission_path"])
+            right = get_path(post_execution, check["post_execution_path"])
+            return left != right, None
+        if kind == "admission_digest":
+            artifact_name = check.get("artifact", "admission_receipt")
+            artifact = read_json(resolve_artifact_path(case, artifact_name))
+            expected_digest = {"alg": "sha-256", "value": sha256_value(artifact)}
+            actual_digest = get_path(post_execution, check.get("post_execution_path", "admission.digest"))
+            return actual_digest != expected_digest, None
+        if kind == "admission_executable":
+            return not admission_executable_for_post_execution(admission), None
+        if kind == "admission_time_window":
+            valid, failure = admission_time_window_valid(admission, post_execution)
+            if failure in {"execution block missing", "execution timestamps must be valid"}:
+                return not valid, failure
+            return not valid, None
+        if kind == "effective_constraints":
+            return bool(post_execution_side_effect_failures(admission, post_execution)), None
+        if kind == "policy_violation":
+            violations = post_execution.get("result", {}).get("policy_violations", [])
+            if not isinstance(violations, list):
+                return True, "policy_violations must be an array"
+            expected_value = check.get("value")
+            if not isinstance(expected_value, str) or not expected_value:
+                return True, "policy_violation check requires value"
+            return expected_value in violations, None
+    except (KeyError, IndexError, TypeError, ValueError) as exc:
+        return True, f"{kind} linkage check path missing: {exc}"
+    return True, f"unsupported linkage check kind {kind}"
+
+
+def expected_linkage_violation(check: dict[str, Any]) -> bool:
+    if "expect_match" in check:
+        return not bool(check.get("expect_match"))
+    if "expect_valid" in check:
+        return not bool(check.get("expect_valid"))
+    if "expect_present" in check:
+        return bool(check.get("expect_present"))
+    return False
 
 
 def expected_outcome(case: dict[str, Any]) -> str:
@@ -942,16 +1042,16 @@ def evaluate_linkage_checks(
     post_execution: dict[str, Any] | None,
 ) -> list[str]:
     failures: list[str] = []
-    for check in case.get("linkage_checks", []):
-        if admission is None or post_execution is None:
-            failures.append("linkage: admission or post-execution artifact missing")
-            continue
-        left = get_path(admission, check["admission_path"])
-        right = get_path(post_execution, check["post_execution_path"])
-        matched = left == right
-        expect_match = bool(check.get("expect_match", True))
-        if matched != expect_match:
-            failures.append(f"linkage: expected match={expect_match} actual match={matched}")
+    for index, check in enumerate(case.get("linkage_checks", [])):
+        violation, failure = linkage_check_violation(case, check, admission, post_execution)
+        if failure:
+            failures.append(f"linkage[{index}] {check.get('kind', 'unknown')}: {failure}")
+        expected_violation = expected_linkage_violation(check)
+        if violation != expected_violation:
+            failures.append(
+                f"linkage[{index}] {check.get('kind', 'unknown')}: "
+                f"expected violation={expected_violation} actual violation={violation}"
+            )
     return failures
 
 
@@ -1229,7 +1329,7 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
 
     expected_codes = [str(code) for code in case["expected"]["reason_codes"]]
     if case["category"] == "linkage":
-        actual_codes = actual_linkage_reason_codes(admission, post_execution)
+        actual_codes = actual_linkage_reason_codes(case, admission, post_execution)
     else:
         actual_codes = actual_reason_codes(admission)
     expected = expected_outcome(case)

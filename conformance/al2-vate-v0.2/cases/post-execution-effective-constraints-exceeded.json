@@ -13,7 +13,7 @@
     "post_execution_outcome": "failed",
     "should_execute": true,
     "reason_codes": [
-      "POST_EXEC_LINKAGE_MISMATCH"
+      "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
     ],
     "checks": [
       {
@@ -30,5 +30,18 @@
     "post-execution linkage",
     "effective constraints",
     "side-effect boundary"
+  ],
+  "linkage_checks": [
+    {
+      "kind": "effective_constraints",
+      "expect_valid": false,
+      "reason_code": "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
+    },
+    {
+      "kind": "policy_violation",
+      "value": "effective_constraints_exceeded",
+      "expect_present": true,
+      "reason_code": "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
+    }
   ]
 }

@@ -74,5 +74,45 @@
     "post-execution receipt linkage",
     "side-effect audit record"
   ],
-  "version": "vate-conformance-0.2"
+  "version": "vate-conformance-0.2",
+  "linkage_checks": [
+    {
+      "kind": "admission_digest",
+      "artifact": "admission_receipt",
+      "post_execution_path": "admission.digest",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_ADMISSION_DIGEST_MISMATCH"
+    },
+    {
+      "kind": "transaction_id",
+      "admission_path": "request.transaction_id",
+      "post_execution_path": "execution.transaction_id",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_TRANSACTION_MISMATCH"
+    },
+    {
+      "kind": "runtime",
+      "admission_path": "subject.runtime",
+      "post_execution_path": "execution.runtime",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_RUNTIME_MISMATCH"
+    },
+    {
+      "kind": "effective_request_hash",
+      "admission_path": "request.input_hash",
+      "post_execution_path": "execution.effective_request_hash",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH"
+    },
+    {
+      "kind": "admission_time_window",
+      "expect_valid": true,
+      "reason_code": "POST_EXEC_ADMISSION_EXPIRED"
+    },
+    {
+      "kind": "effective_constraints",
+      "expect_valid": true,
+      "reason_code": "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
+    }
+  ]
 }

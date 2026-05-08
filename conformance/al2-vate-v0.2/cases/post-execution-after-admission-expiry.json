@@ -13,7 +13,7 @@
     "post_execution_outcome": "failed",
     "should_execute": true,
     "reason_codes": [
-      "POST_EXEC_LINKAGE_MISMATCH"
+      "POST_EXEC_ADMISSION_EXPIRED"
     ],
     "checks": [
       {
@@ -29,5 +29,18 @@
   "validation_focus": [
     "post-execution linkage",
     "admission expiry"
+  ],
+  "linkage_checks": [
+    {
+      "kind": "admission_time_window",
+      "expect_valid": false,
+      "reason_code": "POST_EXEC_ADMISSION_EXPIRED"
+    },
+    {
+      "kind": "policy_violation",
+      "value": "admission_expired_before_execution",
+      "expect_present": true,
+      "reason_code": "POST_EXEC_ADMISSION_EXPIRED"
+    }
   ]
 }
