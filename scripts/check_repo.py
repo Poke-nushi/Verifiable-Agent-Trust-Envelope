@@ -28,6 +28,7 @@ VATE_CONFORMANCE = ROOT / "scripts" / "vate_conformance.py"
 VATE_CORE = ROOT / "reference" / "vate-verifier-core" / "vate_verifier_core.py"
 A2A_ADAPTER = ROOT / "reference" / "a2a-metadata-adapter-demo" / "a2a_metadata_adapter_demo.py"
 EVIDENCE_VOCABULARY = ROOT / "registries" / "evidence-vocabulary.v0.2.json"
+ARTIFACT_VERSIONING_DOC = ROOT / "docs" / "conformance" / "artifact-versioning.md"
 JSON_ONLY_FILES = [
     "reference/a2a-metadata-adapter-demo/agent-card-extension.example.json",
     "examples/a2a/agent-card-v1-vate-extension.example.json",
@@ -358,9 +359,30 @@ def check_evidence_vocabulary_registry() -> None:
         raise RuntimeError("runner accepted an evidence type/protocol hint pair that is not registered")
 
 
+def check_artifact_versioning_docs() -> None:
+    if not ARTIFACT_VERSIONING_DOC.exists():
+        raise RuntimeError(f"missing {ARTIFACT_VERSIONING_DOC.relative_to(ROOT)}")
+    text = ARTIFACT_VERSIONING_DOC.read_text(encoding="utf-8")
+    normalized_text = " ".join(text.split()).lower()
+    required_phrases = [
+        "july 2026 target interop artifact line",
+        "corpus snapshot",
+        "manifest digest",
+        "not the publication date",
+        "not a production-readiness claim",
+        "do not rename",
+    ]
+    missing = [phrase for phrase in required_phrases if phrase not in normalized_text]
+    if missing:
+        raise RuntimeError(
+            f"{ARTIFACT_VERSIONING_DOC.relative_to(ROOT)} is missing artifact versioning language: {missing}"
+        )
+
+
 def main() -> int:
     validate_examples()
     check_evidence_vocabulary_registry()
+    check_artifact_versioning_docs()
     run([sys.executable, "-m", "py_compile", str(DEMO)])
     run([sys.executable, "-m", "py_compile", str(HTTP_DEMO)])
     run([sys.executable, "-m", "py_compile", str(VATE_CONFORMANCE)])

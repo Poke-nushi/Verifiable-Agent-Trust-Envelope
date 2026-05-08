@@ -195,6 +195,8 @@ compatibility claim.
   Trust-bundle checks for issuer, key, algorithm, evidence type, status, and validity windows
 - [docs/conformance/corpus-format.md](docs/conformance/corpus-format.md)
   Language-neutral corpus index and digest rules for non-reference implementations
+- [docs/conformance/artifact-versioning.md](docs/conformance/artifact-versioning.md)
+  Date-stamped conformance artifact versioning rules for the July 2026 target line
 - [docs/conformance/sut-adapter-contract.md](docs/conformance/sut-adapter-contract.md)
   SUT result contract and comparison command for external implementations
 - [docs/profiles/vate-jose-proof-profile-notes-2026-07.md](docs/profiles/vate-jose-proof-profile-notes-2026-07.md)

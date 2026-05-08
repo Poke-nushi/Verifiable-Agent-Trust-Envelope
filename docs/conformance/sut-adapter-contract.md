@@ -22,6 +22,10 @@ This keeps the conformance surface language-neutral while preserving exact expec
 ## SUT Result Shape
 
 A SUT result file records one implementation run against one corpus snapshot.
+The `2026-07` suffix in the current `version` value identifies the target
+interop artifact line, not the date the SUT result was generated. The exact
+corpus snapshot is identified by `corpus.digest`. See
+`docs/conformance/artifact-versioning.md`.
 
 Required top-level fields:
 

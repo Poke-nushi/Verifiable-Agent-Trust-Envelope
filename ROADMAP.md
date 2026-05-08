@@ -53,8 +53,8 @@ adding new adjacent profiles.
   machine-readable source and define allowed type/hint combinations
 - [x] tighten critical report and linkage schema blocks while keeping future
   extension data under explicit extension or annotation fields
-- [ ] clarify whether `2026-07` artifacts are July-target draft artifacts or should
-  be renamed to the current review month
+- [x] clarify that `2026-07` artifacts are a July-target artifact line and should
+  not be renamed to the current review month
 
 ### P1 Before Adjacent Maintainer Outreach
 

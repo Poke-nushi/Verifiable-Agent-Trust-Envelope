@@ -7,6 +7,9 @@ This is a narrow interoperability profile for the `VATE-AL2-Verifier-Admission-v
 It is intended to make conformance fixtures and reference verifier behavior comparable across implementations.
 Passing this profile does not imply production readiness, production endorsement, or any right to make a conformance claim beyond the specific fixture result.
 
+The `2026-07` label identifies the July 2026 target interop artifact line for
+this draft profile. It is not the publication date for this document.
+
 ## Scope
 
 This profile applies only to `AL2` external digital actions:

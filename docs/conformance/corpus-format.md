@@ -7,6 +7,17 @@ This note defines the language-neutral shape of the `VATE AL2 Verifier Admission
 It is an implementation aid, not a production endorsement program.
 It lets non-Python implementations discover cases, resolve artifacts, and publish comparable reports without depending on the reference runner internals.
 
+## Artifact Versioning
+
+The `2026-07` strings in conformance report versions, schema IDs, fixture
+versions, and deterministic fixture timestamps identify the July 2026 target
+interop artifact line. They are not publication dates. Exact corpus snapshots
+are identified by the `corpus.json` manifest digest and the digest fields in
+generated reports.
+
+See `docs/conformance/artifact-versioning.md` for the rule on when to keep or
+change date-stamped conformance artifact identifiers.
+
 ## Corpus Index
 
 Each runnable corpus SHOULD publish a `corpus.json` index at the corpus root.
