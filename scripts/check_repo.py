@@ -508,6 +508,22 @@ def check_status_freshness_boundary_coverage() -> None:
         raise RuntimeError("allow-status-fresh-at-boundary must allow the exact freshness boundary")
 
 
+def check_replay_boundary_coverage() -> None:
+    case_path = ROOT / "conformance" / "al2-vate-v0.2" / "cases" / "allow-replay-state-unused.json"
+    if not case_path.exists():
+        raise RuntimeError(
+            "replay coverage is missing allow-replay-state-unused: AL2 context checks "
+            "must prove that an unused one-time replay key is not treated as replayed."
+        )
+    case = json.loads(case_path.read_text(encoding="utf-8"))
+    context_path = ROOT / case["artifacts"]["replay_context"]
+    context = json.loads(context_path.read_text(encoding="utf-8"))
+    if context.get("state") != "unused":
+        raise RuntimeError("allow-replay-state-unused must exercise an unused replay state")
+    if case.get("expected", {}).get("admission_decision") != "allow":
+        raise RuntimeError("allow-replay-state-unused must allow an unused replay key")
+
+
 def main() -> int:
     validate_examples()
     check_evidence_vocabulary_registry()
@@ -515,6 +531,7 @@ def main() -> int:
     check_post_execution_linkage_kind_coverage()
     check_transport_bound_fixture_coverage()
     check_status_freshness_boundary_coverage()
+    check_replay_boundary_coverage()
     run([sys.executable, "-m", "py_compile", str(DEMO)])
     run([sys.executable, "-m", "py_compile", str(HTTP_DEMO)])
     run([sys.executable, "-m", "py_compile", str(VATE_CONFORMANCE)])

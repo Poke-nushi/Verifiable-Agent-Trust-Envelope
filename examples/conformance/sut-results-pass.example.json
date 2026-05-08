@@ -2,7 +2,7 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "e4c5449e9b560d6cb95a09850334590ca707734081c58714fa9dab15997ca322"
+      "value": "f274da41c63f302dd75f51ed68a4f46f403c6e7eebb8feea4edc1f54e19f40eb"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.2"
   },
@@ -164,6 +164,74 @@
         },
         {
           "name": "evidence[1].protocol_hint",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.result",
+          "pass": true
+        }
+      ],
+      "outcome": "allow",
+      "reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "should_execute": true,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
+            "value": "494ee9af3c773d3c319651ce3574df757450d13199a0c001dfabec1ef89ed593"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-allow-replay-unused.example.json"
+        },
+        "verification_context": [
+          {
+            "case_artifact": "replay_context",
+            "context_bindings": [
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "494ee9af3c773d3c319651ce3574df757450d13199a0c001dfabec1ef89ed593"
+                },
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt"
+              },
+              {
+                "path": "request.transaction_id",
+                "role": "transaction_id",
+                "source_artifact": "admission_receipt",
+                "value": "txn-20260701-replay-unused-001"
+              },
+              {
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "a065fbae4454be98ddde38e38318771ade8e03faffce52f5803193a0028bab46"
+                },
+                "evidence_type": "admission_request",
+                "path": "evidence[0]",
+                "role": "evidence",
+                "source_artifact": "admission_receipt"
+              }
+            ],
+            "digest": {
+              "alg": "sha-256",
+              "value": "8cba4197a4210aa76407c1a0f29836e8cb2ab553bc4c700b426c73199f354eb6"
+            },
+            "kind": "replay",
+            "media_type": "application/json",
+            "uri": "conformance/al2-vate-v0.2/fixtures/replay-unused-context.json"
+          }
+        ]
+      },
+      "case_id": "allow-replay-state-unused",
+      "checks": [
+        {
+          "name": "decision.outcome",
           "pass": true
         },
         {

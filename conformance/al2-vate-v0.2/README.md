@@ -27,6 +27,7 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/allow-valid-admission.json`
 - `cases/allow-valid-basic-external-write.json`
 - `cases/allow-mcp-oauth-transport-bound.json`
+- `cases/allow-replay-state-unused.json`
 - `cases/allow-status-fresh-at-boundary.json`
 - `cases/allow-valid-with-status-fresh.json`
 - `cases/allow-valid-with-policy-snapshot.json`

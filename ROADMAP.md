@@ -80,7 +80,7 @@ adding new adjacent profiles.
   transaction, runtime, denial, expiry, and effective-constraint fixtures added
 - add minimum AL2 verification context for status freshness, replay protection,
   and runtime binding; first `al2_context_checks` fixtures and an exact
-  status-freshness boundary fixture added
+  status-freshness boundary fixture plus an unused replay-key fixture added
 - add an evidence type vocabulary for generic evidence types and
   protocol-specific hints; machine-readable registry, drift checks, and
   type/hint pair checks added
