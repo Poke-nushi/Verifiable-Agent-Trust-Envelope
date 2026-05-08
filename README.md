@@ -1,14 +1,24 @@
 # Verifiable Agent Trust Envelope
 
-[![DOI](https://zenodo.org/badge/1214949350.svg)](https://doi.org/10.5281/zenodo.19839768)
+**Verifier admission receipts for risky agent actions**
 
-**A discussion draft for verifier-side trust / permit / receipt decisions in AI agent systems**
+VATE is a verifier-side profile for deciding and recording whether an external
+AI agent may perform a risky digital action.
+
+It does not replace A2A, MCP, OAuth, OpenID, VC, SPIFFE, AP2, x402, or payment
+mandates.
+
+A2A carries the task.
+MCP, OAuth, AP2, VC, and related systems provide evidence.
+VATE records the verifier decision: `allow`, `attenuate`, or `deny`.
 
 - `v0.1 discussion draft`
 - `v0.2 AL2 verifier admission profile draft`
 - `not production-ready`
 - `no endorsement or production approval implied`
 - `seeking critique on boundary, verifier order, and artifact semantics`
+
+[![DOI](https://zenodo.org/badge/1214949350.svg)](https://doi.org/10.5281/zenodo.19839768)
 
 ## The Problem
 
@@ -29,8 +39,9 @@ It may also need to know:
 - whether current status has narrowed or revoked that authority
 - what receipt should exist after execution
 
-This draft proposes a portable trust envelope for that boundary.
-The current repository makes that boundary concrete through a verifier-centered `AL2` HTTP wedge that evaluates:
+This draft proposes a portable admission-and-receipt layer for that boundary.
+The current repository makes that boundary concrete through a verifier-centered
+`AL2` HTTP wedge that evaluates:
 
 `status -> identity -> runtime -> permit -> policy`
 
@@ -39,16 +50,14 @@ perform structural parsing, digest checks, proof / trust-anchor checks, and
 freshness checks before it treats any input as authoritative or runs expensive
 policy evaluation.
 
-and returns:
-
-`allow / attenuate / deny`
-
-with a machine-readable admission receipt.
+and returns `allow`, `attenuate`, or `deny` with a machine-readable admission
+receipt.
 
 The `v0.2` work keeps that verifier-side boundary but narrows the next deliverable to the [VATE AL2 Verifier Admission Profile v0.2](docs/profiles/vate-al2-verifier-admission-profile-v0.2.md).
 That profile treats A2A, MCP, OAuth, VC, DID, OID4VP, Web Bot Auth, AP2, x402, ACP, and payment-token systems as adjacent layers that can provide evidence.
 VATE defines how a relying party evaluates those inputs before execution and records the decision.
-For A2A reviewers, the shortest maintainer-focused brief is [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md).
+For A2A reviewers, start with the A2A review package in
+[docs/a2a/README.md](docs/a2a/README.md).
 
 ![Where Verifiable Agent Trust Envelope Fits](docs/figures/where-trust-envelope-fits-readme.png)
 
@@ -114,15 +123,17 @@ If you are new to the repo, the fastest path is:
 1. this `README.md`
 2. [docs/v0.2-in-5-minutes.md](docs/v0.2-in-5-minutes.md)
 3. [docs/profiles/vate-al2-verifier-admission-profile-v0.2.md](docs/profiles/vate-al2-verifier-admission-profile-v0.2.md)
-4. [docs/a2a-metadata-binding-v0.2.md](docs/a2a-metadata-binding-v0.2.md)
-5. [docs/a2a-v1-extension-sketch-2026-05.md](docs/a2a-v1-extension-sketch-2026-05.md)
-6. [docs/receipt-model-v0.2.md](docs/receipt-model-v0.2.md)
-7. [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md)
-8. [docs/profiles/vate-al2-admission-interop-profile-2026-07.md](docs/profiles/vate-al2-admission-interop-profile-2026-07.md)
-9. [conformance/al2-vate-v0.2/README.md](conformance/al2-vate-v0.2/README.md)
-10. [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)
-11. section `0` and section `1` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md)
-12. [reference/http-verifier-demo/README.md](reference/http-verifier-demo/README.md)
+4. [docs/a2a/README.md](docs/a2a/README.md)
+5. [docs/a2a/vate-a2a-extension-profile-v0.2.md](docs/a2a/vate-a2a-extension-profile-v0.2.md)
+6. [docs/a2a-metadata-binding-v0.2.md](docs/a2a-metadata-binding-v0.2.md)
+7. [docs/a2a-v1-extension-sketch-2026-05.md](docs/a2a-v1-extension-sketch-2026-05.md)
+8. [docs/receipt-model-v0.2.md](docs/receipt-model-v0.2.md)
+9. [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md)
+10. [docs/profiles/vate-al2-admission-interop-profile-2026-07.md](docs/profiles/vate-al2-admission-interop-profile-2026-07.md)
+11. [conformance/al2-vate-v0.2/README.md](conformance/al2-vate-v0.2/README.md)
+12. [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)
+13. section `0` and section `1` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md)
+14. [reference/http-verifier-demo/README.md](reference/http-verifier-demo/README.md)
 
 If you want the visual system view, see section `11` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md).
 
@@ -179,6 +190,10 @@ compatibility claim.
   Machine-readable attenuation semantics for AL2 conformance
 - [docs/v0.2-in-5-minutes.md](docs/v0.2-in-5-minutes.md)
   Short entry point for the v0.2 draft
+- [docs/a2a/README.md](docs/a2a/README.md)
+  A2A-compatible community profile review package entry point
+- [docs/a2a/vate-a2a-extension-profile-v0.2.md](docs/a2a/vate-a2a-extension-profile-v0.2.md)
+  Consolidated metadata-only A2A extension profile draft for VATE references
 - [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md)
   A2A maintainer-oriented summary of the metadata-only admission and receipt binding
 - [docs/a2a-issue-update-2026-05.md](docs/a2a-issue-update-2026-05.md)
@@ -280,6 +295,8 @@ python3 scripts/check_repo_strict.py
 - [docs/standards-and-ecosystem-landscape-2026-04.md](docs/standards-and-ecosystem-landscape-2026-04.md)
 - [docs/standards-and-ecosystem-landscape-2026-05.md](docs/standards-and-ecosystem-landscape-2026-05.md)
 - [docs/v0.2-in-5-minutes.md](docs/v0.2-in-5-minutes.md)
+- [docs/a2a/README.md](docs/a2a/README.md)
+- [docs/a2a/vate-a2a-extension-profile-v0.2.md](docs/a2a/vate-a2a-extension-profile-v0.2.md)
 - [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md)
 - [docs/release-notes/v0.2.0.md](docs/release-notes/v0.2.0.md)
 - [docs/non-goals.md](docs/non-goals.md)

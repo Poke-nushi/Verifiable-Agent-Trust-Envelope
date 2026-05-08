@@ -8,6 +8,10 @@ It is intentionally small.
 
 It asks A2A to carry references to VATE artifacts, not the full VATE artifact bodies.
 
+For the consolidated A2A-oriented review path, start with
+`docs/a2a/README.md` and
+`docs/a2a/vate-a2a-extension-profile-v0.2.md`.
+
 ## Design Goal
 
 A2A owns discovery, Agent Cards, task exchange, transport bindings, and extension governance.
@@ -25,6 +29,9 @@ https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2
 
 This URI is a draft namespace.
 A future profile may move to a persistent namespace such as `w3id.org` after that namespace is controlled and documented.
+
+For the consolidated community profile draft, see
+`docs/a2a/vate-a2a-extension-profile-v0.2.md`.
 
 For an A2A v1.0-shaped extension sketch using `supportedInterfaces[]`,
 `capabilities.extensions`, optional `A2A-Extensions` activation, and signed

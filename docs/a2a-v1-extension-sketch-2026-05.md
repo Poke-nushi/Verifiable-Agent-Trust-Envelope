@@ -9,6 +9,10 @@ It is not an official A2A extension and does not require an A2A core change.
 The goal is to make the boundary reviewable before any SDK middleware or
 governed extension proposal exists.
 
+For the consolidated community profile draft and review entry point, see
+`docs/a2a/README.md` and
+`docs/a2a/vate-a2a-extension-profile-v0.2.md`.
+
 ## A2A v1.0 Surface Used
 
 This sketch relies on the following A2A v1.0 mechanisms:
