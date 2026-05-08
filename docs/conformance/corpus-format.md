@@ -122,7 +122,10 @@ block. For the AL2 v0.2 corpus:
   request hash, validity window, and side-effect constraints
 - `al2_context_checks` validate minimum freshness, replay, and binding context
   and require external SUT reports to bind that context back to request, receipt,
-  transaction, runtime, and evidence inputs
+  transaction, runtime, and evidence inputs. Each check must state its expected
+  result explicitly with `expect_fresh`, `expect_match`, or `expect_replayed`.
+  Replay context `state` values are restricted to `unused`, `consumed`, or
+  `replayed`; unknown states fail the fixture check.
 - evidence vocabulary checks require canonical generic `type` values, registered
   protocol hints, and registered type/hint combinations on admission request
   references and receipt evidence

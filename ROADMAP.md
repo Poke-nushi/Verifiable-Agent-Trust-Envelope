@@ -65,8 +65,6 @@ adding new adjacent profiles.
   receipt id, receipt digest, transaction, runtime, admitted effective request
   hash, decision, and expiry semantics; receipt id and decision are now
   explicit linkage kinds
-- add minimum AL2 verification context for status freshness, replay protection,
-  and runtime binding
 - add transport-bound fixtures proving VATE only narrows MCP/OAuth authority and
   never unions with upstream authorization; initial fixtures added:
   `deny-mcp-oauth-overscope` and `deny-mcp-oauth-upstream-denied`
@@ -80,7 +78,8 @@ adding new adjacent profiles.
   transaction, runtime, denial, expiry, and effective-constraint fixtures added
 - add minimum AL2 verification context for status freshness, replay protection,
   and runtime binding; first `al2_context_checks` fixtures and an exact
-  status-freshness boundary fixture plus an unused replay-key fixture added
+  status-freshness boundary fixture plus an unused replay-key fixture added;
+  replay context state is now fail-closed for unknown values
 - add an evidence type vocabulary for generic evidence types and
   protocol-specific hints; machine-readable registry, drift checks, and
   type/hint pair checks added

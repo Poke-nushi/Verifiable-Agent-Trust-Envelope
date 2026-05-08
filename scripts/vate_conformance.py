@@ -1389,13 +1389,17 @@ def evaluate_context_freshness_check(check: dict[str, Any], artifact: dict[str, 
     source_issued_at = try_parse_time(artifact.get("source_issued_at"))
     max_age_seconds = artifact.get("max_age_seconds", check.get("max_age_seconds"))
     failures: list[str] = []
+    if not isinstance(check.get("expect_fresh"), bool):
+        failures.append(f"al2_context {check['artifact']}: freshness check requires boolean expect_fresh")
     if checked_at is None or source_issued_at is None:
-        return [f"al2_context {check['artifact']}: freshness timestamps must be valid"]
+        failures.append(f"al2_context {check['artifact']}: freshness timestamps must be valid")
     if isinstance(max_age_seconds, bool) or not isinstance(max_age_seconds, int) or max_age_seconds < 0:
-        return [f"al2_context {check['artifact']}: max_age_seconds must be a non-negative integer"]
+        failures.append(f"al2_context {check['artifact']}: max_age_seconds must be a non-negative integer")
+    if failures:
+        return failures
     age_seconds = (checked_at - source_issued_at).total_seconds()
     fresh = 0 <= age_seconds <= max_age_seconds
-    expect_fresh = bool(check.get("expect_fresh", True))
+    expect_fresh = check["expect_fresh"]
     if fresh != expect_fresh:
         failures.append(f"al2_context {check['artifact']}: expected fresh={expect_fresh} actual fresh={fresh}")
     actual_failure = artifact.get("failure_reason") if not fresh else None
@@ -1411,10 +1415,14 @@ def evaluate_context_binding_check(check: dict[str, Any], artifact: dict[str, An
     expected_value = artifact.get("expected")
     actual_value = artifact.get("actual")
     matched = expected_value == actual_value
-    expect_match = bool(check.get("expect_match", True))
     failures: list[str] = []
+    if not isinstance(check.get("expect_match"), bool):
+        failures.append(f"al2_context {check['artifact']}: binding check requires boolean expect_match")
     if not isinstance(expected_value, str) or not expected_value or not isinstance(actual_value, str) or not actual_value:
         failures.append(f"al2_context {check['artifact']}: binding values must be non-empty strings")
+    if failures:
+        return failures
+    expect_match = check["expect_match"]
     if matched != expect_match:
         failures.append(f"al2_context {check['artifact']}: expected match={expect_match} actual match={matched}")
     actual_failure = artifact.get("failure_reason") if not matched else None
@@ -1430,11 +1438,17 @@ def evaluate_context_replay_check(check: dict[str, Any], artifact: dict[str, Any
     replay_key = artifact.get("replay_key")
     nonce = artifact.get("nonce")
     state = artifact.get("state")
-    replayed = state in {"consumed", "replayed"}
-    expect_replayed = bool(check.get("expect_replayed", False))
     failures: list[str] = []
+    if not isinstance(check.get("expect_replayed"), bool):
+        failures.append(f"al2_context {check['artifact']}: replay check requires boolean expect_replayed")
     if not isinstance(replay_key, str) or not replay_key or not isinstance(nonce, str) or not nonce:
         failures.append(f"al2_context {check['artifact']}: replay_key and nonce must be non-empty strings")
+    if state not in {"unused", "consumed", "replayed"}:
+        failures.append(f"al2_context {check['artifact']}: replay state must be unused, consumed, or replayed")
+    if failures:
+        return failures
+    expect_replayed = check["expect_replayed"]
+    replayed = state in {"consumed", "replayed"}
     if replayed != expect_replayed:
         failures.append(f"al2_context {check['artifact']}: expected replayed={expect_replayed} actual replayed={replayed}")
     actual_failure = artifact.get("failure_reason") if replayed else None

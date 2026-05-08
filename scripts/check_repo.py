@@ -523,6 +523,16 @@ def check_replay_boundary_coverage() -> None:
     if case.get("expected", {}).get("admission_decision") != "allow":
         raise RuntimeError("allow-replay-state-unused must allow an unused replay key")
 
+    conformance = load_vate_conformance_module()
+    invalid_state_context = dict(context)
+    invalid_state_context["state"] = "unknown"
+    failures = conformance.evaluate_context_replay_check(
+        {"kind": "replay", "artifact": "replay_context", "expect_replayed": False},
+        invalid_state_context,
+    )
+    if not failures:
+        raise RuntimeError("replay context checks must reject unknown replay states")
+
 
 def main() -> int:
     validate_examples()

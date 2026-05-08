@@ -1173,7 +1173,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "f274da41c63f302dd75f51ed68a4f46f403c6e7eebb8feea4edc1f54e19f40eb"
+    "value": "fdacea6552bb34e165156c8eda784350f2bdd21b846d4aca3aa87d09016981a3"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -1402,7 +1402,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.2/conformance-case.schema.json",
-      "sha256": "fcf4e53cd55f56625dda31548f782e5769a71047bcc76ae148e2e20758d79b58"
+      "sha256": "229eed66c5012f6e2839128078f20b602987565381794971a10cbb6914abe24a"
     },
     {
       "path": "conformance/al2-vate-v0.2/fixtures/attenuation-max-amount-type-edge.json",

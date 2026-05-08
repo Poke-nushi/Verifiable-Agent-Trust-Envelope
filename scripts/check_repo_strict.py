@@ -155,6 +155,25 @@ def minimal_linkage_case(linkage_checks: list[dict]) -> dict:
     }
 
 
+def minimal_al2_context_case(al2_context_checks: list[dict]) -> dict:
+    return {
+        "version": "vate-conformance-0.2",
+        "profile": "VATE-AL2-Verifier-Admission-v0.2",
+        "case_id": "negative-schema-al2-context-contract",
+        "title": "Negative schema AL2 context contract",
+        "category": "positive",
+        "purpose": "Strict schema validation should reject incomplete AL2 context checks.",
+        "artifacts": {},
+        "expected": {
+            "admission_decision": "allow",
+            "should_execute": True,
+            "reason_codes": ["EVIDENCE_VERIFIED", "POLICY_MATCH"],
+            "checks": [],
+        },
+        "al2_context_checks": al2_context_checks,
+    }
+
+
 def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
     hex_digest = "0" * 64
     empty_summary = {"total": 0, "passed": 0, "failed": 0, "skipped": 0}
@@ -195,6 +214,42 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
                         "value": "unknown_policy_violation",
                         "expect_present": True,
                         "reason_code": "POST_EXEC_LINKAGE_MISMATCH",
+                    }
+                ]
+            ),
+            "conformance/al2-vate-v0.2/conformance-case.schema.json",
+        ),
+        (
+            "replay context check without explicit expectation",
+            minimal_al2_context_case(
+                [
+                    {
+                        "kind": "replay",
+                        "artifact": "replay_context",
+                    }
+                ]
+            ),
+            "conformance/al2-vate-v0.2/conformance-case.schema.json",
+        ),
+        (
+            "freshness context check without explicit expectation",
+            minimal_al2_context_case(
+                [
+                    {
+                        "kind": "freshness",
+                        "artifact": "status_context",
+                    }
+                ]
+            ),
+            "conformance/al2-vate-v0.2/conformance-case.schema.json",
+        ),
+        (
+            "binding context check without explicit expectation",
+            minimal_al2_context_case(
+                [
+                    {
+                        "kind": "binding",
+                        "artifact": "runtime_context",
                     }
                 ]
             ),
