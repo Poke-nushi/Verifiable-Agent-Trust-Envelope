@@ -7,8 +7,17 @@
   "purpose": "A verifier should fail closed when runtime proof freshness fails before local policy or attenuation evaluation can permit execution.",
   "artifacts": {
     "admission_request": "examples/admission-request-runtime-proof-stale.example.json",
-    "admission_receipt": "examples/receipts/admission-deny-runtime-proof-stale.example.json"
+    "admission_receipt": "examples/receipts/admission-deny-runtime-proof-stale.example.json",
+    "runtime_context": "conformance/al2-vate-v0.2/fixtures/runtime-proof-stale-context.json"
   },
+  "al2_context_checks": [
+    {
+      "kind": "freshness",
+      "artifact": "runtime_context",
+      "expect_fresh": false,
+      "expected_failure_reason": "RUNTIME_PROOF_STALE"
+    }
+  ],
   "expected": {
     "admission_decision": "deny",
     "should_execute": false,

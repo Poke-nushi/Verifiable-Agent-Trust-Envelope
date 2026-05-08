@@ -277,6 +277,49 @@
         "additionalProperties": true
       }
     },
+    "al2_context_checks": {
+      "type": "array",
+      "description": "Checks minimum AL2 verification context such as freshness, replay, and binding inputs.",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "artifact"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "freshness",
+              "binding",
+              "replay"
+            ]
+          },
+          "artifact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expect_fresh": {
+            "type": "boolean"
+          },
+          "max_age_seconds": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "expect_match": {
+            "type": "boolean"
+          },
+          "expect_replayed": {
+            "type": "boolean"
+          },
+          "expected_failure_reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true
+      }
+    },
     "trust_checks": {
       "type": "array",
       "description": "Checks local trust-bundle admission behavior for issuer, key id, algorithm, evidence type, status, and validity windows.",

@@ -56,6 +56,8 @@ new adjacent profiles.
   first unsafe-path and max-amount type-edge fixtures added
 - strengthen post-execution linkage checks beyond presence checks; digest,
   transaction, runtime, denial, expiry, and effective-constraint fixtures added
+- add minimum AL2 verification context for status freshness, replay protection,
+  and runtime binding; first `al2_context_checks` fixtures added
 - add an evidence type vocabulary for generic evidence types and
   protocol-specific hints
 - keep the language-neutral conformance corpus index current as cases change

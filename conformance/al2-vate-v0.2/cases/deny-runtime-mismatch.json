@@ -6,8 +6,17 @@
   "category": "negative",
   "purpose": "A verifier should fail closed when the runtime proof does not match the permit-bound runtime.",
   "artifacts": {
-    "admission_receipt": "examples/receipts/admission-deny-runtime-mismatch.example.json"
+    "admission_receipt": "examples/receipts/admission-deny-runtime-mismatch.example.json",
+    "runtime_context": "conformance/al2-vate-v0.2/fixtures/runtime-binding-mismatch-context.json"
   },
+  "al2_context_checks": [
+    {
+      "kind": "binding",
+      "artifact": "runtime_context",
+      "expect_match": false,
+      "expected_failure_reason": "RUNTIME_MISMATCH"
+    }
+  ],
   "expected": {
     "admission_decision": "deny",
     "should_execute": false,

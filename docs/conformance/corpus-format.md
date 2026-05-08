@@ -91,6 +91,24 @@ A non-reference implementation can run the corpus without importing Python code:
 
 Implementations MAY use the reference runner as a comparison oracle, but the corpus index is the portable contract.
 
+## Profile-Specific Checks
+
+Some cases include profile-specific check arrays in addition to the `expected`
+block. For the AL2 v0.2 corpus:
+
+- `integrity_checks` bind referenced artifacts to expected digests
+- `artifact_reference_checks` bind digest references across requests, receipts,
+  and metadata
+- `trust_checks` bind issuer, key, algorithm, evidence type, and validity-window
+  decisions to a trust bundle
+- `jose_checks` bind detached JWS fixture bytes before production signature
+  verification
+- `attenuation_checks` validate machine-readable attenuation boundaries
+- `al2_context_checks` validate minimum freshness, replay, and binding context
+
+An external implementation should treat those arrays as part of the case
+contract, not as optional comments.
+
 For external systems under test, use:
 
 - `docs/conformance/sut-adapter-contract.md`

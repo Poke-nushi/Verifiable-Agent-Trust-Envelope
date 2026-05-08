@@ -70,7 +70,8 @@
     },
     {
       "artifacts": {
-        "admission_receipt": "examples/receipts/admission-allow.example.json"
+        "admission_receipt": "examples/receipts/admission-allow.example.json",
+        "runtime_context": "conformance/al2-vate-v0.2/fixtures/runtime-binding-match-context.json"
       },
       "case_id": "allow-valid-admission",
       "category": "positive",
@@ -130,7 +131,8 @@
     },
     {
       "artifacts": {
-        "admission_receipt": "examples/receipts/admission-allow-status-fresh.example.json"
+        "admission_receipt": "examples/receipts/admission-allow-status-fresh.example.json",
+        "status_context": "conformance/al2-vate-v0.2/fixtures/status-fresh-context.json"
       },
       "case_id": "allow-valid-with-status-fresh",
       "category": "positive",
@@ -624,7 +626,8 @@
     },
     {
       "artifacts": {
-        "admission_receipt": "examples/receipts/admission-deny-replay-detected.example.json"
+        "admission_receipt": "examples/receipts/admission-deny-replay-detected.example.json",
+        "replay_context": "conformance/al2-vate-v0.2/fixtures/replay-consumed-context.json"
       },
       "case_id": "deny-replay-detected",
       "category": "negative",
@@ -643,7 +646,8 @@
     },
     {
       "artifacts": {
-        "admission_receipt": "examples/receipts/admission-deny-runtime-mismatch.example.json"
+        "admission_receipt": "examples/receipts/admission-deny-runtime-mismatch.example.json",
+        "runtime_context": "conformance/al2-vate-v0.2/fixtures/runtime-binding-mismatch-context.json"
       },
       "case_id": "deny-runtime-mismatch",
       "category": "negative",
@@ -663,7 +667,8 @@
     {
       "artifacts": {
         "admission_receipt": "examples/receipts/admission-deny-runtime-proof-stale.example.json",
-        "admission_request": "examples/admission-request-runtime-proof-stale.example.json"
+        "admission_request": "examples/admission-request-runtime-proof-stale.example.json",
+        "runtime_context": "conformance/al2-vate-v0.2/fixtures/runtime-proof-stale-context.json"
       },
       "case_id": "deny-runtime-proof-stale",
       "category": "negative",
@@ -722,7 +727,8 @@
     },
     {
       "artifacts": {
-        "admission_receipt": "examples/receipts/admission-deny-status-stale.example.json"
+        "admission_receipt": "examples/receipts/admission-deny-status-stale.example.json",
+        "status_context": "conformance/al2-vate-v0.2/fixtures/status-stale-context.json"
       },
       "case_id": "deny-status-stale-fail-closed",
       "category": "negative",
@@ -1050,7 +1056,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "9cbb7f3c27ea06285374925897af4953d39e3b4566e5d053276e6f93b9eec6a7"
+    "value": "15d36000189c57dc48d868b59f460938676a0aa1dcb052064883c01983d3fdfe"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -1079,7 +1085,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/allow-valid-admission.json",
-      "sha256": "f25e0b5101c59f82e895749b96d626db42f49c8e76b464485075ee73144ec4e7"
+      "sha256": "57da1f116e4e45126a93c22aebc174e7fd44f7da548413f4dcfd5f18e2b44558"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/allow-valid-basic-external-write.json",
@@ -1091,7 +1097,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/allow-valid-with-status-fresh.json",
-      "sha256": "bb663d3b9d904171adae4f9907396ea5831813835f981993006843b29bb6fdef"
+      "sha256": "e2f58e4a272a95886e44397efc6f3df711f82b91b37b19d0fb428350051f695a"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/attenuate-ap2-hnp-amount-overrun.json",
@@ -1183,15 +1189,15 @@
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-replay-detected.json",
-      "sha256": "7cc42ebc243728205f8a7931e1d56fea437d01dde885c3990ae8faf61cff5414"
+      "sha256": "2e6d34606fd2285790cec54eca27c4c5522114a3d2fe25d3a818ccecf19f8417"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-runtime-mismatch.json",
-      "sha256": "5c00a611f211baa3192bebb85a22443e121286e382956b19eb08423965dea6ca"
+      "sha256": "6c09f788cb30fcbb573e902918e2019dedf3aeeb860f8d574f4e3ba46edaa053"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-runtime-proof-stale.json",
-      "sha256": "3d8dbd48944679d314745443aecf7a6e07fd917b2a3a22c3948aa005a5657889"
+      "sha256": "dbf9ef65487850912aba405b78f523d0d4741971247cb356fe3dd775639fa713"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-signature-tampered.json",
@@ -1203,7 +1209,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-status-stale-fail-closed.json",
-      "sha256": "8799b8f8108cde537185d387c4426e49e54ef630a26ae70beb3c49cb485fed7b"
+      "sha256": "00a0e5206a23d75a96869375e4556ab76e57699b4f140b308fd44a9922a80187"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-trust-anchor-expired.json",
@@ -1267,7 +1273,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.2/conformance-case.schema.json",
-      "sha256": "c441a308a910c100f1ac0f66b87e4ad1734ad22591b47f9a9453faac549f5750"
+      "sha256": "c86349da785501ab384cc93bef3a9d1a4a6f2fb749c377f8ec5d316191d9500f"
     },
     {
       "path": "conformance/al2-vate-v0.2/fixtures/attenuation-max-amount-type-edge.json",
@@ -1276,6 +1282,30 @@
     {
       "path": "conformance/al2-vate-v0.2/fixtures/attenuation-unsafe-path.json",
       "sha256": "68a4f36d35da78742c0105d1623a94222ddbf98401842a0e663d14d88eeb4703"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/fixtures/replay-consumed-context.json",
+      "sha256": "a79e527cef82e84ba918128b96a9a85d8284a45ffc3b2fa7b78a07fc862d9c87"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/fixtures/runtime-binding-match-context.json",
+      "sha256": "6d2ce8f39cf1ebc56a893f01abb83f586cc9a851ac2cdb854064d2b391e361db"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/fixtures/runtime-binding-mismatch-context.json",
+      "sha256": "a7e503305bf0e954fff018fbb15ca9c4369fe69406b95975f7945ea21f25125d"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/fixtures/runtime-proof-stale-context.json",
+      "sha256": "ac6f623b99c398b459cf6f4e2ca2c9c59e1dac4a7fa8de398578dc4205df099d"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/fixtures/status-fresh-context.json",
+      "sha256": "4967a00c0be2429cd16b2f5152c278d970efdf2f17c78bbb8fa5442f64a47f1c"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/fixtures/status-stale-context.json",
+      "sha256": "32464bac060eac870231d0ac4371327836c26a331ab48a57d85f355f4de30ba8"
     },
     {
       "path": "examples/a2a/metadata-admission-issued.json",
@@ -1582,7 +1612,7 @@
     "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.2 --out conformance/al2-vate-v0.2/corpus.json"
   },
   "summary": {
-    "artifact_count": 127,
+    "artifact_count": 133,
     "case_count": 50,
     "category_counts": {
       "linkage": 9,

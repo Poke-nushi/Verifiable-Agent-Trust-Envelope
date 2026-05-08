@@ -1,0 +1,6 @@
+{
+  "binding": "runtime",
+  "expected": "spiffe://agent.example/workload/case-agent",
+  "actual": "spiffe://agent.example/workload/unexpected-runtime",
+  "failure_reason": "RUNTIME_MISMATCH"
+}

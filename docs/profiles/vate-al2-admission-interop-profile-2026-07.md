@@ -44,6 +44,8 @@ An implementation that claims compatibility with this profile MUST:
 - fail closed for stale status, revoked status, unknown trust anchors, replay, digest mismatch, and semantic binding mismatch unless a fixture explicitly states otherwise
 - emit or validate an admission receipt for every admission decision, including `deny`
 - validate post-execution receipt linkage against the admitted effective request hash when execution proceeds
+- preserve enough AL2 verification context to replay freshness, replay, and
+  runtime-binding decisions in conformance fixtures
 
 An implementation SHOULD:
 

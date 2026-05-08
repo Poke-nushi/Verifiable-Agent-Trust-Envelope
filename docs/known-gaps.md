@@ -173,18 +173,15 @@ Remaining work includes:
 - side-effect checks beyond simple amount limits
 - independent implementation reports that exercise the linkage checks
 
-### 14. Status, Replay, And Runtime Binding Need Minimum AL2 Context
+### 14. Status, Replay, And Runtime Binding Need Broader Context Coverage
 
-The draft already names stale status, revoked status, replay, and runtime
-mismatch as fail-closed cases, but the minimum AL2 verification context is not
-yet explicit enough.
+The corpus now includes minimum AL2 context checks for representative status
+freshness, runtime proof freshness, runtime binding, and replay state cases.
+Broader coverage is still needed before treating those checks as a complete
+profile.
 
 Remaining work includes:
 
-- status source, checked time, freshness window, result, and fail behavior
-- replay key, nonce or equivalent uniqueness input, window, and idempotent retry
-  behavior
-- runtime proof freshness, audience, subject, and bound request hash
 - boundary fixtures for status freshness and replay behavior
 - more explicit evaluation-order fixtures showing that malformed proof, replay,
   and digest mismatch fail closed before policy or attenuation can allow

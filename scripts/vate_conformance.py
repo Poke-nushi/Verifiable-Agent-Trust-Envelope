@@ -1042,6 +1042,84 @@ def evaluate_attenuation_checks(case: dict[str, Any], admission: dict[str, Any] 
     return failures
 
 
+def evaluate_al2_context_checks(case: dict[str, Any]) -> list[str]:
+    failures: list[str] = []
+    for check in case.get("al2_context_checks", []):
+        artifact = read_json(resolve_artifact_path(case, check["artifact"]))
+        kind = check.get("kind")
+        if kind == "freshness":
+            failures.extend(evaluate_context_freshness_check(check, artifact))
+        elif kind == "binding":
+            failures.extend(evaluate_context_binding_check(check, artifact))
+        elif kind == "replay":
+            failures.extend(evaluate_context_replay_check(check, artifact))
+        else:
+            failures.append(f"al2_context {check.get('artifact')}: unsupported kind {kind}")
+    return failures
+
+
+def evaluate_context_freshness_check(check: dict[str, Any], artifact: dict[str, Any]) -> list[str]:
+    checked_at = try_parse_time(artifact.get("checked_at"))
+    source_issued_at = try_parse_time(artifact.get("source_issued_at"))
+    max_age_seconds = artifact.get("max_age_seconds", check.get("max_age_seconds"))
+    failures: list[str] = []
+    if checked_at is None or source_issued_at is None:
+        return [f"al2_context {check['artifact']}: freshness timestamps must be valid"]
+    if isinstance(max_age_seconds, bool) or not isinstance(max_age_seconds, int) or max_age_seconds < 0:
+        return [f"al2_context {check['artifact']}: max_age_seconds must be a non-negative integer"]
+    age_seconds = (checked_at - source_issued_at).total_seconds()
+    fresh = 0 <= age_seconds <= max_age_seconds
+    expect_fresh = bool(check.get("expect_fresh", True))
+    if fresh != expect_fresh:
+        failures.append(f"al2_context {check['artifact']}: expected fresh={expect_fresh} actual fresh={fresh}")
+    actual_failure = artifact.get("failure_reason") if not fresh else None
+    expected_failure = check.get("expected_failure_reason")
+    if expected_failure and actual_failure != expected_failure:
+        failures.append(
+            f"al2_context {check['artifact']}: expected failure={expected_failure} actual failure={actual_failure}"
+        )
+    return failures
+
+
+def evaluate_context_binding_check(check: dict[str, Any], artifact: dict[str, Any]) -> list[str]:
+    expected_value = artifact.get("expected")
+    actual_value = artifact.get("actual")
+    matched = expected_value == actual_value
+    expect_match = bool(check.get("expect_match", True))
+    failures: list[str] = []
+    if not isinstance(expected_value, str) or not expected_value or not isinstance(actual_value, str) or not actual_value:
+        failures.append(f"al2_context {check['artifact']}: binding values must be non-empty strings")
+    if matched != expect_match:
+        failures.append(f"al2_context {check['artifact']}: expected match={expect_match} actual match={matched}")
+    actual_failure = artifact.get("failure_reason") if not matched else None
+    expected_failure = check.get("expected_failure_reason")
+    if expected_failure and actual_failure != expected_failure:
+        failures.append(
+            f"al2_context {check['artifact']}: expected failure={expected_failure} actual failure={actual_failure}"
+        )
+    return failures
+
+
+def evaluate_context_replay_check(check: dict[str, Any], artifact: dict[str, Any]) -> list[str]:
+    replay_key = artifact.get("replay_key")
+    nonce = artifact.get("nonce")
+    state = artifact.get("state")
+    replayed = state in {"consumed", "replayed"}
+    expect_replayed = bool(check.get("expect_replayed", False))
+    failures: list[str] = []
+    if not isinstance(replay_key, str) or not replay_key or not isinstance(nonce, str) or not nonce:
+        failures.append(f"al2_context {check['artifact']}: replay_key and nonce must be non-empty strings")
+    if replayed != expect_replayed:
+        failures.append(f"al2_context {check['artifact']}: expected replayed={expect_replayed} actual replayed={replayed}")
+    actual_failure = artifact.get("failure_reason") if replayed else None
+    expected_failure = check.get("expected_failure_reason")
+    if expected_failure and actual_failure != expected_failure:
+        failures.append(
+            f"al2_context {check['artifact']}: expected failure={expected_failure} actual failure={actual_failure}"
+        )
+    return failures
+
+
 def evaluate_case(case_path: Path) -> dict[str, Any]:
     case = read_json(case_path)
     admission_request = load_artifact(case, "admission_request")
@@ -1088,6 +1166,7 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
     failures.extend(evaluate_policy_snapshot_checks(case, admission, a2a_metadata))
     failures.extend(evaluate_artifact_reference_checks(case, admission_request, admission, post_execution, a2a_metadata))
     failures.extend(evaluate_attenuation_checks(case, admission))
+    failures.extend(evaluate_al2_context_checks(case))
 
     return {
         "case_id": case["case_id"],

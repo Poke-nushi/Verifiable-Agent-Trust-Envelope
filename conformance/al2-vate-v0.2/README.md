@@ -155,5 +155,12 @@ Post-execution cases use `expected.post_execution_outcome` so execution results 
 decision, so an attenuated case can still be non-executable when a fresh permit
 is required.
 
+`al2_context_checks` records the minimum verifier context needed for selected
+AL2 cases:
+
+- freshness windows for status and runtime proof evidence
+- runtime binding inputs
+- replay key / nonce state
+
 This is deliberately smaller than the existing `conformance/al2-http/` corpus.
 It focuses on the profile semantics that matter for A2A-adjacent admission and receipt handling.

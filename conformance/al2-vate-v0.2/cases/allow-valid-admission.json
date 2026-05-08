@@ -6,8 +6,16 @@
   "category": "positive",
   "purpose": "A verifier should accept an admission receipt when identity, runtime, audience, evidence, and local policy checks pass without attenuation.",
   "artifacts": {
-    "admission_receipt": "examples/receipts/admission-allow.example.json"
+    "admission_receipt": "examples/receipts/admission-allow.example.json",
+    "runtime_context": "conformance/al2-vate-v0.2/fixtures/runtime-binding-match-context.json"
   },
+  "al2_context_checks": [
+    {
+      "kind": "binding",
+      "artifact": "runtime_context",
+      "expect_match": true
+    }
+  ],
   "expected": {
     "admission_decision": "allow",
     "should_execute": true,
