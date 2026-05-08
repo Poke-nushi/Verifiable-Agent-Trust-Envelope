@@ -2,6 +2,7 @@
   "version": "vate-report-bundle-verification-2026-07",
   "profile": "VATE-AL2-Verifier-Admission-v0.2",
   "checked_at": "2026-07-01T00:10:00Z",
+  "status": "pass",
   "summary": {
     "total": 3,
     "passed": 3,

@@ -70,6 +70,26 @@ CANONICAL_PROTOCOL_HINTS = {
     "ucp",
     "x402",
 }
+LINKAGE_REASON_CODES_BY_KIND = {
+    "admission_digest": "POST_EXEC_ADMISSION_DIGEST_MISMATCH",
+    "admission_executable": "POST_EXEC_ADMISSION_DENIED",
+    "admission_time_window": "POST_EXEC_ADMISSION_EXPIRED",
+    "effective_constraints": "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED",
+    "effective_request_hash": "POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH",
+    "path_match": "POST_EXEC_LINKAGE_MISMATCH",
+    "runtime": "POST_EXEC_RUNTIME_MISMATCH",
+    "transaction_id": "POST_EXEC_TRANSACTION_MISMATCH",
+}
+POLICY_VIOLATION_REASON_CODES = {
+    "admission_digest_mismatch": "POST_EXEC_ADMISSION_DIGEST_MISMATCH",
+    "admission_expired_before_execution": "POST_EXEC_ADMISSION_EXPIRED",
+    "admission_was_denied": "POST_EXEC_ADMISSION_DENIED",
+    "effective_constraints_exceeded": "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED",
+    "effective_request_hash_mismatch": "POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH",
+    "runtime_mismatch": "POST_EXEC_RUNTIME_MISMATCH",
+    "transaction_id_mismatch": "POST_EXEC_TRANSACTION_MISMATCH",
+}
+CANONICAL_POLICY_VIOLATION_TOKENS = set(POLICY_VIOLATION_REASON_CODES)
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -496,6 +516,8 @@ def actual_linkage_reason_codes(
 ) -> list[str]:
     violation_codes: list[str] = []
     for check in case.get("linkage_checks", []):
+        if not isinstance(check, dict):
+            continue
         violation, failure = linkage_check_violation(case, check, admission_receipt, post_execution_receipt)
         reason_code = check.get("reason_code")
         if (violation or failure) and isinstance(reason_code, str) and reason_code:
@@ -510,6 +532,63 @@ def actual_linkage_reason_codes(
     if post_execution_receipt.get("result", {}).get("policy_violations") == []:
         codes.append("NO_POLICY_VIOLATIONS")
     return codes
+
+
+def linkage_check_contract_failures(index: int, check: Any) -> list[str]:
+    if not isinstance(check, dict):
+        return [f"linkage[{index}]: expected object"]
+
+    failures: list[str] = []
+    kind = check.get("kind")
+    if kind in {"transaction_id", "runtime", "effective_request_hash", "path_match"}:
+        required = ("admission_path", "post_execution_path", "expect_match")
+    elif kind == "admission_digest":
+        required = ("post_execution_path", "expect_match")
+    elif kind in {"admission_executable", "admission_time_window", "effective_constraints"}:
+        required = ("expect_valid",)
+    elif kind == "policy_violation":
+        required = ("value", "expect_present")
+    else:
+        return [f"linkage[{index}] {kind!r}: unsupported linkage check kind"]
+
+    for field in required:
+        if field not in check:
+            failures.append(f"linkage[{index}] {kind}: missing required field {field}")
+
+    for field in ("admission_path", "post_execution_path", "value"):
+        if field in required and field in check and (not isinstance(check.get(field), str) or not check.get(field)):
+            failures.append(f"linkage[{index}] {kind}: {field} must be a non-empty string")
+
+    for field in ("expect_match", "expect_valid", "expect_present"):
+        if field in required and field in check and not isinstance(check.get(field), bool):
+            failures.append(f"linkage[{index}] {kind}: {field} must be boolean")
+
+    expected_reason_code = LINKAGE_REASON_CODES_BY_KIND.get(kind)
+    if kind == "policy_violation":
+        value = check.get("value")
+        expected_reason_code = POLICY_VIOLATION_REASON_CODES.get(value)
+        if expected_reason_code is None:
+            failures.append(f"linkage[{index}] policy_violation: unknown policy violation token {value!r}")
+
+    actual_reason_code = check.get("reason_code")
+    if expected_reason_code is not None and actual_reason_code != expected_reason_code:
+        failures.append(
+            f"linkage[{index}] {kind}: expected reason_code {expected_reason_code} actual {actual_reason_code}"
+        )
+    return failures
+
+
+def post_execution_policy_violation_token_failures(post_execution: dict[str, Any] | None) -> list[str]:
+    if post_execution is None:
+        return []
+    violations = post_execution.get("result", {}).get("policy_violations")
+    if not isinstance(violations, list):
+        return ["post_execution.result.policy_violations: expected array"]
+    failures: list[str] = []
+    for index, token in enumerate(violations):
+        if token not in CANONICAL_POLICY_VIOLATION_TOKENS:
+            failures.append(f"post_execution.result.policy_violations[{index}]: unknown token {token!r}")
+    return failures
 
 
 def admitted_effective_request_hash(admission_receipt: dict[str, Any]) -> Any:
@@ -654,6 +733,8 @@ def linkage_check_violation(
     admission: dict[str, Any] | None,
     post_execution: dict[str, Any] | None,
 ) -> tuple[bool, str | None]:
+    if not isinstance(check, dict):
+        return True, "linkage check must be an object"
     if admission is None or post_execution is None:
         return True, "admission or post-execution artifact missing"
 
@@ -1043,6 +1124,10 @@ def evaluate_linkage_checks(
 ) -> list[str]:
     failures: list[str] = []
     for index, check in enumerate(case.get("linkage_checks", [])):
+        contract_failures = linkage_check_contract_failures(index, check)
+        if contract_failures:
+            failures.extend(contract_failures)
+            continue
         violation, failure = linkage_check_violation(case, check, admission, post_execution)
         if failure:
             failures.append(f"linkage[{index}] {check.get('kind', 'unknown')}: {failure}")
@@ -1363,6 +1448,7 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
     failures.extend(evaluate_trust_checks(case))
     failures.extend(jose_failures)
     failures.extend(evaluate_linkage_checks(case, admission, post_execution))
+    failures.extend(post_execution_policy_violation_token_failures(post_execution))
     failures.extend(evaluate_policy_snapshot_checks(case, admission, a2a_metadata))
     failures.extend(evaluate_artifact_reference_checks(case, admission_request, admission, post_execution, a2a_metadata))
     failures.extend(evaluate_attenuation_checks(case, admission))
@@ -2039,6 +2125,7 @@ def verify_report_bundle(
         "version": BUNDLE_VERIFICATION_VERSION,
         "profile": PROFILE,
         "checked_at": iso_now(),
+        "status": "fail" if failed else "pass",
         "summary": {
             "total": len(checks),
             "passed": len(checks) - failed,

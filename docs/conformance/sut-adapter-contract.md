@@ -79,6 +79,11 @@ corpus artifacts required by the case. It does not fetch arbitrary remote URIs
 or verify a detached report bundle yet. Bundle-level artifact verification is
 tracked as a separate hardening step.
 
+The JSON Schema validates the portable result shape only. It does not know which
+artifacts are required by a particular corpus case and, by itself, does not prove
+artifact-backed compliance. Use `compare` against the exact corpus snapshot to
+enforce case-dependent artifact requirements and digest matches.
+
 ## Compare Command
 
 ```bash

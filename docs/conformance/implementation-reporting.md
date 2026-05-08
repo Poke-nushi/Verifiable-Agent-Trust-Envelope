@@ -27,9 +27,13 @@ The report has four important blocks:
 
 - `implementation` - name, version, language, source, and optional commit or environment
 - `corpus` - corpus name, root, case count, artifact count, digest, and manifest
-- `conformance_report` - URI, media type, and digest of the runner output
+- `conformance_report` - URI, media type, digest, and digest basis of the runner output
 - optional `publication` and `proofs` - durable location and external proof references
 - `summary` and `case_results` - the result surface a reviewer can compare across implementations
+
+`case_results[]` is a strict projection of the conformance report cases. It
+includes `case_id`, expected and actual outcome, expected and actual
+`should_execute`, and `pass`.
 
 The portable corpus shape is published separately as:
 

@@ -50,6 +50,10 @@ The output follows:
 
 - `schemas/report-bundle-verification.schema.json`
 
+The verification report includes top-level `status: "pass"` only when every
+local bundle check passes. `status: "fail"` means at least one digest, corpus,
+summary, implementation, or case-projection check failed.
+
 For external SUT comparison bundles, `verify-bundle` checks:
 
 - the committed corpus index digest and manifest against the recomputed corpus
@@ -64,6 +68,12 @@ For external SUT comparison bundles, `verify-bundle` checks:
 For reference-run bundles without a SUT result file, omit `--sut-results`.
 The command still verifies the corpus, conformance report, and implementation
 report chain.
+
+`verify-bundle` is a local digest-chain verifier. It reads the files supplied on
+the command line and compares their canonical JSON digests, corpus digest,
+manifest, summaries, and case projections. It does not fetch arbitrary remote
+URIs, prove that a URI is maintainer-controlled, or verify external signatures.
+Those checks belong to the publication and proof review steps below.
 
 ## Controlled Origin
 

@@ -9,6 +9,7 @@
     "profile",
     "checked_at",
     "summary",
+    "corpus",
     "cases"
   ],
   "properties": {

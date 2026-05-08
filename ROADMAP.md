@@ -42,13 +42,17 @@ adding new adjacent profiles.
   and implementation report digest chain
 - [x] formalize post-execution `linkage_checks` as part of the case contract and
   stop collapsing materially different linkage failures into one reason
+- [x] add kind-specific `linkage_checks` schema requirements, canonical
+  policy-violation token mapping, and strict negative schema tests
+- [x] require report corpus/manifest integrity fields, lowercase SHA-256 digest
+  descriptors, and top-level report-bundle verification status
 - [ ] bind AL2 context checks to request, transaction, evidence, and receipt
   artifacts so external SUT comparison can evaluate freshness, replay, and
   runtime-binding behavior
 - [ ] move evidence type and protocol hint vocabulary toward a single
   machine-readable source and define allowed type/hint combinations
-- [ ] tighten critical schema blocks while keeping future extension data under
-  explicit extension or annotation fields
+- [x] tighten critical report and linkage schema blocks while keeping future
+  extension data under explicit extension or annotation fields
 - [ ] clarify whether `2026-07` artifacts are July-target draft artifacts or should
   be renamed to the current review month
 

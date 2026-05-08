@@ -84,7 +84,8 @@
         "root",
         "case_count",
         "artifact_count",
-        "digest"
+        "digest",
+        "manifest"
       ],
       "properties": {
         "name": {
@@ -104,22 +105,7 @@
           "minimum": 0
         },
         "digest": {
-          "type": "object",
-          "required": [
-            "alg",
-            "value"
-          ],
-          "properties": {
-            "alg": {
-              "type": "string",
-              "const": "sha-256"
-            },
-            "value": {
-              "type": "string",
-              "minLength": 1
-            }
-          },
-          "additionalProperties": true
+          "$ref": "#/$defs/digest"
         },
         "manifest": {
           "type": "array",
@@ -137,7 +123,7 @@
               },
               "sha256": {
                 "type": "string",
-                "minLength": 1
+                "pattern": "^[0-9a-f]{64}$"
               }
             },
             "additionalProperties": true
@@ -151,7 +137,8 @@
       "required": [
         "uri",
         "media_type",
-        "digest"
+        "digest",
+        "digest_basis"
       ],
       "properties": {
         "uri": {
@@ -163,22 +150,7 @@
           "const": "application/vate-conformance-report+json"
         },
         "digest": {
-          "type": "object",
-          "required": [
-            "alg",
-            "value"
-          ],
-          "properties": {
-            "alg": {
-              "type": "string",
-              "const": "sha-256"
-            },
-            "value": {
-              "type": "string",
-              "minLength": 1
-            }
-          },
-          "additionalProperties": true
+          "$ref": "#/$defs/digest"
         },
         "digest_basis": {
           "type": "string",
@@ -258,22 +230,7 @@
             ]
           },
           "payload_digest": {
-            "type": "object",
-            "required": [
-              "alg",
-              "value"
-            ],
-            "properties": {
-              "alg": {
-                "type": "string",
-                "const": "sha-256"
-              },
-              "value": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "additionalProperties": true
+            "$ref": "#/$defs/digest"
           }
         },
         "additionalProperties": true
@@ -315,6 +272,8 @@
           "case_id",
           "expected_outcome",
           "actual_outcome",
+          "expected_should_execute",
+          "actual_should_execute",
           "pass"
         ],
         "properties": {
@@ -352,6 +311,26 @@
         "type": "string",
         "minLength": 1
       }
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "object",
+      "required": [
+        "alg",
+        "value"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "const": "sha-256"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": true
     }
   },
   "additionalProperties": true

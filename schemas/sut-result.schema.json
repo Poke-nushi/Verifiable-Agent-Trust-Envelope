@@ -73,22 +73,7 @@
           "const": "VATE-AL2-Verifier-Admission-v0.2"
         },
         "digest": {
-          "type": "object",
-          "required": [
-            "alg",
-            "value"
-          ],
-          "properties": {
-            "alg": {
-              "type": "string",
-              "const": "sha-256"
-            },
-            "value": {
-              "type": "string",
-              "minLength": 1
-            }
-          },
-          "additionalProperties": true
+          "$ref": "#/$defs/digest"
         }
       },
       "additionalProperties": true

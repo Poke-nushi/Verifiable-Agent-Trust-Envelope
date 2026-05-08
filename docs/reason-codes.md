@@ -94,3 +94,27 @@ Reason-code order is part of the machine-readable decision surface:
 - `FAIL_CLOSED` is a terminal denial marker; it MUST only appear on `deny` outcomes, MUST be last, and MUST follow a primary denial reason
 
 The v0.2 conformance runner enforces the terminal-marker rules above for both repository fixture checks and external SUT comparison reports.
+
+## Post-Execution Policy Violation Tokens
+
+Post-execution receipts also carry `result.policy_violations[]`.
+These are not top-level verifier reason codes. They are lowercase tokens inside
+the observed post-execution result, and the conformance runner maps them to the
+canonical post-execution reason code for the linkage check that failed.
+
+For the AL2 v0.2 conformance corpus, the canonical tokens are:
+
+| Token | Mapped reason code |
+| --- | --- |
+| `admission_digest_mismatch` | `POST_EXEC_ADMISSION_DIGEST_MISMATCH` |
+| `admission_expired_before_execution` | `POST_EXEC_ADMISSION_EXPIRED` |
+| `admission_was_denied` | `POST_EXEC_ADMISSION_DENIED` |
+| `effective_constraints_exceeded` | `POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED` |
+| `effective_request_hash_mismatch` | `POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH` |
+| `runtime_mismatch` | `POST_EXEC_RUNTIME_MISMATCH` |
+| `transaction_id_mismatch` | `POST_EXEC_TRANSACTION_MISMATCH` |
+
+The receipt schema allows lowercase policy-violation tokens so deployments can
+define local policy vocabulary. The AL2 v0.2 conformance cases are stricter:
+`linkage_checks[].value` MUST use one of the canonical tokens above, and the
+case's `reason_code` MUST match the mapped reason code.

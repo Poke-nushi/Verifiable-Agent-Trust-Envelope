@@ -133,6 +133,186 @@ def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def minimal_linkage_case(linkage_checks: list[dict]) -> dict:
+    return {
+        "version": "vate-conformance-0.2",
+        "profile": "VATE-AL2-Verifier-Admission-v0.2",
+        "case_id": "negative-schema-linkage-contract",
+        "title": "Negative schema linkage contract",
+        "category": "linkage",
+        "purpose": "Strict schema validation should reject incomplete or inconsistent linkage checks.",
+        "artifacts": {},
+        "expected": {
+            "post_execution_outcome": "failed",
+            "should_execute": False,
+            "reason_codes": ["POST_EXEC_ADMISSION_DIGEST_MISMATCH"],
+            "checks": [],
+        },
+        "linkage_checks": linkage_checks,
+    }
+
+
+def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
+    hex_digest = "0" * 64
+    empty_summary = {"total": 0, "passed": 0, "failed": 0, "skipped": 0}
+    return [
+        (
+            "incomplete linkage check",
+            minimal_linkage_case(
+                [
+                    {
+                        "kind": "admission_digest",
+                        "reason_code": "POST_EXEC_ADMISSION_DIGEST_MISMATCH",
+                    }
+                ]
+            ),
+            "conformance/al2-vate-v0.2/conformance-case.schema.json",
+        ),
+        (
+            "linkage reason code does not match kind",
+            minimal_linkage_case(
+                [
+                    {
+                        "kind": "runtime",
+                        "admission_path": "subject.runtime",
+                        "post_execution_path": "execution.runtime",
+                        "expect_match": False,
+                        "reason_code": "POST_EXEC_TRANSACTION_MISMATCH",
+                    }
+                ]
+            ),
+            "conformance/al2-vate-v0.2/conformance-case.schema.json",
+        ),
+        (
+            "unknown policy violation token",
+            minimal_linkage_case(
+                [
+                    {
+                        "kind": "policy_violation",
+                        "value": "unknown_policy_violation",
+                        "expect_present": True,
+                        "reason_code": "POST_EXEC_LINKAGE_MISMATCH",
+                    }
+                ]
+            ),
+            "conformance/al2-vate-v0.2/conformance-case.schema.json",
+        ),
+        (
+            "conformance report without corpus",
+            {
+                "version": "vate-conformance-report-2026-07",
+                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "checked_at": "2026-07-01T00:00:00Z",
+                "summary": empty_summary,
+                "cases": [],
+            },
+            "schemas/conformance-report.schema.json",
+        ),
+        (
+            "SUT corpus digest is not lowercase sha-256 hex",
+            {
+                "version": "vate-sut-results-2026-07",
+                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "generated_at": "2026-07-01T00:00:00Z",
+                "implementation": {"name": "x", "type": "x", "version": "x", "language": "x"},
+                "corpus": {
+                    "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                    "digest": {"alg": "sha-256", "value": "not-a-digest"},
+                },
+                "results": [],
+            },
+            "schemas/sut-result.schema.json",
+        ),
+        (
+            "implementation report without corpus manifest",
+            {
+                "version": "vate-implementation-report-2026-07",
+                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "generated_at": "2026-07-01T00:00:00Z",
+                "status": "pass",
+                "implementation": {"name": "x", "type": "x", "version": "x", "language": "x"},
+                "corpus": {
+                    "name": "x",
+                    "root": "x",
+                    "case_count": 0,
+                    "artifact_count": 0,
+                    "digest": {"alg": "sha-256", "value": hex_digest},
+                },
+                "conformance_report": {
+                    "uri": "x",
+                    "media_type": "application/vate-conformance-report+json",
+                    "digest": {"alg": "sha-256", "value": hex_digest},
+                },
+                "summary": empty_summary,
+                "case_results": [],
+            },
+            "schemas/implementation-report.schema.json",
+        ),
+        (
+            "implementation report case result without should_execute projection",
+            {
+                "version": "vate-implementation-report-2026-07",
+                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "generated_at": "2026-07-01T00:00:00Z",
+                "status": "pass",
+                "implementation": {"name": "x", "type": "x", "version": "x", "language": "x"},
+                "corpus": {
+                    "name": "x",
+                    "root": "x",
+                    "case_count": 1,
+                    "artifact_count": 1,
+                    "digest": {"alg": "sha-256", "value": hex_digest},
+                    "manifest": [{"path": "x", "sha256": hex_digest}],
+                },
+                "conformance_report": {
+                    "uri": "x",
+                    "media_type": "application/vate-conformance-report+json",
+                    "digest": {"alg": "sha-256", "value": hex_digest},
+                    "digest_basis": "json-sorted-no-whitespace",
+                },
+                "summary": {"total": 1, "passed": 1, "failed": 0, "skipped": 0},
+                "case_results": [
+                    {
+                        "case_id": "x",
+                        "expected_outcome": "allow",
+                        "actual_outcome": "allow",
+                        "pass": True,
+                    }
+                ],
+            },
+            "schemas/implementation-report.schema.json",
+        ),
+        (
+            "report bundle verification without status",
+            {
+                "version": "vate-report-bundle-verification-2026-07",
+                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "checked_at": "2026-07-01T00:00:00Z",
+                "summary": {"total": 0, "passed": 0, "failed": 0},
+                "artifacts": {
+                    "corpus": {
+                        "root": "conformance/al2-vate-v0.2",
+                        "digest": {"alg": "sha-256", "value": hex_digest},
+                        "artifact_count": 0,
+                    },
+                    "conformance_report": {
+                        "path": "reports/conformance.json",
+                        "digest": {"alg": "sha-256", "value": hex_digest},
+                        "digest_basis": "json-sorted-no-whitespace",
+                    },
+                    "implementation_report": {
+                        "path": "reports/implementation.json",
+                        "digest": {"alg": "sha-256", "value": hex_digest},
+                        "digest_basis": "json-sorted-no-whitespace",
+                    },
+                },
+                "checks": [],
+            },
+            "schemas/report-bundle-verification.schema.json",
+        ),
+    ]
+
+
 def main() -> int:
     try:
         from jsonschema import Draft202012Validator
@@ -156,6 +336,13 @@ def main() -> int:
 
     for json_rel in JSON_ONLY_FILES:
         load_json(ROOT / json_rel)
+
+    for label, example, schema_rel in iter_negative_schema_cases():
+        schema = load_json(ROOT / schema_rel)
+        validator = Draft202012Validator(schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
+        errors = sorted(validator.iter_errors(example), key=lambda item: list(item.path))
+        if not errors:
+            raise SystemExit(f"{label} unexpectedly passed strict validation against {schema_rel}")
 
     print("app draft strict schema validation: ok")
     return 0

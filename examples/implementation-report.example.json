@@ -18,16 +18,16 @@
     "artifact_count": 2,
     "digest": {
       "alg": "sha-256",
-      "value": "example-corpus-digest"
+      "value": "0000000000000000000000000000000000000000000000000000000000000000"
     },
     "manifest": [
       {
         "path": "conformance/al2-vate-v0.2/cases/allow-valid-admission.json",
-        "sha256": "example-case-digest"
+        "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
       },
       {
         "path": "examples/receipts/admission-allow.example.json",
-        "sha256": "example-artifact-digest"
+        "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
       }
     ]
   },
@@ -36,7 +36,7 @@
     "media_type": "application/vate-conformance-report+json",
     "digest": {
       "alg": "sha-256",
-      "value": "example-report-digest"
+      "value": "3333333333333333333333333333333333333333333333333333333333333333"
     },
     "digest_basis": "json-sorted-no-whitespace"
   },

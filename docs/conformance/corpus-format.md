@@ -114,6 +114,21 @@ block. For the AL2 v0.2 corpus:
 An external implementation should treat those arrays as part of the case
 contract, not as optional comments.
 
+`linkage_checks[]` is intentionally kind-specific. A check is not complete just
+because it names a `kind` and `reason_code`:
+
+- `transaction_id`, `runtime`, `effective_request_hash`, and `path_match`
+  require `admission_path`, `post_execution_path`, and `expect_match`
+- `admission_digest` requires `post_execution_path` and `expect_match`; the
+  admission artifact defaults to `admission_receipt` when `artifact` is omitted
+- `admission_executable`, `admission_time_window`, and
+  `effective_constraints` require `expect_valid`
+- `policy_violation` requires `value` and `expect_present`
+
+The `path_match` kind is a generic escape hatch for draft fixtures that need to
+compare two explicitly named paths before a narrower linkage kind exists. It
+maps to `POST_EXEC_LINKAGE_MISMATCH`.
+
 For external systems under test, use:
 
 - `docs/conformance/sut-adapter-contract.md`
