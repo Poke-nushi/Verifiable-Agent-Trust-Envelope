@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { stableJsonBytes } from "./json.js";
-import type { DigestDescriptor } from "./types.js";
+import type { DigestDescriptor, JsonValue } from "./types.js";
 
 export function sha256Hex(bytes: Uint8Array): string {
   return createHash("sha256").update(bytes).digest("hex");
@@ -13,7 +13,7 @@ export function digestDescriptorForBytes(bytes: Uint8Array): DigestDescriptor {
   };
 }
 
-export function digestDescriptorForJson(value: unknown): DigestDescriptor {
+export function digestDescriptorForJson(value: JsonValue): DigestDescriptor {
   return digestDescriptorForBytes(stableJsonBytes(value));
 }
 

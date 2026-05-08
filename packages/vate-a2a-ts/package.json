@@ -10,6 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@vate/reference-core": "0.0.0"
+    "@vate/reference-core": "0.0.0",
+    "ajv": "8.20.0"
   }
 }

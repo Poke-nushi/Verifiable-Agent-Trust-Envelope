@@ -3,6 +3,12 @@ export interface DigestDescriptor {
   value: string;
 }
 
+export type JsonPrimitive = string | number | boolean | null;
+export type JsonValue =
+  | JsonPrimitive
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
 export interface DigestBoundReference {
   uri: string;
   media_type: string;

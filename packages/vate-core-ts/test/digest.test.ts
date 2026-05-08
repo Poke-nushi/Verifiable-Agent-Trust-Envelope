@@ -22,4 +22,16 @@ describe("digest helpers", () => {
     expect(descriptor.alg).toBe("sha-256");
     expect(descriptor.value).toMatch(/^[a-f0-9]{64}$/);
   });
+
+  it("rejects values that JSON.stringify would silently rewrite", () => {
+    expect(() =>
+      stableJsonBytes({ omitted: undefined } as never)
+    ).toThrow("unsupported JSON value");
+    expect(() => stableJsonBytes(Number.NaN as never)).toThrow(
+      "unsupported JSON number"
+    );
+    expect(() => stableJsonBytes([undefined] as never)).toThrow(
+      "unsupported JSON value"
+    );
+  });
 });

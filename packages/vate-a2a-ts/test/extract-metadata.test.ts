@@ -1,5 +1,4 @@
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { extractVateMetadata, validateVateA2aMetadata } from "../src/index.js";
 
@@ -7,7 +6,7 @@ const extensionUri =
   "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2";
 
 function readJson(path: string): unknown {
-  return JSON.parse(readFileSync(resolve(process.cwd(), path), "utf8"));
+  return JSON.parse(readFileSync(new URL(`../../../${path}`, import.meta.url), "utf8"));
 }
 
 describe("A2A VATE metadata", () => {
@@ -26,6 +25,34 @@ describe("A2A VATE metadata", () => {
     };
     expect(validateVateA2aMetadata(metadata)[0]).toContain(
       "must NOT have additional properties"
+    );
+  });
+
+  it("rejects invalid date-time values", () => {
+    const metadata = {
+      ...(readJson("examples/a2a/metadata-admission-issued.json") as Record<
+        string,
+        unknown
+      >),
+      issued_at: "not-a-date",
+    };
+    expect(validateVateA2aMetadata(metadata)[0]).toContain(
+      "must match format"
+    );
+  });
+
+  it("rejects extension keys that are neither URI nor x_ names", () => {
+    const metadata = {
+      ...(readJson("examples/a2a/metadata-admission-issued.json") as Record<
+        string,
+        unknown
+      >),
+      extensions: {
+        "not a uri and not x_name": true,
+      },
+    };
+    expect(validateVateA2aMetadata(metadata)[0]).toContain(
+      "must match format"
     );
   });
 
