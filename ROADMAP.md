@@ -34,9 +34,10 @@ adding new adjacent profiles.
   canonicalization migration path
 - [x] split the conformance language so `run` is clearly a reference artifact /
   fixture integrity check and `compare` is the external SUT comparison path
-- [ ] make the SUT result contract artifact-backed, so external results reference
-  actual admission receipts, post-execution receipts, context artifacts, proofs,
-  and digests where cases require them
+- [x] make the SUT result contract artifact-backed for required admission receipts,
+  post-execution receipts, AL2 context artifacts, and digest descriptors
+- [ ] extend artifact-backed SUT results to JOSE proof-package references where
+  corpus cases require proof provenance
 - [ ] add report-bundle verification for the corpus, SUT result, conformance report,
   and implementation report digest chain
 - [ ] formalize post-execution `linkage_checks` as part of the case contract and

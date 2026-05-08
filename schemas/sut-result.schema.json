@@ -155,6 +155,25 @@
               "additionalProperties": true
             }
           },
+          "artifacts": {
+            "type": "object",
+            "description": "Artifact references used to support the reported result for this case.",
+            "properties": {
+              "admission_receipt": {
+                "$ref": "#/$defs/receiptArtifactRef"
+              },
+              "post_execution_receipt": {
+                "$ref": "#/$defs/receiptArtifactRef"
+              },
+              "verification_context": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/verificationContextRef"
+                }
+              }
+            },
+            "additionalProperties": true
+          },
           "limitations": {
             "type": "array",
             "items": {
@@ -172,6 +191,79 @@
         "type": "string",
         "minLength": 1
       }
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "object",
+      "required": [
+        "alg",
+        "value"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "const": "sha-256"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": true
+    },
+    "receiptArtifactRef": {
+      "type": "object",
+      "required": [
+        "uri",
+        "media_type",
+        "digest"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "media_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      },
+      "additionalProperties": true
+    },
+    "verificationContextRef": {
+      "type": "object",
+      "required": [
+        "kind",
+        "case_artifact",
+        "uri",
+        "digest"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "case_artifact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "media_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      },
+      "additionalProperties": true
     }
   },
   "additionalProperties": true

@@ -40,11 +40,44 @@ Each result entry represents one corpus case:
 - `should_execute` - whether the verifier result permits immediate execution
 - `reason_codes` - the verifier's machine-readable reason codes in order
 - optional `checks` - case-specific check names with `pass: true` when the expected check was satisfied
+- required `artifacts` when the corpus case depends on receipt or context artifacts
 - optional `limitations`
 
 The example file is:
 
 - `examples/conformance/sut-results-pass.example.json`
+
+## Artifact References
+
+SUT results must be artifact-backed for cases that depend on concrete receipts
+or AL2 execution context. This keeps the comparison report from becoming a
+bare assertion detached from the evidence the implementation evaluated.
+
+When the corpus case lists an `admission_receipt`, the result entry must include
+`artifacts.admission_receipt`. When it lists a `post_execution_receipt`, the
+result entry must include `artifacts.post_execution_receipt`.
+
+Receipt artifact references require:
+
+- `uri`
+- `media_type`
+- `digest.alg` set to `sha-256`
+- `digest.value` as lowercase SHA-256 hex
+
+When the corpus case includes `al2_context_checks`, the result entry must
+include `artifacts.verification_context[]` entries with:
+
+- `kind` - the context check kind, such as `binding`, `freshness`, or `replay`
+- `case_artifact` - the corpus artifact key used for the context check
+- `uri`
+- `digest.alg` set to `sha-256`
+- `digest.value` as lowercase SHA-256 hex
+
+The current comparison command validates the presence and descriptor shape of
+these artifact references, and checks their SHA-256 digest values against the
+corpus artifacts required by the case. It does not fetch arbitrary remote URIs
+or verify a detached report bundle yet. Bundle-level artifact verification is
+tracked as a separate hardening step.
 
 ## Compare Command
 

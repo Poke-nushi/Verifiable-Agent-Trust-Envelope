@@ -14,6 +14,7 @@ import base64
 import binascii
 import hashlib
 import json
+import re
 import sys
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
@@ -27,6 +28,7 @@ IMPLEMENTATION_REPORT_VERSION = "vate-implementation-report-2026-07"
 CORPUS_INDEX_VERSION = "vate-conformance-corpus-2026-07"
 CORPUS_INDEX_FILENAME = "corpus.json"
 SUT_RESULTS_VERSION = "vate-sut-results-2026-07"
+SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 CANONICAL_EVIDENCE_TYPES = {
     "admission_receipt",
     "admission_request",
@@ -1315,9 +1317,183 @@ def load_case_expectations(corpus_root: Path) -> list[dict[str, Any]]:
                     }
                     for check in case["expected"].get("checks", [])
                 ],
+                "required_artifacts": required_sut_artifacts(case),
             }
         )
     return expectations
+
+
+def required_sut_artifacts(case: dict[str, Any]) -> dict[str, Any]:
+    artifacts = case.get("artifacts", {})
+    receipt_artifacts: list[dict[str, str]] = []
+    for artifact_name in ("admission_receipt", "post_execution_receipt"):
+        if isinstance(artifacts, dict) and artifact_name in artifacts:
+            receipt_artifacts.append(
+                {
+                    "name": artifact_name,
+                    "expected_digest": sha256_file(resolve_artifact_path(case, artifact_name)),
+                }
+            )
+
+    context_artifacts: list[dict[str, str]] = []
+    for check in case.get("al2_context_checks", []):
+        if not isinstance(check, dict):
+            continue
+        artifact_name = check.get("artifact")
+        kind = check.get("kind")
+        if isinstance(artifact_name, str) and artifact_name and isinstance(kind, str) and kind:
+            context_artifacts.append(
+                {
+                    "case_artifact": artifact_name,
+                    "kind": kind,
+                    "expected_digest": sha256_file(resolve_artifact_path(case, artifact_name)),
+                }
+            )
+
+    return {
+        "receipt_artifacts": receipt_artifacts,
+        "verification_context": context_artifacts,
+    }
+
+
+def digest_descriptor_failures(value: Any, label: str) -> list[str]:
+    failures: list[str] = []
+    if not isinstance(value, dict):
+        return [f"{label}: expected digest object"]
+    if value.get("alg") != "sha-256":
+        failures.append(f"{label}.alg: expected sha-256 actual {value.get('alg')}")
+    digest_value = value.get("value")
+    if not isinstance(digest_value, str) or not SHA256_HEX_RE.fullmatch(digest_value):
+        failures.append(f"{label}.value: expected lowercase sha-256 hex digest")
+    return failures
+
+
+def sut_artifact_ref_failures(value: Any, label: str, *, require_media_type: bool) -> list[str]:
+    failures: list[str] = []
+    if not isinstance(value, dict):
+        return [f"{label}: expected artifact reference object"]
+    uri = value.get("uri")
+    if not isinstance(uri, str) or not uri:
+        failures.append(f"{label}.uri: expected non-empty string")
+    media_type = value.get("media_type")
+    if require_media_type and (not isinstance(media_type, str) or not media_type):
+        failures.append(f"{label}.media_type: expected non-empty string")
+    elif media_type is not None and not isinstance(media_type, str):
+        failures.append(f"{label}.media_type: expected string when present")
+    failures.extend(digest_descriptor_failures(value.get("digest"), f"{label}.digest"))
+    return failures
+
+
+def sut_artifact_digest_match_failures(value: Any, label: str, expected_digest: Any) -> list[str]:
+    if not isinstance(value, dict):
+        return []
+    digest = value.get("digest")
+    if not isinstance(digest, dict):
+        return []
+    actual_digest = digest.get("value")
+    if not isinstance(expected_digest, str):
+        return [f"{label}.digest.value: missing expected corpus digest"]
+    if actual_digest != expected_digest:
+        return [f"{label}.digest.value: expected corpus digest {expected_digest} actual {actual_digest}"]
+    return []
+
+
+def sut_verification_context_failures(value: Any, label: str) -> list[str]:
+    failures = sut_artifact_ref_failures(value, label, require_media_type=False)
+    if not isinstance(value, dict):
+        return failures
+    kind = value.get("kind")
+    if not isinstance(kind, str) or not kind:
+        failures.append(f"{label}.kind: expected non-empty string")
+    case_artifact = value.get("case_artifact")
+    if not isinstance(case_artifact, str) or not case_artifact:
+        failures.append(f"{label}.case_artifact: expected non-empty string")
+    return failures
+
+
+def sut_result_artifact_failures(result: dict[str, Any], requirements: dict[str, Any]) -> list[str]:
+    failures: list[str] = []
+    required_receipts = [
+        receipt for receipt in requirements.get("receipt_artifacts", [])
+        if isinstance(receipt, dict) and isinstance(receipt.get("name"), str)
+    ]
+    required_contexts = [
+        context for context in requirements.get("verification_context", [])
+        if isinstance(context, dict)
+    ]
+    if not required_receipts and not required_contexts:
+        return failures
+
+    artifacts = result.get("artifacts")
+    if not isinstance(artifacts, dict):
+        return ["artifacts: expected object with required artifact references"]
+
+    for required_receipt in required_receipts:
+        artifact_name = required_receipt["name"]
+        label = f"artifacts.{artifact_name}"
+        if artifact_name not in artifacts:
+            failures.append(f"{label}: required for this case")
+            continue
+        artifact_ref = artifacts.get(artifact_name)
+        failures.extend(sut_artifact_ref_failures(artifact_ref, label, require_media_type=True))
+        failures.extend(
+            sut_artifact_digest_match_failures(
+                artifact_ref,
+                label,
+                required_receipt.get("expected_digest"),
+            )
+        )
+
+    raw_contexts = artifacts.get("verification_context", [])
+    if required_contexts:
+        if not isinstance(raw_contexts, list) or not raw_contexts:
+            failures.append("artifacts.verification_context: required non-empty array for this case")
+            raw_contexts = []
+        elif not all(isinstance(context, dict) for context in raw_contexts):
+            failures.append("artifacts.verification_context: expected array of objects")
+            raw_contexts = [context for context in raw_contexts if isinstance(context, dict)]
+        for index, context in enumerate(raw_contexts):
+            failures.extend(
+                sut_verification_context_failures(
+                    context,
+                    f"artifacts.verification_context[{index}]",
+                )
+            )
+
+        available_contexts: dict[tuple[Any, Any], dict[str, Any]] = {
+            (context.get("case_artifact"), context.get("kind")): context
+            for context in raw_contexts
+            if isinstance(context, dict)
+        }
+        for expected_context in required_contexts:
+            key = (expected_context.get("case_artifact"), expected_context.get("kind"))
+            context_ref = available_contexts.get(key)
+            if context_ref is None:
+                failures.append(
+                    "artifacts.verification_context: "
+                    f"missing case_artifact={key[0]} kind={key[1]}"
+                )
+                continue
+            failures.extend(
+                sut_artifact_digest_match_failures(
+                    context_ref,
+                    f"artifacts.verification_context case_artifact={key[0]} kind={key[1]}",
+                    expected_context.get("expected_digest"),
+                )
+            )
+    elif raw_contexts is not None:
+        if not isinstance(raw_contexts, list):
+            failures.append("artifacts.verification_context: expected array when present")
+        else:
+            for index, context in enumerate(raw_contexts):
+                failures.extend(
+                    sut_verification_context_failures(
+                        context,
+                        f"artifacts.verification_context[{index}]",
+                    )
+                )
+
+    return failures
 
 
 def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, Any]:
@@ -1444,6 +1620,7 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
                     continue
                 if actual_check.get("pass") is not True:
                     failures.append(f"check {check['name']}: expected pass")
+            failures.extend(sut_result_artifact_failures(result, expected["required_artifacts"]))
 
         cases.append(
             {
