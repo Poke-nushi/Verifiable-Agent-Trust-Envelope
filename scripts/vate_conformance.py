@@ -1489,29 +1489,77 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
     return report
 
 
+def text_field(source: dict[str, Any], key: str, default: str) -> str:
+    value = source.get(key)
+    return value if isinstance(value, str) and value else default
+
+
+def implementation_metadata(args: argparse.Namespace, conformance_report: dict[str, Any]) -> dict[str, Any]:
+    sut_results = conformance_report.get("sut_results")
+    if isinstance(sut_results, dict) and isinstance(sut_results.get("implementation"), dict):
+        source = sut_results["implementation"]
+        implementation = {
+            "name": text_field(source, "name", "Unknown external VATE verifier"),
+            "type": text_field(source, "type", "external-verifier"),
+            "version": text_field(source, "version", "unknown"),
+            "language": text_field(source, "language", "unknown"),
+        }
+        for optional in ("source", "commit", "environment"):
+            if isinstance(source.get(optional), str) and source[optional]:
+                implementation[optional] = source[optional]
+        return implementation
+
+    implementation = {
+        "name": getattr(args, "implementation_name", "Unknown VATE verifier"),
+        "type": getattr(args, "implementation_type", "external-verifier"),
+        "version": getattr(args, "implementation_version", "unknown"),
+        "language": getattr(args, "implementation_language", "unknown"),
+    }
+    if getattr(args, "implementation_repo", None):
+        implementation["source"] = args.implementation_repo
+    if getattr(args, "implementation_commit", None):
+        implementation["commit"] = args.implementation_commit
+    if getattr(args, "environment", None):
+        implementation["environment"] = args.environment
+    return implementation
+
+
+def add_optional_integrity_metadata(report: dict[str, Any], args: argparse.Namespace) -> None:
+    publication: dict[str, Any] = {}
+    if getattr(args, "implementation_report_uri", None):
+        publication["uri"] = args.implementation_report_uri
+    if getattr(args, "publication_controlled_origin", None):
+        publication["controlled_origin"] = args.publication_controlled_origin
+    if getattr(args, "publication_published_at", None):
+        publication["published_at"] = args.publication_published_at
+    if getattr(args, "publication_immutability", None):
+        publication["immutability"] = args.publication_immutability
+    if publication:
+        report["publication"] = publication
+
+    if getattr(args, "proof_uri", None):
+        proof = {
+            "format": getattr(args, "proof_format", None) or "other",
+            "uri": args.proof_uri,
+        }
+        if getattr(args, "proof_key_ref", None):
+            proof["key_ref"] = args.proof_key_ref
+        if getattr(args, "proof_covered_artifact", None):
+            proof["covered_artifact"] = args.proof_covered_artifact
+        report["proofs"] = [proof]
+
+
 def make_implementation_report(args: argparse.Namespace, conformance_report: dict[str, Any]) -> dict[str, Any]:
     corpus_root = Path(args.corpus_root)
     manifest, digest = corpus_manifest(corpus_root)
-    implementation = {
-        "name": args.implementation_name,
-        "type": args.implementation_type,
-        "version": args.implementation_version,
-        "language": args.implementation_language,
-    }
-    if args.implementation_repo:
-        implementation["source"] = args.implementation_repo
-    if args.implementation_commit:
-        implementation["commit"] = args.implementation_commit
-    if args.environment:
-        implementation["environment"] = args.environment
 
     failed = bool(conformance_report.get("fatal_errors") or conformance_report["summary"]["failed"])
-    return {
+    report = {
         "version": IMPLEMENTATION_REPORT_VERSION,
         "profile": PROFILE,
         "generated_at": conformance_report["checked_at"],
         "status": "fail" if failed else "pass",
-        "implementation": implementation,
+        "implementation": implementation_metadata(args, conformance_report),
         "corpus": {
             "name": corpus_root.name,
             "root": display_path(corpus_root.resolve()),
@@ -1527,6 +1575,7 @@ def make_implementation_report(args: argparse.Namespace, conformance_report: dic
                 "alg": "sha-256",
                 "value": sha256_value(conformance_report),
             },
+            "digest_basis": "json-sorted-no-whitespace",
         },
         "summary": conformance_report["summary"],
         "case_results": [
@@ -1545,6 +1594,41 @@ def make_implementation_report(args: argparse.Namespace, conformance_report: dic
             "Passing cases do not imply production readiness or endorsement.",
         ],
     }
+    add_optional_integrity_metadata(report, args)
+    return report
+
+
+def add_implementation_report_args(parser: argparse.ArgumentParser, *, include_identity: bool) -> None:
+    parser.add_argument("--implementation-report", help="optional path to write an implementation report")
+    parser.add_argument("--implementation-report-uri", help="durable URI where the implementation report will be published")
+    parser.add_argument("--publication-controlled-origin", help="origin or repository namespace controlled by the implementer")
+    parser.add_argument("--publication-published-at", help="publication timestamp for the implementation report")
+    parser.add_argument(
+        "--publication-immutability",
+        choices=["content_addressed", "release_asset", "git_commit", "versioned_url", "mutable_url"],
+        help="immutability level of the published implementation report URI",
+    )
+    parser.add_argument(
+        "--proof-format",
+        choices=["detached_jws", "signed_git_tag", "sigstore_bundle", "other"],
+        help="optional external proof format for the report or release bundle",
+    )
+    parser.add_argument("--proof-uri", help="URI of an optional external proof artifact")
+    parser.add_argument("--proof-key-ref", help="key or identity reference for the optional external proof")
+    parser.add_argument(
+        "--proof-covered-artifact",
+        choices=["implementation_report", "conformance_report", "sut_results", "release_bundle"],
+        help="artifact covered by the optional external proof",
+    )
+    parser.add_argument("--conformance-report-uri")
+    if include_identity:
+        parser.add_argument("--implementation-name", default="VATE reference artifact checker")
+        parser.add_argument("--implementation-type", default="reference-artifact-checker")
+        parser.add_argument("--implementation-version", default="0.2")
+        parser.add_argument("--implementation-language", default="Python 3 standard library")
+        parser.add_argument("--implementation-repo")
+        parser.add_argument("--implementation-commit")
+        parser.add_argument("--environment")
 
 
 def parse_args() -> argparse.Namespace:
@@ -1553,15 +1637,7 @@ def parse_args() -> argparse.Namespace:
     run = subparsers.add_parser("run", help="check repository fixture artifacts with the reference runner")
     run.add_argument("--corpus-root", required=True, help="corpus root containing cases/")
     run.add_argument("--report", required=True, help="path to write the machine-readable report")
-    run.add_argument("--implementation-report", help="optional path to write an implementation report")
-    run.add_argument("--implementation-name", default="VATE reference artifact checker")
-    run.add_argument("--implementation-type", default="reference-artifact-checker")
-    run.add_argument("--implementation-version", default="0.2")
-    run.add_argument("--implementation-language", default="Python 3 standard library")
-    run.add_argument("--implementation-repo")
-    run.add_argument("--implementation-commit")
-    run.add_argument("--environment")
-    run.add_argument("--conformance-report-uri")
+    add_implementation_report_args(run, include_identity=True)
     index = subparsers.add_parser("index", help="write a language-neutral corpus index")
     index.add_argument("--corpus-root", required=True, help="corpus root containing cases/")
     index.add_argument("--out", required=True, help="path to write the corpus index")
@@ -1569,11 +1645,39 @@ def parse_args() -> argparse.Namespace:
     compare.add_argument("--corpus-root", required=True, help="corpus root containing cases/")
     compare.add_argument("--sut-results", required=True, help="path to SUT result JSON")
     compare.add_argument("--report", required=True, help="path to write the comparison report")
+    add_implementation_report_args(compare, include_identity=False)
     return parser.parse_args()
+
+
+def validate_args(args: argparse.Namespace) -> None:
+    if getattr(args, "publication_published_at", None) and try_parse_time(args.publication_published_at) is None:
+        raise SystemExit("--publication-published-at must be a valid date-time")
+
+    publication_metadata_args = [
+        getattr(args, "publication_controlled_origin", None),
+        getattr(args, "publication_published_at", None),
+        getattr(args, "publication_immutability", None),
+        getattr(args, "proof_uri", None),
+    ]
+    if any(publication_metadata_args) and not getattr(args, "implementation_report", None):
+        raise SystemExit("publication and proof metadata require --implementation-report")
+    if any(publication_metadata_args) and not getattr(args, "implementation_report_uri", None):
+        raise SystemExit("publication and proof metadata require --implementation-report-uri")
+    if any(publication_metadata_args) and not getattr(args, "conformance_report_uri", None):
+        raise SystemExit("publication and proof metadata require --conformance-report-uri")
+
+    proof_metadata_args = [
+        getattr(args, "proof_format", None),
+        getattr(args, "proof_key_ref", None),
+        getattr(args, "proof_covered_artifact", None),
+    ]
+    if any(proof_metadata_args) and not getattr(args, "proof_uri", None):
+        raise SystemExit("--proof-format, --proof-key-ref, and --proof-covered-artifact require --proof-uri")
 
 
 def main() -> int:
     args = parse_args()
+    validate_args(args)
     if args.command == "run":
         report = run_corpus(Path(args.corpus_root))
         write_json(Path(args.report), report)
@@ -1588,6 +1692,8 @@ def main() -> int:
     if args.command == "compare":
         report = compare_sut_results(Path(args.corpus_root), Path(args.sut_results))
         write_json(Path(args.report), report)
+        if args.implementation_report:
+            write_json(Path(args.implementation_report), make_implementation_report(args, report))
         if report.get("fatal_errors") or report["summary"]["failed"]:
             return 1
         return 0

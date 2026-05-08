@@ -37,8 +37,23 @@
     "digest": {
       "alg": "sha-256",
       "value": "example-report-digest"
-    }
+    },
+    "digest_basis": "json-sorted-no-whitespace"
   },
+  "publication": {
+    "uri": "https://example.invalid/vate/reports/vate-implementation-report-2026-07-example.json",
+    "controlled_origin": "https://example.invalid",
+    "published_at": "2026-07-01T00:05:00Z",
+    "immutability": "versioned_url"
+  },
+  "proofs": [
+    {
+      "format": "detached_jws",
+      "uri": "https://example.invalid/vate/reports/vate-implementation-report-2026-07-example.json.jws",
+      "key_ref": "did:web:example.invalid#report-signing-key",
+      "covered_artifact": "implementation_report"
+    }
+  ],
   "summary": {
     "total": 2,
     "passed": 2,

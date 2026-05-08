@@ -102,6 +102,11 @@ The implementation report follows:
 
 - `schemas/implementation-report.schema.json`
 
+External SUT comparisons can also write implementation reports by adding
+`--implementation-report` to the `compare` command. Publication guidance is in:
+
+- `docs/conformance/report-integrity.md`
+
 To regenerate the language-neutral corpus index:
 
 ```bash

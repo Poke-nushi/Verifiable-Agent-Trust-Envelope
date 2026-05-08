@@ -59,6 +59,12 @@ The command writes a normal VATE conformance report shape:
 
 - `schemas/conformance-report.schema.json`
 
+To also write an implementation report for the external SUT result, add
+`--implementation-report`. The implementation identity is copied from the SUT
+result file, and optional publication metadata can be supplied with
+`--conformance-report-uri`, `--implementation-report-uri`,
+`--publication-controlled-origin`, and `--publication-immutability`.
+
 It exits non-zero when:
 
 - the SUT result file has the wrong version or profile

@@ -145,7 +145,7 @@ The most useful feedback for this draft is currently:
 - **Primary language**: English
 - **Research refresh date**: 2026-05-07
 - **Primary battlefield**: `AL2` external digital write
-- **Implemented now**: payload schemas, examples, verifier guidance, reference demos, verifier policy example, policy snapshot schema, trust-bundle hardening checks, detached JOSE fixture checks, AL2 HTTP conformance corpus, runnable v0.2 AL2 conformance corpus, language-neutral corpus index, SUT result comparison contract, implementation report schema, MCP/OAuth transport-bound fixture, AP2/UCP commerce crosswalk fixture, AP2 Human Not Present evidence fixtures, v0.2 AL2 verifier admission profile draft, AL2 admission interop profile, dependency-free verifier core, A2A metadata adapter demo, A2A v1.0 extension sketch
+- **Implemented now**: payload schemas, examples, verifier guidance, reference demos, verifier policy example, policy snapshot schema, trust-bundle hardening checks, detached JOSE fixture checks, evidence type registry, AL2 HTTP conformance corpus, runnable v0.2 AL2 conformance corpus, language-neutral corpus index, SUT result comparison contract, implementation report schema, report integrity metadata and guidance, MCP/OAuth transport-bound fixture, AP2/UCP commerce crosswalk fixture, AP2 Human Not Present evidence fixtures, v0.2 AL2 verifier admission profile draft, AL2 admission interop profile, dependency-free verifier core, A2A metadata adapter demo, A2A v1.0 extension sketch
 - **Planned later**: pairwise presentation profile, richer capability registry, formal `AID`, physical `ABS` profiles
 
 ## Repository Map
@@ -196,6 +196,8 @@ The most useful feedback for this draft is currently:
   Runnable conformance corpus for v0.2 admission and receipt semantics
 - [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)
   Implementation report format for publishing one run against one corpus snapshot
+- [docs/conformance/report-integrity.md](docs/conformance/report-integrity.md)
+  Publication and integrity guidance for SUT, conformance, and implementation reports
 - [reference/vate-verifier-core/README.md](reference/vate-verifier-core/README.md)
   Dependency-free verifier core for AL2 admission fixtures
 - [reference/a2a-metadata-adapter-demo/README.md](reference/a2a-metadata-adapter-demo/README.md)

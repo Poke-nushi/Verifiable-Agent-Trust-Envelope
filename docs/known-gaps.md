@@ -205,17 +205,18 @@ Remaining work includes:
 - ensuring trust bundles and policy snapshots refer to the same vocabulary
 - adding more negative fixtures for unknown or malformed protocol hints
 
-### 16. Report Integrity Is Not Yet Defined
+### 16. Report Integrity Needs External Proof Implementation
 
-The SUT result and implementation report schemas carry corpus digests, but they
-do not yet define how a third-party report is authenticated or published.
+The SUT result and implementation report schemas now define publication
+metadata and optional external proof references. The runner can write an
+implementation report for both reference runs and external SUT comparisons.
 
 Remaining work includes:
 
-- documenting how implementation reports should be hosted under an implementer
-  controlled origin
-- deciding whether report proofs should use detached JWS references
-- clarifying what can and cannot be inferred from a passing report
+- implementing real proof verification for detached JWS, signed git tags, or
+  Sigstore bundles
+- publishing real implementation reports under implementer-controlled origins
+- deciding whether future profiles require a specific proof format
 
 ## Practical Reading Of These Gaps
 

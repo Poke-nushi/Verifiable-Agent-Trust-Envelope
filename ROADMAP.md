@@ -65,7 +65,7 @@ new adjacent profiles.
 ### P2 Before Independent Implementation Collection
 
 - add report integrity guidance for SUT result and implementation report
-  publication
+  publication; initial schema, runner, and documentation support added
 - decide whether to add a pinned dependency for production-grade JOSE signature
   fixtures, or keep v0.2 as byte-level detached proof fixtures only
 - add a byte-level A2A signed Agent Card fixture only after the digest target

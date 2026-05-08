@@ -28,6 +28,7 @@ The report has four important blocks:
 - `implementation` - name, version, language, source, and optional commit or environment
 - `corpus` - corpus name, root, case count, artifact count, digest, and manifest
 - `conformance_report` - URI, media type, and digest of the runner output
+- optional `publication` and `proofs` - durable location and external proof references
 - `summary` and `case_results` - the result surface a reviewer can compare across implementations
 
 The portable corpus shape is published separately as:
@@ -46,6 +47,10 @@ The reference runner can compare that SUT result file against the corpus and emi
 Use `compare` for external SUT review. Use `run` to check the repository's own
 fixture artifacts and reference runner behavior.
 
+Report publication and integrity guidance is published separately:
+
+- `docs/conformance/report-integrity.md`
+
 ## Reference Runner Command
 
 ```bash
@@ -53,6 +58,10 @@ python3 scripts/vate_conformance.py run \
   --corpus-root conformance/al2-vate-v0.2 \
   --report /tmp/vate-conformance-report.json \
   --implementation-report /tmp/vate-implementation-report.json \
+  --conformance-report-uri "https://example.invalid/vate/reports/vate-conformance-report.json" \
+  --implementation-report-uri "https://example.invalid/vate/reports/vate-implementation-report.json" \
+  --publication-controlled-origin "https://example.invalid" \
+  --publication-immutability versioned_url \
   --implementation-name "Example VATE verifier" \
   --implementation-type "verifier" \
   --implementation-version "0.1.0" \
@@ -67,9 +76,33 @@ The runner writes:
 - an implementation report using `application/vate-implementation-report+json`
 
 The implementation report includes a digest of the conformance report and a digest of the corpus snapshot.
+The runner records `conformance_report.digest_basis=json-sorted-no-whitespace`
+for its canonical JSON digest.
 The corpus digest is computed over the sorted `corpus.manifest` array.
 Each manifest entry records a repository-relative artifact path and the artifact's raw file SHA-256 digest.
 The committed `corpus.json` uses the same manifest and digest basis.
+
+To publish an implementation report for an external SUT comparison, use
+`compare` with `--implementation-report`:
+
+```bash
+python3 scripts/vate_conformance.py compare \
+  --corpus-root conformance/al2-vate-v0.2 \
+  --sut-results examples/conformance/sut-results-pass.example.json \
+  --report /tmp/vate-sut-compare-report.json \
+  --implementation-report /tmp/vate-sut-implementation-report.json \
+  --conformance-report-uri "https://example.invalid/vate/reports/vate-sut-compare-report.json" \
+  --implementation-report-uri "https://example.invalid/vate/reports/vate-sut-implementation-report.json" \
+  --publication-controlled-origin "https://example.invalid" \
+  --publication-immutability versioned_url
+```
+
+The implementation identity is copied from the SUT result file when `compare`
+generates the implementation report.
+
+Do not put a self-digest of the implementation report inside the same JSON
+object. If a report digest or signature is needed, publish it as an external
+manifest or detached proof and reference it from `proofs[]`.
 
 ## Review Use
 
@@ -93,5 +126,6 @@ Two reports are comparable only when they use the same:
 - corpus digest
 - case set
 - expected reason code vocabulary
+- publication package when comparing independently published implementation reports
 
 If the corpus changes, publish a new report rather than editing the old result in place.

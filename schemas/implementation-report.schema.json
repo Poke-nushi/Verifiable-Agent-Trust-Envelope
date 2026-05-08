@@ -179,9 +179,105 @@
             }
           },
           "additionalProperties": true
+        },
+        "digest_basis": {
+          "type": "string",
+          "description": "How conformance_report.digest was computed.",
+          "enum": [
+            "json-sorted-no-whitespace",
+            "exact-bytes"
+          ]
         }
       },
       "additionalProperties": true
+    },
+    "publication": {
+      "type": "object",
+      "description": "Optional publication metadata for a durable implementation report location controlled by the implementer.",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "controlled_origin": {
+          "type": "string",
+          "description": "Origin or repository namespace controlled by the implementation maintainer.",
+          "minLength": 1
+        },
+        "published_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "immutability": {
+          "type": "string",
+          "enum": [
+            "content_addressed",
+            "release_asset",
+            "git_commit",
+            "versioned_url",
+            "mutable_url"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "proofs": {
+      "type": "array",
+      "description": "Optional external proof references for the implementation report or its containing release artifact.",
+      "items": {
+        "type": "object",
+        "required": [
+          "format",
+          "uri"
+        ],
+        "properties": {
+          "format": {
+            "type": "string",
+            "enum": [
+              "detached_jws",
+              "signed_git_tag",
+              "sigstore_bundle",
+              "other"
+            ]
+          },
+          "uri": {
+            "type": "string",
+            "minLength": 1
+          },
+          "key_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "covered_artifact": {
+            "type": "string",
+            "enum": [
+              "implementation_report",
+              "conformance_report",
+              "sut_results",
+              "release_bundle"
+            ]
+          },
+          "payload_digest": {
+            "type": "object",
+            "required": [
+              "alg",
+              "value"
+            ],
+            "properties": {
+              "alg": {
+                "type": "string",
+                "const": "sha-256"
+              },
+              "value": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": true
+      }
     },
     "summary": {
       "type": "object",
