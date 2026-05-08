@@ -4,10 +4,11 @@
 
 **A discussion draft for verifier-side trust / permit / receipt decisions in AI agent systems**
 
-`v0.1 discussion draft`  
-`v0.2 AL2 verifier admission profile draft`
-`not production-ready`  
-`seeking critique on boundary, verifier order, and artifact semantics`
+- `v0.1 discussion draft`
+- `v0.2 AL2 verifier admission profile draft`
+- `not production-ready`
+- `no endorsement or production approval implied`
+- `seeking critique on boundary, verifier order, and artifact semantics`
 
 ## The Problem
 
@@ -145,8 +146,12 @@ The most useful feedback for this draft is currently:
 - **Primary language**: English
 - **Research refresh date**: 2026-05-07
 - **Primary battlefield**: `AL2` external digital write
-- **Implemented now**: payload schemas, examples, verifier guidance, reference demos, verifier policy example, policy snapshot schema, trust-bundle hardening checks, detached JOSE fixture checks, evidence type registry, AL2 HTTP conformance corpus, runnable v0.2 AL2 conformance corpus, language-neutral corpus index, SUT result comparison contract, implementation report schema, report integrity metadata and guidance, MCP/OAuth transport-bound fixture, AP2/UCP commerce crosswalk fixture, AP2 Human Not Present evidence fixtures, v0.2 AL2 verifier admission profile draft, AL2 admission interop profile, dependency-free verifier core, A2A metadata adapter demo, A2A v1.0 extension sketch
+- **Implemented artifacts**: v0.2 schemas and examples; runnable AL2 fixture corpus with negative cases; SUT comparison and implementation-reporting formats; dependency-free verifier core and A2A-shaped adapter demo; focused adjacent evidence fixtures and crosswalk notes
 - **Planned later**: pairwise presentation profile, richer capability registry, formal `AID`, physical `ABS` profiles
+
+The conformance artifacts record one implementation run against one corpus
+snapshot. They do not imply endorsement, production approval, or a general
+compatibility claim.
 
 ## Repository Map
 
@@ -225,6 +230,29 @@ Dependency-free sanity check:
 ```bash
 python3 scripts/check_repo.py
 ```
+
+The AL2 corpus has separate commands for repository fixture checks and external
+implementation comparison:
+
+```bash
+python3 scripts/vate_conformance.py run \
+  --corpus-root conformance/al2-vate-v0.2 \
+  --report /tmp/vate-conformance-report.json
+```
+
+`run` checks the committed fixture artifacts with the reference runner. It is
+not an external implementation result.
+
+```bash
+python3 scripts/vate_conformance.py compare \
+  --corpus-root conformance/al2-vate-v0.2 \
+  --sut-results examples/conformance/sut-results-pass.example.json \
+  --report /tmp/vate-sut-compare-report.json
+```
+
+`compare` checks an external SUT result file against the same corpus snapshot.
+Independent implementation review should use the SUT adapter contract and the
+`compare` path.
 
 Optional strict schema validation:
 

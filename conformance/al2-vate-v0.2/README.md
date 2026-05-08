@@ -4,6 +4,8 @@ This directory contains a runnable machine-readable corpus for the `VATE AL2 Ver
 
 It is not a production endorsement suite.
 It is an interoperability review and implementation aid.
+It does not grant a badge, endorsement, production approval, or a general
+compatibility claim.
 
 The corpus makes the v0.2 draft easier to evaluate by naming the minimum expected verifier outcomes:
 
@@ -133,6 +135,8 @@ signed-JSON profile.
 
 `python3 scripts/vate_conformance.py run` checks the committed fixture artifacts
 with the reference runner.
+It is a repository fixture integrity check, not an external implementation
+conformance result.
 
 `python3 scripts/vate_conformance.py compare` checks an external SUT result file
 against the same corpus snapshot. Independent implementation review should use
@@ -159,6 +163,8 @@ Post-execution cases use `expected.post_execution_outcome` so execution results 
 `expected.should_execute` records the execution gate separately from the admission
 decision, so an attenuated case can still be non-executable when a fresh permit
 is required.
+For post-execution cases, `expected.should_execute` restates the pre-execution
+admission gate. It does not state whether the post-execution receipt is valid.
 
 `al2_context_checks` records the minimum verifier context needed for selected
 AL2 cases:

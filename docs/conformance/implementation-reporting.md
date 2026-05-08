@@ -44,8 +44,8 @@ For implementations that do not use the reference runner directly, publish a SUT
 - `docs/conformance/sut-adapter-contract.md`
 
 The reference runner can compare that SUT result file against the corpus and emit a standard conformance report.
-Use `compare` for external SUT review. Use `run` to check the repository's own
-fixture artifacts and reference runner behavior.
+Use `compare` for external SUT review. Use `run` only to check the repository's
+own fixture artifacts and reference runner behavior.
 
 Report publication and integrity guidance is published separately:
 

@@ -24,6 +24,12 @@ VATE's narrower role is:
 - emit a VATE admission receipt for a specific external digital action
 - link post-execution evidence back to the admitted request
 
+These mappings are evidence-consumption mappings, not semantic equivalence
+mappings. VATE does not assert that an adjacent artifact is valid, current,
+sufficient, or transferable merely because it is mapped to a VATE evidence
+type. Validity and authority must be established by adjacent-protocol
+verification, trust bundles, status checks, and local policy.
+
 ## Mapping
 
 | OAP / APort concept | VATE field |

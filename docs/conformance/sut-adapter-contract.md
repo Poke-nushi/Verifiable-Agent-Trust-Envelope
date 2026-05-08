@@ -97,6 +97,14 @@ It only needs to state whether the named expected check was satisfied.
 `outcome: "attenuate"` while `should_execute: false` when the attenuation
 requires a fresh permit before execution can proceed.
 
+For post-execution cases, `should_execute` still refers to the pre-execution
+admission gate. It does not mean the post-execution receipt or observed side
+effect is valid.
+
+The SUT result file is an input to comparison, not a standalone proof package.
+Reviewers should inspect referenced artifacts and implementation reports when a
+result is used outside local development.
+
 ## Claim Boundary
 
 Passing `compare` means the SUT result file matched one corpus snapshot.

@@ -21,6 +21,12 @@ VATE's narrower role is:
 - decide whether one externally-effectful action should be admitted, narrowed, or denied
 - emit an admission receipt and validate post-execution linkage
 
+These mappings are evidence-consumption mappings, not semantic equivalence
+mappings. VATE does not assert that an adjacent artifact is valid, current,
+sufficient, or transferable merely because it is mapped to a VATE evidence
+type. Validity and authority must be established by adjacent-protocol
+verification, trust bundles, status checks, and local policy.
+
 ## Mapping
 
 | AgentROA concept | VATE field |

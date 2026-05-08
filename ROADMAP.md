@@ -19,10 +19,10 @@ Focus:
 
 ## May 2026 Review Hardening
 
-External review of commit `80b66fe` found that the boundary is coherent enough
-for narrow review, but not yet strong enough to call the AL2 package
-conformance-ready. The next work should harden the security basis before adding
-new adjacent profiles.
+External review has repeatedly found that the boundary is coherent enough for
+narrow review, but not yet strong enough to call the AL2 package
+conformance-ready. The next work should harden the verification chain before
+adding new adjacent profiles.
 
 ### P0 Before The Next External Review Round
 
@@ -34,6 +34,22 @@ new adjacent profiles.
   canonicalization migration path
 - [x] split the conformance language so `run` is clearly a reference artifact /
   fixture integrity check and `compare` is the external SUT comparison path
+- [ ] make the SUT result contract artifact-backed, so external results reference
+  actual admission receipts, post-execution receipts, context artifacts, proofs,
+  and digests where cases require them
+- [ ] add report-bundle verification for the corpus, SUT result, conformance report,
+  and implementation report digest chain
+- [ ] formalize post-execution `linkage_checks` as part of the case contract and
+  stop collapsing materially different linkage failures into one reason
+- [ ] bind AL2 context checks to request, transaction, evidence, and receipt
+  artifacts so external SUT comparison can evaluate freshness, replay, and
+  runtime-binding behavior
+- [ ] move evidence type and protocol hint vocabulary toward a single
+  machine-readable source and define allowed type/hint combinations
+- [ ] tighten critical schema blocks while keeping future extension data under
+  explicit extension or annotation fields
+- [ ] clarify whether `2026-07` artifacts are July-target draft artifacts or should
+  be renamed to the current review month
 
 ### P1 Before Adjacent Maintainer Outreach
 
