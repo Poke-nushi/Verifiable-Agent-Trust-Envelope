@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:report-bundle-verification:2026-07",
+  "title": "VATE Report Bundle Verification",
+  "description": "Machine-readable verification result for a VATE corpus, SUT result, conformance report, and implementation report bundle.",
+  "type": "object",
+  "required": [
+    "version",
+    "profile",
+    "checked_at",
+    "summary",
+    "artifacts",
+    "checks"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "vate-report-bundle-verification-2026-07"
+    },
+    "profile": {
+      "type": "string",
+      "const": "VATE-AL2-Verifier-Admission-v0.2"
+    },
+    "checked_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "total",
+        "passed",
+        "failed"
+      ],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": true
+    },
+    "artifacts": {
+      "type": "object",
+      "required": [
+        "corpus",
+        "conformance_report",
+        "implementation_report"
+      ],
+      "properties": {
+        "corpus": {
+          "type": "object",
+          "required": [
+            "root",
+            "digest",
+            "artifact_count"
+          ],
+          "properties": {
+            "root": {
+              "type": "string",
+              "minLength": 1
+            },
+            "digest": {
+              "$ref": "#/$defs/digest"
+            },
+            "artifact_count": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": true
+        },
+        "sut_results": {
+          "$ref": "#/$defs/reportArtifact"
+        },
+        "conformance_report": {
+          "$ref": "#/$defs/reportArtifact"
+        },
+        "implementation_report": {
+          "$ref": "#/$defs/reportArtifact"
+        }
+      },
+      "additionalProperties": true
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "pass"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "pass": {
+            "type": "boolean"
+          },
+          "expected": {},
+          "actual": {},
+          "details": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "object",
+      "required": [
+        "alg",
+        "value"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "const": "sha-256"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": true
+    },
+    "reportArtifact": {
+      "type": "object",
+      "required": [
+        "path",
+        "digest",
+        "digest_basis"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "digest_basis": {
+          "type": "string",
+          "const": "json-sorted-no-whitespace"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

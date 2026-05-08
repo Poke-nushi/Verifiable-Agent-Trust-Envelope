@@ -84,6 +84,7 @@ EXAMPLE_PAIRS = [
     ("examples/trust-bundle.example.json", "schemas/trust-bundle.schema.json"),
     ("examples/conformance-report.example.json", "schemas/conformance-report.schema.json"),
     ("examples/implementation-report.example.json", "schemas/implementation-report.schema.json"),
+    ("examples/report-bundle-verification.example.json", "schemas/report-bundle-verification.schema.json"),
     ("examples/conformance/sut-results-pass.example.json", "schemas/sut-result.schema.json"),
     ("conformance/al2-vate-v0.2/corpus.json", "schemas/conformance-corpus.schema.json"),
     ("examples/policies/merchant-purchase-al2-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),

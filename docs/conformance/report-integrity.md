@@ -32,6 +32,39 @@ For an independent implementation review, publish these artifacts together:
 The implementation report should reference the conformance report through
 `conformance_report.uri` and `conformance_report.digest`.
 
+## Bundle Verification
+
+The reference runner can verify the local digest chain for a published report
+bundle:
+
+```bash
+python3 scripts/vate_conformance.py verify-bundle \
+  --corpus-root conformance/al2-vate-v0.2 \
+  --sut-results examples/conformance/sut-results-pass.example.json \
+  --conformance-report /tmp/vate-sut-compare-report.json \
+  --implementation-report /tmp/vate-sut-implementation-report.json \
+  --report /tmp/vate-report-bundle-verification.json
+```
+
+The output follows:
+
+- `schemas/report-bundle-verification.schema.json`
+
+For external SUT comparison bundles, `verify-bundle` checks:
+
+- the committed corpus index digest and manifest against the recomputed corpus
+- the conformance report corpus digest against the recomputed corpus
+- the SUT result corpus digest against the recomputed corpus
+- the conformance report SUT result digest against the supplied SUT result file
+- the implementation report conformance report digest against the supplied
+  conformance report file
+- the implementation report summary, status, and case projection against the
+  conformance report
+
+For reference-run bundles without a SUT result file, omit `--sut-results`.
+The command still verifies the corpus, conformance report, and implementation
+report chain.
+
 ## Controlled Origin
 
 An implementation report should be hosted under an origin or repository

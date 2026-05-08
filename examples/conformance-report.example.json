@@ -8,6 +8,15 @@
     "failed": 0,
     "skipped": 0
   },
+  "corpus": {
+    "name": "al2-vate-v0.2",
+    "root": "conformance/al2-vate-v0.2",
+    "artifact_count": 2,
+    "digest": {
+      "alg": "sha-256",
+      "value": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  },
   "cases": [
     {
       "case_id": "allow-valid-admission",

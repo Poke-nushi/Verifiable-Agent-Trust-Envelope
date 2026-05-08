@@ -38,7 +38,7 @@ adding new adjacent profiles.
   post-execution receipts, AL2 context artifacts, and digest descriptors
 - [ ] extend artifact-backed SUT results to JOSE proof-package references where
   corpus cases require proof provenance
-- [ ] add report-bundle verification for the corpus, SUT result, conformance report,
+- [x] add report-bundle verification for the corpus, SUT result, conformance report,
   and implementation report digest chain
 - [ ] formalize post-execution `linkage_checks` as part of the case contract and
   stop collapsing materially different linkage failures into one reason

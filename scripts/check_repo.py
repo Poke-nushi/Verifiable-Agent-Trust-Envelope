@@ -59,6 +59,7 @@ EXAMPLE_PAIRS = [
     ("examples/trust-bundle.example.json", "schemas/trust-bundle.schema.json"),
     ("examples/conformance-report.example.json", "schemas/conformance-report.schema.json"),
     ("examples/implementation-report.example.json", "schemas/implementation-report.schema.json"),
+    ("examples/report-bundle-verification.example.json", "schemas/report-bundle-verification.schema.json"),
     ("examples/conformance/sut-results-pass.example.json", "schemas/sut-result.schema.json"),
     ("conformance/al2-vate-v0.2/corpus.json", "schemas/conformance-corpus.schema.json"),
     ("examples/policies/merchant-purchase-al2-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),
@@ -379,6 +380,29 @@ def main() -> int:
                 str(ROOT / "examples" / "conformance" / "sut-results-pass.example.json"),
                 "--report",
                 str(tmp_dir / "vate-sut-compare-report.json"),
+                "--implementation-report",
+                str(tmp_dir / "vate-sut-implementation-report.json"),
+                "--conformance-report-uri",
+                str(tmp_dir / "vate-sut-compare-report.json"),
+                "--implementation-report-uri",
+                str(tmp_dir / "vate-sut-implementation-report.json"),
+            ]
+        )
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "verify-bundle",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.2"),
+                "--sut-results",
+                str(ROOT / "examples" / "conformance" / "sut-results-pass.example.json"),
+                "--conformance-report",
+                str(tmp_dir / "vate-sut-compare-report.json"),
+                "--implementation-report",
+                str(tmp_dir / "vate-sut-implementation-report.json"),
+                "--report",
+                str(tmp_dir / "vate-sut-bundle-verification.json"),
             ]
         )
         run([sys.executable, str(VATE_CORE), "self-test"])

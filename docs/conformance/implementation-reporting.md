@@ -81,6 +81,8 @@ for its canonical JSON digest.
 The corpus digest is computed over the sorted `corpus.manifest` array.
 Each manifest entry records a repository-relative artifact path and the artifact's raw file SHA-256 digest.
 The committed `corpus.json` uses the same manifest and digest basis.
+For external SUT comparisons, the conformance report also records
+`sut_results.digest` using the same `json-sorted-no-whitespace` basis.
 
 To publish an implementation report for an external SUT comparison, use
 `compare` with `--implementation-report`:
@@ -99,6 +101,17 @@ python3 scripts/vate_conformance.py compare \
 
 The implementation identity is copied from the SUT result file when `compare`
 generates the implementation report.
+
+To verify that the local report bundle is still tied together, run:
+
+```bash
+python3 scripts/vate_conformance.py verify-bundle \
+  --corpus-root conformance/al2-vate-v0.2 \
+  --sut-results examples/conformance/sut-results-pass.example.json \
+  --conformance-report /tmp/vate-sut-compare-report.json \
+  --implementation-report /tmp/vate-sut-implementation-report.json \
+  --report /tmp/vate-report-bundle-verification.json
+```
 
 Do not put a self-digest of the implementation report inside the same JSON
 object. If a report digest or signature is needed, publish it as an external

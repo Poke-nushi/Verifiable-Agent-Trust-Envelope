@@ -1,0 +1,58 @@
+{
+  "version": "vate-report-bundle-verification-2026-07",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "checked_at": "2026-07-01T00:10:00Z",
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "failed": 0
+  },
+  "artifacts": {
+    "corpus": {
+      "root": "conformance/al2-vate-v0.2",
+      "digest": {
+        "alg": "sha-256",
+        "value": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "artifact_count": 50
+    },
+    "sut_results": {
+      "path": "examples/conformance/sut-results-pass.example.json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "1111111111111111111111111111111111111111111111111111111111111111"
+      },
+      "digest_basis": "json-sorted-no-whitespace"
+    },
+    "conformance_report": {
+      "path": "reports/vate-sut-compare-report.json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "2222222222222222222222222222222222222222222222222222222222222222"
+      },
+      "digest_basis": "json-sorted-no-whitespace"
+    },
+    "implementation_report": {
+      "path": "reports/vate-sut-implementation-report.json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "3333333333333333333333333333333333333333333333333333333333333333"
+      },
+      "digest_basis": "json-sorted-no-whitespace"
+    }
+  },
+  "checks": [
+    {
+      "name": "corpus_index.digest",
+      "pass": true
+    },
+    {
+      "name": "conformance_report.sut_results.digest",
+      "pass": true
+    },
+    {
+      "name": "implementation_report.conformance_report.digest",
+      "pass": true
+    }
+  ]
+}

@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PROFILE = "VATE-AL2-Verifier-Admission-v0.2"
 CONFORMANCE_REPORT_VERSION = "vate-conformance-report-2026-07"
 IMPLEMENTATION_REPORT_VERSION = "vate-implementation-report-2026-07"
+BUNDLE_VERIFICATION_VERSION = "vate-report-bundle-verification-2026-07"
 CORPUS_INDEX_VERSION = "vate-conformance-corpus-2026-07"
 CORPUS_INDEX_FILENAME = "corpus.json"
 SUT_RESULTS_VERSION = "vate-sut-results-2026-07"
@@ -121,6 +122,10 @@ def b64url_decode_text(value: Any) -> bytes | None:
 
 def sha256_value(value: Any) -> str:
     return hashlib.sha256(canonical_bytes(value)).hexdigest()
+
+
+def digest_descriptor(value: Any) -> dict[str, str]:
+    return {"alg": "sha-256", "value": sha256_value(value)}
 
 
 def sha256_file(path: Path) -> str:
@@ -1281,6 +1286,7 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
 def run_corpus(corpus_root: Path) -> dict[str, Any]:
     case_paths = sorted((corpus_root / "cases").glob("*.json"))
     cases = [evaluate_case(path) for path in case_paths]
+    manifest, digest = corpus_manifest(corpus_root)
     failed = sum(1 for item in cases if not item["pass"])
     report = {
         "version": CONFORMANCE_REPORT_VERSION,
@@ -1291,6 +1297,12 @@ def run_corpus(corpus_root: Path) -> dict[str, Any]:
             "passed": len(cases) - failed,
             "failed": failed,
             "skipped": 0,
+        },
+        "corpus": {
+            "name": corpus_root.name,
+            "root": display_path(corpus_root.resolve()),
+            "artifact_count": len(manifest),
+            "digest": digest,
         },
         "cases": cases,
     }
@@ -1657,12 +1669,306 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
         },
         "sut_results": {
             "path": display_path(sut_results_path.resolve()),
+            "digest": digest_descriptor(sut_results),
+            "digest_basis": "json-sorted-no-whitespace",
             "implementation": sut_implementation,
         },
         "cases": cases,
     }
     if fatal_errors:
         report["fatal_errors"] = fatal_errors
+    return report
+
+
+def add_bundle_check(
+    checks: list[dict[str, Any]],
+    name: str,
+    passed: bool,
+    *,
+    expected: Any | None = None,
+    actual: Any | None = None,
+    details: str | None = None,
+) -> None:
+    check: dict[str, Any] = {
+        "name": name,
+        "pass": passed,
+    }
+    if expected is not None:
+        check["expected"] = expected
+    if actual is not None:
+        check["actual"] = actual
+    if details:
+        check["details"] = details
+    checks.append(check)
+
+
+def summary_status(summary: Any) -> str:
+    if not isinstance(summary, dict):
+        return "fail"
+    if summary.get("failed"):
+        return "fail"
+    if summary.get("skipped"):
+        return "partial"
+    return "pass"
+
+
+def implementation_case_results_match(
+    conformance_report: dict[str, Any],
+    implementation_report: dict[str, Any],
+) -> bool:
+    conformance_cases = conformance_report.get("cases")
+    implementation_cases = implementation_report.get("case_results")
+    if not isinstance(conformance_cases, list) or not isinstance(implementation_cases, list):
+        return False
+    expected = [
+        {
+            "case_id": case.get("case_id"),
+            "expected_outcome": case.get("expected_outcome"),
+            "actual_outcome": case.get("actual_outcome"),
+            "expected_should_execute": case.get("expected_should_execute"),
+            "actual_should_execute": case.get("actual_should_execute"),
+            "pass": case.get("pass"),
+        }
+        for case in conformance_cases
+    ]
+    return implementation_cases == expected
+
+
+def json_object_or_empty(value: Any, checks: list[dict[str, Any]], label: str) -> dict[str, Any]:
+    if isinstance(value, dict):
+        add_bundle_check(checks, f"{label}.shape", True)
+        return value
+    add_bundle_check(
+        checks,
+        f"{label}.shape",
+        False,
+        expected="object",
+        actual=type(value).__name__,
+    )
+    return {}
+
+
+def verify_report_bundle(
+    corpus_root: Path,
+    conformance_report_path: Path,
+    implementation_report_path: Path,
+    sut_results_path: Path | None,
+) -> dict[str, Any]:
+    raw_conformance_report = read_json(conformance_report_path)
+    raw_implementation_report = read_json(implementation_report_path)
+    raw_sut_results = read_json(sut_results_path) if sut_results_path else None
+    manifest, corpus_digest = corpus_manifest(corpus_root)
+
+    checks: list[dict[str, Any]] = []
+    conformance_report = json_object_or_empty(raw_conformance_report, checks, "conformance_report")
+    implementation_report = json_object_or_empty(raw_implementation_report, checks, "implementation_report")
+    sut_results = (
+        json_object_or_empty(raw_sut_results, checks, "sut_results")
+        if sut_results_path
+        else None
+    )
+
+    add_bundle_check(
+        checks,
+        "conformance_report.version",
+        conformance_report.get("version") == CONFORMANCE_REPORT_VERSION,
+        expected=CONFORMANCE_REPORT_VERSION,
+        actual=conformance_report.get("version"),
+    )
+    add_bundle_check(
+        checks,
+        "conformance_report.profile",
+        conformance_report.get("profile") == PROFILE,
+        expected=PROFILE,
+        actual=conformance_report.get("profile"),
+    )
+    add_bundle_check(
+        checks,
+        "implementation_report.version",
+        implementation_report.get("version") == IMPLEMENTATION_REPORT_VERSION,
+        expected=IMPLEMENTATION_REPORT_VERSION,
+        actual=implementation_report.get("version"),
+    )
+    add_bundle_check(
+        checks,
+        "implementation_report.profile",
+        implementation_report.get("profile") == PROFILE,
+        expected=PROFILE,
+        actual=implementation_report.get("profile"),
+    )
+
+    corpus_index = read_json(corpus_root / CORPUS_INDEX_FILENAME)
+    add_bundle_check(
+        checks,
+        "corpus_index.digest",
+        corpus_index.get("digest") == corpus_digest,
+        expected=corpus_digest,
+        actual=corpus_index.get("digest"),
+    )
+    add_bundle_check(
+        checks,
+        "corpus_index.manifest",
+        corpus_index.get("manifest") == manifest,
+        details="committed corpus.json manifest matches the recomputed corpus manifest",
+    )
+
+    conformance_corpus = conformance_report.get("corpus", {})
+    add_bundle_check(
+        checks,
+        "conformance_report.corpus.digest",
+        isinstance(conformance_corpus, dict) and conformance_corpus.get("digest") == corpus_digest,
+        expected=corpus_digest,
+        actual=conformance_corpus.get("digest") if isinstance(conformance_corpus, dict) else None,
+    )
+
+    implementation_corpus = implementation_report.get("corpus", {})
+    add_bundle_check(
+        checks,
+        "implementation_report.corpus.digest",
+        isinstance(implementation_corpus, dict) and implementation_corpus.get("digest") == corpus_digest,
+        expected=corpus_digest,
+        actual=implementation_corpus.get("digest") if isinstance(implementation_corpus, dict) else None,
+    )
+    add_bundle_check(
+        checks,
+        "implementation_report.corpus.manifest",
+        isinstance(implementation_corpus, dict) and implementation_corpus.get("manifest") == manifest,
+        details="implementation report manifest matches the recomputed corpus manifest",
+    )
+
+    conformance_digest = digest_descriptor(raw_conformance_report)
+    implementation_conformance = implementation_report.get("conformance_report", {})
+    add_bundle_check(
+        checks,
+        "implementation_report.conformance_report.digest",
+        isinstance(implementation_conformance, dict)
+        and implementation_conformance.get("digest") == conformance_digest,
+        expected=conformance_digest,
+        actual=implementation_conformance.get("digest") if isinstance(implementation_conformance, dict) else None,
+    )
+    add_bundle_check(
+        checks,
+        "implementation_report.conformance_report.digest_basis",
+        isinstance(implementation_conformance, dict)
+        and implementation_conformance.get("digest_basis") == "json-sorted-no-whitespace",
+        expected="json-sorted-no-whitespace",
+        actual=implementation_conformance.get("digest_basis") if isinstance(implementation_conformance, dict) else None,
+    )
+
+    add_bundle_check(
+        checks,
+        "implementation_report.summary",
+        implementation_report.get("summary") == conformance_report.get("summary"),
+        expected=conformance_report.get("summary"),
+        actual=implementation_report.get("summary"),
+    )
+    add_bundle_check(
+        checks,
+        "implementation_report.status",
+        implementation_report.get("status") == summary_status(conformance_report.get("summary")),
+        expected=summary_status(conformance_report.get("summary")),
+        actual=implementation_report.get("status"),
+    )
+    add_bundle_check(
+        checks,
+        "implementation_report.case_results",
+        implementation_case_results_match(conformance_report, implementation_report),
+        details="implementation case_results are the conformance report case projection",
+    )
+
+    conformance_sut = conformance_report.get("sut_results")
+    if sut_results_path:
+        sut_digest = digest_descriptor(sut_results)
+        sut_corpus = sut_results.get("corpus", {}) if isinstance(sut_results, dict) else {}
+        add_bundle_check(
+            checks,
+            "sut_results.version",
+            isinstance(sut_results, dict) and sut_results.get("version") == SUT_RESULTS_VERSION,
+            expected=SUT_RESULTS_VERSION,
+            actual=sut_results.get("version") if isinstance(sut_results, dict) else None,
+        )
+        add_bundle_check(
+            checks,
+            "sut_results.profile",
+            isinstance(sut_results, dict) and sut_results.get("profile") == PROFILE,
+            expected=PROFILE,
+            actual=sut_results.get("profile") if isinstance(sut_results, dict) else None,
+        )
+        add_bundle_check(
+            checks,
+            "sut_results.corpus.digest",
+            isinstance(sut_corpus, dict) and sut_corpus.get("digest") == corpus_digest,
+            expected=corpus_digest,
+            actual=sut_corpus.get("digest") if isinstance(sut_corpus, dict) else None,
+        )
+        add_bundle_check(
+            checks,
+            "conformance_report.sut_results.digest",
+            isinstance(conformance_sut, dict) and conformance_sut.get("digest") == sut_digest,
+            expected=sut_digest,
+            actual=conformance_sut.get("digest") if isinstance(conformance_sut, dict) else None,
+        )
+        add_bundle_check(
+            checks,
+            "conformance_report.sut_results.digest_basis",
+            isinstance(conformance_sut, dict)
+            and conformance_sut.get("digest_basis") == "json-sorted-no-whitespace",
+            expected="json-sorted-no-whitespace",
+            actual=conformance_sut.get("digest_basis") if isinstance(conformance_sut, dict) else None,
+        )
+        add_bundle_check(
+            checks,
+            "conformance_report.sut_results.implementation",
+            isinstance(conformance_sut, dict)
+            and isinstance(sut_results, dict)
+            and conformance_sut.get("implementation") == sut_results.get("implementation"),
+            expected=sut_results.get("implementation") if isinstance(sut_results, dict) else None,
+            actual=conformance_sut.get("implementation") if isinstance(conformance_sut, dict) else None,
+        )
+    else:
+        add_bundle_check(
+            checks,
+            "sut_results.provided",
+            conformance_sut is None,
+            expected="no SUT result file is required for a reference run bundle",
+            actual="SUT result file missing" if conformance_sut is not None else "not applicable",
+        )
+
+    failed = sum(1 for check in checks if not check["pass"])
+    report = {
+        "version": BUNDLE_VERIFICATION_VERSION,
+        "profile": PROFILE,
+        "checked_at": iso_now(),
+        "summary": {
+            "total": len(checks),
+            "passed": len(checks) - failed,
+            "failed": failed,
+        },
+        "artifacts": {
+            "corpus": {
+                "root": display_path(corpus_root.resolve()),
+                "digest": corpus_digest,
+                "artifact_count": len(manifest),
+            },
+            "conformance_report": {
+                "path": display_path(conformance_report_path.resolve()),
+                "digest": digest_descriptor(raw_conformance_report),
+                "digest_basis": "json-sorted-no-whitespace",
+            },
+            "implementation_report": {
+                "path": display_path(implementation_report_path.resolve()),
+                "digest": digest_descriptor(raw_implementation_report),
+                "digest_basis": "json-sorted-no-whitespace",
+            },
+        },
+        "checks": checks,
+    }
+    if sut_results_path and isinstance(sut_results, dict):
+        report["artifacts"]["sut_results"] = {
+            "path": display_path(sut_results_path.resolve()),
+            "digest": digest_descriptor(raw_sut_results),
+            "digest_basis": "json-sorted-no-whitespace",
+        }
     return report
 
 
@@ -1730,12 +2036,15 @@ def make_implementation_report(args: argparse.Namespace, conformance_report: dic
     corpus_root = Path(args.corpus_root)
     manifest, digest = corpus_manifest(corpus_root)
 
-    failed = bool(conformance_report.get("fatal_errors") or conformance_report["summary"]["failed"])
     report = {
         "version": IMPLEMENTATION_REPORT_VERSION,
         "profile": PROFILE,
         "generated_at": conformance_report["checked_at"],
-        "status": "fail" if failed else "pass",
+        "status": (
+            "fail"
+            if conformance_report.get("fatal_errors")
+            else summary_status(conformance_report["summary"])
+        ),
         "implementation": implementation_metadata(args, conformance_report),
         "corpus": {
             "name": corpus_root.name,
@@ -1823,6 +2132,12 @@ def parse_args() -> argparse.Namespace:
     compare.add_argument("--sut-results", required=True, help="path to SUT result JSON")
     compare.add_argument("--report", required=True, help="path to write the comparison report")
     add_implementation_report_args(compare, include_identity=False)
+    verify_bundle = subparsers.add_parser("verify-bundle", help="verify a report bundle digest chain")
+    verify_bundle.add_argument("--corpus-root", required=True, help="corpus root containing corpus.json and cases/")
+    verify_bundle.add_argument("--sut-results", help="optional SUT result JSON for external comparison bundles")
+    verify_bundle.add_argument("--conformance-report", required=True, help="path to the conformance report JSON")
+    verify_bundle.add_argument("--implementation-report", required=True, help="path to the implementation report JSON")
+    verify_bundle.add_argument("--report", required=True, help="path to write the bundle verification report")
     return parser.parse_args()
 
 
@@ -1872,6 +2187,17 @@ def main() -> int:
         if args.implementation_report:
             write_json(Path(args.implementation_report), make_implementation_report(args, report))
         if report.get("fatal_errors") or report["summary"]["failed"]:
+            return 1
+        return 0
+    if args.command == "verify-bundle":
+        report = verify_report_bundle(
+            Path(args.corpus_root),
+            Path(args.conformance_report),
+            Path(args.implementation_report),
+            Path(args.sut_results) if args.sut_results else None,
+        )
+        write_json(Path(args.report), report)
+        if report["summary"]["failed"]:
             return 1
         return 0
     raise RuntimeError(f"unsupported command {args.command}")
