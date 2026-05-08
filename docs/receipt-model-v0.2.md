@@ -72,6 +72,10 @@ It records:
 
 A post-execution receipt must not silently change the admitted request.
 The `effective_request_hash` should match the request admitted by the admission receipt.
+For the AL2 conformance corpus, post-execution linkage also binds the admission
+receipt digest, admission decision, transaction id, runtime id, admission expiry,
+and attenuated effective constraints. A mismatch on any of those fields is
+reported as `POST_EXEC_LINKAGE_MISMATCH`.
 
 An attenuated admission receipt can still be non-executable. In particular,
 `attenuation.require_new_permit: true` means the verifier found a narrower or

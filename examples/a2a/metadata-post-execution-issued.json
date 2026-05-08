@@ -5,11 +5,11 @@
   "assurance_level": "AL2",
   "admission_receipt": {
     "type": "admission_receipt",
-    "uri": "https://verifier.example/vate/admission-receipts/admrec-20260504-001",
+    "uri": "https://verifier.example/vate/admission-receipts/admrec-20260504-attenuate-001",
     "media_type": "application/vate-admission-receipt+json",
     "digest": {
       "alg": "sha-256",
-      "value": "base64url-admission-receipt-digest"
+      "value": "63b7b3c8e7209994eecaa44b2618c7530b74b38f63487312e193a9b4f7ec3997"
     }
   },
   "post_execution_receipt": {
@@ -18,10 +18,9 @@
     "media_type": "application/vate-post-execution-receipt+json",
     "digest": {
       "alg": "sha-256",
-      "value": "base64url-post-execution-receipt-digest"
+      "value": "e67949952211274a9451e2cf783b95e9121ffc4517b70ec21effc5c0a4a12fa3"
     }
   },
   "issuer": "did:web:agent.example",
   "issued_at": "2026-05-04T03:02:31Z"
 }
-

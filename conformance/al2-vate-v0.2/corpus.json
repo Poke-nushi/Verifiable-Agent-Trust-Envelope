@@ -867,6 +867,63 @@
     },
     {
       "artifacts": {
+        "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+        "post_execution_receipt": "examples/receipts/post-execution-admission-digest-mismatch.example.json"
+      },
+      "case_id": "post-execution-admission-digest-mismatch",
+      "category": "linkage",
+      "expected_outcome": "failed",
+      "expected_reason_codes": [
+        "POST_EXEC_LINKAGE_MISMATCH"
+      ],
+      "expected_should_execute": true,
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-admission-digest-mismatch.json",
+      "title": "Reject post-execution admission digest mismatch",
+      "validation_focus": [
+        "post-execution linkage",
+        "admission receipt digest mismatch"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+        "post_execution_receipt": "examples/receipts/post-execution-after-admission-expiry.example.json"
+      },
+      "case_id": "post-execution-after-admission-expiry",
+      "category": "linkage",
+      "expected_outcome": "failed",
+      "expected_reason_codes": [
+        "POST_EXEC_LINKAGE_MISMATCH"
+      ],
+      "expected_should_execute": true,
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-after-admission-expiry.json",
+      "title": "Reject execution after admission expiry",
+      "validation_focus": [
+        "post-execution linkage",
+        "admission expiry"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-audience-mismatch.example.json",
+        "post_execution_receipt": "examples/receipts/post-execution-after-deny.example.json"
+      },
+      "case_id": "post-execution-after-deny",
+      "category": "linkage",
+      "expected_outcome": "failed",
+      "expected_reason_codes": [
+        "POST_EXEC_LINKAGE_MISMATCH"
+      ],
+      "expected_should_execute": false,
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-after-deny.json",
+      "title": "Reject post-execution receipt after denied admission",
+      "validation_focus": [
+        "post-execution linkage",
+        "denied admission cannot execute"
+      ]
+    },
+    {
+      "artifacts": {
         "admission_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-valid.example.json",
         "ap2_mandate": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-valid.example.json",
         "post_execution_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-post-execution-receipt-ap2-hnp-valid.example.json"
@@ -886,6 +943,26 @@
         "AP2 Human Not Present",
         "post-execution receipt linkage",
         "side-effect audit record"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+        "post_execution_receipt": "examples/receipts/post-execution-effective-constraints-exceeded.example.json"
+      },
+      "case_id": "post-execution-effective-constraints-exceeded",
+      "category": "linkage",
+      "expected_outcome": "failed",
+      "expected_reason_codes": [
+        "POST_EXEC_LINKAGE_MISMATCH"
+      ],
+      "expected_should_execute": true,
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-effective-constraints-exceeded.json",
+      "title": "Reject execution outside attenuated constraints",
+      "validation_focus": [
+        "post-execution linkage",
+        "effective constraints",
+        "side-effect boundary"
       ]
     },
     {
@@ -930,12 +1007,50 @@
         "side-effect audit record",
         "digest-bound A2A post-execution reference"
       ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+        "post_execution_receipt": "examples/receipts/post-execution-runtime-mismatch.example.json"
+      },
+      "case_id": "post-execution-runtime-mismatch",
+      "category": "linkage",
+      "expected_outcome": "failed",
+      "expected_reason_codes": [
+        "POST_EXEC_LINKAGE_MISMATCH"
+      ],
+      "expected_should_execute": true,
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-runtime-mismatch.json",
+      "title": "Reject post-execution runtime mismatch",
+      "validation_focus": [
+        "post-execution linkage",
+        "runtime mismatch"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+        "post_execution_receipt": "examples/receipts/post-execution-transaction-mismatch.example.json"
+      },
+      "case_id": "post-execution-transaction-mismatch",
+      "category": "linkage",
+      "expected_outcome": "failed",
+      "expected_reason_codes": [
+        "POST_EXEC_LINKAGE_MISMATCH"
+      ],
+      "expected_should_execute": true,
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-transaction-mismatch.json",
+      "title": "Reject post-execution transaction mismatch",
+      "validation_focus": [
+        "post-execution linkage",
+        "transaction id mismatch"
+      ]
     }
   ],
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "72df2be76866be2d910260130d4a0cd495520161c457a14d273dce2bba9e85c9"
+    "value": "9cbb7f3c27ea06285374925897af4953d39e3b4566e5d053276e6f93b9eec6a7"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -1115,8 +1230,24 @@
       "sha256": "a96479a54fd39b28b0443bd378d2a54bf85247c353fc8406e8eb1378680eec1d"
     },
     {
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-admission-digest-mismatch.json",
+      "sha256": "e058927cf7797a39cc43a43c71d84d3f4ca26af0ca75479575479bd870dc91ec"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-after-admission-expiry.json",
+      "sha256": "d89a9da47bd2ecc2f4115a145d3a30f0442a7bbe76831e5402c978927140e506"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-after-deny.json",
+      "sha256": "32fb9aff72b7551d1bcf3020230e4f40896def3b825c861fcd05bea6fdcc33d1"
+    },
+    {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-ap2-hnp-linkage-success.json",
       "sha256": "3e89edc2dffed5b4ddbdb1b0cb7c2dce497eb08baaa286395c50c668a69ef9c4"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-effective-constraints-exceeded.json",
+      "sha256": "f63fad63fd3f3541729787a36c3de18d984b6309ade8e2f1ddaedd41a8444091"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-linkage-mismatch.json",
@@ -1124,7 +1255,15 @@
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-linkage-success.json",
-      "sha256": "42f0d9d4f562a5ce5db8575eec75f933359dd7d62d8adb6724a949f4440aff42"
+      "sha256": "9dec0817b769d61e1ec21ab5101a6236b084ec29d5eb0a10efb27777a83a29ba"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-runtime-mismatch.json",
+      "sha256": "9f884a3b6186b4869c95935a65b9f27c2c88ee10df50076a66ff235aac31aa30"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-transaction-mismatch.json",
+      "sha256": "2387e3d42e50b07659ba810b3d41030853bc2fe89571924f205209663c7d4e81"
     },
     {
       "path": "conformance/al2-vate-v0.2/conformance-case.schema.json",
@@ -1144,7 +1283,7 @@
     },
     {
       "path": "examples/a2a/metadata-post-execution-issued.json",
-      "sha256": "03a1d8b0ebe50265b1ac2eac2d2a626e0913e8dc356855773d195650dd3d5207"
+      "sha256": "a36469305394e5740e64e6db62138b76f8a52cdc584700191aad5f670d562a5f"
     },
     {
       "path": "examples/admission-request-runtime-proof-stale.example.json",
@@ -1387,12 +1526,36 @@
       "sha256": "604a80da197e382dedf90db3360046ed24281a22db242beb36af43887545bf1f"
     },
     {
+      "path": "examples/receipts/post-execution-admission-digest-mismatch.example.json",
+      "sha256": "6e87d3ea8ba1b65f9449239abdda331289b405347c922f78ed8135aa749184d8"
+    },
+    {
+      "path": "examples/receipts/post-execution-after-admission-expiry.example.json",
+      "sha256": "80344f284bc6860a89f1a0486848fa2c6e79a42a4f45410f7efc09e681d25b9d"
+    },
+    {
+      "path": "examples/receipts/post-execution-after-deny.example.json",
+      "sha256": "6987ce5980d4a34528c418dcdd52964d0aeb4ef802ac3a52089d67a2c7fd08ed"
+    },
+    {
+      "path": "examples/receipts/post-execution-effective-constraints-exceeded.example.json",
+      "sha256": "026ffce648ea8236330393dbe0a6f531d2f8e8943f267f882369602db5791f5b"
+    },
+    {
       "path": "examples/receipts/post-execution-linkage-mismatch.example.json",
       "sha256": "07d6844fed65dbd2206a5aa98ac2e904aff2ee5dd1ca72a89ec8173882d82528"
     },
     {
+      "path": "examples/receipts/post-execution-runtime-mismatch.example.json",
+      "sha256": "533923d2a6388493f25172f4f951349d7d8950e1857f8de3b6b96ab565a19ddc"
+    },
+    {
       "path": "examples/receipts/post-execution-success.example.json",
-      "sha256": "bc08f29e7e221537e513bdc0c9cf7bf768ba7e28e74fd4fbf64b25ca5330a910"
+      "sha256": "8a1babbb9b2ca4a0b9527d02e25f578c72124b103741b5788792a0bbfb726a3c"
+    },
+    {
+      "path": "examples/receipts/post-execution-transaction-mismatch.example.json",
+      "sha256": "3ac680c839e96ee10e3a8c81a73427f13bbf2209cef0011902f6bba899002f9f"
     },
     {
       "path": "examples/transport/mcp-oauth-admission-request.example.json",
@@ -1419,10 +1582,10 @@
     "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.2 --out conformance/al2-vate-v0.2/corpus.json"
   },
   "summary": {
-    "artifact_count": 115,
-    "case_count": 44,
+    "artifact_count": 127,
+    "case_count": 50,
     "category_counts": {
-      "linkage": 3,
+      "linkage": 9,
       "negative": 28,
       "positive": 13
     }

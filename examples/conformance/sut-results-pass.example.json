@@ -2,7 +2,7 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "72df2be76866be2d910260130d4a0cd495520161c457a14d273dce2bba9e85c9"
+      "value": "9cbb7f3c27ea06285374925897af4953d39e3b4566e5d053276e6f93b9eec6a7"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.2"
   },
@@ -964,6 +964,63 @@
       "status": "completed"
     },
     {
+      "case_id": "post-execution-admission-digest-mismatch",
+      "checks": [
+        {
+          "name": "post_execution.admission.digest",
+          "pass": true
+        },
+        {
+          "name": "result.policy_violations",
+          "pass": true
+        }
+      ],
+      "outcome": "failed",
+      "reason_codes": [
+        "POST_EXEC_LINKAGE_MISMATCH"
+      ],
+      "should_execute": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "post-execution-after-admission-expiry",
+      "checks": [
+        {
+          "name": "post_execution.execution.started_at",
+          "pass": true
+        },
+        {
+          "name": "result.policy_violations",
+          "pass": true
+        }
+      ],
+      "outcome": "failed",
+      "reason_codes": [
+        "POST_EXEC_LINKAGE_MISMATCH"
+      ],
+      "should_execute": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "post-execution-after-deny",
+      "checks": [
+        {
+          "name": "post_execution.admission.receipt_id",
+          "pass": true
+        },
+        {
+          "name": "result.policy_violations",
+          "pass": true
+        }
+      ],
+      "outcome": "failed",
+      "reason_codes": [
+        "POST_EXEC_LINKAGE_MISMATCH"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
       "case_id": "post-execution-ap2-hnp-linkage-success",
       "checks": [
         {
@@ -988,6 +1045,25 @@
         "ADMISSION_RECEIPT_LINKED",
         "EFFECTIVE_REQUEST_HASH_MATCH",
         "NO_POLICY_VIOLATIONS"
+      ],
+      "should_execute": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "post-execution-effective-constraints-exceeded",
+      "checks": [
+        {
+          "name": "post_execution.result.side_effects[0].amount.value",
+          "pass": true
+        },
+        {
+          "name": "result.policy_violations",
+          "pass": true
+        }
+      ],
+      "outcome": "failed",
+      "reason_codes": [
+        "POST_EXEC_LINKAGE_MISMATCH"
       ],
       "should_execute": true,
       "status": "completed"
@@ -1036,6 +1112,44 @@
         "ADMISSION_RECEIPT_LINKED",
         "EFFECTIVE_REQUEST_HASH_MATCH",
         "NO_POLICY_VIOLATIONS"
+      ],
+      "should_execute": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "post-execution-runtime-mismatch",
+      "checks": [
+        {
+          "name": "post_execution.execution.runtime",
+          "pass": true
+        },
+        {
+          "name": "result.policy_violations",
+          "pass": true
+        }
+      ],
+      "outcome": "failed",
+      "reason_codes": [
+        "POST_EXEC_LINKAGE_MISMATCH"
+      ],
+      "should_execute": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "post-execution-transaction-mismatch",
+      "checks": [
+        {
+          "name": "post_execution.execution.transaction_id",
+          "pass": true
+        },
+        {
+          "name": "result.policy_violations",
+          "pass": true
+        }
+      ],
+      "outcome": "failed",
+      "reason_codes": [
+        "POST_EXEC_LINKAGE_MISMATCH"
       ],
       "should_execute": true,
       "status": "completed"

@@ -441,24 +441,117 @@ def actual_linkage_reason_codes(
     admission_receipt: dict[str, Any] | None,
     post_execution_receipt: dict[str, Any] | None,
 ) -> list[str]:
-    if admission_receipt is None or post_execution_receipt is None:
-        return []
-
-    receipt_id_matches = post_execution_receipt.get("admission", {}).get("receipt_id") == admission_receipt.get("receipt_id")
-
-    effective_hash = admission_receipt.get("attenuation", {}).get(
-        "effective_request_hash",
-        admission_receipt.get("request", {}).get("input_hash"),
-    )
-    effective_hash_matches = post_execution_receipt.get("execution", {}).get("effective_request_hash") == effective_hash
-
-    if not receipt_id_matches or not effective_hash_matches:
+    if post_execution_linkage_failures(admission_receipt, post_execution_receipt):
         return ["POST_EXEC_LINKAGE_MISMATCH"]
 
     codes = ["ADMISSION_RECEIPT_LINKED", "EFFECTIVE_REQUEST_HASH_MATCH"]
     if post_execution_receipt.get("result", {}).get("policy_violations") == []:
         codes.append("NO_POLICY_VIOLATIONS")
     return codes
+
+
+def admitted_effective_request_hash(admission_receipt: dict[str, Any]) -> Any:
+    if actual_decision(admission_receipt) == "attenuate":
+        return admission_receipt.get("attenuation", {}).get("effective_request_hash")
+    return admission_receipt.get("request", {}).get("input_hash")
+
+
+def post_execution_linkage_failures(
+    admission_receipt: dict[str, Any] | None,
+    post_execution_receipt: dict[str, Any] | None,
+) -> list[str]:
+    failures: list[str] = []
+    if admission_receipt is None or post_execution_receipt is None:
+        return ["admission or post-execution artifact missing"]
+
+    admission_block = post_execution_receipt.get("admission", {})
+    execution = post_execution_receipt.get("execution", {})
+    if not isinstance(admission_block, dict) or not isinstance(execution, dict):
+        return ["post-execution admission or execution block missing"]
+
+    admission_decision = actual_decision(admission_receipt)
+    if admission_decision == "deny":
+        failures.append("post-execution receipt must not link to a denied admission")
+    if admission_decision not in {"allow", "attenuate"}:
+        failures.append("admission decision must be allow or attenuate for post-execution linkage")
+    if (
+        admission_decision == "attenuate"
+        and admission_receipt.get("attenuation", {}).get("require_new_permit") is True
+    ):
+        failures.append("post-execution receipt must not link to an admission requiring a new permit")
+
+    if admission_block.get("receipt_id") != admission_receipt.get("receipt_id"):
+        failures.append("admission receipt_id mismatch")
+    if admission_block.get("decision") != admission_decision:
+        failures.append("admission decision mismatch")
+    if admission_block.get("digest") != {"alg": "sha-256", "value": sha256_value(admission_receipt)}:
+        failures.append("admission digest mismatch")
+
+    request = admission_receipt.get("request", {})
+    subject = admission_receipt.get("subject", {})
+    if execution.get("transaction_id") != request.get("transaction_id"):
+        failures.append("transaction_id mismatch")
+    if execution.get("runtime") != subject.get("runtime"):
+        failures.append("runtime mismatch")
+    if execution.get("effective_request_hash") != admitted_effective_request_hash(admission_receipt):
+        failures.append("effective_request_hash mismatch")
+
+    started_at = try_parse_time(execution.get("started_at"))
+    finished_at = try_parse_time(execution.get("finished_at"))
+    admission_issued_at = try_parse_time(admission_receipt.get("issued_at"))
+    admission_expires_at = try_parse_time(admission_receipt.get("expires_at"))
+    if started_at is None or finished_at is None:
+        failures.append("execution timestamps must be valid")
+    else:
+        if finished_at < started_at:
+            failures.append("execution finished before it started")
+        if admission_issued_at is not None and started_at < admission_issued_at:
+            failures.append("execution started before admission was issued")
+        if admission_expires_at is not None and started_at > admission_expires_at:
+            failures.append("execution started after admission expiry")
+
+    failures.extend(post_execution_side_effect_failures(admission_receipt, post_execution_receipt))
+    return failures
+
+
+def post_execution_side_effect_failures(
+    admission_receipt: dict[str, Any],
+    post_execution_receipt: dict[str, Any],
+) -> list[str]:
+    failures: list[str] = []
+    max_amount = admission_receipt.get("attenuation", {}).get("effective_constraints", {}).get("max_amount")
+    if not isinstance(max_amount, dict):
+        return failures
+    max_currency = max_amount.get("currency")
+    max_value = max_amount.get("value")
+    max_failures = decimal_amount_failures(max_value, label="admitted max_amount.value")
+    if max_failures or not isinstance(max_currency, str):
+        return failures
+    max_decimal = Decimal(str(max_value))
+
+    side_effects = post_execution_receipt.get("result", {}).get("side_effects", [])
+    if not isinstance(side_effects, list):
+        failures.append("side_effects must be an array")
+        return failures
+    for index, side_effect in enumerate(side_effects):
+        if not isinstance(side_effect, dict) or "amount" not in side_effect:
+            continue
+        amount = side_effect.get("amount")
+        if not isinstance(amount, dict):
+            failures.append(f"side_effects[{index}].amount must be an object")
+            continue
+        currency = amount.get("currency")
+        value = amount.get("value")
+        if currency != max_currency:
+            failures.append(f"side_effects[{index}].amount currency exceeds admitted currency boundary")
+            continue
+        amount_failures = decimal_amount_failures(value, label=f"side_effects[{index}].amount.value")
+        if amount_failures:
+            failures.extend(amount_failures)
+            continue
+        if Decimal(str(value)) > max_decimal:
+            failures.append(f"side_effects[{index}].amount exceeds admitted max_amount")
+    return failures
 
 
 def expected_outcome(case: dict[str, Any]) -> str:

@@ -2,7 +2,7 @@
   "version": "vate-0.2",
   "profile": "VATE-AL2-Verifier-Admission-v0.2",
   "receipt_type": "post_execution",
-  "receipt_id": "postrec-20260504-001",
+  "receipt_id": "postrec-20260701-admission-digest-mismatch-001",
   "issued_at": "2026-05-04T03:02:31Z",
   "issuer": {
     "id": "did:web:agent.example",
@@ -14,7 +14,7 @@
     "uri": "https://verifier.example/vate/admission-receipts/admrec-20260504-attenuate-001",
     "digest": {
       "alg": "sha-256",
-      "value": "63b7b3c8e7209994eecaa44b2618c7530b74b38f63487312e193a9b4f7ec3997"
+      "value": "intentionally-wrong-admission-receipt-digest"
     },
     "decision": "attenuate"
   },
@@ -28,26 +28,11 @@
     "runtime": "spiffe://agent.example/workload/purchase-agent"
   },
   "result": {
-    "outcome": "success",
-    "output_hash": "sha-256:base64url-output-digest",
-    "side_effects": [
-      {
-        "type": "commerce.purchase",
-        "merchant": "merchant.example",
-        "amount": {
-          "currency": "USD",
-          "value": "24.50"
-        },
-        "payment_reference": "https://payments.example/payment-intents/pi-123",
-        "confirmation_reference": "https://merchant.example/orders/order-789"
-      }
-    ],
-    "policy_violations": []
-  },
-  "proof": {
-    "format": "detached_jws",
-    "alg": "ES256",
-    "kid": "did:web:agent.example#runtime-key-1",
-    "signature_ref": "https://agent.example/vate/signatures/postrec-20260504-001.jws"
+    "outcome": "failed",
+    "output_hash": "sha-256:admission-digest-mismatch-output",
+    "side_effects": [],
+    "policy_violations": [
+      "admission_digest_mismatch"
+    ]
   }
 }

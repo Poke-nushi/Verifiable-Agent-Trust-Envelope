@@ -1,0 +1,33 @@
+{
+  "version": "vate-conformance-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "case_id": "post-execution-after-deny",
+  "title": "Reject post-execution receipt after denied admission",
+  "category": "linkage",
+  "purpose": "A verifier or auditor should reject post-execution evidence that attempts to link execution to an admission receipt whose decision was deny.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-deny-audience-mismatch.example.json",
+    "post_execution_receipt": "examples/receipts/post-execution-after-deny.example.json"
+  },
+  "expected": {
+    "post_execution_outcome": "failed",
+    "should_execute": false,
+    "reason_codes": [
+      "POST_EXEC_LINKAGE_MISMATCH"
+    ],
+    "checks": [
+      {
+        "name": "post_execution.admission.receipt_id",
+        "expected": "present"
+      },
+      {
+        "name": "result.policy_violations",
+        "expected": "fail"
+      }
+    ]
+  },
+  "validation_focus": [
+    "post-execution linkage",
+    "denied admission cannot execute"
+  ]
+}

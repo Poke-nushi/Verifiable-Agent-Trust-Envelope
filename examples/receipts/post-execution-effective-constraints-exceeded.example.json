@@ -2,7 +2,7 @@
   "version": "vate-0.2",
   "profile": "VATE-AL2-Verifier-Admission-v0.2",
   "receipt_type": "post_execution",
-  "receipt_id": "postrec-20260504-001",
+  "receipt_id": "postrec-20260701-effective-constraints-exceeded-001",
   "issued_at": "2026-05-04T03:02:31Z",
   "issuer": {
     "id": "did:web:agent.example",
@@ -28,26 +28,22 @@
     "runtime": "spiffe://agent.example/workload/purchase-agent"
   },
   "result": {
-    "outcome": "success",
-    "output_hash": "sha-256:base64url-output-digest",
+    "outcome": "failed",
+    "output_hash": "sha-256:effective-constraints-exceeded-output",
     "side_effects": [
       {
         "type": "commerce.purchase",
         "merchant": "merchant.example",
         "amount": {
           "currency": "USD",
-          "value": "24.50"
+          "value": "30.00"
         },
-        "payment_reference": "https://payments.example/payment-intents/pi-123",
-        "confirmation_reference": "https://merchant.example/orders/order-789"
+        "payment_reference": "https://payments.example/payment-intents/pi-over-limit",
+        "confirmation_reference": "https://merchant.example/orders/order-over-limit"
       }
     ],
-    "policy_violations": []
-  },
-  "proof": {
-    "format": "detached_jws",
-    "alg": "ES256",
-    "kid": "did:web:agent.example#runtime-key-1",
-    "signature_ref": "https://agent.example/vate/signatures/postrec-20260504-001.jws"
+    "policy_violations": [
+      "effective_constraints_exceeded"
+    ]
   }
 }

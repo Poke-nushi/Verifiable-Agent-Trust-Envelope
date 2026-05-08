@@ -10,6 +10,32 @@
     "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
     "post_execution_receipt": "examples/receipts/post-execution-success.example.json"
   },
+  "artifact_reference_checks": [
+    {
+      "artifact": "admission_receipt",
+      "expect_match": true,
+      "reference_paths": [
+        {
+          "artifact": "post_execution_receipt",
+          "path": "admission.digest"
+        },
+        {
+          "artifact": "a2a_metadata",
+          "path": "admission_receipt.digest"
+        }
+      ]
+    },
+    {
+      "artifact": "post_execution_receipt",
+      "expect_match": true,
+      "reference_paths": [
+        {
+          "artifact": "a2a_metadata",
+          "path": "post_execution_receipt.digest"
+        }
+      ]
+    }
+  ],
   "expected": {
     "admission_decision": "attenuate",
     "post_execution_outcome": "success",

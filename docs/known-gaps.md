@@ -160,20 +160,18 @@ Remaining work includes:
   authority beyond the intersection of upstream authorization and local verifier
   policy; the first overscope denial fixture is `deny-mcp-oauth-overscope`
 
-### 13. Post-Execution Linkage Is Still Too Narrow
+### 13. Post-Execution Linkage Needs Independent Implementation Evidence
 
-The runner checks the admission receipt id and admitted effective request hash,
-but stronger linkage is needed before claiming broad conformance readiness.
+The runner now checks admission receipt id, admission digest, transaction id,
+runtime, decision, expiry, admitted effective request hash, and basic
+attenuated amount boundaries. That is enough for the v0.2 corpus, but not yet
+enough to claim multi-implementation readiness.
 
-Remaining work includes negative fixtures and checks for:
+Remaining work includes:
 
-- admission receipt digest mismatch
-- transaction id mismatch
-- runtime mismatch
-- post-execution receipt after deny
-- post-execution receipt after admission expiry
-- side effects that exceed attenuated effective constraints
 - policy snapshot digest mismatch after an otherwise matching effective request
+- side-effect checks beyond simple amount limits
+- independent implementation reports that exercise the linkage checks
 
 ### 14. Status, Replay, And Runtime Binding Need Minimum AL2 Context
 

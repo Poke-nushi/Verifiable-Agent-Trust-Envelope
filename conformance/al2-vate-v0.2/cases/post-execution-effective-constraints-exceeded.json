@@ -1,0 +1,34 @@
+{
+  "version": "vate-conformance-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "case_id": "post-execution-effective-constraints-exceeded",
+  "title": "Reject execution outside attenuated constraints",
+  "category": "linkage",
+  "purpose": "A verifier or auditor should reject post-execution evidence when side effects exceed the attenuated effective constraints admitted by the verifier.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+    "post_execution_receipt": "examples/receipts/post-execution-effective-constraints-exceeded.example.json"
+  },
+  "expected": {
+    "post_execution_outcome": "failed",
+    "should_execute": true,
+    "reason_codes": [
+      "POST_EXEC_LINKAGE_MISMATCH"
+    ],
+    "checks": [
+      {
+        "name": "post_execution.result.side_effects[0].amount.value",
+        "expected": "present"
+      },
+      {
+        "name": "result.policy_violations",
+        "expected": "fail"
+      }
+    ]
+  },
+  "validation_focus": [
+    "post-execution linkage",
+    "effective constraints",
+    "side-effect boundary"
+  ]
+}

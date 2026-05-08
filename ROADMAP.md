@@ -54,6 +54,8 @@ new adjacent profiles.
   `deny-jose-hs256-downgrade`
 - add attenuation boundary fixtures for malicious paths and schema type edges;
   first unsafe-path and max-amount type-edge fixtures added
+- strengthen post-execution linkage checks beyond presence checks; digest,
+  transaction, runtime, denial, expiry, and effective-constraint fixtures added
 - add an evidence type vocabulary for generic evidence types and
   protocol-specific hints
 - keep the language-neutral conformance corpus index current as cases change
