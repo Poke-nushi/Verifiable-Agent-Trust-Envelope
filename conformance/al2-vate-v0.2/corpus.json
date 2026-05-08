@@ -1106,7 +1106,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "68aa2681539baea04107dcf9636acadc39359f36d7b6f3a8949ad4acd5b96971"
+    "value": "2f43566b2997e89993f6ab2bf3b5f8846652e9d81dd8e20b478a2270f0323e96"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -1311,7 +1311,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-linkage-success.json",
-      "sha256": "a3afbfec625e4c5194c99d19e5248cd43deda18675b3751cf27fde8de7498767"
+      "sha256": "3cb73f6b6285818d0896c89b8ea385b79e95b0e0c8e698f4d8fbf2f82073bcab"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-runtime-mismatch.json",
@@ -1323,7 +1323,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.2/conformance-case.schema.json",
-      "sha256": "22ad44d49b1ca9553cd0988a2c5eeae48e89e6c3ac93d9695d72a4cc21ea0caa"
+      "sha256": "fcf4e53cd55f56625dda31548f782e5769a71047bcc76ae148e2e20758d79b58"
     },
     {
       "path": "conformance/al2-vate-v0.2/fixtures/attenuation-max-amount-type-edge.json",

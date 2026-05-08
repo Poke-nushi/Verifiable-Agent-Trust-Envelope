@@ -262,8 +262,10 @@
           "kind": {
             "type": "string",
             "enum": [
+              "admission_decision",
               "admission_digest",
               "admission_executable",
+              "admission_receipt_id",
               "admission_time_window",
               "effective_constraints",
               "effective_request_hash",
@@ -332,6 +334,50 @@
               "properties": {
                 "reason_code": {
                   "const": "POST_EXEC_ADMISSION_DIGEST_MISMATCH"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "admission_receipt_id"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "expect_match"
+              ],
+              "properties": {
+                "reason_code": {
+                  "const": "POST_EXEC_LINKAGE_MISMATCH"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "admission_decision"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "expect_match"
+              ],
+              "properties": {
+                "reason_code": {
+                  "const": "POST_EXEC_LINKAGE_MISMATCH"
                 }
               }
             }

@@ -79,6 +79,16 @@
       "reason_code": "POST_EXEC_ADMISSION_DIGEST_MISMATCH"
     },
     {
+      "kind": "admission_receipt_id",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_LINKAGE_MISMATCH"
+    },
+    {
+      "kind": "admission_decision",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_LINKAGE_MISMATCH"
+    },
+    {
       "kind": "transaction_id",
       "admission_path": "request.transaction_id",
       "post_execution_path": "execution.transaction_id",

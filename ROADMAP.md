@@ -63,7 +63,8 @@ adding new adjacent profiles.
   `compare`, and report/corpus primary reason projections are now emitted
 - strengthen post-execution linkage checks beyond presence checks, including
   receipt id, receipt digest, transaction, runtime, admitted effective request
-  hash, decision, and expiry semantics
+  hash, decision, and expiry semantics; receipt id and decision are now
+  explicit linkage kinds
 - add minimum AL2 verification context for status freshness, replay protection,
   and runtime binding
 - add transport-bound fixtures proving VATE only narrows MCP/OAuth authority and

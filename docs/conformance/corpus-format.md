@@ -118,8 +118,8 @@ block. For the AL2 v0.2 corpus:
   package, detached payload, and trust bundle
 - `attenuation_checks` validate machine-readable attenuation boundaries
 - `linkage_checks` bind post-execution receipts to admission digest,
-  transaction, runtime, effective request hash, validity window, and side-effect
-  constraints
+  admission receipt id, admission decision, transaction, runtime, effective
+  request hash, validity window, and side-effect constraints
 - `al2_context_checks` validate minimum freshness, replay, and binding context
   and require external SUT reports to bind that context back to request, receipt,
   transaction, runtime, and evidence inputs
@@ -137,6 +137,8 @@ because it names a `kind` and `reason_code`:
   require `admission_path`, `post_execution_path`, and `expect_match`
 - `admission_digest` requires `post_execution_path` and `expect_match`; the
   admission artifact defaults to `admission_receipt` when `artifact` is omitted
+- `admission_receipt_id` and `admission_decision` require `expect_match`; their
+  admission and post-execution paths are fixed by the profile
 - `admission_executable`, `admission_time_window`, and
   `effective_constraints` require `expect_valid`
 - `policy_violation` requires `value` and `expect_present`

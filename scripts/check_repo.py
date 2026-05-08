@@ -399,10 +399,58 @@ def check_artifact_versioning_docs() -> None:
         )
 
 
+def check_post_execution_linkage_kind_coverage() -> None:
+    case_dir = ROOT / "conformance" / "al2-vate-v0.2" / "cases"
+    observed_kinds: set[str] = set()
+    for case_path in case_dir.glob("post-execution-*.json"):
+        case = json.loads(case_path.read_text(encoding="utf-8"))
+        for check in case.get("linkage_checks", []):
+            if isinstance(check, dict) and isinstance(check.get("kind"), str):
+                observed_kinds.add(check["kind"])
+    required_kinds = {
+        "admission_receipt_id",
+        "admission_decision",
+    }
+    missing = sorted(required_kinds - observed_kinds)
+    if missing:
+        raise RuntimeError(f"post-execution linkage cases are missing explicit linkage kinds: {missing}")
+
+    conformance = load_vate_conformance_module()
+    admission = json.loads((ROOT / "examples" / "receipts" / "admission-attenuate-max-amount.example.json").read_text())
+    post_execution = json.loads((ROOT / "examples" / "receipts" / "post-execution-success.example.json").read_text())
+    receipt_check = {
+        "kind": "admission_receipt_id",
+        "expect_match": True,
+        "reason_code": "POST_EXEC_LINKAGE_MISMATCH",
+    }
+    decision_check = {
+        "kind": "admission_decision",
+        "expect_match": True,
+        "reason_code": "POST_EXEC_LINKAGE_MISMATCH",
+    }
+    for check in (receipt_check, decision_check):
+        violation, failure = conformance.linkage_check_violation({}, check, admission, post_execution)
+        if violation or failure:
+            raise RuntimeError(f"{check['kind']} should pass on the success post-execution fixture")
+
+    mismatched_receipt = json.loads(json.dumps(post_execution))
+    mismatched_receipt["admission"]["receipt_id"] = "wrong-admission-receipt-id"
+    violation, failure = conformance.linkage_check_violation({}, receipt_check, admission, mismatched_receipt)
+    if not violation or failure:
+        raise RuntimeError("admission_receipt_id linkage kind did not detect a mismatched receipt id")
+
+    mismatched_decision = json.loads(json.dumps(post_execution))
+    mismatched_decision["admission"]["decision"] = "allow"
+    violation, failure = conformance.linkage_check_violation({}, decision_check, admission, mismatched_decision)
+    if not violation or failure:
+        raise RuntimeError("admission_decision linkage kind did not detect a mismatched admission decision")
+
+
 def main() -> int:
     validate_examples()
     check_evidence_vocabulary_registry()
     check_artifact_versioning_docs()
+    check_post_execution_linkage_kind_coverage()
     run([sys.executable, "-m", "py_compile", str(DEMO)])
     run([sys.executable, "-m", "py_compile", str(HTTP_DEMO)])
     run([sys.executable, "-m", "py_compile", str(VATE_CONFORMANCE)])

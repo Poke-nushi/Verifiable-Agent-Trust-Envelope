@@ -89,8 +89,10 @@ def load_evidence_vocabulary() -> tuple[frozenset[str], frozenset[str], dict[str
     ALLOWED_PROTOCOL_HINTS_BY_TYPE,
 ) = load_evidence_vocabulary()
 LINKAGE_REASON_CODES_BY_KIND = {
+    "admission_decision": "POST_EXEC_LINKAGE_MISMATCH",
     "admission_digest": "POST_EXEC_ADMISSION_DIGEST_MISMATCH",
     "admission_executable": "POST_EXEC_ADMISSION_DENIED",
+    "admission_receipt_id": "POST_EXEC_LINKAGE_MISMATCH",
     "admission_time_window": "POST_EXEC_ADMISSION_EXPIRED",
     "effective_constraints": "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED",
     "effective_request_hash": "POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH",
@@ -569,6 +571,8 @@ def linkage_check_contract_failures(index: int, check: Any) -> list[str]:
     kind = check.get("kind")
     if kind in {"transaction_id", "runtime", "effective_request_hash", "path_match"}:
         required = ("admission_path", "post_execution_path", "expect_match")
+    elif kind in {"admission_receipt_id", "admission_decision"}:
+        required = ("expect_match",)
     elif kind == "admission_digest":
         required = ("post_execution_path", "expect_match")
     elif kind in {"admission_executable", "admission_time_window", "effective_constraints"}:
@@ -777,6 +781,12 @@ def linkage_check_violation(
             expected_digest = {"alg": "sha-256", "value": sha256_value(artifact)}
             actual_digest = get_path(post_execution, check.get("post_execution_path", "admission.digest"))
             return actual_digest != expected_digest, None
+        if kind == "admission_receipt_id":
+            actual_receipt_id = get_path(post_execution, "admission.receipt_id")
+            return actual_receipt_id != admission.get("receipt_id"), None
+        if kind == "admission_decision":
+            actual_admission_decision = get_path(post_execution, "admission.decision")
+            return actual_admission_decision != actual_decision(admission), None
         if kind == "admission_executable":
             return not admission_executable_for_post_execution(admission), None
         if kind == "admission_time_window":
