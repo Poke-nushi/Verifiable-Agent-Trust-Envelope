@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": [
+    "src/**/*.ts",
+    "../../types/**/*.d.ts"
+  ],
+  "references": [
+    {
+      "path": "../vate-core-ts"
+    }
+  ]
+}

@@ -163,7 +163,7 @@ The most useful feedback for this draft is currently:
 - **Primary language**: English
 - **Research refresh date**: 2026-05-07
 - **Primary battlefield**: `AL2` external digital write
-- **Implemented artifacts**: v0.2 schemas and examples; runnable AL2 fixture corpus with negative cases; SUT comparison and implementation-reporting formats; dependency-free verifier core and A2A-shaped adapter demo; focused adjacent evidence fixtures and crosswalk notes
+- **Implemented artifacts**: v0.2 schemas and examples; runnable AL2 fixture corpus with negative cases; SUT comparison and implementation-reporting formats; dependency-free verifier core and A2A-shaped adapter demo; package-private TypeScript reference helpers for digest-bound artifacts, SUT result shaping, and A2A metadata shape checks; focused adjacent evidence fixtures and crosswalk notes
 - **Planned later**: pairwise presentation profile, richer capability registry, formal `AID`, physical `ABS` profiles
 
 The conformance artifacts record one implementation run against one corpus
@@ -238,6 +238,10 @@ compatibility claim.
   Dependency-free verifier core for AL2 admission fixtures
 - [reference/a2a-metadata-adapter-demo/README.md](reference/a2a-metadata-adapter-demo/README.md)
   Dependency-free A2A-shaped metadata adapter demo
+- [packages/vate-core-ts/README.md](packages/vate-core-ts/README.md)
+  Package-private TypeScript helpers for digest descriptors, artifact references, and SUT result entries
+- [packages/vate-a2a-ts/README.md](packages/vate-a2a-ts/README.md)
+  Package-private TypeScript helpers for the reference-only A2A metadata binding
 - [docs/interop/oap-aport-crosswalk.md](docs/interop/oap-aport-crosswalk.md)
   OAP / APort decision evidence crosswalk for VATE admission receipts
 - [docs/interop/ap2-ucp-commerce-crosswalk.md](docs/interop/ap2-ucp-commerce-crosswalk.md)
@@ -293,6 +297,19 @@ python3 -m venv ../verifiable-agent-trust-envelope-draft-venv
 python3 -m pip install -r requirements-dev.txt
 python3 scripts/check_repo_strict.py
 ```
+
+Package-private TypeScript reference helpers are available for contributors who
+want language-level examples of the same digest-bound reference and A2A metadata
+shapes:
+
+```bash
+npm ci
+npm run ts:check
+npm run ts:test
+```
+
+These packages are not published SDKs, do not add production JOSE/JCS
+verification, and do not make an official A2A compatibility claim.
 
 ## Related Documents
 

@@ -53,6 +53,11 @@ The example file is:
 
 - `examples/conformance/sut-results-pass.example.json`
 
+For TypeScript contributors, `packages/vate-core-ts` includes a package-private
+helper for constructing schema-shaped result entries. It is an implementation
+aid only; `compare` remains the repository comparison command for external SUT
+review.
+
 ## Artifact References
 
 SUT results must be artifact-backed for cases that depend on concrete receipts,

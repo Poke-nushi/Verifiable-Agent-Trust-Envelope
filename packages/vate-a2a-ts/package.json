@@ -1,0 +1,15 @@
+{
+  "name": "@vate/reference-a2a",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@vate/reference-core": "0.0.0"
+  }
+}

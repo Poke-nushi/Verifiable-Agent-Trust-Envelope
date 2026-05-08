@@ -45,6 +45,14 @@ Related schema:
 
 - `schemas/a2a-vate-metadata.schema.json`
 
+Related package-private TypeScript helper:
+
+- `packages/vate-a2a-ts/README.md`
+
+The helper validates the reference metadata shape and optional activation
+header. It is not an official A2A SDK, middleware package, or compatibility
+claim.
+
 ## Review Question
 
 The narrow question for A2A-oriented review is:
