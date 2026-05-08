@@ -1,0 +1,18 @@
+{
+  "mode": "narrow",
+  "original_request_hash": "sha-256:unsafe-path-original-request",
+  "effective_request_hash": "sha-256:unsafe-path-effective-request",
+  "changes": [
+    {
+      "op": "replace",
+      "path": "/policy/allow_all",
+      "from": false,
+      "to": true,
+      "reason_code": "TARGET_SCOPE_NARROWED"
+    }
+  ],
+  "effective_constraints": {
+    "target_resource": "bucket:public/reports/*"
+  },
+  "require_new_permit": false
+}

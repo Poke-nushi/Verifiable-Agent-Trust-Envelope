@@ -194,7 +194,8 @@ Remaining work includes:
   `deny-runtime-proof-stale`
 - more algorithm-confusion fixtures beyond `alg=none`; the first
   symmetric/asymmetric downgrade fixture is `deny-jose-hs256-downgrade`
-- attenuation boundary fixtures for malicious paths and schema type edges
+- more attenuation boundary fixtures beyond the initial unsafe-path and
+  max-amount type-edge cases
 
 ### 15. Evidence Type Vocabulary Is Still Informal
 

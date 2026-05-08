@@ -2,7 +2,7 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "30a95ed7b9d33a84d3103a15b6012c3c65556ceae333f7b5aab48eeb96193a93"
+      "value": "72df2be76866be2d910260130d4a0cd495520161c457a14d273dce2bba9e85c9"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.2"
   },
@@ -378,6 +378,46 @@
       "outcome": "deny",
       "reason_codes": [
         "PERMIT_EXPIRED",
+        "FAIL_CLOSED"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-attenuation-max-amount-type-edge",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "SCHEMA_INVALID",
+        "FAIL_CLOSED"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
+      "case_id": "deny-attenuation-unsafe-path",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "SCHEMA_INVALID",
         "FAIL_CLOSED"
       ],
       "should_execute": false,

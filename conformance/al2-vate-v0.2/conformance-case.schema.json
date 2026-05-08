@@ -248,6 +248,35 @@
         "additionalProperties": true
       }
     },
+    "attenuation_checks": {
+      "type": "array",
+      "description": "Checks that an attenuation object is valid or invalid under the AL2 attenuation boundary rules.",
+      "items": {
+        "type": "object",
+        "required": [
+          "artifact",
+          "expect_valid"
+        ],
+        "properties": {
+          "artifact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expect_valid": {
+            "type": "boolean"
+          },
+          "expected_failure_reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true
+      }
+    },
     "trust_checks": {
       "type": "array",
       "description": "Checks local trust-bundle admission behavior for issuer, key id, algorithm, evidence type, status, and validity windows.",

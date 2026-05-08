@@ -57,6 +57,13 @@ The runnable conformance corpus checks that an attenuated receipt includes:
 - at least one machine-readable change
 - effective constraints
 - an explicit `require_new_permit` boolean
+- change paths inside the AL2 attenuation boundary: request constraints, target,
+  runtime, tools, or approval state
+- scalar, finite, non-negative amount limits when `effective_constraints.max_amount`
+  is present
+
+Candidate attenuation objects that attempt to mutate verifier policy state or
+encode amount limits as non-scalar objects must fail closed.
 
 Conformance does not require a global policy language.
 The verifier only needs to produce comparable admission and receipt semantics for the fixture.

@@ -16,6 +16,7 @@ import hashlib
 import json
 import sys
 from datetime import datetime, timezone
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
@@ -271,6 +272,154 @@ def reason_code_order_failures(codes: list[str], outcome: str, *, label: str) ->
             failures.append(f"{label}: POLICY_MATCH must be last for allow outcomes")
 
     return failures
+
+
+def decode_json_pointer_segment(segment: str) -> str | None:
+    decoded = ""
+    index = 0
+    while index < len(segment):
+        char = segment[index]
+        if char != "~":
+            decoded += char
+            index += 1
+            continue
+        if index + 1 >= len(segment):
+            return None
+        escape = segment[index + 1]
+        if escape == "0":
+            decoded += "~"
+        elif escape == "1":
+            decoded += "/"
+        else:
+            return None
+        index += 2
+    return decoded
+
+
+def safe_attenuation_path_failures(path: Any) -> list[str]:
+    if not isinstance(path, str) or not path:
+        return ["change path must be a non-empty JSON Pointer string"]
+    if any(ord(char) < 32 for char in path):
+        return ["change path must not contain control characters"]
+    if not path.startswith("/"):
+        return ["change path must start with '/'"]
+
+    decoded_segments: list[str] = []
+    for raw_segment in path.split("/")[1:]:
+        if raw_segment == "":
+            return ["change path must not contain empty segments"]
+        decoded = decode_json_pointer_segment(raw_segment)
+        if decoded is None:
+            return ["change path contains an invalid JSON Pointer escape"]
+        if decoded in {".", "..", "__proto__", "prototype", "constructor"}:
+            return [f"change path contains unsafe segment {decoded!r}"]
+        decoded_segments.append(decoded)
+
+    allowed_roots = {"approval", "constraints", "runtime", "target", "tools"}
+    if not decoded_segments or decoded_segments[0] not in allowed_roots:
+        return ["change path is outside the AL2 attenuation boundary"]
+    return []
+
+
+def decimal_amount_failures(value: Any, *, label: str) -> list[str]:
+    if isinstance(value, bool) or not isinstance(value, (str, int, float)):
+        return [f"{label} must be a string or number"]
+    try:
+        amount = Decimal(str(value))
+    except (InvalidOperation, ValueError):
+        return [f"{label} must be a finite non-negative decimal"]
+    if not amount.is_finite() or amount < 0:
+        return [f"{label} must be a finite non-negative decimal"]
+    return []
+
+
+def attenuation_validation_failures(
+    attenuation: Any,
+    *,
+    decision_reason_codes: list[str] | None = None,
+) -> list[str]:
+    failures: list[str] = []
+    if not isinstance(attenuation, dict):
+        return ["attenuation must be an object"]
+
+    mode = attenuation.get("mode")
+    if mode not in {"narrow", "require_new_permit", "deny_if_not_accepted"}:
+        failures.append("mode must be a supported attenuation mode")
+
+    original_hash = attenuation.get("original_request_hash")
+    effective_hash = attenuation.get("effective_request_hash")
+    if not isinstance(original_hash, str) or not original_hash:
+        failures.append("original_request_hash must be a non-empty string")
+    if not isinstance(effective_hash, str) or not effective_hash:
+        failures.append("effective_request_hash must be a non-empty string")
+    if isinstance(original_hash, str) and original_hash and original_hash == effective_hash:
+        failures.append("effective_request_hash must differ from original_request_hash")
+
+    require_new_permit = attenuation.get("require_new_permit")
+    if not isinstance(require_new_permit, bool):
+        failures.append("require_new_permit must be a boolean")
+    if mode == "require_new_permit" and require_new_permit is not True:
+        failures.append("mode require_new_permit requires require_new_permit true")
+
+    changes = attenuation.get("changes")
+    if not isinstance(changes, list) or not changes:
+        failures.append("changes must be a non-empty array")
+    else:
+        for index, change in enumerate(changes):
+            if not isinstance(change, dict):
+                failures.append(f"changes[{index}] must be an object")
+                continue
+            if change.get("op") not in {"add", "remove", "replace"}:
+                failures.append(f"changes[{index}].op must be add, remove, or replace")
+            for failure in safe_attenuation_path_failures(change.get("path")):
+                failures.append(f"changes[{index}].path: {failure}")
+            reason_code = change.get("reason_code")
+            if not isinstance(reason_code, str) or not reason_code:
+                failures.append(f"changes[{index}].reason_code must be a non-empty string")
+            elif decision_reason_codes is not None and reason_code not in decision_reason_codes:
+                failures.append(f"changes[{index}].reason_code must appear in decision.reason_codes")
+
+    effective_constraints = attenuation.get("effective_constraints")
+    if not isinstance(effective_constraints, dict) or not effective_constraints:
+        failures.append("effective_constraints must be a non-empty object")
+    else:
+        max_amount = effective_constraints.get("max_amount")
+        if max_amount is not None:
+            if not isinstance(max_amount, dict):
+                failures.append("effective_constraints.max_amount must be an object")
+            else:
+                currency = max_amount.get("currency")
+                if not isinstance(currency, str) or len(currency) != 3 or currency.upper() != currency:
+                    failures.append("effective_constraints.max_amount.currency must be a 3-letter uppercase code")
+                failures.extend(
+                    decimal_amount_failures(
+                        max_amount.get("value"),
+                        label="effective_constraints.max_amount.value",
+                    )
+                )
+
+        tool_allowlist = effective_constraints.get("tool_allowlist")
+        if tool_allowlist is not None and (
+            not isinstance(tool_allowlist, list)
+            or not all(isinstance(tool, str) and tool for tool in tool_allowlist)
+        ):
+            failures.append("effective_constraints.tool_allowlist must be an array of non-empty strings")
+
+        target_resource = effective_constraints.get("target_resource")
+        if target_resource is not None and (not isinstance(target_resource, str) or not target_resource):
+            failures.append("effective_constraints.target_resource must be a non-empty string")
+
+        expires_at = effective_constraints.get("expires_at")
+        if expires_at is not None and try_parse_time(expires_at) is None:
+            failures.append("effective_constraints.expires_at must be an RFC3339 timestamp")
+
+    return failures
+
+
+def attenuation_failure_reason(failures: list[str]) -> str | None:
+    if not failures:
+        return None
+    return "SCHEMA_INVALID"
 
 
 def expected_should_execute(case: dict[str, Any]) -> bool:
@@ -764,6 +913,42 @@ def evaluate_artifact_reference_checks(
     return failures
 
 
+def evaluate_attenuation_checks(case: dict[str, Any], admission: dict[str, Any] | None) -> list[str]:
+    failures: list[str] = []
+    if admission is not None and actual_decision(admission) == "attenuate":
+        for failure in attenuation_validation_failures(
+            admission.get("attenuation"),
+            decision_reason_codes=actual_reason_codes(admission),
+        ):
+            failures.append(f"attenuation: {failure}")
+
+    for check in case.get("attenuation_checks", []):
+        artifact = read_json(resolve_artifact_path(case, check["artifact"]))
+        source_path = check.get("source_path")
+        if source_path:
+            try:
+                artifact = get_path(artifact, source_path)
+            except (KeyError, IndexError, TypeError, ValueError):
+                failures.append(f"attenuation {check['artifact']}: source path missing")
+                continue
+
+        validation_failures = attenuation_validation_failures(artifact)
+        valid = not validation_failures
+        expect_valid = bool(check.get("expect_valid", True))
+        if valid != expect_valid:
+            failures.append(
+                f"attenuation {check['artifact']}: expected valid={expect_valid} actual valid={valid}"
+            )
+
+        expected_failure = check.get("expected_failure_reason")
+        actual_failure = attenuation_failure_reason(validation_failures)
+        if expected_failure and actual_failure != expected_failure:
+            failures.append(
+                f"attenuation {check['artifact']}: expected failure={expected_failure} actual failure={actual_failure}"
+            )
+    return failures
+
+
 def evaluate_case(case_path: Path) -> dict[str, Any]:
     case = read_json(case_path)
     admission_request = load_artifact(case, "admission_request")
@@ -809,6 +994,7 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
     failures.extend(evaluate_linkage_checks(case, admission, post_execution))
     failures.extend(evaluate_policy_snapshot_checks(case, admission, a2a_metadata))
     failures.extend(evaluate_artifact_reference_checks(case, admission_request, admission, post_execution, a2a_metadata))
+    failures.extend(evaluate_attenuation_checks(case, admission))
 
     return {
         "case_id": case["case_id"],

@@ -1,0 +1,25 @@
+{
+  "mode": "narrow",
+  "original_request_hash": "sha-256:max-amount-type-original-request",
+  "effective_request_hash": "sha-256:max-amount-type-effective-request",
+  "changes": [
+    {
+      "op": "replace",
+      "path": "/constraints/max_amount/value",
+      "from": "120.00",
+      "to": {
+        "unbounded": true
+      },
+      "reason_code": "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+    }
+  ],
+  "effective_constraints": {
+    "max_amount": {
+      "currency": "USD",
+      "value": {
+        "unbounded": true
+      }
+    }
+  },
+  "require_new_permit": false
+}

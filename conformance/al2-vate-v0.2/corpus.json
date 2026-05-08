@@ -317,6 +317,48 @@
     },
     {
       "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-attenuation-max-amount-type-edge.example.json",
+        "bad_attenuation": "conformance/al2-vate-v0.2/fixtures/attenuation-max-amount-type-edge.json"
+      },
+      "case_id": "deny-attenuation-max-amount-type-edge",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "SCHEMA_INVALID",
+        "FAIL_CLOSED"
+      ],
+      "expected_should_execute": false,
+      "path": "conformance/al2-vate-v0.2/cases/deny-attenuation-max-amount-type-edge.json",
+      "title": "Deny non-scalar attenuated max amount",
+      "validation_focus": [
+        "attenuation boundary",
+        "schema type edge",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-attenuation-unsafe-path.example.json",
+        "unsafe_attenuation": "conformance/al2-vate-v0.2/fixtures/attenuation-unsafe-path.json"
+      },
+      "case_id": "deny-attenuation-unsafe-path",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_reason_codes": [
+        "SCHEMA_INVALID",
+        "FAIL_CLOSED"
+      ],
+      "expected_should_execute": false,
+      "path": "conformance/al2-vate-v0.2/cases/deny-attenuation-unsafe-path.json",
+      "title": "Deny attenuation outside the allowed boundary",
+      "validation_focus": [
+        "attenuation boundary",
+        "unsafe path rejection",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
         "admission_receipt": "examples/receipts/admission-deny-audience-mismatch.example.json",
         "base_artifact": "examples/admission-request.example.json",
         "mutation": {
@@ -893,7 +935,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "30a95ed7b9d33a84d3103a15b6012c3c65556ceae333f7b5aab48eeb96193a93"
+    "value": "72df2be76866be2d910260130d4a0cd495520161c457a14d273dce2bba9e85c9"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -967,6 +1009,14 @@
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-ap2-hnp-stale-mandate.json",
       "sha256": "bc2153531400313925b03f68713bd1b58aae27e5847d5c759800ec1ffba23329"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-attenuation-max-amount-type-edge.json",
+      "sha256": "0914dcf0b50ebcd1f1edfe80a9346837394932716a26870299ba9167d45f7ccb"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/deny-attenuation-unsafe-path.json",
+      "sha256": "cbfe23af9a065a9a2ed979a95c05f16fe20bfb8326798b1fe934f1a81f905255"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-audience-mismatch.json",
@@ -1078,7 +1128,15 @@
     },
     {
       "path": "conformance/al2-vate-v0.2/conformance-case.schema.json",
-      "sha256": "12e721b6b4d8b63825da6a9f9020319c032b34290775a6e3263ee7039c86f7a8"
+      "sha256": "c441a308a910c100f1ac0f66b87e4ad1734ad22591b47f9a9453faac549f5750"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/fixtures/attenuation-max-amount-type-edge.json",
+      "sha256": "7d5a26be5435a16c4c1c510f5342b51258065558ad611965eda752577fe92530"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/fixtures/attenuation-unsafe-path.json",
+      "sha256": "68a4f36d35da78742c0105d1623a94222ddbf98401842a0e663d14d88eeb4703"
     },
     {
       "path": "examples/a2a/metadata-admission-issued.json",
@@ -1233,6 +1291,14 @@
       "sha256": "405e5cf81a8fe1e8ffe60141ab8466300bea2cb572d9e4067416d1bdb54af69f"
     },
     {
+      "path": "examples/receipts/admission-deny-attenuation-max-amount-type-edge.example.json",
+      "sha256": "1104a2652d359801f4e3f46e6e1bcea50dc0d03a724211ed4595b342c4a0f34c"
+    },
+    {
+      "path": "examples/receipts/admission-deny-attenuation-unsafe-path.example.json",
+      "sha256": "c2bd1215e7298106acc22c86e5eb6b6dc7c5115986169b1ba46124f333dee5ee"
+    },
+    {
       "path": "examples/receipts/admission-deny-audience-mismatch.example.json",
       "sha256": "618b22cafb1901ea359b7916fd0e739d91b851c22cc0d47dab391644c941a332"
     },
@@ -1353,11 +1419,11 @@
     "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.2 --out conformance/al2-vate-v0.2/corpus.json"
   },
   "summary": {
-    "artifact_count": 109,
-    "case_count": 42,
+    "artifact_count": 115,
+    "case_count": 44,
     "category_counts": {
       "linkage": 3,
-      "negative": 26,
+      "negative": 28,
       "positive": 13
     }
   },

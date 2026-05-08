@@ -31,6 +31,8 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/attenuate-max-amount.json`
 - `cases/attenuate-target-scope.json`
 - `cases/attenuate-requires-new-permit.json`
+- `cases/deny-attenuation-unsafe-path.json`
+- `cases/deny-attenuation-max-amount-type-edge.json`
 - `cases/deny-expired-permit.json`
 - `cases/deny-not-yet-valid-permit.json`
 - `cases/deny-audience-mismatch.json`
