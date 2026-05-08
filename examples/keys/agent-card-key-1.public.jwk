@@ -1,0 +1,7 @@
+{
+  "kty": "EC",
+  "crv": "P-256",
+  "kid": "did:web:agent.example#agent-card-key-1",
+  "x": "base64url-agent-card-test-x",
+  "y": "base64url-agent-card-test-y"
+}

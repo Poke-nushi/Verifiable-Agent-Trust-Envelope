@@ -112,6 +112,31 @@ The current conformance fixtures use SHA-256 over sorted-key compact JSON and en
 The verifier must not treat an A2A Agent Card as sufficient proof of current task authority.
 The verifier must evaluate the referenced artifacts against local policy before accepting a risky external write.
 
+## Signed Agent Card Digest Target
+
+For the v0.2 byte-level fixture, the digest target is the canonicalized A2A
+Agent Card payload, not the HTTP response envelope, discovery URL, mutable
+cache entry, or VATE admission request.
+
+The fixture uses the same dependency-free JSON byte basis as the v0.2
+conformance corpus: sorted object keys, no insignificant whitespace, UTF-8
+bytes, and lowercase SHA-256 hex digests.
+
+The validation responsibility is deliberately split:
+
+- A2A owns whether the Agent Card shape and signature packaging match A2A rules.
+- VATE consumes the signed Agent Card or validation result as adjacent evidence.
+- The verifier still decides whether the issuer, key, endpoint, extension
+  declaration, freshness, runtime binding, and local policy permit the action.
+
+The signed Agent Card fixture is byte-level only. It fixes the protected header,
+payload digest, detached payload bytes, and signing-input digest. It does not
+claim production ECDSA verification.
+It is included in the AL2 v0.2 conformance corpus as
+`allow-a2a-signed-agent-card-evidence`, so external SUT comparison must report
+the referenced proof, Agent Card payload, trust bundle, and admission receipt
+artifacts.
+
 ## Examples
 
 Example files:
@@ -121,6 +146,7 @@ Example files:
 - `examples/a2a/metadata-admission-issued.json`
 - `examples/a2a/metadata-post-execution-issued.json`
 - `examples/a2a/agent-card-v1-vate-extension.example.json`
+- `examples/jose/jose-detached-a2a-agent-card.example.json`
 
 ## Compatibility Notes
 

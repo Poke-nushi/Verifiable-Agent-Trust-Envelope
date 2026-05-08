@@ -187,6 +187,10 @@ compatibility claim.
   Reference-only A2A metadata binding for VATE admission and receipt artifacts
 - [docs/a2a-v1-extension-sketch-2026-05.md](docs/a2a-v1-extension-sketch-2026-05.md)
   A2A v1.0-shaped extension sketch using optional activation, signed Agent Card evidence, and digest-bound VATE references
+- [docs/namespace-migration.md](docs/namespace-migration.md)
+  Repository-scoped draft URI and persistent namespace migration discipline
+- [docs/extension-fields.md](docs/extension-fields.md)
+  Handling rules for unknown extension fields before schema tightening
 - [docs/ecosystem-positioning-2026-05.md](docs/ecosystem-positioning-2026-05.md)
   Current VATE boundary relative to MCP/OAuth, A2A, AP2, ACP/UCP, and x402
 - [docs/receipt-model-v0.2.md](docs/receipt-model-v0.2.md)

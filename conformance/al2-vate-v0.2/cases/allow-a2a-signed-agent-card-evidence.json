@@ -1,0 +1,68 @@
+{
+  "version": "vate-conformance-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "case_id": "allow-a2a-signed-agent-card-evidence",
+  "title": "Allow byte-bound A2A signed Agent Card evidence",
+  "category": "positive",
+  "purpose": "A verifier should accept a byte-level detached JWS fixture for A2A signed Agent Card evidence when protected header, payload digest, signing input, and trust bundle constraints all match.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-allow-a2a-signed-agent-card.example.json",
+    "jose_proof": "examples/jose/jose-detached-a2a-agent-card.example.json",
+    "detached_payload": "examples/a2a/agent-card-v1-vate-extension.example.json",
+    "trust_bundle": "examples/trust-bundle-agent-card.example.json"
+  },
+  "artifact_reference_checks": [
+    {
+      "artifact": "detached_payload",
+      "expect_match": true,
+      "reference_paths": [
+        {
+          "artifact": "admission_receipt",
+          "path": "evidence[0].digest"
+        }
+      ]
+    }
+  ],
+  "jose_checks": [
+    {
+      "proof_package": "jose_proof",
+      "detached_payload": "detached_payload",
+      "trust_bundle": "trust_bundle",
+      "checked_at": "2026-07-01T00:19:05Z",
+      "expected_typ": "a2a-agent-card+jws",
+      "expect_valid": true
+    }
+  ],
+  "expected": {
+    "admission_decision": "allow",
+    "should_execute": true,
+    "reason_codes": [
+      "EVIDENCE_VERIFIED",
+      "POLICY_MATCH"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "pass"
+      },
+      {
+        "name": "jose.protected_header",
+        "expected": "pass"
+      },
+      {
+        "name": "jose.detached_payload_digest",
+        "expected": "pass"
+      },
+      {
+        "name": "jose.signing_input",
+        "expected": "pass"
+      }
+    ]
+  },
+  "validation_focus": [
+    "A2A signed Agent Card",
+    "detached JWS fixture",
+    "byte-level payload binding",
+    "trust bundle"
+  ]
+}

@@ -88,14 +88,15 @@ adding new adjacent profiles.
 
 ### P2 Before Independent Implementation Collection
 
-- add report integrity guidance for SUT result and implementation report
+- [x] add report integrity guidance for SUT result and implementation report
   publication; initial schema, runner, and documentation support added
-- decide whether to add a pinned dependency for production-grade JOSE signature
-  fixtures, or keep v0.2 as byte-level detached proof fixtures only
-- add a byte-level A2A signed Agent Card fixture only after the digest target
-  and validation responsibility are fixed
-- define a persistent namespace migration plan for schema and extension URIs
-- document extension-field handling before tightening `additionalProperties`
+- [x] decide whether to add a pinned dependency for production-grade JOSE
+  signature fixtures, or keep v0.2 as byte-level detached proof fixtures only;
+  v0.2 keeps the dependency-free byte-level fixture boundary
+- [x] add a corpus-bound byte-level A2A signed Agent Card fixture after fixing
+  the digest target and validation responsibility
+- [x] define a persistent namespace migration plan for schema and extension URIs
+- [x] document extension-field handling before tightening `additionalProperties`
 
 ## Next
 
@@ -103,8 +104,10 @@ adding new adjacent profiles.
 - prepare A2A-adjacent review updates from `docs/a2a-issue-update-2026-05.md`
   after P0 is complete
 - collect independent implementation reports using
-  `schemas/implementation-report.schema.json` after the SUT comparison contract
-  and report integrity guidance are clear
+  `schemas/implementation-report.schema.json` now that the SUT comparison
+  contract, report integrity guidance, P2 namespace plan, extension-field
+  handling, and corpus-bound byte-level A2A signed Agent Card fixture boundary
+  are documented
 - add additional transport-bound fixtures beyond the initial MCP/OAuth,
   AP2/UCP, and AP2 Human Not Present examples after the AL2 security basis is
   stable

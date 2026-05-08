@@ -9,8 +9,10 @@ scripts/check_repo_strict.py when jsonschema is available locally.
 
 from __future__ import annotations
 
-import json
+import base64
+import hashlib
 import importlib.util
+import json
 import shutil
 import socket
 import subprocess
@@ -29,6 +31,13 @@ VATE_CORE = ROOT / "reference" / "vate-verifier-core" / "vate_verifier_core.py"
 A2A_ADAPTER = ROOT / "reference" / "a2a-metadata-adapter-demo" / "a2a_metadata_adapter_demo.py"
 EVIDENCE_VOCABULARY = ROOT / "registries" / "evidence-vocabulary.v0.2.json"
 ARTIFACT_VERSIONING_DOC = ROOT / "docs" / "conformance" / "artifact-versioning.md"
+JOSE_PROFILE_NOTES_DOC = ROOT / "docs" / "profiles" / "vate-jose-proof-profile-notes-2026-07.md"
+NAMESPACE_MIGRATION_DOC = ROOT / "docs" / "namespace-migration.md"
+EXTENSION_FIELDS_DOC = ROOT / "docs" / "extension-fields.md"
+A2A_METADATA_BINDING_DOC = ROOT / "docs" / "a2a-metadata-binding-v0.2.md"
+A2A_EXTENSION_SKETCH_DOC = ROOT / "docs" / "a2a-v1-extension-sketch-2026-05.md"
+A2A_SIGNED_AGENT_CARD_PROOF = ROOT / "examples" / "jose" / "jose-detached-a2a-agent-card.example.json"
+A2A_SIGNED_AGENT_CARD_PAYLOAD = ROOT / "examples" / "a2a" / "agent-card-v1-vate-extension.example.json"
 JSON_ONLY_FILES = [
     "reference/a2a-metadata-adapter-demo/agent-card-extension.example.json",
     "examples/a2a/agent-card-v1-vate-extension.example.json",
@@ -62,6 +71,7 @@ EXAMPLE_PAIRS = [
     ("examples/attenuation-max-amount.example.json", "schemas/attenuation-effect.schema.json"),
     ("examples/attenuation-approval.example.json", "schemas/attenuation-effect.schema.json"),
     ("examples/trust-bundle.example.json", "schemas/trust-bundle.schema.json"),
+    ("examples/trust-bundle-agent-card.example.json", "schemas/trust-bundle.schema.json"),
     ("examples/conformance-report.example.json", "schemas/conformance-report.schema.json"),
     ("examples/implementation-report.example.json", "schemas/implementation-report.schema.json"),
     ("examples/report-bundle-verification.example.json", "schemas/report-bundle-verification.schema.json"),
@@ -236,6 +246,28 @@ def run_expect_failure(cmd: list[str], *, cwd: Path = ROOT) -> subprocess.Comple
     if result.returncode == 0:
         raise AssertionError(f"expected command to fail: {' '.join(cmd)}")
     return result
+
+
+def canonical_json_bytes(value) -> bytes:
+    return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+
+
+def b64url_encode_bytes(value: bytes) -> str:
+    return base64.urlsafe_b64encode(value).decode("ascii").rstrip("=")
+
+
+def rewrite_detached_jws_payload_digest(proof: dict, payload: dict) -> None:
+    payload_b64u = b64url_encode_bytes(canonical_json_bytes(payload))
+    proof["detached_payload_b64u"] = payload_b64u
+    proof["detached_payload_sha256"] = {
+        "alg": "sha-256",
+        "value": hashlib.sha256(canonical_json_bytes(payload)).hexdigest(),
+    }
+    signing_input = f"{proof['protected_b64u']}.{payload_b64u}".encode("ascii")
+    proof["signing_input_sha256"] = {
+        "alg": "sha-256",
+        "value": hashlib.sha256(signing_input).hexdigest(),
+    }
 
 
 def write_sut_result_without_jose_proof_artifacts(path: Path) -> None:
@@ -598,6 +630,133 @@ def check_p1_5_fixture_coverage() -> None:
         raise RuntimeError("deny-attenuation-negative-amount must exercise a negative max_amount value")
 
 
+def check_p2_public_artifact_boundary() -> None:
+    required_docs = {
+        JOSE_PROFILE_NOTES_DOC: [
+            "v0.2 decision",
+            "no new jose dependency",
+            "production signature verification remains outside",
+        ],
+        NAMESPACE_MIGRATION_DOC: [
+            "repository-scoped draft uri",
+            "persistent namespace",
+            "migration conditions",
+            "do not break existing v0.2 corpus",
+        ],
+        EXTENSION_FIELDS_DOC: [
+            "unknown extension fields",
+            "must not grant authority",
+            "preserve",
+            "additionalproperties",
+        ],
+        A2A_METADATA_BINDING_DOC: [
+            "digest target",
+            "validation responsibility",
+            "jose-detached-a2a-agent-card.example.json",
+        ],
+        A2A_EXTENSION_SKETCH_DOC: [
+            "digest-bound artifact is the canonicalized agent card payload",
+            "jose-detached-a2a-agent-card.example.json",
+        ],
+    }
+    for path, phrases in required_docs.items():
+        if not path.exists():
+            raise RuntimeError(f"missing P2 artifact-boundary document: {path.relative_to(ROOT)}")
+        normalized = " ".join(path.read_text(encoding="utf-8").split()).lower()
+        missing = [phrase for phrase in phrases if phrase not in normalized]
+        if missing:
+            raise RuntimeError(f"{path.relative_to(ROOT)} is missing P2 artifact-boundary language: {missing}")
+    if "what exact artifact should be digest-bound" in A2A_EXTENSION_SKETCH_DOC.read_text(encoding="utf-8").lower():
+        raise RuntimeError("A2A extension sketch still treats the v0.2 signed Agent Card digest target as open")
+
+    required_case_id = "allow-a2a-signed-agent-card-evidence"
+    corpus = json.loads((ROOT / "conformance" / "al2-vate-v0.2" / "corpus.json").read_text(encoding="utf-8"))
+    corpus_case_ids = {case.get("case_id") for case in corpus.get("cases", []) if isinstance(case, dict)}
+    if required_case_id not in corpus_case_ids:
+        raise RuntimeError(f"P2 A2A signed Agent Card fixture is not corpus-bound: missing {required_case_id}")
+
+    sut_results = json.loads((ROOT / "examples" / "conformance" / "sut-results-pass.example.json").read_text())
+    sut_case_ids = {result.get("case_id") for result in sut_results.get("results", []) if isinstance(result, dict)}
+    if required_case_id not in sut_case_ids:
+        raise RuntimeError(f"P2 A2A signed Agent Card fixture is not represented in the SUT sample: {required_case_id}")
+
+    if not A2A_SIGNED_AGENT_CARD_PROOF.exists():
+        raise RuntimeError(f"missing P2 A2A signed Agent Card fixture: {A2A_SIGNED_AGENT_CARD_PROOF.relative_to(ROOT)}")
+    proof = json.loads(A2A_SIGNED_AGENT_CARD_PROOF.read_text(encoding="utf-8"))
+    payload = json.loads(A2A_SIGNED_AGENT_CARD_PAYLOAD.read_text(encoding="utf-8"))
+    protected = proof.get("protected")
+    if not isinstance(protected, dict):
+        raise RuntimeError("A2A signed Agent Card proof fixture must include a protected header object")
+    if proof.get("evidence_type") != "signed_agent_card":
+        raise RuntimeError("A2A signed Agent Card proof fixture must use evidence_type signed_agent_card")
+    fixture_note = proof.get("fixture_signature_note")
+    if not isinstance(fixture_note, str) or "not a production ecdsa signature" not in fixture_note.lower():
+        raise RuntimeError("A2A signed Agent Card proof fixture must warn that signature_b64u is fixture data")
+    if protected.get("typ") != "a2a-agent-card+jws":
+        raise RuntimeError("A2A signed Agent Card proof fixture must use typ a2a-agent-card+jws")
+    expected_protected_b64u = b64url_encode_bytes(canonical_json_bytes(protected))
+    if proof.get("protected_b64u") != expected_protected_b64u:
+        raise RuntimeError("A2A signed Agent Card proof fixture protected_b64u is not canonical")
+    expected_payload_b64u = b64url_encode_bytes(canonical_json_bytes(payload))
+    expected_payload_digest = {
+        "alg": "sha-256",
+        "value": hashlib.sha256(canonical_json_bytes(payload)).hexdigest(),
+    }
+    if proof.get("detached_payload_b64u") != expected_payload_b64u:
+        raise RuntimeError("A2A signed Agent Card proof fixture payload b64u is not bound to the Agent Card example")
+    if proof.get("detached_payload_sha256") != expected_payload_digest:
+        raise RuntimeError("A2A signed Agent Card proof fixture payload digest is not bound to the Agent Card example")
+    signing_input = f"{proof.get('protected_b64u')}.{proof.get('detached_payload_b64u')}".encode("ascii")
+    expected_signing_input_digest = {
+        "alg": "sha-256",
+        "value": hashlib.sha256(signing_input).hexdigest(),
+    }
+    if proof.get("signing_input_sha256") != expected_signing_input_digest:
+        raise RuntimeError("A2A signed Agent Card proof fixture signing input digest is not canonical")
+
+    conformance = load_vate_conformance_module()
+    case_path = ROOT / "conformance" / "al2-vate-v0.2" / "cases" / f"{required_case_id}.json"
+    case = json.loads(case_path.read_text(encoding="utf-8"))
+
+    with tempfile.TemporaryDirectory(prefix="vate-a2a-agent-card-negative-") as negative_dir:
+        temp_dir = Path(negative_dir)
+        bad_receipt = json.loads((ROOT / case["artifacts"]["admission_receipt"]).read_text(encoding="utf-8"))
+        bad_receipt["evidence"][0]["digest"] = {
+            "alg": "sha-256",
+            "value": "0" * 64,
+        }
+        bad_receipt_path = temp_dir / "bad-admission-receipt.json"
+        bad_receipt_path.write_text(json.dumps(bad_receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        bad_case = json.loads(json.dumps(case))
+        bad_case["artifacts"]["admission_receipt"] = str(bad_receipt_path)
+        bad_case_path = temp_dir / "bad-case.json"
+        bad_case_path.write_text(json.dumps(bad_case, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        if conformance.evaluate_case(bad_case_path)["pass"]:
+            raise RuntimeError("A2A signed Agent Card case must fail when receipt evidence digest is not payload-bound")
+
+    bad_payload = json.loads(json.dumps(payload))
+    bad_payload["capabilities"]["extensions"][0]["uri"] = "https://example.invalid/not-vate"
+    bad_proof = json.loads(json.dumps(proof))
+    rewrite_detached_jws_payload_digest(bad_proof, bad_payload)
+    trust_bundle = json.loads((ROOT / "examples" / "trust-bundle-agent-card.example.json").read_text(encoding="utf-8"))
+    valid, failure_reason, _ = conformance.evaluate_jose_check(
+        bad_proof,
+        bad_payload,
+        trust_bundle,
+        {
+            "checked_at": "2026-07-01T00:19:05Z",
+            "expected_typ": "a2a-agent-card+jws",
+        },
+    )
+    if valid or failure_reason != "SCHEMA_INVALID":
+        raise RuntimeError("A2A signed Agent Card fixture must require the VATE extension declaration")
+
+    agent_card_anchor = trust_bundle["issuers"][0]
+    public_key = json.loads((ROOT / agent_card_anchor["public_key_ref"]).read_text(encoding="utf-8"))
+    if public_key.get("kid") != agent_card_anchor.get("kid"):
+        raise RuntimeError("A2A signed Agent Card trust bundle public_key_ref kid must match the trust anchor kid")
+
+
 def main() -> int:
     validate_examples()
     check_evidence_vocabulary_registry()
@@ -607,6 +766,7 @@ def main() -> int:
     check_status_freshness_boundary_coverage()
     check_replay_boundary_coverage()
     check_p1_5_fixture_coverage()
+    check_p2_public_artifact_boundary()
     run([sys.executable, "-m", "py_compile", str(DEMO)])
     run([sys.executable, "-m", "py_compile", str(HTTP_DEMO)])
     run([sys.executable, "-m", "py_compile", str(VATE_CONFORMANCE)])

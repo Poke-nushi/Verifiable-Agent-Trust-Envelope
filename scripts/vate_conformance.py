@@ -23,6 +23,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 PROFILE = "VATE-AL2-Verifier-Admission-v0.2"
+VATE_A2A_EXTENSION_URI = "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2"
 CONFORMANCE_REPORT_VERSION = "vate-conformance-report-2026-07"
 IMPLEMENTATION_REPORT_VERSION = "vate-implementation-report-2026-07"
 BUNDLE_VERIFICATION_VERSION = "vate-report-bundle-verification-2026-07"
@@ -1134,7 +1135,32 @@ def evaluate_jose_check(
         return False, "SCHEMA_INVALID", check_results
     if evidence_type not in CANONICAL_EVIDENCE_TYPES:
         return False, "SCHEMA_INVALID", check_results
-    if detached_payload.get("evidence_type") != evidence_type or detached_payload.get("issuer") != issuer:
+    if evidence_type == "signed_agent_card":
+        capabilities = detached_payload.get("capabilities")
+        extensions = capabilities.get("extensions") if isinstance(capabilities, dict) else None
+        if not isinstance(extensions, list) or not extensions:
+            return False, "SCHEMA_INVALID", check_results
+        vate_extension = next(
+            (
+                extension for extension in extensions
+                if isinstance(extension, dict) and extension.get("uri") == VATE_A2A_EXTENSION_URI
+            ),
+            None,
+        )
+        if vate_extension is None:
+            return False, "SCHEMA_INVALID", check_results
+        params = vate_extension.get("params")
+        if not isinstance(params, dict):
+            return False, "SCHEMA_INVALID", check_results
+        profiles = params.get("profiles")
+        if not isinstance(profiles, list) or PROFILE not in profiles:
+            return False, "SCHEMA_INVALID", check_results
+        binding = params.get("signed_agent_card_binding")
+        if not isinstance(binding, dict):
+            return False, "SCHEMA_INVALID", check_results
+        if binding.get("mode") != "digest_bound_reference" or binding.get("evidence_type") != "signed_agent_card":
+            return False, "SCHEMA_INVALID", check_results
+    elif detached_payload.get("evidence_type") != evidence_type or detached_payload.get("issuer") != issuer:
         return False, "SCHEMA_INVALID", check_results
     trust_check = {
         "issuer_id": issuer,

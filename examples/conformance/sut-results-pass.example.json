@@ -2,7 +2,7 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "4a674ba9a1a016fd1caffc848f9b4caf075cd3305abf57f304817c6111ce943f"
+      "value": "9bcf40d9cc5646e53d7537b5e8c14a81c776d045a2b7ac36580b5aa9668e1696"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.2"
   },
@@ -21,6 +21,76 @@
   ],
   "profile": "VATE-AL2-Verifier-Admission-v0.2",
   "results": [
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
+            "value": "8a5db05615c7843cd4372aed553fd508959572facb57dd0c05b67a39ef514f9e"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-allow-a2a-signed-agent-card.example.json"
+        },
+        "proof_artifacts": [
+          {
+            "case_artifact": "jose_proof",
+            "digest": {
+              "alg": "sha-256",
+              "value": "ec52f97422de1d01def4d763198a1b25e0b1b03f9c9db8eb80d75457aea3e4d9"
+            },
+            "kind": "jose_proof_package",
+            "media_type": "application/vate-jose-proof-fixture+json",
+            "uri": "examples/jose/jose-detached-a2a-agent-card.example.json"
+          },
+          {
+            "case_artifact": "detached_payload",
+            "digest": {
+              "alg": "sha-256",
+              "value": "8aa3caef62b04390e8ef0f21e4a382435b6f36545c6ff659d1010d0599170548"
+            },
+            "kind": "jose_detached_payload",
+            "media_type": "application/json",
+            "uri": "examples/a2a/agent-card-v1-vate-extension.example.json"
+          },
+          {
+            "case_artifact": "trust_bundle",
+            "digest": {
+              "alg": "sha-256",
+              "value": "52eb6aa22275b514446904bac885723303d20ef264d2fdffcf900b1414c6c6bf"
+            },
+            "kind": "jose_trust_bundle",
+            "media_type": "application/vate-trust-bundle+json",
+            "uri": "examples/trust-bundle-agent-card.example.json"
+          }
+        ]
+      },
+      "case_id": "allow-a2a-signed-agent-card-evidence",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "jose.protected_header",
+          "pass": true
+        },
+        {
+          "name": "jose.detached_payload_digest",
+          "pass": true
+        },
+        {
+          "name": "jose.signing_input",
+          "pass": true
+        }
+      ],
+      "outcome": "allow",
+      "reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "should_execute": true,
+      "status": "completed"
+    },
     {
       "artifacts": {
         "admission_receipt": {

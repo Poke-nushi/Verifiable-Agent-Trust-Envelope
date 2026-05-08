@@ -3,6 +3,31 @@
   "cases": [
     {
       "artifacts": {
+        "admission_receipt": "examples/receipts/admission-allow-a2a-signed-agent-card.example.json",
+        "detached_payload": "examples/a2a/agent-card-v1-vate-extension.example.json",
+        "jose_proof": "examples/jose/jose-detached-a2a-agent-card.example.json",
+        "trust_bundle": "examples/trust-bundle-agent-card.example.json"
+      },
+      "case_id": "allow-a2a-signed-agent-card-evidence",
+      "category": "positive",
+      "expected_outcome": "allow",
+      "expected_primary_reason_code": "EVIDENCE_VERIFIED",
+      "expected_reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "expected_should_execute": true,
+      "path": "conformance/al2-vate-v0.2/cases/allow-a2a-signed-agent-card-evidence.json",
+      "title": "Allow byte-bound A2A signed Agent Card evidence",
+      "validation_focus": [
+        "A2A signed Agent Card",
+        "detached JWS fixture",
+        "byte-level payload binding",
+        "trust bundle"
+      ]
+    },
+    {
+      "artifacts": {
         "admission_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-valid.example.json",
         "admission_request": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-valid.example.json",
         "ap2_mandate": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-valid.example.json"
@@ -1287,7 +1312,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "4a674ba9a1a016fd1caffc848f9b4caf075cd3305abf57f304817c6111ce943f"
+    "value": "9bcf40d9cc5646e53d7537b5e8c14a81c776d045a2b7ac36580b5aa9668e1696"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -1302,6 +1327,10 @@
     "Passing the listed cases does not imply production readiness or endorsement."
   ],
   "manifest": [
+    {
+      "path": "conformance/al2-vate-v0.2/cases/allow-a2a-signed-agent-card-evidence.json",
+      "sha256": "0012ff3b76e59c6bfae66fb914642a9c5dd3478d6982cba0be8eb805dac452ce"
+    },
     {
       "path": "conformance/al2-vate-v0.2/cases/allow-ap2-hnp-preauthorized-mandate.json",
       "sha256": "454bd4764714b085496a74c40d86a48e0f8a672db803a90c7d65ca33ae9a493b"
@@ -1591,6 +1620,10 @@
       "sha256": "c1012bedf2d6e0c8d7f0584c239dacd2c7e1ab5d98ea845573f630148cccdf31"
     },
     {
+      "path": "examples/a2a/agent-card-v1-vate-extension.example.json",
+      "sha256": "8aa3caef62b04390e8ef0f21e4a382435b6f36545c6ff659d1010d0599170548"
+    },
+    {
       "path": "examples/a2a/metadata-admission-issued.json",
       "sha256": "a625b13a81ebbc84e8fbcfe3c7c80d2af06141915fda622a1a3e68deb94459b1"
     },
@@ -1679,6 +1712,10 @@
       "sha256": "ab7261ffbb16e8a093250e71cf5f4c36f923c761099a893866669eaf7952933d"
     },
     {
+      "path": "examples/jose/jose-detached-a2a-agent-card.example.json",
+      "sha256": "ec52f97422de1d01def4d763198a1b25e0b1b03f9c9db8eb80d75457aea3e4d9"
+    },
+    {
       "path": "examples/jose/jose-detached-runtime-attestation-alg-none.example.json",
       "sha256": "f579ae47031d07dff0814a51b487fa510d463b945b9cbc69c7166404179e1ee6"
     },
@@ -1709,6 +1746,10 @@
     {
       "path": "examples/policies/merchant-purchase-al2-policy-snapshot.example.json",
       "sha256": "f5388e13571f9fbf78c809177f5b2ef84f681edd55c052eaf84f5b28e627171d"
+    },
+    {
+      "path": "examples/receipts/admission-allow-a2a-signed-agent-card.example.json",
+      "sha256": "8a5db05615c7843cd4372aed553fd508959572facb57dd0c05b67a39ef514f9e"
     },
     {
       "path": "examples/receipts/admission-allow-mcp-oauth-bound.example.json",
@@ -1919,6 +1960,10 @@
       "sha256": "d043a1aa773fbb4195c767531d5a167c3a420050af451572a70cb953e75217ce"
     },
     {
+      "path": "examples/trust-bundle-agent-card.example.json",
+      "sha256": "52eb6aa22275b514446904bac885723303d20ef264d2fdffcf900b1414c6c6bf"
+    },
+    {
       "path": "examples/trust-bundle-ambiguous.example.json",
       "sha256": "a7fa6a2d307c78128e98113cd0e4961fa0132a6d1c4a8b0a6a17c4b17268b38f"
     },
@@ -1935,12 +1980,12 @@
     "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.2 --out conformance/al2-vate-v0.2/corpus.json"
   },
   "summary": {
-    "artifact_count": 156,
-    "case_count": 58,
+    "artifact_count": 161,
+    "case_count": 59,
     "category_counts": {
       "linkage": 9,
       "negative": 34,
-      "positive": 15
+      "positive": 16
     }
   },
   "version": "vate-conformance-corpus-2026-07"

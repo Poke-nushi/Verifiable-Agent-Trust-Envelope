@@ -33,6 +33,9 @@ What is still open:
 - selective-disclosure presentation approach
 
 The v0.2 AL2 corpus now includes detached JWS byte-level fixtures, but those fixtures do not perform production cryptographic signature verification.
+The v0.2 decision is to avoid adding a JOSE dependency until a production proof
+profile is ready or an independent implementation report demonstrates the
+signature-verification boundary.
 
 ### 2. Pairwise Presentation Guidance Is Still Early
 
@@ -123,6 +126,8 @@ Remaining work includes:
 
 The v0.2 examples use repository-hosted draft URIs.
 A future draft may move schema and extension identifiers to a persistent namespace such as `w3id.org`, but only after the namespace is controlled and documented.
+The migration discipline is now documented in `docs/namespace-migration.md`;
+the remaining gap is choosing and controlling the persistent namespace.
 
 ### 11. Digest And Canonicalization Need A Stable Profile
 
@@ -220,6 +225,9 @@ Remaining work includes:
 The SUT result and implementation report schemas now define publication
 metadata and optional external proof references. The runner can write an
 implementation report for both reference runs and external SUT comparisons.
+The v0.2 package also documents extension-field handling and includes a
+corpus-bound byte-level A2A signed Agent Card fixture, but still does not verify
+production cryptographic signatures.
 
 Remaining work includes:
 

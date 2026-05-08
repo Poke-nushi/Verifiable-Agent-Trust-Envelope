@@ -116,6 +116,12 @@ When the evidence is an A2A Agent Card signature, the referenced signature
 material should follow A2A v1.0 Agent Card signing rules. In particular, the
 protected JWS header is expected to carry `alg`, `typ`, and `kid`.
 
+For the v0.2 byte-level fixture, the digest-bound artifact is the canonicalized
+Agent Card payload shown in
+`examples/a2a/agent-card-v1-vate-extension.example.json`. The detached proof
+fixture is `examples/jose/jose-detached-a2a-agent-card.example.json`, and the
+corpus-bound case is `allow-a2a-signed-agent-card-evidence`.
+
 VATE should consume signed Agent Card material only as evidence:
 
 - as an `evidence_refs[]` item with `type: "signed_agent_card"`;
@@ -183,8 +189,8 @@ This sketch does not define:
   use the A2A extension governance process?
 - Should signed Agent Card evidence be optional for all AL2 cases, or required
   for cross-organization interop fixtures?
-- What exact artifact should be digest-bound: the public Agent Card, an
-  authenticated extended Agent Card, the canonicalized signing payload, or an
-  implementation-defined bundle containing the card plus signature?
+- Should a future production profile keep the v0.2 digest target as the
+  canonicalized Agent Card payload, or move to an implementation-defined bundle
+  containing the card plus signature metadata?
 - Should SDK middleware live outside this repository until at least one
   non-reference implementation can emit a passing SUT result file?

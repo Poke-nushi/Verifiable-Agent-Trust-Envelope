@@ -10,7 +10,7 @@ compatibility claim.
 The corpus makes the v0.2 draft easier to evaluate by naming the minimum expected verifier outcomes:
 
 - admit a valid request
-- accept a byte-bound detached JWS fixture
+- accept byte-bound detached JWS fixtures for runtime attestation and A2A signed Agent Card evidence
 - narrow a request with machine-readable attenuation
 - deny an expired permit
 - deny an audience mismatch
@@ -32,6 +32,7 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/allow-valid-with-status-fresh.json`
 - `cases/allow-valid-with-policy-snapshot.json`
 - `cases/allow-jose-detached-runtime-attestation.json`
+- `cases/allow-a2a-signed-agent-card-evidence.json`
 - `cases/attenuate-max-amount.json`
 - `cases/attenuate-target-scope.json`
 - `cases/attenuate-requires-new-permit.json`

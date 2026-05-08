@@ -1,0 +1,21 @@
+{
+  "version": "vate-trust-bundle-2026-07",
+  "trust_bundle_id": "vate-agent-card-test-bundle-2026-07",
+  "issuers": [
+    {
+      "issuer_id": "did:web:agent.example",
+      "kid": "did:web:agent.example#agent-card-key-1",
+      "alg": "ES256",
+      "status": "active",
+      "not_before": "2026-01-01T00:00:00Z",
+      "not_after": "2026-12-31T23:59:59Z",
+      "public_key_ref": "examples/keys/agent-card-key-1.public.jwk",
+      "usages": [
+        "verify_agent_card_evidence"
+      ],
+      "allowed_evidence_types": [
+        "signed_agent_card"
+      ]
+    }
+  ]
+}
