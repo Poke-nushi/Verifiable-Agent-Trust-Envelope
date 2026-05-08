@@ -68,7 +68,7 @@ Example:
       "media_type": "application/vate-admission-receipt+json",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-admission-receipt-digest"
+        "value": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
       }
     },
     "policy_snapshot": {
@@ -77,7 +77,7 @@ Example:
       "media_type": "application/vate-policy-snapshot+json",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-policy-snapshot-digest"
+        "value": "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
       }
     },
     "issuer": "did:web:verifier.example",
@@ -154,6 +154,15 @@ A verifier still needs to:
 - decide whether to fail closed, deny, or attenuate
 
 This is why the binding is by-reference rather than "trust metadata because it is in A2A".
+
+## Current Corpus Fixture
+
+The current AL2 v0.2 corpus includes `allow-a2a-signed-agent-card-evidence`.
+That case binds a canonicalized A2A Agent Card payload digest to admission
+receipt evidence and detached JOSE fixture bytes.
+
+The fixture is byte-level only. It does not claim production ECDSA verification
+or make signed Agent Cards sufficient authority for risky external writes.
 
 ## Possible A2A Outcomes
 

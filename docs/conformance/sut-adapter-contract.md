@@ -106,8 +106,9 @@ When the corpus case includes `jose_checks`, the result entry must include
 The current comparison command validates the presence and descriptor shape of
 these artifact references, and checks their SHA-256 digest values against the
 corpus artifacts required by the case. It does not fetch arbitrary remote URIs
-or verify a detached report bundle yet. Bundle-level artifact verification is
-tracked as a separate hardening step.
+or verify external signatures. For local report-bundle digest-chain
+verification, use `scripts/vate_conformance.py verify-bundle` as documented in
+`docs/conformance/report-integrity.md`.
 
 The JSON Schema validates the portable result shape only. It does not know which
 artifacts are required by a particular corpus case and, by itself, does not prove

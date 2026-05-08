@@ -7,13 +7,13 @@ authors:
 repository-code: "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope"
 url: "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope"
 license: Apache-2.0
-version: "v0.2.0"
+version: "v0.2-review-snapshot-2026-05-05"
 date-released: 2026-05-05
 doi: 10.5281/zenodo.20043166
 identifiers:
   - type: doi
     value: 10.5281/zenodo.20043166
-    description: "Zenodo archive of the v0.2.0 review snapshot"
+    description: "Zenodo archive of the May 5, 2026 v0.2 review snapshot; not a GitHub v0.2.0 pre-release"
   - type: doi
     value: 10.5281/zenodo.19839768
     description: "Zenodo all-version concept DOI"

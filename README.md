@@ -300,7 +300,10 @@ The maintainer is responsible for the final structure, scope decisions, and publ
 
 ## How to Cite
 
-If you reference the current `v0.2.0` review snapshot in writing, please cite the version-specific Zenodo archive:
+If you reference the May 5, 2026 v0.2 review snapshot in writing, please cite
+the version-specific Zenodo archive below. For the current `main` branch, cite
+the repository URL and commit SHA as well; the archived DOI may lag current
+`main` until the next pre-release archive is cut.
 
 - Version DOI: [10.5281/zenodo.20043166](https://doi.org/10.5281/zenodo.20043166)
 - All-version concept DOI: [10.5281/zenodo.19839768](https://doi.org/10.5281/zenodo.19839768)

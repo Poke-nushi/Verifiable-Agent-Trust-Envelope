@@ -2,6 +2,24 @@
 
 This file records dated public changes to the discussion draft.
 
+## 2026-05-09
+
+- Hardened the AL2 v0.2 conformance package with 59 runnable corpus cases,
+  artifact-backed SUT comparison, implementation report generation, and local
+  report-bundle digest-chain verification.
+- Added byte-level detached JOSE fixture coverage for runtime attestation and
+  A2A signed Agent Card evidence while keeping production JOSE / PKI
+  verification outside the v0.2 conformance claim.
+- Added the corpus-bound `allow-a2a-signed-agent-card-evidence` case with
+  digest-bound admission receipt evidence, proof-package artifacts, and trust
+  bundle references.
+- Added namespace migration, extension-field handling, report integrity,
+  implementation reporting, artifact versioning, evidence vocabulary, and
+  SUT adapter contract guidance for independent implementation review.
+- Strengthened failure semantics for reason-code ordering, AL2 context binding,
+  replay and freshness checks, attenuation boundaries, transport-bound
+  MCP/OAuth authority, policy snapshot digests, and post-execution linkage.
+
 ## 2026-05-07
 
 - Added optional policy snapshot references and digests to the v0.2 admission receipt and A2A metadata binding, keeping policy semantics outside A2A core while improving audit traceability.

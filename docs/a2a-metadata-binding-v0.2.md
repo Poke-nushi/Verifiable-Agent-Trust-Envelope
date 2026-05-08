@@ -45,7 +45,6 @@ An A2A agent that understands this binding may declare the extension in its Agen
       "VATE-AL2-Verifier-Admission-v0.2"
     ],
     "accepted_reference_modes": [
-      "by_reference",
       "reference_plus_digest"
     ],
     "supported_phases": [
@@ -95,6 +94,10 @@ This binding defines three phase values:
 ## Reference Rules
 
 VATE references in A2A metadata should include a digest when the object is dereferenceable.
+For the v0.2 AL2 conformance boundary, digest-bound references are required for
+the artifact references evaluated by the corpus. A pure `by_reference` pointer
+without a digest may be useful as advisory discovery metadata, but it is not a
+passing AL2 conformance reference.
 
 At minimum:
 
@@ -132,6 +135,8 @@ The validation responsibility is deliberately split:
 The signed Agent Card fixture is byte-level only. It fixes the protected header,
 payload digest, detached payload bytes, and signing-input digest. It does not
 claim production ECDSA verification.
+The public JWK used by the Agent Card trust-bundle fixture is fixture material
+for key id and trust-bundle binding checks, not production ECDSA validation.
 It is included in the AL2 v0.2 conformance corpus as
 `allow-a2a-signed-agent-card-evidence`, so external SUT comparison must report
 the referenced proof, Agent Card payload, trust bundle, and admission receipt

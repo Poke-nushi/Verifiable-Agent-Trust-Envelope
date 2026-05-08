@@ -105,7 +105,7 @@ Example metadata shape:
       "media_type": "application/vate-admission-receipt+json",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-example-digest"
+        "value": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
       }
     },
     "issuer": "did:web:verifier.example",

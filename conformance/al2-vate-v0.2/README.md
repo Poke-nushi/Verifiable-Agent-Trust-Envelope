@@ -1,4 +1,4 @@
-# VATE AL2 v0.2 Mini Conformance Corpus
+# VATE AL2 v0.2 Draft Conformance Corpus
 
 This directory contains a runnable machine-readable corpus for the `VATE AL2 Verifier Admission Profile v0.2`.
 

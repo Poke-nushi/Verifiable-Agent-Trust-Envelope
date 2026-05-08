@@ -9,7 +9,7 @@
     "media_type": "application/vate-admission-request+json",
     "digest": {
       "alg": "sha-256",
-      "value": "base64url-admission-request-digest"
+      "value": "1111111111111111111111111111111111111111111111111111111111111111"
     }
   },
   "evidence_refs": [
@@ -19,7 +19,7 @@
       "media_type": "application/json",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-agent-card-digest"
+        "value": "2222222222222222222222222222222222222222222222222222222222222222"
       }
     }
   ],
@@ -27,4 +27,3 @@
   "issued_at": "2026-05-04T03:00:00Z",
   "expires_at": "2026-05-04T03:05:00Z"
 }
-

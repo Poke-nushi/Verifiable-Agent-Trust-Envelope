@@ -1312,7 +1312,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "9bcf40d9cc5646e53d7537b5e8c14a81c776d045a2b7ac36580b5aa9668e1696"
+    "value": "38ec6d2e5000fb78df15d04bc38a82fd3565f95d16f70d8b6f6f44583099fb1a"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -1625,7 +1625,7 @@
     },
     {
       "path": "examples/a2a/metadata-admission-issued.json",
-      "sha256": "a625b13a81ebbc84e8fbcfe3c7c80d2af06141915fda622a1a3e68deb94459b1"
+      "sha256": "80dbb384e925ac2b16e17826280001ee87c787f8797403e7c5ca4d33d21a4629"
     },
     {
       "path": "examples/a2a/metadata-post-execution-issued.json",

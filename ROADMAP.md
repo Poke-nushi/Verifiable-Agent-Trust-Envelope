@@ -13,11 +13,11 @@ Focus:
 - make `allow / attenuate / deny` decisions and machine-readable attenuation explicit
 - treat A2A, MCP, OAuth, VC, DID, OID4VP, Web Bot Auth, AP2, x402, ACP, and payment tokens as adjacent evidence or transport layers
 - add examples and schema validation for v0.2 admission requests, A2A references, and receipts
-- add a maintainer brief and mini conformance corpus for early A2A-adjacent review
+- add a maintainer brief and runnable draft conformance corpus for early A2A-adjacent review
 - keep the May 2026 ecosystem boundary explicit: VATE consumes MCP/OAuth, A2A, AP2, ACP/UCP, and x402 artifacts as adjacent evidence rather than replacing them
 - publish `v0.2.0` as a discussion-draft pre-release
 
-## May 2026 Review Hardening
+## Completed May 2026 Review Hardening
 
 External review has repeatedly found that the boundary is coherent enough for
 narrow review, but not yet strong enough to call the AL2 package
@@ -58,33 +58,33 @@ adding new adjacent profiles.
 
 ### P1 Before Adjacent Maintainer Outreach
 
-- define reason-code ordering or compare reason-code sets with a primary reason
+- [x] define reason-code ordering or compare reason-code sets with a primary reason
   code; terminal marker ordering is now documented and enforced in `run` and
   `compare`, and report/corpus primary reason projections are now emitted
-- strengthen post-execution linkage checks beyond presence checks, including
+- [x] strengthen post-execution linkage checks beyond presence checks, including
   receipt id, receipt digest, transaction, runtime, admitted effective request
   hash, decision, and expiry semantics; receipt id and decision are now
   explicit linkage kinds
-- add transport-bound fixtures proving VATE only narrows MCP/OAuth authority and
+- [x] add transport-bound fixtures proving VATE only narrows MCP/OAuth authority and
   never unions with upstream authorization; initial fixtures added:
   `deny-mcp-oauth-overscope` and `deny-mcp-oauth-upstream-denied`
-- add evaluation-order and algorithm-confusion fixtures before presenting the
+- [x] add evaluation-order and algorithm-confusion fixtures before presenting the
   corpus as broad security conformance; stale runtime proof and digest-before-policy
   fixtures now fail closed before policy admission, and JOSE algorithm confusion
   now covers `alg=none`, HS256 downgrade, and ES384-not-allowed cases
-- add attenuation boundary fixtures for malicious paths, schema type edges, and
+- [x] add attenuation boundary fixtures for malicious paths, schema type edges, and
   amount boundaries; unsafe-path, max-amount type-edge, and negative-amount
   fixtures added
-- strengthen post-execution linkage checks beyond presence checks; digest,
+- [x] strengthen post-execution linkage checks beyond presence checks; digest,
   transaction, runtime, denial, expiry, and effective-constraint fixtures added
-- add minimum AL2 verification context for status freshness, replay protection,
+- [x] add minimum AL2 verification context for status freshness, replay protection,
   and runtime binding; `al2_context_checks` now cover exact status freshness
   boundary, just-over stale boundary, unused replay state, consumed replay state,
   explicit replayed state, runtime binding, and fail-closed unknown replay state
-- add an evidence type vocabulary for generic evidence types and
+- [x] add an evidence type vocabulary for generic evidence types and
   protocol-specific hints; machine-readable registry, drift checks, and
   type/hint pair checks added
-- keep the language-neutral conformance corpus index current as cases change
+- [x] keep the language-neutral conformance corpus index current as cases change
 
 ### P2 Before Independent Implementation Collection
 
@@ -100,14 +100,18 @@ adding new adjacent profiles.
 
 ## Next
 
-- execute the May 2026 review hardening items in P1/P2 order
-- prepare A2A-adjacent review updates from `docs/a2a-issue-update-2026-05.md`
-  after P0 is complete
 - collect independent implementation reports using
   `schemas/implementation-report.schema.json` now that the SUT comparison
   contract, report integrity guidance, P2 namespace plan, extension-field
   handling, and corpus-bound byte-level A2A signed Agent Card fixture boundary
   are documented
+- prepare the A2A-adjacent review package from
+  `docs/a2a-maintainer-brief-v0.2.md`,
+  `docs/a2a-metadata-binding-v0.2.md`,
+  `docs/a2a-v1-extension-sketch-2026-05.md`, and
+  `docs/a2a-issue-update-2026-05.md`
+- update release notes, changelog, and citation metadata before cutting the
+  `v0.2.0` discussion-draft pre-release
 - add additional transport-bound fixtures beyond the initial MCP/OAuth,
   AP2/UCP, and AP2 Human Not Present examples after the AL2 security basis is
   stable

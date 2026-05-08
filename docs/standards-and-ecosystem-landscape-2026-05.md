@@ -64,7 +64,7 @@ The v0.2 direction is to use the VATE extension URI as the metadata key and incl
         "media_type": "application/vate-admission-receipt+json",
         "digest": {
           "alg": "sha-256",
-          "value": "base64url-admission-receipt-digest"
+          "value": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
         }
       },
       "issuer": "did:web:verifier.example",

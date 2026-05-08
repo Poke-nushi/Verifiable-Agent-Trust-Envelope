@@ -4,7 +4,7 @@
   "media_type": "application/vate-admission-receipt+json",
   "digest": {
     "alg": "sha-256",
-    "value": "base64url-admission-receipt-digest"
+    "value": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
   },
   "phase": "admission",
   "issuer": "did:web:verifier.example",
@@ -12,4 +12,3 @@
   "issued_at": "2026-05-04T03:00:08Z",
   "expires_at": "2026-05-04T03:10:08Z"
 }
-

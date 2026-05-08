@@ -9,7 +9,7 @@
     "media_type": "application/vate-admission-request+json",
     "digest": {
       "alg": "sha-256",
-      "value": "base64url-admission-request-digest"
+      "value": "3333333333333333333333333333333333333333333333333333333333333333"
     }
   },
   "evidence_refs": [
@@ -19,7 +19,7 @@
       "media_type": "application/json",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-signed-agent-card-digest"
+        "value": "3ac7b45f5ddab0178d224ae31a617b8194569224f42758d2b8503ac101c457b0"
       },
       "signature_profile": {
         "format": "A2A AgentCard.signatures JWS",
