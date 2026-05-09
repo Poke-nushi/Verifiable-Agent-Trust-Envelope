@@ -154,6 +154,24 @@ It is included in the AL2 v0.2 conformance corpus as
 the referenced proof, Agent Card payload, trust bundle, and admission receipt
 artifacts.
 
+## Conformance Review Path
+
+The current AL2 v0.2 corpus lives under `conformance/al2-vate-v0.2/`, with its
+case count recorded in `corpus.json` as `summary.case_count`. For external
+implementations, start with `docs/conformance/external-sut-quickstart.md` and
+use `compare` against the exact corpus snapshot identified by `corpus.json`.
+
+For published or shared review bundles, `docs/conformance/report-integrity.md`
+documents `verify-bundle`, which checks the local digest chain among the corpus,
+SUT result, conformance report, and implementation report. It is not a
+production signature profile and does not replace external proof review.
+
+The package-private helpers in `packages/vate-core-ts/` and
+`packages/vate-a2a-ts/` show TypeScript examples for digest descriptors,
+artifact references, SUT result entry shaping, A2A metadata shape validation,
+and optional activation header checks. They do not fetch remote artifacts or
+perform production JOSE, PKI, or A2A SDK middleware behavior.
+
 ## Examples
 
 Example files:

@@ -164,6 +164,29 @@ receipt evidence and detached JOSE fixture bytes.
 The fixture is byte-level only. It does not claim production ECDSA verification
 or make signed Agent Cards sufficient authority for risky external writes.
 
+## Current Review Aids
+
+The current AL2 v0.2 conformance surface is the corpus under
+`conformance/al2-vate-v0.2/`. Its current case count is recorded in
+`conformance/al2-vate-v0.2/corpus.json` as `summary.case_count`.
+
+For an external implementation, the command-first path is
+`docs/conformance/external-sut-quickstart.md`. That path treats `compare` as the
+primary external SUT review command. `run` is only a repository fixture and
+reference-runner integrity check.
+
+If a SUT result is compared with both a conformance report and implementation
+report, `docs/conformance/report-integrity.md` documents `verify-bundle` for
+checking the local digest chain among the corpus, SUT result, conformance
+report, and implementation report. That check does not replace JOSE, PKI,
+Sigstore, signed git tags, or other external publication proofs.
+
+Package-private TypeScript helpers are available in `packages/vate-core-ts/` and
+`packages/vate-a2a-ts/` for reviewers who want to inspect digest descriptors, SUT
+result entry shaping, A2A metadata shape validation, and optional activation
+header behavior. They are review aids, not official A2A SDKs or production
+verifiers.
+
 ## Possible A2A Outcomes
 
 There are three reasonable outcomes.

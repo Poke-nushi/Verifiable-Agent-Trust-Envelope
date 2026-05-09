@@ -45,13 +45,26 @@ Related schema:
 
 - `schemas/a2a-vate-metadata.schema.json`
 
-Related package-private TypeScript helper:
+Related conformance and implementation review aids:
 
+- `conformance/al2-vate-v0.2/`
+- `docs/conformance/external-sut-quickstart.md`
+- `docs/conformance/sut-adapter-contract.md`
+- `docs/conformance/report-integrity.md`
+- `packages/vate-core-ts/README.md`
 - `packages/vate-a2a-ts/README.md`
 
-The helper validates the reference metadata shape and optional activation
-header. It is not an official A2A SDK, middleware package, or compatibility
-claim.
+The current AL2 v0.2 corpus case count is recorded in
+`conformance/al2-vate-v0.2/corpus.json` as `summary.case_count`. Use `compare`
+for external SUT review. Use `run` only to check this repository's committed
+fixtures and reference runner behavior. `verify-bundle` is a local digest-chain
+check across the corpus, SUT result, conformance report, and implementation
+report; it is not a production signature profile.
+
+The package-private TypeScript helpers cover digest descriptors, artifact
+references, SUT result entry shaping, A2A metadata shape validation, and optional
+activation header checks. They are not official A2A SDKs, middleware packages,
+published compatibility tools, or production verifiers.
 
 ## Review Question
 
@@ -62,6 +75,11 @@ The narrow question for A2A-oriented review is:
 > community profile?
 
 Either outcome is acceptable for this draft.
+
+Passing an external SUT comparison means only that one submitted SUT result
+matched one corpus snapshot under the repository comparison rules. It does not
+imply certification, endorsement, production approval, or general compatibility
+with future corpus snapshots.
 
 ## Non-Authority Rule
 

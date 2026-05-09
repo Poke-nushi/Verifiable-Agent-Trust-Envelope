@@ -158,6 +158,28 @@ policy, and post-execution linkage.
    `post_execution_receipt_issued` with digest-bound references to both the
    admission receipt and post-execution receipt.
 
+## Current Review Artifacts
+
+The current repository review package includes the AL2 v0.2 corpus under
+`conformance/al2-vate-v0.2/`, with its current case count recorded in
+`corpus.json` as `summary.case_count`. The A2A-specific signed Agent Card case
+is `allow-a2a-signed-agent-card-evidence`.
+
+External implementers should use `docs/conformance/external-sut-quickstart.md`
+as the command-first path and use `compare` for SUT result comparison. The
+repository `run` command remains a fixture and reference-runner integrity check,
+not an external implementation result.
+
+For report sharing, `docs/conformance/report-integrity.md` documents
+`verify-bundle` as a local digest-chain check for the corpus, SUT result,
+conformance report, and implementation report. It is not a production signature
+profile.
+
+The package-private TypeScript helpers in `packages/vate-core-ts/` and
+`packages/vate-a2a-ts/` are review aids for digest-bound references, SUT result
+shaping, metadata validation, and optional activation checks. They are not an
+A2A SDK middleware package.
+
 ## Failure Mapping
 
 VATE verification failures should not be converted into new A2A task states.
@@ -197,4 +219,5 @@ This sketch does not define:
   canonicalized Agent Card payload, or move to an implementation-defined bundle
   containing the card plus signature metadata?
 - Should SDK middleware live outside this repository until at least one
-  non-reference implementation can emit a passing SUT result file?
+  non-reference implementation can emit a SUT result file that passes `compare`
+  against the same corpus snapshot and has a locally verified report bundle?
