@@ -28,7 +28,7 @@
       "uri": "https://agent.example/.well-known/agent-card.json",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-agent-card-digest"
+        "value": "7f718ba23da075884d5be74fe69b983f6d6ffc192c00983ebedc3f94abe041da"
       },
       "verification": {
         "result": "verified",
@@ -43,7 +43,7 @@
       "uri": "https://wallet.example/payment-authorities/spt-123",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-payment-token-digest"
+        "value": "e9e56321a651bb8df1f57f23d933c34e38dac950c21034dcd636f2be4253f49f"
       },
       "verification": {
         "result": "verified",

@@ -25,7 +25,7 @@
       "uri": "https://agent.example/attestations/runtime/alg-not-allowed-001",
       "digest": {
         "alg": "sha-256",
-        "value": "alg-not-allowed-runtime-attestation-digest"
+        "value": "35e4d9343f52bf54357aa0b187cd598fa301d15300769a5753cfd5a1759008e2"
       },
       "verification": {
         "result": "failed",

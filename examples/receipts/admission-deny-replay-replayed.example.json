@@ -25,7 +25,7 @@
       "uri": "https://verifier.example/vate/admission-requests/replay-replayed-001",
       "digest": {
         "alg": "sha-256",
-        "value": "replay-replayed-digest"
+        "value": "bfa9dc22e03732bb72fc88185d5dcdc4c4fe88dd258fe9130ef91a8d649c5ebe"
       },
       "verification": {
         "result": "failed",

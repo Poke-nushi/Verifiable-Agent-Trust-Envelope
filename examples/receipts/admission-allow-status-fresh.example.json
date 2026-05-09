@@ -25,7 +25,7 @@
       "uri": "https://status.example/bundles/status-fresh-001",
       "digest": {
         "alg": "sha-256",
-        "value": "status-fresh-digest"
+        "value": "05ff1a627811cd7ca72e211c2f746463a33492d95af5aa1c59e3015a99bd6f83"
       },
       "verification": {
         "result": "verified",

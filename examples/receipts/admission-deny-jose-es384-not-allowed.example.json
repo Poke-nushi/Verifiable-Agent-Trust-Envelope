@@ -25,7 +25,7 @@
       "uri": "https://agent.example/attestations/runtime/jose-es384-not-allowed-001",
       "digest": {
         "alg": "sha-256",
-        "value": "jose-es384-runtime-attestation-digest"
+        "value": "813a4c16f11ac4eb05959a32655ec10ddbb617cc2270bc39274852fa6e417d3a"
       },
       "verification": {
         "result": "failed",

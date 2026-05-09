@@ -25,7 +25,7 @@
       "uri": "https://agent.example/attestations/runtime/kid-mismatch-001",
       "digest": {
         "alg": "sha-256",
-        "value": "kid-mismatch-runtime-attestation-digest"
+        "value": "42c207701d4ea978c7bf458e65a9935d04588acf4f995048c19c6f3d54186bdb"
       },
       "verification": {
         "result": "failed",

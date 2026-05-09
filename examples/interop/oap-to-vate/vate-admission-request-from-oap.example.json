@@ -22,7 +22,7 @@
       "media_type": "application/oap-decision+json",
       "digest": {
         "alg": "sha-256",
-        "value": "oap-decision-digest"
+        "value": "55c82155841b1995d47db98187413be0e315198f388a34abe97d0df9a641952d"
       }
     }
   ]

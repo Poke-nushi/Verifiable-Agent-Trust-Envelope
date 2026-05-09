@@ -25,7 +25,7 @@
       "uri": "https://agent.example/attestations/runtime/jose-payload-digest-mismatch-001",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-runtime-attestation-digest"
+        "value": "6dd0e22614bc851ca7a55eee7fd9320f048c1f59d53b23c7c2d9fb1b956e5e73"
       },
       "verification": {
         "result": "failed",

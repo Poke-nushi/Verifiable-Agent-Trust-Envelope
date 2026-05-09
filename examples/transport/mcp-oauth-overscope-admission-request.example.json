@@ -47,7 +47,7 @@
       "media_type": "application/oauth-token-introspection+json",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-oauth-overscope-introspection-digest"
+        "value": "94b2ba37bcf26c6cad0c32fb25592c87162a1aa2864ec3815ccc177aea958600"
       }
     },
     {
@@ -56,7 +56,7 @@
       "media_type": "application/openid-connect-claims+json",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-openid-overscope-claims-digest"
+        "value": "94143dff74826f1b65568368ef1230026077010ab3926bd0eb29153002c358f8"
       }
     },
     {
@@ -65,7 +65,7 @@
       "media_type": "application/vnd.spiffe.svid+jwt",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-runtime-overscope-attestation-digest"
+        "value": "46061b99dfff172ee670c029ead9b4402090da1458a8b8857b682590549b56c7"
       }
     }
   ]

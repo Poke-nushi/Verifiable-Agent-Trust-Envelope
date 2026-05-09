@@ -25,7 +25,7 @@
       "uri": "conformance/al2-vate-v0.2/fixtures/attenuation-negative-amount.json",
       "digest": {
         "alg": "sha-256",
-        "value": "negative-amount-candidate-digest"
+        "value": "99a5c45764dbeb50107b5da3686f6b75107458264fae04dbc6463d7d742b01c9"
       },
       "verification": {
         "result": "failed",

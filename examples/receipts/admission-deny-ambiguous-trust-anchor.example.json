@@ -25,7 +25,7 @@
       "uri": "https://agent.example/attestations/runtime/ambiguous-anchor-001",
       "digest": {
         "alg": "sha-256",
-        "value": "ambiguous-anchor-runtime-attestation-digest"
+        "value": "0c115f7a12e8dbf1b77c21e6fab6f5c6956d63f2123e3a34cabd2e2004e0e6a8"
       },
       "verification": {
         "result": "failed",

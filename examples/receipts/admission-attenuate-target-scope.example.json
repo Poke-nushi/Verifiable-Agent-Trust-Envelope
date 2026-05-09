@@ -25,7 +25,7 @@
       "uri": "https://broker.example/permits/permit-target-scope-001",
       "digest": {
         "alg": "sha-256",
-        "value": "permit-target-scope-digest"
+        "value": "6be188de04ca4ec1b0a3fde1067906aafe14dcd396902a1c4ef27a98ab4685c4"
       },
       "verification": {
         "result": "verified",

@@ -48,7 +48,7 @@
       "uri": "https://auth.example/token-introspection/tok-20260507-upstream-denied-001",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-oauth-upstream-denied-introspection-digest"
+        "value": "a299608488b9ff1777989ad3a1e3dc63277e72fd7926b0dade934ab166ff2363"
       },
       "verification": {
         "result": "failed",
@@ -64,7 +64,7 @@
       "uri": "https://auth.example/openid/session/sub-20260507-upstream-denied-001",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-openid-upstream-denied-claims-digest"
+        "value": "ab09823e0cc663a19aa0d09c898132159468f7dd1e6d289c6e7b8f64dd20233d"
       },
       "verification": {
         "result": "verified",
@@ -79,7 +79,7 @@
       "uri": "https://agent.example/attestations/runtime/rp-mcp-oauth-upstream-denied-001",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-runtime-upstream-denied-attestation-digest"
+        "value": "4b09be850d6c5d226a6ad92fa38be853c2430f4c80529e23675c15e844f69b78"
       },
       "verification": {
         "result": "verified",

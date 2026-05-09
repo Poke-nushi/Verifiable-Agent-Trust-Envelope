@@ -25,7 +25,7 @@
       "uri": "https://unknown.example/attestations/runtime/unknown-001",
       "digest": {
         "alg": "sha-256",
-        "value": "unknown-runtime-attestation-digest"
+        "value": "9bd1a39b93302a1b15086de0afc76f1eb4de8564f0455409322065b42539e5ba"
       },
       "verification": {
         "result": "failed",

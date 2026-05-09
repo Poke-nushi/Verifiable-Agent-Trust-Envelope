@@ -25,7 +25,7 @@
       "uri": "https://verifier.example/vate/admission-requests/digest-before-policy",
       "digest": {
         "alg": "sha-256",
-        "value": "intentionally-wrong-digest-before-policy"
+        "value": "957d0469f2d70cbeb96f95f46058423e2de76cd2db987a6a072cdf0569721e7d"
       },
       "verification": {
         "result": "failed",

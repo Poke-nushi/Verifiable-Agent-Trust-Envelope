@@ -28,7 +28,7 @@
       "uri": "https://auth.example/transactions/txn-20260504-deny-001",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-transaction-token-digest"
+        "value": "b70acadc3a56e0509adcb4e873b22bbb6e280c0a92473ce42037e4d73a630524"
       },
       "verification": {
         "result": "failed",

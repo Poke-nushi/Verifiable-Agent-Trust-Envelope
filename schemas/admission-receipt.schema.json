@@ -50,6 +50,24 @@
         "ucp",
         "x402"
       ]
+    },
+    "digestDescriptor": {
+      "type": "object",
+      "required": [
+        "alg",
+        "value"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "const": "sha-256"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": true
     }
   },
   "required": [
@@ -190,22 +208,7 @@
             "description": "Optional informative hint for the concrete source protocol. The canonical evidence type should remain generic unless a profile defines a protocol-specific subtype."
           },
           "digest": {
-            "type": "object",
-            "required": [
-              "alg",
-              "value"
-            ],
-            "properties": {
-              "alg": {
-                "type": "string",
-                "minLength": 1
-              },
-              "value": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "additionalProperties": true
+            "$ref": "#/$defs/digestDescriptor"
           },
           "verification": {
             "type": "object",
@@ -286,22 +289,7 @@
               "minLength": 1
             },
             "digest": {
-              "type": "object",
-              "required": [
-                "alg",
-                "value"
-              ],
-              "properties": {
-                "alg": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "value": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "additionalProperties": true
+              "$ref": "#/$defs/digestDescriptor"
             }
           },
           "additionalProperties": true

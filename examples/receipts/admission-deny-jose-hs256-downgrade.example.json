@@ -25,7 +25,7 @@
       "uri": "https://agent.example/attestations/runtime/jose-hs256-downgrade-001",
       "digest": {
         "alg": "sha-256",
-        "value": "jose-hs256-downgrade-runtime-attestation-digest"
+        "value": "0e8834b1882e5464648df5a2333f4265eac0c9058ad11e1d1ecb761bfc936ff5"
       },
       "verification": {
         "result": "failed",

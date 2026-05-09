@@ -25,7 +25,7 @@
       "uri": "https://broker.example/permits/permit-signature-tampered-001",
       "digest": {
         "alg": "sha-256",
-        "value": "permit-signature-tampered-digest"
+        "value": "6c9930e163a83c6285b9835d5937f16b6c18a7e27e66c02768f42b670ce890aa"
       },
       "verification": {
         "result": "failed",

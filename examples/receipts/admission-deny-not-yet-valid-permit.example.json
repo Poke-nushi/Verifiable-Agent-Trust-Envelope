@@ -25,7 +25,7 @@
       "uri": "https://broker.example/permits/permit-not-yet-valid-001",
       "digest": {
         "alg": "sha-256",
-        "value": "permit-not-yet-valid-digest"
+        "value": "56e858dd04099ae7fc678b29eb5cbabc534a56c9815348c81c27c5c435b37425"
       },
       "verification": {
         "result": "failed",

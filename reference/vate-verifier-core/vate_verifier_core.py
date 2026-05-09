@@ -458,7 +458,7 @@ def sample_request() -> dict[str, Any]:
                 "media_type": "application/json",
                 "digest": {
                     "alg": "sha-256",
-                    "value": "payment-authority-digest"
+                    "value": "1af1019b9c5418522a8473029f095e2b3d27d30c839976a4765e722af32d6031"
                 }
             }
         ]

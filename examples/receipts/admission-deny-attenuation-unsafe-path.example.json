@@ -25,7 +25,7 @@
       "uri": "conformance/al2-vate-v0.2/fixtures/attenuation-unsafe-path.json",
       "digest": {
         "alg": "sha-256",
-        "value": "unsafe-path-candidate-digest"
+        "value": "1100500feb7585914b3f9dc267fe66c3516bf3901adf3f90111e822210d028f8"
       },
       "verification": {
         "result": "failed",

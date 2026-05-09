@@ -28,7 +28,7 @@
       "uri": "https://agent.example/attestations/runtime/runtime-proof-stale-001",
       "digest": {
         "alg": "sha-256",
-        "value": "runtime-proof-stale-digest"
+        "value": "c5d12c74017cef52084bad589fae8a83b7df55e19edf54e2fd39b71f1e698c3e"
       },
       "verification": {
         "result": "stale",

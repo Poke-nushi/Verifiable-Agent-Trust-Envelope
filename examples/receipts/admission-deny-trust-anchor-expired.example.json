@@ -25,7 +25,7 @@
       "uri": "https://agent.example/attestations/runtime/expired-anchor-001",
       "digest": {
         "alg": "sha-256",
-        "value": "expired-anchor-runtime-attestation-digest"
+        "value": "b5b99e20a0d7009426c6c03df2cdaed85552985d9092e0d5826dc33e36a385f8"
       },
       "verification": {
         "result": "failed",

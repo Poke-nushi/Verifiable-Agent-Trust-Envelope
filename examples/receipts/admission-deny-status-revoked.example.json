@@ -25,7 +25,7 @@
       "uri": "https://status.example/bundles/status-revoked-001",
       "digest": {
         "alg": "sha-256",
-        "value": "status-revoked-digest"
+        "value": "4a2bf43c208f432cc9b7810ab0dc6f25706c084446aea6e01644768306971758"
       },
       "verification": {
         "result": "failed",

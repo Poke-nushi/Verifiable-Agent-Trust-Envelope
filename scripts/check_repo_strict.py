@@ -319,6 +319,111 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
             "schemas/sut-result.schema.json",
         ),
         (
+            "admission request evidence digest is not lowercase sha-256 hex",
+            {
+                "version": "vate-0.2",
+                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "request_id": "areq-negative-digest-001",
+                "transaction_id": "txn-negative-digest-001",
+                "issued_at": "2026-07-01T00:00:00Z",
+                "expires_at": "2026-07-01T00:10:00Z",
+                "action": "commerce.purchase",
+                "target": {"resource": "https://merchant.example/checkout", "audience": "https://verifier.example/a2a"},
+                "actor": "did:web:agent.example",
+                "principal": "did:web:user.example",
+                "runtime": "spiffe://agent.example/workload/purchase-agent",
+                "audience": "https://verifier.example/a2a",
+                "input_hash": "sha-256:example-input",
+                "evidence_refs": [
+                    {
+                        "type": "payment_authority",
+                        "uri": "https://wallet.example/payment-authorities/negative",
+                        "media_type": "application/json",
+                        "digest": {"alg": "md5", "value": "x"},
+                    }
+                ],
+            },
+            "schemas/admission-request.schema.json",
+        ),
+        (
+            "admission receipt evidence digest is not lowercase sha-256 hex",
+            {
+                "version": "vate-0.2",
+                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "receipt_type": "admission",
+                "receipt_id": "admrec-negative-digest-001",
+                "issued_at": "2026-07-01T00:00:00Z",
+                "expires_at": "2026-07-01T00:10:00Z",
+                "verifier": {"id": "did:web:verifier.example"},
+                "request": {
+                    "request_id": "areq-negative-digest-001",
+                    "transaction_id": "txn-negative-digest-001",
+                    "action": "commerce.purchase",
+                    "input_hash": "sha-256:example-input",
+                },
+                "subject": {
+                    "principal": "did:web:user.example",
+                    "actor": "did:web:agent.example",
+                    "runtime": "spiffe://agent.example/workload/purchase-agent",
+                },
+                "evidence": [
+                    {
+                        "type": "payment_authority",
+                        "uri": "https://wallet.example/payment-authorities/negative",
+                        "digest": {"alg": "md5", "value": "x"},
+                        "verification": {
+                            "result": "verified",
+                            "checked_at": "2026-07-01T00:00:01Z",
+                            "method": "negative-test",
+                        },
+                    }
+                ],
+                "policy": {
+                    "policy_id": "merchant-purchase-al2",
+                    "policy_version": "2026-07-01.1",
+                    "policy_ref": "https://verifier.example/policies/merchant-purchase-al2/2026-07-01.1",
+                    "policy_snapshot": {
+                        "uri": "https://verifier.example/policies/merchant-purchase-al2/2026-07-01.1/snapshot",
+                        "media_type": "application/json",
+                        "digest": {"alg": "sha-256", "value": hex_digest},
+                    },
+                },
+                "decision": {"outcome": "allow", "reason_codes": ["EVIDENCE_VERIFIED", "POLICY_MATCH"]},
+            },
+            "schemas/admission-receipt.schema.json",
+        ),
+        (
+            "post-execution admission digest is not lowercase sha-256 hex",
+            {
+                "version": "vate-0.2",
+                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "receipt_type": "post_execution",
+                "receipt_id": "postrec-negative-digest-001",
+                "issued_at": "2026-07-01T00:02:00Z",
+                "issuer": {"id": "did:web:agent.example", "role": "runtime"},
+                "admission": {
+                    "receipt_id": "admrec-negative-digest-001",
+                    "uri": "https://verifier.example/vate/admission-receipts/admrec-negative-digest-001",
+                    "digest": {"alg": "md5", "value": "x"},
+                    "decision": "allow",
+                },
+                "execution": {
+                    "transaction_id": "txn-negative-digest-001",
+                    "started_at": "2026-07-01T00:01:00Z",
+                    "finished_at": "2026-07-01T00:02:00Z",
+                    "effective_request_hash": "sha-256:example-input",
+                    "runtime": "spiffe://agent.example/workload/purchase-agent",
+                },
+                "result": {
+                    "outcome": "success",
+                    "output_hash": "sha-256:example-output",
+                    "side_effects": [],
+                    "policy_violations": [],
+                },
+            },
+            "schemas/post-execution-receipt.schema.json",
+        ),
+        (
             "implementation report without corpus manifest",
             {
                 "version": "vate-implementation-report-2026-07",

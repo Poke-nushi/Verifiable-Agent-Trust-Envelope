@@ -25,7 +25,7 @@
       "uri": "https://broker.example/permits/permit-policy-snapshot-001",
       "digest": {
         "alg": "sha-256",
-        "value": "permit-policy-snapshot-digest"
+        "value": "938caccf000740e8242f708f11a9a08b41fba7cdec5ffbfeb29042788ab6439e"
       },
       "verification": {
         "result": "verified",

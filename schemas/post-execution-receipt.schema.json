@@ -4,6 +4,26 @@
   "title": "VATE Post-Execution Receipt",
   "description": "Draft v0.2 post-execution receipt linked to a VATE admission receipt.",
   "type": "object",
+  "$defs": {
+    "digestDescriptor": {
+      "type": "object",
+      "required": [
+        "alg",
+        "value"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "const": "sha-256"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
   "required": [
     "version",
     "profile",
@@ -81,22 +101,7 @@
           "minLength": 1
         },
         "digest": {
-          "type": "object",
-          "required": [
-            "alg",
-            "value"
-          ],
-          "properties": {
-            "alg": {
-              "type": "string",
-              "minLength": 1
-            },
-            "value": {
-              "type": "string",
-              "minLength": 1
-            }
-          },
-          "additionalProperties": true
+          "$ref": "#/$defs/digestDescriptor"
         },
         "decision": {
           "type": "string",

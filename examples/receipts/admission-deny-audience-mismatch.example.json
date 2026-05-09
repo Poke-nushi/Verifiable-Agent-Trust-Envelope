@@ -30,7 +30,7 @@
       "uri": "https://verifier.example/vate/admission-requests/areq-20260504-deny-audience-001",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-admission-request-digest"
+        "value": "d2fdefe868f30ba68f3bc56e7c0c32da3ba68e1bf91acea940c76f8d44c13ead"
       },
       "verification": {
         "result": "failed",

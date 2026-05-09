@@ -25,7 +25,7 @@
       "uri": "https://agent.example/payment-authorities/not-allowed-001",
       "digest": {
         "alg": "sha-256",
-        "value": "evidence-type-not-allowed-digest"
+        "value": "320906654f316e7bd0218cd8cd14d65a38efc687676b9f8f089dae786c7399c0"
       },
       "verification": {
         "result": "failed",

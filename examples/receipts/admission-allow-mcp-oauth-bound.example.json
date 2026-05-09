@@ -43,7 +43,7 @@
       "uri": "https://auth.example/token-introspection/tok-20260507-001",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-oauth-introspection-digest"
+        "value": "18217fd31a79ff1a141d03b148fa8a3bb766a2a62768575c19b76528c8f4d6ea"
       },
       "verification": {
         "result": "verified",
@@ -58,7 +58,7 @@
       "uri": "https://auth.example/openid/session/sub-20260507-001",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-openid-claims-digest"
+        "value": "524962ebffc8fae8a3836cc505ad18dd348899ae7b2e53d3d0283eb4e4567295"
       },
       "verification": {
         "result": "verified",
@@ -73,7 +73,7 @@
       "uri": "https://agent.example/attestations/runtime/rp-mcp-oauth-001",
       "digest": {
         "alg": "sha-256",
-        "value": "base64url-runtime-attestation-digest"
+        "value": "6dd0e22614bc851ca7a55eee7fd9320f048c1f59d53b23c7c2d9fb1b956e5e73"
       },
       "verification": {
         "result": "verified",

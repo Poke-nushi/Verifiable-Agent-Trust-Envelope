@@ -25,7 +25,7 @@
       "uri": "https://status.example/bundles/status-boundary-001",
       "digest": {
         "alg": "sha-256",
-        "value": "status-boundary-digest"
+        "value": "3a44409a31226eb70df0e45612976b9b3c0da93774439e08133cb89dd971b7f0"
       },
       "verification": {
         "result": "verified",

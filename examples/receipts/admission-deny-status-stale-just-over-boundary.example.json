@@ -25,7 +25,7 @@
       "uri": "https://status.example/bundles/status-stale-boundary-001",
       "digest": {
         "alg": "sha-256",
-        "value": "status-stale-boundary-digest"
+        "value": "9a691f119783bffdfe1b65daec65088a07435c57c1f4ca977353234258c8e333"
       },
       "verification": {
         "result": "stale",

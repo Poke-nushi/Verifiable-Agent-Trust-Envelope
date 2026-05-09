@@ -25,7 +25,7 @@
       "uri": "https://verifier.example/vate/admission-requests/digest-mismatch",
       "digest": {
         "alg": "sha-256",
-        "value": "intentionally-wrong-digest"
+        "value": "bc0d3a6714b20db52f3cc74c6fbd94b15f380173f9272f69c9d2541ccd51af89"
       },
       "verification": {
         "result": "failed",

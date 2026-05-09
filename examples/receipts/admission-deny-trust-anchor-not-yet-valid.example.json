@@ -25,7 +25,7 @@
       "uri": "https://agent.example/attestations/runtime/future-anchor-001",
       "digest": {
         "alg": "sha-256",
-        "value": "future-anchor-runtime-attestation-digest"
+        "value": "283fbda4f0d06e774d62adef864315eb82322c81b33a59c36f9fdc6ef4aa8694"
       },
       "verification": {
         "result": "failed",

@@ -14,7 +14,7 @@
     "uri": "https://verifier.example/vate/admission-receipts/admrec-20260504-attenuate-001",
     "digest": {
       "alg": "sha-256",
-      "value": "63b7b3c8e7209994eecaa44b2618c7530b74b38f63487312e193a9b4f7ec3997"
+      "value": "53faf4e23e664597749556665000ba38fe4dff645e56d032f3e7e04090a9cc48"
     },
     "decision": "attenuate"
   },

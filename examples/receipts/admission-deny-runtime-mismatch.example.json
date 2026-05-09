@@ -25,7 +25,7 @@
       "uri": "https://agent.example/attestations/runtime/runtime-mismatch-001",
       "digest": {
         "alg": "sha-256",
-        "value": "runtime-mismatch-digest"
+        "value": "ac33631ad0b47e32f01aba1c9e33b016ba3dd43cd9cbefb95c9f593e33edbbba"
       },
       "verification": {
         "result": "failed",

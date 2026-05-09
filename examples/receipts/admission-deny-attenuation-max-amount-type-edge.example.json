@@ -25,7 +25,7 @@
       "uri": "conformance/al2-vate-v0.2/fixtures/attenuation-max-amount-type-edge.json",
       "digest": {
         "alg": "sha-256",
-        "value": "max-amount-type-candidate-digest"
+        "value": "01fcf4ba7fc2fa98506d4c0c20f9176fbc1e3ca5c13927530d8d70fad4c7992c"
       },
       "verification": {
         "result": "failed",

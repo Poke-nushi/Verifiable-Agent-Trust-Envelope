@@ -25,7 +25,7 @@
       "uri": "https://revoked-agent.example/attestations/runtime/revoked-anchor-001",
       "digest": {
         "alg": "sha-256",
-        "value": "revoked-anchor-runtime-attestation-digest"
+        "value": "ded878969b680349fa09b17b807f77b77d628c8aae89f89c04a36745cde12c4b"
       },
       "verification": {
         "result": "failed",

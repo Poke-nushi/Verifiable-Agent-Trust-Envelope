@@ -25,7 +25,7 @@
       "uri": "https://status.example/bundles/status-stale-001",
       "digest": {
         "alg": "sha-256",
-        "value": "status-stale-digest"
+        "value": "d0e5b826a8df31637f9a2e084575c69488bdbbf696936bd3d2e386a043afaedd"
       },
       "verification": {
         "result": "stale",

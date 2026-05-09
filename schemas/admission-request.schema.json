@@ -50,6 +50,24 @@
         "ucp",
         "x402"
       ]
+    },
+    "digestDescriptor": {
+      "type": "object",
+      "required": [
+        "alg",
+        "value"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "const": "sha-256"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": true
     }
   },
   "required": [
@@ -170,22 +188,7 @@
             "description": "Optional informative hint for the concrete source protocol. Verifiers must not infer authority from this field without local policy."
           },
           "digest": {
-            "type": "object",
-            "required": [
-              "alg",
-              "value"
-            ],
-            "properties": {
-              "alg": {
-                "type": "string",
-                "minLength": 1
-              },
-              "value": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "additionalProperties": true
+            "$ref": "#/$defs/digestDescriptor"
           }
         },
         "additionalProperties": true

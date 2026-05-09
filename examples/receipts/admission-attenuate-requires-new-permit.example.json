@@ -25,7 +25,7 @@
       "uri": "https://wallet.example/payment-authorities/pay-new-permit-001",
       "digest": {
         "alg": "sha-256",
-        "value": "payment-new-permit-digest"
+        "value": "fa1c686b9578c2a60d0ff3a7ccc0cc6960d15bb4a99a7ac5faced0171a98eb97"
       },
       "verification": {
         "result": "verified",

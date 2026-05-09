@@ -40,7 +40,7 @@
       "media_type": "application/ap2-mandate+json",
       "digest": {
         "alg": "sha-256",
-        "value": "ap2-mandate-digest"
+        "value": "b95de339967a071c891fb7eacf836d11dd531eedf6cd44024220a22cdc78b222"
       }
     },
     {
@@ -49,7 +49,7 @@
       "media_type": "application/ucp-checkout-session+json",
       "digest": {
         "alg": "sha-256",
-        "value": "ucp-checkout-session-digest"
+        "value": "10d1aec908c5de17f338e26e4699110ef7982d0c53d81c18fde1a62f71b2e791"
       }
     }
   ]
