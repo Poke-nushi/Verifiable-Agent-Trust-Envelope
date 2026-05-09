@@ -23,6 +23,10 @@ Example:
 
 - `examples/implementation-report.example.json`
 
+For a command-first external SUT path, start with:
+
+- `docs/conformance/external-sut-quickstart.md`
+
 The report has four important blocks:
 
 - `implementation` - name, version, language, source, and optional commit or environment

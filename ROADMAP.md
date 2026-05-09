@@ -104,7 +104,9 @@ adding new adjacent profiles.
   `schemas/implementation-report.schema.json` now that the SUT comparison
   contract, report integrity guidance, P2 namespace plan, extension-field
   handling, and corpus-bound byte-level A2A signed Agent Card fixture boundary
-  are documented
+  are documented; external SUT authors should use
+  `docs/conformance/external-sut-quickstart.md` as the command-first path from
+  corpus index to `compare`, implementation reports, and `verify-bundle`
 - prepare the A2A-adjacent review package from
   `docs/a2a-maintainer-brief-v0.2.md`,
   `docs/a2a-metadata-binding-v0.2.md`,

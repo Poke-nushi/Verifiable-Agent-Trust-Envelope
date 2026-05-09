@@ -7,6 +7,10 @@ This note defines the result contract for comparing an external system under tes
 It does not require an implementation to use Python.
 The Python runner is only a comparison tool for the published corpus expectations.
 
+For a shorter command-first path, start with
+`docs/conformance/external-sut-quickstart.md`, then return to this contract for
+field-level requirements.
+
 ## Goal
 
 An external verifier should be able to:
@@ -52,6 +56,10 @@ Each result entry represents one corpus case:
 The example file is:
 
 - `examples/conformance/sut-results-pass.example.json`
+
+The command-first authoring path is:
+
+- `docs/conformance/external-sut-quickstart.md`
 
 For TypeScript contributors, `packages/vate-core-ts` includes a package-private
 helper for constructing schema-shaped result entries. It is an implementation

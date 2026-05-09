@@ -116,6 +116,7 @@ The implementation report follows:
 External SUT comparisons can also write implementation reports by adding
 `--implementation-report` to the `compare` command. Publication guidance is in:
 
+- `docs/conformance/external-sut-quickstart.md`
 - `docs/conformance/report-integrity.md`
 
 To regenerate the language-neutral corpus index:

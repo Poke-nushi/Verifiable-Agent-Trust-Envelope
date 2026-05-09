@@ -226,6 +226,8 @@ compatibility claim.
   Date-stamped conformance artifact versioning rules for the July 2026 target line
 - [docs/conformance/sut-adapter-contract.md](docs/conformance/sut-adapter-contract.md)
   SUT result contract and comparison command for external implementations
+- [docs/conformance/external-sut-quickstart.md](docs/conformance/external-sut-quickstart.md)
+  Short path for external SUT authors to produce, compare, and bundle-check implementation reports
 - [docs/profiles/vate-jose-proof-profile-notes-2026-07.md](docs/profiles/vate-jose-proof-profile-notes-2026-07.md)
   Production JOSE proof profile notes and current detached fixture boundary
 - [conformance/al2-vate-v0.2/README.md](conformance/al2-vate-v0.2/README.md)
@@ -287,7 +289,8 @@ python3 scripts/vate_conformance.py compare \
 
 `compare` checks an external SUT result file against the same corpus snapshot.
 Independent implementation review should use the SUT adapter contract and the
-`compare` path.
+`compare` path. External SUT authors can start with
+[docs/conformance/external-sut-quickstart.md](docs/conformance/external-sut-quickstart.md).
 
 Optional strict schema validation:
 

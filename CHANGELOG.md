@@ -4,6 +4,13 @@ This file records dated public changes to the discussion draft.
 
 ## 2026-05-09
 
+- Added a command-first external SUT quickstart for producing SUT results,
+  comparing them against the AL2 v0.2 corpus, generating implementation
+  reports, and locally verifying report-bundle digest linkage.
+- Added package-private TypeScript reference helpers for digest-bound artifact
+  references, SUT result entry shaping, and A2A metadata validation. These
+  helpers are not published SDKs and do not implement production JOSE/JCS
+  verification.
 - Hardened the AL2 v0.2 conformance package with 59 runnable corpus cases,
   artifact-backed SUT comparison, implementation report generation, and local
   report-bundle digest-chain verification.
