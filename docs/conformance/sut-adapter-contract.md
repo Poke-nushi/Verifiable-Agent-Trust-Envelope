@@ -123,6 +123,13 @@ or verify external signatures. For local report-bundle digest-chain
 verification, use `scripts/vate_conformance.py verify-bundle` as documented in
 `docs/conformance/report-integrity.md`.
 
+For an independent review, `uri` values should identify SUT-produced artifacts
+or a controlled publication package from the SUT maintainer. The passing example
+SUT file may cite repository fixtures because it is a local contract example.
+That demonstrates shape and digest matching only. It does not prove that the
+SUT generated the referenced artifact, does not prove artifact provenance, and
+does not make copied repository fixtures an implementation result.
+
 The JSON Schema validates the portable result shape only. It does not know which
 artifacts are required by a particular corpus case and, by itself, does not prove
 artifact-backed compliance. Use `compare` against the exact corpus snapshot to

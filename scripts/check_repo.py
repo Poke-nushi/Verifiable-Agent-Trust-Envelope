@@ -36,6 +36,8 @@ NAMESPACE_MIGRATION_DOC = ROOT / "docs" / "namespace-migration.md"
 EXTENSION_FIELDS_DOC = ROOT / "docs" / "extension-fields.md"
 A2A_METADATA_BINDING_DOC = ROOT / "docs" / "a2a-metadata-binding-v0.2.md"
 A2A_EXTENSION_SKETCH_DOC = ROOT / "docs" / "a2a-v1-extension-sketch-2026-05.md"
+EXTERNAL_SUT_QUICKSTART_DOC = ROOT / "docs" / "conformance" / "external-sut-quickstart.md"
+SUT_ADAPTER_CONTRACT_DOC = ROOT / "docs" / "conformance" / "sut-adapter-contract.md"
 A2A_SIGNED_AGENT_CARD_PROOF = ROOT / "examples" / "jose" / "jose-detached-a2a-agent-card.example.json"
 A2A_SIGNED_AGENT_CARD_PAYLOAD = ROOT / "examples" / "a2a" / "agent-card-v1-vate-extension.example.json"
 JSON_ONLY_FILES = [
@@ -686,6 +688,16 @@ def check_p2_public_artifact_boundary() -> None:
         A2A_EXTENSION_SKETCH_DOC: [
             "digest-bound artifact is the canonicalized agent card payload",
             "jose-detached-a2a-agent-card.example.json",
+        ],
+        EXTERNAL_SUT_QUICKSTART_DOC: [
+            "sut-produced artifacts",
+            "does not prove artifact provenance",
+            "copied repository fixtures",
+        ],
+        SUT_ADAPTER_CONTRACT_DOC: [
+            "sut-produced artifacts",
+            "does not prove that the sut generated",
+            "artifact provenance",
         ],
     }
     for path, phrases in required_docs.items():

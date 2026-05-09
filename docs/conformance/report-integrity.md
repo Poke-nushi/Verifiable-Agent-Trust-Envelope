@@ -18,12 +18,16 @@ Report reviewers should assume these failure modes:
 - an implementation identity is copied from another project
 - a mutable URL is later replaced with different results
 - a conformance report is separated from the SUT result or implementation report
+- a SUT result cites copied repository fixtures instead of SUT-produced
+  artifacts
 
 ## Minimum Publication Package
 
 For an independent implementation review, publish these artifacts together:
 
 - the SUT result file matching `schemas/sut-result.schema.json`
+- the SUT-produced artifacts or controlled artifact bundle referenced by the
+  SUT result
 - the comparison conformance report matching `schemas/conformance-report.schema.json`
 - the implementation report matching `schemas/implementation-report.schema.json`
 - the corpus digest and, preferably, the exact `corpus.json`

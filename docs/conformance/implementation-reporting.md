@@ -110,6 +110,13 @@ python3 scripts/vate_conformance.py compare \
 The implementation identity is copied from the SUT result file when `compare`
 generates the implementation report.
 
+For external SUT comparisons, the implementation report records the submitted
+SUT result and comparison output. It does not independently prove that the SUT
+generated every artifact referenced by the SUT result. When artifact provenance
+matters, publish the SUT-produced artifacts or a controlled artifact bundle
+alongside the reports and identify the maintainer-controlled origin in the
+publication metadata.
+
 To verify that the local report bundle is still tied together, run:
 
 ```bash

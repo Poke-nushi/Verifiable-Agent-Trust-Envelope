@@ -100,6 +100,23 @@ case.
 The JSON Schema checks the portable shape. The `compare` command enforces the
 case-dependent artifact requirements and digest matches.
 
+## Artifact Origin Boundary
+
+The passing sample SUT result may point at repository fixture paths because it
+is a local contract example. For an independent implementation review, artifact
+references should identify SUT-produced artifacts or a controlled publication
+package from the SUT maintainer.
+
+`compare` checks the submitted result values against the corpus snapshot. It
+does not prove artifact provenance, does not fetch arbitrary remote URIs, and
+does not prove that the SUT runtime generated the referenced receipts. A SUT
+result that only cites copied repository fixtures can demonstrate result-file
+shape, but it is not enough evidence for an independent implementation run.
+
+When publishing review material, include the SUT result, the generated receipt
+artifacts or controlled artifact bundle, and stable maintainer-controlled URIs
+where reviewers can inspect the submitted artifacts.
+
 ## Implementation Report
 
 To also write an implementation report:
