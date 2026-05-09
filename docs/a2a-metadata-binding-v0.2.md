@@ -118,6 +118,11 @@ At minimum:
 - `digest.alg`
 - `digest.value`
 
+The A2A metadata schema validates artifact reference `uri` values as absolute
+URI-shaped strings. This does not make a referenced location trusted or
+reachable; verifier implementations still need dereference controls, media type
+pinning, digest checks, and local trust policy before using the artifact.
+
 For `admission_issued`, the required decision digest is the `admission_receipt.digest`.
 An optional `policy_snapshot.digest` can be added when the verifier wants consumers or auditors to reconstruct the policy basis for the decision.
 When both the admission receipt and A2A metadata carry `policy_snapshot`, the `uri`, `media_type`, and `digest` values should match.

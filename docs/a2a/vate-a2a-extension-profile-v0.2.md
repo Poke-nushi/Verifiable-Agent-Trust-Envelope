@@ -142,6 +142,11 @@ At minimum, an artifact reference contains:
 - `digest.alg`
 - `digest.value`
 
+The metadata schema requires artifact reference `uri` values to be absolute
+URI-shaped strings. This is shape validation only: the verifier still treats
+every URI as untrusted input until dereference policy, media type, size,
+digest, and local trust checks have been applied.
+
 For the v0.2 AL2 corpus, digest-bound references use SHA-256 with lowercase
 hexadecimal values. A pure pointer without a digest may be useful as advisory
 discovery metadata, but it is not enough for AL2 conformance-facing evidence.

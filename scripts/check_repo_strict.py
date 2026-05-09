@@ -198,6 +198,24 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
             "schemas/a2a-vate-metadata.schema.json",
         ),
         (
+            "A2A metadata artifact URI is not absolute URI",
+            {
+                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "phase": "admission_requested",
+                "transaction_id": "txn-negative-a2a-metadata-uri",
+                "assurance_level": "AL2",
+                "admission_request": {
+                    "type": "admission_request",
+                    "uri": "not-a-uri",
+                    "media_type": "application/vate-admission-request+json",
+                    "digest": {"alg": "sha-256", "value": hex_digest},
+                },
+                "issuer": "did:web:client.example",
+                "issued_at": "2026-07-01T00:00:00Z",
+            },
+            "schemas/a2a-vate-metadata.schema.json",
+        ),
+        (
             "incomplete linkage check",
             minimal_linkage_case(
                 [

@@ -7,6 +7,8 @@ This file records dated public changes to the discussion draft.
 - Synchronized the consolidated A2A review package under `docs/a2a/`, including
   the implementer entry point and v0.2 extension-profile draft for
   metadata-only, digest-bound admission and receipt references.
+- Tightened A2A metadata artifact reference URI shape validation while keeping
+  remote dereference and trust decisions outside schema validation.
 - Added a command-first external SUT quickstart for producing SUT results,
   comparing them against the AL2 v0.2 corpus, generating implementation
   reports, and locally verifying report-bundle digest linkage.

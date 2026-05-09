@@ -41,6 +41,27 @@ describe("A2A VATE metadata", () => {
     );
   });
 
+  it("rejects artifact references without absolute URI strings", () => {
+    const metadata = {
+      ...(readJson("examples/a2a/metadata-admission-issued.json") as Record<
+        string,
+        unknown
+      >),
+      admission_receipt: {
+        type: "admission_receipt",
+        uri: "not-a-uri",
+        media_type: "application/vate-admission-receipt+json",
+        digest: {
+          alg: "sha-256",
+          value: "0".repeat(64),
+        },
+      },
+    };
+    expect(validateVateA2aMetadata(metadata)[0]).toContain(
+      "must match pattern"
+    );
+  });
+
   it("rejects extension keys that are neither URI nor x_ names", () => {
     const metadata = {
       ...(readJson("examples/a2a/metadata-admission-issued.json") as Record<
