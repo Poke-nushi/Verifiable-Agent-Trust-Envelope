@@ -120,7 +120,9 @@ rg -n -i "certified|certification-ready|production-approved|endorsed by A2A|offi
 ```
 
 Matches are acceptable only when they appear in explicit limitation language
-such as "not a published SDK" or "outside the v0.2 claim".
+such as "not a published SDK" or "outside the v0.2 claim", or when the match is
+about an unrelated future hardware-root question rather than VATE
+certification, endorsement, or production approval.
 
 ## Release Artifact Checks
 
