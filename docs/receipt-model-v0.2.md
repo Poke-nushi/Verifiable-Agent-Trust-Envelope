@@ -100,9 +100,11 @@ for the admitted execution, not a per-side-effect cap. Post-execution verifiers
 sum all `result.side_effects[].amount` entries in the admitted currency and
 reject when the total exceeds `max_amount`. Side effects without an `amount` do
 not contribute to the amount total; an amount in a different currency fails the
-constraint check. If a future profile needs both total and per-effect caps, it
-should add a separate field such as `max_amount_per_side_effect` rather than
-changing `max_amount`.
+constraint check. For this corpus, only `side_effects[].amount` is
+amount-bearing; other monetary-looking fields are ignored unless a future
+profile registers them. If a future profile needs both total and per-effect
+caps, it should add a separate field such as `max_amount_per_side_effect`
+rather than changing `max_amount`.
 
 An attenuated admission receipt can still be non-executable. In particular,
 `attenuation.require_new_permit: true` means the verifier found a narrower or

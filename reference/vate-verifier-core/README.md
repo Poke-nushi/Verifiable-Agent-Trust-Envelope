@@ -35,3 +35,9 @@ The self-test exercises:
 
 This core does not implement production JOSE, VC, DID, or PKI processing.
 It provides hooks and deterministic behavior for conformance fixtures.
+
+The core also applies defensive local bounds when parsing `max_amount` and
+side-effect `amount` values: amounts must be finite, non-negative decimals with
+at most 64 text characters, 18 integer digits, and 8 fractional digits. These
+bounds are reference-core guardrails only. They do not narrow the reusable JSON
+schemas or the public VATE contract for every implementation.

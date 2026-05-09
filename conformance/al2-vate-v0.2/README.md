@@ -76,8 +76,11 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/post-execution-admission-digest-mismatch.json`
 - `cases/post-execution-after-admission-expiry.json`
 - `cases/post-execution-after-deny.json`
+- `cases/post-execution-allow-effective-constraints-exceeded.json`
 - `cases/post-execution-ap2-hnp-linkage-success.json`
+- `cases/post-execution-effective-constraints-aggregate-exceeded.json`
 - `cases/post-execution-effective-constraints-exceeded.json`
+- `cases/post-execution-finish-after-admission-expiry.json`
 - `cases/post-execution-runtime-mismatch.json`
 - `cases/post-execution-transaction-mismatch.json`
 - `cases/interop-oap-decision-evidence.json`

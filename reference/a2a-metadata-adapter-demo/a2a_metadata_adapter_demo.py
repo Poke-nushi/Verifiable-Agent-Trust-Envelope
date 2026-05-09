@@ -33,7 +33,7 @@ def load_core():
 core = load_core()
 
 
-def read_json(path: Path) -> dict[str, Any]:
+def read_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
@@ -170,7 +170,7 @@ def make_fail_closed_receipt(
         "receipt_type": "admission",
         "receipt_id": receipt_id,
         "issued_at": issued_at,
-        "expires_at": metadata_string(metadata, "expires_at", issued_at),
+        "expires_at": issued_at,
         "verifier": {
             "id": "did:web:verifier.example",
         },
@@ -279,6 +279,15 @@ def adapt_task_message(task_message: dict[str, Any]) -> dict[str, Any]:
                     "decision": "deny",
                     "reason_codes": ["DIGEST_MISMATCH", "FAIL_CLOSED"],
                     "admission_receipt": make_digest_mismatch_receipt(metadata),
+                }
+            elif not isinstance(admission_request, dict):
+                decision = {
+                    "decision": "deny",
+                    "reason_codes": ["SCHEMA_INVALID", "FAIL_CLOSED"],
+                    "admission_receipt": make_schema_invalid_receipt(
+                        metadata,
+                        "digest-bound admission request artifact was not a JSON object",
+                    ),
                 }
             else:
                 decision = verifier.admit(admission_request, now=core.parse_time("2026-05-04T03:00:30Z"))

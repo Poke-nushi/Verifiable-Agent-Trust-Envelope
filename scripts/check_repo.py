@@ -38,6 +38,8 @@ A2A_METADATA_BINDING_DOC = ROOT / "docs" / "a2a-metadata-binding-v0.2.md"
 A2A_EXTENSION_SKETCH_DOC = ROOT / "docs" / "a2a-v1-extension-sketch-2026-05.md"
 EXTERNAL_SUT_QUICKSTART_DOC = ROOT / "docs" / "conformance" / "external-sut-quickstart.md"
 SUT_ADAPTER_CONTRACT_DOC = ROOT / "docs" / "conformance" / "sut-adapter-contract.md"
+AL2_CORPUS_README = ROOT / "conformance" / "al2-vate-v0.2" / "README.md"
+V02_RELEASE_NOTES = ROOT / "docs" / "release-notes" / "v0.2.0.md"
 A2A_SIGNED_AGENT_CARD_PROOF = ROOT / "examples" / "jose" / "jose-detached-a2a-agent-card.example.json"
 A2A_SIGNED_AGENT_CARD_PAYLOAD = ROOT / "examples" / "a2a" / "agent-card-v1-vate-extension.example.json"
 JSON_ONLY_FILES = [
@@ -364,6 +366,15 @@ def load_vate_conformance_module():
     return module
 
 
+def load_vate_core_module():
+    spec = importlib.util.spec_from_file_location("vate_verifier_core", VATE_CORE)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("could not load reference/vate-verifier-core/vate_verifier_core.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def load_a2a_adapter_module():
     spec = importlib.util.spec_from_file_location("a2a_metadata_adapter_demo", A2A_ADAPTER)
     if spec is None or spec.loader is None:
@@ -398,6 +409,7 @@ def check_a2a_adapter_malformed_metadata_fail_closed() -> None:
     task_message = json.loads((ROOT / "reference" / "a2a-metadata-adapter-demo" / "task-message.example.json").read_text())
     metadata = task_message["metadata"][adapter.EXTENSION_URI]
     metadata["admission_request"].pop("digest")
+    metadata["expires_at"] = "not-a-date-time"
 
     response = adapter.adapt_task_message(task_message)
     decision = response.get("vate_decision", {})
@@ -405,6 +417,51 @@ def check_a2a_adapter_malformed_metadata_fail_closed() -> None:
         raise RuntimeError("A2A adapter must deny malformed VATE metadata")
     if decision.get("reason_codes") != ["SCHEMA_INVALID", "FAIL_CLOSED"]:
         raise RuntimeError("A2A adapter must fail closed on malformed VATE metadata")
+    receipt = adapter.make_schema_invalid_receipt(metadata, "malformed metadata")
+    if receipt.get("expires_at") != receipt.get("issued_at"):
+        raise RuntimeError("A2A fail-closed receipt must not copy malformed metadata expires_at")
+    schema = json.loads((ROOT / "schemas" / "admission-receipt.schema.json").read_text(encoding="utf-8"))
+    errors = check(schema, schema, receipt)
+    if errors:
+        raise RuntimeError(f"A2A fail-closed receipt must be schema-valid: {errors}")
+
+    task_message = json.loads((ROOT / "reference" / "a2a-metadata-adapter-demo" / "task-message.example.json").read_text())
+    metadata = task_message["metadata"][adapter.EXTENSION_URI]
+    malformed_artifact: list[str] = ["not", "an", "admission-request"]
+    with tempfile.TemporaryDirectory(prefix=".tmp-a2a-malformed-", dir=ROOT) as tmp:
+        artifact_path = Path(tmp) / "malformed-admission-request.json"
+        artifact_path.write_text(json.dumps(malformed_artifact), encoding="utf-8")
+        metadata["admission_request"]["uri"] = "local:" + str(artifact_path.relative_to(ROOT))
+        metadata["admission_request"]["digest"] = {
+            "alg": "sha-256",
+            "value": adapter.core.canonical_hash(malformed_artifact).removeprefix("sha-256:"),
+        }
+        response = adapter.adapt_task_message(task_message)
+    decision = response.get("vate_decision", {})
+    if decision.get("outcome") != "deny":
+        raise RuntimeError("A2A adapter must deny digest-matching malformed admission artifacts")
+    if decision.get("reason_codes") != ["SCHEMA_INVALID", "FAIL_CLOSED"]:
+        raise RuntimeError("A2A adapter must fail closed on digest-matching malformed admission artifacts")
+
+
+def check_al2_corpus_docs_synced() -> None:
+    case_dir = ROOT / "conformance" / "al2-vate-v0.2" / "cases"
+    case_paths = sorted(case_dir.glob("*.json"))
+    readme = AL2_CORPUS_README.read_text(encoding="utf-8")
+    missing_readme_cases = [
+        str(path.relative_to(ROOT / "conformance" / "al2-vate-v0.2"))
+        for path in case_paths
+        if str(path.relative_to(ROOT / "conformance" / "al2-vate-v0.2")) not in readme
+    ]
+    if missing_readme_cases:
+        raise RuntimeError(f"AL2 corpus README is missing cases: {missing_readme_cases}")
+
+    release_notes = " ".join(V02_RELEASE_NOTES.read_text(encoding="utf-8").split())
+    case_count = len(case_paths)
+    if f"{case_count}-case AL2 v0.2 draft conformance corpus" not in release_notes:
+        raise RuntimeError("v0.2 release notes case-count summary is stale")
+    if f"{case_count} AL2 v0.2 cases" not in release_notes:
+        raise RuntimeError("v0.2 release notes implementer case-count text is stale")
 
 
 def check_evidence_vocabulary_registry() -> None:
@@ -455,6 +512,17 @@ def check_evidence_vocabulary_registry() -> None:
     failures = conformance.validate_evidence_vocab_object(invalid_pair, label="negative evidence vocabulary pair")
     if not failures:
         raise RuntimeError("runner accepted an evidence type/protocol hint pair that is not registered")
+
+    core = load_vate_core_module()
+    if set(core.EVIDENCE_TYPES) != evidence_type_ids:
+        raise RuntimeError("reference verifier core evidence type set does not match evidence vocabulary registry")
+    core_allowed_hints = getattr(core, "ALLOWED_PROTOCOL_HINTS_BY_TYPE", None)
+    expected_allowed_hints = {
+        item["id"]: frozenset(item["allowed_protocol_hints"])
+        for item in evidence_types
+    }
+    if core_allowed_hints != expected_allowed_hints:
+        raise RuntimeError("reference verifier core evidence type/protocol hint map does not match registry")
 
 
 def check_artifact_versioning_docs() -> None:
@@ -824,6 +892,7 @@ def main() -> int:
     check_p2_public_artifact_boundary()
     check_a2a_adapter_local_uri_boundary()
     check_a2a_adapter_malformed_metadata_fail_closed()
+    check_al2_corpus_docs_synced()
     run([sys.executable, "-m", "py_compile", str(DEMO)])
     run([sys.executable, "-m", "py_compile", str(HTTP_DEMO)])
     run([sys.executable, "-m", "py_compile", str(VATE_CONFORMANCE)])
