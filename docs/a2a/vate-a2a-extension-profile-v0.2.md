@@ -7,7 +7,7 @@ This is a community profile draft for carrying VATE admission and receipt
 references through A2A metadata.
 
 It is not an official A2A extension. It does not require an A2A core change.
-It is intended to make the A2A compatibility boundary reviewable.
+It is intended to make the A2A extension-review boundary reviewable.
 
 ## Problem
 

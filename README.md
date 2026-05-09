@@ -199,7 +199,7 @@ compatibility claim.
 - [docs/v0.2-in-5-minutes.md](docs/v0.2-in-5-minutes.md)
   Short entry point for the v0.2 draft
 - [docs/a2a/README.md](docs/a2a/README.md)
-  A2A-compatible community profile review package entry point
+  A2A-shaped metadata review package entry point
 - [docs/a2a/vate-a2a-extension-profile-v0.2.md](docs/a2a/vate-a2a-extension-profile-v0.2.md)
   Consolidated metadata-only A2A extension profile draft for VATE references
 - [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md)
@@ -314,7 +314,7 @@ npm run ts:test
 ```
 
 These packages are not published SDKs, do not add production JOSE/JCS
-verification, and do not make an official A2A compatibility claim.
+verification, and do not make an official A2A support claim.
 
 ## Related Documents
 

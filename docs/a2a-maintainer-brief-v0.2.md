@@ -9,7 +9,8 @@ The proposal is narrower:
 
 > Let A2A carry task flow and optional references. Let a verifier-side profile define how risky external actions are admitted, narrowed, denied, and later audited.
 
-This brief is written for A2A maintainers and implementers who need to decide whether the VATE v0.2 boundary is compatible with A2A's extension model.
+This brief is written for A2A maintainers and implementers who need to decide
+whether the VATE v0.2 boundary fits A2A-style extension metadata review.
 
 ## The Gap
 
@@ -214,7 +215,7 @@ That should still avoid pulling full verifier policy, payment, identity, or rece
 
 The main question is:
 
-> Is this metadata-only, by-reference admission / receipt binding compatible with A2A's extension model, or should it remain entirely as an adjacent VATE profile outside A2A governance?
+> Can this metadata-only, by-reference admission / receipt binding be reviewed through A2A-style extension metadata, or should it remain entirely as an adjacent VATE profile outside A2A governance?
 
 The proposal is intentionally modest.
 It tries to preserve A2A's boundary while giving implementers a concrete way to carry verifier-side admission evidence across A2A task flows.

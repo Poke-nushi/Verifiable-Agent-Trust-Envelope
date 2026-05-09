@@ -11,7 +11,7 @@ certification checklist, production approval process, or compatibility claim.
 The `v0.2.0` pre-release may be described as:
 
 - an `AL2` verifier admission profile discussion draft;
-- an A2A-compatible metadata review package;
+- an A2A-shaped metadata review package;
 - a conformance review aid for one corpus snapshot;
 - a reference runner and package-private helper set;
 - not production-ready;
@@ -30,7 +30,9 @@ Do not describe it as:
 
 ## Scope Freeze
 
-Before the final external review, freeze scope to release-readiness work only.
+The release candidate is frozen around the 63-case corpus snapshot recorded in
+`conformance/al2-vate-v0.2/corpus.json`. After that snapshot is selected for
+final external review, keep scope to release-readiness work only.
 
 Allowed changes:
 
@@ -40,7 +42,7 @@ Allowed changes:
 - claim-boundary tightening;
 - review-package wording that narrows claims.
 
-Do not add before the final external review:
+Do not add after the 63-case snapshot is selected for final external review:
 
 - new corpus cases;
 - new schema fields or reason codes;

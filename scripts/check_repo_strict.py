@@ -415,6 +415,14 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
             "schemas/admission-request.schema.json",
         ),
         (
+            "admission request evidence_refs is empty",
+            {
+                **minimal_admission_request,
+                "evidence_refs": [],
+            },
+            "schemas/admission-request.schema.json",
+        ),
+        (
             "admission receipt request input_hash is not a profile hash",
             {
                 **minimal_admission_receipt,

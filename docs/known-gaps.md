@@ -185,6 +185,12 @@ Remaining work includes:
 - side-effect checks beyond simple amount limits
 - independent implementation reports that exercise the linkage checks
 
+The reference core's local decimal-size bounds are defensive guardrails only.
+The v0.2 corpus checks aggregate `max_amount` semantics, currency mismatch, and
+finite non-negative amount handling, but it does not require every
+implementation to adopt the same local text-length, integer-digit, or
+fractional-digit limits.
+
 ### 14. Status, Replay, And Runtime Binding Need Broader Context Coverage
 
 The corpus now includes minimum AL2 context checks for representative status

@@ -407,6 +407,70 @@ def check_a2a_adapter_local_uri_boundary() -> None:
 def check_a2a_adapter_malformed_metadata_fail_closed() -> None:
     adapter = load_a2a_adapter_module()
     task_message = json.loads((ROOT / "reference" / "a2a-metadata-adapter-demo" / "task-message.example.json").read_text())
+    missing_metadata_task = {"task_id": "task-missing-vate-metadata"}
+    missing_metadata_response = adapter.adapt_task_message(missing_metadata_task)
+    missing_metadata_decision = missing_metadata_response.get("vate_decision", {})
+    if missing_metadata_decision.get("outcome") != "deny":
+        raise RuntimeError("A2A adapter must deny task messages without the VATE metadata extension")
+    if missing_metadata_decision.get("reason_codes") != ["SCHEMA_INVALID", "FAIL_CLOSED"]:
+        raise RuntimeError("A2A adapter must fail closed when the VATE metadata extension is missing")
+    missing_metadata_receipt = adapter.make_schema_invalid_receipt(
+        None,
+        "missing VATE A2A metadata extension object",
+        source_artifact=missing_metadata_task,
+        source_uri="inline:a2a-task-message",
+    )
+    assert_a2a_adapter_schema_invalid_response_binds_source(
+        adapter,
+        missing_metadata_response,
+        missing_metadata_receipt,
+        missing_metadata_task,
+        "inline:a2a-task-message",
+        "a2a_task_message",
+        "missing VATE A2A metadata extension object",
+        "missing VATE metadata",
+    )
+
+    malformed_task = ["not", "a", "task-message"]
+    malformed_task_response = adapter.adapt_task_message(malformed_task)
+    malformed_task_decision = malformed_task_response.get("vate_decision", {})
+    if malformed_task_decision.get("outcome") != "deny":
+        raise RuntimeError("A2A adapter must deny non-object task messages")
+    if malformed_task_decision.get("reason_codes") != ["SCHEMA_INVALID", "FAIL_CLOSED"]:
+        raise RuntimeError("A2A adapter must fail closed on non-object task messages")
+    malformed_task_receipt = adapter.make_schema_invalid_receipt(
+        None,
+        "task message must be a JSON object",
+        source_artifact=malformed_task,
+        source_uri="inline:a2a-task-message",
+    )
+    assert_a2a_adapter_schema_invalid_response_binds_source(
+        adapter,
+        malformed_task_response,
+        malformed_task_receipt,
+        malformed_task,
+        "inline:a2a-task-message",
+        "a2a_task_message",
+        "task message must be a JSON object",
+        "non-object task message",
+    )
+    missing_receipt_uri = (
+        missing_metadata_response
+        .get("metadata", {})
+        .get(adapter.EXTENSION_URI, {})
+        .get("admission_receipt", {})
+        .get("uri")
+    )
+    malformed_receipt_uri = (
+        malformed_task_response
+        .get("metadata", {})
+        .get(adapter.EXTENSION_URI, {})
+        .get("admission_receipt", {})
+        .get("uri")
+    )
+    if missing_receipt_uri == malformed_receipt_uri:
+        raise RuntimeError("A2A adapter schema-invalid receipt URIs must be unique per failure source")
+
     metadata = task_message["metadata"][adapter.EXTENSION_URI]
     metadata["admission_request"].pop("digest")
     metadata["expires_at"] = "not-a-date-time"
@@ -417,7 +481,23 @@ def check_a2a_adapter_malformed_metadata_fail_closed() -> None:
         raise RuntimeError("A2A adapter must deny malformed VATE metadata")
     if decision.get("reason_codes") != ["SCHEMA_INVALID", "FAIL_CLOSED"]:
         raise RuntimeError("A2A adapter must fail closed on malformed VATE metadata")
-    receipt = adapter.make_schema_invalid_receipt(metadata, "malformed metadata")
+    metadata_failure_reason = "; ".join(adapter.admission_requested_metadata_failures(metadata))
+    receipt = adapter.make_schema_invalid_receipt(
+        metadata,
+        metadata_failure_reason,
+        source_artifact=metadata,
+        source_uri="inline:a2a-metadata",
+    )
+    assert_a2a_adapter_schema_invalid_response_binds_source(
+        adapter,
+        response,
+        receipt,
+        metadata,
+        "inline:a2a-metadata",
+        "a2a_metadata",
+        metadata_failure_reason,
+        "malformed VATE metadata",
+    )
     if receipt.get("expires_at") != receipt.get("issued_at"):
         raise RuntimeError("A2A fail-closed receipt must not copy malformed metadata expires_at")
     schema = json.loads((ROOT / "schemas" / "admission-receipt.schema.json").read_text(encoding="utf-8"))
@@ -442,6 +522,59 @@ def check_a2a_adapter_malformed_metadata_fail_closed() -> None:
         raise RuntimeError("A2A adapter must deny digest-matching malformed admission artifacts")
     if decision.get("reason_codes") != ["SCHEMA_INVALID", "FAIL_CLOSED"]:
         raise RuntimeError("A2A adapter must fail closed on digest-matching malformed admission artifacts")
+
+
+def assert_a2a_adapter_schema_invalid_response_binds_source(
+    adapter,
+    response: dict,
+    expected_receipt: dict,
+    source_artifact,
+    source_uri: str,
+    source_kind: str,
+    expected_failure_reason: str,
+    label: str,
+) -> None:
+    expected_receipt_digest = adapter.core.canonical_hash(expected_receipt).removeprefix("sha-256:")
+    receipt_ref = response.get("metadata", {}).get(adapter.EXTENSION_URI, {}).get("admission_receipt", {})
+    actual_receipt_digest = receipt_ref.get("digest", {}).get("value")
+    if actual_receipt_digest != expected_receipt_digest:
+        raise RuntimeError(f"A2A adapter schema-invalid response must bind {label} in its receipt digest")
+    assert_a2a_adapter_receipt_binds_source(
+        adapter,
+        expected_receipt,
+        source_artifact,
+        source_uri,
+        source_kind,
+        expected_failure_reason,
+        label,
+    )
+
+
+def assert_a2a_adapter_receipt_binds_source(
+    adapter,
+    receipt: dict,
+    source_artifact,
+    source_uri: str,
+    source_kind: str,
+    expected_failure_reason: str,
+    label: str,
+) -> None:
+    for evidence in receipt.get("evidence", []):
+        if evidence.get("type") == "admission_request" and evidence.get("uri") == source_uri:
+            raise RuntimeError(f"A2A adapter schema-invalid receipt must not classify {label} as admission_request evidence")
+    failure_source = receipt.get("failure_source", {})
+    if failure_source.get("kind") != source_kind:
+        raise RuntimeError(f"A2A adapter schema-invalid receipt must classify {label} as {source_kind}")
+    if failure_source.get("uri") != source_uri:
+        raise RuntimeError(f"A2A adapter schema-invalid receipt must use {source_uri} for {label}")
+    expected_digest = adapter.core.safe_digest_value(source_artifact)
+    actual_digest = failure_source.get("digest", {}).get("value")
+    if actual_digest != expected_digest:
+        raise RuntimeError(f"A2A adapter schema-invalid receipt must digest-bind {label}")
+    if actual_digest == adapter.SAFE_DIGEST["value"]:
+        raise RuntimeError(f"A2A adapter schema-invalid receipt must not use placeholder digest for {label}")
+    if failure_source.get("failure_reason") != expected_failure_reason:
+        raise RuntimeError(f"A2A adapter schema-invalid receipt must record the failure reason for {label}")
 
 
 def check_al2_corpus_docs_synced() -> None:

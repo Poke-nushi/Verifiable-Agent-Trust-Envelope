@@ -64,26 +64,18 @@ Report publication and integrity guidance is published separately:
 ```bash
 python3 scripts/vate_conformance.py run \
   --corpus-root conformance/al2-vate-v0.2 \
-  --report /tmp/vate-conformance-report.json \
-  --implementation-report /tmp/vate-implementation-report.json \
-  --conformance-report-uri "https://example.invalid/vate/reports/vate-conformance-report.json" \
-  --implementation-report-uri "https://example.invalid/vate/reports/vate-implementation-report.json" \
-  --publication-controlled-origin "https://example.invalid" \
-  --publication-immutability versioned_url \
-  --implementation-name "Example VATE verifier" \
-  --implementation-type "verifier" \
-  --implementation-version "0.1.0" \
-  --implementation-language "Python 3" \
-  --implementation-repo "https://example.invalid/repo" \
-  --implementation-commit "example-commit"
+  --report /tmp/vate-conformance-report.json
 ```
 
-The runner writes:
+The runner writes a conformance report using
+`application/vate-conformance-report+json`.
 
-- a conformance report using `application/vate-conformance-report+json`
-- an implementation report using `application/vate-implementation-report+json`
+`run` is a repository fixture / reference-runner integrity check. It must not be
+cited as an external implementation conformance claim.
 
-The implementation report includes a digest of the conformance report and a digest of the corpus snapshot.
+## External SUT Implementation Report
+
+An implementation report includes a digest of the conformance report and a digest of the corpus snapshot.
 The runner records `conformance_report.digest_basis=json-sorted-no-whitespace`
 for its canonical JSON digest.
 The corpus digest is computed over the sorted `corpus.manifest` array.

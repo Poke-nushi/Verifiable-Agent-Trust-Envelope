@@ -54,6 +54,10 @@ It should identify:
 - the input digest
 - evidence references
 
+For this `v0.2` AL2 profile, `evidence_refs` is required and must contain at
+least one digest-addressed evidence reference. An empty `evidence_refs` array is
+schema-invalid and should fail closed with `SCHEMA_INVALID` and `FAIL_CLOSED`.
+
 ### Evidence Reference
 
 Evidence references point to artifacts that the verifier consumed or resolved.

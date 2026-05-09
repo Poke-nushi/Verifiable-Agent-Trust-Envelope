@@ -19,6 +19,8 @@ PROFILE = "VATE-AL2-Verifier-Admission-v0.2"
 SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 SAFE_PROFILE_HASH = "sha-256:" + ("0" * 64)
 SAFE_DIGEST = {"alg": "sha-256", "value": "0" * 64}
+INLINE_A2A_TASK_MESSAGE_URI = "inline:a2a-task-message"
+INLINE_A2A_METADATA_URI = "inline:a2a-metadata"
 
 
 def load_core():
@@ -141,13 +143,35 @@ def make_digest_mismatch_receipt(metadata: dict[str, Any]) -> dict[str, Any]:
     )
 
 
-def make_schema_invalid_receipt(metadata: Any, failure_reason: str) -> dict[str, Any]:
+def make_schema_invalid_receipt(
+    metadata: Any,
+    failure_reason: str,
+    *,
+    source_artifact: Any | None = None,
+    source_uri: str | None = None,
+) -> dict[str, Any]:
+    receipt_id = "admrec-schema-invalid-" + core.safe_digest_value(
+        {
+            "failure_reason": failure_reason,
+            "source": source_artifact if source_artifact is not None else metadata,
+        }
+    )
     return make_fail_closed_receipt(
         metadata,
-        receipt_id="admrec-schema-invalid",
+        receipt_id=receipt_id,
         reason_codes=["SCHEMA_INVALID", "FAIL_CLOSED"],
         failure_reason=failure_reason,
+        source_artifact=source_artifact,
+        source_uri=source_uri,
     )
+
+
+def failure_source_kind(source_uri: str | None) -> str:
+    if source_uri == INLINE_A2A_TASK_MESSAGE_URI:
+        return "a2a_task_message"
+    if source_uri == INLINE_A2A_METADATA_URI:
+        return "a2a_metadata"
+    return "artifact"
 
 
 def make_fail_closed_receipt(
@@ -156,15 +180,42 @@ def make_fail_closed_receipt(
     receipt_id: str,
     reason_codes: list[str],
     failure_reason: str,
+    source_artifact: Any | None = None,
+    source_uri: str | None = None,
 ) -> dict[str, Any]:
     issued_at = "2026-05-04T03:00:30Z"
     reference = metadata.get("admission_request", {}) if isinstance(metadata, dict) else {}
-    digest = (
-        reference.get("digest")
-        if isinstance(reference, dict) and is_digest_descriptor(reference.get("digest"))
-        else SAFE_DIGEST
-    )
-    return {
+    failure_source = None
+    if source_artifact is not None:
+        digest = {"alg": "sha-256", "value": core.safe_digest_value(source_artifact)}
+        evidence_uri = source_uri or INLINE_A2A_METADATA_URI
+        evidence_items = []
+        failure_source = {
+            "kind": failure_source_kind(evidence_uri),
+            "uri": evidence_uri,
+            "media_type": "application/json",
+            "digest": digest,
+            "failure_reason": failure_reason,
+        }
+    elif isinstance(reference, dict) and is_digest_descriptor(reference.get("digest")):
+        digest = reference["digest"]
+        evidence_uri = reference.get("uri", "missing")
+        evidence_items = [
+            {
+                "type": "admission_request",
+                "uri": evidence_uri,
+                "digest": digest,
+                "verification": {
+                    "result": "failed",
+                    "checked_at": issued_at,
+                    "method": "a2a-metadata-digest-check",
+                    "failure_reason": failure_reason,
+                },
+            }
+        ]
+    else:
+        evidence_items = []
+    receipt = {
         "version": "vate-0.2",
         "profile": PROFILE,
         "receipt_type": "admission",
@@ -185,19 +236,7 @@ def make_fail_closed_receipt(
             "actor": metadata_string(metadata, "issuer", "missing"),
             "runtime": "missing",
         },
-        "evidence": [
-            {
-                "type": "admission_request",
-                "uri": reference.get("uri", "missing") if isinstance(reference, dict) else "missing",
-                "digest": digest,
-                "verification": {
-                    "result": "failed",
-                    "checked_at": issued_at,
-                    "method": "a2a-metadata-digest-check",
-                    "failure_reason": failure_reason,
-                },
-            }
-        ],
+        "evidence": evidence_items,
         "policy": {
             "policy_id": "a2a-metadata-adapter-demo",
             "policy_version": "2026-05-04.1",
@@ -208,6 +247,9 @@ def make_fail_closed_receipt(
             "reason_codes": reason_codes,
         },
     }
+    if failure_source is not None:
+        receipt["failure_source"] = failure_source
+    return receipt
 
 
 def build_post_execution_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
@@ -250,52 +292,21 @@ def build_post_execution_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def adapt_task_message(task_message: dict[str, Any]) -> dict[str, Any]:
-    metadata = task_message.get("metadata", {}).get(EXTENSION_URI)
-    if metadata is None:
-        raise ValueError("missing VATE A2A metadata extension object")
+def task_string(task_message: Any, field: str, fallback: str) -> str:
+    if isinstance(task_message, dict) and isinstance(task_message.get(field), str) and task_message[field]:
+        return task_message[field]
+    return fallback
 
-    verifier = build_verifier()
-    metadata_failures = admission_requested_metadata_failures(metadata)
-    if metadata_failures:
-        decision = {
-            "decision": "deny",
-            "reason_codes": ["SCHEMA_INVALID", "FAIL_CLOSED"],
-            "admission_receipt": make_schema_invalid_receipt(metadata, "; ".join(metadata_failures)),
-        }
-    else:
-        reference = metadata["admission_request"]
-        try:
-            admission_request = read_json(resolve_local_uri(reference["uri"]))
-        except (ValueError, OSError, json.JSONDecodeError) as exc:
-            decision = {
-                "decision": "deny",
-                "reason_codes": ["SCHEMA_INVALID", "FAIL_CLOSED"],
-                "admission_receipt": make_schema_invalid_receipt(metadata, str(exc)),
-            }
-        else:
-            if not verifier.validate_digest(admission_request, reference["digest"]):
-                decision = {
-                    "decision": "deny",
-                    "reason_codes": ["DIGEST_MISMATCH", "FAIL_CLOSED"],
-                    "admission_receipt": make_digest_mismatch_receipt(metadata),
-                }
-            elif not isinstance(admission_request, dict):
-                decision = {
-                    "decision": "deny",
-                    "reason_codes": ["SCHEMA_INVALID", "FAIL_CLOSED"],
-                    "admission_receipt": make_schema_invalid_receipt(
-                        metadata,
-                        "digest-bound admission request artifact was not a JSON object",
-                    ),
-                }
-            else:
-                decision = verifier.admit(admission_request, now=core.parse_time("2026-05-04T03:00:30Z"))
 
+def make_task_response(
+    task_message: Any,
+    metadata: Any,
+    decision: dict[str, Any],
+) -> dict[str, Any]:
     receipt = decision["admission_receipt"]
     receipt_digest = core.canonical_hash(receipt).removeprefix("sha-256:")
     response = {
-        "task_id": task_message["task_id"],
+        "task_id": task_string(task_message, "task_id", "missing"),
         "kind": "task_response",
         "status": {
             "state": "submitted" if decision["decision"] in {"allow", "attenuate"} else "rejected"
@@ -351,6 +362,80 @@ def adapt_task_message(task_message: dict[str, Any]) -> dict[str, Any]:
             }
         }
     return response
+
+
+def adapt_task_message(task_message: Any) -> dict[str, Any]:
+    if not isinstance(task_message, dict):
+        decision = {
+            "decision": "deny",
+            "reason_codes": ["SCHEMA_INVALID", "FAIL_CLOSED"],
+            "admission_receipt": make_schema_invalid_receipt(
+                None,
+                "task message must be a JSON object",
+                source_artifact=task_message,
+                source_uri=INLINE_A2A_TASK_MESSAGE_URI,
+            ),
+        }
+        return make_task_response(task_message, None, decision)
+
+    metadata_container = task_message.get("metadata")
+    metadata = metadata_container.get(EXTENSION_URI) if isinstance(metadata_container, dict) else None
+    if metadata is None:
+        decision = {
+            "decision": "deny",
+            "reason_codes": ["SCHEMA_INVALID", "FAIL_CLOSED"],
+            "admission_receipt": make_schema_invalid_receipt(
+                None,
+                "missing VATE A2A metadata extension object",
+                source_artifact=task_message,
+                source_uri=INLINE_A2A_TASK_MESSAGE_URI,
+            ),
+        }
+        return make_task_response(task_message, None, decision)
+
+    verifier = build_verifier()
+    metadata_failures = admission_requested_metadata_failures(metadata)
+    if metadata_failures:
+        decision = {
+            "decision": "deny",
+            "reason_codes": ["SCHEMA_INVALID", "FAIL_CLOSED"],
+            "admission_receipt": make_schema_invalid_receipt(
+                metadata,
+                "; ".join(metadata_failures),
+                source_artifact=metadata,
+                source_uri=INLINE_A2A_METADATA_URI,
+            ),
+        }
+    else:
+        reference = metadata["admission_request"]
+        try:
+            admission_request = read_json(resolve_local_uri(reference["uri"]))
+        except (ValueError, OSError, json.JSONDecodeError) as exc:
+            decision = {
+                "decision": "deny",
+                "reason_codes": ["SCHEMA_INVALID", "FAIL_CLOSED"],
+                "admission_receipt": make_schema_invalid_receipt(metadata, str(exc)),
+            }
+        else:
+            if not verifier.validate_digest(admission_request, reference["digest"]):
+                decision = {
+                    "decision": "deny",
+                    "reason_codes": ["DIGEST_MISMATCH", "FAIL_CLOSED"],
+                    "admission_receipt": make_digest_mismatch_receipt(metadata),
+                }
+            elif not isinstance(admission_request, dict):
+                decision = {
+                    "decision": "deny",
+                    "reason_codes": ["SCHEMA_INVALID", "FAIL_CLOSED"],
+                    "admission_receipt": make_schema_invalid_receipt(
+                        metadata,
+                        "digest-bound admission request artifact was not a JSON object",
+                    ),
+                }
+            else:
+                decision = verifier.admit(admission_request, now=core.parse_time("2026-05-04T03:00:30Z"))
+
+    return make_task_response(task_message, metadata, decision)
 
 
 def parse_args() -> argparse.Namespace:

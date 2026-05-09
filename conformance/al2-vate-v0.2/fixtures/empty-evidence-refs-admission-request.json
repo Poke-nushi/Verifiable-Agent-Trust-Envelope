@@ -1,0 +1,25 @@
+{
+  "action": "commerce.purchase",
+  "actor": "did:web:agent.example",
+  "audience": "https://verifier.example/a2a",
+  "constraints": {
+    "max_amount": {
+      "currency": "USD",
+      "value": "120.00"
+    }
+  },
+  "evidence_refs": [],
+  "expires_at": "2026-07-01T00:10:00Z",
+  "input_hash": "sha-256:a0b7d342a0c1eec92f653fb11227398206a66d8fb66f1eefc6ec7812f2741d3c",
+  "issued_at": "2026-07-01T00:00:00Z",
+  "principal": "did:web:user.example",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "request_id": "areq-20260701-empty-evidence-refs-001",
+  "runtime": "spiffe://agent.example/workload/purchase-agent",
+  "target": {
+    "audience": "https://verifier.example/a2a",
+    "resource": "https://merchant.example/checkout"
+  },
+  "transaction_id": "txn-20260701-empty-evidence-refs-001",
+  "version": "vate-0.2"
+}

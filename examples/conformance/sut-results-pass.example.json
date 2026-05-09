@@ -2,7 +2,7 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "9c1d3a677d709057f68f7649b62775368448638aaf6a837c4ec2c050f669d0f6"
+      "value": "1995fda241aebb59a554932f70c8f08b2a5945b173d4ef3c3f3ff9e2ce6790bf"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.2"
   },
@@ -1036,6 +1036,36 @@
       "outcome": "deny",
       "reason_codes": [
         "DIGEST_MISMATCH",
+        "FAIL_CLOSED"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
+            "value": "aa562ad423ad0faae920bc2aa48bfd0f3d519f27a74ba9c83c62721a5c3b9330"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-deny-empty-evidence-refs.example.json"
+        }
+      },
+      "case_id": "deny-empty-evidence-refs",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "SCHEMA_INVALID",
         "FAIL_CLOSED"
       ],
       "should_execute": false,
