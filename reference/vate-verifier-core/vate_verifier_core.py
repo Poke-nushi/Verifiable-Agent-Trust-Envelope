@@ -17,6 +17,7 @@ from typing import Any
 
 PROFILE = "VATE-AL2-Verifier-Admission-v0.2"
 VERSION = "vate-0.2"
+EXECUTABLE_ADMISSION_DECISIONS = {"allow", "attenuate"}
 
 
 def parse_time(value: str) -> datetime:
@@ -37,6 +38,60 @@ def canonical_bytes(value: Any) -> bytes:
 
 def canonical_hash(value: Any) -> str:
     return "sha-256:" + hashlib.sha256(canonical_bytes(value)).hexdigest()
+
+
+def digest_value(value: Any) -> str:
+    return canonical_hash(value).removeprefix("sha-256:")
+
+
+def safe_parse_time(value: Any) -> datetime | None:
+    if not isinstance(value, str):
+        return None
+    try:
+        return parse_time(value)
+    except ValueError:
+        return None
+
+
+def side_effects_exceed_constraints(
+    side_effects: Any,
+    effective_constraints: Any,
+) -> bool:
+    if not isinstance(side_effects, list) or not isinstance(effective_constraints, dict):
+        return False
+
+    max_amount = effective_constraints.get("max_amount")
+    if isinstance(max_amount, dict):
+        try:
+            max_value = float(max_amount["value"])
+            max_currency = str(max_amount["currency"])
+        except (KeyError, TypeError, ValueError):
+            return True
+        for effect in side_effects:
+            if not isinstance(effect, dict):
+                continue
+            amount = effect.get("amount")
+            if not isinstance(amount, dict):
+                continue
+            try:
+                actual_value = float(amount["value"])
+                actual_currency = str(amount["currency"])
+            except (KeyError, TypeError, ValueError):
+                return True
+            if actual_currency != max_currency or actual_value > max_value:
+                return True
+
+    tool_allowlist = effective_constraints.get("tool_allowlist")
+    if isinstance(tool_allowlist, list):
+        allowed_tools = {str(tool) for tool in tool_allowlist}
+        for effect in side_effects:
+            if not isinstance(effect, dict):
+                continue
+            tool = effect.get("tool") or effect.get("tool_id") or effect.get("name")
+            if tool is not None and str(tool) not in allowed_tools:
+                return True
+
+    return False
 
 
 def get_amount(request: dict[str, Any]) -> tuple[str, float] | None:
@@ -121,27 +176,82 @@ class VateVerifier:
         admission_receipt: dict[str, Any],
         post_execution_receipt: dict[str, Any],
     ) -> dict[str, Any]:
+        admission = post_execution_receipt.get("admission")
+        execution = post_execution_receipt.get("execution")
+        result = post_execution_receipt.get("result")
+        if not isinstance(admission, dict) or not isinstance(execution, dict) or not isinstance(result, dict):
+            return {
+                "outcome": "failed",
+                "reason_codes": ["POST_EXEC_LINKAGE_MISMATCH"],
+            }
+
+        failures: list[str] = []
         expected_hash = admission_receipt.get("attenuation", {}).get(
             "effective_request_hash",
             admission_receipt.get("request", {}).get("input_hash"),
         )
-        actual_hash = post_execution_receipt.get("execution", {}).get("effective_request_hash")
-        receipt_id_matches = (
-            post_execution_receipt.get("admission", {}).get("receipt_id") == admission_receipt.get("receipt_id")
-        )
-        hash_matches = expected_hash == actual_hash
-        if receipt_id_matches and hash_matches:
+        if admission.get("receipt_id") != admission_receipt.get("receipt_id"):
+            failures.append("POST_EXEC_LINKAGE_MISMATCH")
+
+        if not self.validate_digest(admission_receipt, admission.get("digest", {})):
+            failures.append("POST_EXEC_ADMISSION_DIGEST_MISMATCH")
+
+        receipt_decision = admission_receipt.get("decision", {}).get("outcome")
+        post_decision = admission.get("decision")
+        if receipt_decision not in EXECUTABLE_ADMISSION_DECISIONS or post_decision == "deny":
+            failures.append("POST_EXEC_ADMISSION_DENIED")
+        elif post_decision != receipt_decision:
+            failures.append("POST_EXEC_LINKAGE_MISMATCH")
+
+        if execution.get("transaction_id") != admission_receipt.get("request", {}).get("transaction_id"):
+            failures.append("POST_EXEC_TRANSACTION_MISMATCH")
+
+        if execution.get("runtime") != admission_receipt.get("subject", {}).get("runtime"):
+            failures.append("POST_EXEC_RUNTIME_MISMATCH")
+
+        if execution.get("effective_request_hash") != expected_hash:
+            failures.append("POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH")
+
+        issued_at = safe_parse_time(admission_receipt.get("issued_at"))
+        expires_at = safe_parse_time(admission_receipt.get("expires_at"))
+        started_at = safe_parse_time(execution.get("started_at"))
+        finished_at = safe_parse_time(execution.get("finished_at"))
+        if (
+            issued_at is None
+            or expires_at is None
+            or started_at is None
+            or finished_at is None
+            or started_at < issued_at
+            or finished_at < started_at
+            or expires_at < started_at
+            or expires_at < finished_at
+        ):
+            failures.append("POST_EXEC_ADMISSION_EXPIRED")
+
+        effective_constraints = admission_receipt.get("attenuation", {}).get("effective_constraints", {})
+        policy_violations = result.get("policy_violations")
+        if policy_violations or side_effects_exceed_constraints(result.get("side_effects"), effective_constraints):
+            failures.append("POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED")
+
+        if failures:
             return {
-                "outcome": "success",
-                "reason_codes": [
-                    "ADMISSION_RECEIPT_LINKED",
-                    "EFFECTIVE_REQUEST_HASH_MATCH",
-                    "NO_POLICY_VIOLATIONS",
-                ],
+                "outcome": "failed",
+                "reason_codes": list(dict.fromkeys(failures)),
             }
+
         return {
-            "outcome": "failed",
-            "reason_codes": ["POST_EXEC_LINKAGE_MISMATCH"],
+            "outcome": "success",
+            "reason_codes": [
+                "ADMISSION_RECEIPT_LINKED",
+                "ADMISSION_DIGEST_MATCH",
+                "ADMISSION_DECISION_EXECUTABLE",
+                "TRANSACTION_MATCH",
+                "RUNTIME_MATCH",
+                "ADMISSION_WINDOW_VALID",
+                "EFFECTIVE_REQUEST_HASH_MATCH",
+                "EFFECTIVE_CONSTRAINTS_OBSERVED",
+                "NO_POLICY_VIOLATIONS",
+            ],
         }
 
     def validate_digest(self, artifact: dict[str, Any], digest: dict[str, str]) -> bool:
@@ -386,19 +496,69 @@ def run_self_test() -> None:
     assert denied["decision"] == "deny"
     assert denied["reason_codes"] == ["AUDIENCE_MISMATCH", "FAIL_CLOSED"]
 
+    admission_receipt = attenuated["admission_receipt"]
     post_execution = {
         "admission": {
-            "receipt_id": attenuated["admission_receipt"]["receipt_id"],
+            "receipt_id": admission_receipt["receipt_id"],
+            "digest": {
+                "alg": "sha-256",
+                "value": digest_value(admission_receipt),
+            },
+            "decision": admission_receipt["decision"]["outcome"],
         },
         "execution": {
-            "effective_request_hash": attenuated["admission_receipt"]["attenuation"]["effective_request_hash"],
+            "transaction_id": admission_receipt["request"]["transaction_id"],
+            "effective_request_hash": admission_receipt["attenuation"]["effective_request_hash"],
+            "runtime": admission_receipt["subject"]["runtime"],
+            "started_at": "2026-07-01T00:02:00Z",
+            "finished_at": "2026-07-01T00:03:00Z",
         },
         "result": {
+            "side_effects": [
+                {
+                    "type": "payment_authorization",
+                    "amount": {
+                        "currency": "USD",
+                        "value": "25.00",
+                    },
+                }
+            ],
             "policy_violations": []
         },
     }
-    linkage = verifier.validate_post_execution_linkage(attenuated["admission_receipt"], post_execution)
+    linkage = verifier.validate_post_execution_linkage(admission_receipt, post_execution)
     assert linkage["outcome"] == "success"
+
+    bad_transaction = copy.deepcopy(post_execution)
+    bad_transaction["execution"]["transaction_id"] = "txn-core-self-test-spoofed"
+    linkage = verifier.validate_post_execution_linkage(admission_receipt, bad_transaction)
+    assert linkage["outcome"] == "failed"
+    assert "POST_EXEC_TRANSACTION_MISMATCH" in linkage["reason_codes"]
+
+    bad_runtime = copy.deepcopy(post_execution)
+    bad_runtime["execution"]["runtime"] = "spiffe://agent.example/workload/spoofed-runtime"
+    linkage = verifier.validate_post_execution_linkage(admission_receipt, bad_runtime)
+    assert linkage["outcome"] == "failed"
+    assert "POST_EXEC_RUNTIME_MISMATCH" in linkage["reason_codes"]
+
+    denied_linkage = copy.deepcopy(post_execution)
+    denied_linkage["admission"]["decision"] = "deny"
+    linkage = verifier.validate_post_execution_linkage(admission_receipt, denied_linkage)
+    assert linkage["outcome"] == "failed"
+    assert "POST_EXEC_ADMISSION_DENIED" in linkage["reason_codes"]
+
+    expired_linkage = copy.deepcopy(post_execution)
+    expired_linkage["execution"]["started_at"] = "2026-07-01T00:11:00Z"
+    expired_linkage["execution"]["finished_at"] = "2026-07-01T00:12:00Z"
+    linkage = verifier.validate_post_execution_linkage(admission_receipt, expired_linkage)
+    assert linkage["outcome"] == "failed"
+    assert "POST_EXEC_ADMISSION_EXPIRED" in linkage["reason_codes"]
+
+    exceeded_constraints = copy.deepcopy(post_execution)
+    exceeded_constraints["result"]["side_effects"][0]["amount"]["value"] = "30.00"
+    linkage = verifier.validate_post_execution_linkage(admission_receipt, exceeded_constraints)
+    assert linkage["outcome"] == "failed"
+    assert "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED" in linkage["reason_codes"]
 
 
 def parse_args() -> argparse.Namespace:
