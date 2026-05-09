@@ -110,8 +110,9 @@ adding new adjacent profiles.
 - use the current A2A review package under `docs/a2a/` for maintainer and
   implementer feedback, while keeping the request framed as metadata-only
   compatibility review rather than A2A governance adoption
-- update release notes, changelog, and citation metadata before cutting the
-  `v0.2.0` discussion-draft pre-release
+- complete the `docs/release-gate-v0.2.0.md` checklist and final external
+  review before cutting the `v0.2.0` discussion-draft pre-release; update
+  citation metadata only after the real archive and DOI exist
 - add additional transport-bound fixtures beyond the initial MCP/OAuth,
   AP2/UCP, and AP2 Human Not Present examples after the AL2 security basis is
   stable

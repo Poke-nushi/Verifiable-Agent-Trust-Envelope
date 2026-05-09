@@ -204,6 +204,8 @@ compatibility claim.
   Consolidated metadata-only A2A extension profile draft for VATE references
 - [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md)
   A2A maintainer-oriented summary of the metadata-only admission and receipt binding
+- [docs/release-gate-v0.2.0.md](docs/release-gate-v0.2.0.md)
+  Final technical gate before cutting the v0.2.0 discussion-draft pre-release
 - [docs/a2a-issue-update-2026-05.md](docs/a2a-issue-update-2026-05.md)
   Short A2A-adjacent issue update draft after the runnable v0.2 artifacts
 - [docs/a2a-metadata-binding-v0.2.md](docs/a2a-metadata-binding-v0.2.md)
