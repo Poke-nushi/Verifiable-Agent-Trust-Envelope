@@ -177,7 +177,7 @@ compatibility claim.
 - [docs/close-adjacent-work-2026-04.md](docs/close-adjacent-work-2026-04.md)
   Direct comparison with the closest public adjacent work
 - [docs/use-cases.md](docs/use-cases.md)
-  Three concrete scenarios for the current `v0.1` wedge
+  Three background scenarios from the original `v0.1` framing
 - [docs/verifier-validation-flow.md](docs/verifier-validation-flow.md)
   Verifier-side validation order
 - [docs/profiles/al2-minimal-profile.md](docs/profiles/al2-minimal-profile.md)

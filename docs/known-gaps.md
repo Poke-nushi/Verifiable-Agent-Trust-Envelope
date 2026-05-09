@@ -107,7 +107,8 @@ The future `ABS` direction exists, but the repo does not yet define:
 
 ### 9. Shared Conformance Across Implementations Is Not Ready
 
-The repo now includes two machine-readable conformance corpora:
+The repo now includes two machine-readable conformance corpora, plus a
+language-neutral corpus index:
 
 - an `AL2` HTTP corpus for the reference verifier demo
 - a runnable `v0.2` AL2 corpus for admission decisions, attenuation, A2A metadata references, negative cases, adjacent evidence, and post-execution linkage

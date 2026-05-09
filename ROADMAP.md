@@ -107,11 +107,9 @@ adding new adjacent profiles.
   are documented; external SUT authors should use
   `docs/conformance/external-sut-quickstart.md` as the command-first path from
   corpus index to `compare`, implementation reports, and `verify-bundle`
-- prepare the A2A-adjacent review package from
-  `docs/a2a-maintainer-brief-v0.2.md`,
-  `docs/a2a-metadata-binding-v0.2.md`,
-  `docs/a2a-v1-extension-sketch-2026-05.md`, and
-  `docs/a2a-issue-update-2026-05.md`
+- use the current A2A review package under `docs/a2a/` for maintainer and
+  implementer feedback, while keeping the request framed as metadata-only
+  compatibility review rather than A2A governance adoption
 - update release notes, changelog, and citation metadata before cutting the
   `v0.2.0` discussion-draft pre-release
 - add additional transport-bound fixtures beyond the initial MCP/OAuth,

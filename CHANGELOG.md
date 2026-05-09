@@ -4,6 +4,9 @@ This file records dated public changes to the discussion draft.
 
 ## 2026-05-09
 
+- Synchronized the consolidated A2A review package under `docs/a2a/`, including
+  the implementer entry point and v0.2 extension-profile draft for
+  metadata-only, digest-bound admission and receipt references.
 - Added a command-first external SUT quickstart for producing SUT results,
   comparing them against the AL2 v0.2 corpus, generating implementation
   reports, and locally verifying report-bundle digest linkage.
