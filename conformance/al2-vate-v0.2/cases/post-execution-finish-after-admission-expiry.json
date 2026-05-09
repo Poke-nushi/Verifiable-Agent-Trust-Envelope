@@ -1,0 +1,41 @@
+{
+  "version": "vate-conformance-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "case_id": "post-execution-finish-after-admission-expiry",
+  "title": "Reject execution that finishes after admission expiry",
+  "category": "linkage",
+  "purpose": "A verifier or auditor should reject post-execution evidence when execution starts before admission expiry but finishes after the admission receipt expiry.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+    "post_execution_receipt": "examples/receipts/post-execution-finish-after-admission-expiry.example.json"
+  },
+  "expected": {
+    "post_execution_outcome": "failed",
+    "should_execute": true,
+    "reason_codes": [
+      "POST_EXEC_ADMISSION_EXPIRED"
+    ],
+    "checks": [
+      {
+        "name": "post_execution.execution.started_at",
+        "expected": "present"
+      },
+      {
+        "name": "post_execution.execution.finished_at",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "post-execution linkage",
+    "admission expiry",
+    "finish-after-expiry boundary"
+  ],
+  "linkage_checks": [
+    {
+      "kind": "admission_time_window",
+      "expect_valid": false,
+      "reason_code": "POST_EXEC_ADMISSION_EXPIRED"
+    }
+  ]
+}

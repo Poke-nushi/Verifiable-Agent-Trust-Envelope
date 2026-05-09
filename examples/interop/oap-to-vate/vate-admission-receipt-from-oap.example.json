@@ -12,7 +12,7 @@
     "request_id": "areq-oap-interop-20260701-001",
     "transaction_id": "txn-oap-interop-20260701-001",
     "action": "crm.case.update",
-    "input_hash": "sha-256:oap-interop-input"
+    "input_hash": "sha-256:81586f3ab4391e6d0aa924bd5e41f6e9daff33f6c9cfd0c675279c25ae9f8437"
   },
   "subject": {
     "principal": "did:web:user.example",

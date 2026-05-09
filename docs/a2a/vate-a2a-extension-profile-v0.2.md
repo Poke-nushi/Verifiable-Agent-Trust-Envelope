@@ -229,6 +229,9 @@ Verifier implementations should check:
 Dereferencing artifacts must be safe for the verifier environment. A URL in A2A
 metadata is untrusted input until scheme, host, media type, digest, size, and
 policy constraints have been applied.
+The reference adapter demo follows that ordering for local fixtures: it validates
+the VATE metadata object and digest descriptor shape before resolving the
+referenced `local:` admission request.
 
 If a deployment uses JOSE/JCS proof packaging, the production proof boundary is
 defined separately in

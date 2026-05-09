@@ -13,7 +13,7 @@
         "media_type": "application/vate-admission-request+json",
         "digest": {
           "alg": "sha-256",
-          "value": "4f501494de2236b218503da42e9f9121431c57b4539edaa52e0ba2f5d0c3b2c6"
+          "value": "f96bdc7abead77240e9fa0f1bd4ed0c9069f8c10bdddd8a4deac8a35ee1582af"
         }
       },
       "issuer": "did:web:agent.example",

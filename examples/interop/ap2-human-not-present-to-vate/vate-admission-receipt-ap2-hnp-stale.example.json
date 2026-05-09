@@ -39,7 +39,7 @@
     "a2a_task_id": "task-ap2hnp-stale-20260507-001",
     "action": "commerce.purchase",
     "audience": "https://tickets.example",
-    "input_hash": "sha-256:ap2hnp-stale-input",
+    "input_hash": "sha-256:fb6980fe15093698f942e85fff6c6fad3d5570266f47f10c35869bed7cfe2b78",
     "request_id": "areq-ap2hnp-stale-20260507-001",
     "target_audience": "https://tickets.example",
     "transaction_id": "txn-ap2hnp-stale-20260507-001"

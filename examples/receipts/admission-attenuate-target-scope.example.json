@@ -12,7 +12,7 @@
     "request_id": "areq-20260701-target-scope-001",
     "transaction_id": "txn-20260701-target-scope-001",
     "action": "storage.object.publish",
-    "input_hash": "sha-256:target-scope-original-input"
+    "input_hash": "sha-256:1c9ca46e1ded4de46be039e9447dff129d06877ffb4bea69a925b8bfcb81c26f"
   },
   "subject": {
     "principal": "did:web:user.example",
@@ -48,8 +48,8 @@
   },
   "attenuation": {
     "mode": "narrow",
-    "original_request_hash": "sha-256:target-scope-original-request",
-    "effective_request_hash": "sha-256:target-scope-effective-request",
+    "original_request_hash": "sha-256:1c30da503c034d5c19420263968b13cbfae1d9ff56b81219c3a3d4fa7fb01b42",
+    "effective_request_hash": "sha-256:6f2388a2950e3a245ea55a4edaa653f48154e7bf31372bb8bd3ee558683b7334",
     "changes": [
       {
         "op": "replace",

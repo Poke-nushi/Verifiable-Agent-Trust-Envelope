@@ -12,7 +12,7 @@
     "request_id": "areq-20260701-runtime-mismatch-001",
     "transaction_id": "txn-20260701-runtime-mismatch-001",
     "action": "crm.case.update",
-    "input_hash": "sha-256:runtime-mismatch-input"
+    "input_hash": "sha-256:fa04d1ac03b414f6f104d522be1afad95baada0c1c4ba4c781a89cf0892cd9fb"
   },
   "subject": {
     "principal": "did:web:user.example",

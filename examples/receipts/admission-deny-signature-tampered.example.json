@@ -12,7 +12,7 @@
     "request_id": "areq-20260701-signature-tampered-001",
     "transaction_id": "txn-20260701-signature-tampered-001",
     "action": "repo.pull_request.merge",
-    "input_hash": "sha-256:signature-tampered-input"
+    "input_hash": "sha-256:baf8e8ae1f54480dd365bc0c42f6dfa83497c02c05493b1b433a68b2fa858afa"
   },
   "subject": {
     "principal": "did:web:user.example",

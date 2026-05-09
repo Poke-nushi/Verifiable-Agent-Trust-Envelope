@@ -72,6 +72,9 @@ It records:
 
 A post-execution receipt must not silently change the admitted request.
 The `effective_request_hash` should match the request admitted by the admission receipt.
+For the AL2 v0.2 profile, `input_hash`, `output_hash`,
+`original_request_hash`, and `effective_request_hash` use the same profile hash
+grammar: `sha-256:` followed by a lowercase 64-character hexadecimal digest.
 For the AL2 conformance corpus, post-execution linkage also binds the admission
 receipt digest, admission decision, transaction id, runtime id, admission expiry,
 and attenuated effective constraints. A mismatch on any of those fields is
@@ -80,6 +83,26 @@ reported with the most specific applicable post-execution reason code, such as
 `POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH`, `POST_EXEC_RUNTIME_MISMATCH`, or
 `POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED`. `POST_EXEC_LINKAGE_MISMATCH` remains
 a generic fallback for older or underspecified fixtures.
+
+The admission receipt top-level `issued_at` and `expires_at` are the authoritative
+post-execution linkage window in the v0.2 corpus: execution must start no earlier
+than `issued_at` and must finish no later than `expires_at`. If an attenuation
+object also carries `effective_constraints.expires_at`, it documents the admitted
+constraint basis but does not broaden the top-level admission window.
+
+For an `attenuate` decision, the post-execution constraint basis is
+`attenuation.effective_constraints`. For an `allow` decision, the original
+request constraints remain effective when the admission receipt records them
+under `request.constraints`.
+
+Within that constraint basis, `max_amount` is interpreted as an aggregate cap
+for the admitted execution, not a per-side-effect cap. Post-execution verifiers
+sum all `result.side_effects[].amount` entries in the admitted currency and
+reject when the total exceeds `max_amount`. Side effects without an `amount` do
+not contribute to the amount total; an amount in a different currency fails the
+constraint check. If a future profile needs both total and per-effect caps, it
+should add a separate field such as `max_amount_per_side_effect` rather than
+changing `max_amount`.
 
 An attenuated admission receipt can still be non-executable. In particular,
 `attenuation.require_new_permit: true` means the verifier found a narrower or

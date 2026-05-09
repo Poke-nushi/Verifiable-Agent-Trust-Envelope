@@ -76,6 +76,18 @@ Future production-oriented profiles should either name a standard JSON
 canonicalization profile, such as RFC 8785 / JCS, or bind signatures and digests
 to exact media bytes without reserializing JSON.
 
+## Digest Strictness Boundary
+
+The reusable artifact and evidence reference schemas are intentionally
+algorithm-extensible so adjacent protocols can carry `sha-384`, `sha-512`, or
+future digest algorithms where a later profile permits them.
+
+The AL2 v0.2 profile schemas and conformance-facing artifact references are
+stricter: descriptor `digest.alg` values must be `sha-256`, and descriptor
+`digest.value` values must be lowercase 64-character hexadecimal strings.
+Profile hash fields such as `input_hash` and `effective_request_hash` use the
+separate `sha-256:<64 lowercase hex>` string form.
+
 ## Runner Boundary
 
 The reference runner has two distinct roles:
@@ -145,6 +157,20 @@ because it names a `kind` and `reason_code`:
 - `admission_executable`, `admission_time_window`, and
   `effective_constraints` require `expect_valid`
 - `policy_violation` requires `value` and `expect_present`
+
+For `max_amount`, `effective_constraints` checks aggregate
+`post_execution.result.side_effects[].amount` values in the admitted currency.
+Two side effects that are individually below the cap can still fail if their
+sum exceeds it.
+
+`admission_time_window` covers both execution start and finish. In the v0.2
+corpus, execution that starts before admission expiry but finishes after
+admission expiry is still invalid and maps to `POST_EXEC_ADMISSION_EXPIRED`.
+
+`effective_constraints` uses `attenuation.effective_constraints` for attenuated
+admissions. For allow-path post-execution cases, it uses
+`admission_receipt.request.constraints` when those constraints are recorded on
+the receipt.
 
 The `path_match` kind is a generic escape hatch for draft fixtures that need to
 compare two explicitly named paths before a narrower linkage kind exists. It

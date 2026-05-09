@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -14,6 +15,10 @@ ROOT = Path(__file__).resolve().parents[2]
 EXTENSION_URI = "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2"
 CORE = ROOT / "reference" / "vate-verifier-core" / "vate_verifier_core.py"
 TASK_MESSAGE = ROOT / "reference" / "a2a-metadata-adapter-demo" / "task-message.example.json"
+PROFILE = "VATE-AL2-Verifier-Admission-v0.2"
+SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
+SAFE_PROFILE_HASH = "sha-256:" + ("0" * 64)
+SAFE_DIGEST = {"alg": "sha-256", "value": "0" * 64}
 
 
 def load_core():
@@ -49,6 +54,68 @@ def resolve_local_uri(uri: str) -> Path:
     return resolved
 
 
+def is_digest_descriptor(value: Any) -> bool:
+    return (
+        isinstance(value, dict)
+        and value.get("alg") == "sha-256"
+        and isinstance(value.get("value"), str)
+        and SHA256_HEX_RE.fullmatch(value["value"]) is not None
+    )
+
+
+def artifact_reference_failures(
+    value: Any,
+    *,
+    label: str,
+    expected_type: str,
+    expected_media_type: str,
+) -> list[str]:
+    failures: list[str] = []
+    if not isinstance(value, dict):
+        return [f"{label} must be an object"]
+    if value.get("type") != expected_type:
+        failures.append(f"{label}.type must be {expected_type}")
+    uri = value.get("uri")
+    if not isinstance(uri, str) or not uri:
+        failures.append(f"{label}.uri must be a non-empty string")
+    media_type = value.get("media_type")
+    if media_type != expected_media_type:
+        failures.append(f"{label}.media_type must be {expected_media_type}")
+    if not is_digest_descriptor(value.get("digest")):
+        failures.append(f"{label}.digest must be a sha-256 lowercase hex digest descriptor")
+    return failures
+
+
+def admission_requested_metadata_failures(metadata: Any) -> list[str]:
+    failures: list[str] = []
+    if not isinstance(metadata, dict):
+        return ["metadata extension must be an object"]
+    if metadata.get("profile") != PROFILE:
+        failures.append("profile must be VATE-AL2-Verifier-Admission-v0.2")
+    if metadata.get("phase") != "admission_requested":
+        failures.append("phase must be admission_requested")
+    if metadata.get("assurance_level") != "AL2":
+        failures.append("assurance_level must be AL2")
+    for field in ("transaction_id", "issuer", "issued_at"):
+        if not isinstance(metadata.get(field), str) or not metadata.get(field):
+            failures.append(f"{field} must be a non-empty string")
+    failures.extend(
+        artifact_reference_failures(
+            metadata.get("admission_request"),
+            label="admission_request",
+            expected_type="admission_request",
+            expected_media_type="application/vate-admission-request+json",
+        )
+    )
+    return failures
+
+
+def metadata_string(metadata: Any, field: str, fallback: str) -> str:
+    if isinstance(metadata, dict) and isinstance(metadata.get(field), str) and metadata[field]:
+        return metadata[field]
+    return fallback
+
+
 def build_verifier() -> Any:
     return core.VateVerifier(
         verifier_id="did:web:verifier.example",
@@ -66,41 +133,68 @@ def build_verifier() -> Any:
 
 
 def make_digest_mismatch_receipt(metadata: dict[str, Any]) -> dict[str, Any]:
+    return make_fail_closed_receipt(
+        metadata,
+        receipt_id="admrec-digest-mismatch",
+        reason_codes=["DIGEST_MISMATCH", "FAIL_CLOSED"],
+        failure_reason="The digest-bound admission request reference did not match the artifact.",
+    )
+
+
+def make_schema_invalid_receipt(metadata: Any, failure_reason: str) -> dict[str, Any]:
+    return make_fail_closed_receipt(
+        metadata,
+        receipt_id="admrec-schema-invalid",
+        reason_codes=["SCHEMA_INVALID", "FAIL_CLOSED"],
+        failure_reason=failure_reason,
+    )
+
+
+def make_fail_closed_receipt(
+    metadata: Any,
+    *,
+    receipt_id: str,
+    reason_codes: list[str],
+    failure_reason: str,
+) -> dict[str, Any]:
     issued_at = "2026-05-04T03:00:30Z"
+    reference = metadata.get("admission_request", {}) if isinstance(metadata, dict) else {}
+    digest = (
+        reference.get("digest")
+        if isinstance(reference, dict) and is_digest_descriptor(reference.get("digest"))
+        else SAFE_DIGEST
+    )
     return {
         "version": "vate-0.2",
-        "profile": "VATE-AL2-Verifier-Admission-v0.2",
+        "profile": PROFILE,
         "receipt_type": "admission",
-        "receipt_id": "admrec-digest-mismatch",
+        "receipt_id": receipt_id,
         "issued_at": issued_at,
-        "expires_at": metadata.get("expires_at", issued_at),
+        "expires_at": metadata_string(metadata, "expires_at", issued_at),
         "verifier": {
             "id": "did:web:verifier.example",
         },
         "request": {
             "request_id": "missing",
-            "transaction_id": metadata.get("transaction_id", "missing"),
+            "transaction_id": metadata_string(metadata, "transaction_id", "missing"),
             "action": "missing",
-            "input_hash": "missing",
+            "input_hash": SAFE_PROFILE_HASH,
         },
         "subject": {
             "principal": "missing",
-            "actor": metadata.get("issuer", "missing"),
+            "actor": metadata_string(metadata, "issuer", "missing"),
             "runtime": "missing",
         },
         "evidence": [
             {
                 "type": "admission_request",
-                "uri": metadata.get("admission_request", {}).get("uri", "missing"),
-                "digest": metadata.get("admission_request", {}).get(
-                    "digest",
-                    {"alg": "sha-256", "value": "missing"},
-                ),
+                "uri": reference.get("uri", "missing") if isinstance(reference, dict) else "missing",
+                "digest": digest,
                 "verification": {
                     "result": "failed",
                     "checked_at": issued_at,
                     "method": "a2a-metadata-digest-check",
-                    "failure_reason": "The digest-bound admission request reference did not match the artifact.",
+                    "failure_reason": failure_reason,
                 },
             }
         ],
@@ -111,7 +205,7 @@ def make_digest_mismatch_receipt(metadata: dict[str, Any]) -> dict[str, Any]:
         },
         "decision": {
             "outcome": "deny",
-            "reason_codes": ["DIGEST_MISMATCH", "FAIL_CLOSED"],
+            "reason_codes": reason_codes,
         },
     }
 
@@ -149,7 +243,7 @@ def build_post_execution_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
         },
         "result": {
             "outcome": "success",
-            "output_hash": "sha-256:a2a-adapter-output",
+            "output_hash": core.canonical_hash({"a2a_adapter_output": receipt["receipt_id"]}),
             "side_effects": [],
             "policy_violations": [],
         },
@@ -160,20 +254,34 @@ def adapt_task_message(task_message: dict[str, Any]) -> dict[str, Any]:
     metadata = task_message.get("metadata", {}).get(EXTENSION_URI)
     if metadata is None:
         raise ValueError("missing VATE A2A metadata extension object")
-    if metadata.get("phase") != "admission_requested":
-        raise ValueError(f"unsupported VATE metadata phase {metadata.get('phase')}")
 
-    reference = metadata["admission_request"]
-    admission_request = read_json(resolve_local_uri(reference["uri"]))
     verifier = build_verifier()
-    if not verifier.validate_digest(admission_request, reference["digest"]):
+    metadata_failures = admission_requested_metadata_failures(metadata)
+    if metadata_failures:
         decision = {
             "decision": "deny",
-            "reason_codes": ["DIGEST_MISMATCH", "FAIL_CLOSED"],
-            "admission_receipt": make_digest_mismatch_receipt(metadata),
+            "reason_codes": ["SCHEMA_INVALID", "FAIL_CLOSED"],
+            "admission_receipt": make_schema_invalid_receipt(metadata, "; ".join(metadata_failures)),
         }
     else:
-        decision = verifier.admit(admission_request, now=core.parse_time("2026-05-04T03:00:30Z"))
+        reference = metadata["admission_request"]
+        try:
+            admission_request = read_json(resolve_local_uri(reference["uri"]))
+        except (ValueError, OSError, json.JSONDecodeError) as exc:
+            decision = {
+                "decision": "deny",
+                "reason_codes": ["SCHEMA_INVALID", "FAIL_CLOSED"],
+                "admission_receipt": make_schema_invalid_receipt(metadata, str(exc)),
+            }
+        else:
+            if not verifier.validate_digest(admission_request, reference["digest"]):
+                decision = {
+                    "decision": "deny",
+                    "reason_codes": ["DIGEST_MISMATCH", "FAIL_CLOSED"],
+                    "admission_receipt": make_digest_mismatch_receipt(metadata),
+                }
+            else:
+                decision = verifier.admit(admission_request, now=core.parse_time("2026-05-04T03:00:30Z"))
 
     receipt = decision["admission_receipt"]
     receipt_digest = core.canonical_hash(receipt).removeprefix("sha-256:")
@@ -191,7 +299,7 @@ def adapt_task_message(task_message: dict[str, Any]) -> dict[str, Any]:
             EXTENSION_URI: {
                 "profile": "VATE-AL2-Verifier-Admission-v0.2",
                 "phase": "admission_issued",
-                "transaction_id": metadata["transaction_id"],
+                "transaction_id": metadata_string(metadata, "transaction_id", "missing"),
                 "assurance_level": "AL2",
                 "decision": decision["decision"],
                 "admission_receipt": {
@@ -215,7 +323,7 @@ def adapt_task_message(task_message: dict[str, Any]) -> dict[str, Any]:
             EXTENSION_URI: {
                 "profile": "VATE-AL2-Verifier-Admission-v0.2",
                 "phase": "post_execution_receipt_issued",
-                "transaction_id": metadata["transaction_id"],
+                "transaction_id": metadata_string(metadata, "transaction_id", "missing"),
                 "assurance_level": "AL2",
                 "admission_receipt": response["metadata"][EXTENSION_URI]["admission_receipt"],
                 "post_execution_receipt": {

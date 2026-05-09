@@ -14,7 +14,7 @@
     "uri": "https://verifier.example/vate/admission-receipts/admrec-20260504-attenuate-001",
     "digest": {
       "alg": "sha-256",
-      "value": "63b7b3c8e7209994eecaa44b2618c7530b74b38f63487312e193a9b4f7ec3997"
+      "value": "02628c006e04d55f3d7823254f033ddd3e203c3b5f3c0ccd7bbdb3d777bb9de1"
     },
     "decision": "attenuate"
   },
@@ -24,12 +24,12 @@
     "a2a_task_id": "task-abc123",
     "started_at": "2026-05-04T03:01:02Z",
     "finished_at": "2026-05-04T03:02:28Z",
-    "effective_request_hash": "sha-256:base64url-effective-request-digest",
+    "effective_request_hash": "sha-256:55a42639dd40cd0908361d420c52c73a5c40849236dbed6a526abbbb643cbd97",
     "runtime": "spiffe://agent.example/workload/purchase-agent"
   },
   "result": {
     "outcome": "failed",
-    "output_hash": "sha-256:transaction-mismatch-output",
+    "output_hash": "sha-256:3d047f0e7cd8d05791a0dc77a2e9b2807e375cf463e5817fb05126277d5a334c",
     "side_effects": [],
     "policy_violations": [
       "transaction_id_mismatch"

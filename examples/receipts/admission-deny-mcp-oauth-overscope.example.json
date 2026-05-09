@@ -13,7 +13,7 @@
     "request_id": "areq-20260507-mcp-oauth-overscope-001",
     "transaction_id": "txn-20260507-mcp-oauth-overscope-001",
     "action": "crm.case.delete",
-    "input_hash": "sha-256:base64url-mcp-overscope-tool-call-input-digest",
+    "input_hash": "sha-256:789055272989ea3df5b7ed88927709ac3683c0e2a16aaf4ceb9a4c533fee1193",
     "audience": "https://mcp.crm.example",
     "target_audience": "https://mcp.crm.example",
     "target_resource": "mcp://crm.example/tools/admin.delete",

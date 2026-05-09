@@ -14,7 +14,7 @@
     "a2a_context_id": "ctx-commerce-20260507-001",
     "a2a_task_id": "task-commerce-20260507-001",
     "action": "commerce.purchase",
-    "input_hash": "sha-256:ap2-ucp-commerce-input",
+    "input_hash": "sha-256:cf81b9a06f3fb5bad2204522a86d4e381e2c8df4ea10557eaf3bea41fd1547b1",
     "audience": "https://merchant.example/ucp",
     "target_audience": "https://merchant.example/ucp"
   },

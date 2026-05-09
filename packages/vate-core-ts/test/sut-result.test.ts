@@ -34,4 +34,21 @@ describe("SUT result helpers", () => {
       "JOSE proof artifact references are recorded only; production signature verification is outside this helper.",
     ]);
   });
+
+  it("emits post-execution linkage outcomes", () => {
+    const entry = createSutResultEntry({
+      caseId: "post-execution-after-deny",
+      outcome: "failed",
+      shouldExecute: false,
+      reasonCodes: ["POST_EXEC_ADMISSION_DENIED"],
+    });
+
+    expect(entry).toMatchObject({
+      case_id: "post-execution-after-deny",
+      status: "completed",
+      outcome: "failed",
+      should_execute: false,
+      reason_codes: ["POST_EXEC_ADMISSION_DENIED"],
+    });
+  });
 });

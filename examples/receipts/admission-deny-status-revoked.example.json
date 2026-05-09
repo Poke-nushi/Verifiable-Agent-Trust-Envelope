@@ -12,7 +12,7 @@
     "request_id": "areq-20260701-status-revoked-001",
     "transaction_id": "txn-20260701-status-revoked-001",
     "action": "calendar.event.create",
-    "input_hash": "sha-256:status-revoked-input"
+    "input_hash": "sha-256:000030f0c28a43689179a521806d9f60c948edc7780dc2d2787dd380ca548e79"
   },
   "subject": {
     "principal": "did:web:user.example",

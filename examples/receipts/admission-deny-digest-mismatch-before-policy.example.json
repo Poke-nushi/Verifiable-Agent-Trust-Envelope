@@ -12,7 +12,7 @@
     "request_id": "areq-20260701-digest-before-policy-001",
     "transaction_id": "txn-20260701-digest-before-policy-001",
     "action": "crm.case.update",
-    "input_hash": "sha-256:digest-before-policy-input"
+    "input_hash": "sha-256:54457b7df805d82a53dc8f89f71c6e4572f4bf4ceb0ee48cafc57c1f5ce53ab6"
   },
   "subject": {
     "principal": "did:web:user.example",

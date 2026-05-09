@@ -1,15 +1,15 @@
 import type {
-  AdmissionDecision,
   ProofArtifactReference,
   SutResultArtifacts,
   SutResultEntry,
   SutCaseStatus,
+  SutOutcome,
 } from "./types.js";
 
 export interface CreateSutResultEntryInput {
   caseId: string;
   status?: SutCaseStatus;
-  outcome: AdmissionDecision;
+  outcome: SutOutcome;
   shouldExecute: boolean;
   reasonCodes: string[];
   artifacts?: SutResultArtifacts;

@@ -13,7 +13,7 @@
     "request_id": "areq-20260507-mcp-oauth-upstream-denied-001",
     "transaction_id": "txn-20260507-mcp-oauth-upstream-denied-001",
     "action": "crm.case.update",
-    "input_hash": "sha-256:base64url-mcp-upstream-denied-tool-call-input-digest",
+    "input_hash": "sha-256:0856c0d4c1b9b14d8b120b52978a48adbaf4c4f0ab3f4583e8047824e79ac633",
     "audience": "https://mcp.crm.example",
     "target_audience": "https://mcp.crm.example",
     "target_resource": "mcp://crm.example/tools/cases.update",

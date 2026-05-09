@@ -15,7 +15,7 @@
     "a2a_context_id": "ctx-allow-001",
     "a2a_task_id": "task-allow-001",
     "action": "crm.case.update",
-    "input_hash": "sha-256:base64url-allow-input-digest"
+    "input_hash": "sha-256:1830d13118c98983bb2d942aa358715059d2ac3301a6b7296f0832a126a5c186"
   },
   "subject": {
     "principal": "did:web:user.example",

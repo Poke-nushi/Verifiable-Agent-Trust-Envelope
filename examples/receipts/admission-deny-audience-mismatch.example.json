@@ -17,7 +17,7 @@
     "action": "commerce.purchase",
     "audience": "https://unexpected.example/a2a",
     "target_audience": "https://agent.example/a2a",
-    "input_hash": "sha-256:base64url-deny-audience-input-digest"
+    "input_hash": "sha-256:451e98530091604b835950df6920d3a31afdca91322987e2efd175a0fd084136"
   },
   "subject": {
     "principal": "did:web:user.example",

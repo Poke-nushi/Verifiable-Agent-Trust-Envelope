@@ -39,7 +39,7 @@
     "a2a_task_id": "task-ap2hnp-replay-20260507-001",
     "action": "commerce.purchase",
     "audience": "https://tickets.example",
-    "input_hash": "sha-256:ap2hnp-replay-input",
+    "input_hash": "sha-256:cf6e8a35b2587fea27dbdeb9b2d734a54dc1bcf20f9c7440678b4bf7e06c1b82",
     "request_id": "areq-ap2hnp-replay-20260507-001",
     "target_audience": "https://tickets.example",
     "transaction_id": "txn-ap2hnp-replay-20260507-001"

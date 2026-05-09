@@ -14,7 +14,7 @@
   "principal": "did:web:user.example",
   "runtime": "spiffe://agent.example/workload/case-agent",
   "audience": "https://crm.example/a2a",
-  "input_hash": "sha-256:oap-interop-input",
+  "input_hash": "sha-256:81586f3ab4391e6d0aa924bd5e41f6e9daff33f6c9cfd0c675279c25ae9f8437",
   "evidence_refs": [
     {
       "type": "oap_decision",

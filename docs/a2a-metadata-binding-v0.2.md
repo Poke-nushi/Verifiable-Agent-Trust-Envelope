@@ -111,6 +111,11 @@ the artifact references evaluated by the corpus. A pure `by_reference` pointer
 without a digest may be useful as advisory discovery metadata, but it is not a
 passing AL2 conformance reference.
 
+The reusable artifact and evidence reference schemas are intentionally
+algorithm-extensible. The AL2 v0.2 profile schemas and conformance-facing
+artifact references are stricter: `digest.alg` must be `sha-256` and
+`digest.value` must be a lowercase 64-character hexadecimal digest.
+
 At minimum:
 
 - `uri`
@@ -122,6 +127,9 @@ The A2A metadata schema validates artifact reference `uri` values as absolute
 URI-shaped strings. This does not make a referenced location trusted or
 reachable; verifier implementations still need dereference controls, media type
 pinning, digest checks, and local trust policy before using the artifact.
+The dependency-free adapter demo performs a lightweight metadata shape check
+before dereferencing `local:` fixture URIs. Malformed VATE metadata is mapped to
+a fail-closed VATE denial with `SCHEMA_INVALID` and `FAIL_CLOSED`.
 
 For `admission_issued`, the required decision digest is the `admission_receipt.digest`.
 An optional `policy_snapshot.digest` can be added when the verifier wants consumers or auditors to reconstruct the policy basis for the decision.

@@ -2,8 +2,8 @@
   "version": "vate-0.2",
   "profile": "VATE-AL2-Verifier-Admission-v0.2",
   "receipt_type": "post_execution",
-  "receipt_id": "postrec-20260701-admission-digest-mismatch-001",
-  "issued_at": "2026-05-04T03:02:31Z",
+  "receipt_id": "postrec-20260701-finish-after-admission-expiry-001",
+  "issued_at": "2026-05-04T03:10:10Z",
   "issuer": {
     "id": "did:web:agent.example",
     "role": "runtime",
@@ -14,7 +14,7 @@
     "uri": "https://verifier.example/vate/admission-receipts/admrec-20260504-attenuate-001",
     "digest": {
       "alg": "sha-256",
-      "value": "0000000000000000000000000000000000000000000000000000000000000000"
+      "value": "02628c006e04d55f3d7823254f033ddd3e203c3b5f3c0ccd7bbdb3d777bb9de1"
     },
     "decision": "attenuate"
   },
@@ -22,17 +22,15 @@
     "transaction_id": "txn-20260504-001",
     "a2a_context_id": "ctx-abc123",
     "a2a_task_id": "task-abc123",
-    "started_at": "2026-05-04T03:01:02Z",
-    "finished_at": "2026-05-04T03:02:28Z",
+    "started_at": "2026-05-04T03:09:59Z",
+    "finished_at": "2026-05-04T03:10:09Z",
     "effective_request_hash": "sha-256:55a42639dd40cd0908361d420c52c73a5c40849236dbed6a526abbbb643cbd97",
     "runtime": "spiffe://agent.example/workload/purchase-agent"
   },
   "result": {
     "outcome": "failed",
-    "output_hash": "sha-256:f7c41ad90b1e4b1ac031665a2011226d38e9c0cb0937c94faf0a2476f9392692",
+    "output_hash": "sha-256:af5be75ee5f701666cc55c7fe0c635ce2ecea86be0f6c3e2aea5d512288d1000",
     "side_effects": [],
-    "policy_violations": [
-      "admission_digest_mismatch"
-    ]
+    "policy_violations": []
   }
 }

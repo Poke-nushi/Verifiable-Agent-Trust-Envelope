@@ -21,9 +21,9 @@
         "mandate_id": "ap2hnp-20260507-overrun-001"
       }
     },
-    "effective_request_hash": "sha-256:ap2hnp-overrun-effective-request",
+    "effective_request_hash": "sha-256:792e8611f6cb3064f3b9801ec90ba486924b2e9291c010f52650d6ca29ca89ca",
     "mode": "narrow",
-    "original_request_hash": "sha-256:ap2hnp-overrun-original-request",
+    "original_request_hash": "sha-256:e6db1a5fb7bb48b424acda5e9b092d31b94cf8d1bdeccc8fc08e7daaea85c30b",
     "require_new_permit": false
   },
   "decision": {
@@ -66,7 +66,7 @@
     "a2a_task_id": "task-ap2hnp-overrun-20260507-001",
     "action": "commerce.purchase",
     "audience": "https://tickets.example",
-    "input_hash": "sha-256:ap2hnp-overrun-original-input",
+    "input_hash": "sha-256:7df33abc1344838c35cd5e36fe8c36bb2b954e3e307f2f48cd31928174aea848",
     "request_id": "areq-ap2hnp-overrun-20260507-001",
     "target_audience": "https://tickets.example",
     "transaction_id": "txn-ap2hnp-overrun-20260507-001"

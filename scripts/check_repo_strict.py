@@ -177,6 +177,94 @@ def minimal_al2_context_case(al2_context_checks: list[dict]) -> dict:
 def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
     hex_digest = "0" * 64
     empty_summary = {"total": 0, "passed": 0, "failed": 0, "skipped": 0}
+    minimal_admission_request = {
+        "version": "vate-0.2",
+        "profile": "VATE-AL2-Verifier-Admission-v0.2",
+        "request_id": "areq-negative-hash-001",
+        "transaction_id": "txn-negative-hash-001",
+        "issued_at": "2026-07-01T00:00:00Z",
+        "expires_at": "2026-07-01T00:10:00Z",
+        "action": "commerce.purchase",
+        "target": {"resource": "https://merchant.example/checkout", "audience": "https://verifier.example/a2a"},
+        "actor": "did:web:agent.example",
+        "principal": "did:web:user.example",
+        "runtime": "spiffe://agent.example/workload/purchase-agent",
+        "audience": "https://verifier.example/a2a",
+        "input_hash": "sha-256:" + hex_digest,
+        "evidence_refs": [
+            {
+                "type": "payment_authority",
+                "uri": "https://wallet.example/payment-authorities/negative",
+                "media_type": "application/json",
+                "digest": {"alg": "sha-256", "value": hex_digest},
+            }
+        ],
+    }
+    minimal_admission_receipt = {
+        "version": "vate-0.2",
+        "profile": "VATE-AL2-Verifier-Admission-v0.2",
+        "receipt_type": "admission",
+        "receipt_id": "admrec-negative-hash-001",
+        "issued_at": "2026-07-01T00:00:00Z",
+        "expires_at": "2026-07-01T00:10:00Z",
+        "verifier": {"id": "did:web:verifier.example"},
+        "request": {
+            "request_id": "areq-negative-hash-001",
+            "transaction_id": "txn-negative-hash-001",
+            "action": "commerce.purchase",
+            "input_hash": "sha-256:" + hex_digest,
+        },
+        "subject": {
+            "principal": "did:web:user.example",
+            "actor": "did:web:agent.example",
+            "runtime": "spiffe://agent.example/workload/purchase-agent",
+        },
+        "evidence": [
+            {
+                "type": "payment_authority",
+                "uri": "https://wallet.example/payment-authorities/negative",
+                "digest": {"alg": "sha-256", "value": hex_digest},
+                "verification": {
+                    "result": "verified",
+                    "checked_at": "2026-07-01T00:00:01Z",
+                    "method": "negative-test",
+                },
+            }
+        ],
+        "policy": {
+            "policy_id": "merchant-purchase-al2",
+            "policy_version": "2026-07-01.1",
+            "policy_ref": "https://verifier.example/policies/merchant-purchase-al2/2026-07-01.1",
+        },
+        "decision": {"outcome": "allow", "reason_codes": ["EVIDENCE_VERIFIED", "POLICY_MATCH"]},
+    }
+    minimal_post_execution_receipt = {
+        "version": "vate-0.2",
+        "profile": "VATE-AL2-Verifier-Admission-v0.2",
+        "receipt_type": "post_execution",
+        "receipt_id": "postrec-negative-hash-001",
+        "issued_at": "2026-07-01T00:02:00Z",
+        "issuer": {"id": "did:web:agent.example", "role": "runtime"},
+        "admission": {
+            "receipt_id": "admrec-negative-hash-001",
+            "uri": "https://verifier.example/vate/admission-receipts/admrec-negative-hash-001",
+            "digest": {"alg": "sha-256", "value": hex_digest},
+            "decision": "allow",
+        },
+        "execution": {
+            "transaction_id": "txn-negative-hash-001",
+            "started_at": "2026-07-01T00:01:00Z",
+            "finished_at": "2026-07-01T00:02:00Z",
+            "effective_request_hash": "sha-256:" + hex_digest,
+            "runtime": "spiffe://agent.example/workload/purchase-agent",
+        },
+        "result": {
+            "outcome": "success",
+            "output_hash": "sha-256:" + hex_digest,
+            "side_effects": [],
+            "policy_violations": [],
+        },
+    }
     return [
         (
             "A2A metadata unknown core field",
@@ -319,6 +407,69 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
             "schemas/sut-result.schema.json",
         ),
         (
+            "admission request input_hash is not a profile hash",
+            {
+                **minimal_admission_request,
+                "input_hash": "sha-256:not-a-lowercase-hex-digest",
+            },
+            "schemas/admission-request.schema.json",
+        ),
+        (
+            "admission receipt request input_hash is not a profile hash",
+            {
+                **minimal_admission_receipt,
+                "request": {
+                    **minimal_admission_receipt["request"],
+                    "input_hash": "sha-256:not-a-lowercase-hex-digest",
+                },
+            },
+            "schemas/admission-receipt.schema.json",
+        ),
+        (
+            "admission receipt attenuation hashes are not profile hashes",
+            {
+                **minimal_admission_receipt,
+                "decision": {"outcome": "attenuate", "reason_codes": ["LOCAL_POLICY_MAX_AMOUNT_NARROWED"]},
+                "attenuation": {
+                    "mode": "narrow",
+                    "original_request_hash": "sha-256:not-a-lowercase-hex-digest",
+                    "effective_request_hash": "sha-256:" + hex_digest,
+                    "changes": [
+                        {
+                            "op": "replace",
+                            "path": "/constraints/max_amount/value",
+                            "reason_code": "LOCAL_POLICY_MAX_AMOUNT_NARROWED",
+                        }
+                    ],
+                    "effective_constraints": {"max_amount": {"currency": "USD", "value": "25.00"}},
+                    "require_new_permit": False,
+                },
+            },
+            "schemas/admission-receipt.schema.json",
+        ),
+        (
+            "post-execution effective_request_hash is not a profile hash",
+            {
+                **minimal_post_execution_receipt,
+                "execution": {
+                    **minimal_post_execution_receipt["execution"],
+                    "effective_request_hash": "sha-256:not-a-lowercase-hex-digest",
+                },
+            },
+            "schemas/post-execution-receipt.schema.json",
+        ),
+        (
+            "post-execution output_hash is not a profile hash",
+            {
+                **minimal_post_execution_receipt,
+                "result": {
+                    **minimal_post_execution_receipt["result"],
+                    "output_hash": "sha-256:not-a-lowercase-hex-digest",
+                },
+            },
+            "schemas/post-execution-receipt.schema.json",
+        ),
+        (
             "admission request evidence digest is not lowercase sha-256 hex",
             {
                 "version": "vate-0.2",
@@ -333,7 +484,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
                 "principal": "did:web:user.example",
                 "runtime": "spiffe://agent.example/workload/purchase-agent",
                 "audience": "https://verifier.example/a2a",
-                "input_hash": "sha-256:example-input",
+                "input_hash": "sha-256:" + hex_digest,
                 "evidence_refs": [
                     {
                         "type": "payment_authority",
@@ -359,7 +510,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
                     "request_id": "areq-negative-digest-001",
                     "transaction_id": "txn-negative-digest-001",
                     "action": "commerce.purchase",
-                    "input_hash": "sha-256:example-input",
+                    "input_hash": "sha-256:" + hex_digest,
                 },
                 "subject": {
                     "principal": "did:web:user.example",
@@ -411,12 +562,12 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
                     "transaction_id": "txn-negative-digest-001",
                     "started_at": "2026-07-01T00:01:00Z",
                     "finished_at": "2026-07-01T00:02:00Z",
-                    "effective_request_hash": "sha-256:example-input",
+                    "effective_request_hash": "sha-256:" + hex_digest,
                     "runtime": "spiffe://agent.example/workload/purchase-agent",
                 },
                 "result": {
                     "outcome": "success",
-                    "output_hash": "sha-256:example-output",
+                    "output_hash": "sha-256:" + hex_digest,
                     "side_effects": [],
                     "policy_violations": [],
                 },

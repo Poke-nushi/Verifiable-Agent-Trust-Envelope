@@ -12,7 +12,7 @@
     "request_id": "areq-20260701-jose-es384-not-allowed-001",
     "transaction_id": "txn-20260701-jose-es384-not-allowed-001",
     "action": "crm.case.update",
-    "input_hash": "sha-256:jose-es384-not-allowed-input"
+    "input_hash": "sha-256:177664f249873f18ceebb25d375cdb6254b459ec5ec0811f3859949974e7158b"
   },
   "subject": {
     "principal": "did:web:user.example",

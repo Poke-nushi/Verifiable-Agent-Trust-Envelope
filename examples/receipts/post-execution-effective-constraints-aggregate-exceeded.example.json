@@ -2,7 +2,7 @@
   "version": "vate-0.2",
   "profile": "VATE-AL2-Verifier-Admission-v0.2",
   "receipt_type": "post_execution",
-  "receipt_id": "postrec-20260701-effective-constraints-exceeded-001",
+  "receipt_id": "postrec-20260701-effective-constraints-aggregate-exceeded-001",
   "issued_at": "2026-05-04T03:02:31Z",
   "issuer": {
     "id": "did:web:agent.example",
@@ -29,21 +29,29 @@
   },
   "result": {
     "outcome": "failed",
-    "output_hash": "sha-256:c8db6ad13b039aa6610e6000585cb50ab8ed48b28bfc717fb1d209ccf8be3f6a",
+    "output_hash": "sha-256:b6a73e1589417b5c5efb7be310007e8862c629d935876b9d7c88ece375199463",
     "side_effects": [
       {
         "type": "commerce.purchase",
         "merchant": "merchant.example",
         "amount": {
           "currency": "USD",
-          "value": "30.00"
+          "value": "20.00"
         },
-        "payment_reference": "https://payments.example/payment-intents/pi-over-limit",
-        "confirmation_reference": "https://merchant.example/orders/order-over-limit"
+        "payment_reference": "https://payments.example/payment-intents/pi-aggregate-1",
+        "confirmation_reference": "https://merchant.example/orders/order-aggregate-1"
+      },
+      {
+        "type": "commerce.purchase",
+        "merchant": "merchant.example",
+        "amount": {
+          "currency": "USD",
+          "value": "10.00"
+        },
+        "payment_reference": "https://payments.example/payment-intents/pi-aggregate-2",
+        "confirmation_reference": "https://merchant.example/orders/order-aggregate-2"
       }
     ],
-    "policy_violations": [
-      "effective_constraints_exceeded"
-    ]
+    "policy_violations": []
   }
 }

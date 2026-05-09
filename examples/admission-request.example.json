@@ -14,7 +14,7 @@
   "principal": "did:web:user.example",
   "runtime": "spiffe://agent.example/workload/purchase-agent",
   "audience": "https://agent.example/a2a",
-  "input_hash": "sha-256:base64url-original-input-digest",
+  "input_hash": "sha-256:93c1c247147d76292d245e86495488b011a35bb73c402af8b6114600339a9ccd",
   "constraints": {
     "max_amount": {
       "currency": "USD",

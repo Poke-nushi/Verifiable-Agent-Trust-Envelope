@@ -14,7 +14,7 @@
   "principal": "did:web:user.example",
   "runtime": "spiffe://agent.example/workload/shopping-agent",
   "audience": "https://merchant.example/ucp",
-  "input_hash": "sha-256:ap2-ucp-commerce-input",
+  "input_hash": "sha-256:cf81b9a06f3fb5bad2204522a86d4e381e2c8df4ea10557eaf3bea41fd1547b1",
   "constraints": {
     "max_amount": {
       "currency": "JPY",

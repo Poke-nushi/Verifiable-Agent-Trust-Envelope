@@ -12,7 +12,7 @@
     "request_id": "areq-20260701-new-permit-001",
     "transaction_id": "txn-20260701-new-permit-001",
     "action": "commerce.purchase",
-    "input_hash": "sha-256:new-permit-original-input"
+    "input_hash": "sha-256:28a4ffd20ced99d41b57cdf66e1d164eec8a6f65ce1c1a825bde3abc0446adb3"
   },
   "subject": {
     "principal": "did:web:user.example",
@@ -48,8 +48,8 @@
   },
   "attenuation": {
     "mode": "require_new_permit",
-    "original_request_hash": "sha-256:new-permit-original-request",
-    "effective_request_hash": "sha-256:new-permit-effective-request",
+    "original_request_hash": "sha-256:807a13a218a3af52b0f5bed8651e55839bf96d54990a1ddea441ff0becc5faf8",
+    "effective_request_hash": "sha-256:8ef97b616de3516309e6cf8813f64cd885c051ce00d6fd649081591176aa6d17",
     "changes": [
       {
         "op": "replace",

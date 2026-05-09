@@ -21,6 +21,14 @@ export interface ArtifactReference extends DigestBoundReference {
 
 export type AdmissionDecision = "allow" | "attenuate" | "deny";
 
+export type PostExecutionOutcome =
+  | "success"
+  | "partial_success"
+  | "failed"
+  | "cancelled";
+
+export type SutOutcome = AdmissionDecision | PostExecutionOutcome;
+
 export type SutCaseStatus = "completed" | "skipped" | "error";
 
 export type ProofArtifactKind =
@@ -44,7 +52,7 @@ export interface SutResultArtifacts {
 export interface SutResultEntry {
   case_id: string;
   status: SutCaseStatus;
-  outcome: AdmissionDecision;
+  outcome: SutOutcome;
   should_execute: boolean;
   reason_codes: string[];
   artifacts?: SutResultArtifacts;

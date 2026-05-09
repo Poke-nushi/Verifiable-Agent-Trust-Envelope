@@ -9,7 +9,7 @@
     "media_type": "application/vate-admission-receipt+json",
     "digest": {
       "alg": "sha-256",
-      "value": "53faf4e23e664597749556665000ba38fe4dff645e56d032f3e7e04090a9cc48"
+      "value": "02628c006e04d55f3d7823254f033ddd3e203c3b5f3c0ccd7bbdb3d777bb9de1"
     }
   },
   "post_execution_receipt": {
@@ -18,7 +18,7 @@
     "media_type": "application/vate-post-execution-receipt+json",
     "digest": {
       "alg": "sha-256",
-      "value": "f02afca94be7ba856ead2f78c7c44252d9f8cbe93856b6dfce39c36eeb1a2238"
+      "value": "f4047986e0b26a69f466924bf72c8292c4504fd9cae4aa3e4209d0df07f73423"
     }
   },
   "issuer": "did:web:agent.example",

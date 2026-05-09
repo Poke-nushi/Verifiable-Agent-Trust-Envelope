@@ -14,7 +14,7 @@
       "artifact": "base_artifact",
       "expected_digest": {
         "alg": "sha-256",
-        "value": "not-the-canonical-sha256"
+        "value": "0000000000000000000000000000000000000000000000000000000000000000"
       },
       "expect_match": false
     }

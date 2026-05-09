@@ -32,7 +32,7 @@
     }
   ],
   "expires_at": "2026-05-07T10:05:00Z",
-  "input_hash": "sha-256:ap2hnp-stale-input",
+  "input_hash": "sha-256:fb6980fe15093698f942e85fff6c6fad3d5570266f47f10c35869bed7cfe2b78",
   "issued_at": "2026-05-07T10:00:00Z",
   "principal": "did:web:user.example",
   "profile": "VATE-AL2-Verifier-Admission-v0.2",

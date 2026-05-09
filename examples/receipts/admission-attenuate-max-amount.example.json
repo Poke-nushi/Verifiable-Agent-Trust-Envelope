@@ -15,7 +15,7 @@
     "a2a_context_id": "ctx-abc123",
     "a2a_task_id": "task-abc123",
     "action": "commerce.purchase",
-    "input_hash": "sha-256:base64url-original-input-digest"
+    "input_hash": "sha-256:93c1c247147d76292d245e86495488b011a35bb73c402af8b6114600339a9ccd"
   },
   "subject": {
     "principal": "did:web:user.example",
@@ -76,8 +76,8 @@
   },
   "attenuation": {
     "mode": "narrow",
-    "original_request_hash": "sha-256:base64url-original-request-digest",
-    "effective_request_hash": "sha-256:base64url-effective-request-digest",
+    "original_request_hash": "sha-256:26211859a859b2c686daf981196dd2b1545ce7b57b172fc70fdef6967e60c63c",
+    "effective_request_hash": "sha-256:55a42639dd40cd0908361d420c52c73a5c40849236dbed6a526abbbb643cbd97",
     "changes": [
       {
         "op": "replace",

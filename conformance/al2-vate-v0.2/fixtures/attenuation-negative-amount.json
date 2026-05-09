@@ -1,7 +1,7 @@
 {
   "mode": "narrow",
-  "original_request_hash": "sha-256:negative-amount-original-request",
-  "effective_request_hash": "sha-256:negative-amount-effective-request",
+  "original_request_hash": "sha-256:9f1057374d666a1d9a19fc9d7fe5da9927007d6e95b399cd17833e9fe8834ff2",
+  "effective_request_hash": "sha-256:d79a43208c9e69a3f54640d1a96cf5f60c14eba8f6cfe3a3482b8d424c96783b",
   "changes": [
     {
       "op": "replace",

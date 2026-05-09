@@ -12,6 +12,7 @@ The purpose is to show a dependency-free A2A-shaped adapter:
 - the task response carries an admission receipt reference, not the full receipt body
 - the demo also emits a follow-up `post_execution_receipt_issued` metadata example for the admitted request
 - digest mismatch is mapped to a rejected task response with `DIGEST_MISMATCH` and `FAIL_CLOSED`
+- malformed VATE metadata is checked before local fixture dereference and mapped to `SCHEMA_INVALID` with `FAIL_CLOSED`
 
 For the A2A v1.0-shaped extension sketch, see
 `docs/a2a-v1-extension-sketch-2026-05.md`.

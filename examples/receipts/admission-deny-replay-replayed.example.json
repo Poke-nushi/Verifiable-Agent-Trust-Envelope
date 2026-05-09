@@ -12,7 +12,7 @@
     "request_id": "areq-20260701-replay-replayed-001",
     "transaction_id": "txn-20260701-replay-replayed-001",
     "action": "repo.pull_request.merge",
-    "input_hash": "sha-256:replay-replayed-input"
+    "input_hash": "sha-256:5f8515736fbf8b097cad16fc126b387f8b179db38bedc9b244b0e5b153f06b31"
   },
   "subject": {
     "principal": "did:web:user.example",

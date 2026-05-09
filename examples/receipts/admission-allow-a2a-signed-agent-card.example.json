@@ -15,7 +15,7 @@
     "a2a_context_id": "ctx-a2a-agent-card-001",
     "a2a_task_id": "task-a2a-agent-card-001",
     "action": "crm.case.update",
-    "input_hash": "sha-256:a2a-agent-card-admission-input"
+    "input_hash": "sha-256:63df7b474543470da076083a08ea4290d9ce3411ae407669d87e65cbf27bb7e9"
   },
   "subject": {
     "principal": "did:web:user.example",

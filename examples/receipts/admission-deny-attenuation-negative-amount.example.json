@@ -12,7 +12,7 @@
     "request_id": "areq-20260701-attenuation-negative-amount-001",
     "transaction_id": "txn-20260701-attenuation-negative-amount-001",
     "action": "commerce.purchase",
-    "input_hash": "sha-256:attenuation-negative-amount-input"
+    "input_hash": "sha-256:e73e1ded58a8f3a3dbf68ff63265c81f128a064a927e002f040728c947ffe552"
   },
   "subject": {
     "principal": "did:web:user.example",

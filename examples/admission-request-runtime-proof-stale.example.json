@@ -14,7 +14,7 @@
   "principal": "did:web:user.example",
   "runtime": "spiffe://agent.example/workload/case-agent",
   "audience": "https://crm.example",
-  "input_hash": "sha-256:runtime-proof-stale-input",
+  "input_hash": "sha-256:22c95493efbbaaf774844cec8175c4329cb13532d3d6ae99147adc8e299c278c",
   "constraints": {
     "expected_runtime": "spiffe://agent.example/workload/case-agent",
     "policy_would_allow_if_runtime_fresh": true,

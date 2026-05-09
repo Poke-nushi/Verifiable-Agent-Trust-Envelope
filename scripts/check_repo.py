@@ -393,6 +393,20 @@ def check_a2a_adapter_local_uri_boundary() -> None:
         raise RuntimeError(f"A2A adapter local URI resolver accepted unsafe URI {uri!r}")
 
 
+def check_a2a_adapter_malformed_metadata_fail_closed() -> None:
+    adapter = load_a2a_adapter_module()
+    task_message = json.loads((ROOT / "reference" / "a2a-metadata-adapter-demo" / "task-message.example.json").read_text())
+    metadata = task_message["metadata"][adapter.EXTENSION_URI]
+    metadata["admission_request"].pop("digest")
+
+    response = adapter.adapt_task_message(task_message)
+    decision = response.get("vate_decision", {})
+    if decision.get("outcome") != "deny":
+        raise RuntimeError("A2A adapter must deny malformed VATE metadata")
+    if decision.get("reason_codes") != ["SCHEMA_INVALID", "FAIL_CLOSED"]:
+        raise RuntimeError("A2A adapter must fail closed on malformed VATE metadata")
+
+
 def check_evidence_vocabulary_registry() -> None:
     registry = json.loads(EVIDENCE_VOCABULARY.read_text(encoding="utf-8"))
     evidence_types = registry.get("evidence_types")
@@ -809,6 +823,7 @@ def main() -> int:
     check_p1_5_fixture_coverage()
     check_p2_public_artifact_boundary()
     check_a2a_adapter_local_uri_boundary()
+    check_a2a_adapter_malformed_metadata_fail_closed()
     run([sys.executable, "-m", "py_compile", str(DEMO)])
     run([sys.executable, "-m", "py_compile", str(HTTP_DEMO)])
     run([sys.executable, "-m", "py_compile", str(VATE_CONFORMANCE)])

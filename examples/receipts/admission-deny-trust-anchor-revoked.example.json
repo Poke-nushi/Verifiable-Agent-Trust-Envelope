@@ -12,7 +12,7 @@
     "request_id": "areq-20260701-trust-anchor-revoked-001",
     "transaction_id": "txn-20260701-trust-anchor-revoked-001",
     "action": "storage.object.publish",
-    "input_hash": "sha-256:trust-anchor-revoked-input"
+    "input_hash": "sha-256:1c7cbd7dbabc3ee35af47092e88a735d1f35c93cd191b8e741e3b3daed23a502"
   },
   "subject": {
     "principal": "did:web:user.example",

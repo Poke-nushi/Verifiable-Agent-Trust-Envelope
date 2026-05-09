@@ -22,6 +22,11 @@
         }
       },
       "additionalProperties": true
+    },
+    "profileHash": {
+      "type": "string",
+      "description": "Profile-defined SHA-256 hash string for AL2 request and execution binding fields.",
+      "pattern": "^sha-256:[0-9a-f]{64}$"
     }
   },
   "required": [
@@ -144,8 +149,7 @@
           "format": "date-time"
         },
         "effective_request_hash": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/profileHash"
         },
         "runtime": {
           "type": "string",
@@ -173,8 +177,7 @@
           ]
         },
         "output_hash": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/profileHash"
         },
         "side_effects": {
           "type": "array",

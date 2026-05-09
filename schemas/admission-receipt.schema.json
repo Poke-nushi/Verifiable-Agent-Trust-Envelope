@@ -68,6 +68,11 @@
         }
       },
       "additionalProperties": true
+    },
+    "profileHash": {
+      "type": "string",
+      "description": "Profile-defined SHA-256 hash string for AL2 request and execution binding fields.",
+      "pattern": "^sha-256:[0-9a-f]{64}$"
     }
   },
   "required": [
@@ -156,8 +161,12 @@
           "minLength": 1
         },
         "input_hash": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/profileHash"
+        },
+        "constraints": {
+          "type": "object",
+          "description": "For allow decisions, the original request constraints are the effective post-execution constraint basis when present.",
+          "additionalProperties": true
         }
       },
       "additionalProperties": true
@@ -336,6 +345,28 @@
         "effective_constraints",
         "require_new_permit"
       ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "original_request_hash": {
+          "$ref": "#/$defs/profileHash"
+        },
+        "effective_request_hash": {
+          "$ref": "#/$defs/profileHash"
+        },
+        "changes": {
+          "type": "array"
+        },
+        "effective_constraints": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "require_new_permit": {
+          "type": "boolean"
+        }
+      },
       "additionalProperties": true
     },
     "proof": {

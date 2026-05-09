@@ -12,12 +12,15 @@ import argparse
 import copy
 import hashlib
 import json
+import re
 from datetime import datetime, timezone
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 PROFILE = "VATE-AL2-Verifier-Admission-v0.2"
 VERSION = "vate-0.2"
 EXECUTABLE_ADMISSION_DECISIONS = {"allow", "attenuate"}
+PROFILE_HASH_RE = re.compile(r"^sha-256:[0-9a-f]{64}$")
 
 
 def parse_time(value: str) -> datetime:
@@ -44,12 +47,37 @@ def digest_value(value: Any) -> str:
     return canonical_hash(value).removeprefix("sha-256:")
 
 
+def is_profile_hash(value: Any) -> bool:
+    return isinstance(value, str) and PROFILE_HASH_RE.fullmatch(value) is not None
+
+
 def safe_parse_time(value: Any) -> datetime | None:
     if not isinstance(value, str):
         return None
     try:
         return parse_time(value)
     except ValueError:
+        return None
+
+
+def safe_decimal_amount(value: Any) -> Decimal | None:
+    if isinstance(value, bool):
+        return None
+    try:
+        amount = Decimal(str(value))
+    except (InvalidOperation, ValueError):
+        return None
+    if not amount.is_finite() or amount < 0:
+        return None
+    return amount
+
+
+def safe_int(value: Any) -> int | None:
+    if isinstance(value, bool):
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
         return None
 
 
@@ -62,23 +90,25 @@ def side_effects_exceed_constraints(
 
     max_amount = effective_constraints.get("max_amount")
     if isinstance(max_amount, dict):
-        try:
-            max_value = float(max_amount["value"])
-            max_currency = str(max_amount["currency"])
-        except (KeyError, TypeError, ValueError):
+        max_value = safe_decimal_amount(max_amount.get("value"))
+        max_currency = max_amount.get("currency")
+        if max_value is None or not isinstance(max_currency, str):
             return True
+        total_amount = Decimal("0")
         for effect in side_effects:
             if not isinstance(effect, dict):
                 continue
             amount = effect.get("amount")
             if not isinstance(amount, dict):
                 continue
-            try:
-                actual_value = float(amount["value"])
-                actual_currency = str(amount["currency"])
-            except (KeyError, TypeError, ValueError):
+            actual_value = safe_decimal_amount(amount.get("value"))
+            actual_currency = amount.get("currency")
+            if actual_value is None or not isinstance(actual_currency, str):
                 return True
-            if actual_currency != max_currency or actual_value > max_value:
+            if actual_currency != max_currency:
+                return True
+            total_amount += actual_value
+            if total_amount > max_value:
                 return True
 
     tool_allowlist = effective_constraints.get("tool_allowlist")
@@ -92,6 +122,16 @@ def side_effects_exceed_constraints(
                 return True
 
     return False
+
+
+def admitted_effective_constraints(admission_receipt: dict[str, Any]) -> dict[str, Any]:
+    attenuation_constraints = admission_receipt.get("attenuation", {}).get("effective_constraints")
+    if isinstance(attenuation_constraints, dict):
+        return attenuation_constraints
+    request_constraints = admission_receipt.get("request", {}).get("constraints")
+    if isinstance(request_constraints, dict):
+        return request_constraints
+    return {}
 
 
 def get_amount(request: dict[str, Any]) -> tuple[str, float] | None:
@@ -209,7 +249,12 @@ class VateVerifier:
         if execution.get("runtime") != admission_receipt.get("subject", {}).get("runtime"):
             failures.append("POST_EXEC_RUNTIME_MISMATCH")
 
-        if execution.get("effective_request_hash") != expected_hash:
+        execution_hash = execution.get("effective_request_hash")
+        if (
+            not is_profile_hash(expected_hash)
+            or not is_profile_hash(execution_hash)
+            or execution_hash != expected_hash
+        ):
             failures.append("POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH")
 
         issued_at = safe_parse_time(admission_receipt.get("issued_at"))
@@ -228,7 +273,7 @@ class VateVerifier:
         ):
             failures.append("POST_EXEC_ADMISSION_EXPIRED")
 
-        effective_constraints = admission_receipt.get("attenuation", {}).get("effective_constraints", {})
+        effective_constraints = admitted_effective_constraints(admission_receipt)
         policy_violations = result.get("policy_violations")
         if policy_violations or side_effects_exceed_constraints(result.get("side_effects"), effective_constraints):
             failures.append("POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED")
@@ -255,6 +300,8 @@ class VateVerifier:
         }
 
     def validate_digest(self, artifact: dict[str, Any], digest: dict[str, str]) -> bool:
+        if not isinstance(digest, dict):
+            return False
         if digest.get("alg") != "sha-256":
             return False
         return hashlib.sha256(canonical_bytes(artifact)).hexdigest() == digest.get("value")
@@ -300,12 +347,16 @@ class VateVerifier:
             return ["SCHEMA_INVALID"]
         if request["version"] != VERSION or request["profile"] != PROFILE:
             return ["SCHEMA_INVALID"]
+        if not is_profile_hash(request.get("input_hash")):
+            return ["SCHEMA_INVALID"]
         if request["request_id"] in self._seen_request_ids:
             return ["REPLAY_DETECTED"]
         self._seen_request_ids.add(request["request_id"])
 
-        issued_at = parse_time(request["issued_at"])
-        expires_at = parse_time(request["expires_at"])
+        issued_at = safe_parse_time(request.get("issued_at"))
+        expires_at = safe_parse_time(request.get("expires_at"))
+        if issued_at is None or expires_at is None:
+            return ["SCHEMA_INVALID"]
         if issued_at > now:
             return ["PERMIT_NOT_YET_VALID"]
         if expires_at < now:
@@ -324,9 +375,14 @@ class VateVerifier:
             if state in {"revoked", "suspended", "quarantined"}:
                 return ["STATUS_REVOKED"]
             checked_at = status.get("checked_at")
-            freshness_seconds = int(status.get("freshness_seconds", 0))
+            freshness_seconds = safe_int(status.get("freshness_seconds", 0))
+            if freshness_seconds is None or freshness_seconds < 0:
+                return ["SCHEMA_INVALID"]
             if checked_at and freshness_seconds:
-                age = (now - parse_time(checked_at)).total_seconds()
+                checked_at_time = safe_parse_time(checked_at)
+                if checked_at_time is None:
+                    return ["SCHEMA_INVALID"]
+                age = (now - checked_at_time).total_seconds()
                 if age > freshness_seconds:
                     return ["STATUS_STALE"]
 
@@ -422,6 +478,8 @@ class VateVerifier:
                 "reason_codes": reason_codes,
             },
         }
+        if isinstance(request.get("constraints"), dict):
+            receipt["request"]["constraints"] = copy.deepcopy(request["constraints"])
         if attenuation is not None:
             receipt["attenuation"] = attenuation
         return receipt
@@ -444,7 +502,7 @@ def sample_request() -> dict[str, Any]:
         "principal": "did:web:user.example",
         "runtime": "spiffe://agent.example/workload/purchase-agent",
         "audience": "https://verifier.example/a2a",
-        "input_hash": "sha-256:self-test-input",
+        "input_hash": "sha-256:a0b7d342a0c1eec92f653fb11227398206a66d8fb66f1eefc6ec7812f2741d3c",
         "constraints": {
             "max_amount": {
                 "currency": "USD",
@@ -480,6 +538,12 @@ def run_self_test() -> None:
             },
         },
     )
+
+    def assert_schema_invalid_denial(request: dict[str, Any]) -> None:
+        result = verifier.admit(request, now=now)
+        assert result["decision"] == "deny"
+        assert result["reason_codes"] == ["SCHEMA_INVALID", "FAIL_CLOSED"]
+
     attenuated = verifier.admit(sample_request(), now=now)
     assert attenuated["decision"] == "attenuate"
     assert attenuated["admission_receipt"]["attenuation"]["effective_request_hash"]
@@ -488,6 +552,41 @@ def run_self_test() -> None:
     allowed_request["request_id"] = "areq-core-self-test-allow-001"
     allowed = verifier.admit(allowed_request, now=now)
     assert allowed["decision"] == "allow"
+    allowed_receipt = allowed["admission_receipt"]
+    assert allowed_receipt["request"]["constraints"]["max_amount"]["value"] == "10.00"
+
+    invalid_hash_request = sample_request()
+    invalid_hash_request["request_id"] = "areq-core-self-test-invalid-hash-001"
+    invalid_hash_request["input_hash"] = "sha-256:not-a-lowercase-hex-digest"
+    assert_schema_invalid_denial(invalid_hash_request)
+
+    malformed_issued_at_request = sample_request()
+    malformed_issued_at_request["request_id"] = "areq-core-self-test-malformed-issued-at-001"
+    malformed_issued_at_request["issued_at"] = "not-a-timestamp"
+    assert_schema_invalid_denial(malformed_issued_at_request)
+
+    malformed_expires_at_request = sample_request()
+    malformed_expires_at_request["request_id"] = "areq-core-self-test-malformed-expires-at-001"
+    malformed_expires_at_request["expires_at"] = "not-a-timestamp"
+    assert_schema_invalid_denial(malformed_expires_at_request)
+
+    malformed_status_checked_at_request = sample_request()
+    malformed_status_checked_at_request["request_id"] = "areq-core-self-test-malformed-status-checked-at-001"
+    malformed_status_checked_at_request["constraints"]["status"] = {
+        "state": "valid",
+        "checked_at": "not-a-timestamp",
+        "freshness_seconds": 300,
+    }
+    assert_schema_invalid_denial(malformed_status_checked_at_request)
+
+    malformed_status_freshness_request = sample_request()
+    malformed_status_freshness_request["request_id"] = "areq-core-self-test-malformed-status-freshness-001"
+    malformed_status_freshness_request["constraints"]["status"] = {
+        "state": "valid",
+        "checked_at": "2026-07-01T00:00:00Z",
+        "freshness_seconds": "not-an-int",
+    }
+    assert_schema_invalid_denial(malformed_status_freshness_request)
 
     denied_request = sample_request()
     denied_request["request_id"] = "areq-core-self-test-deny-001"
@@ -529,6 +628,23 @@ def run_self_test() -> None:
     linkage = verifier.validate_post_execution_linkage(admission_receipt, post_execution)
     assert linkage["outcome"] == "success"
 
+    allow_post_execution = copy.deepcopy(post_execution)
+    allow_post_execution["admission"] = {
+        "receipt_id": allowed_receipt["receipt_id"],
+        "digest": {
+            "alg": "sha-256",
+            "value": digest_value(allowed_receipt),
+        },
+        "decision": allowed_receipt["decision"]["outcome"],
+    }
+    allow_post_execution["execution"]["transaction_id"] = allowed_receipt["request"]["transaction_id"]
+    allow_post_execution["execution"]["effective_request_hash"] = allowed_receipt["request"]["input_hash"]
+    allow_post_execution["execution"]["runtime"] = allowed_receipt["subject"]["runtime"]
+    allow_post_execution["result"]["side_effects"][0]["amount"]["value"] = "12.00"
+    linkage = verifier.validate_post_execution_linkage(allowed_receipt, allow_post_execution)
+    assert linkage["outcome"] == "failed"
+    assert "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED" in linkage["reason_codes"]
+
     bad_transaction = copy.deepcopy(post_execution)
     bad_transaction["execution"]["transaction_id"] = "txn-core-self-test-spoofed"
     linkage = verifier.validate_post_execution_linkage(admission_receipt, bad_transaction)
@@ -557,6 +673,27 @@ def run_self_test() -> None:
     exceeded_constraints = copy.deepcopy(post_execution)
     exceeded_constraints["result"]["side_effects"][0]["amount"]["value"] = "30.00"
     linkage = verifier.validate_post_execution_linkage(admission_receipt, exceeded_constraints)
+    assert linkage["outcome"] == "failed"
+    assert "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED" in linkage["reason_codes"]
+
+    aggregate_exceeded_constraints = copy.deepcopy(post_execution)
+    aggregate_exceeded_constraints["result"]["side_effects"] = [
+        {
+            "type": "payment_authorization",
+            "amount": {
+                "currency": "USD",
+                "value": "20.00",
+            },
+        },
+        {
+            "type": "payment_authorization",
+            "amount": {
+                "currency": "USD",
+                "value": "10.00",
+            },
+        },
+    ]
+    linkage = verifier.validate_post_execution_linkage(admission_receipt, aggregate_exceeded_constraints)
     assert linkage["outcome"] == "failed"
     assert "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED" in linkage["reason_codes"]
 

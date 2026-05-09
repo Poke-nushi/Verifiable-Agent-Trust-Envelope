@@ -12,7 +12,7 @@
     "request_id": "areq-20260701-status-stale-boundary-001",
     "transaction_id": "txn-20260701-status-stale-boundary-001",
     "action": "crm.case.update",
-    "input_hash": "sha-256:status-stale-boundary-input"
+    "input_hash": "sha-256:24b99ffffe936bc35219e0d2bf6027eb39832850878fa74d2545dcf1bc7e1ccc"
   },
   "subject": {
     "principal": "did:web:user.example",

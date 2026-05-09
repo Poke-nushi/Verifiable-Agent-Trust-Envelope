@@ -1,0 +1,45 @@
+{
+  "version": "vate-conformance-0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "case_id": "post-execution-effective-constraints-aggregate-exceeded",
+  "title": "Reject execution whose aggregate side-effect amount exceeds constraints",
+  "category": "linkage",
+  "purpose": "A verifier or auditor should reject post-execution evidence when individual side effects are below the admitted max_amount but their aggregate amount exceeds it.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+    "post_execution_receipt": "examples/receipts/post-execution-effective-constraints-aggregate-exceeded.example.json"
+  },
+  "expected": {
+    "post_execution_outcome": "failed",
+    "should_execute": true,
+    "reason_codes": [
+      "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
+    ],
+    "checks": [
+      {
+        "name": "post_execution.result.side_effects[0].amount.value",
+        "expected": "present"
+      },
+      {
+        "name": "post_execution.result.side_effects[1].amount.value",
+        "expected": "present"
+      },
+      {
+        "name": "post_execution.result.policy_violations",
+        "expected": "pass"
+      }
+    ]
+  },
+  "validation_focus": [
+    "post-execution linkage",
+    "effective constraints",
+    "aggregate side-effect boundary"
+  ],
+  "linkage_checks": [
+    {
+      "kind": "effective_constraints",
+      "expect_valid": false,
+      "reason_code": "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
+    }
+  ]
+}

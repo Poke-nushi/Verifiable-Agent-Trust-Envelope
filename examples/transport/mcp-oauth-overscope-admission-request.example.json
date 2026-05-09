@@ -14,7 +14,7 @@
   "principal": "did:web:user.example",
   "runtime": "spiffe://agent.example/workload/case-agent",
   "audience": "https://mcp.crm.example",
-  "input_hash": "sha-256:base64url-mcp-overscope-tool-call-input-digest",
+  "input_hash": "sha-256:789055272989ea3df5b7ed88927709ac3683c0e2a16aaf4ceb9a4c533fee1193",
   "constraints": {
     "transport": {
       "protocol": "mcp",

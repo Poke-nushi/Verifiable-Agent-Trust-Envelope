@@ -24,19 +24,21 @@
     "role": "runtime"
   },
   "profile": "VATE-AL2-Verifier-Admission-v0.2",
-  "receipt_id": "postrec-ap2hnp-valid-20260507-001",
+  "receipt_id": "postrec-ap2hnp-overrun-20260507-001",
   "receipt_type": "post_execution",
   "result": {
-    "outcome": "success",
-    "output_hash": "sha-256:3f52723c2ccd45ab28f3e03441f4eb6678e169039fd64c131976a47ae3236d44",
-    "policy_violations": [],
+    "outcome": "failed",
+    "output_hash": "sha-256:4496d222736eeeb0725880025c605d238a649feddbf1535c865eb0e78200cc80",
+    "policy_violations": [
+      "effective_constraints_exceeded"
+    ],
     "side_effects": [
       {
         "amount": {
           "currency": "USD",
-          "value": "45.00"
+          "value": "46.00"
         },
-        "confirmation_reference": "https://tickets.example/orders/order-ap2hnp-20260507-001",
+        "confirmation_reference": "https://tickets.example/orders/order-ap2hnp-20260507-overrun",
         "merchant": "tickets.example",
         "payment_authority_ref": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-valid.example.json",
         "type": "commerce.purchase"

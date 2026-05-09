@@ -12,7 +12,7 @@
     "request_id": "areq-20260701-attenuation-max-amount-type-001",
     "transaction_id": "txn-20260701-attenuation-max-amount-type-001",
     "action": "commerce.purchase",
-    "input_hash": "sha-256:attenuation-max-amount-type-input"
+    "input_hash": "sha-256:cf912f1ee1caf3be59517b9d863bb5c57e4e58c6440e1395760c566ea6d28fe8"
   },
   "subject": {
     "principal": "did:web:user.example",

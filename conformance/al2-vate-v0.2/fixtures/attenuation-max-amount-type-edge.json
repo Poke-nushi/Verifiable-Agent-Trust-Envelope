@@ -1,7 +1,7 @@
 {
   "mode": "narrow",
-  "original_request_hash": "sha-256:max-amount-type-original-request",
-  "effective_request_hash": "sha-256:max-amount-type-effective-request",
+  "original_request_hash": "sha-256:bedf81c4cd9a496193068252764e2daee7a2dd91a31c4b004a6d6448ec688393",
+  "effective_request_hash": "sha-256:ce4f09d95905d9ba7ac764d21a7d3e148b55bcee00ef77f2a4e3c1afad4b9d50",
   "changes": [
     {
       "op": "replace",

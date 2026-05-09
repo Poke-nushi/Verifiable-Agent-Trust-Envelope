@@ -1181,6 +1181,28 @@
     {
       "artifacts": {
         "admission_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-valid.example.json",
+        "post_execution_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-post-execution-receipt-ap2-hnp-overrun.example.json"
+      },
+      "case_id": "post-execution-allow-effective-constraints-exceeded",
+      "category": "linkage",
+      "expected_outcome": "failed",
+      "expected_primary_reason_code": "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED",
+      "expected_reason_codes": [
+        "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
+      ],
+      "expected_should_execute": true,
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-allow-effective-constraints-exceeded.json",
+      "title": "Reject allow-path execution outside admitted constraints",
+      "validation_focus": [
+        "post-execution linkage",
+        "allow decision",
+        "effective constraints",
+        "side-effect boundary"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-valid.example.json",
         "ap2_mandate": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-valid.example.json",
         "post_execution_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-post-execution-receipt-ap2-hnp-valid.example.json"
       },
@@ -1205,6 +1227,27 @@
     {
       "artifacts": {
         "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+        "post_execution_receipt": "examples/receipts/post-execution-effective-constraints-aggregate-exceeded.example.json"
+      },
+      "case_id": "post-execution-effective-constraints-aggregate-exceeded",
+      "category": "linkage",
+      "expected_outcome": "failed",
+      "expected_primary_reason_code": "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED",
+      "expected_reason_codes": [
+        "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
+      ],
+      "expected_should_execute": true,
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-effective-constraints-aggregate-exceeded.json",
+      "title": "Reject execution whose aggregate side-effect amount exceeds constraints",
+      "validation_focus": [
+        "post-execution linkage",
+        "effective constraints",
+        "aggregate side-effect boundary"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
         "post_execution_receipt": "examples/receipts/post-execution-effective-constraints-exceeded.example.json"
       },
       "case_id": "post-execution-effective-constraints-exceeded",
@@ -1221,6 +1264,27 @@
         "post-execution linkage",
         "effective constraints",
         "side-effect boundary"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+        "post_execution_receipt": "examples/receipts/post-execution-finish-after-admission-expiry.example.json"
+      },
+      "case_id": "post-execution-finish-after-admission-expiry",
+      "category": "linkage",
+      "expected_outcome": "failed",
+      "expected_primary_reason_code": "POST_EXEC_ADMISSION_EXPIRED",
+      "expected_reason_codes": [
+        "POST_EXEC_ADMISSION_EXPIRED"
+      ],
+      "expected_should_execute": true,
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-finish-after-admission-expiry.json",
+      "title": "Reject execution that finishes after admission expiry",
+      "validation_focus": [
+        "post-execution linkage",
+        "admission expiry",
+        "finish-after-expiry boundary"
       ]
     },
     {
@@ -1312,7 +1376,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "70734f78c7cd0692ca73908d3163b3dbdda105cb65a65a01a97a9f1d196a79dd"
+    "value": "9c1d3a677d709057f68f7649b62775368448638aaf6a837c4ec2c050f669d0f6"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -1417,11 +1481,11 @@
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-digest-mismatch-before-policy.json",
-      "sha256": "86c2dfc400a260cdda2b90374f2a8fa6b8da73d73e8262d15610b44c77749d8b"
+      "sha256": "1f124d09e3a060778a3a599d14eaee82f4c23146b1e1c6bb42c96d21820b30d9"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-digest-mismatch.json",
-      "sha256": "fcc708376f902521ac44722623c07088aeee8850896c15ac63cd6b36b3d5656e"
+      "sha256": "a9a6c11fff1a1c2c643b81f1e1ad56ad9357d309b9151f742f339bfcbecb750c"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-evidence-type-not-allowed.json",
@@ -1540,12 +1604,24 @@
       "sha256": "ffe65cc65bb865ec5784406e84fe6d54084040a49d84bcd4434e255e323be803"
     },
     {
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-allow-effective-constraints-exceeded.json",
+      "sha256": "686d6065e208cb39256d4f6c2ad0be8fde509f88ac0da5a98f4af0ab5fa6c44e"
+    },
+    {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-ap2-hnp-linkage-success.json",
       "sha256": "4d619122365abbc2a005d79ac342d2347a363c73ebd17bbc14833f521e88af7e"
     },
     {
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-effective-constraints-aggregate-exceeded.json",
+      "sha256": "af833a07595e41104e6caba24ae4c486394416752cea107f0066ae1b3e972539"
+    },
+    {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-effective-constraints-exceeded.json",
       "sha256": "0e0aedfdc5ea3956d15d8ae1a2e3f6488fc320d8f4d7ea23248487ef78d1dd34"
+    },
+    {
+      "path": "conformance/al2-vate-v0.2/cases/post-execution-finish-after-admission-expiry.json",
+      "sha256": "41ee7ff35454aa26697767a92597206b8b1c812d280a8d56a23ad6de51b0fe23"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/post-execution-linkage-mismatch.json",
@@ -1569,15 +1645,15 @@
     },
     {
       "path": "conformance/al2-vate-v0.2/fixtures/attenuation-max-amount-type-edge.json",
-      "sha256": "7d5a26be5435a16c4c1c510f5342b51258065558ad611965eda752577fe92530"
+      "sha256": "3481bf845de28733de6d975782f933dc7c43fbdf0603c0eaa0b91883bf816052"
     },
     {
       "path": "conformance/al2-vate-v0.2/fixtures/attenuation-negative-amount.json",
-      "sha256": "b51e69fd092711fc2403fa66fede72abd208fa52e1e2405ce854a0ad274e0f49"
+      "sha256": "8b6b2373653283213d9933a3d88b5368e14988bedf8c0298d1e141fbdc67d020"
     },
     {
       "path": "conformance/al2-vate-v0.2/fixtures/attenuation-unsafe-path.json",
-      "sha256": "68a4f36d35da78742c0105d1623a94222ddbf98401842a0e663d14d88eeb4703"
+      "sha256": "d7d8f74ea8b377692c73ca96140bd1261e247969df70b8e8735763b9fd1cd073"
     },
     {
       "path": "conformance/al2-vate-v0.2/fixtures/replay-consumed-context.json",
@@ -1629,15 +1705,15 @@
     },
     {
       "path": "examples/a2a/metadata-post-execution-issued.json",
-      "sha256": "92ddc3194058293d6f211960a283a0c5e2ea99e8b0641a4727d14d639223f134"
+      "sha256": "2bcff6241dc29b87c39cb81b45a7f7d5117bade72c9dbda0f35bd9cdf35f7016"
     },
     {
       "path": "examples/admission-request-runtime-proof-stale.example.json",
-      "sha256": "d671f1acf701356d1dd0389338f017aada21bb08cf357edd849b8e7939694eda"
+      "sha256": "64900e09efc2e2d5ce5578d17cc8dfc513c06f045aab0bd9b7df5487e55880e9"
     },
     {
       "path": "examples/admission-request.example.json",
-      "sha256": "3c77625f75f959c7e5b11a1b3eb28ff5122b571514c4ebf64a3c6b7fe25f22cf"
+      "sha256": "3e21dbfb8fe6397eeea20ce3f0fd934cf71e1c1752a8c2a8e28f78c80a55ad96"
     },
     {
       "path": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-overrun.example.json",
@@ -1657,55 +1733,59 @@
     },
     {
       "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-overrun.example.json",
-      "sha256": "4c3ba446cf08fea31e3d7f6ee007b63d5989899d0891ff468e59a2a70ddc7be6"
+      "sha256": "381a139320f2597ec7106f374e35dba5a4eff781616b820542c74c54d41681fb"
     },
     {
       "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-replay.example.json",
-      "sha256": "eb201131518a1389bef9b79bcb50f7e68db547872f307e18dc2ffc8cae04787f"
+      "sha256": "864081937316ee3b66d23591b5eaec7fd4ae2769aba5e95e6a2b1414d910351b"
     },
     {
       "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-stale.example.json",
-      "sha256": "2825cf59ce31dba6115287c7033f6d488a1b7e17f517971d68fc9dd0b8b5f995"
+      "sha256": "d318ee7738d0b91a35a8c3423ad93ebbd14764c1845a7b21c9305ae57f523b9f"
     },
     {
       "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-valid.example.json",
-      "sha256": "cb4203fbc2c9c8c818d6c58f5919bc30562bf9e9880d6d6aa949fa25493cd260"
+      "sha256": "49d38257fba06e39626a4166938d39e2b18cdf40bb96813e21921ea6620850ea"
     },
     {
       "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-overrun.example.json",
-      "sha256": "0f1c70ad54608ab17cfd7bc3dd61b216bfb45e1503567174dea147cec105fa10"
+      "sha256": "50082a6a547788d0b8e5ec6c583600c4ffbfd97045625c0c6256512ec7070974"
     },
     {
       "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-replay.example.json",
-      "sha256": "892e7e1b41e16ae1fe405e9e346d4ba1e211f47ef40475143a9c7f5cfd18e4ec"
+      "sha256": "7ec85c6a9976aeb008aefa1f2d8dcd9ad311c701ecb4c1af916d5fa1ee60010b"
     },
     {
       "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-stale.example.json",
-      "sha256": "f8d82fe92977533468349b2e3aa7d8841f73c3b7b48bca2399b5f426f10a35d8"
+      "sha256": "100479b59f7108b5098e4ca0a128f570849d3290369b19f12950eed41bc4a434"
     },
     {
       "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-valid.example.json",
-      "sha256": "a873c6302d31383ba9300e316790009b99e613b4ec4e13c01c744e3d26723651"
+      "sha256": "7282d377a892917763fad4cd16d91fcf0ecc2e4cc9feb123b30cbc70eea9be9b"
+    },
+    {
+      "path": "examples/interop/ap2-human-not-present-to-vate/vate-post-execution-receipt-ap2-hnp-overrun.example.json",
+      "sha256": "5fdf1f46fc345b95e3343db090cc235bf26d5611a169959b53f7f85ef74d9331"
     },
     {
       "path": "examples/interop/ap2-human-not-present-to-vate/vate-post-execution-receipt-ap2-hnp-valid.example.json",
-      "sha256": "c47075bd0abe35c16d43285c4d15360a3cff653f27c1242109e732f911231258"
+      "sha256": "5c67149b9f61eedfde474b08de2e69b312c5797287d8e9084aec722460ecdcd1"
     },
     {
       "path": "examples/interop/ap2-ucp-to-vate/vate-admission-receipt-from-ap2-ucp.example.json",
-      "sha256": "a01bff29bcd3f731d7a44bd423783c9f51ad427a9eefe9d00475328bdbb0fe04"
+      "sha256": "1b468a5d4b0dafc86d14ff3ae304f54db1852b1f1cb36f1c0f3ca324d0c7c38e"
     },
     {
       "path": "examples/interop/ap2-ucp-to-vate/vate-admission-request-from-ap2-ucp.example.json",
-      "sha256": "b212d7ce4e0a6b10ae309b7c644fc30d6394afbe3e69524f3807655c40a5314b"
+      "sha256": "de43ccc1a9750125a3334209a9c4989988760a7a726acb8eafce1402291dcf8d"
     },
     {
       "path": "examples/interop/oap-to-vate/vate-admission-receipt-from-oap.example.json",
-      "sha256": "ef46ad843fc3248479a5f0e140028fe03e71add920dbf70a250d53b7ae98af5f"
+      "sha256": "733870b8e76aa382ca6a3a88475d5b266f2c7d5b931b8458abf0c34fd0f847ab"
     },
     {
       "path": "examples/interop/oap-to-vate/vate-admission-request-from-oap.example.json",
-      "sha256": "db6c87672d82843e5803931b598ac0b4dda6cd04ed9941605bb9a5a78b436c85"
+      "sha256": "3bff185fa058d6fd146f64a459e6890be962d6380d7277c59496478f174654c0"
     },
     {
       "path": "examples/jose/detached-runtime-attestation-payload.json",
@@ -1749,215 +1829,223 @@
     },
     {
       "path": "examples/receipts/admission-allow-a2a-signed-agent-card.example.json",
-      "sha256": "8a5db05615c7843cd4372aed553fd508959572facb57dd0c05b67a39ef514f9e"
+      "sha256": "6ba1ec86089cc39a985e1aee6b281cbfd9d835900200a50f6df16ff765dd500f"
     },
     {
       "path": "examples/receipts/admission-allow-mcp-oauth-bound.example.json",
-      "sha256": "8b23bb16180d05c127d951baafbaf96fb95e5b92991b7ed430b4a199017a057b"
+      "sha256": "25a6c37b57af1446a8882e94e0145d1c92eadf39c3f6dd4950e15a9c245c14e0"
     },
     {
       "path": "examples/receipts/admission-allow-policy-snapshot.example.json",
-      "sha256": "cb717bb45b81cca9ba107d418b35a72195871dd4fe5f399a87fae0255d0e6411"
+      "sha256": "e09757d72a10d07bd90c7bd9d53e266c908490f8225e8716067ee64f9f6d486a"
     },
     {
       "path": "examples/receipts/admission-allow-replay-unused.example.json",
-      "sha256": "424f7eba5b8e20842a7ab77527ea183bf543217b2b542cb5326183f92d938021"
+      "sha256": "3657601eb339472702ea98551edb31fb1ff3b98313c1ccce5df26232b700cbec"
     },
     {
       "path": "examples/receipts/admission-allow-status-boundary.example.json",
-      "sha256": "81f7b9f63b9e0ec0ee0e59dbb59c472f49dbbd657045db37e0c1dbcd3933bc81"
+      "sha256": "0c8bafffe615c4996fe0d27a8c349321389aa06abf3653019f76caddbca8a9cb"
     },
     {
       "path": "examples/receipts/admission-allow-status-fresh.example.json",
-      "sha256": "ec5e524b497dea9bc237b71b1990919de4879b65312a71fabf9202de0fcf0ba2"
+      "sha256": "e08a0988ecf896850dc8d95f14ce0aab684a41259b59990a88622e910018312b"
     },
     {
       "path": "examples/receipts/admission-allow.example.json",
-      "sha256": "e011aacc3b8610fbe994221ef1753359c0b6010ac98ca4e507bf0de770427c8c"
+      "sha256": "8365f95a34e9833d0eae8ee7999a4e2c62fbf7bcd40a31d06c9a90ae877e2b76"
     },
     {
       "path": "examples/receipts/admission-attenuate-max-amount.example.json",
-      "sha256": "7ba4e2032e41e67eb48368ca4ce0e30d606141c175e2234f120bad3ec02e249a"
+      "sha256": "72f81d235678ef06300e2131e6d0f6e1f58ece6eac699a9459493847ddb1494a"
     },
     {
       "path": "examples/receipts/admission-attenuate-requires-new-permit.example.json",
-      "sha256": "d1de34ac78d002c080a054425f3aecaad84e37a7d8a8650e6741696c5cbf8af0"
+      "sha256": "c3932fd9fafad91535c56667df09a3bc7bdf1908dea39069a1f3056bf5b8880f"
     },
     {
       "path": "examples/receipts/admission-attenuate-target-scope.example.json",
-      "sha256": "1c7e5882ac131b282e6473e53907279e6b3cfb0e6148096163ec466e110b44b0"
+      "sha256": "a402a3c3a76f5676f0852bd0a28cec1e893fb0268d9d7a008f28910bde61223c"
     },
     {
       "path": "examples/receipts/admission-deny-alg-not-allowed.example.json",
-      "sha256": "ebf6c05c14b8a06e22190297a1679eabe2592b114fa44fe75564e73f480c95c7"
+      "sha256": "5cafee432b44ca42e447958434042b9dc0deac861ed190ebe037359e1e216bd7"
     },
     {
       "path": "examples/receipts/admission-deny-ambiguous-trust-anchor.example.json",
-      "sha256": "843b05e8973bbb1ace071646a5bf40fa776370611ba6bc5cbc8e893d2dbfbf15"
+      "sha256": "9e238d2ac4521a062c017ea96e9e4c475db62fe92390c6047338b177a41fb316"
     },
     {
       "path": "examples/receipts/admission-deny-attenuation-max-amount-type-edge.example.json",
-      "sha256": "9190aa49f672ea8b901db7019cb0e5b3ef0469380e3353c9df7a69d6e10299e9"
+      "sha256": "7083d56487e19df8855e0a91f5f1a3087eb7e8cfcc5dfb291e4a8036618192c3"
     },
     {
       "path": "examples/receipts/admission-deny-attenuation-negative-amount.example.json",
-      "sha256": "4922c941595c7a39013d8770ed052fad37d806673b2b2a6d2437e92ce719e30d"
+      "sha256": "dd898063485012e5ef858706640c66019b5ec79e32219c944db3aefdda9968c1"
     },
     {
       "path": "examples/receipts/admission-deny-attenuation-unsafe-path.example.json",
-      "sha256": "c9ab2655d4946992591b9ce1e37dabb1f0c0a89687a205eba5280973e48eca52"
+      "sha256": "0060e70c4ad972c9071aa8326e0aa7c10c128c51cf2fa8bbe730c38880acffe9"
     },
     {
       "path": "examples/receipts/admission-deny-audience-mismatch.example.json",
-      "sha256": "fea229f083c14934dbd0572805a9b835d3d2c4f0f9f19bfde9dedf50a490d984"
+      "sha256": "9cd20fee193c9286d993d2fba3a7ccdce496b0c9e5f28b26c870c467a4eb9d58"
     },
     {
       "path": "examples/receipts/admission-deny-digest-mismatch-before-policy.example.json",
-      "sha256": "a1f900806d8b5f3d13cbedde1aa3b07d709492a6882dda7ec71879bd1a1124bf"
+      "sha256": "6b7c32f2531f5042fbe96ed6ab04ad90256b9261bbd611929d95a6a7f2b7f219"
     },
     {
       "path": "examples/receipts/admission-deny-digest-mismatch.example.json",
-      "sha256": "72cac6b49d19bf99c42fdec816d16714dda940533aff4d7e8a75087f8943b30d"
+      "sha256": "8fbe413b1ebb53f106cade7fb831831a84eb44b830a2c9266a4edbb339c1833d"
     },
     {
       "path": "examples/receipts/admission-deny-evidence-type-not-allowed.example.json",
-      "sha256": "1dfa351b0173c1a71afd77f5f971dab673998a7561768385636cf719e104021e"
+      "sha256": "fe46396fdcaac2fd4f94ec6dbce27ab1d430dddeddabe8631573d9f0ba3fdf2e"
     },
     {
       "path": "examples/receipts/admission-deny-expired-permit.example.json",
-      "sha256": "f3f30344441c14a54826921fadc1bcabe17bc559c9c535e1c74434dec52618cc"
+      "sha256": "1dca489179c4a2c5646c6358b66830683cc8d59490f96513334c871b60f7e7e7"
     },
     {
       "path": "examples/receipts/admission-deny-jose-alg-none.example.json",
-      "sha256": "c58d2104c147f6a8bb66684f4902da2f16225b1ebf4362990dded8679d8d754e"
+      "sha256": "7c807d8faae79542657c012829ddcf8f878e99d200919a6a7b59907668589867"
     },
     {
       "path": "examples/receipts/admission-deny-jose-crit-unsupported.example.json",
-      "sha256": "3bb10f16740691be3cace8fab97678cfcba4b18a7aad9e0a3761c85f64e4a2ea"
+      "sha256": "bac419134331f46991f1ee1f3e482a92ce2778d5dc5bf1942a4e74406a283ebf"
     },
     {
       "path": "examples/receipts/admission-deny-jose-es384-not-allowed.example.json",
-      "sha256": "e0cd5c8244205cfb87d65c42c8de4a8f68f49c2b33cfab0ced29baed563c5b5e"
+      "sha256": "2a264612c09f6da02377d78d00ade5776265ec16c25271959ec407ed6b3ff118"
     },
     {
       "path": "examples/receipts/admission-deny-jose-hs256-downgrade.example.json",
-      "sha256": "ec8fb07069829ef3cbdcabe2af65df180aa506ee2aae491f0c2259cfc5f55ada"
+      "sha256": "8a9e85dcdc3077cb7221082238696a63f6cf37715efa63c40f86253d7039d3a3"
     },
     {
       "path": "examples/receipts/admission-deny-jose-payload-digest-mismatch.example.json",
-      "sha256": "a27dde35cc8ed7bfe7c3ad675dbeb19d5f90e44e3846262b34231a0badb07750"
+      "sha256": "f84dc61c739afca2f9baf1fa2a42a87fbbd1271d6285fe4f6db38dd85f64e7d4"
     },
     {
       "path": "examples/receipts/admission-deny-kid-mismatch.example.json",
-      "sha256": "a79b3cac2d0be6baa95f7d727cf397cc82a293b84080a7ac4838e662e6caf44c"
+      "sha256": "01c30b60bab0341de475e906a689aabb53a447373a5067f6f6846dfa8b6ff2de"
     },
     {
       "path": "examples/receipts/admission-deny-mcp-oauth-overscope.example.json",
-      "sha256": "c97dc4230079b6f55c219af4c4a6101e34c3d8f79a749ed18f487b9ccd4868af"
+      "sha256": "38a031665dcc16d58219859fb46708bea24aebb61c2ce8111163af8d19b2528d"
     },
     {
       "path": "examples/receipts/admission-deny-mcp-oauth-upstream-denied.example.json",
-      "sha256": "cf059df7c10145da87c33bb00d95f194fa3aee0d9f658aabf97790525146fc47"
+      "sha256": "9b65d02fb23e07dcb0b0565956498026722cc05d50268873ffbfb6ec94bbaac5"
     },
     {
       "path": "examples/receipts/admission-deny-not-yet-valid-permit.example.json",
-      "sha256": "a1f19af575def9fb796546477e257b34f93f67c97791bc920f42309fd801e83f"
+      "sha256": "c9c75bf4862edffbc9e32c5ffe775d875285c4153d19b10acfee7ba521e8c423"
     },
     {
       "path": "examples/receipts/admission-deny-policy-snapshot-mismatch.example.json",
-      "sha256": "2616566cab756125d57800271df050d728dc901f16112a62279df0c521b63e24"
+      "sha256": "44c058b8fe924e2119f943c97e4278a8a25930abc2e849b3bbb8c37c9cc4922a"
     },
     {
       "path": "examples/receipts/admission-deny-replay-detected.example.json",
-      "sha256": "255fe6b2b8f9d5bf415026b288628f5026b8de41c14cf7125986ef3c0e613e9f"
+      "sha256": "dbccfe340d0a48b164dd7a7bbdd7d98745cdb19b588329d207b2a400368b0f01"
     },
     {
       "path": "examples/receipts/admission-deny-replay-replayed.example.json",
-      "sha256": "31a540cb6cfe53727ecc73ae49cd99704d564bbdf1d5ec4336af1b04b4cd8a31"
+      "sha256": "3113c48786a0838cf7f639ced1646f12e3bac464102ecec2aa367db6f15eb48e"
     },
     {
       "path": "examples/receipts/admission-deny-runtime-mismatch.example.json",
-      "sha256": "e07bba88906ad3ad2df6934c1e77405bb97d5dbddef76df587e87c65819536cc"
+      "sha256": "bcc562815ee66b30b942bfeed9ff2313111e03c93c1dac0c8e95d4ae00fa28c3"
     },
     {
       "path": "examples/receipts/admission-deny-runtime-proof-stale.example.json",
-      "sha256": "c6ade9a71cf7371d028e691782a3dbdab5076b10d6de138f705c858af286c337"
+      "sha256": "14d7608751eac3f4888813bb93dfb5adafb593333d8a2c3822a2c291c3c30e93"
     },
     {
       "path": "examples/receipts/admission-deny-signature-tampered.example.json",
-      "sha256": "38460573585c7d1af1d70a59b4bbafc5a3c5e13a7ced0c8969936cda3e7c0d8c"
+      "sha256": "cf988df8e6e160d338fab98c328eb20ad45830bee33fab8b28225125a3ee0d9a"
     },
     {
       "path": "examples/receipts/admission-deny-status-revoked.example.json",
-      "sha256": "feb96a4797b85692af016a09bec518bdfb5d0a4996a7344d6436b02f196b3e0b"
+      "sha256": "28eebeebacd038a99f3cc95a557192fc06ac0f96aacfc9781db8e4d12e6d620c"
     },
     {
       "path": "examples/receipts/admission-deny-status-stale-just-over-boundary.example.json",
-      "sha256": "cb21fe4f2fef67ce59b1ab6a9bb13f126110f802acd5dcb77ce428afe677577b"
+      "sha256": "82ea158dacf020971ecf891b87ae42c68fbfc98560e337d2109f66d4ad948014"
     },
     {
       "path": "examples/receipts/admission-deny-status-stale.example.json",
-      "sha256": "752dce24f8c73ae42e9645ebe156ff3ed59ca762a7c6926f5a92b71981c97085"
+      "sha256": "b669be3bbb93fcc32c1cf864774e3fc7a7a5347579df4c76b246043add85bd3f"
     },
     {
       "path": "examples/receipts/admission-deny-trust-anchor-expired.example.json",
-      "sha256": "3e323829119a6e36bdc9597f30d59bc0880a6d1bd00c2223a74198b0bbb0566c"
+      "sha256": "5bbea2c540bc13b2f73cb7b260e3a527e8c5351b2bfcfbc2f25ed5fa90cc707a"
     },
     {
       "path": "examples/receipts/admission-deny-trust-anchor-not-yet-valid.example.json",
-      "sha256": "721a119bf31aedc6097ce3b3710d6a6a78022d1907c284d8dd28f26bbc10a77c"
+      "sha256": "c13507002c189f9542bcddd2587b0cadf7e76a2e2077140ee92c6f9f21a602f4"
     },
     {
       "path": "examples/receipts/admission-deny-trust-anchor-revoked.example.json",
-      "sha256": "43670375b24d61510e299408b032523422d2f27dc1c37de501fd28b9e96c8534"
+      "sha256": "c1fd1615a8452ef9a8716cb46f7bb76f56d48b4ac6c3f1696db1dfc1472286f7"
     },
     {
       "path": "examples/receipts/admission-deny-unknown-trust-anchor.example.json",
-      "sha256": "1133f95706bdf1a1a6b6f860054114f1f92cbb4e51e2e58e4556a03d39d355d0"
+      "sha256": "d92e11797d2c6786c780013a47c2c85640c4a51d9738398777ccbe6ec0566e12"
     },
     {
       "path": "examples/receipts/post-execution-admission-digest-mismatch.example.json",
-      "sha256": "9dbce6c960f5c72955eb072fa5550970758ac22c7b1d9957df67cee8c792d475"
+      "sha256": "b2271146dfa1925bead1b04f865084c5e9398afa572cbd9d80cde8e6ec066d50"
     },
     {
       "path": "examples/receipts/post-execution-after-admission-expiry.example.json",
-      "sha256": "80344f284bc6860a89f1a0486848fa2c6e79a42a4f45410f7efc09e681d25b9d"
+      "sha256": "592a30fb165dc64f4250744418e76bdad4f888c0b46fea4a9074a43358b18fa6"
     },
     {
       "path": "examples/receipts/post-execution-after-deny.example.json",
-      "sha256": "6987ce5980d4a34528c418dcdd52964d0aeb4ef802ac3a52089d67a2c7fd08ed"
+      "sha256": "0a504be76840a62526774aa8b571cc2cb8b38c8051905786531ff8978b68d094"
+    },
+    {
+      "path": "examples/receipts/post-execution-effective-constraints-aggregate-exceeded.example.json",
+      "sha256": "0ad82bbd93740f003406f5222b22fe523024ccfa0dd15aa152e66a0dc73302a0"
     },
     {
       "path": "examples/receipts/post-execution-effective-constraints-exceeded.example.json",
-      "sha256": "026ffce648ea8236330393dbe0a6f531d2f8e8943f267f882369602db5791f5b"
+      "sha256": "97b8b96b95150b9027965a58a975ebea698ec5ab4baf0ea332c495edd9e1d818"
+    },
+    {
+      "path": "examples/receipts/post-execution-finish-after-admission-expiry.example.json",
+      "sha256": "106af39ac586346e769dfdf70d2495c2bfb8df1369bd3d69e23f30d3b30eabef"
     },
     {
       "path": "examples/receipts/post-execution-linkage-mismatch.example.json",
-      "sha256": "7336a4b9d04c03339debc427847fd33c052b576b6192a23cb0ab78b7c9fa728e"
+      "sha256": "0191b0ee99b510416515581dd7a2fa8636b2aac016f70b953b91c74727d77c45"
     },
     {
       "path": "examples/receipts/post-execution-runtime-mismatch.example.json",
-      "sha256": "533923d2a6388493f25172f4f951349d7d8950e1857f8de3b6b96ab565a19ddc"
+      "sha256": "9640c18ff264eb784d03954ad95bdcf931fbeee2c09cd33066f9a9190b61234a"
     },
     {
       "path": "examples/receipts/post-execution-success.example.json",
-      "sha256": "84db0b15d1062e16b28028114e3203b9da8c5d49ab506240f72dcc28a0448a5e"
+      "sha256": "1b9c2fb4011255def18f83d16efd0e6bbafdfa03dca6bfd212ea677d40ef7f79"
     },
     {
       "path": "examples/receipts/post-execution-transaction-mismatch.example.json",
-      "sha256": "3ac680c839e96ee10e3a8c81a73427f13bbf2209cef0011902f6bba899002f9f"
+      "sha256": "b782a92a7a146be56ea6b0042c02fadbdc1ec60896e8549b56c6646ab300326a"
     },
     {
       "path": "examples/transport/mcp-oauth-admission-request.example.json",
-      "sha256": "0912002355b49eeeda4c889494039ab24e88110e8dcda6e191a9a1e224540419"
+      "sha256": "41985ef5140b07cdd4ea58d90dabc4e4c577639a1207b7367bd2aa1ee20de5fb"
     },
     {
       "path": "examples/transport/mcp-oauth-overscope-admission-request.example.json",
-      "sha256": "e82b7542ae8dd3353e24ad4483b790131a1b0084a7dd65a1bf470a229c1139d7"
+      "sha256": "970cf9e129c404138f88d9165470d6104d64d048d6e1d6bc1b49d481b4bcf91e"
     },
     {
       "path": "examples/transport/mcp-oauth-upstream-denied-admission-request.example.json",
-      "sha256": "ab47301225316e774ce9f65923fae2f3d727cbd707dac064ab436282161ef402"
+      "sha256": "e8713080aa649f6cc4ab6f5e1365b341d4325af992e3b2e8456ea11dbae2afb3"
     },
     {
       "path": "examples/trust-bundle-agent-card.example.json",
@@ -1980,10 +2068,10 @@
     "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.2 --out conformance/al2-vate-v0.2/corpus.json"
   },
   "summary": {
-    "artifact_count": 161,
-    "case_count": 59,
+    "artifact_count": 167,
+    "case_count": 62,
     "category_counts": {
-      "linkage": 9,
+      "linkage": 12,
       "negative": 34,
       "positive": 16
     }

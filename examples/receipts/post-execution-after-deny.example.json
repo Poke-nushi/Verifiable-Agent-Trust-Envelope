@@ -13,7 +13,7 @@
     "uri": "https://verifier.example/vate/admission-receipts/admrec-20260504-deny-audience-001",
     "digest": {
       "alg": "sha-256",
-      "value": "0a147bb55ae39d82dcb8debfc40d69f7520378f1c4d5c389a663cde0bdaa249d"
+      "value": "93394c52eed07ce84f5b9fe95175f255b699c81227579d5b7c35b8b8656e70fa"
     },
     "decision": "allow"
   },
@@ -21,12 +21,12 @@
     "transaction_id": "txn-20260504-deny-audience-001",
     "started_at": "2026-05-04T03:01:02Z",
     "finished_at": "2026-05-04T03:02:28Z",
-    "effective_request_hash": "sha-256:deny-audience-input",
+    "effective_request_hash": "sha-256:11d76d621c9f81227ed3ba65ddb714ab8d9e85053a581f15d1f28a49e1315d28",
     "runtime": "spiffe://agent.example/workload/purchase-agent"
   },
   "result": {
     "outcome": "failed",
-    "output_hash": "sha-256:after-deny-output",
+    "output_hash": "sha-256:e8693d03d333fc3ba57a0a07574015af39635608a7a38d2ff32dea68c1233c70",
     "side_effects": [],
     "policy_violations": [
       "admission_was_denied"

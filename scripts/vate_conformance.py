@@ -32,6 +32,7 @@ CORPUS_INDEX_FILENAME = "corpus.json"
 SUT_RESULTS_VERSION = "vate-sut-results-2026-07"
 EVIDENCE_VOCABULARY_VERSION = "vate-evidence-vocabulary-2026-07"
 SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
+PROFILE_HASH_RE = re.compile(r"^sha-256:[0-9a-f]{64}$")
 EVIDENCE_VOCABULARY_PATH = ROOT / "registries" / "evidence-vocabulary.v0.2.json"
 TERMINAL_REASON_CODES = {"FAIL_CLOSED", "POLICY_MATCH"}
 
@@ -167,6 +168,16 @@ def sha256_value(value: Any) -> str:
 
 def digest_descriptor(value: Any) -> dict[str, str]:
     return {"alg": "sha-256", "value": sha256_value(value)}
+
+
+def is_profile_hash(value: Any) -> bool:
+    return isinstance(value, str) and PROFILE_HASH_RE.fullmatch(value) is not None
+
+
+def profile_hash_failures(value: Any, *, label: str) -> list[str]:
+    if is_profile_hash(value):
+        return []
+    return [f"{label} must be sha-256 followed by a lowercase 64-character hex digest"]
 
 
 def sha256_file(path: Path) -> str:
@@ -445,11 +456,9 @@ def attenuation_validation_failures(
 
     original_hash = attenuation.get("original_request_hash")
     effective_hash = attenuation.get("effective_request_hash")
-    if not isinstance(original_hash, str) or not original_hash:
-        failures.append("original_request_hash must be a non-empty string")
-    if not isinstance(effective_hash, str) or not effective_hash:
-        failures.append("effective_request_hash must be a non-empty string")
-    if isinstance(original_hash, str) and original_hash and original_hash == effective_hash:
+    failures.extend(profile_hash_failures(original_hash, label="original_request_hash"))
+    failures.extend(profile_hash_failures(effective_hash, label="effective_request_hash"))
+    if is_profile_hash(original_hash) and original_hash == effective_hash:
         failures.append("effective_request_hash must differ from original_request_hash")
 
     require_new_permit = attenuation.get("require_new_permit")
@@ -629,6 +638,16 @@ def admitted_effective_request_hash(admission_receipt: dict[str, Any]) -> Any:
     return admission_receipt.get("request", {}).get("input_hash")
 
 
+def admitted_effective_constraints(admission_receipt: dict[str, Any]) -> dict[str, Any]:
+    attenuation_constraints = admission_receipt.get("attenuation", {}).get("effective_constraints")
+    if isinstance(attenuation_constraints, dict):
+        return attenuation_constraints
+    request_constraints = admission_receipt.get("request", {}).get("constraints")
+    if isinstance(request_constraints, dict):
+        return request_constraints
+    return {}
+
+
 def post_execution_linkage_failures(
     admission_receipt: dict[str, Any] | None,
     post_execution_receipt: dict[str, Any] | None,
@@ -666,7 +685,13 @@ def post_execution_linkage_failures(
         failures.append("transaction_id mismatch")
     if execution.get("runtime") != subject.get("runtime"):
         failures.append("runtime mismatch")
-    if execution.get("effective_request_hash") != admitted_effective_request_hash(admission_receipt):
+    expected_request_hash = admitted_effective_request_hash(admission_receipt)
+    actual_request_hash = execution.get("effective_request_hash")
+    if (
+        not is_profile_hash(expected_request_hash)
+        or not is_profile_hash(actual_request_hash)
+        or actual_request_hash != expected_request_hash
+    ):
         failures.append("effective_request_hash mismatch")
 
     started_at = try_parse_time(execution.get("started_at"))
@@ -682,6 +707,8 @@ def post_execution_linkage_failures(
             failures.append("execution started before admission was issued")
         if admission_expires_at is not None and started_at > admission_expires_at:
             failures.append("execution started after admission expiry")
+        if admission_expires_at is not None and finished_at > admission_expires_at:
+            failures.append("execution finished after admission expiry")
 
     failures.extend(post_execution_side_effect_failures(admission_receipt, post_execution_receipt))
     return failures
@@ -692,7 +719,7 @@ def post_execution_side_effect_failures(
     post_execution_receipt: dict[str, Any],
 ) -> list[str]:
     failures: list[str] = []
-    max_amount = admission_receipt.get("attenuation", {}).get("effective_constraints", {}).get("max_amount")
+    max_amount = admitted_effective_constraints(admission_receipt).get("max_amount")
     if not isinstance(max_amount, dict):
         return failures
     max_currency = max_amount.get("currency")
@@ -701,6 +728,7 @@ def post_execution_side_effect_failures(
     if max_failures or not isinstance(max_currency, str):
         return failures
     max_decimal = Decimal(str(max_value))
+    total_decimal = Decimal("0")
 
     side_effects = post_execution_receipt.get("result", {}).get("side_effects", [])
     if not isinstance(side_effects, list):
@@ -722,8 +750,10 @@ def post_execution_side_effect_failures(
         if amount_failures:
             failures.extend(amount_failures)
             continue
-        if Decimal(str(value)) > max_decimal:
-            failures.append(f"side_effects[{index}].amount exceeds admitted max_amount")
+        total_decimal += Decimal(str(value))
+        if total_decimal > max_decimal:
+            failures.append("side_effects aggregate amount exceeds admitted max_amount")
+            break
     return failures
 
 
@@ -756,6 +786,8 @@ def admission_time_window_valid(
         return False, "execution started before admission was issued"
     if admission_expires_at is not None and started_at > admission_expires_at:
         return False, "execution started after admission expiry"
+    if admission_expires_at is not None and finished_at > admission_expires_at:
+        return False, "execution finished after admission expiry"
     return True, None
 
 

@@ -12,7 +12,7 @@
     "request_id": "areq-20260701-kid-mismatch-001",
     "transaction_id": "txn-20260701-kid-mismatch-001",
     "action": "storage.object.publish",
-    "input_hash": "sha-256:kid-mismatch-input"
+    "input_hash": "sha-256:f6b9181a9788871f12aa9399f36bdf83b47a01e6d878e3b6f50856ac6d35026d"
   },
   "subject": {
     "principal": "did:web:user.example",

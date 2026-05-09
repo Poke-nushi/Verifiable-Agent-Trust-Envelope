@@ -12,7 +12,7 @@
     "request_id": "areq-20260701-runtime-proof-stale-001",
     "transaction_id": "txn-20260701-runtime-proof-stale-001",
     "action": "crm.case.update",
-    "input_hash": "sha-256:runtime-proof-stale-input",
+    "input_hash": "sha-256:22c95493efbbaaf774844cec8175c4329cb13532d3d6ae99147adc8e299c278c",
     "audience": "https://crm.example",
     "target_audience": "https://crm.example",
     "target_resource": "https://crm.example/cases/case-123"

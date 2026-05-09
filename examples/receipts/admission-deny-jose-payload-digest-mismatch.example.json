@@ -12,7 +12,7 @@
     "request_id": "areq-20260701-jose-payload-digest-mismatch-001",
     "transaction_id": "txn-20260701-jose-payload-digest-mismatch-001",
     "action": "crm.case.update",
-    "input_hash": "sha-256:jose-payload-digest-mismatch-input"
+    "input_hash": "sha-256:c2b052d0f3ba948883844d7a6aa91bb7e12328eb4f8bb2c941796ea2db997f6a"
   },
   "subject": {
     "principal": "did:web:user.example",

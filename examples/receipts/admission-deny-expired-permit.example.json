@@ -15,7 +15,7 @@
     "a2a_context_id": "ctx-deny-001",
     "a2a_task_id": "task-deny-001",
     "action": "commerce.purchase",
-    "input_hash": "sha-256:base64url-deny-input-digest"
+    "input_hash": "sha-256:8563a7ea79fab3aa49886f994595bd2469df51051293c30c64633416f90b764c"
   },
   "subject": {
     "principal": "did:web:user.example",

@@ -12,7 +12,7 @@
     "request_id": "areq-20260701-trust-anchor-expired-001",
     "transaction_id": "txn-20260701-trust-anchor-expired-001",
     "action": "storage.object.publish",
-    "input_hash": "sha-256:trust-anchor-expired-input"
+    "input_hash": "sha-256:bb9d5b4cea25b3d57db3b7f8ba28bac9e099868b5c7b6df38a3052cc9f08c1c0"
   },
   "subject": {
     "principal": "did:web:user.example",

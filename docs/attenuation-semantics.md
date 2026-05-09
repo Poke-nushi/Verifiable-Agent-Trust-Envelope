@@ -62,10 +62,19 @@ Each change SHOULD include:
 
 `effective_request_hash` identifies the authority the verifier admitted after narrowing.
 
+For AL2 v0.2, both fields use the profile hash string grammar:
+`sha-256:` followed by a lowercase 64-character hexadecimal digest.
+
 The post-execution receipt MUST link to the admitted effective request hash.
 If post-execution evidence references the original request hash or a different
 effective request hash, the verifier or auditor SHOULD return
 `POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH`.
+
+When `effective_constraints.max_amount` is present, AL2 v0.2 treats it as the
+aggregate amount admitted for the execution. Multiple side effects are summed;
+each side effect does not get a fresh `max_amount` allowance. Future
+per-side-effect limits should use a distinct field such as
+`max_amount_per_side_effect`.
 
 ## Common Modes
 
