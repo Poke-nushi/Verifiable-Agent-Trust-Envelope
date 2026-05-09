@@ -11,6 +11,9 @@ Since the earlier VATE v0.2 discussion draft, I narrowed the proposal to a
 metadata-only A2A-oriented community profile and added the current AL2 v0.2
 corpus plus an external SUT comparison path.
 
+This is not an official A2A extension proposal and does not require A2A core
+changes.
+
 The current boundary is:
 
 - A2A carries task flow and optional digest-bound references in metadata.
@@ -32,41 +35,10 @@ The shortest review path is:
 - Package-private TypeScript helpers: `packages/vate-core-ts/README.md` and
   `packages/vate-a2a-ts/README.md`
 
-For external implementation review, the primary path is `compare`:
-
-```bash
-python3 scripts/vate_conformance.py compare \
-  --corpus-root conformance/al2-vate-v0.2 \
-  --sut-results examples/conformance/sut-results-pass.example.json \
-  --report /tmp/vate-sut-compare-report.json \
-  --implementation-report /tmp/vate-sut-implementation-report.json \
-  --conformance-report-uri https://example.invalid/vate/reports/vate-sut-compare-report.json \
-  --implementation-report-uri https://example.invalid/vate/reports/vate-sut-implementation-report.json
-```
-
-The `example.invalid` report URI values above are placeholders. Before sharing
-an implementation report, replace them with stable URIs under the implementer's
-control, or omit implementation-report generation from the posted command.
-
-The resulting local report bundle can be checked with:
-
-```bash
-python3 scripts/vate_conformance.py verify-bundle \
-  --corpus-root conformance/al2-vate-v0.2 \
-  --sut-results examples/conformance/sut-results-pass.example.json \
-  --conformance-report /tmp/vate-sut-compare-report.json \
-  --implementation-report /tmp/vate-sut-implementation-report.json \
-  --report /tmp/vate-report-bundle-verification.json
-```
-
-For a repository fixture sanity check, the reference runner can still be
-exercised with:
-
-```bash
-python3 scripts/vate_conformance.py run \
-  --corpus-root conformance/al2-vate-v0.2 \
-  --report /tmp/vate-reference-run.json
-```
+For external implementation review, the primary path is `compare`, documented
+in `docs/conformance/external-sut-quickstart.md`.
+Repository fixture checks still use `run`, and local report-bundle integrity
+checks use `verify-bundle`.
 
 The question for A2A maintainers remains intentionally narrow:
 
@@ -86,6 +58,7 @@ verifier policy, identity, payment, or receipt-storage semantics into A2A core.
 - Confirm `verify-bundle` passes for any report bundle intended for publication.
 - If mentioning TypeScript, keep it framed as package-private helper code, not a
   published SDK or A2A middleware package.
-- Replace local `/tmp/` report paths with durable links only if those files are intentionally published.
+- Do not post local `/tmp/` report paths or placeholder report URIs. Include
+  implementation-report URIs only when stable public artifacts already exist.
 - Keep the issue comment focused on A2A extension compatibility, not business positioning.
 - Confirm the repository owner has reviewed the exact text before posting.
