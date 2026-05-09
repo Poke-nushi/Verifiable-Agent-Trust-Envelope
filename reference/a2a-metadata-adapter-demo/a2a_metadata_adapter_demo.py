@@ -35,7 +35,18 @@ def read_json(path: Path) -> dict[str, Any]:
 def resolve_local_uri(uri: str) -> Path:
     if not uri.startswith("local:"):
         raise ValueError(f"demo only resolves local: URIs, got {uri}")
-    return ROOT / uri.removeprefix("local:")
+    local_path = uri.removeprefix("local:")
+    if not local_path or "\x00" in local_path:
+        raise ValueError("local URI must contain a repository-relative path")
+    relative_path = Path(local_path)
+    if relative_path.is_absolute() or ".." in relative_path.parts:
+        raise ValueError(f"local URI must not escape the repository root: {uri}")
+    resolved = (ROOT / relative_path).resolve()
+    try:
+        resolved.relative_to(ROOT)
+    except ValueError as exc:
+        raise ValueError(f"local URI must remain under the repository root: {uri}") from exc
+    return resolved
 
 
 def build_verifier() -> Any:

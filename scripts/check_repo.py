@@ -362,6 +362,35 @@ def load_vate_conformance_module():
     return module
 
 
+def load_a2a_adapter_module():
+    spec = importlib.util.spec_from_file_location("a2a_metadata_adapter_demo", A2A_ADAPTER)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("could not load reference/a2a-metadata-adapter-demo/a2a_metadata_adapter_demo.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def check_a2a_adapter_local_uri_boundary() -> None:
+    adapter = load_a2a_adapter_module()
+    expected = ROOT / "examples" / "admission-request.example.json"
+    if adapter.resolve_local_uri("local:examples/admission-request.example.json") != expected:
+        raise RuntimeError("A2A adapter local URI resolver must preserve repository-relative local paths")
+    unsafe_uris = [
+        "local:",
+        "local:/etc/passwd",
+        "local:../AGENTS.md",
+        "local:examples/../AGENTS.md",
+        "https://verifier.example/vate/admission-request.json",
+    ]
+    for uri in unsafe_uris:
+        try:
+            adapter.resolve_local_uri(uri)
+        except ValueError:
+            continue
+        raise RuntimeError(f"A2A adapter local URI resolver accepted unsafe URI {uri!r}")
+
+
 def check_evidence_vocabulary_registry() -> None:
     registry = json.loads(EVIDENCE_VOCABULARY.read_text(encoding="utf-8"))
     evidence_types = registry.get("evidence_types")
@@ -767,6 +796,7 @@ def main() -> int:
     check_replay_boundary_coverage()
     check_p1_5_fixture_coverage()
     check_p2_public_artifact_boundary()
+    check_a2a_adapter_local_uri_boundary()
     run([sys.executable, "-m", "py_compile", str(DEMO)])
     run([sys.executable, "-m", "py_compile", str(HTTP_DEMO)])
     run([sys.executable, "-m", "py_compile", str(VATE_CONFORMANCE)])
