@@ -5,9 +5,10 @@
 This directory is a review package for a VATE community profile draft that uses
 A2A metadata to carry digest-bound admission and receipt references.
 
-It is not an official A2A extension, does not require an A2A core change, and
-does not make A2A responsible for verifier policy, payment semantics, identity
-registries, or receipt storage.
+This is not an official A2A extension, endorsement, certification, SDK,
+middleware package, or general compatibility proof. It does not require an A2A
+core change and does not make A2A responsible for verifier policy, payment
+semantics, identity registries, or receipt storage.
 
 ## Short Position
 
@@ -63,8 +64,9 @@ report; it is not a production signature profile.
 
 The package-private TypeScript helpers cover digest descriptors, artifact
 references, SUT result entry shaping, A2A metadata shape validation, and optional
-activation header checks. They are not official A2A SDKs, middleware packages,
-published compatibility tools, or production verifiers.
+activation header checks. They are not official A2A extensions, endorsements,
+certifications, SDKs, middleware packages, production verifiers, or general
+compatibility proofs.
 
 ## Review Question
 

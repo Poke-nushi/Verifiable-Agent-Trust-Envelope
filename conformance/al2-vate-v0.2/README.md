@@ -1,11 +1,14 @@
-# VATE AL2 v0.2 Draft Conformance Corpus
+# VATE AL2 v0.2 Draft Conformance Corpus [Historical]
 
 This directory contains a runnable machine-readable corpus for the `VATE AL2 Verifier Admission Profile v0.2`.
 
 Historical note: current main-branch hardening work uses
 `conformance/al2-vate-v0.3/`. For the archived May 5, 2026 `v0.2.0` review
 snapshot, use the `v0.2.0` GitHub tag and Zenodo version DOI
-`10.5281/zenodo.20043166`.
+`10.5281/zenodo.20043166`. When reading this file on `main`, resolve
+referenced schemas and guidance through the `v0.2.0` tag for historical
+reproduction. The same relative paths on `main` now describe the v0.3 profile
+boundary.
 
 It is not a production endorsement suite.
 It is an interoperability review and implementation aid.

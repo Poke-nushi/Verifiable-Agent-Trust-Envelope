@@ -10,8 +10,10 @@ main-branch hardening work uses
 This is a community profile draft for carrying VATE admission and receipt
 references through A2A metadata.
 
-It is not an official A2A extension. It does not require an A2A core change.
-It is intended to make the A2A extension-review boundary reviewable.
+This is not an official A2A extension, endorsement, certification, SDK,
+middleware package, or general compatibility proof. It does not require an A2A
+core change and is intended to make the A2A extension-review boundary
+reviewable.
 
 ## Problem
 

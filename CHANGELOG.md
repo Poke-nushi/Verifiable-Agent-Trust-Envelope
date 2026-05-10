@@ -2,6 +2,17 @@
 
 This file records dated public changes to the discussion draft.
 
+## 2026-05-10
+
+- Prepared the v0.3.0 AL2 evidence reference hardening release candidate.
+- Updated current schema and profile identifiers to
+  `VATE-AL2-Verifier-Admission-v0.3`.
+- Required non-empty `evidence_refs` for AL2 admission requests.
+- Added the `deny-empty-evidence-refs` fail-closed conformance case.
+- Split archived v0.2.0 release documentation from current v0.3.0 hardening
+  work.
+- Kept A2A-shaped metadata review wording non-official and metadata-only.
+
 ## 2026-05-09
 
 - Synchronized the consolidated A2A review package under `docs/a2a/`, including

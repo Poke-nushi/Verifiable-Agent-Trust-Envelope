@@ -16,7 +16,8 @@ VATE records the verifier decision: `allow`, `attenuate`, or `deny`.
 - `v0.2.0 archived May 5, 2026 review snapshot`
 - `v0.3.0 current AL2 verifier admission hardening draft`
 - `not production-ready`
-- `no endorsement, certification, official A2A compatibility, or production approval implied`
+- `not an official A2A extension, endorsement, certification, SDK, middleware package, or general compatibility proof`
+- `no production approval implied`
 - `seeking critique on boundary, verifier order, and artifact semantics`
 
 [![DOI](https://zenodo.org/badge/1214949350.svg)](https://doi.org/10.5281/zenodo.19839768)
@@ -314,8 +315,9 @@ npm run ts:check
 npm run ts:test
 ```
 
-These packages are not published SDKs, do not add production JOSE/JCS
-verification, and do not make an official A2A support claim.
+These packages are not official A2A extensions, endorsements, certifications,
+SDKs, middleware packages, or general compatibility proofs. They do not imply
+production approval and do not add production JOSE/JCS verification.
 
 ## Related Documents
 

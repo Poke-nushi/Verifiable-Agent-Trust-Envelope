@@ -5,9 +5,10 @@
 This is a public sketch for how the current VATE AL2 admission artifacts could
 fit into the A2A v1.0 extension model.
 
-It is not an official A2A extension and does not require an A2A core change.
-The goal is to make the boundary reviewable before any SDK middleware or
-governed extension proposal exists.
+This is not an official A2A extension, endorsement, certification, SDK,
+middleware package, or general compatibility proof. It does not require an A2A
+core change. The goal is to make the boundary reviewable before any governed
+extension proposal exists.
 
 For the consolidated community profile draft and review entry point, see
 `docs/a2a/README.md` and
@@ -177,8 +178,9 @@ profile.
 
 The package-private TypeScript helpers in `packages/vate-core-ts/` and
 `packages/vate-a2a-ts/` are review aids for digest-bound references, SUT result
-shaping, metadata validation, and optional activation checks. They are not an
-A2A SDK middleware package.
+shaping, metadata validation, and optional activation checks. They are not
+official A2A extensions, endorsements, certifications, SDKs, middleware
+packages, or general compatibility proofs.
 
 ## Failure Mapping
 
@@ -200,8 +202,8 @@ Examples:
 
 This sketch does not define:
 
-- an official A2A extension namespace;
-- an A2A SDK middleware package;
+- an official A2A extension namespace, endorsement, certification, SDK,
+  middleware package, or general compatibility proof;
 - a new A2A RPC method;
 - a new A2A task state;
 - an identity registry;
