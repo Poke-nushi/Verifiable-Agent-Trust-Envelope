@@ -1,6 +1,6 @@
 {
   "version": "vate-implementation-report-2026-07",
-  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "generated_at": "2026-07-01T00:00:00Z",
   "status": "pass",
   "implementation": {
@@ -12,8 +12,8 @@
     "commit": "example"
   },
   "corpus": {
-    "name": "al2-vate-v0.2",
-    "root": "conformance/al2-vate-v0.2",
+    "name": "al2-vate-v0.3",
+    "root": "conformance/al2-vate-v0.3",
     "case_count": 2,
     "artifact_count": 2,
     "digest": {
@@ -22,7 +22,7 @@
     },
     "manifest": [
       {
-        "path": "conformance/al2-vate-v0.2/cases/allow-valid-admission.json",
+        "path": "conformance/al2-vate-v0.3/cases/allow-valid-admission.json",
         "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
       },
       {

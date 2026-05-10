@@ -1,6 +1,6 @@
 {
   "version": "vate-jose-proof-fixture-2026-07",
-  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "evidence_type": "runtime_attestation",
   "issuer": "did:web:agent.example",
   "subject": {

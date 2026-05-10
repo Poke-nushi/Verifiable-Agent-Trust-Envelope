@@ -64,14 +64,14 @@ Admission receipts should still include `FAIL_CLOSED` when trust-bundle failures
 
 ## Current Negative Cases
 
-- `conformance/al2-vate-v0.2/cases/deny-unknown-trust-anchor.json`
-- `conformance/al2-vate-v0.2/cases/deny-ambiguous-trust-anchor.json`
-- `conformance/al2-vate-v0.2/cases/deny-kid-mismatch.json`
-- `conformance/al2-vate-v0.2/cases/deny-alg-not-allowed.json`
-- `conformance/al2-vate-v0.2/cases/deny-evidence-type-not-allowed.json`
-- `conformance/al2-vate-v0.2/cases/deny-trust-anchor-expired.json`
-- `conformance/al2-vate-v0.2/cases/deny-trust-anchor-not-yet-valid.json`
-- `conformance/al2-vate-v0.2/cases/deny-trust-anchor-revoked.json`
+- `conformance/al2-vate-v0.3/cases/deny-unknown-trust-anchor.json`
+- `conformance/al2-vate-v0.3/cases/deny-ambiguous-trust-anchor.json`
+- `conformance/al2-vate-v0.3/cases/deny-kid-mismatch.json`
+- `conformance/al2-vate-v0.3/cases/deny-alg-not-allowed.json`
+- `conformance/al2-vate-v0.3/cases/deny-evidence-type-not-allowed.json`
+- `conformance/al2-vate-v0.3/cases/deny-trust-anchor-expired.json`
+- `conformance/al2-vate-v0.3/cases/deny-trust-anchor-not-yet-valid.json`
+- `conformance/al2-vate-v0.3/cases/deny-trust-anchor-revoked.json`
 
 ## Production Notes
 

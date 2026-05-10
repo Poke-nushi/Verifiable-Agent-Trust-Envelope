@@ -10,13 +10,13 @@
     {
       "digest": {
         "alg": "sha-256",
-        "value": "891d4f2c016517b4df1d2bec28a9cd2a4ae7981f23c25d07c2c7bbccfd1e39fe"
+        "value": "f98309a0ba13ec7abec478d76118602476cd2a35f8fce128b927790d25baa01a"
       },
       "type": "admission_request",
       "uri": "inline:admission-request",
       "verification": {
         "checked_at": "2026-07-01T00:01:00Z",
-        "failure_reason": "schema-invalid evidence reference",
+        "failure_reason": "empty evidence_refs: at least one digest-addressed evidence reference is required",
         "method": "vate-verifier-core",
         "result": "failed"
       }
@@ -29,7 +29,7 @@
     "policy_ref": "https://verifier.example/policies/merchant-purchase-al2/2026-07-01.1",
     "policy_version": "2026-07-01.1"
   },
-  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "receipt_id": "admrec-areq-20260701-empty-evidence-refs-001",
   "receipt_type": "admission",
   "request": {
@@ -52,5 +52,5 @@
   "verifier": {
     "id": "did:web:verifier.example"
   },
-  "version": "vate-0.2"
+  "version": "vate-0.3"
 }

@@ -3,9 +3,11 @@
 
 ## Status
 
-This is a review profile for future production proof verification.
+This is a review profile for future production proof verification. The profile
+note originated in the v0.2 line and is carried forward as a production-proof
+boundary for current v0.3 corpus review.
 
-It does not change the v0.2 AL2 conformance claim. The current corpus still
+It does not change the v0.3 AL2 conformance claim. The current corpus still
 uses dependency-free byte-level detached JWS fixtures and does not verify real
 ECDSA, EdDSA, PKI, DID, or certificate-chain signatures.
 
@@ -43,7 +45,7 @@ It does not define:
 
 ## Production Claim Boundary
 
-Passing the current v0.2 AL2 corpus does not mean this proof profile has been
+Passing the current v0.3 AL2 corpus does not mean this proof profile has been
 implemented.
 
 An implementation may report support for this profile only when it actually

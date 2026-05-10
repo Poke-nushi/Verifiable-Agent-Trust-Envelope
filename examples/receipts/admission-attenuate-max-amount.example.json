@@ -1,6 +1,6 @@
 {
-  "version": "vate-0.2",
-  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "version": "vate-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "receipt_type": "admission",
   "receipt_id": "admrec-20260504-attenuate-001",
   "issued_at": "2026-05-04T03:00:08Z",
@@ -62,7 +62,7 @@
       "media_type": "application/vate-policy-snapshot+json",
       "digest": {
         "alg": "sha-256",
-        "value": "eda9c4cb303c03cbbb7cdc5859d4ce9e9008e2f13d708a3e07540dd38f99d7e0"
+        "value": "5c1c2822f0440a319bbad8e26ad599cb223e6ce7e36e50bfe0b6f6c126465dbb"
       }
     }
   },

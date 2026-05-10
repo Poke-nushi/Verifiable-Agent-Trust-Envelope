@@ -1,6 +1,11 @@
 # A2A Maintainer Brief For VATE v0.2
 ## Metadata-only admission and receipt binding
 
+## Historical Note
+
+This file describes the v0.2 A2A-shaped review line. Current main-branch
+hardening work uses [A2A Maintainer Brief For VATE v0.3](a2a-maintainer-brief-v0.3.md).
+
 ## Short Position
 
 VATE v0.2 is not asking A2A to become a trust, payment, identity, or policy protocol.
@@ -156,19 +161,19 @@ A verifier still needs to:
 
 This is why the binding is by-reference rather than "trust metadata because it is in A2A".
 
-## Current Corpus Fixture
+## v0.2 Corpus Fixture
 
-The current AL2 v0.2 corpus includes `allow-a2a-signed-agent-card-evidence`.
+The AL2 v0.2 corpus includes `allow-a2a-signed-agent-card-evidence`.
 That case binds a canonicalized A2A Agent Card payload digest to admission
 receipt evidence and detached JOSE fixture bytes.
 
 The fixture is byte-level only. It does not claim production ECDSA verification
 or make signed Agent Cards sufficient authority for risky external writes.
 
-## Current Review Aids
+## v0.2 Review Aids
 
-The current AL2 v0.2 conformance surface is the corpus under
-`conformance/al2-vate-v0.2/`. Its current case count is recorded in
+The AL2 v0.2 conformance surface is the corpus under
+`conformance/al2-vate-v0.2/`. Its case count is recorded in
 `conformance/al2-vate-v0.2/corpus.json` as `summary.case_count`.
 
 For an external implementation, the command-first path is

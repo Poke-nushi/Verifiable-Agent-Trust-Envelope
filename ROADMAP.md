@@ -2,20 +2,16 @@
 
 ## Current Milestone
 
-### `v0.2-al2-verifier-admission-profile`
+### `v0.3-al2-admission-hardening`
 
 Focus:
 
-- preserve the `v0.1` discussion draft as the core framing
-- narrow the next profile to `AL2` verifier-side admission for external digital actions
-- define reference-only A2A metadata binding for admission and receipt artifacts
-- split admission receipts from post-execution receipts in profile-specific schemas
-- make `allow / attenuate / deny` decisions and machine-readable attenuation explicit
-- treat A2A, MCP, OAuth, VC, DID, OID4VP, Web Bot Auth, AP2, x402, ACP, and payment tokens as adjacent evidence or transport layers
-- add examples and schema validation for v0.2 admission requests, A2A references, and receipts
-- add a maintainer brief and runnable draft conformance corpus for early A2A-adjacent review
-- keep the May 2026 ecosystem boundary explicit: VATE consumes MCP/OAuth, A2A, AP2, ACP/UCP, and x402 artifacts as adjacent evidence rather than replacing them
-- publish `v0.2.0` as a discussion-draft pre-release
+- preserve the archived `v0.2.0` review snapshot
+- harden AL2 admission request evidence reference handling
+- require non-empty `evidence_refs`
+- add a fail-closed conformance case for empty `evidence_refs`
+- keep A2A claim boundaries narrow
+- publish `v0.3.0` as a discussion-draft pre-release
 
 ## Completed May 2026 Review Hardening
 
@@ -24,13 +20,16 @@ narrow review, but not yet strong enough to call the AL2 package
 conformance-ready. The next work should harden the verification chain before
 adding new adjacent profiles.
 
+- [x] publish `v0.2.0` as an archived discussion-draft pre-release with the
+  version DOI `10.5281/zenodo.20043166`
+
 ### P0 Before The Next External Review Round
 
 - [x] align A2A signed Agent Card evidence with A2A v1.0 JWS header expectations,
   including the `typ` protected header
 - [x] resolve `require_new_permit` execution semantics so fixtures and docs agree
   on whether execution may proceed
-- [x] document the v0.2 fixture canonicalization limits and the intended production
+- [x] document the v0.3 fixture canonicalization limits and the intended production
   canonicalization migration path
 - [x] split the conformance language so `run` is clearly a reference artifact /
   fixture integrity check and `compare` is the external SUT comparison path
@@ -91,8 +90,8 @@ adding new adjacent profiles.
 - [x] add report integrity guidance for SUT result and implementation report
   publication; initial schema, runner, and documentation support added
 - [x] decide whether to add a pinned dependency for production-grade JOSE
-  signature fixtures, or keep v0.2 as byte-level detached proof fixtures only;
-  v0.2 keeps the dependency-free byte-level fixture boundary
+  signature fixtures, or keep the current byte-level detached proof fixture
+  boundary; the current corpus remains dependency-free
 - [x] add a corpus-bound byte-level A2A signed Agent Card fixture after fixing
   the digest target and validation responsibility
 - [x] define a persistent namespace migration plan for schema and extension URIs
@@ -110,9 +109,9 @@ adding new adjacent profiles.
 - use the current A2A review package under `docs/a2a/` for maintainer and
   implementer feedback, while keeping the request framed as metadata-only
   compatibility review rather than A2A governance adoption
-- complete the `docs/release-gate-v0.2.0.md` checklist and final external
-  review before cutting the `v0.2.0` discussion-draft pre-release; update
-  citation metadata only after the real archive and DOI exist
+- complete the `docs/release-gate-v0.3.0.md` checklist and final external
+  review before cutting the `v0.3.0` discussion-draft pre-release; update
+  citation metadata only after the real v0.3 archive and DOI exist
 - add additional transport-bound fixtures beyond the initial MCP/OAuth,
   AP2/UCP, and AP2 Human Not Present examples after the AL2 security basis is
   stable
@@ -127,7 +126,7 @@ adding new adjacent profiles.
 
 ## June 2026 Target
 
-The June target is to complete the `v0.2` AL2 review package, not to broaden the protocol.
+The June target is to complete the `v0.3` AL2 review package, not to broaden the protocol.
 Items should land only when they preserve the verifier boundary and pass the runnable checks.
 
 Completion means:

@@ -1,0 +1,985 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:conformance:al2-vate-v0.3:case",
+  "title": "VATE AL2 v0.3 Conformance Case",
+  "description": "Minimal machine-readable conformance case shape for the VATE AL2 verifier admission profile v0.3.",
+  "type": "object",
+  "required": [
+    "version",
+    "profile",
+    "case_id",
+    "title",
+    "category",
+    "purpose",
+    "artifacts",
+    "expected"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "vate-conformance-0.3"
+    },
+    "profile": {
+      "type": "string",
+      "const": "VATE-AL2-Verifier-Admission-v0.3"
+    },
+    "case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "positive",
+        "negative",
+        "linkage"
+      ]
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artifacts": {
+      "type": "object",
+      "properties": {
+        "a2a_metadata": {
+          "type": "string",
+          "minLength": 1
+        },
+        "admission_request": {
+          "type": "string",
+          "minLength": 1
+        },
+        "admission_receipt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policy_snapshot": {
+          "type": "string",
+          "minLength": 1
+        },
+        "post_execution_receipt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_artifact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mutation": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "expected": {
+      "type": "object",
+      "required": [
+        "should_execute",
+        "reason_codes",
+        "checks"
+      ],
+      "properties": {
+        "admission_decision": {
+          "type": "string",
+          "description": "Verifier-side admission decision before execution. This is always allow, attenuate, or deny.",
+          "enum": [
+            "allow",
+            "attenuate",
+            "deny"
+          ]
+        },
+        "post_execution_outcome": {
+          "type": "string",
+          "description": "Post-execution receipt result outcome. This is separate from the admission decision vocabulary.",
+          "enum": [
+            "success",
+            "partial_success",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "should_execute": {
+          "type": "boolean"
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "expected"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expected": {
+                "type": "string",
+                "enum": [
+                  "pass",
+                  "fail",
+                  "present",
+                  "absent"
+                ]
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "validation_focus": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "policy_snapshot_checks": {
+      "type": "array",
+      "description": "Checks that a policy snapshot artifact digest matches or intentionally does not match the digest-bound references in receipts or metadata.",
+      "items": {
+        "type": "object",
+        "required": [
+          "artifact"
+        ],
+        "properties": {
+          "artifact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expect_match": {
+            "type": "boolean"
+          },
+          "reference_paths": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "artifact",
+                "path"
+              ],
+              "properties": {
+                "artifact": {
+                  "type": "string",
+                  "enum": [
+                    "admission_receipt",
+                    "a2a_metadata"
+                  ]
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": true
+            }
+          },
+          "compare_fields": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "artifact_reference_checks": {
+      "type": "array",
+      "description": "Checks that any referenced artifact digest matches digest-bound references in requests, receipts, or metadata.",
+      "items": {
+        "type": "object",
+        "required": [
+          "artifact",
+          "reference_paths"
+        ],
+        "properties": {
+          "artifact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expect_match": {
+            "type": "boolean"
+          },
+          "reference_paths": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "artifact",
+                "path"
+              ],
+              "properties": {
+                "artifact": {
+                  "type": "string",
+                  "enum": [
+                    "admission_request",
+                    "admission_receipt",
+                    "post_execution_receipt",
+                    "a2a_metadata"
+                  ]
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "linkage_checks": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Post-execution linkage checks that bind an execution receipt back to the admitted request, decision, runtime, time window, and side-effect boundaries.",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "reason_code"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "admission_decision",
+              "admission_digest",
+              "admission_executable",
+              "admission_receipt_id",
+              "admission_time_window",
+              "effective_constraints",
+              "effective_request_hash",
+              "path_match",
+              "policy_violation",
+              "runtime",
+              "transaction_id"
+            ]
+          },
+          "reason_code": {
+            "type": "string",
+            "enum": [
+              "POST_EXEC_ADMISSION_DENIED",
+              "POST_EXEC_ADMISSION_DIGEST_MISMATCH",
+              "POST_EXEC_ADMISSION_EXPIRED",
+              "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED",
+              "POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH",
+              "POST_EXEC_LINKAGE_MISMATCH",
+              "POST_EXEC_RUNTIME_MISMATCH",
+              "POST_EXEC_TRANSACTION_MISMATCH"
+            ]
+          },
+          "artifact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "admission_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "post_execution_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expect_match": {
+            "type": "boolean"
+          },
+          "expect_valid": {
+            "type": "boolean"
+          },
+          "expect_present": {
+            "type": "boolean"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "admission_digest"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "post_execution_path",
+                "expect_match"
+              ],
+              "properties": {
+                "reason_code": {
+                  "const": "POST_EXEC_ADMISSION_DIGEST_MISMATCH"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "admission_receipt_id"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "expect_match"
+              ],
+              "properties": {
+                "reason_code": {
+                  "const": "POST_EXEC_LINKAGE_MISMATCH"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "admission_decision"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "expect_match"
+              ],
+              "properties": {
+                "reason_code": {
+                  "const": "POST_EXEC_LINKAGE_MISMATCH"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "admission_executable"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "expect_valid"
+              ],
+              "properties": {
+                "reason_code": {
+                  "const": "POST_EXEC_ADMISSION_DENIED"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "admission_time_window"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "expect_valid"
+              ],
+              "properties": {
+                "reason_code": {
+                  "const": "POST_EXEC_ADMISSION_EXPIRED"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "effective_constraints"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "expect_valid"
+              ],
+              "properties": {
+                "reason_code": {
+                  "const": "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "effective_request_hash"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "admission_path",
+                "post_execution_path",
+                "expect_match"
+              ],
+              "properties": {
+                "reason_code": {
+                  "const": "POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "path_match"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "admission_path",
+                "post_execution_path",
+                "expect_match"
+              ],
+              "properties": {
+                "reason_code": {
+                  "const": "POST_EXEC_LINKAGE_MISMATCH"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "runtime"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "admission_path",
+                "post_execution_path",
+                "expect_match"
+              ],
+              "properties": {
+                "reason_code": {
+                  "const": "POST_EXEC_RUNTIME_MISMATCH"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "transaction_id"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "admission_path",
+                "post_execution_path",
+                "expect_match"
+              ],
+              "properties": {
+                "reason_code": {
+                  "const": "POST_EXEC_TRANSACTION_MISMATCH"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "policy_violation"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "value",
+                "expect_present"
+              ],
+              "properties": {
+                "value": {
+                  "enum": [
+                    "admission_digest_mismatch",
+                    "admission_expired_before_execution",
+                    "admission_was_denied",
+                    "effective_constraints_exceeded",
+                    "effective_request_hash_mismatch",
+                    "runtime_mismatch",
+                    "transaction_id_mismatch"
+                  ]
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "value": {
+                        "const": "admission_digest_mismatch"
+                      }
+                    },
+                    "required": [
+                      "value"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "reason_code": {
+                        "const": "POST_EXEC_ADMISSION_DIGEST_MISMATCH"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "value": {
+                        "const": "admission_expired_before_execution"
+                      }
+                    },
+                    "required": [
+                      "value"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "reason_code": {
+                        "const": "POST_EXEC_ADMISSION_EXPIRED"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "value": {
+                        "const": "admission_was_denied"
+                      }
+                    },
+                    "required": [
+                      "value"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "reason_code": {
+                        "const": "POST_EXEC_ADMISSION_DENIED"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "value": {
+                        "const": "effective_constraints_exceeded"
+                      }
+                    },
+                    "required": [
+                      "value"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "reason_code": {
+                        "const": "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "value": {
+                        "const": "effective_request_hash_mismatch"
+                      }
+                    },
+                    "required": [
+                      "value"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "reason_code": {
+                        "const": "POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "value": {
+                        "const": "runtime_mismatch"
+                      }
+                    },
+                    "required": [
+                      "value"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "reason_code": {
+                        "const": "POST_EXEC_RUNTIME_MISMATCH"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "value": {
+                        "const": "transaction_id_mismatch"
+                      }
+                    },
+                    "required": [
+                      "value"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "reason_code": {
+                        "const": "POST_EXEC_TRANSACTION_MISMATCH"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "additionalProperties": true
+      }
+    },
+    "attenuation_checks": {
+      "type": "array",
+      "description": "Checks that an attenuation object is valid or invalid under the AL2 attenuation boundary rules.",
+      "items": {
+        "type": "object",
+        "required": [
+          "artifact",
+          "expect_valid"
+        ],
+        "properties": {
+          "artifact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expect_valid": {
+            "type": "boolean"
+          },
+          "expected_failure_reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "al2_context_checks": {
+      "type": "array",
+      "description": "Checks minimum AL2 verification context such as freshness, replay, and binding inputs.",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "artifact"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "freshness",
+              "binding",
+              "replay"
+            ]
+          },
+          "artifact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expect_fresh": {
+            "type": "boolean"
+          },
+          "max_age_seconds": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "expect_match": {
+            "type": "boolean"
+          },
+          "expect_replayed": {
+            "type": "boolean"
+          },
+          "expected_failure_reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "freshness"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "expect_fresh"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "binding"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "expect_match"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "replay"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "expect_replayed"
+              ]
+            }
+          }
+        ],
+        "additionalProperties": true
+      }
+    },
+    "trust_checks": {
+      "type": "array",
+      "description": "Checks local trust-bundle admission behavior for issuer, key id, algorithm, evidence type, status, and validity windows.",
+      "items": {
+        "type": "object",
+        "required": [
+          "trust_bundle",
+          "issuer_id",
+          "kid",
+          "evidence_type",
+          "expect_trusted"
+        ],
+        "properties": {
+          "trust_bundle": {
+            "type": "string",
+            "minLength": 1
+          },
+          "issuer_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "alg": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "checked_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expect_trusted": {
+            "type": "boolean"
+          },
+          "expected_failure_reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "jose_checks": {
+      "type": "array",
+      "description": "Checks dependency-free detached JWS fixture behavior for protected headers, payload bytes, signing input, and trust-bundle binding.",
+      "items": {
+        "type": "object",
+        "required": [
+          "proof_package",
+          "detached_payload",
+          "trust_bundle",
+          "expect_valid"
+        ],
+        "properties": {
+          "proof_package": {
+            "type": "string",
+            "minLength": 1
+          },
+          "detached_payload": {
+            "type": "string",
+            "minLength": 1
+          },
+          "trust_bundle": {
+            "type": "string",
+            "minLength": 1
+          },
+          "checked_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expected_typ": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expect_valid": {
+            "type": "boolean"
+          },
+          "expected_failure_reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "category": {
+            "enum": [
+              "positive",
+              "negative"
+            ]
+          }
+        },
+        "required": [
+          "category"
+        ]
+      },
+      "then": {
+        "properties": {
+          "expected": {
+            "required": [
+              "admission_decision"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "category": {
+            "const": "linkage"
+          }
+        },
+        "required": [
+          "category"
+        ]
+      },
+      "then": {
+        "required": [
+          "linkage_checks"
+        ],
+        "properties": {
+          "expected": {
+            "required": [
+              "post_execution_outcome"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": true
+}

@@ -32,8 +32,8 @@ What is still open:
 - production JOSE signature verification profile choices
 - selective-disclosure presentation approach
 
-The v0.2 AL2 corpus now includes detached JWS byte-level fixtures, but those fixtures do not perform production cryptographic signature verification.
-The v0.2 decision is to avoid adding a JOSE dependency until a production proof
+The v0.3 AL2 corpus now includes detached JWS byte-level fixtures, but those fixtures do not perform production cryptographic signature verification.
+The v0.3 decision is to avoid adding a JOSE dependency until a production proof
 profile is ready or an independent implementation report demonstrates the
 signature-verification boundary.
 A review boundary for that future work is now documented in
@@ -68,7 +68,7 @@ The draft now distinguishes admission receipts from post-execution receipts, but
 - canonical correlation rules for `admission_receipt_ref`, `attestation_id`, and profile-specific correlation objects
 - when an admission receipt should be inline, dereferenceable, or both
 
-The v0.2 AL2 verifier admission profile adds separate admission and post-execution receipt schemas.
+The v0.3 AL2 verifier admission profile adds separate admission and post-execution receipt schemas.
 Remaining work is to validate those shapes across independent implementations and decide which proof packaging profiles are mandatory for each assurance level.
 
 ### 5. Status Policy Is Still Profile-Dependent
@@ -111,8 +111,8 @@ The repo now includes two machine-readable conformance corpora, plus a
 language-neutral corpus index:
 
 - an `AL2` HTTP corpus for the reference verifier demo
-- a runnable `v0.2` AL2 corpus for admission decisions, attenuation, A2A metadata references, negative cases, adjacent evidence, and post-execution linkage
-- a language-neutral `corpus.json` index for the `v0.2` AL2 corpus
+- a runnable `v0.3` AL2 corpus for admission decisions, attenuation, A2A metadata references, negative cases, adjacent evidence, and post-execution linkage
+- a language-neutral `corpus.json` index for the `v0.3` AL2 corpus
 
 Those corpora make the draft easier to inspect and replay, but they are not yet a multi-implementation conformance suite.
 
@@ -128,14 +128,14 @@ Remaining work includes:
 
 ### 10. Persistent Namespace Is Not Yet Chosen
 
-The v0.2 examples use repository-hosted draft URIs.
+The v0.3 examples use repository-hosted draft URIs.
 A future draft may move schema and extension identifiers to a persistent namespace such as `w3id.org`, but only after the namespace is controlled and documented.
 The migration discipline is now documented in `docs/namespace-migration.md`;
 the remaining gap is choosing and controlling the persistent namespace.
 
 ### 11. Digest And Canonicalization Need A Stable Profile
 
-The v0.2 runner uses dependency-free JSON canonical bytes produced by sorting
+The v0.3 runner uses dependency-free JSON canonical bytes produced by sorting
 object keys and removing insignificant whitespace before SHA-256 hashing.
 That is sufficient for current fixtures, but it is not a full production
 canonicalization profile.
@@ -150,7 +150,7 @@ Remaining work includes:
   request hashes, attenuation hashes, receipts, policy snapshots, and A2A
   metadata references
 The draft JOSE/JCS proof profile records the intended production direction, but
-the reference runner still uses the dependency-free v0.2 fixture byte basis.
+the reference runner still uses the dependency-free v0.3 fixture byte basis.
 
 ### 12. Execution Semantics Need Sharper Production Semantics
 
@@ -176,7 +176,7 @@ Remaining work includes:
 
 The runner now checks admission receipt id, admission digest, transaction id,
 runtime, decision, expiry, admitted effective request hash, and basic
-attenuated amount boundaries. That is enough for the v0.2 corpus, but not yet
+attenuated amount boundaries. That is enough for the v0.3 corpus, but not yet
 enough to claim multi-implementation readiness.
 
 Remaining work includes:
@@ -186,7 +186,7 @@ Remaining work includes:
 - independent implementation reports that exercise the linkage checks
 
 The reference core's local decimal-size bounds are defensive guardrails only.
-The v0.2 corpus checks aggregate `max_amount` semantics, currency mismatch, and
+The v0.3 corpus checks aggregate `max_amount` semantics, currency mismatch, and
 finite non-negative amount handling, but it does not require every
 implementation to adopt the same local text-length, integer-digit, or
 fractional-digit limits.
@@ -227,7 +227,7 @@ allowed evidence type / protocol hint combinations.
 Remaining work includes:
 
 - carrying the same vocabulary into independent verifier implementations
-- deciding how extension evidence types are registered after v0.2
+- deciding how extension evidence types are registered after v0.3
 - ensuring trust bundles and policy snapshots refer to the same vocabulary
 - adding more negative fixtures for unknown, malformed, or unregistered
   type/hint combinations
@@ -237,7 +237,7 @@ Remaining work includes:
 The SUT result and implementation report schemas now define publication
 metadata and optional external proof references. The runner can write an
 implementation report for both reference runs and external SUT comparisons.
-The v0.2 package also documents extension-field handling and includes a
+The v0.3 package also documents extension-field handling and includes a
 corpus-bound byte-level A2A signed Agent Card fixture, but still does not verify
 production cryptographic signatures.
 

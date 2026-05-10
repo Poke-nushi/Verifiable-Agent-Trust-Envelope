@@ -1,0 +1,48 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "post-execution-transaction-mismatch",
+  "title": "Reject post-execution transaction mismatch",
+  "category": "linkage",
+  "purpose": "A verifier or auditor should reject post-execution evidence when the execution transaction does not match the admitted transaction.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+    "post_execution_receipt": "examples/receipts/post-execution-transaction-mismatch.example.json"
+  },
+  "linkage_checks": [
+    {
+      "kind": "transaction_id",
+      "admission_path": "request.transaction_id",
+      "post_execution_path": "execution.transaction_id",
+      "expect_match": false,
+      "reason_code": "POST_EXEC_TRANSACTION_MISMATCH"
+    },
+    {
+      "kind": "policy_violation",
+      "value": "transaction_id_mismatch",
+      "expect_present": true,
+      "reason_code": "POST_EXEC_TRANSACTION_MISMATCH"
+    }
+  ],
+  "expected": {
+    "post_execution_outcome": "failed",
+    "should_execute": true,
+    "reason_codes": [
+      "POST_EXEC_TRANSACTION_MISMATCH"
+    ],
+    "checks": [
+      {
+        "name": "post_execution.execution.transaction_id",
+        "expected": "present"
+      },
+      {
+        "name": "result.policy_violations",
+        "expected": "fail"
+      }
+    ]
+  },
+  "validation_focus": [
+    "post-execution linkage",
+    "transaction id mismatch"
+  ]
+}

@@ -1,7 +1,7 @@
 # External SUT Quickstart
 
 This quickstart is for implementers who want to compare an external verifier
-implementation against the `VATE-AL2-Verifier-Admission-v0.2` corpus.
+implementation against the `VATE-AL2-Verifier-Admission-v0.3` corpus.
 
 It is an implementation review aid. It is not certification, endorsement,
 production approval, or a general compatibility claim.
@@ -24,8 +24,8 @@ repository's committed fixtures and reference runner behavior.
 
 Use these files as the contract surface:
 
-- `conformance/al2-vate-v0.2/corpus.json`
-- `conformance/al2-vate-v0.2/conformance-case.schema.json`
+- `conformance/al2-vate-v0.3/corpus.json`
+- `conformance/al2-vate-v0.3/conformance-case.schema.json`
 - `schemas/sut-result.schema.json`
 - `schemas/conformance-report.schema.json`
 - `schemas/implementation-report.schema.json`
@@ -47,7 +47,7 @@ Compare your SUT result against the same corpus snapshot:
 
 ```bash
 python3 scripts/vate_conformance.py compare \
-  --corpus-root conformance/al2-vate-v0.2 \
+  --corpus-root conformance/al2-vate-v0.3 \
   --sut-results /path/to/your-sut-results.json \
   --report /tmp/vate-sut-compare-report.json
 ```
@@ -63,7 +63,7 @@ before comparing an external SUT result, run:
 
 ```bash
 python3 scripts/vate_conformance.py run \
-  --corpus-root conformance/al2-vate-v0.2 \
+  --corpus-root conformance/al2-vate-v0.3 \
   --report /tmp/vate-reference-run.json
 ```
 
@@ -123,7 +123,7 @@ To also write an implementation report:
 
 ```bash
 python3 scripts/vate_conformance.py compare \
-  --corpus-root conformance/al2-vate-v0.2 \
+  --corpus-root conformance/al2-vate-v0.3 \
   --sut-results /path/to/your-sut-results.json \
   --report /tmp/vate-sut-compare-report.json \
   --implementation-report /tmp/vate-sut-implementation-report.json \
@@ -141,7 +141,7 @@ After generating both reports, verify the local digest chain:
 
 ```bash
 python3 scripts/vate_conformance.py verify-bundle \
-  --corpus-root conformance/al2-vate-v0.2 \
+  --corpus-root conformance/al2-vate-v0.3 \
   --sut-results /path/to/your-sut-results.json \
   --conformance-report /tmp/vate-sut-compare-report.json \
   --implementation-report /tmp/vate-sut-implementation-report.json \

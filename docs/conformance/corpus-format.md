@@ -2,7 +2,7 @@
 
 ## Status
 
-This note defines the language-neutral shape of the `VATE AL2 Verifier Admission v0.2` conformance corpus.
+This note defines the language-neutral shape of the `VATE AL2 Verifier Admission v0.3` conformance corpus.
 
 It is an implementation aid, not a production endorsement program.
 It lets non-Python implementations discover cases, resolve artifacts, and publish comparable reports without depending on the reference runner internals.
@@ -22,11 +22,11 @@ change date-stamped conformance artifact identifiers.
 
 Each runnable corpus SHOULD publish a `corpus.json` index at the corpus root.
 
-For the v0.2 AL2 corpus:
+For the v0.3 AL2 corpus:
 
-- index: `conformance/al2-vate-v0.2/corpus.json`
+- index: `conformance/al2-vate-v0.3/corpus.json`
 - schema: `schemas/conformance-corpus.schema.json`
-- case schema: `conformance/al2-vate-v0.2/conformance-case.schema.json`
+- case schema: `conformance/al2-vate-v0.3/conformance-case.schema.json`
 - report schema: `schemas/conformance-report.schema.json`
 - implementation report schema: `schemas/implementation-report.schema.json`
 
@@ -60,7 +60,7 @@ Each manifest entry records:
 The digest value is the SHA-256 of canonical JSON bytes for the manifest array.
 The current reference canonicalization sorts object keys and removes insignificant whitespace.
 
-This is a v0.2 fixture digest basis, not a production canonicalization profile.
+This is a v0.3 fixture digest basis, not a production canonicalization profile.
 It keeps the dependency-free corpus reproducible, but it does not define
 duplicate-key rejection, Unicode normalization, floating-point number
 normalization, streaming payload handling, or a general signed-JSON profile.
@@ -82,7 +82,7 @@ The reusable artifact and evidence reference schemas are intentionally
 algorithm-extensible so adjacent protocols can carry `sha-384`, `sha-512`, or
 future digest algorithms where a later profile permits them.
 
-The AL2 v0.2 profile schemas and conformance-facing artifact references are
+The AL2 v0.3 profile schemas and conformance-facing artifact references are
 stricter: descriptor `digest.alg` values must be `sha-256`, and descriptor
 `digest.value` values must be lowercase 64-character hexadecimal strings.
 Profile hash fields such as `input_hash` and `effective_request_hash` use the
@@ -118,7 +118,7 @@ Implementations MAY use the reference runner as a comparison oracle, but the cor
 ## Profile-Specific Checks
 
 Some cases include profile-specific check arrays in addition to the `expected`
-block. For the AL2 v0.2 corpus:
+block. For the AL2 v0.3 corpus:
 
 - `integrity_checks` bind referenced artifacts to expected digests
 - `artifact_reference_checks` bind digest references across requests, receipts,
@@ -163,7 +163,7 @@ For `max_amount`, `effective_constraints` checks aggregate
 Two side effects that are individually below the cap can still fail if their
 sum exceeds it.
 
-`admission_time_window` covers both execution start and finish. In the v0.2
+`admission_time_window` covers both execution start and finish. In the v0.3
 corpus, execution that starts before admission expiry but finishes after
 admission expiry is still invalid and maps to `POST_EXEC_ADMISSION_EXPIRED`.
 
@@ -188,8 +188,8 @@ When case files or referenced artifacts change, regenerate `corpus.json`:
 
 ```bash
 python3 scripts/vate_conformance.py index \
-  --corpus-root conformance/al2-vate-v0.2 \
-  --out conformance/al2-vate-v0.2/corpus.json
+  --corpus-root conformance/al2-vate-v0.3 \
+  --out conformance/al2-vate-v0.3/corpus.json
 ```
 
 `scripts/check_repo.py` fails if the committed corpus index is stale.

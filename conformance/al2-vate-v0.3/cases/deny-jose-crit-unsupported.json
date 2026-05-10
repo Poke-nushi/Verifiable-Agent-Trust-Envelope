@@ -1,0 +1,48 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "deny-jose-crit-unsupported",
+  "title": "Deny detached JWS fixture with unsupported critical header",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when a protected JOSE header contains unsupported crit parameters.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-deny-jose-crit-unsupported.example.json",
+    "jose_proof": "examples/jose/jose-detached-runtime-attestation-crit-unsupported.example.json",
+    "detached_payload": "examples/jose/detached-runtime-attestation-payload.json",
+    "trust_bundle": "examples/trust-bundle.example.json"
+  },
+  "jose_checks": [
+    {
+      "proof_package": "jose_proof",
+      "detached_payload": "detached_payload",
+      "trust_bundle": "trust_bundle",
+      "checked_at": "2026-07-01T00:17:05Z",
+      "expected_typ": "vate-evidence+jws",
+      "expect_valid": false,
+      "expected_failure_reason": "SCHEMA_INVALID"
+    }
+  ],
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "SCHEMA_INVALID",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "detached JWS fixture",
+    "critical header policy",
+    "fail closed"
+  ]
+}

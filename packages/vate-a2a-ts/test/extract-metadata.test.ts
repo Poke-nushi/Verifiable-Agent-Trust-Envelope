@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { extractVateMetadata, validateVateA2aMetadata } from "../src/index.js";
 
 const extensionUri =
-  "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2";
+  "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.3";
 
 function readJson(path: string): unknown {
   return JSON.parse(readFileSync(new URL(`../../../${path}`, import.meta.url), "utf8"));

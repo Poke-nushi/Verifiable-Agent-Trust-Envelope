@@ -29,17 +29,17 @@ HTTP_DEMO = ROOT / "reference" / "http-verifier-demo" / "http_verifier_demo.py"
 VATE_CONFORMANCE = ROOT / "scripts" / "vate_conformance.py"
 VATE_CORE = ROOT / "reference" / "vate-verifier-core" / "vate_verifier_core.py"
 A2A_ADAPTER = ROOT / "reference" / "a2a-metadata-adapter-demo" / "a2a_metadata_adapter_demo.py"
-EVIDENCE_VOCABULARY = ROOT / "registries" / "evidence-vocabulary.v0.2.json"
+EVIDENCE_VOCABULARY = ROOT / "registries" / "evidence-vocabulary.v0.3.json"
 ARTIFACT_VERSIONING_DOC = ROOT / "docs" / "conformance" / "artifact-versioning.md"
 JOSE_PROFILE_NOTES_DOC = ROOT / "docs" / "profiles" / "vate-jose-proof-profile-notes-2026-07.md"
 NAMESPACE_MIGRATION_DOC = ROOT / "docs" / "namespace-migration.md"
 EXTENSION_FIELDS_DOC = ROOT / "docs" / "extension-fields.md"
-A2A_METADATA_BINDING_DOC = ROOT / "docs" / "a2a-metadata-binding-v0.2.md"
+A2A_METADATA_BINDING_DOC = ROOT / "docs" / "a2a-metadata-binding-v0.3.md"
 A2A_EXTENSION_SKETCH_DOC = ROOT / "docs" / "a2a-v1-extension-sketch-2026-05.md"
 EXTERNAL_SUT_QUICKSTART_DOC = ROOT / "docs" / "conformance" / "external-sut-quickstart.md"
 SUT_ADAPTER_CONTRACT_DOC = ROOT / "docs" / "conformance" / "sut-adapter-contract.md"
-AL2_CORPUS_README = ROOT / "conformance" / "al2-vate-v0.2" / "README.md"
-V02_RELEASE_NOTES = ROOT / "docs" / "release-notes" / "v0.2.0.md"
+AL2_CORPUS_README = ROOT / "conformance" / "al2-vate-v0.3" / "README.md"
+V03_RELEASE_NOTES = ROOT / "docs" / "release-notes" / "v0.3.0.md"
 A2A_SIGNED_AGENT_CARD_PROOF = ROOT / "examples" / "jose" / "jose-detached-a2a-agent-card.example.json"
 A2A_SIGNED_AGENT_CARD_PAYLOAD = ROOT / "examples" / "a2a" / "agent-card-v1-vate-extension.example.json"
 JSON_ONLY_FILES = [
@@ -47,7 +47,7 @@ JSON_ONLY_FILES = [
     "examples/a2a/agent-card-v1-vate-extension.example.json",
 ]
 EXAMPLE_PAIRS = [
-    ("registries/evidence-vocabulary.v0.2.json", "schemas/evidence-vocabulary.schema.json"),
+    ("registries/evidence-vocabulary.v0.3.json", "schemas/evidence-vocabulary.schema.json"),
     ("examples/passport-credential.example.json", "schemas/passport-credential.schema.json"),
     ("examples/runtime-proof.example.json", "schemas/runtime-proof.schema.json"),
     ("examples/mission-permit.example.json", "schemas/mission-permit.schema.json"),
@@ -80,7 +80,7 @@ EXAMPLE_PAIRS = [
     ("examples/implementation-report.example.json", "schemas/implementation-report.schema.json"),
     ("examples/report-bundle-verification.example.json", "schemas/report-bundle-verification.schema.json"),
     ("examples/conformance/sut-results-pass.example.json", "schemas/sut-result.schema.json"),
-    ("conformance/al2-vate-v0.2/corpus.json", "schemas/conformance-corpus.schema.json"),
+    ("conformance/al2-vate-v0.3/corpus.json", "schemas/conformance-corpus.schema.json"),
     ("examples/policies/merchant-purchase-al2-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),
     ("examples/policies/al2-repo-merge-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),
     ("examples/status-bundle.example.json", "schemas/status-bundle.schema.json"),
@@ -104,24 +104,24 @@ EXAMPLE_PAIRS = [
         "conformance/al2-http/verification-report.schema.json",
     ),
     (
-        "conformance/al2-vate-v0.2/cases/allow-valid-admission.json",
-        "conformance/al2-vate-v0.2/conformance-case.schema.json",
+        "conformance/al2-vate-v0.3/cases/allow-valid-admission.json",
+        "conformance/al2-vate-v0.3/conformance-case.schema.json",
     ),
     (
-        "conformance/al2-vate-v0.2/cases/attenuate-max-amount.json",
-        "conformance/al2-vate-v0.2/conformance-case.schema.json",
+        "conformance/al2-vate-v0.3/cases/attenuate-max-amount.json",
+        "conformance/al2-vate-v0.3/conformance-case.schema.json",
     ),
     (
-        "conformance/al2-vate-v0.2/cases/deny-expired-permit.json",
-        "conformance/al2-vate-v0.2/conformance-case.schema.json",
+        "conformance/al2-vate-v0.3/cases/deny-expired-permit.json",
+        "conformance/al2-vate-v0.3/conformance-case.schema.json",
     ),
     (
-        "conformance/al2-vate-v0.2/cases/deny-audience-mismatch.json",
-        "conformance/al2-vate-v0.2/conformance-case.schema.json",
+        "conformance/al2-vate-v0.3/cases/deny-audience-mismatch.json",
+        "conformance/al2-vate-v0.3/conformance-case.schema.json",
     ),
     (
-        "conformance/al2-vate-v0.2/cases/post-execution-linkage-success.json",
-        "conformance/al2-vate-v0.2/conformance-case.schema.json",
+        "conformance/al2-vate-v0.3/cases/post-execution-linkage-success.json",
+        "conformance/al2-vate-v0.3/conformance-case.schema.json",
     ),
 ]
 
@@ -157,8 +157,8 @@ def iter_example_pairs() -> list[tuple[str, str]]:
         for path in sorted((ROOT / "examples" / "interop").glob("**/vate-post-execution-receipt*.json"))
     )
     pairs.extend(
-        (str(path.relative_to(ROOT)), "conformance/al2-vate-v0.2/conformance-case.schema.json")
-        for path in sorted((ROOT / "conformance" / "al2-vate-v0.2" / "cases").glob("*.json"))
+        (str(path.relative_to(ROOT)), "conformance/al2-vate-v0.3/conformance-case.schema.json")
+        for path in sorted((ROOT / "conformance" / "al2-vate-v0.3" / "cases").glob("*.json"))
     )
     return sorted(set(pairs))
 
@@ -418,7 +418,6 @@ def check_a2a_adapter_malformed_metadata_fail_closed() -> None:
         None,
         "missing VATE A2A metadata extension object",
         source_artifact=missing_metadata_task,
-        source_uri="inline:a2a-task-message",
     )
     assert_a2a_adapter_schema_invalid_response_binds_source(
         adapter,
@@ -442,7 +441,6 @@ def check_a2a_adapter_malformed_metadata_fail_closed() -> None:
         None,
         "task message must be a JSON object",
         source_artifact=malformed_task,
-        source_uri="inline:a2a-task-message",
     )
     assert_a2a_adapter_schema_invalid_response_binds_source(
         adapter,
@@ -486,7 +484,6 @@ def check_a2a_adapter_malformed_metadata_fail_closed() -> None:
         metadata,
         metadata_failure_reason,
         source_artifact=metadata,
-        source_uri="inline:a2a-metadata",
     )
     assert_a2a_adapter_schema_invalid_response_binds_source(
         adapter,
@@ -538,9 +535,12 @@ def assert_a2a_adapter_schema_invalid_response_binds_source(
     receipt_ref = response.get("metadata", {}).get(adapter.EXTENSION_URI, {}).get("admission_receipt", {})
     actual_receipt_digest = receipt_ref.get("digest", {}).get("value")
     if actual_receipt_digest != expected_receipt_digest:
-        raise RuntimeError(f"A2A adapter schema-invalid response must bind {label} in its receipt digest")
-    assert_a2a_adapter_receipt_binds_source(
+        raise RuntimeError(f"A2A adapter schema-invalid response must reference the expected receipt for {label}")
+    if "failure_source" in expected_receipt:
+        raise RuntimeError("A2A adapter schema-invalid receipt must not carry demo-local failure_source")
+    assert_a2a_adapter_response_binds_source(
         adapter,
+        response,
         expected_receipt,
         source_artifact,
         source_uri,
@@ -550,8 +550,9 @@ def assert_a2a_adapter_schema_invalid_response_binds_source(
     )
 
 
-def assert_a2a_adapter_receipt_binds_source(
+def assert_a2a_adapter_response_binds_source(
     adapter,
+    response: dict,
     receipt: dict,
     source_artifact,
     source_uri: str,
@@ -562,39 +563,39 @@ def assert_a2a_adapter_receipt_binds_source(
     for evidence in receipt.get("evidence", []):
         if evidence.get("type") == "admission_request" and evidence.get("uri") == source_uri:
             raise RuntimeError(f"A2A adapter schema-invalid receipt must not classify {label} as admission_request evidence")
-    failure_source = receipt.get("failure_source", {})
+    failure_source = response.get("demo_local_failure_source", {})
     if failure_source.get("kind") != source_kind:
-        raise RuntimeError(f"A2A adapter schema-invalid receipt must classify {label} as {source_kind}")
+        raise RuntimeError(f"A2A adapter schema-invalid response must classify {label} as {source_kind}")
     if failure_source.get("uri") != source_uri:
-        raise RuntimeError(f"A2A adapter schema-invalid receipt must use {source_uri} for {label}")
+        raise RuntimeError(f"A2A adapter schema-invalid response must use {source_uri} for {label}")
     expected_digest = adapter.core.safe_digest_value(source_artifact)
     actual_digest = failure_source.get("digest", {}).get("value")
     if actual_digest != expected_digest:
-        raise RuntimeError(f"A2A adapter schema-invalid receipt must digest-bind {label}")
+        raise RuntimeError(f"A2A adapter schema-invalid response must digest-bind {label}")
     if actual_digest == adapter.SAFE_DIGEST["value"]:
-        raise RuntimeError(f"A2A adapter schema-invalid receipt must not use placeholder digest for {label}")
+        raise RuntimeError(f"A2A adapter schema-invalid response must not use placeholder digest for {label}")
     if failure_source.get("failure_reason") != expected_failure_reason:
-        raise RuntimeError(f"A2A adapter schema-invalid receipt must record the failure reason for {label}")
+        raise RuntimeError(f"A2A adapter schema-invalid response must record the failure reason for {label}")
 
 
 def check_al2_corpus_docs_synced() -> None:
-    case_dir = ROOT / "conformance" / "al2-vate-v0.2" / "cases"
+    case_dir = ROOT / "conformance" / "al2-vate-v0.3" / "cases"
     case_paths = sorted(case_dir.glob("*.json"))
     readme = AL2_CORPUS_README.read_text(encoding="utf-8")
     missing_readme_cases = [
-        str(path.relative_to(ROOT / "conformance" / "al2-vate-v0.2"))
+        str(path.relative_to(ROOT / "conformance" / "al2-vate-v0.3"))
         for path in case_paths
-        if str(path.relative_to(ROOT / "conformance" / "al2-vate-v0.2")) not in readme
+        if str(path.relative_to(ROOT / "conformance" / "al2-vate-v0.3")) not in readme
     ]
     if missing_readme_cases:
         raise RuntimeError(f"AL2 corpus README is missing cases: {missing_readme_cases}")
 
-    release_notes = " ".join(V02_RELEASE_NOTES.read_text(encoding="utf-8").split())
+    release_notes = " ".join(V03_RELEASE_NOTES.read_text(encoding="utf-8").split())
     case_count = len(case_paths)
-    if f"{case_count}-case AL2 v0.2 draft conformance corpus" not in release_notes:
-        raise RuntimeError("v0.2 release notes case-count summary is stale")
-    if f"{case_count} AL2 v0.2 cases" not in release_notes:
-        raise RuntimeError("v0.2 release notes implementer case-count text is stale")
+    if f"{case_count}-case AL2 v0.3 draft conformance corpus" not in release_notes:
+        raise RuntimeError("v0.3 release notes case-count summary is stale")
+    if f"{case_count} AL2 v0.3 cases" not in release_notes:
+        raise RuntimeError("v0.3 release notes implementer case-count text is stale")
 
 
 def check_evidence_vocabulary_registry() -> None:
@@ -679,7 +680,7 @@ def check_artifact_versioning_docs() -> None:
 
 
 def check_post_execution_linkage_kind_coverage() -> None:
-    case_dir = ROOT / "conformance" / "al2-vate-v0.2" / "cases"
+    case_dir = ROOT / "conformance" / "al2-vate-v0.3" / "cases"
     observed_kinds: set[str] = set()
     for case_path in case_dir.glob("post-execution-*.json"):
         case = json.loads(case_path.read_text(encoding="utf-8"))
@@ -726,7 +727,7 @@ def check_post_execution_linkage_kind_coverage() -> None:
 
 
 def check_transport_bound_fixture_coverage() -> None:
-    case_dir = ROOT / "conformance" / "al2-vate-v0.2" / "cases"
+    case_dir = ROOT / "conformance" / "al2-vate-v0.3" / "cases"
     case_path = case_dir / "deny-mcp-oauth-upstream-denied.json"
     if not case_path.exists():
         raise RuntimeError(
@@ -767,7 +768,7 @@ def check_transport_bound_fixture_coverage() -> None:
 
 
 def check_status_freshness_boundary_coverage() -> None:
-    case_path = ROOT / "conformance" / "al2-vate-v0.2" / "cases" / "allow-status-fresh-at-boundary.json"
+    case_path = ROOT / "conformance" / "al2-vate-v0.3" / "cases" / "allow-status-fresh-at-boundary.json"
     if not case_path.exists():
         raise RuntimeError(
             "status freshness coverage is missing allow-status-fresh-at-boundary: "
@@ -787,7 +788,7 @@ def check_status_freshness_boundary_coverage() -> None:
 
 
 def check_replay_boundary_coverage() -> None:
-    case_path = ROOT / "conformance" / "al2-vate-v0.2" / "cases" / "allow-replay-state-unused.json"
+    case_path = ROOT / "conformance" / "al2-vate-v0.3" / "cases" / "allow-replay-state-unused.json"
     if not case_path.exists():
         raise RuntimeError(
             "replay coverage is missing allow-replay-state-unused: AL2 context checks "
@@ -820,7 +821,7 @@ def check_p1_5_fixture_coverage() -> None:
         "deny-jose-es384-not-allowed": ["ALG_NOT_ALLOWED", "FAIL_CLOSED"],
         "deny-attenuation-negative-amount": ["SCHEMA_INVALID", "FAIL_CLOSED"],
     }
-    case_dir = ROOT / "conformance" / "al2-vate-v0.2" / "cases"
+    case_dir = ROOT / "conformance" / "al2-vate-v0.3" / "cases"
     for case_id, expected_reason_codes in required_cases.items():
         case_path = case_dir / f"{case_id}.json"
         if not case_path.exists():
@@ -887,7 +888,7 @@ def check_p2_public_artifact_boundary() -> None:
             "repository-scoped draft uri",
             "persistent namespace",
             "migration conditions",
-            "do not break existing v0.2 corpus",
+            "do not break existing v0.3 corpus",
         ],
         EXTENSION_FIELDS_DOC: [
             "unknown extension fields",
@@ -923,10 +924,10 @@ def check_p2_public_artifact_boundary() -> None:
         if missing:
             raise RuntimeError(f"{path.relative_to(ROOT)} is missing P2 artifact-boundary language: {missing}")
     if "what exact artifact should be digest-bound" in A2A_EXTENSION_SKETCH_DOC.read_text(encoding="utf-8").lower():
-        raise RuntimeError("A2A extension sketch still treats the v0.2 signed Agent Card digest target as open")
+        raise RuntimeError("A2A extension sketch still treats the v0.3 signed Agent Card digest target as open")
 
     required_case_id = "allow-a2a-signed-agent-card-evidence"
-    corpus = json.loads((ROOT / "conformance" / "al2-vate-v0.2" / "corpus.json").read_text(encoding="utf-8"))
+    corpus = json.loads((ROOT / "conformance" / "al2-vate-v0.3" / "corpus.json").read_text(encoding="utf-8"))
     corpus_case_ids = {case.get("case_id") for case in corpus.get("cases", []) if isinstance(case, dict)}
     if required_case_id not in corpus_case_ids:
         raise RuntimeError(f"P2 A2A signed Agent Card fixture is not corpus-bound: missing {required_case_id}")
@@ -971,7 +972,7 @@ def check_p2_public_artifact_boundary() -> None:
         raise RuntimeError("A2A signed Agent Card proof fixture signing input digest is not canonical")
 
     conformance = load_vate_conformance_module()
-    case_path = ROOT / "conformance" / "al2-vate-v0.2" / "cases" / f"{required_case_id}.json"
+    case_path = ROOT / "conformance" / "al2-vate-v0.3" / "cases" / f"{required_case_id}.json"
     case = json.loads(case_path.read_text(encoding="utf-8"))
 
     with tempfile.TemporaryDirectory(prefix="vate-a2a-agent-card-negative-") as negative_dir:
@@ -1102,7 +1103,7 @@ def main() -> int:
                 str(VATE_CONFORMANCE),
                 "run",
                 "--corpus-root",
-                str(ROOT / "conformance" / "al2-vate-v0.2"),
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
                 "--report",
                 str(tmp_dir / "vate-conformance-report.json"),
                 "--implementation-report",
@@ -1125,12 +1126,12 @@ def main() -> int:
                 str(VATE_CONFORMANCE),
                 "index",
                 "--corpus-root",
-                str(ROOT / "conformance" / "al2-vate-v0.2"),
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
                 "--out",
                 str(generated_corpus_index),
             ]
         )
-        assert_json_matches(generated_corpus_index, ROOT / "conformance" / "al2-vate-v0.2" / "corpus.json")
+        assert_json_matches(generated_corpus_index, ROOT / "conformance" / "al2-vate-v0.3" / "corpus.json")
         assert_primary_reason_codes(generated_corpus_index)
         run(
             [
@@ -1138,7 +1139,7 @@ def main() -> int:
                 str(VATE_CONFORMANCE),
                 "compare",
                 "--corpus-root",
-                str(ROOT / "conformance" / "al2-vate-v0.2"),
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
                 "--sut-results",
                 str(ROOT / "examples" / "conformance" / "sut-results-pass.example.json"),
                 "--report",
@@ -1160,7 +1161,7 @@ def main() -> int:
                 str(VATE_CONFORMANCE),
                 "compare",
                 "--corpus-root",
-                str(ROOT / "conformance" / "al2-vate-v0.2"),
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
                 "--sut-results",
                 str(missing_jose_proofs),
                 "--report",
@@ -1175,7 +1176,7 @@ def main() -> int:
                 str(VATE_CONFORMANCE),
                 "compare",
                 "--corpus-root",
-                str(ROOT / "conformance" / "al2-vate-v0.2"),
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
                 "--sut-results",
                 str(missing_context_bindings),
                 "--report",
@@ -1188,7 +1189,7 @@ def main() -> int:
                 str(VATE_CONFORMANCE),
                 "verify-bundle",
                 "--corpus-root",
-                str(ROOT / "conformance" / "al2-vate-v0.2"),
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
                 "--sut-results",
                 str(ROOT / "examples" / "conformance" / "sut-results-pass.example.json"),
                 "--conformance-report",

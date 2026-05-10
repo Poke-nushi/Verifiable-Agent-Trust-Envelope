@@ -17,8 +17,8 @@ from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
-PROFILE = "VATE-AL2-Verifier-Admission-v0.2"
-VERSION = "vate-0.2"
+PROFILE = "VATE-AL2-Verifier-Admission-v0.3"
+VERSION = "vate-0.3"
 EXECUTABLE_ADMISSION_DECISIONS = {"allow", "attenuate"}
 SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 PROFILE_HASH_RE = re.compile(r"^sha-256:[0-9a-f]{64}$")
@@ -193,6 +193,16 @@ def is_valid_evidence_reference(value: Any) -> bool:
     if not isinstance(protocol_hint, str) or not protocol_hint:
         return False
     return protocol_hint in ALLOWED_PROTOCOL_HINTS_BY_TYPE[evidence_type]
+
+
+def evidence_refs_failure_reason(request_obj: dict[str, Any], raw_evidence_refs: Any) -> str:
+    if "evidence_refs" not in request_obj:
+        return "missing evidence_refs: at least one digest-addressed evidence reference is required"
+    if raw_evidence_refs == []:
+        return "empty evidence_refs: at least one digest-addressed evidence reference is required"
+    if not isinstance(raw_evidence_refs, list):
+        return "schema-invalid evidence_refs: expected an array of digest-addressed evidence references"
+    return "schema-invalid evidence reference"
 
 
 def side_effects_exceed_constraints(
@@ -655,7 +665,7 @@ class VateVerifier:
                         "result": "failed",
                         "checked_at": iso(now),
                         "method": "vate-verifier-core",
-                        "failure_reason": "schema-invalid evidence reference",
+                        "failure_reason": evidence_refs_failure_reason(request_obj, raw_evidence_refs),
                     },
                 }
             ]

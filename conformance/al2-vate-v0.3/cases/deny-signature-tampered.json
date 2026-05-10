@@ -1,0 +1,33 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "deny-signature-tampered",
+  "title": "Deny tampered signed evidence",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when signed evidence is modified after signing.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-deny-signature-tampered.example.json"
+  },
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "SIGNATURE_INVALID",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "proof integrity",
+    "fail closed"
+  ]
+}

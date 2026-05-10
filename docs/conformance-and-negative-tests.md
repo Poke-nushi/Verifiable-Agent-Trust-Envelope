@@ -135,9 +135,9 @@ That corpus could later back:
 - CI conformance runs
 - interoperability bake-offs between independent implementations
 
-## v0.2 AL2 Admission Corpus
+## v0.3 AL2 Admission Corpus
 
-The v0.2 AL2 verifier admission profile now includes a small corpus that focuses on admission and receipt semantics across transports.
+The v0.3 AL2 verifier admission profile now includes a small corpus that focuses on admission and receipt semantics across transports.
 
 Current cases:
 
@@ -161,9 +161,9 @@ These cases should validate:
 - `schemas/admission-receipt.schema.json`
 - `schemas/post-execution-receipt.schema.json`
 
-The repository now includes a small v0.2 profile corpus under:
+The repository now includes a small v0.3 profile corpus under:
 
-- `conformance/al2-vate-v0.2/`
+- `conformance/al2-vate-v0.3/`
 
 That corpus is not a production endorsement suite.
-It is the first reviewable shape for expected v0.2 admission decisions and post-execution outcomes.
+It is the first reviewable shape for expected v0.3 admission decisions and post-execution outcomes.

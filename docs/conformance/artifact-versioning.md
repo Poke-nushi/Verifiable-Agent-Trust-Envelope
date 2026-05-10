@@ -3,7 +3,7 @@
 ## Status
 
 This note fixes how date-stamped conformance artifact identifiers are used in
-the v0.2 AL2 draft.
+the v0.3 AL2 draft.
 
 ## Current Decision
 
@@ -14,14 +14,21 @@ It is not the publication date, not the date on which a fixture was edited, and
 not a production-readiness claim.
 
 The exact corpus snapshot for a run is identified by the manifest digest in
-`conformance/al2-vate-v0.2/corpus.json` and in generated reports. The date label
+`conformance/al2-vate-v0.3/corpus.json` and in generated reports. The date label
 is a compatibility line for the draft artifact contracts, not a substitute for
 that digest.
 
+The repository release version (`v0.3.0`), the AL2 profile version
+(`VATE-AL2-Verifier-Admission-v0.3`), and the `2026-07` conformance artifact
+line are separate identifiers.
+
+The `2026-07` label remains a deterministic interop artifact line unless the
+report or SUT schema contract itself is replaced.
+
 In short: Do not rename `2026-07` identifiers to the current review month while
-the same profile, corpus, schema, and report contracts are being hardened.
+the report and SUT artifact-line contracts are being carried forward.
 Renaming these identifiers would change report constants, schema IDs, fixture
-versions, and corpus manifests without changing verifier semantics.
+versions, and corpus manifests without changing the report exchange format.
 
 ## What The Label Covers
 

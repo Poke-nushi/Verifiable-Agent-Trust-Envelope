@@ -51,7 +51,7 @@ The fixture under `examples/interop/oap-to-vate/` uses:
 
 The corresponding conformance case is:
 
-- `conformance/al2-vate-v0.2/cases/interop-oap-decision-evidence.json`
+- `conformance/al2-vate-v0.3/cases/interop-oap-decision-evidence.json`
 
 ## Non-Goals
 

@@ -1,0 +1,42 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "deny-status-stale-fail-closed",
+  "title": "Deny stale status under fail-closed policy",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when status evidence is stale for an AL2 action.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-deny-status-stale.example.json",
+    "status_context": "conformance/al2-vate-v0.3/fixtures/status-stale-context.json"
+  },
+  "al2_context_checks": [
+    {
+      "kind": "freshness",
+      "artifact": "status_context",
+      "expect_fresh": false,
+      "expected_failure_reason": "STATUS_STALE"
+    }
+  ],
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "STATUS_STALE",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "status freshness",
+    "fail closed"
+  ]
+}

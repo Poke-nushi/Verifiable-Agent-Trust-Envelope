@@ -13,7 +13,7 @@
   "input_hash": "sha-256:a0b7d342a0c1eec92f653fb11227398206a66d8fb66f1eefc6ec7812f2741d3c",
   "issued_at": "2026-07-01T00:00:00Z",
   "principal": "did:web:user.example",
-  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "request_id": "areq-20260701-empty-evidence-refs-001",
   "runtime": "spiffe://agent.example/workload/purchase-agent",
   "target": {
@@ -21,5 +21,5 @@
     "resource": "https://merchant.example/checkout"
   },
   "transaction_id": "txn-20260701-empty-evidence-refs-001",
-  "version": "vate-0.2"
+  "version": "vate-0.3"
 }

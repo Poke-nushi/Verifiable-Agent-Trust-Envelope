@@ -1,0 +1,123 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "post-execution-linkage-success",
+  "title": "Link post-execution receipt to the admitted effective request",
+  "category": "linkage",
+  "purpose": "A verifier or auditor should be able to link post-execution evidence back to the admission receipt and effective request hash.",
+  "artifacts": {
+    "a2a_metadata": "examples/a2a/metadata-post-execution-issued.json",
+    "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+    "post_execution_receipt": "examples/receipts/post-execution-success.example.json"
+  },
+  "artifact_reference_checks": [
+    {
+      "artifact": "admission_receipt",
+      "expect_match": true,
+      "reference_paths": [
+        {
+          "artifact": "post_execution_receipt",
+          "path": "admission.digest"
+        },
+        {
+          "artifact": "a2a_metadata",
+          "path": "admission_receipt.digest"
+        }
+      ]
+    },
+    {
+      "artifact": "post_execution_receipt",
+      "expect_match": true,
+      "reference_paths": [
+        {
+          "artifact": "a2a_metadata",
+          "path": "post_execution_receipt.digest"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "admission_decision": "attenuate",
+    "post_execution_outcome": "success",
+    "should_execute": true,
+    "reason_codes": [
+      "ADMISSION_RECEIPT_LINKED",
+      "EFFECTIVE_REQUEST_HASH_MATCH",
+      "NO_POLICY_VIOLATIONS"
+    ],
+    "checks": [
+      {
+        "name": "post_execution.admission.digest",
+        "expected": "present"
+      },
+      {
+        "name": "post_execution.execution.effective_request_hash",
+        "expected": "present"
+      },
+      {
+        "name": "post_execution.result.policy_violations",
+        "expected": "pass"
+      },
+      {
+        "name": "a2a_metadata.post_execution_receipt.digest",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "post-execution receipt linkage",
+    "effective request hash continuity",
+    "side-effect audit record",
+    "digest-bound A2A post-execution reference"
+  ],
+  "linkage_checks": [
+    {
+      "kind": "admission_digest",
+      "artifact": "admission_receipt",
+      "post_execution_path": "admission.digest",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_ADMISSION_DIGEST_MISMATCH"
+    },
+    {
+      "kind": "admission_receipt_id",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_LINKAGE_MISMATCH"
+    },
+    {
+      "kind": "admission_decision",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_LINKAGE_MISMATCH"
+    },
+    {
+      "kind": "transaction_id",
+      "admission_path": "request.transaction_id",
+      "post_execution_path": "execution.transaction_id",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_TRANSACTION_MISMATCH"
+    },
+    {
+      "kind": "runtime",
+      "admission_path": "subject.runtime",
+      "post_execution_path": "execution.runtime",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_RUNTIME_MISMATCH"
+    },
+    {
+      "kind": "effective_request_hash",
+      "admission_path": "attenuation.effective_request_hash",
+      "post_execution_path": "execution.effective_request_hash",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH"
+    },
+    {
+      "kind": "admission_time_window",
+      "expect_valid": true,
+      "reason_code": "POST_EXEC_ADMISSION_EXPIRED"
+    },
+    {
+      "kind": "effective_constraints",
+      "expect_valid": true,
+      "reason_code": "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
+    }
+  ]
+}

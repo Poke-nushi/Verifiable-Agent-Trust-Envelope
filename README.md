@@ -13,9 +13,10 @@ MCP, OAuth, AP2, VC, and related systems provide evidence.
 VATE records the verifier decision: `allow`, `attenuate`, or `deny`.
 
 - `v0.1 discussion draft`
-- `v0.2 AL2 verifier admission profile draft`
+- `v0.2.0 archived May 5, 2026 review snapshot`
+- `v0.3.0 current AL2 verifier admission hardening draft`
 - `not production-ready`
-- `no endorsement or production approval implied`
+- `no endorsement, certification, official A2A compatibility, or production approval implied`
 - `seeking critique on boundary, verifier order, and artifact semantics`
 
 [![DOI](https://zenodo.org/badge/1214949350.svg)](https://doi.org/10.5281/zenodo.19839768)
@@ -53,7 +54,7 @@ policy evaluation.
 and returns `allow`, `attenuate`, or `deny` with a machine-readable admission
 receipt.
 
-The `v0.2` work keeps that verifier-side boundary but narrows the next deliverable to the [VATE AL2 Verifier Admission Profile v0.2](docs/profiles/vate-al2-verifier-admission-profile-v0.2.md).
+The `v0.3` work keeps that verifier-side boundary but narrows the next deliverable to the [VATE AL2 Verifier Admission Profile v0.3](docs/profiles/vate-al2-verifier-admission-profile-v0.3.md).
 That profile treats A2A, MCP, OAuth, VC, DID, OID4VP, Web Bot Auth, AP2, x402, ACP, and payment-token systems as adjacent layers that can provide evidence.
 VATE defines how a relying party evaluates those inputs before execution and records the decision.
 For A2A reviewers, start with the A2A review package in
@@ -127,16 +128,16 @@ Direct comparison note:
 If you are new to the repo, the fastest path is:
 
 1. this `README.md`
-2. [docs/v0.2-in-5-minutes.md](docs/v0.2-in-5-minutes.md)
-3. [docs/profiles/vate-al2-verifier-admission-profile-v0.2.md](docs/profiles/vate-al2-verifier-admission-profile-v0.2.md)
+2. [docs/v0.3-in-5-minutes.md](docs/v0.3-in-5-minutes.md)
+3. [docs/profiles/vate-al2-verifier-admission-profile-v0.3.md](docs/profiles/vate-al2-verifier-admission-profile-v0.3.md)
 4. [docs/a2a/README.md](docs/a2a/README.md)
-5. [docs/a2a/vate-a2a-extension-profile-v0.2.md](docs/a2a/vate-a2a-extension-profile-v0.2.md)
-6. [docs/a2a-metadata-binding-v0.2.md](docs/a2a-metadata-binding-v0.2.md)
+5. [docs/a2a/vate-a2a-extension-profile-v0.3.md](docs/a2a/vate-a2a-extension-profile-v0.3.md)
+6. [docs/a2a-metadata-binding-v0.3.md](docs/a2a-metadata-binding-v0.3.md)
 7. [docs/a2a-v1-extension-sketch-2026-05.md](docs/a2a-v1-extension-sketch-2026-05.md)
-8. [docs/receipt-model-v0.2.md](docs/receipt-model-v0.2.md)
-9. [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md)
+8. [docs/receipt-model-v0.3.md](docs/receipt-model-v0.3.md)
+9. [docs/a2a-maintainer-brief-v0.3.md](docs/a2a-maintainer-brief-v0.3.md)
 10. [docs/profiles/vate-al2-admission-interop-profile-2026-07.md](docs/profiles/vate-al2-admission-interop-profile-2026-07.md)
-11. [conformance/al2-vate-v0.2/README.md](conformance/al2-vate-v0.2/README.md)
+11. [conformance/al2-vate-v0.3/README.md](conformance/al2-vate-v0.3/README.md)
 12. [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)
 13. section `0` and section `1` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md)
 14. [reference/http-verifier-demo/README.md](reference/http-verifier-demo/README.md)
@@ -163,7 +164,7 @@ The most useful feedback for this draft is currently:
 - **Primary language**: English
 - **Research refresh date**: 2026-05-07
 - **Primary battlefield**: `AL2` external digital write
-- **Implemented artifacts**: v0.2 schemas and examples; runnable AL2 fixture corpus with negative cases; SUT comparison and implementation-reporting formats; dependency-free verifier core and A2A-shaped adapter demo; package-private TypeScript reference helpers for digest-bound artifacts, SUT result shaping, and A2A metadata shape checks; focused adjacent evidence fixtures and crosswalk notes
+- **Implemented artifacts**: v0.3 schemas and examples; runnable AL2 fixture corpus with negative cases; SUT comparison and implementation-reporting formats; dependency-free verifier core and A2A-shaped adapter demo; package-private TypeScript reference helpers for digest-bound artifacts, SUT result shaping, and A2A metadata shape checks; focused adjacent evidence fixtures and crosswalk notes
 - **Planned later**: pairwise presentation profile, richer capability registry, formal `AID`, physical `ABS` profiles
 
 The conformance artifacts record one implementation run against one corpus
@@ -182,8 +183,8 @@ compatibility claim.
   Verifier-side validation order
 - [docs/profiles/al2-minimal-profile.md](docs/profiles/al2-minimal-profile.md)
   Baseline profile for the current reference battlefield
-- [docs/profiles/vate-al2-verifier-admission-profile-v0.2.md](docs/profiles/vate-al2-verifier-admission-profile-v0.2.md)
-  Narrow v0.2 profile for verifier-side AL2 admission decisions
+- [docs/profiles/vate-al2-verifier-admission-profile-v0.3.md](docs/profiles/vate-al2-verifier-admission-profile-v0.3.md)
+  Narrow v0.3 profile for verifier-side AL2 admission decisions
 - [docs/profiles/vate-al2-admission-interop-profile-2026-07.md](docs/profiles/vate-al2-admission-interop-profile-2026-07.md)
   Narrow conformance-facing AL2 admission interop profile
 - [docs/profiles/vate-proof-profile-jose-jcs-v0.2.md](docs/profiles/vate-proof-profile-jose-jcs-v0.2.md)
@@ -192,23 +193,23 @@ compatibility claim.
   Canonical machine-readable reason codes for AL2 conformance
 - [docs/evidence-types.md](docs/evidence-types.md)
   Human-readable evidence type and protocol hint vocabulary for AL2 conformance
-- [registries/evidence-vocabulary.v0.2.json](registries/evidence-vocabulary.v0.2.json)
+- [registries/evidence-vocabulary.v0.3.json](registries/evidence-vocabulary.v0.3.json)
   Canonical machine-readable evidence vocabulary registry, including allowed type/hint pairs
 - [docs/attenuation-semantics.md](docs/attenuation-semantics.md)
   Machine-readable attenuation semantics for AL2 conformance
-- [docs/v0.2-in-5-minutes.md](docs/v0.2-in-5-minutes.md)
-  Short entry point for the v0.2 draft
+- [docs/v0.3-in-5-minutes.md](docs/v0.3-in-5-minutes.md)
+  Short entry point for the v0.3 draft
 - [docs/a2a/README.md](docs/a2a/README.md)
   A2A-shaped metadata review package entry point
-- [docs/a2a/vate-a2a-extension-profile-v0.2.md](docs/a2a/vate-a2a-extension-profile-v0.2.md)
+- [docs/a2a/vate-a2a-extension-profile-v0.3.md](docs/a2a/vate-a2a-extension-profile-v0.3.md)
   Consolidated metadata-only A2A extension profile draft for VATE references
-- [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md)
+- [docs/a2a-maintainer-brief-v0.3.md](docs/a2a-maintainer-brief-v0.3.md)
   A2A maintainer-oriented summary of the metadata-only admission and receipt binding
-- [docs/release-gate-v0.2.0.md](docs/release-gate-v0.2.0.md)
-  Final technical gate before cutting the v0.2.0 discussion-draft pre-release
+- [docs/release-gate-v0.3.0.md](docs/release-gate-v0.3.0.md)
+  Final technical gate before cutting the v0.3.0 discussion-draft pre-release
 - [docs/a2a-issue-update-2026-05.md](docs/a2a-issue-update-2026-05.md)
   Short A2A-adjacent issue update draft after the runnable v0.2 artifacts
-- [docs/a2a-metadata-binding-v0.2.md](docs/a2a-metadata-binding-v0.2.md)
+- [docs/a2a-metadata-binding-v0.3.md](docs/a2a-metadata-binding-v0.3.md)
   Reference-only A2A metadata binding for VATE admission and receipt artifacts
 - [docs/a2a-v1-extension-sketch-2026-05.md](docs/a2a-v1-extension-sketch-2026-05.md)
   A2A v1.0-shaped extension sketch using optional activation, signed Agent Card evidence, and digest-bound VATE references
@@ -218,8 +219,8 @@ compatibility claim.
   Handling rules for unknown extension fields before schema tightening
 - [docs/ecosystem-positioning-2026-05.md](docs/ecosystem-positioning-2026-05.md)
   Current VATE boundary relative to MCP/OAuth, A2A, AP2, ACP/UCP, and x402
-- [docs/receipt-model-v0.2.md](docs/receipt-model-v0.2.md)
-  v0.2 split between admission receipts and post-execution receipts
+- [docs/receipt-model-v0.3.md](docs/receipt-model-v0.3.md)
+  v0.3 split between admission receipts and post-execution receipts
 - [docs/trust-bundle-hardening.md](docs/trust-bundle-hardening.md)
   Trust-bundle checks for issuer, key, algorithm, evidence type, status, and validity windows
 - [docs/conformance/corpus-format.md](docs/conformance/corpus-format.md)
@@ -232,8 +233,8 @@ compatibility claim.
   Short path for external SUT authors to produce, compare, and bundle-check implementation reports
 - [docs/profiles/vate-jose-proof-profile-notes-2026-07.md](docs/profiles/vate-jose-proof-profile-notes-2026-07.md)
   Production JOSE proof profile notes and current detached fixture boundary
-- [conformance/al2-vate-v0.2/README.md](conformance/al2-vate-v0.2/README.md)
-  Runnable conformance corpus for v0.2 admission and receipt semantics
+- [conformance/al2-vate-v0.3/README.md](conformance/al2-vate-v0.3/README.md)
+  Runnable conformance corpus for v0.3 admission and receipt semantics
 - [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)
   Implementation report format for publishing one run against one corpus snapshot
 - [docs/conformance/report-integrity.md](docs/conformance/report-integrity.md)
@@ -275,7 +276,7 @@ implementation comparison:
 
 ```bash
 python3 scripts/vate_conformance.py run \
-  --corpus-root conformance/al2-vate-v0.2 \
+  --corpus-root conformance/al2-vate-v0.3 \
   --report /tmp/vate-conformance-report.json
 ```
 
@@ -284,7 +285,7 @@ not an external implementation result.
 
 ```bash
 python3 scripts/vate_conformance.py compare \
-  --corpus-root conformance/al2-vate-v0.2 \
+  --corpus-root conformance/al2-vate-v0.3 \
   --sut-results examples/conformance/sut-results-pass.example.json \
   --report /tmp/vate-sut-compare-report.json
 ```
@@ -324,17 +325,17 @@ verification, and do not make an official A2A support claim.
 - [SECURITY.md](SECURITY.md)
 - [docs/standards-and-ecosystem-landscape-2026-04.md](docs/standards-and-ecosystem-landscape-2026-04.md)
 - [docs/standards-and-ecosystem-landscape-2026-05.md](docs/standards-and-ecosystem-landscape-2026-05.md)
-- [docs/v0.2-in-5-minutes.md](docs/v0.2-in-5-minutes.md)
+- [docs/v0.3-in-5-minutes.md](docs/v0.3-in-5-minutes.md)
 - [docs/a2a/README.md](docs/a2a/README.md)
-- [docs/a2a/vate-a2a-extension-profile-v0.2.md](docs/a2a/vate-a2a-extension-profile-v0.2.md)
-- [docs/a2a-maintainer-brief-v0.2.md](docs/a2a-maintainer-brief-v0.2.md)
-- [docs/release-notes/v0.2.0.md](docs/release-notes/v0.2.0.md)
+- [docs/a2a/vate-a2a-extension-profile-v0.3.md](docs/a2a/vate-a2a-extension-profile-v0.3.md)
+- [docs/a2a-maintainer-brief-v0.3.md](docs/a2a-maintainer-brief-v0.3.md)
+- [docs/release-notes/v0.3.0.md](docs/release-notes/v0.3.0.md)
 - [docs/non-goals.md](docs/non-goals.md)
 - [docs/delegated-identity-composition-example.md](docs/delegated-identity-composition-example.md)
 - [docs/transport-bindings.md](docs/transport-bindings.md)
-- [docs/a2a-metadata-binding-v0.2.md](docs/a2a-metadata-binding-v0.2.md)
+- [docs/a2a-metadata-binding-v0.3.md](docs/a2a-metadata-binding-v0.3.md)
 - [docs/a2a-v1-extension-sketch-2026-05.md](docs/a2a-v1-extension-sketch-2026-05.md)
-- [docs/receipt-model-v0.2.md](docs/receipt-model-v0.2.md)
+- [docs/receipt-model-v0.3.md](docs/receipt-model-v0.3.md)
 - [docs/jws-packaging-and-status-delivery.md](docs/jws-packaging-and-status-delivery.md)
 - [docs/threat-model.md](docs/threat-model.md)
 - [docs/status-network-model.md](docs/status-network-model.md)
@@ -347,13 +348,17 @@ The maintainer is responsible for the final structure, scope decisions, and publ
 
 ## How to Cite
 
-If you reference the May 5, 2026 v0.2 review snapshot in writing, please cite
-the version-specific Zenodo archive below. For the current `main` branch, cite
-the repository URL and commit SHA as well; the archived DOI may lag current
-`main` until the next pre-release archive is cut.
+If you reference the archived May 5, 2026 `v0.2.0` snapshot, cite:
 
 - Version DOI: [10.5281/zenodo.20043166](https://doi.org/10.5281/zenodo.20043166)
 - All-version concept DOI: [10.5281/zenodo.19839768](https://doi.org/10.5281/zenodo.19839768)
+
+If you reference current `main` before the `v0.3.0` archive is cut, cite:
+
+- repository URL
+- commit SHA
+- a note that the `v0.3.0` archive DOI is not yet available
+
 - Earlier `v0.1.0` DOI: [10.5281/zenodo.19839769](https://doi.org/10.5281/zenodo.19839769)
 - Machine-readable metadata: [CITATION.cff](CITATION.cff)
 

@@ -93,14 +93,14 @@ Reason-code order is part of the machine-readable decision surface:
 - `POLICY_MATCH` is a terminal success marker; it MUST only appear on `allow` outcomes and MUST be last
 - `FAIL_CLOSED` is a terminal denial marker; it MUST only appear on `deny` outcomes, MUST be last, and MUST follow a primary denial reason
 
-The v0.2 conformance runner enforces the terminal-marker rules above for both repository fixture checks and external SUT comparison reports.
+The v0.3 conformance runner enforces the terminal-marker rules above for both repository fixture checks and external SUT comparison reports.
 
 Conformance reports expose derived `expected_primary_reason_code` and
 `actual_primary_reason_code` fields. Corpus indexes expose
 `expected_primary_reason_code` for each case. These fields are the first
 non-terminal reason code after excluding `POLICY_MATCH` and `FAIL_CLOSED`.
 They are report and index projections; they do not relax the ordered
-`reason_codes` comparison in the v0.2 corpus.
+`reason_codes` comparison in the v0.3 corpus.
 
 ## Post-Execution Policy Violation Tokens
 
@@ -109,7 +109,7 @@ These are not top-level verifier reason codes. They are lowercase tokens inside
 the observed post-execution result, and the conformance runner maps them to the
 canonical post-execution reason code for the linkage check that failed.
 
-For the AL2 v0.2 conformance corpus, the canonical tokens are:
+For the AL2 v0.3 conformance corpus, the canonical tokens are:
 
 | Token | Mapped reason code |
 | --- | --- |
@@ -122,6 +122,6 @@ For the AL2 v0.2 conformance corpus, the canonical tokens are:
 | `transaction_id_mismatch` | `POST_EXEC_TRANSACTION_MISMATCH` |
 
 The receipt schema allows lowercase policy-violation tokens so deployments can
-define local policy vocabulary. The AL2 v0.2 conformance cases are stricter:
+define local policy vocabulary. The AL2 v0.3 conformance cases are stricter:
 `linkage_checks[].value` MUST use one of the canonical tokens above, and the
 case's `reason_code` MUST match the mapped reason code.

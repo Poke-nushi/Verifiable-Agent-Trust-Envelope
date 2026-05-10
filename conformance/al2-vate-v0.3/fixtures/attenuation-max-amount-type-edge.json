@@ -1,0 +1,25 @@
+{
+  "mode": "narrow",
+  "original_request_hash": "sha-256:bedf81c4cd9a496193068252764e2daee7a2dd91a31c4b004a6d6448ec688393",
+  "effective_request_hash": "sha-256:ce4f09d95905d9ba7ac764d21a7d3e148b55bcee00ef77f2a4e3c1afad4b9d50",
+  "changes": [
+    {
+      "op": "replace",
+      "path": "/constraints/max_amount/value",
+      "from": "120.00",
+      "to": {
+        "unbounded": true
+      },
+      "reason_code": "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+    }
+  ],
+  "effective_constraints": {
+    "max_amount": {
+      "currency": "USD",
+      "value": {
+        "unbounded": true
+      }
+    }
+  },
+  "require_new_permit": false
+}

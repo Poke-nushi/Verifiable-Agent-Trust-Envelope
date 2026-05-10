@@ -1,0 +1,36 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "attenuate-target-scope",
+  "title": "Attenuate target resource scope",
+  "category": "positive",
+  "purpose": "A verifier should admit only the narrower target scope when the requested resource exceeds policy.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-attenuate-target-scope.example.json"
+  },
+  "expected": {
+    "admission_decision": "attenuate",
+    "should_execute": true,
+    "reason_codes": [
+      "TARGET_SCOPE_NARROWED"
+    ],
+    "checks": [
+      {
+        "name": "attenuation.original_request_hash",
+        "expected": "present"
+      },
+      {
+        "name": "attenuation.effective_request_hash",
+        "expected": "present"
+      },
+      {
+        "name": "attenuation.effective_constraints",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "target attenuation",
+    "effective constraints"
+  ]
+}

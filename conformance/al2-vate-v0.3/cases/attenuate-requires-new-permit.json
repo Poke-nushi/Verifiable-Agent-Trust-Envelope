@@ -1,0 +1,32 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "attenuate-requires-new-permit",
+  "title": "Attenuate by requiring a fresh permit",
+  "category": "positive",
+  "purpose": "A verifier should make fresh permit requirements machine-readable when authority cannot be safely narrowed in place.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-attenuate-requires-new-permit.example.json"
+  },
+  "expected": {
+    "admission_decision": "attenuate",
+    "should_execute": false,
+    "reason_codes": [
+      "NEW_PERMIT_REQUIRED"
+    ],
+    "checks": [
+      {
+        "name": "attenuation.require_new_permit",
+        "expected": "present"
+      },
+      {
+        "name": "attenuation.changes[0].reason_code",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "fresh permit requirement",
+    "machine-readable attenuation"
+  ]
+}

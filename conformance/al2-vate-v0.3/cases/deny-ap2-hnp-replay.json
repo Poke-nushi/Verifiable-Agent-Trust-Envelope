@@ -1,0 +1,62 @@
+{
+  "artifact_reference_checks": [
+    {
+      "artifact": "ap2_mandate",
+      "expect_match": true,
+      "reference_paths": [
+        {
+          "artifact": "admission_request",
+          "path": "evidence_refs[0].digest"
+        },
+        {
+          "artifact": "admission_receipt",
+          "path": "evidence[0].digest"
+        }
+      ]
+    }
+  ],
+  "artifacts": {
+    "admission_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-replay.example.json",
+    "admission_request": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-replay.example.json",
+    "ap2_mandate": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-replay.example.json"
+  },
+  "case_id": "deny-ap2-hnp-replay",
+  "category": "negative",
+  "expected": {
+    "admission_decision": "deny",
+    "checks": [
+      {
+        "expected": "fail",
+        "name": "decision.outcome"
+      },
+      {
+        "expected": "present",
+        "name": "evidence.verification.failure_reason"
+      }
+    ],
+    "reason_codes": [
+      "REPLAY_DETECTED",
+      "FAIL_CLOSED"
+    ],
+    "should_execute": false
+  },
+  "integrity_checks": [
+    {
+      "artifact": "ap2_mandate",
+      "expect_match": true,
+      "expected_digest": {
+        "alg": "sha-256",
+        "value": "b4b683cb51fd8fe60fed329d0ad8efbbeb24943a0bc801f5e6e69e6f143d6f64"
+      }
+    }
+  ],
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "purpose": "A VATE verifier should fail closed when a one-time AP2 Human Not Present mandate nonce has already been consumed.",
+  "title": "Deny a replayed AP2 Human Not Present mandate",
+  "validation_focus": [
+    "AP2 Human Not Present",
+    "one-time use",
+    "replay detection"
+  ],
+  "version": "vate-conformance-0.3"
+}

@@ -34,11 +34,11 @@ The fixture directory is:
 
 The conformance cases are:
 
-- `conformance/al2-vate-v0.2/cases/allow-ap2-hnp-preauthorized-mandate.json`
-- `conformance/al2-vate-v0.2/cases/deny-ap2-hnp-stale-mandate.json`
-- `conformance/al2-vate-v0.2/cases/attenuate-ap2-hnp-amount-overrun.json`
-- `conformance/al2-vate-v0.2/cases/deny-ap2-hnp-replay.json`
-- `conformance/al2-vate-v0.2/cases/post-execution-ap2-hnp-linkage-success.json`
+- `conformance/al2-vate-v0.3/cases/allow-ap2-hnp-preauthorized-mandate.json`
+- `conformance/al2-vate-v0.3/cases/deny-ap2-hnp-stale-mandate.json`
+- `conformance/al2-vate-v0.3/cases/attenuate-ap2-hnp-amount-overrun.json`
+- `conformance/al2-vate-v0.3/cases/deny-ap2-hnp-replay.json`
+- `conformance/al2-vate-v0.3/cases/post-execution-ap2-hnp-linkage-success.json`
 
 ## What The Cases Prove
 

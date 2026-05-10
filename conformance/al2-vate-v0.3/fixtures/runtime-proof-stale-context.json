@@ -1,0 +1,7 @@
+{
+  "source": "runtime_attestation",
+  "source_issued_at": "2026-07-01T00:00:00Z",
+  "checked_at": "2026-07-01T00:12:05Z",
+  "max_age_seconds": 300,
+  "failure_reason": "RUNTIME_PROOF_STALE"
+}

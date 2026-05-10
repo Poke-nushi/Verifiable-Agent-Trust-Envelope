@@ -1,0 +1,44 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "deny-digest-mismatch",
+  "title": "Deny a digest mismatch",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when a digest-bound reference does not match the referenced artifact.",
+  "artifacts": {
+    "base_artifact": "examples/admission-request.example.json",
+    "admission_receipt": "examples/receipts/admission-deny-digest-mismatch.example.json"
+  },
+  "integrity_checks": [
+    {
+      "artifact": "base_artifact",
+      "expected_digest": {
+        "alg": "sha-256",
+        "value": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "expect_match": false
+    }
+  ],
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "DIGEST_MISMATCH",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "digest-bound reference",
+    "semantic rejection"
+  ]
+}

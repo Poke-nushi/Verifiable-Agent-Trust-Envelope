@@ -541,28 +541,6 @@
     },
     {
       "artifacts": {
-        "admission_receipt": "examples/receipts/admission-deny-empty-evidence-refs.example.json",
-        "admission_request": "conformance/al2-vate-v0.2/fixtures/empty-evidence-refs-admission-request.json"
-      },
-      "case_id": "deny-empty-evidence-refs",
-      "category": "negative",
-      "expected_outcome": "deny",
-      "expected_primary_reason_code": "SCHEMA_INVALID",
-      "expected_reason_codes": [
-        "SCHEMA_INVALID",
-        "FAIL_CLOSED"
-      ],
-      "expected_should_execute": false,
-      "path": "conformance/al2-vate-v0.2/cases/deny-empty-evidence-refs.json",
-      "title": "Deny an admission request with empty evidence references",
-      "validation_focus": [
-        "admission request shape",
-        "evidence references",
-        "fail closed"
-      ]
-    },
-    {
-      "artifacts": {
         "admission_receipt": "examples/receipts/admission-deny-evidence-type-not-allowed.example.json",
         "trust_bundle": "examples/trust-bundle.example.json"
       },
@@ -1398,7 +1376,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "1995fda241aebb59a554932f70c8f08b2a5945b173d4ef3c3f3ff9e2ce6790bf"
+    "value": "9c1d3a677d709057f68f7649b62775368448638aaf6a837c4ec2c050f669d0f6"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -1508,10 +1486,6 @@
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-digest-mismatch.json",
       "sha256": "a9a6c11fff1a1c2c643b81f1e1ad56ad9357d309b9151f742f339bfcbecb750c"
-    },
-    {
-      "path": "conformance/al2-vate-v0.2/cases/deny-empty-evidence-refs.json",
-      "sha256": "422855938b2bcef55965ad9f4cf3db6854036aebc91093befe6bd8518f543fe4"
     },
     {
       "path": "conformance/al2-vate-v0.2/cases/deny-evidence-type-not-allowed.json",
@@ -1680,10 +1654,6 @@
     {
       "path": "conformance/al2-vate-v0.2/fixtures/attenuation-unsafe-path.json",
       "sha256": "d7d8f74ea8b377692c73ca96140bd1261e247969df70b8e8735763b9fd1cd073"
-    },
-    {
-      "path": "conformance/al2-vate-v0.2/fixtures/empty-evidence-refs-admission-request.json",
-      "sha256": "45e08f65e08456b21dffce3c0be302a1fa79fd188db2fb7ea84ec1ceea60d4d4"
     },
     {
       "path": "conformance/al2-vate-v0.2/fixtures/replay-consumed-context.json",
@@ -1930,10 +1900,6 @@
       "sha256": "8fbe413b1ebb53f106cade7fb831831a84eb44b830a2c9266a4edbb339c1833d"
     },
     {
-      "path": "examples/receipts/admission-deny-empty-evidence-refs.example.json",
-      "sha256": "aa562ad423ad0faae920bc2aa48bfd0f3d519f27a74ba9c83c62721a5c3b9330"
-    },
-    {
       "path": "examples/receipts/admission-deny-evidence-type-not-allowed.example.json",
       "sha256": "fe46396fdcaac2fd4f94ec6dbce27ab1d430dddeddabe8631573d9f0ba3fdf2e"
     },
@@ -2102,11 +2068,11 @@
     "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.2 --out conformance/al2-vate-v0.2/corpus.json"
   },
   "summary": {
-    "artifact_count": 170,
-    "case_count": 63,
+    "artifact_count": 167,
+    "case_count": 62,
     "category_counts": {
       "linkage": 12,
-      "negative": 35,
+      "negative": 34,
       "positive": 16
     }
   },

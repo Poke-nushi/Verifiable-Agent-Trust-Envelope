@@ -1,0 +1,33 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "allow-valid-basic-external-write",
+  "title": "Allow a valid basic external write",
+  "category": "positive",
+  "purpose": "A verifier should allow a basic external write when required evidence and policy checks pass.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-allow.example.json"
+  },
+  "expected": {
+    "admission_decision": "allow",
+    "should_execute": true,
+    "reason_codes": [
+      "EVIDENCE_VERIFIED",
+      "POLICY_MATCH"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "pass"
+      },
+      {
+        "name": "evidence.verification.result",
+        "expected": "pass"
+      }
+    ]
+  },
+  "validation_focus": [
+    "allow decision",
+    "external write admission"
+  ]
+}

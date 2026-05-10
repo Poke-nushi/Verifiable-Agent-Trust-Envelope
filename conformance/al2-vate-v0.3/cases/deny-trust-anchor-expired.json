@@ -1,0 +1,47 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "deny-trust-anchor-expired",
+  "title": "Deny an expired trust anchor",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when a matched trust anchor is outside its accepted validity window.",
+  "artifacts": {
+    "trust_bundle": "examples/trust-bundle.example.json",
+    "admission_receipt": "examples/receipts/admission-deny-trust-anchor-expired.example.json"
+  },
+  "trust_checks": [
+    {
+      "trust_bundle": "trust_bundle",
+      "issuer_id": "did:web:expired-agent.example",
+      "kid": "did:web:expired-agent.example#runtime-key-1",
+      "alg": "ES256",
+      "evidence_type": "runtime_attestation",
+      "checked_at": "2026-07-01T00:08:05Z",
+      "expect_trusted": false,
+      "expected_failure_reason": "TRUST_ANCHOR_EXPIRED"
+    }
+  ],
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "TRUST_ANCHOR_EXPIRED",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "trust bundle",
+    "trust anchor expiry",
+    "fail closed"
+  ]
+}

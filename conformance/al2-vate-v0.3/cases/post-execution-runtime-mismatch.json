@@ -1,0 +1,48 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "post-execution-runtime-mismatch",
+  "title": "Reject post-execution runtime mismatch",
+  "category": "linkage",
+  "purpose": "A verifier or auditor should reject post-execution evidence when the execution runtime differs from the admitted runtime.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+    "post_execution_receipt": "examples/receipts/post-execution-runtime-mismatch.example.json"
+  },
+  "linkage_checks": [
+    {
+      "kind": "runtime",
+      "admission_path": "subject.runtime",
+      "post_execution_path": "execution.runtime",
+      "expect_match": false,
+      "reason_code": "POST_EXEC_RUNTIME_MISMATCH"
+    },
+    {
+      "kind": "policy_violation",
+      "value": "runtime_mismatch",
+      "expect_present": true,
+      "reason_code": "POST_EXEC_RUNTIME_MISMATCH"
+    }
+  ],
+  "expected": {
+    "post_execution_outcome": "failed",
+    "should_execute": true,
+    "reason_codes": [
+      "POST_EXEC_RUNTIME_MISMATCH"
+    ],
+    "checks": [
+      {
+        "name": "post_execution.execution.runtime",
+        "expected": "present"
+      },
+      {
+        "name": "result.policy_violations",
+        "expected": "fail"
+      }
+    ]
+  },
+  "validation_focus": [
+    "post-execution linkage",
+    "runtime mismatch"
+  ]
+}

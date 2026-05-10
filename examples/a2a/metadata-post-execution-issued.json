@@ -1,5 +1,5 @@
 {
-  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "phase": "post_execution_receipt_issued",
   "transaction_id": "txn-20260504-001",
   "assurance_level": "AL2",
@@ -9,7 +9,7 @@
     "media_type": "application/vate-admission-receipt+json",
     "digest": {
       "alg": "sha-256",
-      "value": "02628c006e04d55f3d7823254f033ddd3e203c3b5f3c0ccd7bbdb3d777bb9de1"
+      "value": "9b1159869e5220783c64d349a41ccb9ddff358c4e2b7d36a75bf718856062fbd"
     }
   },
   "post_execution_receipt": {
@@ -18,7 +18,7 @@
     "media_type": "application/vate-post-execution-receipt+json",
     "digest": {
       "alg": "sha-256",
-      "value": "f4047986e0b26a69f466924bf72c8292c4504fd9cae4aa3e4209d0df07f73423"
+      "value": "1ea0c0caa05e363b960e0d047241ddb090d9068687f7dd13874ea0ccd3226f18"
     }
   },
   "issuer": "did:web:agent.example",

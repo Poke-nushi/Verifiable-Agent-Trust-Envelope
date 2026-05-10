@@ -1,0 +1,47 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "deny-evidence-type-not-allowed",
+  "title": "Deny an unauthorized evidence type",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when an issuer is known but not authorized for the presented evidence type.",
+  "artifacts": {
+    "trust_bundle": "examples/trust-bundle.example.json",
+    "admission_receipt": "examples/receipts/admission-deny-evidence-type-not-allowed.example.json"
+  },
+  "trust_checks": [
+    {
+      "trust_bundle": "trust_bundle",
+      "issuer_id": "did:web:agent.example",
+      "kid": "did:web:agent.example#runtime-key-1",
+      "alg": "ES256",
+      "evidence_type": "payment_authority",
+      "checked_at": "2026-07-01T00:11:05Z",
+      "expect_trusted": false,
+      "expected_failure_reason": "ISSUER_NOT_AUTHORIZED"
+    }
+  ],
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "ISSUER_NOT_AUTHORIZED",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "trust bundle",
+    "evidence type authorization",
+    "fail closed"
+  ]
+}

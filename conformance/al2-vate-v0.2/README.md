@@ -2,6 +2,11 @@
 
 This directory contains a runnable machine-readable corpus for the `VATE AL2 Verifier Admission Profile v0.2`.
 
+Historical note: current main-branch hardening work uses
+`conformance/al2-vate-v0.3/`. For the archived May 5, 2026 `v0.2.0` review
+snapshot, use the `v0.2.0` GitHub tag and Zenodo version DOI
+`10.5281/zenodo.20043166`.
+
 It is not a production endorsement suite.
 It is an interoperability review and implementation aid.
 It does not grant a badge, endorsement, production approval, or a general
@@ -42,7 +47,6 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 - `cases/deny-expired-permit.json`
 - `cases/deny-not-yet-valid-permit.json`
 - `cases/deny-audience-mismatch.json`
-- `cases/deny-empty-evidence-refs.json`
 - `cases/deny-mcp-oauth-overscope.json`
 - `cases/deny-mcp-oauth-upstream-denied.json`
 - `cases/deny-digest-mismatch.json`
@@ -90,6 +94,10 @@ The corpus makes the v0.2 draft easier to evaluate by naming the minimum expecte
 
 ## Run
 
+The commands in this section describe the archived v0.2 corpus flow. Run them
+from the `v0.2.0` tag if you need to reproduce the May 5, 2026 snapshot.
+Current main-branch review uses `conformance/al2-vate-v0.3/`.
+
 ```bash
 python3 scripts/vate_conformance.py run \
   --corpus-root conformance/al2-vate-v0.2 \
@@ -100,24 +108,25 @@ The report is machine-readable JSON and follows:
 
 - `schemas/conformance-report.schema.json`
 
-`run` checks repository fixtures and reference-runner behavior only. It is not
-an external SUT comparison result.
-
-For external SUT implementation reports, use `compare` with a SUT result file:
+To also write a machine-readable implementation report for one run:
 
 ```bash
-python3 scripts/vate_conformance.py compare \
+python3 scripts/vate_conformance.py run \
   --corpus-root conformance/al2-vate-v0.2 \
-  --sut-results examples/conformance/sut-results-pass.example.json \
-  --report /tmp/vate-sut-compare-report.json \
-  --implementation-report /tmp/vate-sut-implementation-report.json
+  --report /tmp/vate-conformance-report.json \
+  --implementation-report /tmp/vate-implementation-report.json \
+  --implementation-name "Example VATE verifier" \
+  --implementation-type "verifier" \
+  --implementation-version "0.1.0" \
+  --implementation-language "Python 3"
 ```
 
 The implementation report follows:
 
 - `schemas/implementation-report.schema.json`
 
-Publication guidance is in:
+External SUT comparisons can also write implementation reports by adding
+`--implementation-report` to the `compare` command. Publication guidance is in:
 
 - `docs/conformance/external-sut-quickstart.md`
 - `docs/conformance/report-integrity.md`

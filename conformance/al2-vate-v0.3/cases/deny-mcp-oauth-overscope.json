@@ -1,0 +1,48 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "deny-mcp-oauth-overscope",
+  "title": "Deny an MCP OAuth request that exceeds upstream authority",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when VATE-local policy would otherwise admit a request that exceeds the OAuth resource and MCP tool authorization boundary.",
+  "artifacts": {
+    "admission_request": "examples/transport/mcp-oauth-overscope-admission-request.example.json",
+    "admission_receipt": "examples/receipts/admission-deny-mcp-oauth-overscope.example.json"
+  },
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "TARGET_NOT_PERMITTED",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "request.transport.oauth.resource",
+        "expected": "present"
+      },
+      {
+        "name": "request.target_resource",
+        "expected": "present"
+      },
+      {
+        "name": "evidence.verification.result",
+        "expected": "fail"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "MCP transport binding",
+    "OAuth resource boundary",
+    "authority intersection",
+    "fail closed"
+  ]
+}

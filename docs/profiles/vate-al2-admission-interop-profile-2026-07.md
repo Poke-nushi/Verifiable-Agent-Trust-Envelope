@@ -2,7 +2,7 @@
 
 ## Status
 
-This is a narrow interoperability profile for the `VATE-AL2-Verifier-Admission-v0.2` discussion draft.
+This is a narrow interoperability profile for the `VATE-AL2-Verifier-Admission-v0.3` discussion draft.
 
 It is intended to make conformance fixtures and reference verifier behavior comparable across implementations.
 Passing this profile does not imply production readiness, production endorsement, or any right to make a conformance claim beyond the specific fixture result.
@@ -32,7 +32,7 @@ This profile does not define:
 
 An implementation that claims compatibility with this profile MUST:
 
-- parse `admission_request`, `admission_receipt`, `post_execution_receipt`, and A2A VATE metadata artifacts that conform to the v0.2 schemas
+- parse `admission_request`, `admission_receipt`, `post_execution_receipt`, and A2A VATE metadata artifacts that conform to the v0.3 schemas
 - treat A2A metadata as untrusted references, not authority
 - verify digest-bound references when a fixture explicitly requires an integrity check
 - resolve evidence references according to local verifier policy or the test trust bundle
@@ -103,7 +103,7 @@ The verifier MUST dereference or otherwise obtain the referenced artifacts and e
 
 ## Interop Cut Line
 
-For July 2026 interop, a profile-compatible implementation is expected to pass the runnable corpus under `conformance/al2-vate-v0.2/`.
+For July 2026 interop, a profile-compatible implementation is expected to pass the runnable corpus under `conformance/al2-vate-v0.3/`.
 
 Passing that corpus means the implementation is fixture-compatible for this draft.
 It does not imply production readiness or production endorsement.

@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:vate:schema:admission-request:0.2",
+  "$id": "urn:vate:schema:admission-request:0.3",
   "title": "VATE Admission Request",
-  "description": "Draft v0.2 verifier admission request for AL2 external digital actions.",
+  "description": "Draft v0.3 verifier admission request for AL2 external digital actions.",
   "type": "object",
   "$defs": {
     "evidenceType": {
@@ -94,11 +94,11 @@
   "properties": {
     "version": {
       "type": "string",
-      "const": "vate-0.2"
+      "const": "vate-0.3"
     },
     "profile": {
       "type": "string",
-      "const": "VATE-AL2-Verifier-Admission-v0.2"
+      "const": "VATE-AL2-Verifier-Admission-v0.3"
     },
     "request_id": {
       "type": "string",

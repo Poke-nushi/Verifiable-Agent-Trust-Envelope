@@ -1,0 +1,61 @@
+{
+  "artifact_reference_checks": [
+    {
+      "artifact": "admission_receipt",
+      "expect_match": true,
+      "reference_paths": [
+        {
+          "artifact": "post_execution_receipt",
+          "path": "admission.digest"
+        }
+      ]
+    }
+  ],
+  "artifacts": {
+    "admission_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-valid.example.json",
+    "post_execution_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-post-execution-receipt-ap2-hnp-overrun.example.json"
+  },
+  "case_id": "post-execution-allow-effective-constraints-exceeded",
+  "category": "linkage",
+  "expected": {
+    "admission_decision": "allow",
+    "checks": [
+      {
+        "expected": "present",
+        "name": "post_execution.result.side_effects[0].amount.value"
+      },
+      {
+        "expected": "fail",
+        "name": "result.policy_violations"
+      }
+    ],
+    "post_execution_outcome": "failed",
+    "reason_codes": [
+      "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
+    ],
+    "should_execute": true
+  },
+  "linkage_checks": [
+    {
+      "kind": "effective_constraints",
+      "expect_valid": false,
+      "reason_code": "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
+    },
+    {
+      "kind": "policy_violation",
+      "value": "effective_constraints_exceeded",
+      "expect_present": true,
+      "reason_code": "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
+    }
+  ],
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "purpose": "A VATE post-execution receipt linked to an allow admission should still be checked against the admitted request constraints when they are recorded on the admission receipt.",
+  "title": "Reject allow-path execution outside admitted constraints",
+  "validation_focus": [
+    "post-execution linkage",
+    "allow decision",
+    "effective constraints",
+    "side-effect boundary"
+  ],
+  "version": "vate-conformance-0.3"
+}

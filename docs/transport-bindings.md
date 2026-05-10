@@ -79,8 +79,8 @@ Each object may be:
 
 Use this draft to complement A2A discovery and task delegation without changing the purpose of the A2A layer itself.
 
-The `v0.2` direction is a reference-only metadata binding for the AL2 verifier admission profile.
-The detailed draft binding is in [docs/a2a-metadata-binding-v0.2.md](a2a-metadata-binding-v0.2.md).
+The `v0.3` direction is a reference-only metadata binding for the AL2 verifier admission profile.
+The detailed draft binding is in [docs/a2a-metadata-binding-v0.3.md](a2a-metadata-binding-v0.3.md).
 
 ### Suggested approach
 
@@ -94,8 +94,8 @@ Example metadata shape:
 
 ```json
 {
-  "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2": {
-    "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.3": {
+    "profile": "VATE-AL2-Verifier-Admission-v0.3",
     "phase": "admission_issued",
     "transaction_id": "txn:6e7d",
     "assurance_level": "AL2",
@@ -152,25 +152,25 @@ for, MCP/OAuth authorization.
 
 ### AL2 transport-bound fixture
 
-The `v0.2` conformance corpus includes one MCP-shaped fixture:
+The `v0.3` conformance corpus includes one MCP-shaped fixture:
 
 - `examples/transport/mcp-oauth-admission-request.example.json`
 - `examples/receipts/admission-allow-mcp-oauth-bound.example.json`
-- `conformance/al2-vate-v0.2/cases/allow-mcp-oauth-transport-bound.json`
+- `conformance/al2-vate-v0.3/cases/allow-mcp-oauth-transport-bound.json`
 
 It also includes a negative fixture proving that VATE cannot widen upstream MCP
 or OAuth authority by changing the requested tool beyond the token resource:
 
 - `examples/transport/mcp-oauth-overscope-admission-request.example.json`
 - `examples/receipts/admission-deny-mcp-oauth-overscope.example.json`
-- `conformance/al2-vate-v0.2/cases/deny-mcp-oauth-overscope.json`
+- `conformance/al2-vate-v0.3/cases/deny-mcp-oauth-overscope.json`
 
 The companion negative fixture keeps the requested MCP tool stable but denies
 the request when the OAuth token lacks the action scope:
 
 - `examples/transport/mcp-oauth-upstream-denied-admission-request.example.json`
 - `examples/receipts/admission-deny-mcp-oauth-upstream-denied.example.json`
-- `conformance/al2-vate-v0.2/cases/deny-mcp-oauth-upstream-denied.json`
+- `conformance/al2-vate-v0.3/cases/deny-mcp-oauth-upstream-denied.json`
 
 The fixture treats OAuth and OpenID artifacts as verifier evidence.
 It does not define a new MCP authorization flow.

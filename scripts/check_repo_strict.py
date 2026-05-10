@@ -18,7 +18,7 @@ JSON_ONLY_FILES = [
     "examples/a2a/agent-card-v1-vate-extension.example.json",
 ]
 EXAMPLE_PAIRS = [
-    ("registries/evidence-vocabulary.v0.2.json", "schemas/evidence-vocabulary.schema.json"),
+    ("registries/evidence-vocabulary.v0.3.json", "schemas/evidence-vocabulary.schema.json"),
     ("examples/passport-credential.example.json", "schemas/passport-credential.schema.json"),
     ("examples/runtime-proof.example.json", "schemas/runtime-proof.schema.json"),
     ("examples/mission-permit.example.json", "schemas/mission-permit.schema.json"),
@@ -65,31 +65,31 @@ EXAMPLE_PAIRS = [
         "conformance/al2-http/verification-report.schema.json",
     ),
     (
-        "conformance/al2-vate-v0.2/cases/allow-valid-admission.json",
-        "conformance/al2-vate-v0.2/conformance-case.schema.json",
+        "conformance/al2-vate-v0.3/cases/allow-valid-admission.json",
+        "conformance/al2-vate-v0.3/conformance-case.schema.json",
     ),
     (
-        "conformance/al2-vate-v0.2/cases/attenuate-max-amount.json",
-        "conformance/al2-vate-v0.2/conformance-case.schema.json",
+        "conformance/al2-vate-v0.3/cases/attenuate-max-amount.json",
+        "conformance/al2-vate-v0.3/conformance-case.schema.json",
     ),
     (
-        "conformance/al2-vate-v0.2/cases/deny-expired-permit.json",
-        "conformance/al2-vate-v0.2/conformance-case.schema.json",
+        "conformance/al2-vate-v0.3/cases/deny-expired-permit.json",
+        "conformance/al2-vate-v0.3/conformance-case.schema.json",
     ),
     (
-        "conformance/al2-vate-v0.2/cases/deny-audience-mismatch.json",
-        "conformance/al2-vate-v0.2/conformance-case.schema.json",
+        "conformance/al2-vate-v0.3/cases/deny-audience-mismatch.json",
+        "conformance/al2-vate-v0.3/conformance-case.schema.json",
     ),
     (
-        "conformance/al2-vate-v0.2/cases/post-execution-linkage-success.json",
-        "conformance/al2-vate-v0.2/conformance-case.schema.json",
+        "conformance/al2-vate-v0.3/cases/post-execution-linkage-success.json",
+        "conformance/al2-vate-v0.3/conformance-case.schema.json",
     ),
     ("examples/trust-bundle.example.json", "schemas/trust-bundle.schema.json"),
     ("examples/conformance-report.example.json", "schemas/conformance-report.schema.json"),
     ("examples/implementation-report.example.json", "schemas/implementation-report.schema.json"),
     ("examples/report-bundle-verification.example.json", "schemas/report-bundle-verification.schema.json"),
     ("examples/conformance/sut-results-pass.example.json", "schemas/sut-result.schema.json"),
-    ("conformance/al2-vate-v0.2/corpus.json", "schemas/conformance-corpus.schema.json"),
+    ("conformance/al2-vate-v0.3/corpus.json", "schemas/conformance-corpus.schema.json"),
     ("examples/policies/merchant-purchase-al2-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),
     ("examples/policies/al2-repo-merge-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),
 ]
@@ -126,8 +126,8 @@ def iter_example_pairs() -> list[tuple[str, str]]:
         for path in sorted((ROOT / "examples" / "interop").glob("**/vate-post-execution-receipt*.json"))
     )
     pairs.extend(
-        (str(path.relative_to(ROOT)), "conformance/al2-vate-v0.2/conformance-case.schema.json")
-        for path in sorted((ROOT / "conformance" / "al2-vate-v0.2" / "cases").glob("*.json"))
+        (str(path.relative_to(ROOT)), "conformance/al2-vate-v0.3/conformance-case.schema.json")
+        for path in sorted((ROOT / "conformance" / "al2-vate-v0.3" / "cases").glob("*.json"))
     )
     return sorted(set(pairs))
 
@@ -138,8 +138,8 @@ def load_json(path: Path) -> dict:
 
 def minimal_linkage_case(linkage_checks: list[dict]) -> dict:
     return {
-        "version": "vate-conformance-0.2",
-        "profile": "VATE-AL2-Verifier-Admission-v0.2",
+        "version": "vate-conformance-0.3",
+        "profile": "VATE-AL2-Verifier-Admission-v0.3",
         "case_id": "negative-schema-linkage-contract",
         "title": "Negative schema linkage contract",
         "category": "linkage",
@@ -157,8 +157,8 @@ def minimal_linkage_case(linkage_checks: list[dict]) -> dict:
 
 def minimal_al2_context_case(al2_context_checks: list[dict]) -> dict:
     return {
-        "version": "vate-conformance-0.2",
-        "profile": "VATE-AL2-Verifier-Admission-v0.2",
+        "version": "vate-conformance-0.3",
+        "profile": "VATE-AL2-Verifier-Admission-v0.3",
         "case_id": "negative-schema-al2-context-contract",
         "title": "Negative schema AL2 context contract",
         "category": "positive",
@@ -178,8 +178,8 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
     hex_digest = "0" * 64
     empty_summary = {"total": 0, "passed": 0, "failed": 0, "skipped": 0}
     minimal_admission_request = {
-        "version": "vate-0.2",
-        "profile": "VATE-AL2-Verifier-Admission-v0.2",
+        "version": "vate-0.3",
+        "profile": "VATE-AL2-Verifier-Admission-v0.3",
         "request_id": "areq-negative-hash-001",
         "transaction_id": "txn-negative-hash-001",
         "issued_at": "2026-07-01T00:00:00Z",
@@ -201,8 +201,8 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
         ],
     }
     minimal_admission_receipt = {
-        "version": "vate-0.2",
-        "profile": "VATE-AL2-Verifier-Admission-v0.2",
+        "version": "vate-0.3",
+        "profile": "VATE-AL2-Verifier-Admission-v0.3",
         "receipt_type": "admission",
         "receipt_id": "admrec-negative-hash-001",
         "issued_at": "2026-07-01T00:00:00Z",
@@ -239,8 +239,8 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
         "decision": {"outcome": "allow", "reason_codes": ["EVIDENCE_VERIFIED", "POLICY_MATCH"]},
     }
     minimal_post_execution_receipt = {
-        "version": "vate-0.2",
-        "profile": "VATE-AL2-Verifier-Admission-v0.2",
+        "version": "vate-0.3",
+        "profile": "VATE-AL2-Verifier-Admission-v0.3",
         "receipt_type": "post_execution",
         "receipt_id": "postrec-negative-hash-001",
         "issued_at": "2026-07-01T00:02:00Z",
@@ -269,7 +269,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
         (
             "A2A metadata unknown core field",
             {
-                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "phase": "admission_requested",
                 "transaction_id": "txn-negative-a2a-metadata",
                 "assurance_level": "AL2",
@@ -288,7 +288,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
         (
             "A2A metadata artifact URI is not absolute URI",
             {
-                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "phase": "admission_requested",
                 "transaction_id": "txn-negative-a2a-metadata-uri",
                 "assurance_level": "AL2",
@@ -313,7 +313,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
                     }
                 ]
             ),
-            "conformance/al2-vate-v0.2/conformance-case.schema.json",
+            "conformance/al2-vate-v0.3/conformance-case.schema.json",
         ),
         (
             "linkage reason code does not match kind",
@@ -328,7 +328,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
                     }
                 ]
             ),
-            "conformance/al2-vate-v0.2/conformance-case.schema.json",
+            "conformance/al2-vate-v0.3/conformance-case.schema.json",
         ),
         (
             "unknown policy violation token",
@@ -342,7 +342,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
                     }
                 ]
             ),
-            "conformance/al2-vate-v0.2/conformance-case.schema.json",
+            "conformance/al2-vate-v0.3/conformance-case.schema.json",
         ),
         (
             "replay context check without explicit expectation",
@@ -354,7 +354,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
                     }
                 ]
             ),
-            "conformance/al2-vate-v0.2/conformance-case.schema.json",
+            "conformance/al2-vate-v0.3/conformance-case.schema.json",
         ),
         (
             "freshness context check without explicit expectation",
@@ -366,7 +366,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
                     }
                 ]
             ),
-            "conformance/al2-vate-v0.2/conformance-case.schema.json",
+            "conformance/al2-vate-v0.3/conformance-case.schema.json",
         ),
         (
             "binding context check without explicit expectation",
@@ -378,13 +378,13 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
                     }
                 ]
             ),
-            "conformance/al2-vate-v0.2/conformance-case.schema.json",
+            "conformance/al2-vate-v0.3/conformance-case.schema.json",
         ),
         (
             "conformance report without corpus",
             {
                 "version": "vate-conformance-report-2026-07",
-                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "checked_at": "2026-07-01T00:00:00Z",
                 "summary": empty_summary,
                 "cases": [],
@@ -395,11 +395,11 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
             "SUT corpus digest is not lowercase sha-256 hex",
             {
                 "version": "vate-sut-results-2026-07",
-                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "generated_at": "2026-07-01T00:00:00Z",
                 "implementation": {"name": "x", "type": "x", "version": "x", "language": "x"},
                 "corpus": {
-                    "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                    "profile": "VATE-AL2-Verifier-Admission-v0.3",
                     "digest": {"alg": "sha-256", "value": "not-a-digest"},
                 },
                 "results": [],
@@ -480,8 +480,8 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
         (
             "admission request evidence digest is not lowercase sha-256 hex",
             {
-                "version": "vate-0.2",
-                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "version": "vate-0.3",
+                "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "request_id": "areq-negative-digest-001",
                 "transaction_id": "txn-negative-digest-001",
                 "issued_at": "2026-07-01T00:00:00Z",
@@ -507,8 +507,8 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
         (
             "admission receipt evidence digest is not lowercase sha-256 hex",
             {
-                "version": "vate-0.2",
-                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "version": "vate-0.3",
+                "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "receipt_type": "admission",
                 "receipt_id": "admrec-negative-digest-001",
                 "issued_at": "2026-07-01T00:00:00Z",
@@ -554,8 +554,8 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
         (
             "post-execution admission digest is not lowercase sha-256 hex",
             {
-                "version": "vate-0.2",
-                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "version": "vate-0.3",
+                "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "receipt_type": "post_execution",
                 "receipt_id": "postrec-negative-digest-001",
                 "issued_at": "2026-07-01T00:02:00Z",
@@ -586,7 +586,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
             "implementation report without corpus manifest",
             {
                 "version": "vate-implementation-report-2026-07",
-                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "generated_at": "2026-07-01T00:00:00Z",
                 "status": "pass",
                 "implementation": {"name": "x", "type": "x", "version": "x", "language": "x"},
@@ -611,7 +611,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
             "implementation report case result without should_execute projection",
             {
                 "version": "vate-implementation-report-2026-07",
-                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "generated_at": "2026-07-01T00:00:00Z",
                 "status": "pass",
                 "implementation": {"name": "x", "type": "x", "version": "x", "language": "x"},
@@ -645,12 +645,12 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
             "report bundle verification without status",
             {
                 "version": "vate-report-bundle-verification-2026-07",
-                "profile": "VATE-AL2-Verifier-Admission-v0.2",
+                "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "checked_at": "2026-07-01T00:00:00Z",
                 "summary": {"total": 0, "passed": 0, "failed": 0},
                 "artifacts": {
                     "corpus": {
-                        "root": "conformance/al2-vate-v0.2",
+                        "root": "conformance/al2-vate-v0.3",
                         "digest": {"alg": "sha-256", "value": hex_digest},
                         "artifact_count": 0,
                     },
