@@ -5,6 +5,8 @@
 
 This file describes the v0.2 A2A-shaped review line. Current main-branch
 hardening work uses [A2A Maintainer Brief For VATE v0.3](a2a-maintainer-brief-v0.3.md).
+Unversioned schema and example paths on current main may reflect v0.3; use the
+`v0.2.0` tag for the exact archived v0.2 artifacts.
 
 ## Short Position
 

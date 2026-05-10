@@ -2,7 +2,7 @@
 
 ## Status
 
-The v0.2 schemas intentionally keep some `additionalProperties` surfaces open
+The current v0.3 schemas intentionally keep some `additionalProperties` surfaces open
 while the AL2 admission profile is still under review.
 
 This note defines how implementations should handle extension data before those
@@ -51,5 +51,5 @@ Before tightening a schema, the repository should identify:
 - whether unknown values must be ignored, preserved, or rejected
 - which conformance fixture proves the behavior
 
-This keeps the v0.2 corpus extensible without letting extension data become
+This keeps the current v0.3 corpus extensible without letting extension data become
 implicit authority.

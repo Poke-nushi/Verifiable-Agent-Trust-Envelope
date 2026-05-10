@@ -21,7 +21,7 @@ The JSON Schemas in `schemas/` validate the decoded payloads, not the compact to
 
 For the future JOSE/JCS production proof verification boundary, see
 `docs/profiles/vate-proof-profile-jose-jcs-v0.2.md`. The reference demo and the
-v0.2 corpus remain dependency-free fixture checks and do not claim production
+current v0.3 corpus remain dependency-free fixture checks and do not claim production
 cryptographic signature verification.
 
 ## Compact JWS In The Demo

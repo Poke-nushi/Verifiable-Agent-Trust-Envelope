@@ -6,6 +6,8 @@
 Historical note: this file describes the v0.2 A2A-shaped review line. Current
 main-branch hardening work uses
 [VATE A2A Extension Profile v0.3](vate-a2a-extension-profile-v0.3.md).
+Unversioned schema and example paths on current main may reflect v0.3; use the
+`v0.2.0` tag for the exact archived v0.2 artifacts.
 
 This is a community profile draft for carrying VATE admission and receipt
 references through A2A metadata.

@@ -8,6 +8,8 @@ It does not replace the `v0.1` core discussion draft or the existing AL2 minimal
 It describes the v0.2 profile line. Later hardening in v0.3.0 tightens empty
 `evidence_refs` handling; see
 `docs/profiles/vate-al2-verifier-admission-profile-v0.3.md`.
+Unversioned schema and example paths on current main may reflect v0.3; use the
+`v0.2.0` tag for the exact archived v0.2 artifacts.
 
 The goal is to make one verifier-side boundary precise enough for review:
 
@@ -57,9 +59,10 @@ It should identify:
 - the input digest
 - evidence references
 
-For this `v0.2` AL2 profile, `evidence_refs` is required and must contain at
-least one digest-addressed evidence reference. An empty `evidence_refs` array is
-schema-invalid and should fail closed with `SCHEMA_INVALID` and `FAIL_CLOSED`.
+The archived v0.2 line made evidence references part of the admission request
+model, but it did not make an empty `evidence_refs` array a named fail-closed
+case in this profile text. Current main-branch v0.3 hardening adds that
+non-empty requirement and the `deny-empty-evidence-refs` conformance case.
 
 ### Evidence Reference
 

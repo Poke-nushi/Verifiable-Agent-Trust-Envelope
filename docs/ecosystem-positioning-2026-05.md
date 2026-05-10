@@ -4,7 +4,7 @@
 
 This note records the current public positioning boundary for VATE after the May 2026 agentic commerce and protocol updates.
 
-It is not a new profile and does not broaden the `VATE AL2 Verifier Admission v0.2` scope.
+It is not a new profile and does not broaden the current `VATE-AL2-Verifier-Admission-v0.3` scope.
 
 ## Boundary
 

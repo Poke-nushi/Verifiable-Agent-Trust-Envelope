@@ -55,7 +55,7 @@ Other layers already exist for:
 
 This draft should compose with them rather than re-specify them.
 
-For `v0.2`, this means A2A, MCP, OAuth, OID4VP, VC, DID, Web Bot Auth, AP2, x402, ACP, and payment-token systems are treated as adjacent evidence or transport layers.
+For the current `v0.3` AL2 profile, this means A2A, MCP, OAuth, OID4VP, VC, DID, Web Bot Auth, AP2, x402, ACP, and payment-token systems are treated as adjacent evidence or transport layers.
 VATE standardizes the verifier-side admission decision and receipt semantics around those inputs.
 
 ### 3. Avoid platform sprawl
@@ -83,7 +83,7 @@ This draft is trying to standardize a portable artifact model for:
 
 That is the narrow boundary this draft should protect.
 
-The v0.2 AL2 verifier admission profile narrows this further to:
+The current v0.3 AL2 verifier admission profile narrows this further to:
 
 - verifier-side admission requests
 - evidence references

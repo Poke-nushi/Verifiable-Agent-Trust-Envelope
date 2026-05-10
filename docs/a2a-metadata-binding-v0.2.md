@@ -6,15 +6,18 @@
 Historical note: this file describes the v0.2 A2A-shaped review line. Current
 main-branch hardening work uses
 [`docs/a2a-metadata-binding-v0.3.md`](a2a-metadata-binding-v0.3.md).
+Unversioned schema and example paths on current main may reflect v0.3; use the
+`v0.2.0` tag for the exact archived v0.2 artifacts.
 
 This is a proposed binding for `VATE AL2 Verifier Admission Profile v0.2`.
 It is intentionally small.
 
 It asks A2A to carry references to VATE artifacts, not the full VATE artifact bodies.
 
-For the consolidated A2A-oriented review path, start with
+For the current consolidated A2A-oriented review path, start with
 `docs/a2a/README.md` and
-`docs/a2a/vate-a2a-extension-profile-v0.2.md`.
+`docs/a2a/vate-a2a-extension-profile-v0.3.md`. For this historical v0.2
+binding, use `docs/a2a/vate-a2a-extension-profile-v0.2.md`.
 
 ## Design Goal
 

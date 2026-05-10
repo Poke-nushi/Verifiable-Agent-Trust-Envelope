@@ -30,7 +30,7 @@ Optionally, the verifier may also receive:
 
 ## Recommended Validation Order
 
-For `v0.2`, this sequence should be read as dependency-aware validation stages, not a rigid one-dimensional algorithm.
+For the current `v0.3` AL2 profile, this sequence should be read as dependency-aware validation stages, not a rigid one-dimensional algorithm.
 Some checks need evidence resolution before status can be checked, and some status checks depend on first identifying the artifact being checked.
 The important requirement is that the verifier records the stage outcomes and reason codes in the admission receipt.
 
@@ -219,4 +219,4 @@ It is the consistent evaluation of:
 That dependency-aware evaluation prevents many classes of "valid signature, wrong context" failures.
 It also makes attenuation practical: the verifier can only narrow execution safely after it has already established current status, identity, runtime, and permit scope.
 
-For the v0.2 AL2 profile, see [docs/profiles/vate-al2-verifier-admission-profile-v0.2.md](profiles/vate-al2-verifier-admission-profile-v0.2.md).
+For the current v0.3 AL2 profile, see [docs/profiles/vate-al2-verifier-admission-profile-v0.3.md](profiles/vate-al2-verifier-admission-profile-v0.3.md).

@@ -286,7 +286,7 @@ Draft response:
 - prefer pre-fetched or allowlisted artifacts for high-risk deployments
 
 Residual risk:
-The v0.2 reference runner does not implement a production network dereferencer.
+The current v0.3 reference runner does not implement a production network dereferencer.
 Deployment gateways must enforce their own network policy.
 
 ### 16. Cross-Tenant Receipt Correlation

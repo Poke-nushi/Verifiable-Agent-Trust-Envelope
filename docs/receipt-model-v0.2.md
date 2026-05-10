@@ -5,6 +5,9 @@
 
 This document defines the v0.2 receipt model for the AL2 verifier admission profile.
 It does not remove the existing `schemas/execution-receipt.schema.json` v0.1 AER schema.
+Current main-branch hardening work uses [Receipt Model v0.3](receipt-model-v0.3.md).
+Unversioned schema and example paths on current main may reflect v0.3; use the
+`v0.2.0` tag for the exact archived v0.2 artifacts.
 
 In v0.2, the generic v0.1 AER shape remains a legacy-compatible receipt.
 The profile adds two narrower schemas:
