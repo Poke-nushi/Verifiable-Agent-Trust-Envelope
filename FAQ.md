@@ -19,9 +19,9 @@ The preserved `v0.1` core makes that concrete through a verifier-centered `AL2` 
 and then emits a machine-readable receipt.
 
 The current `v0.3` profile keeps that boundary, makes the admission moment more
-explicit, and hardens evidence-reference handling across admission requests,
-admission receipts, A2A metadata references, attenuation records, and
-post-execution receipts.
+explicit, and hardens digest-bound evidence-reference handling across the review
+package. Its concrete machine-readable change is narrower: AL2 admission
+requests must include at least one `evidence_refs` entry.
 
 ## Why Isn't A Valid Token Enough?
 

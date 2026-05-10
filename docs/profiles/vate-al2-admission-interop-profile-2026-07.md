@@ -30,7 +30,7 @@ This profile does not define:
 
 ## Required Interop Behavior
 
-An implementation that claims compatibility with this profile MUST:
+An implementation result that is reported as matching this profile snapshot MUST:
 
 - parse `admission_request`, `admission_receipt`, `post_execution_receipt`, and A2A VATE metadata artifacts that conform to the v0.3 schemas
 - treat A2A metadata as untrusted references, not authority
@@ -103,7 +103,9 @@ The verifier MUST dereference or otherwise obtain the referenced artifacts and e
 
 ## Interop Cut Line
 
-For July 2026 interop, a profile-compatible implementation is expected to pass the runnable corpus under `conformance/al2-vate-v0.3/`.
+For July 2026 interop, a reported implementation result is expected to match the
+runnable corpus under `conformance/al2-vate-v0.3/`.
 
-Passing that corpus means the implementation is fixture-compatible for this draft.
-It does not imply production readiness or production endorsement.
+Passing that corpus means one implementation result matched one corpus snapshot
+under the repository comparison rules. It does not imply production readiness,
+production endorsement, or compatibility with future corpus snapshots.
