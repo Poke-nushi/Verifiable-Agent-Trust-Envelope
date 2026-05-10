@@ -1,0 +1,42 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "deny-attenuation-unsafe-path",
+  "title": "Deny attenuation outside the allowed boundary",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when a candidate attenuation change attempts to modify policy state instead of narrowing request, target, runtime, tool, or approval constraints.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-deny-attenuation-unsafe-path.example.json",
+    "unsafe_attenuation": "conformance/al2-vate-v0.3/fixtures/attenuation-unsafe-path.json"
+  },
+  "attenuation_checks": [
+    {
+      "artifact": "unsafe_attenuation",
+      "expect_valid": false,
+      "expected_failure_reason": "SCHEMA_INVALID"
+    }
+  ],
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "SCHEMA_INVALID",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "attenuation boundary",
+    "unsafe path rejection",
+    "fail closed"
+  ]
+}

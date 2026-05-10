@@ -3,11 +3,17 @@
 
 ## Status
 
+Historical note: this file describes the v0.2 A2A-shaped review line. Current
+main-branch hardening work uses
+[VATE A2A Extension Profile v0.3](vate-a2a-extension-profile-v0.3.md).
+
 This is a community profile draft for carrying VATE admission and receipt
 references through A2A metadata.
 
-It is not an official A2A extension. It does not require an A2A core change.
-It is intended to make the A2A compatibility boundary reviewable.
+This is not an official A2A extension, endorsement, certification, SDK,
+middleware package, or general compatibility proof. It does not require an A2A
+core change and is intended to make the A2A extension-review boundary
+reviewable.
 
 ## Problem
 

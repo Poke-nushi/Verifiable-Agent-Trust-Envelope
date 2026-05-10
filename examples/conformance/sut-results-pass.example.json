@@ -2,9 +2,9 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "9c1d3a677d709057f68f7649b62775368448638aaf6a837c4ec2c050f669d0f6"
+      "value": "b83b85fc38fac5220828b9c81ff311674c81390dfa323ad5687dffee9c4bc8dd"
     },
-    "profile": "VATE-AL2-Verifier-Admission-v0.2"
+    "profile": "VATE-AL2-Verifier-Admission-v0.3"
   },
   "generated_at": "2026-07-01T00:30:00Z",
   "implementation": {
@@ -19,14 +19,14 @@
     "This is a passing example file for the public fixture corpus, not an independent implementation result.",
     "It must be regenerated whenever the corpus digest changes."
   ],
-  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "results": [
     {
       "artifacts": {
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "6ba1ec86089cc39a985e1aee6b281cbfd9d835900200a50f6df16ff765dd500f"
+            "value": "b557fce66a40a3036a5232a2953bd5df0f394e3ea40092d80f967d86026a93c8"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-allow-a2a-signed-agent-card.example.json"
@@ -36,7 +36,7 @@
             "case_artifact": "jose_proof",
             "digest": {
               "alg": "sha-256",
-              "value": "ec52f97422de1d01def4d763198a1b25e0b1b03f9c9db8eb80d75457aea3e4d9"
+              "value": "1f8278484961f780805748ba7f5cb8233a42e62e34b6c0c233ac84531762ea8f"
             },
             "kind": "jose_proof_package",
             "media_type": "application/vate-jose-proof-fixture+json",
@@ -46,7 +46,7 @@
             "case_artifact": "detached_payload",
             "digest": {
               "alg": "sha-256",
-              "value": "8aa3caef62b04390e8ef0f21e4a382435b6f36545c6ff659d1010d0599170548"
+              "value": "b38046a2784da8dc2b0218fee7b8a9c72f139174c888eb09468638d810c9e9a8"
             },
             "kind": "jose_detached_payload",
             "media_type": "application/json",
@@ -96,7 +96,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "49d38257fba06e39626a4166938d39e2b18cdf40bb96813e21921ea6620850ea"
+            "value": "60ab3343833cb5840ed8070cc55b55dd715c72f04284a542c42c113290b2eae9"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-valid.example.json"
@@ -134,7 +134,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "8365f95a34e9833d0eae8ee7999a4e2c62fbf7bcd40a31d06c9a90ae877e2b76"
+            "value": "ddf27a01edcbaf6130470bc52309ee757c9c5a2b39f300444c2b767256ee5015"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-allow.example.json"
@@ -144,7 +144,7 @@
             "case_artifact": "jose_proof",
             "digest": {
               "alg": "sha-256",
-              "value": "355d6376b15c1cc38bca8cae8129f89071dc7c0245b13320488a8065d55b496a"
+              "value": "25d61756d37ee5a651747742b0141b127c870a7cb3d2771d53fdb951db0f156c"
             },
             "kind": "jose_proof_package",
             "media_type": "application/vate-jose-proof-fixture+json",
@@ -154,7 +154,7 @@
             "case_artifact": "detached_payload",
             "digest": {
               "alg": "sha-256",
-              "value": "ab7261ffbb16e8a093250e71cf5f4c36f923c761099a893866669eaf7952933d"
+              "value": "6f1dbae1c2dd871de2d6b7f25418469adcfdf6430fb492014c0f023b13173c20"
             },
             "kind": "jose_detached_payload",
             "media_type": "application/json",
@@ -200,7 +200,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "25a6c37b57af1446a8882e94e0145d1c92eadf39c3f6dd4950e15a9c245c14e0"
+            "value": "8855d35a43aeb1cd6e0211e974587999f5d176d2a8b4fb20b968c20b311ba920"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-allow-mcp-oauth-bound.example.json"
@@ -254,7 +254,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "3657601eb339472702ea98551edb31fb1ff3b98313c1ccce5df26232b700cbec"
+            "value": "41e96d8d5779076beaddb1f47612821cfa6a0ffd4b2ad44a45fde35431930420"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-allow-replay-unused.example.json"
@@ -264,28 +264,28 @@
             "case_artifact": "replay_context",
             "context_bindings": [
               {
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt",
                 "digest": {
                   "alg": "sha-256",
-                  "value": "3657601eb339472702ea98551edb31fb1ff3b98313c1ccce5df26232b700cbec"
-                },
-                "role": "admission_receipt",
-                "source_artifact": "admission_receipt"
+                  "value": "41e96d8d5779076beaddb1f47612821cfa6a0ffd4b2ad44a45fde35431930420"
+                }
               },
               {
-                "path": "request.transaction_id",
                 "role": "transaction_id",
                 "source_artifact": "admission_receipt",
+                "path": "request.transaction_id",
                 "value": "txn-20260701-replay-unused-001"
               },
               {
+                "role": "evidence",
+                "source_artifact": "admission_receipt",
+                "path": "evidence[0]",
+                "evidence_type": "admission_request",
                 "digest": {
                   "alg": "sha-256",
                   "value": "ea16ffb2b7f8b1acc536666e83effd0420e018f3e05ba772a3c629be259e9b06"
-                },
-                "evidence_type": "admission_request",
-                "path": "evidence[0]",
-                "role": "evidence",
-                "source_artifact": "admission_receipt"
+                }
               }
             ],
             "digest": {
@@ -294,7 +294,7 @@
             },
             "kind": "replay",
             "media_type": "application/json",
-            "uri": "conformance/al2-vate-v0.2/fixtures/replay-unused-context.json"
+            "uri": "conformance/al2-vate-v0.3/fixtures/replay-unused-context.json"
           }
         ]
       },
@@ -322,7 +322,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "0c8bafffe615c4996fe0d27a8c349321389aa06abf3653019f76caddbca8a9cb"
+            "value": "5805759bb6beb10cfae6719781acaf3cc729af6e80a136f460c3a0b89ceea286"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-allow-status-boundary.example.json"
@@ -332,28 +332,28 @@
             "case_artifact": "status_context",
             "context_bindings": [
               {
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt",
                 "digest": {
                   "alg": "sha-256",
-                  "value": "0c8bafffe615c4996fe0d27a8c349321389aa06abf3653019f76caddbca8a9cb"
-                },
-                "role": "admission_receipt",
-                "source_artifact": "admission_receipt"
+                  "value": "5805759bb6beb10cfae6719781acaf3cc729af6e80a136f460c3a0b89ceea286"
+                }
               },
               {
-                "path": "request.transaction_id",
                 "role": "transaction_id",
                 "source_artifact": "admission_receipt",
+                "path": "request.transaction_id",
                 "value": "txn-20260701-status-boundary-001"
               },
               {
+                "role": "evidence",
+                "source_artifact": "admission_receipt",
+                "path": "evidence[0]",
+                "evidence_type": "status_bundle",
                 "digest": {
                   "alg": "sha-256",
                   "value": "12381c277f6e7111e45f4d3a3b007598cd8133471a3f415a884e6bd2279c0022"
-                },
-                "evidence_type": "status_bundle",
-                "path": "evidence[0]",
-                "role": "evidence",
-                "source_artifact": "admission_receipt"
+                }
               }
             ],
             "digest": {
@@ -362,7 +362,7 @@
             },
             "kind": "freshness",
             "media_type": "application/json",
-            "uri": "conformance/al2-vate-v0.2/fixtures/status-boundary-context.json"
+            "uri": "conformance/al2-vate-v0.3/fixtures/status-boundary-context.json"
           }
         ]
       },
@@ -390,7 +390,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "8365f95a34e9833d0eae8ee7999a4e2c62fbf7bcd40a31d06c9a90ae877e2b76"
+            "value": "ddf27a01edcbaf6130470bc52309ee757c9c5a2b39f300444c2b767256ee5015"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-allow.example.json"
@@ -400,34 +400,34 @@
             "case_artifact": "runtime_context",
             "context_bindings": [
               {
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt",
                 "digest": {
                   "alg": "sha-256",
-                  "value": "8365f95a34e9833d0eae8ee7999a4e2c62fbf7bcd40a31d06c9a90ae877e2b76"
-                },
-                "role": "admission_receipt",
-                "source_artifact": "admission_receipt"
+                  "value": "ddf27a01edcbaf6130470bc52309ee757c9c5a2b39f300444c2b767256ee5015"
+                }
               },
               {
-                "path": "request.transaction_id",
                 "role": "transaction_id",
                 "source_artifact": "admission_receipt",
+                "path": "request.transaction_id",
                 "value": "txn-20260504-allow-001"
               },
               {
-                "path": "subject.runtime",
                 "role": "runtime",
                 "source_artifact": "admission_receipt",
+                "path": "subject.runtime",
                 "value": "spiffe://agent.example/workload/case-agent"
               },
               {
+                "role": "evidence",
+                "source_artifact": "admission_receipt",
+                "path": "evidence[1]",
+                "evidence_type": "runtime_attestation",
                 "digest": {
                   "alg": "sha-256",
                   "value": "61693a846ba790fac993da02608fee292b847947586aa81e1a916587b08dba76"
-                },
-                "evidence_type": "runtime_attestation",
-                "path": "evidence[1]",
-                "role": "evidence",
-                "source_artifact": "admission_receipt"
+                }
               }
             ],
             "digest": {
@@ -436,7 +436,7 @@
             },
             "kind": "binding",
             "media_type": "application/json",
-            "uri": "conformance/al2-vate-v0.2/fixtures/runtime-binding-match-context.json"
+            "uri": "conformance/al2-vate-v0.3/fixtures/runtime-binding-match-context.json"
           }
         ]
       },
@@ -468,7 +468,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "8365f95a34e9833d0eae8ee7999a4e2c62fbf7bcd40a31d06c9a90ae877e2b76"
+            "value": "ddf27a01edcbaf6130470bc52309ee757c9c5a2b39f300444c2b767256ee5015"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-allow.example.json"
@@ -498,7 +498,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "e09757d72a10d07bd90c7bd9d53e266c908490f8225e8716067ee64f9f6d486a"
+            "value": "0a67a7d778c3ec8f87dfce648a631f92606cb31d178741b395207436e9a98930"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-allow-policy-snapshot.example.json"
@@ -528,7 +528,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "e08a0988ecf896850dc8d95f14ce0aab684a41259b59990a88622e910018312b"
+            "value": "c461cf51c1569d6d7876bdbc6b5e43284dad992484abc7c038e132ed4408af3e"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-allow-status-fresh.example.json"
@@ -538,28 +538,28 @@
             "case_artifact": "status_context",
             "context_bindings": [
               {
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt",
                 "digest": {
                   "alg": "sha-256",
-                  "value": "e08a0988ecf896850dc8d95f14ce0aab684a41259b59990a88622e910018312b"
-                },
-                "role": "admission_receipt",
-                "source_artifact": "admission_receipt"
+                  "value": "c461cf51c1569d6d7876bdbc6b5e43284dad992484abc7c038e132ed4408af3e"
+                }
               },
               {
-                "path": "request.transaction_id",
                 "role": "transaction_id",
                 "source_artifact": "admission_receipt",
+                "path": "request.transaction_id",
                 "value": "txn-20260701-status-fresh-001"
               },
               {
+                "role": "evidence",
+                "source_artifact": "admission_receipt",
+                "path": "evidence[0]",
+                "evidence_type": "status_bundle",
                 "digest": {
                   "alg": "sha-256",
                   "value": "8fe0a5395797c7fcf42814276d3160a8f6000a98a857083527039057661c00e3"
-                },
-                "evidence_type": "status_bundle",
-                "path": "evidence[0]",
-                "role": "evidence",
-                "source_artifact": "admission_receipt"
+                }
               }
             ],
             "digest": {
@@ -568,7 +568,7 @@
             },
             "kind": "freshness",
             "media_type": "application/json",
-            "uri": "conformance/al2-vate-v0.2/fixtures/status-fresh-context.json"
+            "uri": "conformance/al2-vate-v0.3/fixtures/status-fresh-context.json"
           }
         ]
       },
@@ -596,7 +596,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "381a139320f2597ec7106f374e35dba5a4eff781616b820542c74c54d41681fb"
+            "value": "08803e26794f3513dc108f3f03c238e9acb17e7a23e1b4bdd62730cc6973c8f6"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-overrun.example.json"
@@ -634,7 +634,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "72f81d235678ef06300e2131e6d0f6e1f58ece6eac699a9459493847ddb1494a"
+            "value": "3fc16f29508874c0ff813e52eb069b39b49a2ad544d5418ecc26fc7f2c68d580"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-attenuate-max-amount.example.json"
@@ -676,7 +676,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "c3932fd9fafad91535c56667df09a3bc7bdf1908dea39069a1f3056bf5b8880f"
+            "value": "036f19b784d3db518227573dd4ecf9880ea7b92c717ff133e9a8320bfde089d0"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-attenuate-requires-new-permit.example.json"
@@ -705,7 +705,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "a402a3c3a76f5676f0852bd0a28cec1e893fb0268d9d7a008f28910bde61223c"
+            "value": "86c6d93b0b1eda7d2a30e1de7df8e4a28dcdd2348927b438f292c4260ad9aab5"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-attenuate-target-scope.example.json"
@@ -738,7 +738,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "5cafee432b44ca42e447958434042b9dc0deac861ed190ebe037359e1e216bd7"
+            "value": "a6f53337b763ea52b0b109ed540e2de803adfe57190e8490b0949624cc0518db"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-alg-not-allowed.example.json"
@@ -768,7 +768,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "9e238d2ac4521a062c017ea96e9e4c475db62fe92390c6047338b177a41fb316"
+            "value": "53cfea9e7fef658836c238b232fa1651f41dc7bedc2e2067b43d549e8df2b76e"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-ambiguous-trust-anchor.example.json"
@@ -798,7 +798,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "864081937316ee3b66d23591b5eaec7fd4ae2769aba5e95e6a2b1414d910351b"
+            "value": "cc6b04954436a3b15502476a377e109b1065c066d4cc370bbd5760475e6a1036"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-replay.example.json"
@@ -828,7 +828,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "d318ee7738d0b91a35a8c3423ad93ebbd14764c1845a7b21c9305ae57f523b9f"
+            "value": "535294eaa7d3c6d0ae3844eb31314ab60657267d2889ba41b85ceaa787dcdff6"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-stale.example.json"
@@ -858,7 +858,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "7083d56487e19df8855e0a91f5f1a3087eb7e8cfcc5dfb291e4a8036618192c3"
+            "value": "6301ebae36a4949f3e95e93cb110ea55a2710738c8b96f09d2d662eb46418674"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-attenuation-max-amount-type-edge.example.json"
@@ -888,7 +888,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "dd898063485012e5ef858706640c66019b5ec79e32219c944db3aefdda9968c1"
+            "value": "7686b169c13fcc8f787d3fe012877e7a062b7b4ef4b145bc43fe88384ee78b5d"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-attenuation-negative-amount.example.json"
@@ -918,7 +918,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "0060e70c4ad972c9071aa8326e0aa7c10c128c51cf2fa8bbe730c38880acffe9"
+            "value": "f3488a4a50971e40163cd5277f1a11eb660045a846665ba02728a077f8ea5882"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-attenuation-unsafe-path.example.json"
@@ -948,7 +948,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "9cd20fee193c9286d993d2fba3a7ccdce496b0c9e5f28b26c870c467a4eb9d58"
+            "value": "d7b8089e3245c4bd78dbafc3f27218201782e81be39731cfd62ba437fbc86dcf"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-audience-mismatch.example.json"
@@ -982,7 +982,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "6b7c32f2531f5042fbe96ed6ab04ad90256b9261bbd611929d95a6a7f2b7f219"
+            "value": "066a5b1a95abed928777cfb49f1fc56d68d60e9e6d896dff4726809322f785af"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-digest-mismatch-before-policy.example.json"
@@ -1016,7 +1016,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "8fbe413b1ebb53f106cade7fb831831a84eb44b830a2c9266a4edbb339c1833d"
+            "value": "02a70868d3ca8739369e69708ee34b8870ca807932a37deee26b064bc9c1f4d9"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-digest-mismatch.example.json"
@@ -1046,7 +1046,37 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "fe46396fdcaac2fd4f94ec6dbce27ab1d430dddeddabe8631573d9f0ba3fdf2e"
+            "value": "2790c2bfa8aa5e4d699f67219411ff9f7c471dbe88830f71bcaea5acb416fd4b"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-deny-empty-evidence-refs.example.json"
+        }
+      },
+      "case_id": "deny-empty-evidence-refs",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "SCHEMA_INVALID",
+        "FAIL_CLOSED"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
+            "value": "1d25474f6d132d317a661084097ef80438378c0a4ef90f1224e3622eaa611731"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-evidence-type-not-allowed.example.json"
@@ -1076,7 +1106,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "1dca489179c4a2c5646c6358b66830683cc8d59490f96513334c871b60f7e7e7"
+            "value": "e5c71daa1b3017df6ef6c15334ecfcf3b6435c53e4698b6b385d1862650b017a"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-expired-permit.example.json"
@@ -1110,7 +1140,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "7c807d8faae79542657c012829ddcf8f878e99d200919a6a7b59907668589867"
+            "value": "139b99a51ee72c8c950417115968793a5f9fb54489912c5f60e53ebbfc6191d0"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-jose-alg-none.example.json"
@@ -1120,7 +1150,7 @@
             "case_artifact": "jose_proof",
             "digest": {
               "alg": "sha-256",
-              "value": "f579ae47031d07dff0814a51b487fa510d463b945b9cbc69c7166404179e1ee6"
+              "value": "28b612a8dc66e287535bc2b88e6d73a8b77ebe4a5389b377cb8df9c8e4651995"
             },
             "kind": "jose_proof_package",
             "media_type": "application/vate-jose-proof-fixture+json",
@@ -1130,7 +1160,7 @@
             "case_artifact": "detached_payload",
             "digest": {
               "alg": "sha-256",
-              "value": "ab7261ffbb16e8a093250e71cf5f4c36f923c761099a893866669eaf7952933d"
+              "value": "6f1dbae1c2dd871de2d6b7f25418469adcfdf6430fb492014c0f023b13173c20"
             },
             "kind": "jose_detached_payload",
             "media_type": "application/json",
@@ -1172,7 +1202,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "bac419134331f46991f1ee1f3e482a92ce2778d5dc5bf1942a4e74406a283ebf"
+            "value": "79a0225d57baef0eb2062be786913e43061a401c4b69334ab14f1c6ad2dc9007"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-jose-crit-unsupported.example.json"
@@ -1182,7 +1212,7 @@
             "case_artifact": "jose_proof",
             "digest": {
               "alg": "sha-256",
-              "value": "c6ebeade970a3b3528637bc4089b326778e84c0ed8f4b34e0586f72b1fbacdda"
+              "value": "867b873a4ecd5275a24257392b591a5e6008692707f091fec4b520ba8ca4c3f6"
             },
             "kind": "jose_proof_package",
             "media_type": "application/vate-jose-proof-fixture+json",
@@ -1192,7 +1222,7 @@
             "case_artifact": "detached_payload",
             "digest": {
               "alg": "sha-256",
-              "value": "ab7261ffbb16e8a093250e71cf5f4c36f923c761099a893866669eaf7952933d"
+              "value": "6f1dbae1c2dd871de2d6b7f25418469adcfdf6430fb492014c0f023b13173c20"
             },
             "kind": "jose_detached_payload",
             "media_type": "application/json",
@@ -1234,7 +1264,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "2a264612c09f6da02377d78d00ade5776265ec16c25271959ec407ed6b3ff118"
+            "value": "e85b83b7c685c74856b3edcc3f57a9c64b9732eea6df51855caa69302be66e9c"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-jose-es384-not-allowed.example.json"
@@ -1244,7 +1274,7 @@
             "case_artifact": "jose_proof",
             "digest": {
               "alg": "sha-256",
-              "value": "d663e92e154cf7484e3fa8bd48412b33778dbd9f796555c83531577ceec93029"
+              "value": "d5744746e782a1b37ca344b93592c2bfd6dc6cdf892c003ca782f39b670d6b3a"
             },
             "kind": "jose_proof_package",
             "media_type": "application/vate-jose-proof-fixture+json",
@@ -1254,7 +1284,7 @@
             "case_artifact": "detached_payload",
             "digest": {
               "alg": "sha-256",
-              "value": "ab7261ffbb16e8a093250e71cf5f4c36f923c761099a893866669eaf7952933d"
+              "value": "6f1dbae1c2dd871de2d6b7f25418469adcfdf6430fb492014c0f023b13173c20"
             },
             "kind": "jose_detached_payload",
             "media_type": "application/json",
@@ -1308,7 +1338,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "8a9e85dcdc3077cb7221082238696a63f6cf37715efa63c40f86253d7039d3a3"
+            "value": "d43fdc09d18b961f1556167b847f6df143d707368446f1854e1b800fe1052723"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-jose-hs256-downgrade.example.json"
@@ -1318,7 +1348,7 @@
             "case_artifact": "jose_proof",
             "digest": {
               "alg": "sha-256",
-              "value": "47779b023ac63d5036659816344f3193c41e5db2fd41acd58c7f5b6871304aaf"
+              "value": "d11c5f76b3892698fa8942ec0da1f31dab10a01cf1d063e493cdc16142173c2e"
             },
             "kind": "jose_proof_package",
             "media_type": "application/vate-jose-proof-fixture+json",
@@ -1328,7 +1358,7 @@
             "case_artifact": "detached_payload",
             "digest": {
               "alg": "sha-256",
-              "value": "ab7261ffbb16e8a093250e71cf5f4c36f923c761099a893866669eaf7952933d"
+              "value": "6f1dbae1c2dd871de2d6b7f25418469adcfdf6430fb492014c0f023b13173c20"
             },
             "kind": "jose_detached_payload",
             "media_type": "application/json",
@@ -1382,7 +1412,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "f84dc61c739afca2f9baf1fa2a42a87fbbd1271d6285fe4f6db38dd85f64e7d4"
+            "value": "37e425aca82fd5e677a59689f2dd14bff743b256820d679f1009de44eb80aecc"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-jose-payload-digest-mismatch.example.json"
@@ -1392,7 +1422,7 @@
             "case_artifact": "jose_proof",
             "digest": {
               "alg": "sha-256",
-              "value": "0462deb7354478d3ae8e39300d2b210d9e61dae37457d438983afcf4825e0abb"
+              "value": "23fdcf8176bbb99ce58e6312163132bd5eff816547e8f955c96e2e287305755f"
             },
             "kind": "jose_proof_package",
             "media_type": "application/vate-jose-proof-fixture+json",
@@ -1402,7 +1432,7 @@
             "case_artifact": "detached_payload",
             "digest": {
               "alg": "sha-256",
-              "value": "ab7261ffbb16e8a093250e71cf5f4c36f923c761099a893866669eaf7952933d"
+              "value": "6f1dbae1c2dd871de2d6b7f25418469adcfdf6430fb492014c0f023b13173c20"
             },
             "kind": "jose_detached_payload",
             "media_type": "application/json",
@@ -1444,7 +1474,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "01c30b60bab0341de475e906a689aabb53a447373a5067f6f6846dfa8b6ff2de"
+            "value": "f2dc291102ed75a36ca876ed0f2da640974a3bf11eb928df15c978702256b0d1"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-kid-mismatch.example.json"
@@ -1474,7 +1504,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "38a031665dcc16d58219859fb46708bea24aebb61c2ce8111163af8d19b2528d"
+            "value": "54e64169886955879c5a035eeda124b32ca193d935c5f3a214514b38dc98a7de"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-mcp-oauth-overscope.example.json"
@@ -1516,7 +1546,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "9b65d02fb23e07dcb0b0565956498026722cc05d50268873ffbfb6ec94bbaac5"
+            "value": "d69fd7d707ff4af7ad0b52706830bcc413ac08cd9fe9ebb93b13e427eca15818"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-mcp-oauth-upstream-denied.example.json"
@@ -1570,7 +1600,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "c9c75bf4862edffbc9e32c5ffe775d875285c4153d19b10acfee7ba521e8c423"
+            "value": "0e8f1a34ff6829fc79e01974abdcb97cb054f7d1df1ee53f1653251bd06b47c1"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-not-yet-valid-permit.example.json"
@@ -1600,7 +1630,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "44c058b8fe924e2119f943c97e4278a8a25930abc2e849b3bbb8c37c9cc4922a"
+            "value": "cd81157bc6e1499957467de463274d6f89171fdd9edd0ade37e6808ba96f3658"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-policy-snapshot-mismatch.example.json"
@@ -1634,7 +1664,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "dbccfe340d0a48b164dd7a7bbdd7d98745cdb19b588329d207b2a400368b0f01"
+            "value": "296159be0434aa5a966b1a81fc90076f7deb27abf75a11a38e5953dbf4ca3fdd"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-replay-detected.example.json"
@@ -1644,28 +1674,28 @@
             "case_artifact": "replay_context",
             "context_bindings": [
               {
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt",
                 "digest": {
                   "alg": "sha-256",
-                  "value": "dbccfe340d0a48b164dd7a7bbdd7d98745cdb19b588329d207b2a400368b0f01"
-                },
-                "role": "admission_receipt",
-                "source_artifact": "admission_receipt"
+                  "value": "296159be0434aa5a966b1a81fc90076f7deb27abf75a11a38e5953dbf4ca3fdd"
+                }
               },
               {
-                "path": "request.transaction_id",
                 "role": "transaction_id",
                 "source_artifact": "admission_receipt",
+                "path": "request.transaction_id",
                 "value": "txn-20260701-replay-detected-001"
               },
               {
+                "role": "evidence",
+                "source_artifact": "admission_receipt",
+                "path": "evidence[0]",
+                "evidence_type": "admission_request",
                 "digest": {
                   "alg": "sha-256",
                   "value": "b0f3fbf153ae69564600bbea07d49cb8e47b08148fe2de38006edab028806b30"
-                },
-                "evidence_type": "admission_request",
-                "path": "evidence[0]",
-                "role": "evidence",
-                "source_artifact": "admission_receipt"
+                }
               }
             ],
             "digest": {
@@ -1674,7 +1704,7 @@
             },
             "kind": "replay",
             "media_type": "application/json",
-            "uri": "conformance/al2-vate-v0.2/fixtures/replay-consumed-context.json"
+            "uri": "conformance/al2-vate-v0.3/fixtures/replay-consumed-context.json"
           }
         ]
       },
@@ -1702,7 +1732,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "3113c48786a0838cf7f639ced1646f12e3bac464102ecec2aa367db6f15eb48e"
+            "value": "adabc11f449b84470d9e5ed8172abc9fc4a0aedab8df2c2609856bc112b1c4da"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-replay-replayed.example.json"
@@ -1712,28 +1742,28 @@
             "case_artifact": "replay_context",
             "context_bindings": [
               {
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt",
                 "digest": {
                   "alg": "sha-256",
-                  "value": "3113c48786a0838cf7f639ced1646f12e3bac464102ecec2aa367db6f15eb48e"
-                },
-                "role": "admission_receipt",
-                "source_artifact": "admission_receipt"
+                  "value": "adabc11f449b84470d9e5ed8172abc9fc4a0aedab8df2c2609856bc112b1c4da"
+                }
               },
               {
-                "path": "request.transaction_id",
                 "role": "transaction_id",
                 "source_artifact": "admission_receipt",
+                "path": "request.transaction_id",
                 "value": "txn-20260701-replay-replayed-001"
               },
               {
+                "role": "evidence",
+                "source_artifact": "admission_receipt",
+                "path": "evidence[0]",
+                "evidence_type": "admission_request",
                 "digest": {
                   "alg": "sha-256",
                   "value": "1201de9351c30cdd4a3233830d384a188dd105098dfd622a8cb8163edbcec66e"
-                },
-                "evidence_type": "admission_request",
-                "path": "evidence[0]",
-                "role": "evidence",
-                "source_artifact": "admission_receipt"
+                }
               }
             ],
             "digest": {
@@ -1742,7 +1772,7 @@
             },
             "kind": "replay",
             "media_type": "application/json",
-            "uri": "conformance/al2-vate-v0.2/fixtures/replay-replayed-context.json"
+            "uri": "conformance/al2-vate-v0.3/fixtures/replay-replayed-context.json"
           }
         ]
       },
@@ -1770,7 +1800,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "bcc562815ee66b30b942bfeed9ff2313111e03c93c1dac0c8e95d4ae00fa28c3"
+            "value": "8675ed9bd118e0306b224d3822ecd5497c9c55a59ba474f91682ec38a490c40c"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-runtime-mismatch.example.json"
@@ -1780,34 +1810,34 @@
             "case_artifact": "runtime_context",
             "context_bindings": [
               {
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt",
                 "digest": {
                   "alg": "sha-256",
-                  "value": "bcc562815ee66b30b942bfeed9ff2313111e03c93c1dac0c8e95d4ae00fa28c3"
-                },
-                "role": "admission_receipt",
-                "source_artifact": "admission_receipt"
+                  "value": "8675ed9bd118e0306b224d3822ecd5497c9c55a59ba474f91682ec38a490c40c"
+                }
               },
               {
-                "path": "request.transaction_id",
                 "role": "transaction_id",
                 "source_artifact": "admission_receipt",
+                "path": "request.transaction_id",
                 "value": "txn-20260701-runtime-mismatch-001"
               },
               {
-                "path": "subject.runtime",
                 "role": "runtime",
                 "source_artifact": "admission_receipt",
+                "path": "subject.runtime",
                 "value": "spiffe://agent.example/workload/unexpected-runtime"
               },
               {
+                "role": "evidence",
+                "source_artifact": "admission_receipt",
+                "path": "evidence[0]",
+                "evidence_type": "runtime_attestation",
                 "digest": {
                   "alg": "sha-256",
                   "value": "6d366d6e1ae5765fab82b9290eddf64630619e10c5d9344faef35f812726e623"
-                },
-                "evidence_type": "runtime_attestation",
-                "path": "evidence[0]",
-                "role": "evidence",
-                "source_artifact": "admission_receipt"
+                }
               }
             ],
             "digest": {
@@ -1816,7 +1846,7 @@
             },
             "kind": "binding",
             "media_type": "application/json",
-            "uri": "conformance/al2-vate-v0.2/fixtures/runtime-binding-mismatch-context.json"
+            "uri": "conformance/al2-vate-v0.3/fixtures/runtime-binding-mismatch-context.json"
           }
         ]
       },
@@ -1844,7 +1874,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "14d7608751eac3f4888813bb93dfb5adafb593333d8a2c3822a2c291c3c30e93"
+            "value": "cabdc49f806d25115f1c8c486e145c43b6abb62726552c4cd676f3f102b4c043"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-runtime-proof-stale.example.json"
@@ -1854,46 +1884,46 @@
             "case_artifact": "runtime_context",
             "context_bindings": [
               {
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt",
                 "digest": {
                   "alg": "sha-256",
-                  "value": "14d7608751eac3f4888813bb93dfb5adafb593333d8a2c3822a2c291c3c30e93"
-                },
-                "role": "admission_receipt",
-                "source_artifact": "admission_receipt"
+                  "value": "cabdc49f806d25115f1c8c486e145c43b6abb62726552c4cd676f3f102b4c043"
+                }
               },
               {
-                "path": "request.transaction_id",
                 "role": "transaction_id",
                 "source_artifact": "admission_receipt",
+                "path": "request.transaction_id",
                 "value": "txn-20260701-runtime-proof-stale-001"
               },
               {
+                "role": "admission_request",
+                "source_artifact": "admission_request",
                 "digest": {
                   "alg": "sha-256",
-                  "value": "64900e09efc2e2d5ce5578d17cc8dfc513c06f045aab0bd9b7df5487e55880e9"
-                },
-                "role": "admission_request",
-                "source_artifact": "admission_request"
+                  "value": "db6813f24fd3dfe2973e9a43d3806957a27415738c97ddb77f0d6b06c7fbe718"
+                }
               },
               {
+                "role": "evidence",
+                "source_artifact": "admission_receipt",
+                "path": "evidence[0]",
+                "evidence_type": "runtime_attestation",
                 "digest": {
                   "alg": "sha-256",
                   "value": "a911a55ba778d7acf066841d6ea75a221a231d8c6c502cca4771d94839b4d917"
-                },
-                "evidence_type": "runtime_attestation",
-                "path": "evidence[0]",
-                "role": "evidence",
-                "source_artifact": "admission_receipt"
+                }
               },
               {
+                "role": "evidence",
+                "source_artifact": "admission_request",
+                "path": "evidence_refs[0]",
+                "evidence_type": "runtime_attestation",
                 "digest": {
                   "alg": "sha-256",
                   "value": "1871eb865b1c933943d3089a6b303d633a9e431ea6242bd845e6e350f1504c11"
-                },
-                "evidence_type": "runtime_attestation",
-                "path": "evidence_refs[0]",
-                "role": "evidence",
-                "source_artifact": "admission_request"
+                }
               }
             ],
             "digest": {
@@ -1902,7 +1932,7 @@
             },
             "kind": "freshness",
             "media_type": "application/json",
-            "uri": "conformance/al2-vate-v0.2/fixtures/runtime-proof-stale-context.json"
+            "uri": "conformance/al2-vate-v0.3/fixtures/runtime-proof-stale-context.json"
           }
         ]
       },
@@ -1938,7 +1968,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "cf988df8e6e160d338fab98c328eb20ad45830bee33fab8b28225125a3ee0d9a"
+            "value": "a83ee881c642ea7747e575508f2bacaf1cfafbb173f561cc744dde4f85aa6bf8"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-signature-tampered.example.json"
@@ -1968,7 +1998,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "28eebeebacd038a99f3cc95a557192fc06ac0f96aacfc9781db8e4d12e6d620c"
+            "value": "3e2257b1f59a5cc2401bb1820a627f0353e5450f91a2498eab324945360af246"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-status-revoked.example.json"
@@ -1998,7 +2028,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "b669be3bbb93fcc32c1cf864774e3fc7a7a5347579df4c76b246043add85bd3f"
+            "value": "c1080250a5b99259d579b58349444e86345e17271d851c324d6ec8f63990996a"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-status-stale.example.json"
@@ -2008,28 +2038,28 @@
             "case_artifact": "status_context",
             "context_bindings": [
               {
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt",
                 "digest": {
                   "alg": "sha-256",
-                  "value": "b669be3bbb93fcc32c1cf864774e3fc7a7a5347579df4c76b246043add85bd3f"
-                },
-                "role": "admission_receipt",
-                "source_artifact": "admission_receipt"
+                  "value": "c1080250a5b99259d579b58349444e86345e17271d851c324d6ec8f63990996a"
+                }
               },
               {
-                "path": "request.transaction_id",
                 "role": "transaction_id",
                 "source_artifact": "admission_receipt",
+                "path": "request.transaction_id",
                 "value": "txn-20260701-status-stale-001"
               },
               {
+                "role": "evidence",
+                "source_artifact": "admission_receipt",
+                "path": "evidence[0]",
+                "evidence_type": "status_bundle",
                 "digest": {
                   "alg": "sha-256",
                   "value": "7d0705e7f2c7db6752d159246801a6d9366fac098fa1b967feea6b9fe6875886"
-                },
-                "evidence_type": "status_bundle",
-                "path": "evidence[0]",
-                "role": "evidence",
-                "source_artifact": "admission_receipt"
+                }
               }
             ],
             "digest": {
@@ -2038,7 +2068,7 @@
             },
             "kind": "freshness",
             "media_type": "application/json",
-            "uri": "conformance/al2-vate-v0.2/fixtures/status-stale-context.json"
+            "uri": "conformance/al2-vate-v0.3/fixtures/status-stale-context.json"
           }
         ]
       },
@@ -2066,7 +2096,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "82ea158dacf020971ecf891b87ae42c68fbfc98560e337d2109f66d4ad948014"
+            "value": "fb8a9352b8e86fb386b36f272ebee09c05b72b686806e535808f36192eea6166"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-status-stale-just-over-boundary.example.json"
@@ -2076,28 +2106,28 @@
             "case_artifact": "status_context",
             "context_bindings": [
               {
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt",
                 "digest": {
                   "alg": "sha-256",
-                  "value": "82ea158dacf020971ecf891b87ae42c68fbfc98560e337d2109f66d4ad948014"
-                },
-                "role": "admission_receipt",
-                "source_artifact": "admission_receipt"
+                  "value": "fb8a9352b8e86fb386b36f272ebee09c05b72b686806e535808f36192eea6166"
+                }
               },
               {
-                "path": "request.transaction_id",
                 "role": "transaction_id",
                 "source_artifact": "admission_receipt",
+                "path": "request.transaction_id",
                 "value": "txn-20260701-status-stale-boundary-001"
               },
               {
+                "role": "evidence",
+                "source_artifact": "admission_receipt",
+                "path": "evidence[0]",
+                "evidence_type": "status_bundle",
                 "digest": {
                   "alg": "sha-256",
                   "value": "042e0052fdac657b240a1a971fa95c5998c137ca0cb33b83205bcb1ab495a71f"
-                },
-                "evidence_type": "status_bundle",
-                "path": "evidence[0]",
-                "role": "evidence",
-                "source_artifact": "admission_receipt"
+                }
               }
             ],
             "digest": {
@@ -2106,7 +2136,7 @@
             },
             "kind": "freshness",
             "media_type": "application/json",
-            "uri": "conformance/al2-vate-v0.2/fixtures/status-stale-just-over-boundary-context.json"
+            "uri": "conformance/al2-vate-v0.3/fixtures/status-stale-just-over-boundary-context.json"
           }
         ]
       },
@@ -2134,7 +2164,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "5bbea2c540bc13b2f73cb7b260e3a527e8c5351b2bfcfbc2f25ed5fa90cc707a"
+            "value": "2f08e4b7181747a9aa40275236f5743fef0fcd64aca4d222e8e884303d0fce62"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-trust-anchor-expired.example.json"
@@ -2164,7 +2194,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "c13507002c189f9542bcddd2587b0cadf7e76a2e2077140ee92c6f9f21a602f4"
+            "value": "cfb833d1ad84e8727604985f43b145d21d88adf0d544c23cb073f0fe0cf9c90b"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-trust-anchor-not-yet-valid.example.json"
@@ -2194,7 +2224,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "c1fd1615a8452ef9a8716cb46f7bb76f56d48b4ac6c3f1696db1dfc1472286f7"
+            "value": "4c01041678b833ee99b61971b78dfd3cf8506e1009845a0643d1000cd52331e7"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-trust-anchor-revoked.example.json"
@@ -2224,7 +2254,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "d92e11797d2c6786c780013a47c2c85640c4a51d9738398777ccbe6ec0566e12"
+            "value": "c1e3ec917dc34b7a319161b4a0661120c1e2823c7530b3ecd3d5550ad29601d9"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-unknown-trust-anchor.example.json"
@@ -2254,7 +2284,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "1b468a5d4b0dafc86d14ff3ae304f54db1852b1f1cb36f1c0f3ca324d0c7c38e"
+            "value": "2e3ae3bd54cf5343d6a4b5a4e9940de6041283b35a22f810a8b16a523826b4ef"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/interop/ap2-ucp-to-vate/vate-admission-receipt-from-ap2-ucp.example.json"
@@ -2296,7 +2326,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "733870b8e76aa382ca6a3a88475d5b266f2c7d5b931b8458abf0c34fd0f847ab"
+            "value": "c383e3e2cf7c30189a4886ca29f21dfd7f0e8543bb008350b554d39c603b9c37"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/interop/oap-to-vate/vate-admission-receipt-from-oap.example.json"
@@ -2330,7 +2360,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "72f81d235678ef06300e2131e6d0f6e1f58ece6eac699a9459493847ddb1494a"
+            "value": "3fc16f29508874c0ff813e52eb069b39b49a2ad544d5418ecc26fc7f2c68d580"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-attenuate-max-amount.example.json"
@@ -2338,7 +2368,7 @@
         "post_execution_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "b2271146dfa1925bead1b04f865084c5e9398afa572cbd9d80cde8e6ec066d50"
+            "value": "4157dee0d8ff4fa3c656771d846f75a99fb2b4c52ca602937acb80106539d177"
           },
           "media_type": "application/vate-post-execution-receipt+json",
           "uri": "examples/receipts/post-execution-admission-digest-mismatch.example.json"
@@ -2367,7 +2397,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "72f81d235678ef06300e2131e6d0f6e1f58ece6eac699a9459493847ddb1494a"
+            "value": "3fc16f29508874c0ff813e52eb069b39b49a2ad544d5418ecc26fc7f2c68d580"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-attenuate-max-amount.example.json"
@@ -2375,7 +2405,7 @@
         "post_execution_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "592a30fb165dc64f4250744418e76bdad4f888c0b46fea4a9074a43358b18fa6"
+            "value": "3815cf95fe9d40798dd500f05c3ea368abc79cc4ab88658052e518b39b8b68e8"
           },
           "media_type": "application/vate-post-execution-receipt+json",
           "uri": "examples/receipts/post-execution-after-admission-expiry.example.json"
@@ -2404,7 +2434,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "9cd20fee193c9286d993d2fba3a7ccdce496b0c9e5f28b26c870c467a4eb9d58"
+            "value": "d7b8089e3245c4bd78dbafc3f27218201782e81be39731cfd62ba437fbc86dcf"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-audience-mismatch.example.json"
@@ -2412,7 +2442,7 @@
         "post_execution_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "0a504be76840a62526774aa8b571cc2cb8b38c8051905786531ff8978b68d094"
+            "value": "3a1272a842c12cf9f0ea2d2d2fa150ecd3fcf36257204e18ad117e0080f02211"
           },
           "media_type": "application/vate-post-execution-receipt+json",
           "uri": "examples/receipts/post-execution-after-deny.example.json"
@@ -2441,7 +2471,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "49d38257fba06e39626a4166938d39e2b18cdf40bb96813e21921ea6620850ea"
+            "value": "60ab3343833cb5840ed8070cc55b55dd715c72f04284a542c42c113290b2eae9"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-valid.example.json"
@@ -2449,7 +2479,7 @@
         "post_execution_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "5fdf1f46fc345b95e3343db090cc235bf26d5611a169959b53f7f85ef74d9331"
+            "value": "eb9ac1a9ab095e9b6a3b98a174322e22ad4256cdc90a7fa43364d97d95aa0c69"
           },
           "media_type": "application/vate-post-execution-receipt+json",
           "uri": "examples/interop/ap2-human-not-present-to-vate/vate-post-execution-receipt-ap2-hnp-overrun.example.json"
@@ -2478,7 +2508,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "49d38257fba06e39626a4166938d39e2b18cdf40bb96813e21921ea6620850ea"
+            "value": "60ab3343833cb5840ed8070cc55b55dd715c72f04284a542c42c113290b2eae9"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-valid.example.json"
@@ -2486,7 +2516,7 @@
         "post_execution_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "5c67149b9f61eedfde474b08de2e69b312c5797287d8e9084aec722460ecdcd1"
+            "value": "b8270db155bdf2cb3063bede1d22bdf2c26f03a20cd68f5b1a591fae0db0bc72"
           },
           "media_type": "application/vate-post-execution-receipt+json",
           "uri": "examples/interop/ap2-human-not-present-to-vate/vate-post-execution-receipt-ap2-hnp-valid.example.json"
@@ -2525,7 +2555,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "72f81d235678ef06300e2131e6d0f6e1f58ece6eac699a9459493847ddb1494a"
+            "value": "3fc16f29508874c0ff813e52eb069b39b49a2ad544d5418ecc26fc7f2c68d580"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-attenuate-max-amount.example.json"
@@ -2533,7 +2563,7 @@
         "post_execution_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "0ad82bbd93740f003406f5222b22fe523024ccfa0dd15aa152e66a0dc73302a0"
+            "value": "6853ad9d334b427ccf891e928cad84c9d6e86b79e01cd0030fd951748ee9784a"
           },
           "media_type": "application/vate-post-execution-receipt+json",
           "uri": "examples/receipts/post-execution-effective-constraints-aggregate-exceeded.example.json"
@@ -2566,7 +2596,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "72f81d235678ef06300e2131e6d0f6e1f58ece6eac699a9459493847ddb1494a"
+            "value": "3fc16f29508874c0ff813e52eb069b39b49a2ad544d5418ecc26fc7f2c68d580"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-attenuate-max-amount.example.json"
@@ -2574,7 +2604,7 @@
         "post_execution_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "97b8b96b95150b9027965a58a975ebea698ec5ab4baf0ea332c495edd9e1d818"
+            "value": "7fcdb1161aec3ca7bc4408bafafac4e68e1d6c0fd8bff0c0a679e988ad104db1"
           },
           "media_type": "application/vate-post-execution-receipt+json",
           "uri": "examples/receipts/post-execution-effective-constraints-exceeded.example.json"
@@ -2603,7 +2633,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "72f81d235678ef06300e2131e6d0f6e1f58ece6eac699a9459493847ddb1494a"
+            "value": "3fc16f29508874c0ff813e52eb069b39b49a2ad544d5418ecc26fc7f2c68d580"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-attenuate-max-amount.example.json"
@@ -2611,7 +2641,7 @@
         "post_execution_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "106af39ac586346e769dfdf70d2495c2bfb8df1369bd3d69e23f30d3b30eabef"
+            "value": "ecf64c16e89155b4ecc228e66aabf8e8d9692f035d7205df800a3d22dd716ffd"
           },
           "media_type": "application/vate-post-execution-receipt+json",
           "uri": "examples/receipts/post-execution-finish-after-admission-expiry.example.json"
@@ -2640,7 +2670,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "72f81d235678ef06300e2131e6d0f6e1f58ece6eac699a9459493847ddb1494a"
+            "value": "3fc16f29508874c0ff813e52eb069b39b49a2ad544d5418ecc26fc7f2c68d580"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-attenuate-max-amount.example.json"
@@ -2648,7 +2678,7 @@
         "post_execution_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "0191b0ee99b510416515581dd7a2fa8636b2aac016f70b953b91c74727d77c45"
+            "value": "44591a1f0ffe8be02a265ddac5807deb3e8ba1e827ee87a49eca2c032b146230"
           },
           "media_type": "application/vate-post-execution-receipt+json",
           "uri": "examples/receipts/post-execution-linkage-mismatch.example.json"
@@ -2677,7 +2707,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "72f81d235678ef06300e2131e6d0f6e1f58ece6eac699a9459493847ddb1494a"
+            "value": "3fc16f29508874c0ff813e52eb069b39b49a2ad544d5418ecc26fc7f2c68d580"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-attenuate-max-amount.example.json"
@@ -2685,7 +2715,7 @@
         "post_execution_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "1b9c2fb4011255def18f83d16efd0e6bbafdfa03dca6bfd212ea677d40ef7f79"
+            "value": "258b5995711d81d6f8d987f159e845e164ee37ae8896b9bcd16b91b725ee111e"
           },
           "media_type": "application/vate-post-execution-receipt+json",
           "uri": "examples/receipts/post-execution-success.example.json"
@@ -2724,7 +2754,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "72f81d235678ef06300e2131e6d0f6e1f58ece6eac699a9459493847ddb1494a"
+            "value": "3fc16f29508874c0ff813e52eb069b39b49a2ad544d5418ecc26fc7f2c68d580"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-attenuate-max-amount.example.json"
@@ -2732,7 +2762,7 @@
         "post_execution_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "9640c18ff264eb784d03954ad95bdcf931fbeee2c09cd33066f9a9190b61234a"
+            "value": "7793044864a0a6ecf69a9c5c276f5440b8918625df41dc294fd7e7133659a45c"
           },
           "media_type": "application/vate-post-execution-receipt+json",
           "uri": "examples/receipts/post-execution-runtime-mismatch.example.json"
@@ -2761,7 +2791,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "72f81d235678ef06300e2131e6d0f6e1f58ece6eac699a9459493847ddb1494a"
+            "value": "3fc16f29508874c0ff813e52eb069b39b49a2ad544d5418ecc26fc7f2c68d580"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-attenuate-max-amount.example.json"
@@ -2769,7 +2799,7 @@
         "post_execution_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "b782a92a7a146be56ea6b0042c02fadbdc1ec60896e8549b56c6646ab300326a"
+            "value": "ad6ca5f12c21c9e301e9b8d83a247e25e18c7ce79e647acdf5f2d5b76a628d74"
           },
           "media_type": "application/vate-post-execution-receipt+json",
           "uri": "examples/receipts/post-execution-transaction-mismatch.example.json"

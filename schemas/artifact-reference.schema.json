@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:vate:schema:artifact-reference:0.2",
+  "$id": "urn:vate:schema:artifact-reference:0.3",
   "title": "VATE Artifact Reference",
-  "description": "Draft v0.2 reference descriptor for dereferenceable or digest-bound VATE and adjacent protocol artifacts.",
+  "description": "Draft v0.3 reference descriptor for dereferenceable or digest-bound VATE and adjacent protocol artifacts.",
   "type": "object",
   "required": [
     "type",
@@ -37,7 +37,7 @@
     },
     "digest": {
       "type": "object",
-      "description": "Portable digest descriptor. The v0.2 AL2 conformance corpus is stricter than this reusable schema and requires sha-256 with a lowercase 64-character hexadecimal value for artifact-backed comparison.",
+      "description": "Portable digest descriptor. The v0.3 AL2 conformance corpus is stricter than this reusable schema and requires sha-256 with a lowercase 64-character hexadecimal value for artifact-backed comparison.",
       "required": [
         "alg",
         "value"
@@ -53,7 +53,7 @@
         },
         "value": {
           "type": "string",
-          "description": "Digest value. For the v0.2 AL2 conformance corpus, use lowercase SHA-256 hexadecimal.",
+          "description": "Digest value. For the v0.3 AL2 conformance corpus, use lowercase SHA-256 hexadecimal.",
           "minLength": 1
         }
       },

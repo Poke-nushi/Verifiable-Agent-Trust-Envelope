@@ -2,7 +2,7 @@
 
 ## Status
 
-The v0.2 AL2 artifacts use repository-scoped draft URI values. They are stable
+The v0.3 AL2 artifacts use repository-scoped draft URI values. They are stable
 enough for review and fixture comparison, but they are not a permanent standards
 namespace.
 
@@ -11,14 +11,21 @@ introduced.
 
 ## Current Draft URIs
 
-The current A2A metadata extension URI is:
+The archived v0.2 A2A metadata extension URI was:
 
 ```text
 https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2
 ```
 
+The current v0.3 A2A metadata extension URI is:
+
+```text
+https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.3
+```
+
 Schema identifiers currently use draft `urn:vate:*` identifiers or repository
-paths. These identifiers are suitable for the v0.2 corpus and examples.
+paths. Current v0.3 schemas and examples use the `v0.3` profile line. The
+older `v0.2` URI remains a historical draft URI for archived v0.2 artifacts.
 
 ## Persistent Namespace Target
 
@@ -45,12 +52,14 @@ Do not migrate identifiers until all of the following are true:
 
 ## Compatibility Rule
 
-Do not break existing v0.2 corpus artifacts during namespace migration.
+Do not break existing v0.3 corpus artifacts during namespace migration.
 
-If a persistent namespace is added, v0.2 repository-scoped draft URI values must
+If a persistent namespace is added, v0.3 repository-scoped draft URI values must
 continue to resolve in examples, reports, and corpus snapshots that already use
-them. A verifier may recognize both identifiers during a transition window, but
-must not treat namespace aliases as additional authority.
+them. Historical v0.2 repository-scoped draft URI values should remain
+resolvable for archived snapshots. A verifier may recognize multiple identifiers
+during a transition window, but must not treat namespace aliases as additional
+authority.
 
 ## Non-Goals
 

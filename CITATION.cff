@@ -1,19 +1,19 @@
 cff-version: 1.2.0
 title: "Verifiable Agent Trust Envelope"
-message: "If you use or discuss this draft, please cite the repository metadata below."
+message: "This citation metadata describes the archived v0.2.0 snapshot. For current unarchived v0.3 work, cite the repository URL and exact commit SHA until a v0.3.0 archive DOI exists."
 type: software
 authors:
   - family-names: "Poke-nushi"
 repository-code: "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope"
 url: "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope"
 license: Apache-2.0
-version: "v0.2-review-snapshot-2026-05-05"
+version: "v0.2.0"
 date-released: 2026-05-05
 doi: 10.5281/zenodo.20043166
 identifiers:
   - type: doi
     value: 10.5281/zenodo.20043166
-    description: "Zenodo archive of the May 5, 2026 v0.2 review snapshot; not a GitHub v0.2.0 pre-release"
+    description: "Zenodo archive of the May 5, 2026 v0.2.0 review snapshot"
   - type: doi
     value: 10.5281/zenodo.19839768
     description: "Zenodo all-version concept DOI"

@@ -12,13 +12,15 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
-EXTENSION_URI = "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2"
+EXTENSION_URI = "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.3"
 CORE = ROOT / "reference" / "vate-verifier-core" / "vate_verifier_core.py"
 TASK_MESSAGE = ROOT / "reference" / "a2a-metadata-adapter-demo" / "task-message.example.json"
-PROFILE = "VATE-AL2-Verifier-Admission-v0.2"
+PROFILE = "VATE-AL2-Verifier-Admission-v0.3"
 SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 SAFE_PROFILE_HASH = "sha-256:" + ("0" * 64)
 SAFE_DIGEST = {"alg": "sha-256", "value": "0" * 64}
+INLINE_A2A_TASK_MESSAGE_URI = "inline:a2a-task-message"
+INLINE_A2A_METADATA_URI = "inline:a2a-metadata"
 
 
 def load_core():
@@ -91,7 +93,7 @@ def admission_requested_metadata_failures(metadata: Any) -> list[str]:
     if not isinstance(metadata, dict):
         return ["metadata extension must be an object"]
     if metadata.get("profile") != PROFILE:
-        failures.append("profile must be VATE-AL2-Verifier-Admission-v0.2")
+        failures.append("profile must be VATE-AL2-Verifier-Admission-v0.3")
     if metadata.get("phase") != "admission_requested":
         failures.append("phase must be admission_requested")
     if metadata.get("assurance_level") != "AL2":
@@ -141,13 +143,74 @@ def make_digest_mismatch_receipt(metadata: dict[str, Any]) -> dict[str, Any]:
     )
 
 
-def make_schema_invalid_receipt(metadata: Any, failure_reason: str) -> dict[str, Any]:
+def make_schema_invalid_receipt(
+    metadata: Any,
+    failure_reason: str,
+    *,
+    source_artifact: Any | None = None,
+) -> dict[str, Any]:
+    receipt_id = "admrec-schema-invalid-" + core.safe_digest_value(
+        {
+            "failure_reason": failure_reason,
+            "source": source_artifact if source_artifact is not None else metadata,
+        }
+    )
     return make_fail_closed_receipt(
         metadata,
-        receipt_id="admrec-schema-invalid",
+        receipt_id=receipt_id,
         reason_codes=["SCHEMA_INVALID", "FAIL_CLOSED"],
         failure_reason=failure_reason,
+        source_artifact=source_artifact,
     )
+
+
+def make_schema_invalid_decision(
+    metadata: Any,
+    failure_reason: str,
+    *,
+    source_artifact: Any | None = None,
+    source_uri: str | None = None,
+) -> dict[str, Any]:
+    decision = {
+        "decision": "deny",
+        "reason_codes": ["SCHEMA_INVALID", "FAIL_CLOSED"],
+        "admission_receipt": make_schema_invalid_receipt(
+            metadata,
+            failure_reason,
+            source_artifact=source_artifact,
+        ),
+    }
+    if source_artifact is not None:
+        decision["demo_local_failure_source"] = make_demo_local_failure_source(
+            source_artifact,
+            source_uri=source_uri,
+            failure_reason=failure_reason,
+        )
+    return decision
+
+
+def failure_source_kind(source_uri: str | None) -> str:
+    if source_uri == INLINE_A2A_TASK_MESSAGE_URI:
+        return "a2a_task_message"
+    if source_uri == INLINE_A2A_METADATA_URI:
+        return "a2a_metadata"
+    return "artifact"
+
+
+def make_demo_local_failure_source(
+    source_artifact: Any,
+    *,
+    source_uri: str | None,
+    failure_reason: str,
+) -> dict[str, Any]:
+    evidence_uri = source_uri or INLINE_A2A_METADATA_URI
+    return {
+        "kind": failure_source_kind(evidence_uri),
+        "uri": evidence_uri,
+        "media_type": "application/json",
+        "digest": {"alg": "sha-256", "value": core.safe_digest_value(source_artifact)},
+        "failure_reason": failure_reason,
+    }
 
 
 def make_fail_closed_receipt(
@@ -156,16 +219,34 @@ def make_fail_closed_receipt(
     receipt_id: str,
     reason_codes: list[str],
     failure_reason: str,
+    source_artifact: Any | None = None,
 ) -> dict[str, Any]:
     issued_at = "2026-05-04T03:00:30Z"
     reference = metadata.get("admission_request", {}) if isinstance(metadata, dict) else {}
-    digest = (
-        reference.get("digest")
-        if isinstance(reference, dict) and is_digest_descriptor(reference.get("digest"))
-        else SAFE_DIGEST
-    )
-    return {
-        "version": "vate-0.2",
+    if source_artifact is not None:
+        # Demo-local source binding lives on the A2A response envelope, not in
+        # the admission receipt schema contract.
+        evidence_items = []
+    elif isinstance(reference, dict) and is_digest_descriptor(reference.get("digest")):
+        digest = reference["digest"]
+        evidence_uri = reference.get("uri", "missing")
+        evidence_items = [
+            {
+                "type": "admission_request",
+                "uri": evidence_uri,
+                "digest": digest,
+                "verification": {
+                    "result": "failed",
+                    "checked_at": issued_at,
+                    "method": "a2a-metadata-digest-check",
+                    "failure_reason": failure_reason,
+                },
+            }
+        ]
+    else:
+        evidence_items = []
+    receipt = {
+        "version": "vate-0.3",
         "profile": PROFILE,
         "receipt_type": "admission",
         "receipt_id": receipt_id,
@@ -185,19 +266,7 @@ def make_fail_closed_receipt(
             "actor": metadata_string(metadata, "issuer", "missing"),
             "runtime": "missing",
         },
-        "evidence": [
-            {
-                "type": "admission_request",
-                "uri": reference.get("uri", "missing") if isinstance(reference, dict) else "missing",
-                "digest": digest,
-                "verification": {
-                    "result": "failed",
-                    "checked_at": issued_at,
-                    "method": "a2a-metadata-digest-check",
-                    "failure_reason": failure_reason,
-                },
-            }
-        ],
+        "evidence": evidence_items,
         "policy": {
             "policy_id": "a2a-metadata-adapter-demo",
             "policy_version": "2026-05-04.1",
@@ -208,6 +277,7 @@ def make_fail_closed_receipt(
             "reason_codes": reason_codes,
         },
     }
+    return receipt
 
 
 def build_post_execution_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
@@ -216,8 +286,8 @@ def build_post_execution_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
         receipt.get("request", {}).get("input_hash", "missing"),
     )
     return {
-        "version": "vate-0.2",
-        "profile": "VATE-AL2-Verifier-Admission-v0.2",
+        "version": "vate-0.3",
+        "profile": "VATE-AL2-Verifier-Admission-v0.3",
         "receipt_type": "post_execution",
         "receipt_id": "postrec-" + receipt["receipt_id"].removeprefix("admrec-"),
         "issued_at": "2026-05-04T03:02:30Z",
@@ -250,19 +320,110 @@ def build_post_execution_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def adapt_task_message(task_message: dict[str, Any]) -> dict[str, Any]:
-    metadata = task_message.get("metadata", {}).get(EXTENSION_URI)
+def task_string(task_message: Any, field: str, fallback: str) -> str:
+    if isinstance(task_message, dict) and isinstance(task_message.get(field), str) and task_message[field]:
+        return task_message[field]
+    return fallback
+
+
+def make_task_response(
+    task_message: Any,
+    metadata: Any,
+    decision: dict[str, Any],
+) -> dict[str, Any]:
+    receipt = decision["admission_receipt"]
+    receipt_digest = core.canonical_hash(receipt).removeprefix("sha-256:")
+    response = {
+        "task_id": task_string(task_message, "task_id", "missing"),
+        "kind": "task_response",
+        "status": {
+            "state": "submitted" if decision["decision"] in {"allow", "attenuate"} else "rejected"
+        },
+        "vate_decision": {
+            "outcome": decision["decision"],
+            "reason_codes": decision["reason_codes"],
+        },
+        "metadata": {
+            EXTENSION_URI: {
+                "profile": "VATE-AL2-Verifier-Admission-v0.3",
+                "phase": "admission_issued",
+                "transaction_id": metadata_string(metadata, "transaction_id", "missing"),
+                "assurance_level": "AL2",
+                "decision": decision["decision"],
+                "admission_receipt": {
+                    "type": "admission_receipt",
+                    "uri": "local:generated/admission-receipts/" + receipt["receipt_id"] + ".json",
+                    "media_type": "application/vate-admission-receipt+json",
+                    "digest": {
+                        "alg": "sha-256",
+                        "value": receipt_digest
+                    }
+                },
+                "issuer": "did:web:verifier.example",
+                "issued_at": receipt["issued_at"],
+                "expires_at": receipt["expires_at"]
+            }
+        }
+    }
+    if "demo_local_failure_source" in decision:
+        response["demo_local_failure_source"] = decision["demo_local_failure_source"]
+    if decision["decision"] in {"allow", "attenuate"}:
+        post_execution_receipt = build_post_execution_receipt(receipt)
+        response["post_execution_metadata_example"] = {
+            EXTENSION_URI: {
+                "profile": "VATE-AL2-Verifier-Admission-v0.3",
+                "phase": "post_execution_receipt_issued",
+                "transaction_id": metadata_string(metadata, "transaction_id", "missing"),
+                "assurance_level": "AL2",
+                "admission_receipt": response["metadata"][EXTENSION_URI]["admission_receipt"],
+                "post_execution_receipt": {
+                    "type": "post_execution_receipt",
+                    "uri": "local:generated/post-execution-receipts/"
+                    + post_execution_receipt["receipt_id"]
+                    + ".json",
+                    "media_type": "application/vate-post-execution-receipt+json",
+                    "digest": {
+                        "alg": "sha-256",
+                        "value": core.canonical_hash(post_execution_receipt).removeprefix("sha-256:"),
+                    },
+                },
+                "issuer": post_execution_receipt["issuer"]["id"],
+                "issued_at": post_execution_receipt["issued_at"],
+            }
+        }
+    return response
+
+
+def adapt_task_message(task_message: Any) -> dict[str, Any]:
+    if not isinstance(task_message, dict):
+        decision = make_schema_invalid_decision(
+            None,
+            "task message must be a JSON object",
+            source_artifact=task_message,
+            source_uri=INLINE_A2A_TASK_MESSAGE_URI,
+        )
+        return make_task_response(task_message, None, decision)
+
+    metadata_container = task_message.get("metadata")
+    metadata = metadata_container.get(EXTENSION_URI) if isinstance(metadata_container, dict) else None
     if metadata is None:
-        raise ValueError("missing VATE A2A metadata extension object")
+        decision = make_schema_invalid_decision(
+            None,
+            "missing VATE A2A metadata extension object",
+            source_artifact=task_message,
+            source_uri=INLINE_A2A_TASK_MESSAGE_URI,
+        )
+        return make_task_response(task_message, None, decision)
 
     verifier = build_verifier()
     metadata_failures = admission_requested_metadata_failures(metadata)
     if metadata_failures:
-        decision = {
-            "decision": "deny",
-            "reason_codes": ["SCHEMA_INVALID", "FAIL_CLOSED"],
-            "admission_receipt": make_schema_invalid_receipt(metadata, "; ".join(metadata_failures)),
-        }
+        decision = make_schema_invalid_decision(
+            metadata,
+            "; ".join(metadata_failures),
+            source_artifact=metadata,
+            source_uri=INLINE_A2A_METADATA_URI,
+        )
     else:
         reference = metadata["admission_request"]
         try:
@@ -292,65 +453,7 @@ def adapt_task_message(task_message: dict[str, Any]) -> dict[str, Any]:
             else:
                 decision = verifier.admit(admission_request, now=core.parse_time("2026-05-04T03:00:30Z"))
 
-    receipt = decision["admission_receipt"]
-    receipt_digest = core.canonical_hash(receipt).removeprefix("sha-256:")
-    response = {
-        "task_id": task_message["task_id"],
-        "kind": "task_response",
-        "status": {
-            "state": "submitted" if decision["decision"] in {"allow", "attenuate"} else "rejected"
-        },
-        "vate_decision": {
-            "outcome": decision["decision"],
-            "reason_codes": decision["reason_codes"],
-        },
-        "metadata": {
-            EXTENSION_URI: {
-                "profile": "VATE-AL2-Verifier-Admission-v0.2",
-                "phase": "admission_issued",
-                "transaction_id": metadata_string(metadata, "transaction_id", "missing"),
-                "assurance_level": "AL2",
-                "decision": decision["decision"],
-                "admission_receipt": {
-                    "type": "admission_receipt",
-                    "uri": "local:generated/admission-receipts/" + receipt["receipt_id"] + ".json",
-                    "media_type": "application/vate-admission-receipt+json",
-                    "digest": {
-                        "alg": "sha-256",
-                        "value": receipt_digest
-                    }
-                },
-                "issuer": "did:web:verifier.example",
-                "issued_at": receipt["issued_at"],
-                "expires_at": receipt["expires_at"]
-            }
-        }
-    }
-    if decision["decision"] in {"allow", "attenuate"}:
-        post_execution_receipt = build_post_execution_receipt(receipt)
-        response["post_execution_metadata_example"] = {
-            EXTENSION_URI: {
-                "profile": "VATE-AL2-Verifier-Admission-v0.2",
-                "phase": "post_execution_receipt_issued",
-                "transaction_id": metadata_string(metadata, "transaction_id", "missing"),
-                "assurance_level": "AL2",
-                "admission_receipt": response["metadata"][EXTENSION_URI]["admission_receipt"],
-                "post_execution_receipt": {
-                    "type": "post_execution_receipt",
-                    "uri": "local:generated/post-execution-receipts/"
-                    + post_execution_receipt["receipt_id"]
-                    + ".json",
-                    "media_type": "application/vate-post-execution-receipt+json",
-                    "digest": {
-                        "alg": "sha-256",
-                        "value": core.canonical_hash(post_execution_receipt).removeprefix("sha-256:"),
-                    },
-                },
-                "issuer": post_execution_receipt["issuer"]["id"],
-                "issued_at": post_execution_receipt["issued_at"],
-            }
-        }
-    return response
+    return make_task_response(task_message, metadata, decision)
 
 
 def parse_args() -> argparse.Namespace:

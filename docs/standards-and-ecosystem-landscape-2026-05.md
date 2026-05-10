@@ -47,13 +47,13 @@ VATE can sit after or beside them when a relying party still needs to decide whe
 ### A2A task reference
 
 An A2A task message can carry the task and compact references to verifier-side artifacts.
-The v0.2 direction is to use the VATE extension URI as the metadata key and include digest-bound artifact references:
+The current v0.3 direction is to use the VATE extension URI as the metadata key and include digest-bound artifact references:
 
 ```json
 {
   "metadata": {
-    "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2": {
-      "profile": "VATE-AL2-Verifier-Admission-v0.2",
+    "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.3": {
+      "profile": "VATE-AL2-Verifier-Admission-v0.3",
       "phase": "admission_issued",
       "transaction_id": "txn-20260504-001",
       "assurance_level": "AL2",
@@ -113,7 +113,7 @@ VATE does not replace:
 - VC / JWT
 - cloud workload identity
 
-The v0.2 direction should therefore strengthen VATE as an adjacent verifier-side admission / permit / receipt layer, not broaden it into registry, commerce, transport, or identity infrastructure.
+The current v0.3 direction should therefore strengthen VATE as an adjacent verifier-side admission / permit / receipt layer, not broaden it into registry, commerce, transport, or identity infrastructure.
 
 ---
 

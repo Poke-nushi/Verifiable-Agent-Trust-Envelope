@@ -1,0 +1,47 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "deny-trust-anchor-revoked",
+  "title": "Deny a revoked trust anchor",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when a matched trust anchor is revoked.",
+  "artifacts": {
+    "trust_bundle": "examples/trust-bundle.example.json",
+    "admission_receipt": "examples/receipts/admission-deny-trust-anchor-revoked.example.json"
+  },
+  "trust_checks": [
+    {
+      "trust_bundle": "trust_bundle",
+      "issuer_id": "did:web:revoked-agent.example",
+      "kid": "did:web:revoked-agent.example#runtime-key-1",
+      "alg": "ES256",
+      "evidence_type": "runtime_attestation",
+      "checked_at": "2026-07-01T00:09:05Z",
+      "expect_trusted": false,
+      "expected_failure_reason": "TRUST_ANCHOR_REVOKED"
+    }
+  ],
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "TRUST_ANCHOR_REVOKED",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "trust bundle",
+    "revoked trust anchor",
+    "fail closed"
+  ]
+}

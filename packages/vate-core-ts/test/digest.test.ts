@@ -12,7 +12,7 @@ describe("digest helpers", () => {
     );
   });
 
-  it("uses sorted-key compact JSON for the v0.2 fixture byte basis", () => {
+  it("uses sorted-key compact JSON for the v0.3 fixture byte basis", () => {
     const bytes = stableJsonBytes({ b: 2, a: 1 });
     expect(new TextDecoder().decode(bytes)).toBe("{\"a\":1,\"b\":2}");
   });

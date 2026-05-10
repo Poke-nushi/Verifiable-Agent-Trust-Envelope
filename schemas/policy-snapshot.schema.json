@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:vate:schema:policy-snapshot:0.2",
+  "$id": "urn:vate:schema:policy-snapshot:0.3",
   "title": "VATE Policy Snapshot",
   "description": "Digest-bound verifier policy snapshot used as the audit basis for an admission decision.",
   "type": "object",
@@ -16,7 +16,7 @@
   "properties": {
     "version": {
       "type": "string",
-      "const": "vate-0.2"
+      "const": "vate-0.3"
     },
     "type": {
       "type": "string",

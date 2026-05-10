@@ -1,0 +1,41 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "allow-valid-with-status-fresh",
+  "title": "Allow with fresh status evidence",
+  "category": "positive",
+  "purpose": "A verifier should allow execution when status evidence meets the AL2 freshness requirement.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-allow-status-fresh.example.json",
+    "status_context": "conformance/al2-vate-v0.3/fixtures/status-fresh-context.json"
+  },
+  "al2_context_checks": [
+    {
+      "kind": "freshness",
+      "artifact": "status_context",
+      "expect_fresh": true
+    }
+  ],
+  "expected": {
+    "admission_decision": "allow",
+    "should_execute": true,
+    "reason_codes": [
+      "STATUS_FRESH",
+      "POLICY_MATCH"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "pass"
+      },
+      {
+        "name": "evidence.verification.result",
+        "expected": "pass"
+      }
+    ]
+  },
+  "validation_focus": [
+    "status freshness",
+    "allow decision"
+  ]
+}

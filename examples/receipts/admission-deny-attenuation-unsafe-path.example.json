@@ -1,6 +1,6 @@
 {
-  "version": "vate-0.2",
-  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "version": "vate-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "receipt_type": "admission",
   "receipt_id": "admrec-20260701-attenuation-unsafe-path-001",
   "issued_at": "2026-07-01T00:34:08Z",
@@ -22,7 +22,7 @@
   "evidence": [
     {
       "type": "attenuation_candidate",
-      "uri": "conformance/al2-vate-v0.2/fixtures/attenuation-unsafe-path.json",
+      "uri": "conformance/al2-vate-v0.3/fixtures/attenuation-unsafe-path.json",
       "digest": {
         "alg": "sha-256",
         "value": "1100500feb7585914b3f9dc267fe66c3516bf3901adf3f90111e822210d028f8"

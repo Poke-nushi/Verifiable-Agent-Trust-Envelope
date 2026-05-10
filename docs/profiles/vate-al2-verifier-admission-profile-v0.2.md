@@ -5,6 +5,9 @@
 
 This document is a `v0.2` profile proposal.
 It does not replace the `v0.1` core discussion draft or the existing AL2 minimal profile.
+It describes the v0.2 profile line. Later hardening in v0.3.0 tightens empty
+`evidence_refs` handling; see
+`docs/profiles/vate-al2-verifier-admission-profile-v0.3.md`.
 
 The goal is to make one verifier-side boundary precise enough for review:
 
@@ -53,6 +56,10 @@ It should identify:
 - the audience
 - the input digest
 - evidence references
+
+For this `v0.2` AL2 profile, `evidence_refs` is required and must contain at
+least one digest-addressed evidence reference. An empty `evidence_refs` array is
+schema-invalid and should fail closed with `SCHEMA_INVALID` and `FAIL_CLOSED`.
 
 ### Evidence Reference
 

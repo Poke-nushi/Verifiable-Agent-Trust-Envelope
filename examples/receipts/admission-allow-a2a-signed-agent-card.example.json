@@ -1,6 +1,6 @@
 {
-  "version": "vate-0.2",
-  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "version": "vate-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "receipt_type": "admission",
   "receipt_id": "admrec-20260701-a2a-agent-card-001",
   "issued_at": "2026-07-01T00:19:08Z",
@@ -29,7 +29,7 @@
       "media_type": "application/json",
       "digest": {
         "alg": "sha-256",
-        "value": "3ac7b45f5ddab0178d224ae31a617b8194569224f42758d2b8503ac101c457b0"
+        "value": "786cf87d8b1de3915203b25a4f53305db31c778fbb5c2bb358b25986ffb97e7c"
       },
       "verification": {
         "result": "verified",

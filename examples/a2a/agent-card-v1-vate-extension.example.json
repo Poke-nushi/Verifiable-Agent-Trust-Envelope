@@ -20,12 +20,12 @@
     "extendedAgentCard": true,
     "extensions": [
       {
-        "uri": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2",
+        "uri": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.3",
         "description": "Carries digest-bound VATE admission and receipt references in A2A metadata.",
         "required": false,
         "params": {
           "profiles": [
-            "VATE-AL2-Verifier-Admission-v0.2"
+            "VATE-AL2-Verifier-Admission-v0.3"
           ],
           "accepted_reference_modes": [
             "reference_plus_digest"

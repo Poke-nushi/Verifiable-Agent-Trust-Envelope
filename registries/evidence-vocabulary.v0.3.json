@@ -1,0 +1,230 @@
+{
+  "$schema": "../schemas/evidence-vocabulary.schema.json",
+  "version": "vate-evidence-vocabulary-2026-07",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "evidence_types": [
+    {
+      "id": "admission_receipt",
+      "category": "admission_and_receipts",
+      "description": "An admission receipt issued by a verifier.",
+      "allowed_protocol_hints": []
+    },
+    {
+      "id": "admission_request",
+      "category": "admission_and_receipts",
+      "description": "A request for verifier admission before an external digital action.",
+      "allowed_protocol_hints": []
+    },
+    {
+      "id": "agent_card",
+      "category": "agent_and_identity_evidence",
+      "description": "Unsigned agent metadata used as verifier input.",
+      "allowed_protocol_hints": []
+    },
+    {
+      "id": "attenuation_candidate",
+      "category": "admission_and_receipts",
+      "description": "Candidate effective request or constraint data produced during attenuation.",
+      "allowed_protocol_hints": []
+    },
+    {
+      "id": "delegated_payment_token",
+      "category": "payment_and_commerce_evidence",
+      "description": "A protocol-specific delegated payment token consumed as payment authority evidence.",
+      "allowed_protocol_hints": [
+        "stripe_spt"
+      ]
+    },
+    {
+      "id": "did_document",
+      "category": "agent_and_identity_evidence",
+      "description": "DID document evidence consumed for identity or key material checks.",
+      "allowed_protocol_hints": []
+    },
+    {
+      "id": "http_message_signature",
+      "category": "authorization_and_transport_evidence",
+      "description": "HTTP message signature evidence for transport-bound request checks.",
+      "allowed_protocol_hints": []
+    },
+    {
+      "id": "local_policy",
+      "category": "policy_evidence",
+      "description": "Verifier-local policy input used during admission evaluation.",
+      "allowed_protocol_hints": []
+    },
+    {
+      "id": "mission_permit",
+      "category": "authorization_and_transport_evidence",
+      "description": "Delegation permit or mission authorization evidence.",
+      "allowed_protocol_hints": []
+    },
+    {
+      "id": "oap_decision",
+      "category": "adjacent_decision_evidence",
+      "description": "OAP/APort decision object consumed as adjacent decision evidence.",
+      "allowed_protocol_hints": [
+        "oap_aport"
+      ]
+    },
+    {
+      "id": "oauth_access_token",
+      "category": "authorization_and_transport_evidence",
+      "description": "OAuth access token evidence used for upstream authorization checks.",
+      "allowed_protocol_hints": [
+        "mcp-oauth"
+      ]
+    },
+    {
+      "id": "oauth_transaction_token",
+      "category": "authorization_and_transport_evidence",
+      "description": "OAuth transaction token evidence used for request or transaction binding.",
+      "allowed_protocol_hints": [
+        "mcp-oauth"
+      ]
+    },
+    {
+      "id": "oid4vp_presentation",
+      "category": "agent_and_identity_evidence",
+      "description": "OID4VP presentation evidence.",
+      "allowed_protocol_hints": []
+    },
+    {
+      "id": "openid_subject",
+      "category": "agent_and_identity_evidence",
+      "description": "OpenID subject evidence used for principal or actor binding.",
+      "allowed_protocol_hints": [
+        "openid-connect"
+      ]
+    },
+    {
+      "id": "payment_authority",
+      "category": "payment_and_commerce_evidence",
+      "description": "Generic payment authority evidence.",
+      "allowed_protocol_hints": [
+        "x402"
+      ]
+    },
+    {
+      "id": "payment_mandate",
+      "category": "payment_and_commerce_evidence",
+      "description": "Payment mandate evidence such as an AP2 mandate.",
+      "allowed_protocol_hints": [
+        "ap2",
+        "ap2_human_not_present"
+      ]
+    },
+    {
+      "id": "payment_required_state",
+      "category": "payment_and_commerce_evidence",
+      "description": "Payment-required state or challenge evidence.",
+      "allowed_protocol_hints": [
+        "x402"
+      ]
+    },
+    {
+      "id": "policy_snapshot",
+      "category": "policy_evidence",
+      "description": "Digest-bound policy snapshot used by a verifier decision.",
+      "allowed_protocol_hints": []
+    },
+    {
+      "id": "post_execution_receipt",
+      "category": "admission_and_receipts",
+      "description": "Receipt linking execution results back to an admission decision.",
+      "allowed_protocol_hints": []
+    },
+    {
+      "id": "runtime_attestation",
+      "category": "runtime_and_status_evidence",
+      "description": "Runtime attestation evidence used for workload or execution environment checks.",
+      "allowed_protocol_hints": [
+        "spiffe"
+      ]
+    },
+    {
+      "id": "runtime_disclosure",
+      "category": "runtime_and_status_evidence",
+      "description": "Runtime disclosure evidence that is not itself an attestation proof.",
+      "allowed_protocol_hints": []
+    },
+    {
+      "id": "signed_agent_card",
+      "category": "agent_and_identity_evidence",
+      "description": "Signed agent metadata used as verifier input.",
+      "allowed_protocol_hints": []
+    },
+    {
+      "id": "status_bundle",
+      "category": "runtime_and_status_evidence",
+      "description": "Status bundle evidence used for freshness, revocation, or replay checks.",
+      "allowed_protocol_hints": []
+    },
+    {
+      "id": "ucp_checkout_session",
+      "category": "payment_and_commerce_evidence",
+      "description": "UCP checkout session evidence.",
+      "allowed_protocol_hints": [
+        "ucp"
+      ]
+    },
+    {
+      "id": "vc_status",
+      "category": "agent_and_identity_evidence",
+      "description": "Verifiable Credential status evidence.",
+      "allowed_protocol_hints": []
+    },
+    {
+      "id": "verifiable_credential",
+      "category": "agent_and_identity_evidence",
+      "description": "Verifiable Credential evidence consumed by verifier policy.",
+      "allowed_protocol_hints": [
+        "oap_aport"
+      ]
+    },
+    {
+      "id": "web_bot_auth_signature",
+      "category": "authorization_and_transport_evidence",
+      "description": "Web Bot Auth signature evidence for bot identity or request checks.",
+      "allowed_protocol_hints": []
+    }
+  ],
+  "protocol_hints": [
+    {
+      "id": "ap2",
+      "description": "Agent Payments Protocol evidence with a human-present or generally interactive mandate flow."
+    },
+    {
+      "id": "ap2_human_not_present",
+      "description": "Agent Payments Protocol evidence for a human-not-present mandate flow."
+    },
+    {
+      "id": "mcp-oauth",
+      "description": "MCP authorization evidence carried through OAuth-style tokens or transaction context."
+    },
+    {
+      "id": "oap_aport",
+      "description": "OAP/APort passport or decision evidence."
+    },
+    {
+      "id": "openid-connect",
+      "description": "OpenID Connect identity evidence."
+    },
+    {
+      "id": "spiffe",
+      "description": "SPIFFE workload identity or attestation evidence."
+    },
+    {
+      "id": "stripe_spt",
+      "description": "Stripe scoped payment token or payment-authority evidence."
+    },
+    {
+      "id": "ucp",
+      "description": "Universal Checkout Protocol checkout evidence."
+    },
+    {
+      "id": "x402",
+      "description": "x402 payment-required or payment-settlement evidence."
+    }
+  ]
+}

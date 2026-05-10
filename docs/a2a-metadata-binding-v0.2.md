@@ -3,6 +3,10 @@
 
 ## Status
 
+Historical note: this file describes the v0.2 A2A-shaped review line. Current
+main-branch hardening work uses
+[`docs/a2a-metadata-binding-v0.3.md`](a2a-metadata-binding-v0.3.md).
+
 This is a proposed binding for `VATE AL2 Verifier Admission Profile v0.2`.
 It is intentionally small.
 
@@ -169,7 +173,7 @@ artifacts.
 
 ## Conformance Review Path
 
-The current AL2 v0.2 corpus lives under `conformance/al2-vate-v0.2/`, with its
+The AL2 v0.2 corpus lives under `conformance/al2-vate-v0.2/`, with its
 case count recorded in `corpus.json` as `summary.case_count`. For external
 implementations, start with `docs/conformance/external-sut-quickstart.md` and
 use `compare` against the exact corpus snapshot identified by `corpus.json`.

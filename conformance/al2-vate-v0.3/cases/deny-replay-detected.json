@@ -1,0 +1,42 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "deny-replay-detected",
+  "title": "Deny a replayed admission request",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when a one-time admission request or nonce is replayed.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-deny-replay-detected.example.json",
+    "replay_context": "conformance/al2-vate-v0.3/fixtures/replay-consumed-context.json"
+  },
+  "al2_context_checks": [
+    {
+      "kind": "replay",
+      "artifact": "replay_context",
+      "expect_replayed": true,
+      "expected_failure_reason": "REPLAY_DETECTED"
+    }
+  ],
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "REPLAY_DETECTED",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "replay detection",
+    "one-time use"
+  ]
+}

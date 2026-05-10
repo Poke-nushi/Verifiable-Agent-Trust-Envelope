@@ -1,13 +1,14 @@
-# A2A Review Package For VATE v0.2
+# A2A Review Package For VATE v0.3
 
 ## Status
 
 This directory is a review package for a VATE community profile draft that uses
 A2A metadata to carry digest-bound admission and receipt references.
 
-It is not an official A2A extension, does not require an A2A core change, and
-does not make A2A responsible for verifier policy, payment semantics, identity
-registries, or receipt storage.
+This is not an official A2A extension, endorsement, certification, SDK,
+middleware package, or general compatibility proof. It does not require an A2A
+core change and does not make A2A responsible for verifier policy, payment
+semantics, identity registries, or receipt storage.
 
 ## Short Position
 
@@ -27,10 +28,10 @@ objects.
 
 ## Read Order
 
-1. [VATE A2A Extension Profile v0.2](vate-a2a-extension-profile-v0.2.md)
-2. [A2A Metadata Binding v0.2](../a2a-metadata-binding-v0.2.md)
+1. [VATE A2A Extension Profile v0.3](vate-a2a-extension-profile-v0.3.md)
+2. [A2A Metadata Binding v0.3](../a2a-metadata-binding-v0.3.md)
 3. [A2A v1.0 Extension Sketch](../a2a-v1-extension-sketch-2026-05.md)
-4. [A2A Maintainer Brief](../a2a-maintainer-brief-v0.2.md)
+4. [A2A Maintainer Brief](../a2a-maintainer-brief-v0.3.md)
 5. [A2A Issue Update Draft](../a2a-issue-update-2026-05.md)
 
 Related examples:
@@ -47,15 +48,15 @@ Related schema:
 
 Related conformance and implementation review aids:
 
-- `conformance/al2-vate-v0.2/`
+- `conformance/al2-vate-v0.3/`
 - `docs/conformance/external-sut-quickstart.md`
 - `docs/conformance/sut-adapter-contract.md`
 - `docs/conformance/report-integrity.md`
 - `packages/vate-core-ts/README.md`
 - `packages/vate-a2a-ts/README.md`
 
-The current AL2 v0.2 corpus case count is recorded in
-`conformance/al2-vate-v0.2/corpus.json` as `summary.case_count`. Use `compare`
+The current AL2 v0.3 corpus case count is recorded in
+`conformance/al2-vate-v0.3/corpus.json` as `summary.case_count`. Use `compare`
 for external SUT review. Use `run` only to check this repository's committed
 fixtures and reference runner behavior. `verify-bundle` is a local digest-chain
 check across the corpus, SUT result, conformance report, and implementation
@@ -63,8 +64,9 @@ report; it is not a production signature profile.
 
 The package-private TypeScript helpers cover digest descriptors, artifact
 references, SUT result entry shaping, A2A metadata shape validation, and optional
-activation header checks. They are not official A2A SDKs, middleware packages,
-published compatibility tools, or production verifiers.
+activation header checks. They are not official A2A extensions, endorsements,
+certifications, SDKs, middleware packages, production verifiers, or general
+compatibility proofs.
 
 ## Review Question
 

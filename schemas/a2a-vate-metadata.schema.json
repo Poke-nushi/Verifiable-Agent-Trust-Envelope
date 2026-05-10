@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:vate:schema:a2a-metadata:0.2",
+  "$id": "urn:vate:schema:a2a-metadata:0.3",
   "title": "A2A VATE Metadata Binding",
-  "description": "Draft v0.2 metadata object for carrying VATE admission and receipt references in A2A metadata.",
+  "description": "Draft v0.3 metadata object for carrying VATE admission and receipt references in A2A metadata.",
   "type": "object",
   "required": [
     "profile",
@@ -15,7 +15,7 @@
   "properties": {
     "profile": {
       "type": "string",
-      "const": "VATE-AL2-Verifier-Admission-v0.2"
+      "const": "VATE-AL2-Verifier-Admission-v0.3"
     },
     "phase": {
       "type": "string",
@@ -174,7 +174,7 @@
         },
         "digest": {
           "type": "object",
-          "description": "Digest descriptor for A2A metadata references. The v0.2 AL2 metadata profile requires sha-256 with a lowercase 64-character hexadecimal value.",
+          "description": "Digest descriptor for A2A metadata references. The v0.3 AL2 metadata profile requires sha-256 with a lowercase 64-character hexadecimal value.",
           "required": [
             "alg",
             "value"
@@ -186,7 +186,7 @@
             },
             "value": {
               "type": "string",
-              "description": "Digest value. For the v0.2 AL2 conformance corpus, use lowercase SHA-256 hexadecimal.",
+              "description": "Digest value. For the v0.3 AL2 conformance corpus, use lowercase SHA-256 hexadecimal.",
               "pattern": "^[a-f0-9]{64}$"
             }
           },

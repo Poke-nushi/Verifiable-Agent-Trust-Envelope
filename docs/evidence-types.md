@@ -3,10 +3,10 @@
 ## Status
 
 The machine-readable registry is
-[`registries/evidence-vocabulary.v0.2.json`](../registries/evidence-vocabulary.v0.2.json).
+[`registries/evidence-vocabulary.v0.3.json`](../registries/evidence-vocabulary.v0.3.json).
 That file is the canonical source for evidence type values, protocol hint
 values, and allowed evidence type / protocol hint combinations under the
-`VATE AL2 Verifier Admission v0.2` conformance corpus.
+`VATE AL2 Verifier Admission v0.3` conformance corpus.
 
 This document is the human-readable companion to that registry.
 
@@ -22,7 +22,7 @@ useful for logs, receipts, or local policy.
 ## Core Rule
 
 Admission requests and admission receipts MUST use a canonical `type` value
-from this registry when they are evaluated under the AL2 v0.2 conformance
+from this registry when they are evaluated under the AL2 v0.3 conformance
 profile.
 
 `protocol_hint` is optional and informative. When present, it MUST be allowed
@@ -104,7 +104,7 @@ For example, AP2 Human Not Present payment authority is represented as:
 
 ## Allowed Type / Hint Combinations
 
-The following combinations are registered for the AL2 v0.2 conformance profile.
+The following combinations are registered for the AL2 v0.3 conformance profile.
 Any `protocol_hint` not listed for a given `type` fails the profile checks.
 
 | Evidence type | Allowed protocol hints |
@@ -126,8 +126,8 @@ All other registered evidence types currently have no registered
 
 ## Extension Rule
 
-The AL2 v0.2 conformance corpus is closed over the values in
-`registries/evidence-vocabulary.v0.2.json`. Unknown evidence types, unknown
+The AL2 v0.3 conformance corpus is closed over the values in
+`registries/evidence-vocabulary.v0.3.json`. Unknown evidence types, unknown
 protocol hints, or unregistered type/hint combinations fail the profile checks.
 
 Future profiles may add values, but they should prefer a generic evidence type

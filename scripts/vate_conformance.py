@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Runnable VATE AL2 v0.2 conformance corpus checker.
+"""Runnable VATE AL2 v0.3 conformance corpus checker.
 
 This runner intentionally uses only the Python standard library.
 It validates the machine-readable behavior that matters for early interop:
@@ -22,8 +22,8 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-PROFILE = "VATE-AL2-Verifier-Admission-v0.2"
-VATE_A2A_EXTENSION_URI = "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2"
+PROFILE = "VATE-AL2-Verifier-Admission-v0.3"
+VATE_A2A_EXTENSION_URI = "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.3"
 CONFORMANCE_REPORT_VERSION = "vate-conformance-report-2026-07"
 IMPLEMENTATION_REPORT_VERSION = "vate-implementation-report-2026-07"
 BUNDLE_VERIFICATION_VERSION = "vate-report-bundle-verification-2026-07"
@@ -33,7 +33,7 @@ SUT_RESULTS_VERSION = "vate-sut-results-2026-07"
 EVIDENCE_VOCABULARY_VERSION = "vate-evidence-vocabulary-2026-07"
 SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 PROFILE_HASH_RE = re.compile(r"^sha-256:[0-9a-f]{64}$")
-EVIDENCE_VOCABULARY_PATH = ROOT / "registries" / "evidence-vocabulary.v0.2.json"
+EVIDENCE_VOCABULARY_PATH = ROOT / "registries" / "evidence-vocabulary.v0.3.json"
 TERMINAL_REASON_CODES = {"FAIL_CLOSED", "POLICY_MATCH"}
 
 
@@ -308,8 +308,8 @@ def make_corpus_index(corpus_root: Path) -> dict[str, Any]:
         "cases": cases,
         "manifest": manifest,
         "runner": {
-            "command": "python3 scripts/vate_conformance.py run --corpus-root conformance/al2-vate-v0.2 --report /tmp/vate-conformance-report.json",
-            "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.2 --out conformance/al2-vate-v0.2/corpus.json",
+            "command": "python3 scripts/vate_conformance.py run --corpus-root conformance/al2-vate-v0.3 --report /tmp/vate-conformance-report.json",
+            "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.3 --out conformance/al2-vate-v0.3/corpus.json",
         },
         "limitations": [
             "This corpus index is an implementation aid, not a production endorsement statement.",
@@ -2709,7 +2709,7 @@ def add_implementation_report_args(parser: argparse.ArgumentParser, *, include_i
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Check VATE AL2 v0.2 fixture artifacts or compare external SUT results")
+    parser = argparse.ArgumentParser(description="Check VATE AL2 v0.3 fixture artifacts or compare external SUT results")
     subparsers = parser.add_subparsers(dest="command", required=True)
     run = subparsers.add_parser("run", help="check repository fixture artifacts with the reference runner")
     run.add_argument("--corpus-root", required=True, help="corpus root containing cases/")

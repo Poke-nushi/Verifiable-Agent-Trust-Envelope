@@ -1,0 +1,8 @@
+{
+  "replay_key": "areq-20260701-replay-detected-001:nonce-001",
+  "nonce": "nonce-001",
+  "state": "consumed",
+  "first_seen_at": "2026-07-01T00:10:30Z",
+  "checked_at": "2026-07-01T00:11:05Z",
+  "failure_reason": "REPLAY_DETECTED"
+}

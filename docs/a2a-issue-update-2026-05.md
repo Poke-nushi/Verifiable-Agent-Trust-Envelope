@@ -1,6 +1,6 @@
 # A2A Issue Update Draft
 
-This is a concise update draft for an A2A-adjacent discussion after the v0.2
+This is a concise update draft for an A2A-adjacent discussion after the v0.3
 AL2 admission artifacts became runnable.
 
 It must be reviewed and edited for the specific venue before posting.
@@ -8,7 +8,7 @@ It must be reviewed and edited for the specific venue before posting.
 ## Suggested Comment
 
 Since the earlier VATE v0.2 discussion draft, I narrowed the proposal to a
-metadata-only A2A-oriented community profile and added the current AL2 v0.2
+metadata-only A2A-oriented community profile and added the current AL2 v0.3
 corpus plus an external SUT comparison path.
 
 This is not an official A2A extension proposal and does not require A2A core
@@ -24,11 +24,11 @@ The current boundary is:
 The shortest review path is:
 
 - A2A review package: `docs/a2a/README.md`
-- A2A extension profile draft: `docs/a2a/vate-a2a-extension-profile-v0.2.md`
-- A2A metadata binding: `docs/a2a-metadata-binding-v0.2.md`
+- A2A extension profile draft: `docs/a2a/vate-a2a-extension-profile-v0.3.md`
+- A2A metadata binding: `docs/a2a-metadata-binding-v0.3.md`
 - A2A v1.0 extension sketch: `docs/a2a-v1-extension-sketch-2026-05.md`
-- A2A maintainer brief: `docs/a2a-maintainer-brief-v0.2.md`
-- Runnable conformance corpus: `conformance/al2-vate-v0.2/`
+- A2A maintainer brief: `docs/a2a-maintainer-brief-v0.3.md`
+- Runnable conformance corpus: `conformance/al2-vate-v0.3/`
 - External SUT quickstart: `docs/conformance/external-sut-quickstart.md`
 - SUT result comparison contract: `docs/conformance/sut-adapter-contract.md`
 - Report-bundle integrity guidance: `docs/conformance/report-integrity.md`

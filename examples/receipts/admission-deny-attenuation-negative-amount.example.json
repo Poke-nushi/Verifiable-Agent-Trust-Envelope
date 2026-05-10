@@ -1,6 +1,6 @@
 {
-  "version": "vate-0.2",
-  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "version": "vate-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "receipt_type": "admission",
   "receipt_id": "admrec-20260701-attenuation-negative-amount-001",
   "issued_at": "2026-07-01T00:36:08Z",
@@ -22,7 +22,7 @@
   "evidence": [
     {
       "type": "attenuation_candidate",
-      "uri": "conformance/al2-vate-v0.2/fixtures/attenuation-negative-amount.json",
+      "uri": "conformance/al2-vate-v0.3/fixtures/attenuation-negative-amount.json",
       "digest": {
         "alg": "sha-256",
         "value": "99a5c45764dbeb50107b5da3686f6b75107458264fae04dbc6463d7d742b01c9"

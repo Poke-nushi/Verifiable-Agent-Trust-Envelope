@@ -1,0 +1,33 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "deny-status-revoked",
+  "title": "Deny revoked status",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when current status revokes required authority.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-deny-status-revoked.example.json"
+  },
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "STATUS_REVOKED",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "revocation",
+    "status check"
+  ]
+}

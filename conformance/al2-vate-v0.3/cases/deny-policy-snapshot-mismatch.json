@@ -1,0 +1,51 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "deny-policy-snapshot-mismatch",
+  "title": "Deny when policy snapshot digest does not match",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when a digest-bound policy snapshot reference does not match the policy artifact used as the decision basis.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-deny-policy-snapshot-mismatch.example.json",
+    "policy_snapshot": "examples/policies/al2-repo-merge-policy-snapshot.example.json"
+  },
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "POLICY_SNAPSHOT_MISMATCH",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "policy.policy_snapshot.digest",
+        "expected": "present"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "policy snapshot digest mismatch",
+    "audit basis",
+    "fail closed"
+  ],
+  "policy_snapshot_checks": [
+    {
+      "artifact": "policy_snapshot",
+      "expect_match": false,
+      "reference_paths": [
+        {
+          "artifact": "admission_receipt",
+          "path": "policy.policy_snapshot"
+        }
+      ]
+    }
+  ]
+}

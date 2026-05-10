@@ -68,7 +68,7 @@ The fixture under `examples/interop/ap2-ucp-to-vate/` uses:
 
 The corresponding conformance case is:
 
-- `conformance/al2-vate-v0.2/cases/interop-ap2-ucp-commerce-evidence.json`
+- `conformance/al2-vate-v0.3/cases/interop-ap2-ucp-commerce-evidence.json`
 
 ## Non-Goals
 

@@ -1,0 +1,42 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "allow-replay-state-unused",
+  "title": "Allow an unused replay key",
+  "category": "positive",
+  "purpose": "A verifier should not treat an unused one-time replay key as replayed.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-allow-replay-unused.example.json",
+    "replay_context": "conformance/al2-vate-v0.3/fixtures/replay-unused-context.json"
+  },
+  "al2_context_checks": [
+    {
+      "kind": "replay",
+      "artifact": "replay_context",
+      "expect_replayed": false
+    }
+  ],
+  "expected": {
+    "admission_decision": "allow",
+    "should_execute": true,
+    "reason_codes": [
+      "EVIDENCE_VERIFIED",
+      "POLICY_MATCH"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "pass"
+      },
+      {
+        "name": "evidence.verification.result",
+        "expected": "pass"
+      }
+    ]
+  },
+  "validation_focus": [
+    "replay detection",
+    "one-time use",
+    "allow decision"
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "deny-alg-not-allowed",
+  "title": "Deny a disallowed proof algorithm",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when the matched trust anchor does not allow the presented proof algorithm.",
+  "artifacts": {
+    "trust_bundle": "examples/trust-bundle.example.json",
+    "admission_receipt": "examples/receipts/admission-deny-alg-not-allowed.example.json"
+  },
+  "trust_checks": [
+    {
+      "trust_bundle": "trust_bundle",
+      "issuer_id": "did:web:agent.example",
+      "kid": "did:web:agent.example#runtime-key-1",
+      "alg": "HS256",
+      "evidence_type": "runtime_attestation",
+      "checked_at": "2026-07-01T00:10:05Z",
+      "expect_trusted": false,
+      "expected_failure_reason": "ALG_NOT_ALLOWED"
+    }
+  ],
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "ALG_NOT_ALLOWED",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "trust bundle",
+    "algorithm allowlist",
+    "fail closed"
+  ]
+}

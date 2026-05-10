@@ -3,7 +3,7 @@
     "decision": "allow",
     "digest": {
       "alg": "sha-256",
-      "value": "c6858c4e8015fe78e6db98e48b65158f909e1ec4b47200c5f56b6cd03c8fe563"
+      "value": "fe9bdb1dc823858ec0caaaef092a28661ca54ffe874e26e0c26580816171c69d"
     },
     "receipt_id": "admrec-ap2hnp-valid-20260507-001",
     "uri": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-valid.example.json"
@@ -23,7 +23,7 @@
     "key_id": "did:web:agent.example#runtime-key-1",
     "role": "runtime"
   },
-  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "receipt_id": "postrec-ap2hnp-valid-20260507-001",
   "receipt_type": "post_execution",
   "result": {
@@ -43,5 +43,5 @@
       }
     ]
   },
-  "version": "vate-0.2"
+  "version": "vate-0.3"
 }

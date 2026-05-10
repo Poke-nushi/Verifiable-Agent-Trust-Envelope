@@ -1,6 +1,6 @@
 {
-  "version": "vate-0.2",
-  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "version": "vate-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "receipt_type": "admission",
   "receipt_id": "admrec-20260701-attenuation-max-amount-type-001",
   "issued_at": "2026-07-01T00:35:08Z",
@@ -22,7 +22,7 @@
   "evidence": [
     {
       "type": "attenuation_candidate",
-      "uri": "conformance/al2-vate-v0.2/fixtures/attenuation-max-amount-type-edge.json",
+      "uri": "conformance/al2-vate-v0.3/fixtures/attenuation-max-amount-type-edge.json",
       "digest": {
         "alg": "sha-256",
         "value": "01fcf4ba7fc2fa98506d4c0c20f9176fbc1e3ca5c13927530d8d70fad4c7992c"

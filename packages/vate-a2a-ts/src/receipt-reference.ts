@@ -14,7 +14,7 @@ export function buildAdmissionIssuedMetadata(
   input: BuildAdmissionIssuedMetadataInput
 ) {
   return {
-    profile: "VATE-AL2-Verifier-Admission-v0.2" as const,
+    profile: "VATE-AL2-Verifier-Admission-v0.3" as const,
     phase: "admission_issued" as const,
     transaction_id: input.transactionId,
     assurance_level: "AL2" as const,

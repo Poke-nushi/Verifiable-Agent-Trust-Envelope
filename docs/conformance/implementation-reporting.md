@@ -1,6 +1,6 @@
 # VATE Implementation Reporting
 
-This note defines how an implementation can publish a machine-readable result for the `VATE-AL2-Verifier-Admission-v0.2` conformance corpus.
+This note defines how an implementation can publish a machine-readable result for the `VATE-AL2-Verifier-Admission-v0.3` conformance corpus.
 
 The purpose is narrow:
 
@@ -41,7 +41,7 @@ includes `case_id`, expected and actual outcome, expected and actual
 
 The portable corpus shape is published separately as:
 
-- `conformance/al2-vate-v0.2/corpus.json`
+- `conformance/al2-vate-v0.3/corpus.json`
 - `schemas/conformance-corpus.schema.json`
 
 Non-reference implementations should use the corpus index to discover cases and artifacts, then publish their own conformance and implementation reports.
@@ -63,27 +63,19 @@ Report publication and integrity guidance is published separately:
 
 ```bash
 python3 scripts/vate_conformance.py run \
-  --corpus-root conformance/al2-vate-v0.2 \
-  --report /tmp/vate-conformance-report.json \
-  --implementation-report /tmp/vate-implementation-report.json \
-  --conformance-report-uri "https://example.invalid/vate/reports/vate-conformance-report.json" \
-  --implementation-report-uri "https://example.invalid/vate/reports/vate-implementation-report.json" \
-  --publication-controlled-origin "https://example.invalid" \
-  --publication-immutability versioned_url \
-  --implementation-name "Example VATE verifier" \
-  --implementation-type "verifier" \
-  --implementation-version "0.1.0" \
-  --implementation-language "Python 3" \
-  --implementation-repo "https://example.invalid/repo" \
-  --implementation-commit "example-commit"
+  --corpus-root conformance/al2-vate-v0.3 \
+  --report /tmp/vate-conformance-report.json
 ```
 
-The runner writes:
+The runner writes a conformance report using
+`application/vate-conformance-report+json`.
 
-- a conformance report using `application/vate-conformance-report+json`
-- an implementation report using `application/vate-implementation-report+json`
+`run` is a repository fixture / reference-runner integrity check. It must not be
+cited as an external implementation conformance claim.
 
-The implementation report includes a digest of the conformance report and a digest of the corpus snapshot.
+## External SUT Implementation Report
+
+An implementation report includes a digest of the conformance report and a digest of the corpus snapshot.
 The runner records `conformance_report.digest_basis=json-sorted-no-whitespace`
 for its canonical JSON digest.
 The corpus digest is computed over the sorted `corpus.manifest` array.
@@ -97,7 +89,7 @@ To publish an implementation report for an external SUT comparison, use
 
 ```bash
 python3 scripts/vate_conformance.py compare \
-  --corpus-root conformance/al2-vate-v0.2 \
+  --corpus-root conformance/al2-vate-v0.3 \
   --sut-results examples/conformance/sut-results-pass.example.json \
   --report /tmp/vate-sut-compare-report.json \
   --implementation-report /tmp/vate-sut-implementation-report.json \
@@ -121,7 +113,7 @@ To verify that the local report bundle is still tied together, run:
 
 ```bash
 python3 scripts/vate_conformance.py verify-bundle \
-  --corpus-root conformance/al2-vate-v0.2 \
+  --corpus-root conformance/al2-vate-v0.3 \
   --sut-results examples/conformance/sut-results-pass.example.json \
   --conformance-report /tmp/vate-sut-compare-report.json \
   --implementation-report /tmp/vate-sut-implementation-report.json \

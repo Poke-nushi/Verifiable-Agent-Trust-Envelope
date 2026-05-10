@@ -2,7 +2,7 @@
 
 ## Status
 
-This note defines the publication and integrity guidance for AL2 v0.2 SUT
+This note defines the publication and integrity guidance for AL2 v0.3 SUT
 results, conformance reports, and implementation reports.
 
 It is not a production signature profile. It gives reviewers enough information
@@ -43,7 +43,7 @@ bundle:
 
 ```bash
 python3 scripts/vate_conformance.py verify-bundle \
-  --corpus-root conformance/al2-vate-v0.2 \
+  --corpus-root conformance/al2-vate-v0.3 \
   --sut-results examples/conformance/sut-results-pass.example.json \
   --conformance-report /tmp/vate-sut-compare-report.json \
   --implementation-report /tmp/vate-sut-implementation-report.json \
@@ -106,7 +106,7 @@ Supported proof reference labels are:
 - `sigstore_bundle`
 - `other`
 
-The v0.2 repository does not verify those proofs. It only records where a
+The v0.3 repository does not verify those proofs. It only records where a
 reviewer can find them and what artifact they are intended to cover.
 
 ## Verification Checklist

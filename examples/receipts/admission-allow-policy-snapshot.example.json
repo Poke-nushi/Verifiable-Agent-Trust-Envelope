@@ -1,6 +1,6 @@
 {
-  "version": "vate-0.2",
-  "profile": "VATE-AL2-Verifier-Admission-v0.2",
+  "version": "vate-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "receipt_type": "admission",
   "receipt_id": "admrec-20260701-policy-snapshot-001",
   "issued_at": "2026-07-01T00:01:08Z",
@@ -43,7 +43,7 @@
       "media_type": "application/vate-policy-snapshot+json",
       "digest": {
         "alg": "sha-256",
-        "value": "55765d05af2fb4920871edde7a48e129c378701705d37add128e7ad550efea80"
+        "value": "66dbcb55e6452fe2f21c3ffdc1a5892e1a2e7e7e61a8efc9ef4f805a37e89d76"
       }
     }
   },

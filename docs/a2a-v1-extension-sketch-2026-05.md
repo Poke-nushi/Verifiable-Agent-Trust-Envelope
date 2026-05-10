@@ -5,13 +5,14 @@
 This is a public sketch for how the current VATE AL2 admission artifacts could
 fit into the A2A v1.0 extension model.
 
-It is not an official A2A extension and does not require an A2A core change.
-The goal is to make the boundary reviewable before any SDK middleware or
-governed extension proposal exists.
+This is not an official A2A extension, endorsement, certification, SDK,
+middleware package, or general compatibility proof. It does not require an A2A
+core change. The goal is to make the boundary reviewable before any governed
+extension proposal exists.
 
 For the consolidated community profile draft and review entry point, see
 `docs/a2a/README.md` and
-`docs/a2a/vate-a2a-extension-profile-v0.2.md`.
+`docs/a2a/vate-a2a-extension-profile-v0.3.md`.
 
 ## A2A v1.0 Surface Used
 
@@ -50,7 +51,7 @@ VATE should be treated as a data/profile extension:
 The current draft URI remains:
 
 ```text
-https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2
+https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.3
 ```
 
 This is a repository-scoped draft namespace. A persistent URI can be considered
@@ -65,12 +66,12 @@ An A2A v1.0 Agent Card can advertise VATE support as an optional extension:
   "capabilities": {
     "extensions": [
       {
-        "uri": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2",
+        "uri": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.3",
         "description": "Carries digest-bound VATE admission and receipt references in A2A metadata.",
         "required": false,
         "params": {
           "profiles": [
-            "VATE-AL2-Verifier-Admission-v0.2"
+            "VATE-AL2-Verifier-Admission-v0.3"
           ],
           "accepted_reference_modes": [
             "reference_plus_digest"
@@ -101,7 +102,7 @@ For HTTP-based A2A bindings, a client that wants the VATE metadata semantics for
 a request can send:
 
 ```http
-A2A-Extensions: https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.2
+A2A-Extensions: https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.3
 ```
 
 The extension should remain `required: false` during early interop. If a later
@@ -120,7 +121,7 @@ When the evidence is an A2A Agent Card signature, the referenced signature
 material should follow A2A v1.0 Agent Card signing rules. In particular, the
 protected JWS header is expected to carry `alg`, `typ`, and `kid`.
 
-For the v0.2 byte-level fixture, the digest-bound artifact is the canonicalized
+For the v0.3 byte-level fixture, the digest-bound artifact is the canonicalized
 Agent Card payload shown in
 `examples/a2a/agent-card-v1-vate-extension.example.json`. The detached proof
 fixture is `examples/jose/jose-detached-a2a-agent-card.example.json`, and the
@@ -160,8 +161,8 @@ policy, and post-execution linkage.
 
 ## Current Review Artifacts
 
-The current repository review package includes the AL2 v0.2 corpus under
-`conformance/al2-vate-v0.2/`, with its current case count recorded in
+The current repository review package includes the AL2 v0.3 corpus under
+`conformance/al2-vate-v0.3/`, with its current case count recorded in
 `corpus.json` as `summary.case_count`. The A2A-specific signed Agent Card case
 is `allow-a2a-signed-agent-card-evidence`.
 
@@ -177,8 +178,9 @@ profile.
 
 The package-private TypeScript helpers in `packages/vate-core-ts/` and
 `packages/vate-a2a-ts/` are review aids for digest-bound references, SUT result
-shaping, metadata validation, and optional activation checks. They are not an
-A2A SDK middleware package.
+shaping, metadata validation, and optional activation checks. They are not
+official A2A extensions, endorsements, certifications, SDKs, middleware
+packages, or general compatibility proofs.
 
 ## Failure Mapping
 
@@ -200,8 +202,8 @@ Examples:
 
 This sketch does not define:
 
-- an official A2A extension namespace;
-- an A2A SDK middleware package;
+- an official A2A extension namespace, endorsement, certification, SDK,
+  middleware package, or general compatibility proof;
 - a new A2A RPC method;
 - a new A2A task state;
 - an identity registry;
@@ -215,7 +217,7 @@ This sketch does not define:
   use the A2A extension governance process?
 - Should signed Agent Card evidence be optional for all AL2 cases, or required
   for cross-organization interop fixtures?
-- Should a future production profile keep the v0.2 digest target as the
+- Should a future production profile keep the v0.3 digest target as the
   canonicalized Agent Card payload, or move to an implementation-defined bundle
   containing the card plus signature metadata?
 - Should SDK middleware live outside this repository until at least one

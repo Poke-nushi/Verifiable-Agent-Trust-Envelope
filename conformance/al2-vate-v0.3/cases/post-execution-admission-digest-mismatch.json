@@ -1,0 +1,60 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "post-execution-admission-digest-mismatch",
+  "title": "Reject post-execution admission digest mismatch",
+  "category": "linkage",
+  "purpose": "A verifier or auditor should reject post-execution evidence when the admission receipt digest does not match the referenced admission artifact.",
+  "artifacts": {
+    "admission_receipt": "examples/receipts/admission-attenuate-max-amount.example.json",
+    "post_execution_receipt": "examples/receipts/post-execution-admission-digest-mismatch.example.json"
+  },
+  "artifact_reference_checks": [
+    {
+      "artifact": "admission_receipt",
+      "expect_match": false,
+      "reference_paths": [
+        {
+          "artifact": "post_execution_receipt",
+          "path": "admission.digest"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "post_execution_outcome": "failed",
+    "should_execute": true,
+    "reason_codes": [
+      "POST_EXEC_ADMISSION_DIGEST_MISMATCH"
+    ],
+    "checks": [
+      {
+        "name": "post_execution.admission.digest",
+        "expected": "present"
+      },
+      {
+        "name": "result.policy_violations",
+        "expected": "fail"
+      }
+    ]
+  },
+  "validation_focus": [
+    "post-execution linkage",
+    "admission receipt digest mismatch"
+  ],
+  "linkage_checks": [
+    {
+      "kind": "admission_digest",
+      "artifact": "admission_receipt",
+      "post_execution_path": "admission.digest",
+      "expect_match": false,
+      "reason_code": "POST_EXEC_ADMISSION_DIGEST_MISMATCH"
+    },
+    {
+      "kind": "policy_violation",
+      "value": "admission_digest_mismatch",
+      "expect_present": true,
+      "reason_code": "POST_EXEC_ADMISSION_DIGEST_MISMATCH"
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 ## Status
 
-This note defines the result contract for comparing an external system under test (SUT) against the `VATE AL2 Verifier Admission v0.2` corpus.
+This note defines the result contract for comparing an external system under test (SUT) against the `VATE AL2 Verifier Admission v0.3` corpus.
 
 It does not require an implementation to use Python.
 The Python runner is only a comparison tool for the published corpus expectations.
@@ -15,7 +15,7 @@ field-level requirements.
 
 An external verifier should be able to:
 
-1. Load `conformance/al2-vate-v0.2/corpus.json`.
+1. Load `conformance/al2-vate-v0.3/corpus.json`.
 2. Execute each listed case in its own runtime.
 3. Emit a SUT result file matching `schemas/sut-result.schema.json`.
 4. Compare that file against the corpus with the reference runner.
@@ -34,7 +34,7 @@ corpus snapshot is identified by `corpus.digest`. See
 Required top-level fields:
 
 - `version` - currently `vate-sut-results-2026-07`
-- `profile` - currently `VATE-AL2-Verifier-Admission-v0.2`
+- `profile` - currently `VATE-AL2-Verifier-Admission-v0.3`
 - `generated_at`
 - `implementation`
 - `corpus.digest`
@@ -139,7 +139,7 @@ enforce case-dependent artifact requirements and digest matches.
 
 ```bash
 python3 scripts/vate_conformance.py compare \
-  --corpus-root conformance/al2-vate-v0.2 \
+  --corpus-root conformance/al2-vate-v0.3 \
   --sut-results examples/conformance/sut-results-pass.example.json \
   --report /tmp/vate-sut-compare-report.json
 ```

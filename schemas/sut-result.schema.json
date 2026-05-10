@@ -19,7 +19,7 @@
     },
     "profile": {
       "type": "string",
-      "const": "VATE-AL2-Verifier-Admission-v0.2"
+      "const": "VATE-AL2-Verifier-Admission-v0.3"
     },
     "generated_at": {
       "type": "string",
@@ -70,7 +70,7 @@
       "properties": {
         "profile": {
           "type": "string",
-          "const": "VATE-AL2-Verifier-Admission-v0.2"
+          "const": "VATE-AL2-Verifier-Admission-v0.3"
         },
         "digest": {
           "$ref": "#/$defs/digest"

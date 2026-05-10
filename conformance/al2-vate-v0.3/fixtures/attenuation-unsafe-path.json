@@ -1,0 +1,18 @@
+{
+  "mode": "narrow",
+  "original_request_hash": "sha-256:898be4457b2c79117bcdfe1aec009fd488dc939a077d3321d2e40ae174060c5a",
+  "effective_request_hash": "sha-256:7a8a42214237c86695911f17d8d903245a6b2b5bffe3f1b2106c39a63d6ac6ff",
+  "changes": [
+    {
+      "op": "replace",
+      "path": "/policy/allow_all",
+      "from": false,
+      "to": true,
+      "reason_code": "TARGET_SCOPE_NARROWED"
+    }
+  ],
+  "effective_constraints": {
+    "target_resource": "bucket:public/reports/*"
+  },
+  "require_new_permit": false
+}
