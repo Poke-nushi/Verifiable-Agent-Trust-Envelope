@@ -119,7 +119,7 @@ A production JOSE profile should define the exact payload bytes that are signed 
 
 ## Current Fixture Coverage
 
-The v0.2 AL2 corpus now includes detached JWS fixture checks for:
+The current v0.3 AL2 corpus includes detached JWS fixture checks for:
 
 - protected header canonical bytes and base64url encoding
 - detached payload canonical bytes and base64url encoding
@@ -148,7 +148,7 @@ Denial receipts should include `FAIL_CLOSED` when proof verification failure pre
 
 ## Deferred Decisions
 
-These decisions should remain outside v0.2 fixture conformance:
+These decisions should remain outside the v0.3 fixture conformance claim:
 
 - DID resolution rules
 - certificate path building

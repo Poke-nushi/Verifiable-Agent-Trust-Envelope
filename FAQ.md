@@ -18,7 +18,10 @@ The preserved `v0.1` core makes that concrete through a verifier-centered `AL2` 
 
 and then emits a machine-readable receipt.
 
-The `v0.2` profile keeps that boundary, but makes the admission moment more explicit by separating admission requests, admission receipts, A2A metadata references, attenuation records, and post-execution receipts.
+The current `v0.3` profile keeps that boundary, makes the admission moment more
+explicit, and hardens evidence-reference handling across admission requests,
+admission receipts, A2A metadata references, attenuation records, and
+post-execution receipts.
 
 ## Why Isn't A Valid Token Enough?
 
@@ -97,7 +100,8 @@ That is a fair concern, and the current answer should be:
 
 - the core claim is narrow
 - the durable battlefield is still `AL2` external digital write
-- `v0.2` moves the most concrete new work into an AL2 verifier admission profile
+- `v0.3` keeps the most concrete new work in a narrow AL2 verifier admission
+  profile and hardens empty `evidence_refs` handling
 - broader deployment shapes should move into profiles, extensions, or later drafts where possible
 
 If reviewers think a concept does not help that verifier-side boundary, it is a good candidate to remove from the core.
@@ -113,7 +117,9 @@ The preserved v0.1 core discussion draft centers on:
 - `ASN` - status, revocation, and attenuation signaling
 
 The repository also includes payload schemas, examples, verifier guidance, negative tests, and educational reference demos.
-The current v0.2 additions provide a concrete AL2 verifier admission profile, reference-only A2A metadata binding, separate admission and post-execution receipt schemas, and a small machine-readable conformance corpus.
+The current v0.3 additions provide a concrete AL2 verifier admission profile,
+reference-only A2A metadata binding, separate admission and post-execution
+receipt schemas, and a 63-case machine-readable conformance corpus.
 
 ## What Is Still Future Work?
 

@@ -232,7 +232,7 @@ execution.
 
 ## Relationship To Current Fixtures
 
-The v0.2 AL2 corpus currently checks:
+The current v0.3 AL2 corpus checks:
 
 - protected header bytes;
 - detached payload bytes;
