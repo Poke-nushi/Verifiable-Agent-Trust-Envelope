@@ -350,16 +350,19 @@ The maintainer is responsible for the final structure, scope decisions, and publ
 
 ## How to Cite
 
+If you reference the archived May 10, 2026 `v0.3.0` discussion-draft
+pre-release snapshot, cite:
+
+- Version DOI: [10.5281/zenodo.20107413](https://doi.org/10.5281/zenodo.20107413)
+- All-version concept DOI: [10.5281/zenodo.19839768](https://doi.org/10.5281/zenodo.19839768)
+
+If you reference unarchived main-branch changes after `v0.3.0`, cite the
+repository URL and exact commit SHA in addition to the latest applicable
+archived version DOI.
+
 If you reference the archived May 5, 2026 `v0.2.0` snapshot, cite:
 
 - Version DOI: [10.5281/zenodo.20043166](https://doi.org/10.5281/zenodo.20043166)
-- All-version concept DOI: [10.5281/zenodo.19839768](https://doi.org/10.5281/zenodo.19839768)
-
-If you reference current `main` before the `v0.3.0` archive is cut, cite:
-
-- repository URL
-- commit SHA
-- a note that the `v0.3.0` archive DOI is not yet available
 
 - Earlier `v0.1.0` DOI: [10.5281/zenodo.19839769](https://doi.org/10.5281/zenodo.19839769)
 - Machine-readable metadata: [CITATION.cff](CITATION.cff)
