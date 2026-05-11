@@ -4,6 +4,21 @@
 
 Verifiable Agent Trust Envelope is an early discussion draft for the verifier-side trust / permit / receipt boundary that appears when an external agent wants to perform a risky write against a remote system.
 
+## What Public Claims Are Safe?
+
+Use the [public claim boundary](docs/public-claim-boundary.md) as the short
+rulebook for README text, roadmap text, GitHub issues, outreach, and report
+publication.
+
+The safe short version is:
+
+- VATE is a discussion-draft verifier-side admission and receipt profile.
+- It records `allow`, `attenuate`, or `deny` decisions for risky AI-agent
+  actions.
+- It composes with A2A, MCP/OAuth, AP2, VC, and related evidence sources.
+- It is not production-ready, not a certification program, not an endorsement,
+  and not an official A2A extension.
+
 ## What Exact Moment Is This Repo About?
 
 The focal moment is narrow:

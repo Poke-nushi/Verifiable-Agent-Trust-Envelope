@@ -14,13 +14,29 @@ VATE records the verifier decision: `allow`, `attenuate`, or `deny`.
 
 - `v0.1 discussion draft`
 - `v0.2.0 archived May 5, 2026 review snapshot`
-- `v0.3.0 current AL2 verifier admission hardening draft`
+- `v0.3.0 archived May 10, 2026 AL2 verifier admission hardening snapshot`
+- `main branch preparing a v0.3.1 credibility and reviewability patch`
 - `not production-ready`
 - `not an official A2A extension, endorsement, certification, SDK, middleware package, or general compatibility proof`
 - `no production approval implied`
 - `seeking critique on boundary, verifier order, and artifact semantics`
 
 [![DOI](https://zenodo.org/badge/1214949350.svg)](https://doi.org/10.5281/zenodo.19839768)
+
+## Reviewer Entry Points
+
+If you are reviewing the current `v0.3.0` discussion-draft snapshot or
+main-branch work after it, start here:
+
+- [Public claim boundary](docs/public-claim-boundary.md) - what this repo can
+  and cannot claim publicly
+- [External SUT quickstart](docs/conformance/external-sut-quickstart.md) - how
+  a non-reference implementation can submit a result for `compare`
+- [Implementation reporting](docs/conformance/implementation-reporting.md) -
+  how to publish one implementation run against one corpus snapshot
+- [A2A review package](docs/a2a/README.md) - metadata-only admission and receipt
+  references for A2A-shaped flows
+- [Known gaps](docs/known-gaps.md) - unresolved work and residual limitations
 
 ## The Problem
 
@@ -129,19 +145,21 @@ Direct comparison note:
 If you are new to the repo, the fastest path is:
 
 1. this `README.md`
-2. [docs/v0.3-in-5-minutes.md](docs/v0.3-in-5-minutes.md)
-3. [docs/profiles/vate-al2-verifier-admission-profile-v0.3.md](docs/profiles/vate-al2-verifier-admission-profile-v0.3.md)
-4. [docs/a2a/README.md](docs/a2a/README.md)
-5. [docs/a2a/vate-a2a-extension-profile-v0.3.md](docs/a2a/vate-a2a-extension-profile-v0.3.md)
-6. [docs/a2a-metadata-binding-v0.3.md](docs/a2a-metadata-binding-v0.3.md)
-7. [docs/a2a-v1-extension-sketch-2026-05.md](docs/a2a-v1-extension-sketch-2026-05.md)
-8. [docs/receipt-model-v0.3.md](docs/receipt-model-v0.3.md)
-9. [docs/a2a-maintainer-brief-v0.3.md](docs/a2a-maintainer-brief-v0.3.md)
-10. [docs/profiles/vate-al2-admission-interop-profile-2026-07.md](docs/profiles/vate-al2-admission-interop-profile-2026-07.md)
-11. [conformance/al2-vate-v0.3/README.md](conformance/al2-vate-v0.3/README.md)
-12. [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)
-13. section `0` and section `1` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md)
-14. [reference/http-verifier-demo/README.md](reference/http-verifier-demo/README.md)
+2. [docs/public-claim-boundary.md](docs/public-claim-boundary.md)
+3. [docs/v0.3-in-5-minutes.md](docs/v0.3-in-5-minutes.md)
+4. [docs/profiles/vate-al2-verifier-admission-profile-v0.3.md](docs/profiles/vate-al2-verifier-admission-profile-v0.3.md)
+5. [docs/a2a/README.md](docs/a2a/README.md)
+6. [docs/a2a/vate-a2a-extension-profile-v0.3.md](docs/a2a/vate-a2a-extension-profile-v0.3.md)
+7. [docs/a2a-metadata-binding-v0.3.md](docs/a2a-metadata-binding-v0.3.md)
+8. [docs/a2a-v1-extension-sketch-2026-05.md](docs/a2a-v1-extension-sketch-2026-05.md)
+9. [docs/receipt-model-v0.3.md](docs/receipt-model-v0.3.md)
+10. [docs/a2a-maintainer-brief-v0.3.md](docs/a2a-maintainer-brief-v0.3.md)
+11. [docs/profiles/vate-al2-admission-interop-profile-2026-07.md](docs/profiles/vate-al2-admission-interop-profile-2026-07.md)
+12. [conformance/al2-vate-v0.3/README.md](conformance/al2-vate-v0.3/README.md)
+13. [docs/conformance/external-sut-quickstart.md](docs/conformance/external-sut-quickstart.md)
+14. [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)
+15. section `0` and section `1` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md)
+16. [reference/http-verifier-demo/README.md](reference/http-verifier-demo/README.md)
 
 If you want the visual system view, see section `11` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md).
 
@@ -178,6 +196,9 @@ compatibility claim.
   Detailed requirements and reference architecture
 - [docs/close-adjacent-work-2026-04.md](docs/close-adjacent-work-2026-04.md)
   Direct comparison with the closest public adjacent work
+- [docs/public-claim-boundary.md](docs/public-claim-boundary.md)
+  Allowed, discouraged, and forbidden public claim language for the current
+  discussion-draft repository state
 - [docs/use-cases.md](docs/use-cases.md)
   Three background scenarios from the original `v0.1` framing
 - [docs/verifier-validation-flow.md](docs/verifier-validation-flow.md)
@@ -207,7 +228,8 @@ compatibility claim.
 - [docs/a2a-maintainer-brief-v0.3.md](docs/a2a-maintainer-brief-v0.3.md)
   A2A maintainer-oriented summary of the metadata-only admission and receipt binding
 - [docs/release-gate-v0.3.0.md](docs/release-gate-v0.3.0.md)
-  Final technical gate before cutting the v0.3.0 discussion-draft pre-release
+  Archived technical gate used before cutting the v0.3.0 discussion-draft
+  pre-release
 - [docs/a2a-issue-update-2026-05.md](docs/a2a-issue-update-2026-05.md)
   Short A2A-adjacent issue update draft after the runnable v0.2 artifacts
 - [docs/a2a-metadata-binding-v0.3.md](docs/a2a-metadata-binding-v0.3.md)
@@ -323,6 +345,7 @@ production approval and do not add production JOSE/JCS verification.
 
 - [FAQ.md](FAQ.md)
 - [ROADMAP.md](ROADMAP.md)
+- [docs/public-claim-boundary.md](docs/public-claim-boundary.md)
 - [CONTRIBUTING.md](CONTRIBUTING.md)
 - [SECURITY.md](SECURITY.md)
 - [docs/standards-and-ecosystem-landscape-2026-04.md](docs/standards-and-ecosystem-landscape-2026-04.md)
