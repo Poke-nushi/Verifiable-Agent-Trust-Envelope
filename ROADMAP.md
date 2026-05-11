@@ -21,7 +21,8 @@ Focus:
   reviewability patch
 - [x] make the README's reviewer path surface the external SUT quickstart,
   implementation reporting, A2A review package, known gaps, and claim boundary
-- [ ] open a narrow independent implementation / external SUT review issue
+- [x] open a narrow independent implementation / external SUT review issue:
+  [#2](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2)
 - [ ] add a short external implementation call page if the issue text alone is
   not enough
 - [ ] collect at least one non-reference SUT result and implementation report
@@ -125,9 +126,9 @@ discussion-draft snapshot reviewable without broadening the claim boundary.
   `schemas/implementation-report.schema.json`; external SUT authors should use
   `docs/conformance/external-sut-quickstart.md` as the command-first path from
   corpus index to `compare`, implementation reports, and `verify-bundle`
-- open a narrow GitHub issue for independent implementation / external SUT
-  review, framed as a request for technical validation rather than production
-  adoption
+- keep the independent implementation / external SUT review intake active in
+  [issue #2](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2),
+  framed as a request for technical validation rather than production adoption
 - use the current A2A review package under `docs/a2a/` for implementer feedback,
   while keeping the request framed as metadata-only compatibility review rather
   than A2A governance adoption
