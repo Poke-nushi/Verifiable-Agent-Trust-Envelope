@@ -1,185 +1,132 @@
 # Roadmap
 
-## Current Milestone
+This public roadmap describes reviewable technical direction for the VATE
+discussion draft. It intentionally avoids certification, endorsement,
+production-readiness, or official adjacent-protocol adoption claims.
+
+For public wording rules, see
+[docs/public-claim-boundary.md](docs/public-claim-boundary.md).
+
+## Current Direction
 
 ### `v0.3.1-credibility-and-reviewability`
 
-Focus:
+The next patch is a boundary-preserving credibility and reviewability patch. It
+does not broaden VATE beyond the archived `v0.3.0`
+`VATE-AL2-Verifier-Admission-v0.3` discussion-draft scope.
 
-- preserve the archived `v0.3.0` discussion-draft snapshot;
-- keep the `VATE-AL2-Verifier-Admission-v0.3` protocol boundary unchanged;
-- make public claim boundaries easy to cite;
-- make the external SUT comparison and implementation-reporting path visible;
-- collect independent implementation reports without implying certification,
-  endorsement, production approval, or general compatibility.
+The current public review surface is:
 
-### P0 For `v0.3.1`
+- archived `v0.3.0` discussion-draft release:
+  <https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.3.0>
+- public claim boundary:
+  [docs/public-claim-boundary.md](docs/public-claim-boundary.md)
+- reviewer entry points in
+  [README.md](README.md) and [FAQ.md](FAQ.md)
+- external SUT quickstart:
+  [docs/conformance/external-sut-quickstart.md](docs/conformance/external-sut-quickstart.md)
+- implementation reporting:
+  [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)
+- A2A-shaped metadata review package:
+  [docs/a2a/README.md](docs/a2a/README.md)
+- independent implementation / external SUT review intake:
+  [issue #2](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2)
 
-- [x] add a public claim-boundary page for allowed, discouraged, and forbidden
-  phrasing
-- [x] update this roadmap so post-`v0.3.0` work starts with a credibility and
-  reviewability patch
-- [x] make the README's reviewer path surface the external SUT quickstart,
-  implementation reporting, A2A review package, known gaps, and claim boundary
-- [x] open a narrow independent implementation / external SUT review issue:
-  [#2](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2)
-- [ ] add a short external implementation call page if the issue text alone is
-  not enough
-- [ ] collect at least one non-reference SUT result and implementation report
-  against the `v0.3` corpus snapshot
-- [ ] strengthen controlled-origin publication guidance so copied repository
-  fixtures are not mistaken for independent implementation evidence
+Near-term public work should focus on:
+
+- collecting at least one non-reference SUT result and implementation report
+  against the `v0.3` corpus snapshot;
+- deciding whether issue #2 is enough, or whether a shorter external
+  implementation call page would help reviewers;
+- strengthening controlled-origin publication guidance so copied repository
+  fixtures are not mistaken for independent implementation evidence;
+- keeping A2A feedback framed as metadata-only compatibility review, not an
+  adoption request or governance claim;
+- adding small transport-bound negative fixtures only where they preserve the
+  existing AL2 verifier boundary.
 
 Out of scope for `v0.3.1`:
 
-- production JOSE/JCS verification implementation
-- official A2A extension claims
-- AP2 profile expansion
-- certification, endorsement, badge, or production-readiness language
-- large schema redesigns unrelated to external reviewability
+- production JOSE/JCS verification implementation;
+- official A2A extension claims;
+- AP2 profile expansion;
+- certification, endorsement, badge, or production-readiness language;
+- broad schema redesigns unrelated to external reviewability.
 
-## Completed May 2026 Review Hardening
+## Completed `v0.3.0` Hardening
 
-This section records the completed hardening work that made the `v0.3.0`
-discussion-draft snapshot reviewable without broadening the claim boundary.
+The archived `v0.3.0` snapshot made the AL2 verifier-admission review package
+more concrete without changing the public claim boundary. It should still be
+read as a discussion draft and review aid, not as a certification or production
+approval.
 
-- [x] publish `v0.2.0` as an archived discussion-draft pre-release with the
-  version DOI `10.5281/zenodo.20043166`
+The `v0.3.0` package includes:
 
-### P0 Before The Next External Review Round
+- an archived `v0.2.0` review snapshot with version DOI
+  `10.5281/zenodo.20043166`;
+- an archived `v0.3.0` discussion-draft snapshot with version DOI
+  `10.5281/zenodo.20107413`;
+- a split between `run` as repository fixture / reference-runner integrity
+  checking and `compare` as the external SUT comparison path;
+- artifact-backed SUT result requirements for admission receipts,
+  post-execution receipts, AL2 context artifacts, and JOSE proof-package
+  fixture references;
+- implementation report and report-bundle verification formats for one
+  implementation run against one corpus snapshot;
+- corpus manifest integrity fields and lowercase SHA-256 digest descriptors;
+- a language-neutral corpus index for non-reference implementations;
+- explicit `should_execute` comparison semantics for attenuation and
+  fail-closed cases;
+- formal post-execution `linkage_checks` for receipt id, receipt digest,
+  transaction, runtime, decision, expiry, and effective request hash checks;
+- minimum AL2 context checks for status freshness, replay state, runtime
+  freshness, runtime binding, request artifacts, evidence artifacts, and
+  receipt artifacts;
+- machine-readable evidence type and protocol-hint vocabulary with allowed
+  type / hint combinations;
+- MCP/OAuth denial fixtures showing that VATE narrows upstream authorization
+  and never unions with it;
+- JOSE byte-level fixtures for algorithm confusion and detached proof binding,
+  while explicitly excluding production cryptographic signature verification;
+- attenuation boundary fixtures for unsafe paths, max-amount type edges, and
+  negative amount handling;
+- AP2 Human Not Present evidence cases for pre-authorization, stale authority,
+  amount overrun, replay, and post-execution linkage;
+- A2A-shaped metadata examples and a review package that keeps VATE references
+  optional, digest-bound, and by reference;
+- documentation for fixture canonicalization limits, namespace migration,
+  extension-field handling, and the `2026-07` conformance artifact line.
 
-- [x] align A2A signed Agent Card evidence with A2A v1.0 JWS header expectations,
-  including the `typ` protected header
-- [x] resolve `require_new_permit` execution semantics so fixtures and docs agree
-  on whether execution may proceed
-- [x] document the v0.3 fixture canonicalization limits and the intended production
-  canonicalization migration path
-- [x] split the conformance language so `run` is clearly a reference artifact /
-  fixture integrity check and `compare` is the external SUT comparison path
-- [x] make the SUT result contract artifact-backed for required admission receipts,
-  post-execution receipts, AL2 context artifacts, and digest descriptors
-- [x] extend artifact-backed SUT results to JOSE proof-package references where
-  corpus cases require proof provenance
-- [x] add report-bundle verification for the corpus, SUT result, conformance report,
-  and implementation report digest chain
-- [x] formalize post-execution `linkage_checks` as part of the case contract and
-  stop collapsing materially different linkage failures into one reason
-- [x] add kind-specific `linkage_checks` schema requirements, canonical
-  policy-violation token mapping, and strict negative schema tests
-- [x] require report corpus/manifest integrity fields, lowercase SHA-256 digest
-  descriptors, and top-level report-bundle verification status
-- [x] bind AL2 context checks to request, transaction, evidence, and receipt
-  artifacts so external SUT comparison can evaluate freshness, replay, and
-  runtime-binding behavior
-- [x] move evidence type and protocol hint vocabulary toward a single
-  machine-readable source and define allowed type/hint combinations
-- [x] tighten critical report and linkage schema blocks while keeping future
-  extension data under explicit extension or annotation fields
-- [x] clarify that `2026-07` artifacts are a July-target artifact line and should
-  not be renamed to the current review month
+## External Review Target
 
-### P1 Before Adjacent Maintainer Outreach
+The May-June 2026 target is to move from author-run artifacts toward independent
+implementation evidence. The priority is not a broader protocol surface.
 
-- [x] define reason-code ordering or compare reason-code sets with a primary reason
-  code; terminal marker ordering is now documented and enforced in `run` and
-  `compare`, and report/corpus primary reason projections are now emitted
-- [x] strengthen post-execution linkage checks beyond presence checks, including
-  receipt id, receipt digest, transaction, runtime, admitted effective request
-  hash, decision, and expiry semantics; receipt id and decision are now
-  explicit linkage kinds
-- [x] add transport-bound fixtures proving VATE only narrows MCP/OAuth authority and
-  never unions with upstream authorization; initial fixtures added:
-  `deny-mcp-oauth-overscope` and `deny-mcp-oauth-upstream-denied`
-- [x] add evaluation-order and algorithm-confusion fixtures before presenting the
-  corpus as broad security conformance; stale runtime proof and digest-before-policy
-  fixtures now fail closed before policy admission, and JOSE algorithm confusion
-  now covers `alg=none`, HS256 downgrade, and ES384-not-allowed cases
-- [x] add attenuation boundary fixtures for malicious paths, schema type edges, and
-  amount boundaries; unsafe-path, max-amount type-edge, and negative-amount
-  fixtures added
-- [x] strengthen post-execution linkage checks beyond presence checks; digest,
-  transaction, runtime, denial, expiry, and effective-constraint fixtures added
-- [x] add minimum AL2 verification context for status freshness, replay protection,
-  and runtime binding; `al2_context_checks` now cover exact status freshness
-  boundary, just-over stale boundary, unused replay state, consumed replay state,
-  explicit replayed state, runtime binding, and fail-closed unknown replay state
-- [x] add an evidence type vocabulary for generic evidence types and
-  protocol-specific hints; machine-readable registry, drift checks, and
-  type/hint pair checks added
-- [x] keep the language-neutral conformance corpus index current as cases change
+Useful external evidence would include:
 
-### P2 Before Independent Implementation Collection
+- one or more non-reference SUT result files;
+- generated artifacts or controlled artifact bundles from the implementer;
+- implementation reports tied to the same corpus snapshot;
+- `compare` reports showing expected, failed, skipped, or unsupported cases;
+- local `verify-bundle` reports for the corpus, SUT result, conformance report,
+  and implementation report digest chain;
+- reviewer feedback on decision semantics, reason codes, artifact binding,
+  post-execution linkage, and adjacent protocol boundaries.
 
-- [x] add report integrity guidance for SUT result and implementation report
-  publication; initial schema, runner, and documentation support added
-- [x] decide whether to add a pinned dependency for production-grade JOSE
-  signature fixtures, or keep the current byte-level detached proof fixture
-  boundary; the current corpus remains dependency-free
-- [x] add a corpus-bound byte-level A2A signed Agent Card fixture after fixing
-  the digest target and validation responsibility
-- [x] define a persistent namespace migration plan for schema and extension URIs
-- [x] document extension-field handling before tightening `additionalProperties`
-
-## Next
-
-- collect independent implementation reports using
-  `schemas/implementation-report.schema.json`; external SUT authors should use
-  `docs/conformance/external-sut-quickstart.md` as the command-first path from
-  corpus index to `compare`, implementation reports, and `verify-bundle`
-- keep the independent implementation / external SUT review intake active in
-  [issue #2](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2),
-  framed as a request for technical validation rather than production adoption
-- use the current A2A review package under `docs/a2a/` for implementer feedback,
-  while keeping the request framed as metadata-only compatibility review rather
-  than A2A governance adoption
-- keep public wording aligned with `docs/public-claim-boundary.md` whenever
-  release notes, issues, docs, or outreach text are updated
-- add a short external implementation call page if reviewers need a single page
-  describing the three requested outputs: SUT result file, generated artifacts
-  or controlled artifact bundle, and implementation report
-- add additional transport-bound fixtures beyond the initial MCP/OAuth,
-  AP2/UCP, and AP2 Human Not Present examples after the AL2 security basis is
-  stable
-- expand policy snapshot digest fixtures beyond the initial positive and
-  mismatch cases
-- refine pairwise presentation guidance
-- add clearer MCP / OAuth / OpenID binding notes and transport-bound examples
-- improve comparison material around close adjacent work where interoperability
-  questions remain
-- add production-signature fixtures after the detached JWS byte-level basis and
-  dependency policy are fixed
-
-## June 2026 Target After `v0.3.0`
-
-The June target is to move from author-run artifacts to independent
-implementation evidence, not to broaden the protocol. Items should land only
-when they preserve the verifier boundary and pass the runnable checks.
-
-Completion means:
-
-- public claim boundaries are easy to cite from README, FAQ, roadmap, issues,
-  and release notes
-- at least one non-reference SUT result and implementation report is reviewed
-  against the `v0.3` corpus snapshot
-- reproducible implementation reports with corpus manifests
-- transport-bound fixtures for the most important adjacent paths
-- policy snapshot digest checks across receipts, metadata references, and fixtures
-- trust-bundle hardening checks for issuer, key id, algorithm, evidence type, status, and validity windows
-- detached JOSE fixture checks that separate byte-level proof binding from production signature verification
-- language-neutral corpus guidance and a committed corpus index for non-reference implementations
-- SUT result comparison contract for non-reference implementation reports
-- AP2 Human Not Present evidence cases for pre-authorization, stale authority, amount overrun, replay, and post-execution linkage
-- an A2A-adjacent review package that does not require A2A core changes, including an A2A v1.0-shaped extension sketch
-- review-derived hardening for digest basis, execution semantics, reason codes,
-  post-execution linkage, status freshness, replay, runtime binding, evidence
-  vocabulary, and report integrity
+Passing reports must continue to be described narrowly: one submitted SUT result
+matched one corpus snapshot under the repository comparison rules. They do not
+imply production readiness, endorsement, certification, official compatibility,
+or future compatibility.
 
 ## Later
 
 - selective-disclosure or VC-oriented packaging profile
 - richer capability claim registry and extension points
 - formal `AID` abstraction guidance
-- review whether internal mnemonic aliases should gain clearer public-facing alternatives after external feedback
+- clearer public-facing alternatives for mnemonic aliases after external
+  feedback
 - AL3 and AL4 profiles
 - physical AI / `ABS` extensions
 - stronger status discovery and federation guidance
+- production proof verification only after a separate dependency and security
+  review decision
