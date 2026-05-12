@@ -1,9 +1,9 @@
 # Verifiable Agent Trust Envelope
 
-**Verifier admission receipts for risky agent actions**
+**Verifier admission receipts for risky external digital actions**
 
-VATE is a verifier-side profile for deciding and recording whether an external
-AI agent may perform a risky digital action.
+VATE is a verifier-side profile for deciding and recording whether an AI agent
+may perform a risky external digital action.
 
 It does not replace A2A, MCP, OAuth, OpenID, VC, SPIFFE, AP2, x402, or payment
 mandates.
@@ -12,6 +12,10 @@ A2A carries the task.
 MCP, OAuth, AP2, VC, and related systems provide evidence.
 VATE records the verifier decision: `allow`, `attenuate`, or `deny`.
 
+Read this as a discussion draft and gap-analysis question for the boundary
+around risky writes and other external digital actions, not as a replacement for
+adjacent protocols.
+
 - `v0.1 discussion draft`
 - `v0.2.0 archived May 5, 2026 review snapshot`
 - `v0.3.0 archived May 10, 2026 AL2 verifier admission hardening snapshot`
@@ -19,7 +23,7 @@ VATE records the verifier decision: `allow`, `attenuate`, or `deny`.
 - `not production-ready`
 - `not an official A2A extension, endorsement, certification, SDK, middleware package, or general compatibility proof`
 - `no production approval implied`
-- `seeking critique on boundary, verifier order, and artifact semantics`
+- `seeking critique on boundary, verifier order, gap analysis, and artifact semantics`
 
 [![DOI](https://zenodo.org/badge/1214949350.svg)](https://doi.org/10.5281/zenodo.19839768)
 
@@ -41,6 +45,9 @@ main-branch work after it, start here:
 ## The Problem
 
 An external agent wants to perform a risky write against a remote system.
+That risky write is one example of a broader risky external digital action: a
+side effect that leaves the agent runtime and changes a relying party's
+resource, record, payment state, or account state.
 
 In that moment, the relying party often needs more than:
 
@@ -74,6 +81,9 @@ receipt.
 The `v0.3` work keeps that verifier-side boundary but narrows the next deliverable to the [VATE AL2 Verifier Admission Profile v0.3](docs/profiles/vate-al2-verifier-admission-profile-v0.3.md).
 That profile treats A2A, MCP, OAuth, VC, DID, OID4VP, Web Bot Auth, AP2, x402, ACP, and payment-token systems as adjacent layers that can provide evidence.
 VATE defines how a relying party evaluates those inputs before execution and records the decision.
+The open design question is which facts belong in task flow, transport
+authorization, or adjacent evidence, and which facts belong in verifier-side
+admission and receipt semantics.
 For A2A reviewers, start with the A2A review package in
 [docs/a2a/README.md](docs/a2a/README.md).
 
