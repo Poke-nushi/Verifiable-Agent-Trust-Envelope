@@ -25,6 +25,8 @@ The current public review surface is:
   [README.md](README.md) and [FAQ.md](FAQ.md)
 - external SUT quickstart:
   [docs/conformance/external-sut-quickstart.md](docs/conformance/external-sut-quickstart.md)
+- external implementation call:
+  [docs/conformance/external-implementation-call.md](docs/conformance/external-implementation-call.md)
 - implementation reporting:
   [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)
 - A2A-shaped metadata review package:
@@ -36,8 +38,8 @@ Near-term public work should focus on:
 
 - collecting at least one non-reference SUT result and implementation report
   against the `v0.3` corpus snapshot;
-- deciding whether issue #2 is enough, or whether a shorter external
-  implementation call page would help reviewers;
+- keeping the external implementation call short enough that implementers can
+  see the minimum review package before reading the detailed quickstart;
 - strengthening controlled-origin publication guidance so copied repository
   fixtures are not mistaken for independent implementation evidence;
 - keeping A2A feedback framed as metadata-only compatibility review, not an
@@ -52,6 +54,11 @@ Out of scope for `v0.3.1`:
 - AP2 profile expansion;
 - certification, endorsement, badge, or production-readiness language;
 - broad schema redesigns unrelated to external reviewability.
+
+For `v0.3.1`, keep scope locked to claim-boundary clarity, review entry points,
+external implementation intake, controlled-origin publication guidance, and
+small negative fixtures that preserve the current AL2 verifier-admission
+boundary.
 
 ## Completed `v0.3.0` Hardening
 

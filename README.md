@@ -34,6 +34,9 @@ main-branch work after it, start here:
 
 - [Public claim boundary](docs/public-claim-boundary.md) - what this repo can
   and cannot claim publicly
+- [External implementation call](docs/conformance/external-implementation-call.md) -
+  short request for non-reference SUT results, generated artifacts, and
+  implementation reports
 - [External SUT quickstart](docs/conformance/external-sut-quickstart.md) - how
   a non-reference implementation can submit a result for `compare`
 - [Implementation reporting](docs/conformance/implementation-reporting.md) -
@@ -262,6 +265,8 @@ compatibility claim.
   Date-stamped conformance artifact versioning rules for the July 2026 target line
 - [docs/conformance/sut-adapter-contract.md](docs/conformance/sut-adapter-contract.md)
   SUT result contract and comparison command for external implementations
+- [docs/conformance/external-implementation-call.md](docs/conformance/external-implementation-call.md)
+  Short call for independent implementation review materials
 - [docs/conformance/external-sut-quickstart.md](docs/conformance/external-sut-quickstart.md)
   Short path for external SUT authors to produce, compare, and bundle-check implementation reports
 - [docs/profiles/vate-jose-proof-profile-notes-2026-07.md](docs/profiles/vate-jose-proof-profile-notes-2026-07.md)

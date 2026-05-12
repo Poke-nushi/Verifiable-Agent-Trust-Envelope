@@ -25,6 +25,7 @@ Example:
 
 For a command-first external SUT path, start with:
 
+- `docs/conformance/external-implementation-call.md`
 - `docs/conformance/external-sut-quickstart.md`
 
 The report has four important blocks:
