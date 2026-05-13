@@ -94,6 +94,12 @@ For an `attenuate` decision, the post-execution constraint basis is
 `attenuation.effective_constraints`. For an `allow` decision, the original
 request constraints remain effective when the admission receipt records them
 under `request.constraints`.
+The emitted AL2 admission receipt uses the canonical effective constraint names
+defined in `docs/attenuation-semantics.md`: `max_amount`, `tool_allowlist`,
+`target_resource`, `approval`, and `expires_at`. Legacy or status-input aliases
+such as `max_amount_usd`, bare `resource`, or string-valued `approval` may be
+accepted before admission evaluation only if they are normalized before receipt
+emission.
 
 Within that constraint basis, `max_amount` is interpreted as an aggregate cap
 for the admitted execution, not a per-side-effect cap. Post-execution verifiers
@@ -156,6 +162,9 @@ A receipt may be packaged as:
 
 Profiles and deployments decide which packaging forms they accept.
 For AL2, signed or digest-bound receipts are strongly recommended.
+For a reviewer-facing path through admission receipts, post-execution receipts,
+policy snapshots, and implementation report bundles, see
+`docs/receipt-audit-walkthrough-v0.3.1.md`.
 
 ## Evidence Results
 

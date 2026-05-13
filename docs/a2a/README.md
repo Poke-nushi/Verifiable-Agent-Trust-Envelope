@@ -32,7 +32,8 @@ objects.
 2. [A2A Metadata Binding v0.3](../a2a-metadata-binding-v0.3.md)
 3. [A2A v1.0 Extension Sketch](../a2a-v1-extension-sketch-2026-05.md)
 4. [A2A Maintainer Brief](../a2a-maintainer-brief-v0.3.md)
-5. [A2A Issue Update Draft](../a2a-issue-update-2026-05.md)
+5. [Receipt Audit Walkthrough v0.3.1](../receipt-audit-walkthrough-v0.3.1.md)
+6. [A2A Issue Update Draft](../a2a-issue-update-2026-05.md)
 
 Related examples:
 
@@ -52,6 +53,7 @@ Related conformance and implementation review aids:
 - `docs/conformance/external-sut-quickstart.md`
 - `docs/conformance/sut-adapter-contract.md`
 - `docs/conformance/report-integrity.md`
+- `docs/receipt-audit-walkthrough-v0.3.1.md`
 - `packages/vate-core-ts/README.md`
 - `packages/vate-a2a-ts/README.md`
 

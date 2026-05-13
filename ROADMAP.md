@@ -44,6 +44,12 @@ Near-term public work should focus on:
   fixtures are not mistaken for independent implementation evidence;
 - keeping A2A feedback framed as metadata-only compatibility review, not an
   adoption request or governance claim;
+- aligning emitted AL2 attenuation `effective_constraints` around canonical
+  field names so schema, examples, runner behavior, and SUT review expectations
+  do not drift;
+- adding a short receipt audit walkthrough so reviewers can follow
+  digest-bound admission, post-execution, policy snapshot, and report-bundle
+  references without reading every conformance document first;
 - adding small transport-bound negative fixtures only where they preserve the
   existing AL2 verifier boundary.
 
@@ -52,6 +58,9 @@ Out of scope for `v0.3.1`:
 - production JOSE/JCS verification implementation;
 - official A2A extension claims;
 - AP2 profile expansion;
+- AgentKit, AgentBook, World ID, or other adjacent-protocol-specific evidence
+  vocabulary expansion;
+- a machine-readable attenuation primitive registry;
 - certification, endorsement, badge, or production-readiness language;
 - broad schema redesigns unrelated to external reviewability.
 
