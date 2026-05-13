@@ -24,8 +24,8 @@ attenuate
 Effective constraints:
 
 ```text
-max_amount: USD 500
-approval_required_above: USD 100
+max_amount: { currency: USD, value: 500.00 }
+approval: { mode: human_required, policy_ref: policy:example:manual-review }
 expires_at: 2026-05-09T00:10:00Z
 ```
 
@@ -64,17 +64,75 @@ Each change SHOULD include:
 
 For the current AL2 v0.3 corpus, both fields use the profile hash string grammar:
 `sha-256:` followed by a lowercase 64-character hexadecimal digest.
+The hash input is the profile-canonicalized request object after any accepted
+input aliases have been normalized. Raw legacy input, if retained, belongs in a
+separate evidence artifact or annotation and must not replace the profile hash
+basis.
 
 The post-execution receipt MUST link to the admitted effective request hash.
 If post-execution evidence references the original request hash or a different
 effective request hash, the verifier or auditor SHOULD return
 `POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH`.
 
-When `effective_constraints.max_amount` is present, the current AL2 v0.3 corpus treats it as the
-aggregate amount admitted for the execution. Multiple side effects are summed;
-each side effect does not get a fresh `max_amount` allowance. Future
-per-side-effect limits should use a distinct field such as
-`max_amount_per_side_effect`.
+## Canonical Effective Constraints
+
+The emitted AL2 admission receipt uses canonical effective constraint names.
+Adjacent protocols, status inputs, or legacy candidate objects may use different
+field names before admission evaluation, but a verifier must normalize any
+accepted aliases before emitting an admission receipt.
+
+The current canonical fields are:
+
+| Field | Shape | Meaning |
+| --- | --- | --- |
+| `max_amount` | object with `currency` and `value` | Aggregate monetary cap for the admitted execution. |
+| `tool_allowlist` | array of non-empty strings | Tools that remain allowed after narrowing. |
+| `target_resource` | non-empty string | Target resource admitted after narrowing. |
+| `approval` | object with `mode` and optional `policy_ref` | Approval constraint or escalation requirement. |
+| `expires_at` | RFC3339 timestamp | Constraint-specific expiry that must not broaden the top-level admission window. |
+
+`max_amount.currency` is a three-letter uppercase currency code. Emitted
+examples should use a decimal string for `max_amount.value`, such as `"25.00"`,
+to avoid JSON number rounding ambiguity. A verifier may accept a numeric input
+amount before normalization, but the emitted receipt should preserve a stable
+decimal representation.
+
+`effective_constraints.max_amount` is an aggregate amount admitted for the
+execution. Multiple side effects are summed; each side effect does not get a
+fresh `max_amount` allowance. Future per-side-effect limits should use a
+distinct field such as `max_amount_per_side_effect`.
+
+`resource`, `max_amount_usd`, and string-valued `approval` are not canonical
+emitted AL2 `effective_constraints` fields. If an implementation accepts them as
+legacy or status-input aliases, it must normalize them before receipt emission:
+
+```json
+{
+  "max_amount_usd": 25,
+  "resource": "bucket:public/reports/*",
+  "approval": "fresh_permit_required"
+}
+```
+
+becomes:
+
+```json
+{
+  "max_amount": {
+    "currency": "USD",
+    "value": "25.00"
+  },
+  "target_resource": "bucket:public/reports/*",
+  "approval": {
+    "mode": "fresh_permit_required"
+  }
+}
+```
+
+`changes[].path` may still point at the source request path that was narrowed,
+such as `/target/resource` or `/constraints/max_amount/value`. That path records
+where the verifier found the requested authority. It does not change the
+canonical field names used in emitted `effective_constraints`.
 
 ## Common Modes
 
@@ -97,11 +155,12 @@ The runnable conformance corpus checks that an attenuated receipt includes:
 - an explicit `require_new_permit` boolean
 - change paths inside the AL2 attenuation boundary: request constraints, target,
   runtime, tools, or approval state
-- scalar, finite, non-negative amount limits when `effective_constraints.max_amount`
-  is present
+- a canonical money object with a finite, non-negative amount value when
+  `effective_constraints.max_amount` is present
 
 Candidate attenuation objects that attempt to mutate verifier policy state or
-encode amount limits as non-scalar objects must fail closed.
+emit legacy aliases, string-valued approval constraints, malformed money
+objects, or non-finite / negative amount values must fail closed.
 
 Conformance does not require a global policy language.
 The verifier only needs to produce comparable admission and receipt semantics for the fixture.

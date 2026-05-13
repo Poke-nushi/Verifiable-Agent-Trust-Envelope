@@ -199,6 +199,11 @@ A minimal machine-readable attenuation effect can be represented as:
 }
 ```
 
+This status-layer shape is an input signal. When an AL2 verifier emits an
+admission receipt, accepted status effects are normalized into the canonical
+`attenuation.effective_constraints` shape described in
+`docs/attenuation-semantics.md`.
+
 Interpretation:
 
 - `mode: narrow` means the artifact is still usable only under the listed narrower constraints

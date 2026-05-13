@@ -73,6 +73,91 @@
       "type": "string",
       "description": "Profile-defined SHA-256 hash string for AL2 request and execution binding fields.",
       "pattern": "^sha-256:[0-9a-f]{64}$"
+    },
+    "moneyAmount": {
+      "type": "object",
+      "required": [
+        "currency",
+        "value"
+      ],
+      "properties": {
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            },
+            {
+              "type": "number",
+              "minimum": 0
+            }
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "approvalConstraint": {
+      "type": "object",
+      "required": [
+        "mode"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policy_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "effectiveConstraints": {
+      "type": "object",
+      "minProperties": 1,
+      "properties": {
+        "max_amount": {
+          "$ref": "#/$defs/moneyAmount"
+        },
+        "tool_allowlist": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "target_resource": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approval": {
+          "$ref": "#/$defs/approvalConstraint"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "max_amount_usd"
+            ]
+          },
+          {
+            "required": [
+              "resource"
+            ]
+          }
+        ]
+      },
+      "additionalProperties": true
     }
   },
   "required": [
@@ -360,8 +445,7 @@
           "type": "array"
         },
         "effective_constraints": {
-          "type": "object",
-          "additionalProperties": true
+          "$ref": "#/$defs/effectiveConstraints"
         },
         "require_new_permit": {
           "type": "boolean"

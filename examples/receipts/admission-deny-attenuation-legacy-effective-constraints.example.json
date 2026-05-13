@@ -1,0 +1,50 @@
+{
+  "version": "vate-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-20260701-attenuation-legacy-aliases-001",
+  "issued_at": "2026-07-01T00:38:08Z",
+  "expires_at": "2026-07-01T00:48:08Z",
+  "verifier": {
+    "id": "did:web:verifier.example"
+  },
+  "request": {
+    "request_id": "areq-20260701-attenuation-legacy-aliases-001",
+    "transaction_id": "txn-20260701-attenuation-legacy-aliases-001",
+    "action": "commerce.purchase",
+    "input_hash": "sha-256:e73e1ded58a8f3a3dbf68ff63265c81f128a064a927e002f040728c947ffe552"
+  },
+  "subject": {
+    "principal": "did:web:user.example",
+    "actor": "did:web:agent.example",
+    "runtime": "spiffe://agent.example/workload/purchase-agent"
+  },
+  "evidence": [
+    {
+      "type": "attenuation_candidate",
+      "uri": "conformance/al2-vate-v0.3/fixtures/attenuation-legacy-effective-constraints.json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "a40b9efaf9bd0dbd642bdd2f6865b2ad2e9f6f1529abc9623cd7fc098d89596d"
+      },
+      "verification": {
+        "result": "failed",
+        "checked_at": "2026-07-01T00:38:05Z",
+        "method": "attenuation-boundary-check",
+        "failure_reason": "The attenuation candidate used legacy emitted effective constraint aliases instead of canonical max_amount and target_resource fields."
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "merchant-purchase-al2",
+    "policy_version": "2026-07-01.1",
+    "policy_ref": "https://verifier.example/policies/merchant-purchase-al2/2026-07-01.1"
+  },
+  "decision": {
+    "outcome": "deny",
+    "reason_codes": [
+      "SCHEMA_INVALID",
+      "FAIL_CLOSED"
+    ]
+  }
+}

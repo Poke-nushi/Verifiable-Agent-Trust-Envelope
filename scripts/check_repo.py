@@ -40,6 +40,7 @@ EXTERNAL_SUT_QUICKSTART_DOC = ROOT / "docs" / "conformance" / "external-sut-quic
 SUT_ADAPTER_CONTRACT_DOC = ROOT / "docs" / "conformance" / "sut-adapter-contract.md"
 AL2_CORPUS_README = ROOT / "conformance" / "al2-vate-v0.3" / "README.md"
 V03_RELEASE_NOTES = ROOT / "docs" / "release-notes" / "v0.3.0.md"
+V031_RELEASE_NOTES = ROOT / "docs" / "release-notes" / "v0.3.1.md"
 A2A_SIGNED_AGENT_CARD_PROOF = ROOT / "examples" / "jose" / "jose-detached-a2a-agent-card.example.json"
 A2A_SIGNED_AGENT_CARD_PAYLOAD = ROOT / "examples" / "a2a" / "agent-card-v1-vate-extension.example.json"
 JSON_ONLY_FILES = [
@@ -590,12 +591,18 @@ def check_al2_corpus_docs_synced() -> None:
     if missing_readme_cases:
         raise RuntimeError(f"AL2 corpus README is missing cases: {missing_readme_cases}")
 
-    release_notes = " ".join(V03_RELEASE_NOTES.read_text(encoding="utf-8").split())
+    v030_release_notes = " ".join(V03_RELEASE_NOTES.read_text(encoding="utf-8").split())
+    if "63-case AL2 v0.3 draft conformance corpus" not in v030_release_notes:
+        raise RuntimeError("v0.3.0 release notes must preserve the archived 63-case corpus count")
+    if "63 AL2 v0.3 cases" not in v030_release_notes:
+        raise RuntimeError("v0.3.0 release notes implementer case-count text must preserve the archived count")
+
+    release_notes = " ".join(V031_RELEASE_NOTES.read_text(encoding="utf-8").split())
     case_count = len(case_paths)
     if f"{case_count}-case AL2 v0.3 draft conformance corpus" not in release_notes:
-        raise RuntimeError("v0.3 release notes case-count summary is stale")
+        raise RuntimeError("v0.3.1 release notes case-count summary is stale")
     if f"{case_count} AL2 v0.3 cases" not in release_notes:
-        raise RuntimeError("v0.3 release notes implementer case-count text is stale")
+        raise RuntimeError("v0.3.1 release notes implementer case-count text is stale")
 
 
 def check_evidence_vocabulary_registry() -> None:
@@ -819,6 +826,9 @@ def check_p1_5_fixture_coverage() -> None:
         "deny-replay-state-replayed": ["REPLAY_DETECTED", "FAIL_CLOSED"],
         "deny-digest-mismatch-before-policy": ["DIGEST_MISMATCH", "FAIL_CLOSED"],
         "deny-jose-es384-not-allowed": ["ALG_NOT_ALLOWED", "FAIL_CLOSED"],
+        "deny-attenuation-approval-string": ["SCHEMA_INVALID", "FAIL_CLOSED"],
+        "deny-attenuation-legacy-effective-constraints": ["SCHEMA_INVALID", "FAIL_CLOSED"],
+        "deny-attenuation-malformed-money": ["SCHEMA_INVALID", "FAIL_CLOSED"],
         "deny-attenuation-negative-amount": ["SCHEMA_INVALID", "FAIL_CLOSED"],
     }
     case_dir = ROOT / "conformance" / "al2-vate-v0.3" / "cases"
@@ -875,6 +885,29 @@ def check_p1_5_fixture_coverage() -> None:
     amount = attenuation.get("effective_constraints", {}).get("max_amount", {}).get("value")
     if not isinstance(amount, str) or not amount.startswith("-"):
         raise RuntimeError("deny-attenuation-negative-amount must exercise a negative max_amount value")
+
+    conformance = load_vate_conformance_module()
+    legacy_case = json.loads((case_dir / "deny-attenuation-legacy-effective-constraints.json").read_text(encoding="utf-8"))
+    legacy_attenuation = json.loads((ROOT / legacy_case["artifacts"]["bad_attenuation"]).read_text(encoding="utf-8"))
+    legacy_failures = conformance.attenuation_validation_failures(legacy_attenuation)
+    if not any("max_amount_usd" in failure for failure in legacy_failures):
+        raise RuntimeError("deny-attenuation-legacy-effective-constraints must reject max_amount_usd")
+    if not any("resource" in failure and "target_resource" in failure for failure in legacy_failures):
+        raise RuntimeError("deny-attenuation-legacy-effective-constraints must reject bare resource")
+
+    approval_case = json.loads((case_dir / "deny-attenuation-approval-string.json").read_text(encoding="utf-8"))
+    approval_attenuation = json.loads((ROOT / approval_case["artifacts"]["bad_attenuation"]).read_text(encoding="utf-8"))
+    approval_failures = conformance.attenuation_validation_failures(approval_attenuation)
+    if not any("approval must be an object" in failure for failure in approval_failures):
+        raise RuntimeError("deny-attenuation-approval-string must reject string approval")
+
+    money_case = json.loads((case_dir / "deny-attenuation-malformed-money.json").read_text(encoding="utf-8"))
+    money_attenuation = json.loads((ROOT / money_case["artifacts"]["bad_attenuation"]).read_text(encoding="utf-8"))
+    money_failures = conformance.attenuation_validation_failures(money_attenuation)
+    if not any("currency" in failure for failure in money_failures):
+        raise RuntimeError("deny-attenuation-malformed-money must reject malformed currency")
+    if not any("canonical non-negative decimal string" in failure for failure in money_failures):
+        raise RuntimeError("deny-attenuation-malformed-money must reject non-canonical decimal string values")
 
 
 def check_p2_public_artifact_boundary() -> None:

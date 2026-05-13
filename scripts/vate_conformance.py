@@ -33,6 +33,7 @@ SUT_RESULTS_VERSION = "vate-sut-results-2026-07"
 EVIDENCE_VOCABULARY_VERSION = "vate-evidence-vocabulary-2026-07"
 SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 PROFILE_HASH_RE = re.compile(r"^sha-256:[0-9a-f]{64}$")
+CANONICAL_MONEY_VALUE_RE = re.compile(r"^(0|[1-9][0-9]*)(\.[0-9]+)?$")
 EVIDENCE_VOCABULARY_PATH = ROOT / "registries" / "evidence-vocabulary.v0.3.json"
 TERMINAL_REASON_CODES = {"FAIL_CLOSED", "POLICY_MATCH"}
 
@@ -432,6 +433,8 @@ def safe_attenuation_path_failures(path: Any) -> list[str]:
 def decimal_amount_failures(value: Any, *, label: str) -> list[str]:
     if isinstance(value, bool) or not isinstance(value, (str, int, float)):
         return [f"{label} must be a string or number"]
+    if isinstance(value, str) and not CANONICAL_MONEY_VALUE_RE.fullmatch(value):
+        return [f"{label} must be a canonical non-negative decimal string"]
     try:
         amount = Decimal(str(value))
     except (InvalidOperation, ValueError):
@@ -489,13 +492,22 @@ def attenuation_validation_failures(
     if not isinstance(effective_constraints, dict) or not effective_constraints:
         failures.append("effective_constraints must be a non-empty object")
     else:
+        if "max_amount_usd" in effective_constraints:
+            failures.append("effective_constraints.max_amount_usd is a legacy input alias; use max_amount")
+        if "resource" in effective_constraints:
+            failures.append("effective_constraints.resource is a legacy input alias; use target_resource")
+
         max_amount = effective_constraints.get("max_amount")
         if max_amount is not None:
             if not isinstance(max_amount, dict):
                 failures.append("effective_constraints.max_amount must be an object")
             else:
                 currency = max_amount.get("currency")
-                if not isinstance(currency, str) or len(currency) != 3 or currency.upper() != currency:
+                if (
+                    not isinstance(currency, str)
+                    or len(currency) != 3
+                    or not all("A" <= char <= "Z" for char in currency)
+                ):
                     failures.append("effective_constraints.max_amount.currency must be a 3-letter uppercase code")
                 failures.extend(
                     decimal_amount_failures(
@@ -514,6 +526,18 @@ def attenuation_validation_failures(
         target_resource = effective_constraints.get("target_resource")
         if target_resource is not None and (not isinstance(target_resource, str) or not target_resource):
             failures.append("effective_constraints.target_resource must be a non-empty string")
+
+        approval = effective_constraints.get("approval")
+        if approval is not None:
+            if not isinstance(approval, dict):
+                failures.append("effective_constraints.approval must be an object")
+            else:
+                approval_mode = approval.get("mode")
+                if not isinstance(approval_mode, str) or not approval_mode:
+                    failures.append("effective_constraints.approval.mode must be a non-empty string")
+                policy_ref = approval.get("policy_ref")
+                if policy_ref is not None and (not isinstance(policy_ref, str) or not policy_ref):
+                    failures.append("effective_constraints.approval.policy_ref must be a non-empty string")
 
         expires_at = effective_constraints.get("expires_at")
         if expires_at is not None and try_parse_time(expires_at) is None:

@@ -1,13 +1,13 @@
 {
   "version": "vate-conformance-0.3",
   "profile": "VATE-AL2-Verifier-Admission-v0.3",
-  "case_id": "deny-attenuation-max-amount-type-edge",
-  "title": "Deny non-scalar attenuated max amount value",
+  "case_id": "deny-attenuation-malformed-money",
+  "title": "Deny malformed attenuation money object",
   "category": "negative",
-  "purpose": "A verifier should fail closed when an attenuated max_amount.value is represented as a non-scalar object instead of a finite decimal amount.",
+  "purpose": "A verifier should fail closed when an emitted admission receipt attenuation records a malformed money object for max_amount.",
   "artifacts": {
-    "admission_receipt": "examples/receipts/admission-deny-attenuation-max-amount-type-edge.example.json",
-    "bad_attenuation": "conformance/al2-vate-v0.3/fixtures/attenuation-max-amount-type-edge.json"
+    "admission_receipt": "examples/receipts/admission-deny-attenuation-malformed-money.example.json",
+    "bad_attenuation": "conformance/al2-vate-v0.3/fixtures/attenuation-malformed-money.json"
   },
   "attenuation_checks": [
     {
@@ -35,8 +35,8 @@
     ]
   },
   "validation_focus": [
-    "attenuation boundary",
-    "schema type edge",
+    "attenuation canonicalization",
+    "money object shape",
     "fail closed"
   ]
 }

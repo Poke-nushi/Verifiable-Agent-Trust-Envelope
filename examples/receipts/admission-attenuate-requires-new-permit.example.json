@@ -60,7 +60,9 @@
       }
     ],
     "effective_constraints": {
-      "approval": "fresh_permit_required"
+      "approval": {
+        "mode": "fresh_permit_required"
+      }
     },
     "require_new_permit": true
   }
