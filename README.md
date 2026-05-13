@@ -34,6 +34,9 @@ main-branch work after it, start here:
 
 - [Public claim boundary](docs/public-claim-boundary.md) - what this repo can
   and cannot claim publicly
+- [Independent implementation review issue](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2) -
+  public intake thread for external SUT questions, partial results, and
+  implementation report links
 - [External implementation call](docs/conformance/external-implementation-call.md) -
   short request for non-reference SUT results, generated artifacts, and
   implementation reports
@@ -266,7 +269,8 @@ compatibility claim.
 - [docs/conformance/sut-adapter-contract.md](docs/conformance/sut-adapter-contract.md)
   SUT result contract and comparison command for external implementations
 - [docs/conformance/external-implementation-call.md](docs/conformance/external-implementation-call.md)
-  Short call for independent implementation review materials
+  Short call for independent implementation review materials, with the public
+  intake thread for questions and result links
 - [docs/conformance/external-sut-quickstart.md](docs/conformance/external-sut-quickstart.md)
   Short path for external SUT authors to produce, compare, and bundle-check implementation reports
 - [docs/profiles/vate-jose-proof-profile-notes-2026-07.md](docs/profiles/vate-jose-proof-profile-notes-2026-07.md)
@@ -332,6 +336,9 @@ python3 scripts/vate_conformance.py compare \
 Independent implementation review should use the SUT adapter contract and the
 `compare` path. External SUT authors can start with
 [docs/conformance/external-sut-quickstart.md](docs/conformance/external-sut-quickstart.md).
+Questions, partial results, unsupported-case reports, and implementation report
+links can be shared in
+[issue #2](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2).
 
 Optional strict schema validation:
 

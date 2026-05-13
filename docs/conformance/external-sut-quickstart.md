@@ -20,6 +20,11 @@ An external system under test, or SUT, should:
 Use `compare` for external SUT review. Use `run` only to check this
 repository's committed fixtures and reference runner behavior.
 
+If you have questions, a partial result, or a report link to share, use the
+public intake thread:
+
+- [Seeking independent implementation / external SUT review for VATE v0.3.0](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2)
+
 ## Inputs
 
 Use these files as the contract surface:
@@ -176,6 +181,10 @@ Before sharing an implementation report, confirm:
 - limitations are explicit;
 - the report text does not imply certification, endorsement, production
   readiness, or compatibility with future corpus snapshots.
+
+Share questions, draft results, final report links, or unsupported-case notes in
+[issue #2](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2).
+Do not paste secrets, credentials, or sensitive production data into the issue.
 
 ## Troubleshooting
 

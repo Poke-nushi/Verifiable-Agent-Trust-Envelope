@@ -25,6 +25,30 @@ copied from repository fixtures.
 The implementation report ties the run to one implementation, one corpus
 snapshot, and one comparison report.
 
+## Where To Send Questions Or Results
+
+Use
+[issue #2](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2)
+as the public intake thread for external SUT review.
+
+That issue is appropriate for:
+
+- questions about how to shape a SUT result file;
+- links to draft or final SUT results;
+- links to generated artifacts or a controlled artifact bundle;
+- implementation report links;
+- failed, partial, skipped, or unsupported-case reports;
+- review comments on unclear corpus cases, reason codes, artifact binding, or
+  report fields.
+
+A passing report is not required for useful review. A partial report is useful
+when it identifies the corpus snapshot, attempted cases, limitations, and
+which artifacts were produced by the SUT.
+
+Do not paste secrets, private credentials, or sensitive production data into
+the issue. When publishing review material, use stable URIs controlled by the
+implementer instead of local `/tmp/` paths.
+
 ## Minimum Package
 
 Use these files and formats:
@@ -96,4 +120,3 @@ snapshot under this repository's comparison rules.
 
 It does not mean the implementation is production-ready, endorsed, certified,
 generally compatible, or compatible with future corpus versions.
-
