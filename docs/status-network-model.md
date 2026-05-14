@@ -48,7 +48,12 @@ Suggested meaning:
 - `quarantined`: blocked because of suspected compromise or abnormal behavior
 - `attenuated`: still usable, but only under narrower policy than originally granted
 
-When a verifier honors an `attenuated` status entry, the admission receipt should carry a structured `attenuations[]` list describing the field narrowed, the original value, the applied value, the reason code, and the source status reference.
+When a verifier honors an `attenuated` status entry, the status effect remains
+an input signal. A v0.3 AL2 admission receipt should emit the single
+`attenuation` object defined by `schemas/admission-receipt.schema.json`,
+including `attenuation.changes` and canonical
+`attenuation.effective_constraints`. Older draft notes that used
+`attenuations[]` are not the emitted v0.3 receipt shape.
 
 Profiles or extensions may add finer detail such as `degraded`, `disputed`, or physical-only states.
 The core vocabulary above is the interoperable baseline for v0.1.
@@ -198,6 +203,11 @@ A minimal machine-readable attenuation effect can be represented as:
   }
 }
 ```
+
+This status-layer shape is an input signal. When an AL2 verifier emits an
+admission receipt, accepted status effects are normalized into the canonical
+`attenuation.effective_constraints` shape described in
+`docs/attenuation-semantics.md`.
 
 Interpretation:
 

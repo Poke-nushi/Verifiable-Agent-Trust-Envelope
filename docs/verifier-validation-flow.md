@@ -149,7 +149,8 @@ An admission receipt should record at least:
 - action/resource
 - decision: `allow`, `attenuate`, or `deny`
 - policy_id and policy_version
-- attenuations[] when the verifier narrowed the original authority
+- `attenuation` with structured `changes` when the verifier narrowed the
+  original authority
 - timestamp
 
 A post-execution receipt should record at least:

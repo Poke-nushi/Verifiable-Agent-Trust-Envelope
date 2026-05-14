@@ -232,6 +232,11 @@ Remaining work includes:
 - adding more negative fixtures for unknown, malformed, or unregistered
   type/hint combinations
 
+AgentKit, AgentBook, World ID, and similar adjacent protocol evidence remain
+future interop work. The current v0.3.1 direction is to avoid protocol-specific
+evidence vocabulary expansion and keep adjacent artifacts under generic evidence
+types plus `protocol_hint` until a later profile has a concrete validation need.
+
 ### 16. Report Integrity Needs External Proof Implementation
 
 The SUT result and implementation report schemas now define publication

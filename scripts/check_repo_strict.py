@@ -238,6 +238,17 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
         },
         "decision": {"outcome": "allow", "reason_codes": ["EVIDENCE_VERIFIED", "POLICY_MATCH"]},
     }
+    minimal_attenuation_effect = {
+        "version": "app-effect-0.2",
+        "mode": "narrow",
+        "require_new_permit": False,
+        "constraints": {
+            "max_amount": {
+                "currency": "USD",
+                "value": "25.00",
+            }
+        },
+    }
     minimal_post_execution_receipt = {
         "version": "vate-0.3",
         "profile": "VATE-AL2-Verifier-Admission-v0.3",
@@ -454,6 +465,199 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
                 },
             },
             "schemas/admission-receipt.schema.json",
+        ),
+        (
+            "admission receipt attenuation rejects unsupported mode",
+            {
+                **minimal_admission_receipt,
+                "decision": {"outcome": "attenuate", "reason_codes": ["LOCAL_POLICY_MAX_AMOUNT_NARROWED"]},
+                "attenuation": {
+                    "mode": "unsupported",
+                    "original_request_hash": "sha-256:" + "1" * 64,
+                    "effective_request_hash": "sha-256:" + hex_digest,
+                    "changes": [
+                        {
+                            "op": "replace",
+                            "path": "/constraints/max_amount/value",
+                            "reason_code": "LOCAL_POLICY_MAX_AMOUNT_NARROWED",
+                        }
+                    ],
+                    "effective_constraints": {"max_amount": {"currency": "USD", "value": "25.00"}},
+                    "require_new_permit": False,
+                },
+            },
+            "schemas/admission-receipt.schema.json",
+        ),
+        (
+            "admission receipt attenuation rejects legacy emitted aliases",
+            {
+                **minimal_admission_receipt,
+                "decision": {"outcome": "attenuate", "reason_codes": ["LOCAL_POLICY_MAX_AMOUNT_NARROWED"]},
+                "attenuation": {
+                    "mode": "narrow",
+                    "original_request_hash": "sha-256:" + "1" * 64,
+                    "effective_request_hash": "sha-256:" + hex_digest,
+                    "changes": [
+                        {
+                            "op": "replace",
+                            "path": "/constraints/max_amount_usd",
+                            "reason_code": "LOCAL_POLICY_MAX_AMOUNT_NARROWED",
+                        }
+                    ],
+                    "effective_constraints": {
+                        "max_amount_usd": 25,
+                        "resource": "bucket:public/reports/*",
+                    },
+                    "require_new_permit": False,
+                },
+            },
+            "schemas/admission-receipt.schema.json",
+        ),
+        (
+            "admission receipt attenuation rejects string approval",
+            {
+                **minimal_admission_receipt,
+                "decision": {"outcome": "attenuate", "reason_codes": ["NEW_PERMIT_REQUIRED"]},
+                "attenuation": {
+                    "mode": "require_new_permit",
+                    "original_request_hash": "sha-256:" + "1" * 64,
+                    "effective_request_hash": "sha-256:" + hex_digest,
+                    "changes": [
+                        {
+                            "op": "replace",
+                            "path": "/constraints/approval",
+                            "reason_code": "NEW_PERMIT_REQUIRED",
+                        }
+                    ],
+                    "effective_constraints": {"approval": "fresh_permit_required"},
+                    "require_new_permit": True,
+                },
+            },
+            "schemas/admission-receipt.schema.json",
+        ),
+        (
+            "admission receipt attenuation rejects malformed money object",
+            {
+                **minimal_admission_receipt,
+                "decision": {"outcome": "attenuate", "reason_codes": ["LOCAL_POLICY_MAX_AMOUNT_NARROWED"]},
+                "attenuation": {
+                    "mode": "narrow",
+                    "original_request_hash": "sha-256:" + "1" * 64,
+                    "effective_request_hash": "sha-256:" + hex_digest,
+                    "changes": [
+                        {
+                            "op": "replace",
+                            "path": "/constraints/max_amount/value",
+                            "reason_code": "LOCAL_POLICY_MAX_AMOUNT_NARROWED",
+                        }
+                    ],
+                    "effective_constraints": {
+                        "max_amount": {
+                            "currency": "12$",
+                            "value": "01",
+                        }
+                    },
+                    "require_new_permit": False,
+                },
+            },
+            "schemas/admission-receipt.schema.json",
+        ),
+        (
+            "admission receipt attenuation rejects empty effective constraints",
+            {
+                **minimal_admission_receipt,
+                "decision": {"outcome": "attenuate", "reason_codes": ["LOCAL_POLICY_MAX_AMOUNT_NARROWED"]},
+                "attenuation": {
+                    "mode": "narrow",
+                    "original_request_hash": "sha-256:" + "1" * 64,
+                    "effective_request_hash": "sha-256:" + hex_digest,
+                    "changes": [
+                        {
+                            "op": "replace",
+                            "path": "/constraints/max_amount/value",
+                            "reason_code": "LOCAL_POLICY_MAX_AMOUNT_NARROWED",
+                        }
+                    ],
+                    "effective_constraints": {},
+                    "require_new_permit": False,
+                },
+            },
+            "schemas/admission-receipt.schema.json",
+        ),
+        (
+            "admission receipt attenuation rejects empty changes",
+            {
+                **minimal_admission_receipt,
+                "decision": {"outcome": "attenuate", "reason_codes": ["LOCAL_POLICY_MAX_AMOUNT_NARROWED"]},
+                "attenuation": {
+                    "mode": "narrow",
+                    "original_request_hash": "sha-256:" + "1" * 64,
+                    "effective_request_hash": "sha-256:" + hex_digest,
+                    "changes": [],
+                    "effective_constraints": {"max_amount": {"currency": "USD", "value": "25.00"}},
+                    "require_new_permit": False,
+                },
+            },
+            "schemas/admission-receipt.schema.json",
+        ),
+        (
+            "admission receipt attenuation rejects incomplete changes",
+            {
+                **minimal_admission_receipt,
+                "decision": {"outcome": "attenuate", "reason_codes": ["LOCAL_POLICY_MAX_AMOUNT_NARROWED"]},
+                "attenuation": {
+                    "mode": "narrow",
+                    "original_request_hash": "sha-256:" + "1" * 64,
+                    "effective_request_hash": "sha-256:" + hex_digest,
+                    "changes": [
+                        {
+                            "op": "replace",
+                            "path": "/constraints/max_amount/value",
+                        }
+                    ],
+                    "effective_constraints": {"max_amount": {"currency": "USD", "value": "25.00"}},
+                    "require_new_permit": False,
+                },
+            },
+            "schemas/admission-receipt.schema.json",
+        ),
+        (
+            "admission receipt attenuation rejects change paths outside safe roots",
+            {
+                **minimal_admission_receipt,
+                "decision": {"outcome": "attenuate", "reason_codes": ["LOCAL_POLICY_MAX_AMOUNT_NARROWED"]},
+                "attenuation": {
+                    "mode": "narrow",
+                    "original_request_hash": "sha-256:" + "1" * 64,
+                    "effective_request_hash": "sha-256:" + hex_digest,
+                    "changes": [
+                        {
+                            "op": "replace",
+                            "path": "/policy/max_amount",
+                            "reason_code": "LOCAL_POLICY_MAX_AMOUNT_NARROWED",
+                        }
+                    ],
+                    "effective_constraints": {"max_amount": {"currency": "USD", "value": "25.00"}},
+                    "require_new_permit": False,
+                },
+            },
+            "schemas/admission-receipt.schema.json",
+        ),
+        (
+            "attenuation effect rejects empty constraints",
+            {
+                **minimal_attenuation_effect,
+                "constraints": {},
+            },
+            "schemas/attenuation-effect.schema.json",
+        ),
+        (
+            "attenuation effect rejects admission effective constraints view",
+            {
+                **minimal_attenuation_effect,
+                "effective_constraints": {"max_amount": {"currency": "USD", "value": "25.00"}},
+            },
+            "schemas/attenuation-effect.schema.json",
         ),
         (
             "post-execution effective_request_hash is not a profile hash",

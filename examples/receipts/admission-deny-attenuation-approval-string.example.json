@@ -1,0 +1,50 @@
+{
+  "version": "vate-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-20260701-attenuation-approval-string-001",
+  "issued_at": "2026-07-01T00:39:08Z",
+  "expires_at": "2026-07-01T00:49:08Z",
+  "verifier": {
+    "id": "did:web:verifier.example"
+  },
+  "request": {
+    "request_id": "areq-20260701-attenuation-approval-string-001",
+    "transaction_id": "txn-20260701-attenuation-approval-string-001",
+    "action": "commerce.purchase",
+    "input_hash": "sha-256:807a13a218a3af52b0f5bed8651e55839bf96d54990a1ddea441ff0becc5faf8"
+  },
+  "subject": {
+    "principal": "did:web:user.example",
+    "actor": "did:web:agent.example",
+    "runtime": "spiffe://agent.example/workload/purchase-agent"
+  },
+  "evidence": [
+    {
+      "type": "attenuation_candidate",
+      "uri": "conformance/al2-vate-v0.3/fixtures/attenuation-approval-string.json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "73b95c887a9a77cca3fd5461ce70d9d3a73b431b6e7105b12b91ada3f8756938"
+      },
+      "verification": {
+        "result": "failed",
+        "checked_at": "2026-07-01T00:39:05Z",
+        "method": "attenuation-boundary-check",
+        "failure_reason": "The attenuation candidate recorded approval constraints as a string instead of the canonical approval object form."
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "merchant-purchase-al2",
+    "policy_version": "2026-07-01.1",
+    "policy_ref": "https://verifier.example/policies/merchant-purchase-al2/2026-07-01.1"
+  },
+  "decision": {
+    "outcome": "deny",
+    "reason_codes": [
+      "SCHEMA_INVALID",
+      "FAIL_CLOSED"
+    ]
+  }
+}

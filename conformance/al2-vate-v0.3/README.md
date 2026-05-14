@@ -42,6 +42,9 @@ array condition while keeping `SCHEMA_INVALID` as the normative reason code.
 - `cases/attenuate-max-amount.json`
 - `cases/attenuate-target-scope.json`
 - `cases/attenuate-requires-new-permit.json`
+- `cases/deny-attenuation-approval-string.json`
+- `cases/deny-attenuation-legacy-effective-constraints.json`
+- `cases/deny-attenuation-malformed-money.json`
 - `cases/deny-attenuation-negative-amount.json`
 - `cases/deny-attenuation-unsafe-path.json`
 - `cases/deny-attenuation-max-amount-type-edge.json`

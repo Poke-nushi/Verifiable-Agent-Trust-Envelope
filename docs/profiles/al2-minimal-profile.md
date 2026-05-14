@@ -89,7 +89,8 @@ An AL2 receipt should include at least:
 For verifier-signed admission receipts, AL2 should also include:
 
 - `decision`: `allow`, `attenuate`, or `deny`
-- `attenuations[]` when the effective constraints differ from the original permit constraints
+- `attenuation` with structured `changes` when the effective constraints differ
+  from the original permit constraints
 
 For post-execution receipts, AL2 should include `admission_receipt_ref` when an admission receipt was issued.
 

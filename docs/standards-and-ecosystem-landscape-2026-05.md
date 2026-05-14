@@ -84,7 +84,7 @@ VATE can add a verifier-signed admission receipt before payment execution:
 
 - decision: `allow`, `attenuate`, or `deny`
 - policy_id and policy_version
-- attenuations[] if amount, merchant, geography, or tool scope is narrowed
+- `attenuation` details if amount, merchant, geography, or tool scope is narrowed
 - post-execution receipt linked by `admission_receipt_ref`
 
 ### Signed crawler or content access

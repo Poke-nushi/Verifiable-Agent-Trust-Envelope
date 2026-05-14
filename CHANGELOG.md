@@ -2,6 +2,18 @@
 
 This file records dated public changes to the discussion draft.
 
+## 2026-05-14
+
+- Started the v0.3.1 credibility and reviewability patch.
+- Defined canonical emitted AL2 attenuation `effective_constraints` names for
+  admission receipts and kept legacy aliases out of emitted receipt semantics.
+- Added fail-closed attenuation cases for legacy emitted aliases and
+  string-valued approval constraints.
+- Added a receipt audit walkthrough for following digest-bound admission,
+  post-execution, policy snapshot, and report-bundle references.
+- Kept AgentKit, AgentBook, World ID, and other adjacent-protocol-specific
+  evidence vocabulary expansion out of the v0.3.1 scope.
+
 ## 2026-05-10
 
 - Prepared the v0.3.0 AL2 evidence reference hardening release candidate.

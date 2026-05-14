@@ -2,7 +2,7 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "b83b85fc38fac5220828b9c81ff311674c81390dfa323ad5687dffee9c4bc8dd"
+      "value": "7b01b5f3d7cf8ce559da41aad5ca31c7cf5ef430ea1eda64f244c029e5d8582f"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.3"
   },
@@ -676,7 +676,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "036f19b784d3db518227573dd4ecf9880ea7b92c717ff133e9a8320bfde089d0"
+            "value": "f453881b03e7029be60e55474d3df29f52cf6dae57b6dbbf6cb0931c4c6532a3"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-attenuate-requires-new-permit.example.json"
@@ -696,6 +696,96 @@
       "outcome": "attenuate",
       "reason_codes": [
         "NEW_PERMIT_REQUIRED"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
+            "value": "61532c44a46e97d84da3c0e011356569ab0d9040e6ba667e6f46a04e7f7bacaf"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-deny-attenuation-malformed-money.example.json"
+        }
+      },
+      "case_id": "deny-attenuation-malformed-money",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "SCHEMA_INVALID",
+        "FAIL_CLOSED"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
+            "value": "621d8bfb4dc8f94d9cd3eefde2a7f068a9fad2018937209fc31c97ef90f31a53"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-deny-attenuation-approval-string.example.json"
+        }
+      },
+      "case_id": "deny-attenuation-approval-string",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "SCHEMA_INVALID",
+        "FAIL_CLOSED"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
+            "value": "3dd0dc03028e0e389071aff4c3ac644b55ebbcc3b579739c4c290177dabd2f65"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-deny-attenuation-legacy-effective-constraints.example.json"
+        }
+      },
+      "case_id": "deny-attenuation-legacy-effective-constraints",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "SCHEMA_INVALID",
+        "FAIL_CLOSED"
       ],
       "should_execute": false,
       "status": "completed"

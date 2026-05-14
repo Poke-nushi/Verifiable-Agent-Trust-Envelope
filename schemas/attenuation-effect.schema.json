@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:app:schema:attenuation-effect:0.1",
+  "$id": "urn:app:schema:attenuation-effect:0.2",
   "title": "Trust Envelope Attenuation Effect",
-  "description": "Draft JSON Schema for a machine-readable attenuation effect object in Verifiable Agent Trust Envelope.",
+  "description": "Draft JSON Schema for a canonical machine-readable attenuation effect object in Verifiable Agent Trust Envelope. This schema describes normalized AL2 emission shape; status-layer or legacy input aliases such as max_amount_usd are input signals that must be normalized before receipt emission.",
   "type": "object",
   "required": [
     "version",
@@ -13,7 +13,7 @@
   "properties": {
     "version": {
       "type": "string",
-      "const": "app-effect-0.1"
+      "const": "app-effect-0.2"
     },
     "mode": {
       "type": "string",
@@ -76,14 +76,15 @@
     },
     "constraints": {
       "type": "object",
+      "description": "Canonical constraints carried by app-effect-0.2. Admission receipts use attenuation.effective_constraints instead.",
+      "minProperties": 1,
       "properties": {
-        "resource": {
+        "target_resource": {
           "type": "string",
           "minLength": 1
         },
-        "max_amount_usd": {
-          "type": "number",
-          "minimum": 0
+        "max_amount": {
+          "$ref": "#/$defs/moneyAmount"
         },
         "max_redelegation_depth": {
           "type": "integer",
@@ -114,10 +115,71 @@
           "additionalProperties": true
         }
       },
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "max_amount_usd"
+            ]
+          },
+          {
+            "required": [
+              "resource"
+            ]
+          }
+        ]
+      },
+      "additionalProperties": true
+    }
+  },
+  "not": {
+    "required": [
+      "effective_constraints"
+    ]
+  },
+  "$defs": {
+    "moneyAmount": {
+      "type": "object",
+      "required": [
+        "currency",
+        "value"
+      ],
+      "properties": {
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "value": {
+          "description": "Review artifacts SHOULD emit a canonical decimal string. JSON numbers are accepted only for input compatibility and must be normalized before stable receipt emission.",
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            },
+            {
+              "type": "number",
+              "minimum": 0
+            }
+          ]
+        }
+      },
       "additionalProperties": true
     },
-    "effective_constraints": {
+    "approvalConstraint": {
       "type": "object",
+      "required": [
+        "mode"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policy_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
       "additionalProperties": true
     }
   },

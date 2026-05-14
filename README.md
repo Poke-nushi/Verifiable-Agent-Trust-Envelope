@@ -169,13 +169,14 @@ If you are new to the repo, the fastest path is:
 7. [docs/a2a-metadata-binding-v0.3.md](docs/a2a-metadata-binding-v0.3.md)
 8. [docs/a2a-v1-extension-sketch-2026-05.md](docs/a2a-v1-extension-sketch-2026-05.md)
 9. [docs/receipt-model-v0.3.md](docs/receipt-model-v0.3.md)
-10. [docs/a2a-maintainer-brief-v0.3.md](docs/a2a-maintainer-brief-v0.3.md)
-11. [docs/profiles/vate-al2-admission-interop-profile-2026-07.md](docs/profiles/vate-al2-admission-interop-profile-2026-07.md)
-12. [conformance/al2-vate-v0.3/README.md](conformance/al2-vate-v0.3/README.md)
-13. [docs/conformance/external-sut-quickstart.md](docs/conformance/external-sut-quickstart.md)
-14. [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)
-15. section `0` and section `1` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md)
-16. [reference/http-verifier-demo/README.md](reference/http-verifier-demo/README.md)
+10. [docs/receipt-audit-walkthrough-v0.3.1.md](docs/receipt-audit-walkthrough-v0.3.1.md)
+11. [docs/a2a-maintainer-brief-v0.3.md](docs/a2a-maintainer-brief-v0.3.md)
+12. [docs/profiles/vate-al2-admission-interop-profile-2026-07.md](docs/profiles/vate-al2-admission-interop-profile-2026-07.md)
+13. [conformance/al2-vate-v0.3/README.md](conformance/al2-vate-v0.3/README.md)
+14. [docs/conformance/external-sut-quickstart.md](docs/conformance/external-sut-quickstart.md)
+15. [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)
+16. section `0` and section `1` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md)
+17. [reference/http-verifier-demo/README.md](reference/http-verifier-demo/README.md)
 
 If you want the visual system view, see section `11` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md).
 
@@ -246,6 +247,8 @@ compatibility claim.
 - [docs/release-gate-v0.3.0.md](docs/release-gate-v0.3.0.md)
   Archived technical gate used before cutting the v0.3.0 discussion-draft
   pre-release
+- [docs/release-notes/v0.3.1.md](docs/release-notes/v0.3.1.md)
+  Draft notes for the current v0.3.1 credibility and reviewability patch
 - [docs/a2a-issue-update-2026-05.md](docs/a2a-issue-update-2026-05.md)
   Short A2A-adjacent issue update draft after the runnable v0.2 artifacts
 - [docs/a2a-metadata-binding-v0.3.md](docs/a2a-metadata-binding-v0.3.md)
@@ -260,6 +263,9 @@ compatibility claim.
   Current VATE boundary relative to MCP/OAuth, A2A, AP2, ACP/UCP, and x402
 - [docs/receipt-model-v0.3.md](docs/receipt-model-v0.3.md)
   v0.3 split between admission receipts and post-execution receipts
+- [docs/receipt-audit-walkthrough-v0.3.1.md](docs/receipt-audit-walkthrough-v0.3.1.md)
+  v0.3.1 reviewability walkthrough for following digest-bound receipt,
+  post-execution, policy snapshot, and report-bundle references
 - [docs/trust-bundle-hardening.md](docs/trust-bundle-hardening.md)
   Trust-bundle checks for issuer, key, algorithm, evidence type, status, and validity windows
 - [docs/conformance/corpus-format.md](docs/conformance/corpus-format.md)
