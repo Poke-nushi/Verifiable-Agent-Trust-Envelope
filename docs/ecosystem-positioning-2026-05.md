@@ -13,6 +13,14 @@ VATE is a verifier-side admission and receipt layer for risky external digital a
 It should consume adjacent artifacts by reference, bind them to the concrete action context, and emit admission and post-execution receipts.
 It should not redefine the adjacent protocols that already own identity, transport, checkout, payment authority, or payment rails.
 
+Much of the recent adjacent protocol activity is visible around agentic
+commerce surfaces such as payment authority, checkout, payment-required state,
+and delegated commerce credentials. VATE should still keep a commerce-neutral
+admission and receipt vocabulary. The same verifier-side semantics should apply
+to non-commerce risky external actions such as repository merges,
+infrastructure changes, regulated data writes, account modifications, and
+external communications.
+
 ## Adjacent Protocol Roles
 
 | Surface | Primary role | VATE relationship |

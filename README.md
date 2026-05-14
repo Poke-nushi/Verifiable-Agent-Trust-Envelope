@@ -38,8 +38,8 @@ main-branch work after it, start here:
   public intake thread for external SUT questions, partial results, and
   implementation report links
 - [External implementation call](docs/conformance/external-implementation-call.md) -
-  short request for non-reference SUT results, generated artifacts, and
-  implementation reports
+  short request for result files from implementations other than the repository
+  reference runner, plus generated artifacts and implementation reports
 - [External SUT quickstart](docs/conformance/external-sut-quickstart.md) - how
   a non-reference implementation can submit a result for `compare`
 - [Implementation reporting](docs/conformance/implementation-reporting.md) -
@@ -191,6 +191,9 @@ The most useful feedback for this draft is currently:
   sound once proof, digest, trust, and freshness gates have failed closed
 - are permit, receipt, status, and attenuation semantics coherent together
 - is the difference from close adjacent work stated honestly and precisely enough
+- can an external SUT produce digest-bound artifacts, a comparison report, and
+  an implementation report without relying on the Python reference runner as
+  the primary specification
 - what should remain core versus move into profiles or extensions
 
 ## Current Status
@@ -198,9 +201,14 @@ The most useful feedback for this draft is currently:
 - **Repository type**: protocol discussion draft
 - **Document maturity**: early draft
 - **Primary language**: English
-- **Research refresh date**: 2026-05-07
+- **Roadmap refresh date**: 2026-05-14
 - **Primary battlefield**: `AL2` external digital write
+- **Current archived snapshot**: `v0.3.1` credibility and reviewability patch
 - **Implemented artifacts**: v0.3 schemas and examples; runnable AL2 fixture corpus with negative cases; SUT comparison and implementation-reporting formats; dependency-free verifier core and A2A-shaped adapter demo; package-private TypeScript reference helpers for digest-bound artifacts, SUT result shaping, and A2A metadata shape checks; focused adjacent evidence fixtures and crosswalk notes
+- **Immediate next action**: collect one SUT result from an implementation that
+  is not the repository reference runner, plus generated artifacts or a
+  controlled artifact bundle, an implementation report, and a local bundle
+  verification report for one `v0.3` corpus snapshot
 - **Planned later**: pairwise presentation profile, richer capability registry, formal `AID`, physical `ABS` profiles
 
 The conformance artifacts record one implementation run against one corpus
