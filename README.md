@@ -19,7 +19,7 @@ adjacent protocols.
 - `v0.1 discussion draft`
 - `v0.2.0 archived May 5, 2026 review snapshot`
 - `v0.3.0 archived May 10, 2026 AL2 verifier admission hardening snapshot`
-- `main branch preparing a v0.3.1 credibility and reviewability patch`
+- `v0.3.1 archived May 14, 2026 credibility and reviewability patch`
 - `not production-ready`
 - `not an official A2A extension, endorsement, certification, SDK, middleware package, or general compatibility proof`
 - `no production approval implied`
@@ -29,7 +29,7 @@ adjacent protocols.
 
 ## Reviewer Entry Points
 
-If you are reviewing the current `v0.3.0` discussion-draft snapshot or
+If you are reviewing the current `v0.3.1` discussion-draft snapshot or
 main-branch work after it, start here:
 
 - [Public claim boundary](docs/public-claim-boundary.md) - what this repo can
@@ -248,7 +248,7 @@ compatibility claim.
   Archived technical gate used before cutting the v0.3.0 discussion-draft
   pre-release
 - [docs/release-notes/v0.3.1.md](docs/release-notes/v0.3.1.md)
-  Draft notes for the current v0.3.1 credibility and reviewability patch
+  Archived notes for the v0.3.1 credibility and reviewability patch
 - [docs/a2a-issue-update-2026-05.md](docs/a2a-issue-update-2026-05.md)
   Short A2A-adjacent issue update draft after the runnable v0.2 artifacts
 - [docs/a2a-metadata-binding-v0.3.md](docs/a2a-metadata-binding-v0.3.md)
@@ -401,15 +401,20 @@ The maintainer is responsible for the final structure, scope decisions, and publ
 
 ## How to Cite
 
+If you reference the archived May 14, 2026 `v0.3.1` credibility and
+reviewability patch, cite:
+
+- Version DOI: [10.5281/zenodo.20173995](https://doi.org/10.5281/zenodo.20173995)
+- All-version concept DOI: [10.5281/zenodo.19839768](https://doi.org/10.5281/zenodo.19839768)
+
+If you reference unarchived main-branch changes after `v0.3.1`, cite the
+repository URL and exact commit SHA in addition to the latest applicable
+archived version DOI.
+
 If you reference the archived May 10, 2026 `v0.3.0` discussion-draft
 pre-release snapshot, cite:
 
 - Version DOI: [10.5281/zenodo.20107413](https://doi.org/10.5281/zenodo.20107413)
-- All-version concept DOI: [10.5281/zenodo.19839768](https://doi.org/10.5281/zenodo.19839768)
-
-If you reference unarchived main-branch changes after `v0.3.0`, cite the
-repository URL and exact commit SHA in addition to the latest applicable
-archived version DOI.
 
 If you reference the archived May 5, 2026 `v0.2.0` snapshot, cite:
 

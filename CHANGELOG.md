@@ -11,6 +11,8 @@ This file records dated public changes to the discussion draft.
   string-valued approval constraints.
 - Added a receipt audit walkthrough for following digest-bound admission,
   post-execution, policy snapshot, and report-bundle references.
+- Archived the v0.3.1 credibility and reviewability patch on Zenodo and
+  assigned version DOI [10.5281/zenodo.20173995](https://doi.org/10.5281/zenodo.20173995).
 - Kept AgentKit, AgentBook, World ID, and other adjacent-protocol-specific
   evidence vocabulary expansion out of the v0.3.1 scope.
 
