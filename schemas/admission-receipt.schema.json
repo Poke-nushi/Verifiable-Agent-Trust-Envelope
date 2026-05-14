@@ -472,7 +472,11 @@
       "properties": {
         "mode": {
           "type": "string",
-          "minLength": 1
+          "enum": [
+            "narrow",
+            "require_new_permit",
+            "deny_if_not_accepted"
+          ]
         },
         "original_request_hash": {
           "$ref": "#/$defs/profileHash"

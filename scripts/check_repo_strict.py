@@ -467,6 +467,28 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
             "schemas/admission-receipt.schema.json",
         ),
         (
+            "admission receipt attenuation rejects unsupported mode",
+            {
+                **minimal_admission_receipt,
+                "decision": {"outcome": "attenuate", "reason_codes": ["LOCAL_POLICY_MAX_AMOUNT_NARROWED"]},
+                "attenuation": {
+                    "mode": "unsupported",
+                    "original_request_hash": "sha-256:" + "1" * 64,
+                    "effective_request_hash": "sha-256:" + hex_digest,
+                    "changes": [
+                        {
+                            "op": "replace",
+                            "path": "/constraints/max_amount/value",
+                            "reason_code": "LOCAL_POLICY_MAX_AMOUNT_NARROWED",
+                        }
+                    ],
+                    "effective_constraints": {"max_amount": {"currency": "USD", "value": "25.00"}},
+                    "require_new_permit": False,
+                },
+            },
+            "schemas/admission-receipt.schema.json",
+        ),
+        (
             "admission receipt attenuation rejects legacy emitted aliases",
             {
                 **minimal_admission_receipt,
