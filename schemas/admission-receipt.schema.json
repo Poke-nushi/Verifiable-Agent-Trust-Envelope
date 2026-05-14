@@ -86,6 +86,7 @@
           "pattern": "^[A-Z]{3}$"
         },
         "value": {
+          "description": "Review artifacts SHOULD emit a canonical decimal string. JSON numbers are accepted only for input compatibility and must be normalized before stable receipt emission.",
           "anyOf": [
             {
               "type": "string",
@@ -156,6 +157,44 @@
             ]
           }
         ]
+      },
+      "additionalProperties": true
+    },
+    "attenuationChange": {
+      "type": "object",
+      "required": [
+        "op",
+        "path",
+        "reason_code"
+      ],
+      "properties": {
+        "op": {
+          "type": "string",
+          "enum": [
+            "add",
+            "remove",
+            "replace"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^/(approval|constraints|runtime|target|tools)(/|$)"
+        },
+        "from": {},
+        "to": {},
+        "reason_code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_status_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_evidence_ref": {
+          "type": "string",
+          "minLength": 1
+        }
       },
       "additionalProperties": true
     }
@@ -442,7 +481,11 @@
           "$ref": "#/$defs/profileHash"
         },
         "changes": {
-          "type": "array"
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/attenuationChange"
+          }
         },
         "effective_constraints": {
           "$ref": "#/$defs/effectiveConstraints"

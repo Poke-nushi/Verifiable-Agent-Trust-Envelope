@@ -76,6 +76,7 @@
     },
     "constraints": {
       "type": "object",
+      "description": "Canonical constraints carried by app-effect-0.2. Admission receipts use attenuation.effective_constraints instead.",
       "minProperties": 1,
       "properties": {
         "target_resource": {
@@ -129,49 +130,12 @@
         ]
       },
       "additionalProperties": true
-    },
-    "effective_constraints": {
-      "type": "object",
-      "minProperties": 1,
-      "properties": {
-        "target_resource": {
-          "type": "string",
-          "minLength": 1
-        },
-        "max_amount": {
-          "$ref": "#/$defs/moneyAmount"
-        },
-        "tool_allowlist": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "approval": {
-          "$ref": "#/$defs/approvalConstraint"
-        },
-        "expires_at": {
-          "type": "string",
-          "format": "date-time"
-        }
-      },
-      "not": {
-        "anyOf": [
-          {
-            "required": [
-              "max_amount_usd"
-            ]
-          },
-          {
-            "required": [
-              "resource"
-            ]
-          }
-        ]
-      },
-      "additionalProperties": true
     }
+  },
+  "not": {
+    "required": [
+      "effective_constraints"
+    ]
   },
   "$defs": {
     "moneyAmount": {
@@ -186,6 +150,7 @@
           "pattern": "^[A-Z]{3}$"
         },
         "value": {
+          "description": "Review artifacts SHOULD emit a canonical decimal string. JSON numbers are accepted only for input compatibility and must be normalized before stable receipt emission.",
           "anyOf": [
             {
               "type": "string",

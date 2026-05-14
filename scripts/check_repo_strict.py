@@ -563,6 +563,65 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
             "schemas/admission-receipt.schema.json",
         ),
         (
+            "admission receipt attenuation rejects empty changes",
+            {
+                **minimal_admission_receipt,
+                "decision": {"outcome": "attenuate", "reason_codes": ["LOCAL_POLICY_MAX_AMOUNT_NARROWED"]},
+                "attenuation": {
+                    "mode": "narrow",
+                    "original_request_hash": "sha-256:" + "1" * 64,
+                    "effective_request_hash": "sha-256:" + hex_digest,
+                    "changes": [],
+                    "effective_constraints": {"max_amount": {"currency": "USD", "value": "25.00"}},
+                    "require_new_permit": False,
+                },
+            },
+            "schemas/admission-receipt.schema.json",
+        ),
+        (
+            "admission receipt attenuation rejects incomplete changes",
+            {
+                **minimal_admission_receipt,
+                "decision": {"outcome": "attenuate", "reason_codes": ["LOCAL_POLICY_MAX_AMOUNT_NARROWED"]},
+                "attenuation": {
+                    "mode": "narrow",
+                    "original_request_hash": "sha-256:" + "1" * 64,
+                    "effective_request_hash": "sha-256:" + hex_digest,
+                    "changes": [
+                        {
+                            "op": "replace",
+                            "path": "/constraints/max_amount/value",
+                        }
+                    ],
+                    "effective_constraints": {"max_amount": {"currency": "USD", "value": "25.00"}},
+                    "require_new_permit": False,
+                },
+            },
+            "schemas/admission-receipt.schema.json",
+        ),
+        (
+            "admission receipt attenuation rejects change paths outside safe roots",
+            {
+                **minimal_admission_receipt,
+                "decision": {"outcome": "attenuate", "reason_codes": ["LOCAL_POLICY_MAX_AMOUNT_NARROWED"]},
+                "attenuation": {
+                    "mode": "narrow",
+                    "original_request_hash": "sha-256:" + "1" * 64,
+                    "effective_request_hash": "sha-256:" + hex_digest,
+                    "changes": [
+                        {
+                            "op": "replace",
+                            "path": "/policy/max_amount",
+                            "reason_code": "LOCAL_POLICY_MAX_AMOUNT_NARROWED",
+                        }
+                    ],
+                    "effective_constraints": {"max_amount": {"currency": "USD", "value": "25.00"}},
+                    "require_new_permit": False,
+                },
+            },
+            "schemas/admission-receipt.schema.json",
+        ),
+        (
             "attenuation effect rejects empty constraints",
             {
                 **minimal_attenuation_effect,
@@ -571,10 +630,10 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
             "schemas/attenuation-effect.schema.json",
         ),
         (
-            "attenuation effect rejects empty effective constraints when present",
+            "attenuation effect rejects admission effective constraints view",
             {
                 **minimal_attenuation_effect,
-                "effective_constraints": {},
+                "effective_constraints": {"max_amount": {"currency": "USD", "value": "25.00"}},
             },
             "schemas/attenuation-effect.schema.json",
         ),

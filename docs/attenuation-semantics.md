@@ -145,6 +145,11 @@ When `require_new_permit` is `true`, an AL2 conformance case should report
 The decision records that the verifier found a possible narrower path; the
 execution gate remains closed until a fresh permit is presented.
 
+`approval.mode` describes the approval constraint that remains in the admitted
+authority. `attenuation.require_new_permit` is the execution gate used by the
+AL2 corpus. If an approval mode is intended to block execution until a fresh
+permit is presented, the emitted receipt must set `require_new_permit: true`.
+
 ## Conformance Expectations
 
 The runnable conformance corpus checks that an attenuated receipt includes:
