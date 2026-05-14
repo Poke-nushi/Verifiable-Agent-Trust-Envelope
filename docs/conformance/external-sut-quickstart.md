@@ -23,7 +23,10 @@ repository's committed fixtures and reference runner behavior.
 If you have questions, a partial result, or a report link to share, use the
 public intake thread:
 
-- [Seeking independent implementation / external SUT review for VATE v0.3.0](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2)
+- [issue #2: independent implementation / external SUT review](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2)
+
+The issue was opened during the v0.3.0 review cycle and remains the intake
+thread for the current v0.3.x corpus line.
 
 ## Inputs
 
