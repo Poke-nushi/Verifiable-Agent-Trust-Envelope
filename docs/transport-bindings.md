@@ -150,9 +150,10 @@ verifier should deny or fail closed. An `allow` VATE admission only means the
 request passed VATE's additional gate; it is not a union with, or replacement
 for, MCP/OAuth authorization.
 
-### AL2 transport-bound fixture
+### AL2 transport-bound fixtures
 
-The `v0.3` conformance corpus includes one MCP-shaped fixture:
+The `v0.3` conformance corpus includes an MCP/OAuth fixture set. The first
+positive fixture binds a single MCP-shaped admission request:
 
 - `examples/transport/mcp-oauth-admission-request.example.json`
 - `examples/receipts/admission-allow-mcp-oauth-bound.example.json`
@@ -184,6 +185,20 @@ confusion modes into smaller reviewable cases:
 - `examples/transport/mcp-oauth-tool-class-mismatch-admission-request.example.json`
 - `examples/receipts/admission-deny-mcp-tool-class-mismatch.example.json`
 - `conformance/al2-vate-v0.3/cases/deny-mcp-tool-class-mismatch.json`
+
+Each of those denial modes has a minimal positive-control companion so the
+corpus shows that VATE denies the boundary mismatch, not every MCP/OAuth-shaped
+input:
+
+- `examples/transport/mcp-oauth-token-authority-bound-admission-request.example.json`
+- `examples/receipts/admission-allow-mcp-oauth-token-authority-bound.example.json`
+- `conformance/al2-vate-v0.3/cases/allow-mcp-oauth-token-authority-bound.json`
+- `examples/transport/mcp-oauth-resource-indicator-aligned-admission-request.example.json`
+- `examples/receipts/admission-allow-mcp-oauth-resource-indicator-aligned.example.json`
+- `conformance/al2-vate-v0.3/cases/allow-resource-indicator-aligned.json`
+- `examples/transport/mcp-oauth-tool-class-aligned-admission-request.example.json`
+- `examples/receipts/admission-allow-mcp-oauth-tool-class-aligned.example.json`
+- `conformance/al2-vate-v0.3/cases/allow-mcp-tool-class-aligned.json`
 
 The fixture treats OAuth and OpenID artifacts as verifier evidence.
 It does not define a new MCP authorization flow.

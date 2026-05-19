@@ -35,6 +35,9 @@ array condition while keeping `SCHEMA_INVALID` as the normative reason code.
 - `cases/allow-valid-admission.json`
 - `cases/allow-valid-basic-external-write.json`
 - `cases/allow-mcp-oauth-transport-bound.json`
+- `cases/allow-mcp-oauth-token-authority-bound.json`
+- `cases/allow-resource-indicator-aligned.json`
+- `cases/allow-mcp-tool-class-aligned.json`
 - `cases/allow-replay-state-unused.json`
 - `cases/allow-status-fresh-at-boundary.json`
 - `cases/allow-valid-with-status-fresh.json`

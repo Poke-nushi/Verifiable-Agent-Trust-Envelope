@@ -75,6 +75,29 @@
     },
     {
       "artifacts": {
+        "admission_receipt": "examples/receipts/admission-allow-mcp-oauth-token-authority-bound.example.json",
+        "admission_request": "examples/transport/mcp-oauth-token-authority-bound-admission-request.example.json"
+      },
+      "case_id": "allow-mcp-oauth-token-authority-bound",
+      "category": "positive",
+      "expected_outcome": "allow",
+      "expected_primary_reason_code": "EVIDENCE_VERIFIED",
+      "expected_reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "expected_should_execute": true,
+      "path": "conformance/al2-vate-v0.3/cases/allow-mcp-oauth-token-authority-bound.json",
+      "title": "Allow token evidence with matched upstream authority",
+      "validation_focus": [
+        "MCP transport binding",
+        "OAuth authority intersection",
+        "resource binding",
+        "positive control"
+      ]
+    },
+    {
+      "artifacts": {
         "admission_receipt": "examples/receipts/admission-allow-mcp-oauth-bound.example.json",
         "admission_request": "examples/transport/mcp-oauth-admission-request.example.json"
       },
@@ -98,6 +121,28 @@
     },
     {
       "artifacts": {
+        "admission_receipt": "examples/receipts/admission-allow-mcp-oauth-tool-class-aligned.example.json",
+        "admission_request": "examples/transport/mcp-oauth-tool-class-aligned-admission-request.example.json"
+      },
+      "case_id": "allow-mcp-tool-class-aligned",
+      "category": "positive",
+      "expected_outcome": "allow",
+      "expected_primary_reason_code": "EVIDENCE_VERIFIED",
+      "expected_reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "expected_should_execute": true,
+      "path": "conformance/al2-vate-v0.3/cases/allow-mcp-tool-class-aligned.json",
+      "title": "Allow aligned MCP tool class",
+      "validation_focus": [
+        "MCP tool class binding",
+        "OAuth scope boundary",
+        "positive control"
+      ]
+    },
+    {
+      "artifacts": {
         "admission_receipt": "examples/receipts/admission-allow-replay-unused.example.json",
         "replay_context": "conformance/al2-vate-v0.3/fixtures/replay-unused-context.json"
       },
@@ -116,6 +161,28 @@
         "replay detection",
         "one-time use",
         "allow decision"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-allow-mcp-oauth-resource-indicator-aligned.example.json",
+        "admission_request": "examples/transport/mcp-oauth-resource-indicator-aligned-admission-request.example.json"
+      },
+      "case_id": "allow-resource-indicator-aligned",
+      "category": "positive",
+      "expected_outcome": "allow",
+      "expected_primary_reason_code": "EVIDENCE_VERIFIED",
+      "expected_reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "expected_should_execute": true,
+      "path": "conformance/al2-vate-v0.3/cases/allow-resource-indicator-aligned.json",
+      "title": "Allow aligned OAuth resource indicator",
+      "validation_focus": [
+        "OAuth resource indicator binding",
+        "MCP target resource binding",
+        "positive control"
       ]
     },
     {
@@ -1536,7 +1603,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "7951901d06fc6a7878cc10ec769fb02a3891532fbc73fb02aebac31800814c77"
+    "value": "ff57d6d70a592624989b9ac265e3aafbef5a66176198f485f93ff5b4c85a7956"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -1564,12 +1631,24 @@
       "sha256": "e46fd7e6112e559fb37b8b58c41deff9d83ec737f422f169576fd6f4a4dcd85b"
     },
     {
+      "path": "conformance/al2-vate-v0.3/cases/allow-mcp-oauth-token-authority-bound.json",
+      "sha256": "27c7ee306d90a89a494413fd450fc2b894a1f5e4850ee8fb436a44c8cc2012a9"
+    },
+    {
       "path": "conformance/al2-vate-v0.3/cases/allow-mcp-oauth-transport-bound.json",
       "sha256": "9723455a5ec9f8941553796f8ba1b800090f08af9ac97c1619af965e1a5060d6"
     },
     {
+      "path": "conformance/al2-vate-v0.3/cases/allow-mcp-tool-class-aligned.json",
+      "sha256": "a3979343754ed92910310f78b3173fbbe7cbcdcbd83e70b52bb12e897ade35a3"
+    },
+    {
       "path": "conformance/al2-vate-v0.3/cases/allow-replay-state-unused.json",
       "sha256": "324d6feb59f867e2f86ed89762f62a8319157a073e6e762791566eed037ceea6"
+    },
+    {
+      "path": "conformance/al2-vate-v0.3/cases/allow-resource-indicator-aligned.json",
+      "sha256": "9c04fc00d3e98833faf48d4babfd587933edf7e9090134ddf34485628cb155a2"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-status-fresh-at-boundary.json",
@@ -2040,6 +2119,18 @@
       "sha256": "8855d35a43aeb1cd6e0211e974587999f5d176d2a8b4fb20b968c20b311ba920"
     },
     {
+      "path": "examples/receipts/admission-allow-mcp-oauth-resource-indicator-aligned.example.json",
+      "sha256": "d1e584a1259acf2ba85747535e46c619a3630c259f189948cb1a23fb3db0c3b6"
+    },
+    {
+      "path": "examples/receipts/admission-allow-mcp-oauth-token-authority-bound.example.json",
+      "sha256": "2a044a7725fd4654b32612f60f00392591a58ffd5e1e11ffb3305271d1c63e79"
+    },
+    {
+      "path": "examples/receipts/admission-allow-mcp-oauth-tool-class-aligned.example.json",
+      "sha256": "420c98e3e4ca170b928c90d6200318733aa88fa4d5d78945d240c41cfc68c261"
+    },
+    {
       "path": "examples/receipts/admission-allow-policy-snapshot.example.json",
       "sha256": "0a67a7d778c3ec8f87dfce648a631f92606cb31d178741b395207436e9a98930"
     },
@@ -2181,7 +2272,7 @@
     },
     {
       "path": "examples/receipts/admission-deny-resource-indicator-drift.example.json",
-      "sha256": "1b12512e11247e85d1bae055da21677da7ed23ac167778ba03566f0f3e6f04ef"
+      "sha256": "049f4bc7f77364696d00da5cdfa329af25aa85e83f5adfe092a3d8e965dbbf05"
     },
     {
       "path": "examples/receipts/admission-deny-runtime-mismatch.example.json",
@@ -2209,7 +2300,7 @@
     },
     {
       "path": "examples/receipts/admission-deny-token-passthrough-as-authority.example.json",
-      "sha256": "22b33923b8d0134894518da41dc7f4ab24d36336250d465290bd0d2e7c7ab05f"
+      "sha256": "2307c223cfdf707d2b297d775c85febf49b8a49e515d833581fe279f1b406936"
     },
     {
       "path": "examples/receipts/admission-deny-trust-anchor-expired.example.json",
@@ -2276,12 +2367,24 @@
       "sha256": "29d9a7b6224d6870f496e007e2871941b70830d07962cc68b7e0b0fe5861b6c8"
     },
     {
+      "path": "examples/transport/mcp-oauth-resource-indicator-aligned-admission-request.example.json",
+      "sha256": "94487db75ad56444bc5d209ef5c941c3e294ee4ab74ab95ab0d656448e997f1b"
+    },
+    {
       "path": "examples/transport/mcp-oauth-resource-indicator-drift-admission-request.example.json",
-      "sha256": "6a25616d9b70aa07359b0a2de0b0f0b5a37dfff60d44ef7dd6563c174fd21997"
+      "sha256": "94269d4415eddbbca1101f31fd5bff7e1a1e07d2cecd38657a5e648309973605"
+    },
+    {
+      "path": "examples/transport/mcp-oauth-token-authority-bound-admission-request.example.json",
+      "sha256": "27fe8e9e5d2a232dada179b409ee5f0343964685458cb28a3f7fdaf2fb87ac61"
     },
     {
       "path": "examples/transport/mcp-oauth-token-passthrough-admission-request.example.json",
-      "sha256": "13c6b4ef50e2ec637750955240cdee8c22a96785c6b02135efc09978542f8b78"
+      "sha256": "5e33b6c041dbe414b06afb4f987e410266cc134191369ba5fc2a0185a7e95bbe"
+    },
+    {
+      "path": "examples/transport/mcp-oauth-tool-class-aligned-admission-request.example.json",
+      "sha256": "729f19fdf5631c0b1c4c325d94039bf988ef04497b51bf2f72571d941c7f17cd"
     },
     {
       "path": "examples/transport/mcp-oauth-tool-class-mismatch-admission-request.example.json",
@@ -2312,12 +2415,12 @@
     "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.3 --out conformance/al2-vate-v0.3/corpus.json"
   },
   "summary": {
-    "artifact_count": 188,
-    "case_count": 69,
+    "artifact_count": 197,
+    "case_count": 72,
     "category_counts": {
       "linkage": 12,
       "negative": 41,
-      "positive": 16
+      "positive": 19
     }
   },
   "version": "vate-conformance-corpus-2026-07"

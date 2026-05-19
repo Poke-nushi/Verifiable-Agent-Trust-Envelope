@@ -118,6 +118,10 @@ def iter_example_pairs() -> list[tuple[str, str]]:
     )
     pairs.extend(
         (str(path.relative_to(ROOT)), "schemas/admission-request.schema.json")
+        for path in sorted((ROOT / "examples" / "transport").glob("*admission-request*.json"))
+    )
+    pairs.extend(
+        (str(path.relative_to(ROOT)), "schemas/admission-request.schema.json")
         for path in sorted((ROOT / "examples" / "interop").glob("**/vate-admission-request*.json"))
     )
     pairs.extend(

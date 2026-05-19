@@ -165,6 +165,10 @@ def iter_example_pairs() -> list[tuple[str, str]]:
     )
     pairs.extend(
         (str(path.relative_to(ROOT)), "schemas/admission-request.schema.json")
+        for path in sorted((ROOT / "examples" / "transport").glob("*admission-request*.json"))
+    )
+    pairs.extend(
+        (str(path.relative_to(ROOT)), "schemas/admission-request.schema.json")
         for path in sorted((ROOT / "examples" / "interop").glob("**/vate-admission-request*.json"))
     )
     pairs.extend(
@@ -796,6 +800,12 @@ def check_transport_bound_fixture_coverage() -> None:
             "status_result": "token_present_without_authority",
             "request_checks": {
                 ("constraints", "transport", "oauth", "token_present"): True,
+                ("constraints", "transport", "oauth", "upstream_authorization"): "missing",
+                ("constraints", "transport", "oauth", "resource_binding"): "missing",
+            },
+            "receipt_checks": {
+                ("request", "transport", "oauth", "upstream_authorization"): "missing",
+                ("request", "transport", "oauth", "resource_binding"): "missing",
             },
             "forbidden_receipt_paths": [
                 ("request", "transport", "oauth", "access_token"),
@@ -814,6 +824,10 @@ def check_transport_bound_fixture_coverage() -> None:
             "status_result": "resource_indicator_mismatch",
             "request_checks": {
                 ("constraints", "transport", "oauth", "protected_resource"): "https://mcp.crm.example/resources/case-search",
+                ("requested_target_resource", "normalized"): "mcp://crm.example/tools/cases.update",
+            },
+            "receipt_checks": {
+                ("request", "requested_target_resource", "normalized"): "mcp://crm.example/tools/cases.update",
             },
             "forbidden_receipt_paths": [
                 ("evidence", 0, "verification", "full_token"),
@@ -868,6 +882,10 @@ def check_transport_bound_fixture_coverage() -> None:
             actual_value = value_at_path(request, path)
             if actual_value != expected_value:
                 raise RuntimeError(f"{case_id} must set {'.'.join(str(part) for part in path)} to {expected_value}")
+        for path, expected_value in requirements.get("receipt_checks", {}).items():
+            actual_value = value_at_path(receipt, path)
+            if actual_value != expected_value:
+                raise RuntimeError(f"{case_id} receipt must set {'.'.join(str(part) for part in path)} to {expected_value}")
         for path in requirements["forbidden_receipt_paths"]:
             if path_exists(receipt, path):
                 raise RuntimeError(f"{case_id} must not echo sensitive diagnostic data at {path}")
@@ -875,6 +893,121 @@ def check_transport_bound_fixture_coverage() -> None:
             actual_value = value_at_path(receipt, path)
             if actual_value != expected_value:
                 raise RuntimeError(f"{case_id} must mark {'.'.join(str(part) for part in path)} as {expected_value}")
+
+    def parse_fixture_time(value: object, *, label: str) -> datetime:
+        if not isinstance(value, str):
+            raise RuntimeError(f"{label} must be an RFC3339 timestamp string")
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+    positive_control_cases = {
+        "allow-mcp-oauth-token-authority-bound": {
+            "request_checks": {
+                ("constraints", "transport", "oauth", "token_present"): True,
+                ("constraints", "transport", "oauth", "upstream_authorization"): "matched",
+                ("constraints", "transport", "oauth", "resource_binding"): "matched",
+                ("constraints", "transport", "oauth", "resource"): "mcp://crm.example/tools/cases.update",
+                ("constraints", "transport", "mcp", "requested_tool_class"): "write",
+            },
+            "receipt_checks": {
+                ("request", "transport", "oauth", "upstream_authorization"): "matched",
+                ("request", "transport", "oauth", "resource_binding"): "matched",
+                ("request", "transport", "oauth", "resource"): "mcp://crm.example/tools/cases.update",
+                ("request", "transport", "mcp", "requested_tool_class"): "write",
+            },
+        },
+        "allow-resource-indicator-aligned": {
+            "request_checks": {
+                ("requested_target_resource", "normalized"): "mcp://crm.example/tools/cases.update",
+                ("constraints", "transport", "oauth", "resource"): "mcp://crm.example/tools/cases.update",
+                ("constraints", "transport", "oauth", "protected_resource"): "mcp://crm.example/tools/cases.update",
+                ("constraints", "transport", "oauth", "resource_binding"): "matched",
+                ("constraints", "transport", "mcp", "requested_tool_class"): "write",
+            },
+            "receipt_checks": {
+                ("request", "requested_target_resource", "normalized"): "mcp://crm.example/tools/cases.update",
+                ("request", "transport", "oauth", "resource"): "mcp://crm.example/tools/cases.update",
+                ("request", "transport", "oauth", "protected_resource"): "mcp://crm.example/tools/cases.update",
+                ("request", "transport", "oauth", "resource_binding"): "matched",
+                ("request", "transport", "mcp", "requested_tool_class"): "write",
+            },
+        },
+        "allow-mcp-tool-class-aligned": {
+            "request_checks": {
+                ("constraints", "transport", "oauth", "resource"): "mcp://crm.example/tools/cases.update",
+                ("constraints", "transport", "mcp", "authorized_tool"): "cases.update",
+                ("constraints", "transport", "mcp", "authorized_tool_class"): "write",
+                ("constraints", "transport", "mcp", "requested_tool"): "cases.update",
+                ("constraints", "transport", "mcp", "requested_tool_class"): "write",
+            },
+            "receipt_checks": {
+                ("request", "transport", "oauth", "resource"): "mcp://crm.example/tools/cases.update",
+                ("request", "transport", "mcp", "authorized_tool"): "cases.update",
+                ("request", "transport", "mcp", "authorized_tool_class"): "write",
+                ("request", "transport", "mcp", "requested_tool"): "cases.update",
+                ("request", "transport", "mcp", "requested_tool_class"): "write",
+            },
+        },
+    }
+    for case_id, requirements in positive_control_cases.items():
+        positive_case_path = case_dir / f"{case_id}.json"
+        if not positive_case_path.exists():
+            raise RuntimeError(f"MCP/OAuth positive-control coverage is missing {case_id}")
+
+        positive_case = json.loads(positive_case_path.read_text(encoding="utf-8"))
+        positive_artifacts = positive_case.get("artifacts", {})
+        request = json.loads((ROOT / positive_artifacts["admission_request"]).read_text(encoding="utf-8"))
+        receipt = json.loads((ROOT / positive_artifacts["admission_receipt"]).read_text(encoding="utf-8"))
+
+        if positive_case.get("category") != "positive":
+            raise RuntimeError(f"{case_id} must be a positive-control case")
+        expected = positive_case.get("expected", {})
+        if expected.get("admission_decision") != "allow" or expected.get("should_execute") is not True:
+            raise RuntimeError(f"{case_id} must allow execution as a positive control")
+        if expected.get("reason_codes") != ["EVIDENCE_VERIFIED", "POLICY_MATCH"]:
+            raise RuntimeError(f"{case_id} expected.reason_codes must be EVIDENCE_VERIFIED then POLICY_MATCH")
+        if receipt.get("decision", {}).get("outcome") != "allow":
+            raise RuntimeError(f"{case_id} receipt must allow")
+        if receipt.get("decision", {}).get("reason_codes") != ["EVIDENCE_VERIFIED", "POLICY_MATCH"]:
+            raise RuntimeError(f"{case_id} receipt reason_codes must be EVIDENCE_VERIFIED then POLICY_MATCH")
+
+        if receipt.get("subject", {}).get("actor") != request.get("actor"):
+            raise RuntimeError(f"{case_id} must keep actor aligned between request and receipt")
+        if receipt.get("subject", {}).get("principal") != request.get("principal"):
+            raise RuntimeError(f"{case_id} must keep principal aligned between request and receipt")
+        if receipt.get("subject", {}).get("runtime") != request.get("runtime"):
+            raise RuntimeError(f"{case_id} must keep runtime aligned between request and receipt")
+        if receipt.get("request", {}).get("target_resource") != request.get("target", {}).get("resource"):
+            raise RuntimeError(f"{case_id} must keep target resource aligned between request and receipt")
+        if receipt.get("request", {}).get("action") != request.get("action"):
+            raise RuntimeError(f"{case_id} must keep action aligned between request and receipt")
+
+        for path, expected_value in requirements["request_checks"].items():
+            actual_value = value_at_path(request, path)
+            if actual_value != expected_value:
+                raise RuntimeError(f"{case_id} must set {'.'.join(str(part) for part in path)} to {expected_value}")
+        for path, expected_value in requirements["receipt_checks"].items():
+            actual_value = value_at_path(receipt, path)
+            if actual_value != expected_value:
+                raise RuntimeError(f"{case_id} receipt must set {'.'.join(str(part) for part in path)} to {expected_value}")
+
+        request_issued_at = parse_fixture_time(request.get("issued_at"), label=f"{case_id} request.issued_at")
+        request_expires_at = parse_fixture_time(request.get("expires_at"), label=f"{case_id} request.expires_at")
+        receipt_issued_at = parse_fixture_time(receipt.get("issued_at"), label=f"{case_id} receipt.issued_at")
+        receipt_expires_at = parse_fixture_time(receipt.get("expires_at"), label=f"{case_id} receipt.expires_at")
+        if receipt_expires_at != request_expires_at:
+            raise RuntimeError(f"{case_id} must preserve the request freshness window in the receipt")
+        if not request_issued_at <= receipt_issued_at <= request_expires_at:
+            raise RuntimeError(f"{case_id} receipt issuance must fall inside the request freshness window")
+        for index, evidence in enumerate(receipt.get("evidence", [])):
+            verification = evidence.get("verification", {})
+            if verification.get("result") != "verified":
+                raise RuntimeError(f"{case_id} evidence[{index}] must be verified")
+            checked_at = parse_fixture_time(
+                verification.get("checked_at"),
+                label=f"{case_id} evidence[{index}].verification.checked_at",
+            )
+            if not request_issued_at <= checked_at <= request_expires_at:
+                raise RuntimeError(f"{case_id} evidence[{index}] check must fall inside the request freshness window")
 
 
 def check_status_freshness_boundary_coverage() -> None:

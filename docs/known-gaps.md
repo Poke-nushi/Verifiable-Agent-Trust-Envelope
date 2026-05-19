@@ -170,7 +170,8 @@ Remaining work includes:
 - adding more transport-bound fixtures only where they expose a distinct
   MCP/OAuth authority-confusion mode; the current fixtures already cover
   overscope, upstream scope denial, token passthrough, resource-indicator drift,
-  and MCP tool-class mismatch
+  MCP tool-class mismatch, and minimal positive controls for those focused
+  boundary cases
 
 ### 13. Post-Execution Linkage Needs Independent Implementation Evidence
 

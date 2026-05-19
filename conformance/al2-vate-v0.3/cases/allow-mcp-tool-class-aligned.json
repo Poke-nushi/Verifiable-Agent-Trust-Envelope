@@ -1,0 +1,55 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "allow-mcp-tool-class-aligned",
+  "title": "Allow aligned MCP tool class",
+  "category": "positive",
+  "purpose": "A verifier should allow an MCP OAuth-shaped request when upstream tool evidence and local policy agree on the same resource and side-effecting action class.",
+  "artifacts": {
+    "admission_request": "examples/transport/mcp-oauth-tool-class-aligned-admission-request.example.json",
+    "admission_receipt": "examples/receipts/admission-allow-mcp-oauth-tool-class-aligned.example.json"
+  },
+  "expected": {
+    "admission_decision": "allow",
+    "should_execute": true,
+    "reason_codes": [
+      "EVIDENCE_VERIFIED",
+      "POLICY_MATCH"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "pass"
+      },
+      {
+        "name": "request.transport.mcp.authorized_tool",
+        "expected": "present"
+      },
+      {
+        "name": "request.transport.mcp.authorized_tool_class",
+        "expected": "present"
+      },
+      {
+        "name": "request.transport.mcp.requested_tool",
+        "expected": "present"
+      },
+      {
+        "name": "request.transport.mcp.requested_tool_class",
+        "expected": "present"
+      },
+      {
+        "name": "request.target_resource",
+        "expected": "present"
+      },
+      {
+        "name": "evidence.verification.result",
+        "expected": "pass"
+      }
+    ]
+  },
+  "validation_focus": [
+    "MCP tool class binding",
+    "OAuth scope boundary",
+    "positive control"
+  ]
+}

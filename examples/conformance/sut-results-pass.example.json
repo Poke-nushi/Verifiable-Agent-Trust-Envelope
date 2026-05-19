@@ -2,7 +2,7 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "7951901d06fc6a7878cc10ec769fb02a3891532fbc73fb02aebac31800814c77"
+      "value": "ff57d6d70a592624989b9ac265e3aafbef5a66176198f485f93ff5b4c85a7956"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.3"
   },
@@ -80,6 +80,168 @@
         },
         {
           "name": "jose.signing_input",
+          "pass": true
+        }
+      ],
+      "outcome": "allow",
+      "reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "should_execute": true,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
+            "value": "2a044a7725fd4654b32612f60f00392591a58ffd5e1e11ffb3305271d1c63e79"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-allow-mcp-oauth-token-authority-bound.example.json"
+        }
+      },
+      "case_id": "allow-mcp-oauth-token-authority-bound",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "request.transport.oauth.token_present",
+          "pass": true
+        },
+        {
+          "name": "request.transport.oauth.upstream_authorization",
+          "pass": true
+        },
+        {
+          "name": "request.transport.oauth.resource_binding",
+          "pass": true
+        },
+        {
+          "name": "request.transport.oauth.resource",
+          "pass": true
+        },
+        {
+          "name": "request.target_resource",
+          "pass": true
+        },
+        {
+          "name": "request.transport.openid.subject",
+          "pass": true
+        },
+        {
+          "name": "request.transport.mcp.requested_tool_class",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.result",
+          "pass": true
+        }
+      ],
+      "outcome": "allow",
+      "reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "should_execute": true,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
+            "value": "420c98e3e4ca170b928c90d6200318733aa88fa4d5d78945d240c41cfc68c261"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-allow-mcp-oauth-tool-class-aligned.example.json"
+        }
+      },
+      "case_id": "allow-mcp-tool-class-aligned",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "request.transport.mcp.authorized_tool",
+          "pass": true
+        },
+        {
+          "name": "request.transport.mcp.authorized_tool_class",
+          "pass": true
+        },
+        {
+          "name": "request.transport.mcp.requested_tool",
+          "pass": true
+        },
+        {
+          "name": "request.transport.mcp.requested_tool_class",
+          "pass": true
+        },
+        {
+          "name": "request.target_resource",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.result",
+          "pass": true
+        }
+      ],
+      "outcome": "allow",
+      "reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "should_execute": true,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
+            "value": "d1e584a1259acf2ba85747535e46c619a3630c259f189948cb1a23fb3db0c3b6"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-allow-mcp-oauth-resource-indicator-aligned.example.json"
+        }
+      },
+      "case_id": "allow-resource-indicator-aligned",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "request.requested_target_resource.normalized",
+          "pass": true
+        },
+        {
+          "name": "request.transport.oauth.resource",
+          "pass": true
+        },
+        {
+          "name": "request.transport.oauth.protected_resource",
+          "pass": true
+        },
+        {
+          "name": "request.transport.oauth.resource_binding",
+          "pass": true
+        },
+        {
+          "name": "request.target_resource",
+          "pass": true
+        },
+        {
+          "name": "request.transport.mcp.requested_tool_class",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.result",
           "pass": true
         }
       ],
@@ -1690,7 +1852,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "22b33923b8d0134894518da41dc7f4ab24d36336250d465290bd0d2e7c7ab05f"
+            "value": "2307c223cfdf707d2b297d775c85febf49b8a49e515d833581fe279f1b406936"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-token-passthrough-as-authority.example.json"
@@ -1744,7 +1906,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "1b12512e11247e85d1bae055da21677da7ed23ac167778ba03566f0f3e6f04ef"
+            "value": "049f4bc7f77364696d00da5cdfa329af25aa85e83f5adfe092a3d8e965dbbf05"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-resource-indicator-drift.example.json"

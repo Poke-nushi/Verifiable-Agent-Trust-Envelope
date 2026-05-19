@@ -1,10 +1,10 @@
 {
   "version": "vate-0.3",
   "profile": "VATE-AL2-Verifier-Admission-v0.3",
-  "request_id": "areq-20260519-token-passthrough-001",
-  "transaction_id": "txn-20260519-token-passthrough-001",
-  "issued_at": "2026-05-19T10:00:00Z",
-  "expires_at": "2026-05-19T10:05:00Z",
+  "request_id": "areq-20260519-tool-class-aligned-001",
+  "transaction_id": "txn-20260519-tool-class-aligned-001",
+  "issued_at": "2026-05-19T10:50:00Z",
+  "expires_at": "2026-05-19T10:55:00Z",
   "action": "crm.case.update",
   "target": {
     "resource": "mcp://crm.example/tools/cases.update",
@@ -14,63 +14,71 @@
   "principal": "did:web:user.example",
   "runtime": "spiffe://agent.example/workload/case-agent",
   "audience": "https://mcp.crm.example",
-  "input_hash": "sha-256:37754d9b7e6241dac9bc6283f29cefe774d5299a236bd5d1e9028051c5b4f54f",
+  "input_hash": "sha-256:42191f3df8aead88e5545b31fe31b786192798626af74a4c6171b662fe7166f3",
   "constraints": {
     "transport": {
       "protocol": "mcp",
       "oauth": {
         "issuer": "https://auth.example",
         "audience": "https://mcp.crm.example",
-        "token_present": true,
-        "token_kind": "bearer",
-        "upstream_authorization": "missing",
-        "resource_binding": "missing",
-        "proof_of_possession": "none"
+        "resource": "mcp://crm.example/tools/cases.update",
+        "required_scope": "crm.case.update",
+        "scopes": [
+          "crm.case.update"
+        ],
+        "proof_of_possession": "dpop-jkt:base64url-thumbprint"
       },
       "openid": {
         "issuer": "https://auth.example",
         "subject": "did:web:user.example",
         "client_id": "did:web:agent.example"
+      },
+      "mcp": {
+        "authorized_tool": "cases.update",
+        "authorized_tool_class": "write",
+        "requested_tool": "cases.update",
+        "requested_tool_class": "write"
       }
     },
     "expected_runtime": "spiffe://agent.example/workload/case-agent",
     "tool_allowlist": [
       "cases.update"
     ],
-    "requested_tool": "cases.update"
+    "requested_tool": "cases.update",
+    "requested_tool_class": "write"
   },
   "correlation": {
-    "mcp_session_id": "mcp-session-deny-token-passthrough-as-authority",
-    "mcp_request_id": "mcp-req-deny-token-passthrough-as-authority"
+    "mcp_session_id": "mcp-session-allow-tool-class-aligned",
+    "mcp_request_id": "mcp-req-allow-tool-class-aligned"
   },
   "evidence_refs": [
     {
       "type": "oauth_access_token",
-      "uri": "https://auth.example/token-introspection/tok-20260519-token-passthrough-001",
+      "uri": "https://auth.example/token-introspection/tok-20260519-tool-class-aligned-001",
       "media_type": "application/oauth-token-introspection+json",
       "digest": {
         "alg": "sha-256",
-        "value": "9c9c5534f728aa479ea922db9bdf6aae84510503038ca4bacae85a5d4f0256dc"
+        "value": "e7fab3da94f782392e1b7f54ab78e1696faf5440b59fba02e30222d7a54f0b80"
       },
       "protocol_hint": "mcp-oauth"
     },
     {
       "type": "openid_subject",
-      "uri": "https://auth.example/openid/session/sub-20260519-token-passthrough-001",
+      "uri": "https://auth.example/openid/session/sub-20260519-tool-class-aligned-001",
       "media_type": "application/openid-connect-claims+json",
       "digest": {
         "alg": "sha-256",
-        "value": "0058687a3ded7e11a01f31b614069d803099760d36728b0f559eb6df18fa37e2"
+        "value": "05b04dc0c6984068f9a856ed182ba75e3da334b912359ea97c29fe4163c84010"
       },
       "protocol_hint": "openid-connect"
     },
     {
       "type": "runtime_attestation",
-      "uri": "https://agent.example/attestations/runtime/rp-20260519-token-passthrough-001",
+      "uri": "https://agent.example/attestations/runtime/rp-20260519-tool-class-aligned-001",
       "media_type": "application/vnd.spiffe.svid+jwt",
       "digest": {
         "alg": "sha-256",
-        "value": "ecf514696cc6ebed79062f9e4f5d146027c71e2357bd4528bb720e4e846964a4"
+        "value": "0752c2d1f5a17da8c87c90ec6d02d6494bda8506e25188c755297f4ad9b7ec3c"
       },
       "protocol_hint": "spiffe"
     }

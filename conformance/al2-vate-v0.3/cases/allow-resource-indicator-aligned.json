@@ -1,0 +1,59 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "allow-resource-indicator-aligned",
+  "title": "Allow aligned OAuth resource indicator",
+  "category": "positive",
+  "purpose": "A verifier should allow an MCP OAuth-shaped request when the normalized requested target resource and upstream resource indicator bind to the same admitted target.",
+  "artifacts": {
+    "admission_request": "examples/transport/mcp-oauth-resource-indicator-aligned-admission-request.example.json",
+    "admission_receipt": "examples/receipts/admission-allow-mcp-oauth-resource-indicator-aligned.example.json"
+  },
+  "expected": {
+    "admission_decision": "allow",
+    "should_execute": true,
+    "reason_codes": [
+      "EVIDENCE_VERIFIED",
+      "POLICY_MATCH"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "pass"
+      },
+      {
+        "name": "request.requested_target_resource.normalized",
+        "expected": "present"
+      },
+      {
+        "name": "request.transport.oauth.resource",
+        "expected": "present"
+      },
+      {
+        "name": "request.transport.oauth.protected_resource",
+        "expected": "present"
+      },
+      {
+        "name": "request.transport.oauth.resource_binding",
+        "expected": "present"
+      },
+      {
+        "name": "request.target_resource",
+        "expected": "present"
+      },
+      {
+        "name": "request.transport.mcp.requested_tool_class",
+        "expected": "present"
+      },
+      {
+        "name": "evidence.verification.result",
+        "expected": "pass"
+      }
+    ]
+  },
+  "validation_focus": [
+    "OAuth resource indicator binding",
+    "MCP target resource binding",
+    "positive control"
+  ]
+}

@@ -148,6 +148,10 @@ Current cases:
 - `deny-token-passthrough-as-authority`: token presence alone is not admission authority
 - `deny-resource-indicator-drift`: OAuth resource indicators must bind to the admitted target
 - `deny-mcp-tool-class-mismatch`: read/search MCP evidence must not become write/execute authority
+- `allow-mcp-oauth-token-authority-bound`, `allow-resource-indicator-aligned`,
+  and `allow-mcp-tool-class-aligned`: minimal positive controls showing the
+  corresponding boundary fields aligned on actor, resource, action class, and
+  freshness window
 - `post-exec-linkage-success`: post-execution receipt links to the admitted effective request hash
 
 Remaining useful cases:

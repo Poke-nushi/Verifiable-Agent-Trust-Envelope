@@ -10,6 +10,9 @@ This file records dated public changes to the discussion draft.
 - Added typed denial reason codes for those authority-confusion cases and kept
   denial diagnostics redacted from full token, tool payload, and prompt-like
   resource-description data.
+- Added paired positive-control fixtures for the token authority, resource
+  indicator, and MCP tool-class cases so reviewers can distinguish boundary
+  mismatches from blanket fail-closed treatment.
 
 ## 2026-05-14
 
