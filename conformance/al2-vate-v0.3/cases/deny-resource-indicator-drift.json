@@ -1,0 +1,65 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "deny-resource-indicator-drift",
+  "title": "Deny OAuth resource indicator drift",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when OAuth audience appears plausible but the protected resource or resource indicator maps to a different target than the external action being admitted.",
+  "artifacts": {
+    "admission_request": "examples/transport/mcp-oauth-resource-indicator-drift-admission-request.example.json",
+    "admission_receipt": "examples/receipts/admission-deny-resource-indicator-drift.example.json"
+  },
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "RESOURCE_INDICATOR_MISMATCH",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "request.transport.oauth.resource",
+        "expected": "present"
+      },
+      {
+        "name": "request.transport.oauth.protected_resource",
+        "expected": "present"
+      },
+      {
+        "name": "request.target_resource",
+        "expected": "present"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      },
+      {
+        "name": "admission_receipt.evidence[0].verification.diagnostic_code",
+        "expected": "present"
+      },
+      {
+        "name": "admission_receipt.evidence[0].verification.full_token",
+        "expected": "absent"
+      },
+      {
+        "name": "admission_receipt.evidence[0].verification.tool_payload",
+        "expected": "absent"
+      },
+      {
+        "name": "admission_receipt.evidence[0].verification.prompt",
+        "expected": "absent"
+      }
+    ]
+  },
+  "validation_focus": [
+    "OAuth resource indicator binding",
+    "MCP target resource binding",
+    "authority intersection",
+    "diagnostic redaction",
+    "fail closed"
+  ]
+}

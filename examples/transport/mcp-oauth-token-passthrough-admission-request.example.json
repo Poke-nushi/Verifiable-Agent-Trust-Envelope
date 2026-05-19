@@ -1,0 +1,76 @@
+{
+  "version": "vate-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "request_id": "areq-20260519-token-passthrough-001",
+  "transaction_id": "txn-20260519-token-passthrough-001",
+  "issued_at": "2026-05-19T10:00:00Z",
+  "expires_at": "2026-05-19T10:05:00Z",
+  "action": "crm.case.update",
+  "target": {
+    "resource": "mcp://crm.example/tools/cases.update",
+    "audience": "https://mcp.crm.example"
+  },
+  "actor": "did:web:agent.example",
+  "principal": "did:web:user.example",
+  "runtime": "spiffe://agent.example/workload/case-agent",
+  "audience": "https://mcp.crm.example",
+  "input_hash": "sha-256:37754d9b7e6241dac9bc6283f29cefe774d5299a236bd5d1e9028051c5b4f54f",
+  "constraints": {
+    "transport": {
+      "protocol": "mcp",
+      "oauth": {
+        "issuer": "https://auth.example",
+        "audience": "https://mcp.crm.example",
+        "token_present": true,
+        "token_kind": "bearer",
+        "proof_of_possession": "none"
+      },
+      "openid": {
+        "issuer": "https://auth.example",
+        "subject": "did:web:user.example",
+        "client_id": "did:web:agent.example"
+      }
+    },
+    "expected_runtime": "spiffe://agent.example/workload/case-agent",
+    "tool_allowlist": [
+      "cases.update"
+    ],
+    "requested_tool": "cases.update"
+  },
+  "correlation": {
+    "mcp_session_id": "mcp-session-deny-token-passthrough-as-authority",
+    "mcp_request_id": "mcp-req-deny-token-passthrough-as-authority"
+  },
+  "evidence_refs": [
+    {
+      "type": "oauth_access_token",
+      "uri": "https://auth.example/token-introspection/tok-20260519-token-passthrough-001",
+      "media_type": "application/oauth-token-introspection+json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "9c9c5534f728aa479ea922db9bdf6aae84510503038ca4bacae85a5d4f0256dc"
+      },
+      "protocol_hint": "mcp-oauth"
+    },
+    {
+      "type": "openid_subject",
+      "uri": "https://auth.example/openid/session/sub-20260519-token-passthrough-001",
+      "media_type": "application/openid-connect-claims+json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "0058687a3ded7e11a01f31b614069d803099760d36728b0f559eb6df18fa37e2"
+      },
+      "protocol_hint": "openid-connect"
+    },
+    {
+      "type": "runtime_attestation",
+      "uri": "https://agent.example/attestations/runtime/rp-20260519-token-passthrough-001",
+      "media_type": "application/vnd.spiffe.svid+jwt",
+      "digest": {
+        "alg": "sha-256",
+        "value": "ecf514696cc6ebed79062f9e4f5d146027c71e2357bd4528bb720e4e846964a4"
+      },
+      "protocol_hint": "spiffe"
+    }
+  ]
+}

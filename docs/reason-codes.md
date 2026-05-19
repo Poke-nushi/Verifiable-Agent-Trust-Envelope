@@ -66,6 +66,9 @@ Implementations MAY include additional profile-specific reason codes, but the ca
 
 - `ACTION_NOT_PERMITTED` - requested action exceeded the permit, upstream authorization evidence, or local policy
 - `TARGET_NOT_PERMITTED` - target resource exceeded the permit, upstream authorization evidence, or local policy
+- `TOKEN_AUTHORITY_INSUFFICIENT` - token presence did not provide matching verifier-consumed authority for the requested action
+- `RESOURCE_INDICATOR_MISMATCH` - OAuth resource or protected-resource indicator did not match the requested target resource
+- `TOOL_CLASS_MISMATCH` - upstream tool evidence authorized a different tool class than the requested side-effecting action
 - `POLICY_DENIED` - local verifier policy denied the request
 - `POLICY_SNAPSHOT_MISMATCH` - policy snapshot digest did not match the referenced policy basis
 - `POST_EXEC_LINKAGE_MISMATCH` - post-execution receipt did not link to the admitted effective request

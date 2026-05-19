@@ -2,7 +2,7 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "7b01b5f3d7cf8ce559da41aad5ca31c7cf5ef430ea1eda64f244c029e5d8582f"
+      "value": "7951901d06fc6a7878cc10ec769fb02a3891532fbc73fb02aebac31800814c77"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.3"
   },
@@ -1680,6 +1680,176 @@
       "outcome": "deny",
       "reason_codes": [
         "ACTION_NOT_PERMITTED",
+        "FAIL_CLOSED"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
+            "value": "22b33923b8d0134894518da41dc7f4ab24d36336250d465290bd0d2e7c7ab05f"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-deny-token-passthrough-as-authority.example.json"
+        }
+      },
+      "case_id": "deny-token-passthrough-as-authority",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "request.transport.oauth.token_present",
+          "pass": true
+        },
+        {
+          "name": "request.transport.oauth.access_token",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.evidence[0].verification.diagnostic_code",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.evidence[0].verification.full_token",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.evidence[0].verification.tool_payload",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.evidence[0].verification.prompt",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "TOKEN_AUTHORITY_INSUFFICIENT",
+        "FAIL_CLOSED"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
+            "value": "1b12512e11247e85d1bae055da21677da7ed23ac167778ba03566f0f3e6f04ef"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-deny-resource-indicator-drift.example.json"
+        }
+      },
+      "case_id": "deny-resource-indicator-drift",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "request.transport.oauth.resource",
+          "pass": true
+        },
+        {
+          "name": "request.transport.oauth.protected_resource",
+          "pass": true
+        },
+        {
+          "name": "request.target_resource",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.evidence[0].verification.diagnostic_code",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.evidence[0].verification.full_token",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.evidence[0].verification.tool_payload",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.evidence[0].verification.prompt",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "RESOURCE_INDICATOR_MISMATCH",
+        "FAIL_CLOSED"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "admission_receipt": {
+          "digest": {
+            "alg": "sha-256",
+            "value": "0dc5ead7a649b96174ee9d42bbc57896a5e2cde91beb00b4b70eca821099575a"
+          },
+          "media_type": "application/vate-admission-receipt+json",
+          "uri": "examples/receipts/admission-deny-mcp-tool-class-mismatch.example.json"
+        }
+      },
+      "case_id": "deny-mcp-tool-class-mismatch",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "request.transport.mcp.authorized_tool_class",
+          "pass": true
+        },
+        {
+          "name": "request.transport.mcp.requested_tool_class",
+          "pass": true
+        },
+        {
+          "name": "request.target_resource",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.evidence[0].verification.diagnostic_code",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.evidence[0].verification.full_token",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.evidence[0].verification.tool_payload",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.evidence[0].verification.prompt",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "TOOL_CLASS_MISMATCH",
         "FAIL_CLOSED"
       ],
       "should_execute": false,

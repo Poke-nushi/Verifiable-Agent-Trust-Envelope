@@ -15,6 +15,8 @@ The corpus makes the v0.3 draft easier to evaluate by naming the minimum expecte
 - deny an expired permit
 - deny an audience mismatch
 - deny an MCP/OAuth request that would widen upstream tool authority
+- deny MCP/OAuth requests where token presence, resource indicators, or tool
+  classes do not jointly authorize the same target action
 - deny stale runtime proof before policy or attenuation can admit execution
 - deny stale, revoked, replayed, tampered, mismatched, and untrusted inputs
 - consume AP2 Human Not Present payment-authority evidence without redefining AP2
@@ -54,6 +56,9 @@ array condition while keeping `SCHEMA_INVALID` as the normative reason code.
 - `cases/deny-empty-evidence-refs.json`
 - `cases/deny-mcp-oauth-overscope.json`
 - `cases/deny-mcp-oauth-upstream-denied.json`
+- `cases/deny-token-passthrough-as-authority.json`
+- `cases/deny-resource-indicator-drift.json`
+- `cases/deny-mcp-tool-class-mismatch.json`
 - `cases/deny-digest-mismatch.json`
 - `cases/deny-digest-mismatch-before-policy.json`
 - `cases/deny-jose-alg-none.json`

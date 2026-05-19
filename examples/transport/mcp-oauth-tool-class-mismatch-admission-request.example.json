@@ -1,0 +1,85 @@
+{
+  "version": "vate-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "request_id": "areq-20260519-tool-class-001",
+  "transaction_id": "txn-20260519-tool-class-001",
+  "issued_at": "2026-05-19T10:20:00Z",
+  "expires_at": "2026-05-19T10:25:00Z",
+  "action": "crm.case.update",
+  "target": {
+    "resource": "mcp://crm.example/tools/cases.update",
+    "audience": "https://mcp.crm.example"
+  },
+  "actor": "did:web:agent.example",
+  "principal": "did:web:user.example",
+  "runtime": "spiffe://agent.example/workload/case-agent",
+  "audience": "https://mcp.crm.example",
+  "input_hash": "sha-256:0ae4bf236da87ccda029fb4ded1745b02a6d55eb305c3d81ae51cc5f581a028a",
+  "constraints": {
+    "transport": {
+      "protocol": "mcp",
+      "oauth": {
+        "issuer": "https://auth.example",
+        "audience": "https://mcp.crm.example",
+        "resource": "mcp://crm.example/tools/cases.update",
+        "scopes": [
+          "crm.case.read"
+        ],
+        "proof_of_possession": "dpop-jkt:base64url-thumbprint"
+      },
+      "openid": {
+        "issuer": "https://auth.example",
+        "subject": "did:web:user.example",
+        "client_id": "did:web:agent.example"
+      },
+      "mcp": {
+        "authorized_tool": "cases.search",
+        "authorized_tool_class": "read",
+        "requested_tool": "cases.update",
+        "requested_tool_class": "write"
+      }
+    },
+    "expected_runtime": "spiffe://agent.example/workload/case-agent",
+    "tool_allowlist": [
+      "cases.update"
+    ],
+    "requested_tool": "cases.update",
+    "requested_tool_class": "write"
+  },
+  "correlation": {
+    "mcp_session_id": "mcp-session-deny-mcp-tool-class-mismatch",
+    "mcp_request_id": "mcp-req-deny-mcp-tool-class-mismatch"
+  },
+  "evidence_refs": [
+    {
+      "type": "oauth_access_token",
+      "uri": "https://auth.example/token-introspection/tok-20260519-tool-class-001",
+      "media_type": "application/oauth-token-introspection+json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "fb4da02fb1085b3b6538d0374483bae66f360ce9a3f1538b12dc4f058e6ec19e"
+      },
+      "protocol_hint": "mcp-oauth"
+    },
+    {
+      "type": "openid_subject",
+      "uri": "https://auth.example/openid/session/sub-20260519-tool-class-001",
+      "media_type": "application/openid-connect-claims+json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "da934d069dce3ead7c47da1b32abe728eb06892a38521751e8c4f745c3a7f1a3"
+      },
+      "protocol_hint": "openid-connect"
+    },
+    {
+      "type": "runtime_attestation",
+      "uri": "https://agent.example/attestations/runtime/rp-20260519-tool-class-001",
+      "media_type": "application/vnd.spiffe.svid+jwt",
+      "digest": {
+        "alg": "sha-256",
+        "value": "fb1248fea0ed43e64967fe8f68bff08922f7dffea349cb9abc168b13c6dfd097"
+      },
+      "protocol_hint": "spiffe"
+    }
+  ]
+}

@@ -167,10 +167,10 @@ Remaining work includes:
   adapter behavior and post-execution receipt validation
 - adding more fixtures where an admission decision exists but execution must not
   proceed
-- adding more transport-bound fixtures that prove VATE never widens MCP/OAuth
-  authority beyond the intersection of upstream authorization and local verifier
-  policy; the initial MCP/OAuth denial fixtures are
-  `deny-mcp-oauth-overscope` and `deny-mcp-oauth-upstream-denied`
+- adding more transport-bound fixtures only where they expose a distinct
+  MCP/OAuth authority-confusion mode; the current fixtures already cover
+  overscope, upstream scope denial, token passthrough, resource-indicator drift,
+  and MCP tool-class mismatch
 
 ### 13. Post-Execution Linkage Needs Independent Implementation Evidence
 

@@ -1,0 +1,61 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "deny-token-passthrough-as-authority",
+  "title": "Deny token passthrough as admission authority",
+  "category": "negative",
+  "purpose": "A verifier should fail closed when a bearer or access token is merely present but no matching resource, audience, or tool authorization evidence supports the requested action.",
+  "artifacts": {
+    "admission_request": "examples/transport/mcp-oauth-token-passthrough-admission-request.example.json",
+    "admission_receipt": "examples/receipts/admission-deny-token-passthrough-as-authority.example.json"
+  },
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "TOKEN_AUTHORITY_INSUFFICIENT",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "request.transport.oauth.token_present",
+        "expected": "present"
+      },
+      {
+        "name": "request.transport.oauth.access_token",
+        "expected": "absent"
+      },
+      {
+        "name": "evidence.verification.failure_reason",
+        "expected": "present"
+      },
+      {
+        "name": "admission_receipt.evidence[0].verification.diagnostic_code",
+        "expected": "present"
+      },
+      {
+        "name": "admission_receipt.evidence[0].verification.full_token",
+        "expected": "absent"
+      },
+      {
+        "name": "admission_receipt.evidence[0].verification.tool_payload",
+        "expected": "absent"
+      },
+      {
+        "name": "admission_receipt.evidence[0].verification.prompt",
+        "expected": "absent"
+      }
+    ]
+  },
+  "validation_focus": [
+    "MCP transport binding",
+    "OAuth token passthrough boundary",
+    "authority intersection",
+    "diagnostic redaction",
+    "fail closed"
+  ]
+}

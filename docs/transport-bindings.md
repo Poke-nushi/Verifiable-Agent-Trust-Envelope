@@ -172,6 +172,19 @@ the request when the OAuth token lacks the action scope:
 - `examples/receipts/admission-deny-mcp-oauth-upstream-denied.example.json`
 - `conformance/al2-vate-v0.3/cases/deny-mcp-oauth-upstream-denied.json`
 
+Additional negative fixtures keep the same boundary but split common authority
+confusion modes into smaller reviewable cases:
+
+- `examples/transport/mcp-oauth-token-passthrough-admission-request.example.json`
+- `examples/receipts/admission-deny-token-passthrough-as-authority.example.json`
+- `conformance/al2-vate-v0.3/cases/deny-token-passthrough-as-authority.json`
+- `examples/transport/mcp-oauth-resource-indicator-drift-admission-request.example.json`
+- `examples/receipts/admission-deny-resource-indicator-drift.example.json`
+- `conformance/al2-vate-v0.3/cases/deny-resource-indicator-drift.json`
+- `examples/transport/mcp-oauth-tool-class-mismatch-admission-request.example.json`
+- `examples/receipts/admission-deny-mcp-tool-class-mismatch.example.json`
+- `conformance/al2-vate-v0.3/cases/deny-mcp-tool-class-mismatch.json`
+
 The fixture treats OAuth and OpenID artifacts as verifier evidence.
 It does not define a new MCP authorization flow.
 The verifier-visible requirement is narrower:
@@ -181,6 +194,8 @@ The verifier-visible requirement is narrower:
 - the OpenID subject and client binding are visible
 - the runtime binding is preserved
 - the admission receipt records the evidence and local policy decision
+- denial diagnostics use typed reason codes and diagnostic tokens without
+  echoing full tokens, tool payloads, or prompt-like resource descriptions
 
 ---
 

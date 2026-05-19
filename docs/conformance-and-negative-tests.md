@@ -145,6 +145,9 @@ Current cases:
 - `attenuate`: requested amount or tool scope narrowed by policy or status
 - `deny-expired-permit`: permit validity window fails before admission
 - `deny-audience-mismatch`: permit or token audience does not match verifier
+- `deny-token-passthrough-as-authority`: token presence alone is not admission authority
+- `deny-resource-indicator-drift`: OAuth resource indicators must bind to the admitted target
+- `deny-mcp-tool-class-mismatch`: read/search MCP evidence must not become write/execute authority
 - `post-exec-linkage-success`: post-execution receipt links to the admitted effective request hash
 
 Remaining useful cases:

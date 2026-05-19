@@ -60,6 +60,9 @@ EXAMPLE_PAIRS = [
     ("examples/transport/mcp-oauth-admission-request.example.json", "schemas/admission-request.schema.json"),
     ("examples/transport/mcp-oauth-overscope-admission-request.example.json", "schemas/admission-request.schema.json"),
     ("examples/transport/mcp-oauth-upstream-denied-admission-request.example.json", "schemas/admission-request.schema.json"),
+    ("examples/transport/mcp-oauth-token-passthrough-admission-request.example.json", "schemas/admission-request.schema.json"),
+    ("examples/transport/mcp-oauth-resource-indicator-drift-admission-request.example.json", "schemas/admission-request.schema.json"),
+    ("examples/transport/mcp-oauth-tool-class-mismatch-admission-request.example.json", "schemas/admission-request.schema.json"),
     ("examples/a2a/metadata-admission-requested.json", "schemas/a2a-vate-metadata.schema.json"),
     (
         "examples/a2a/metadata-admission-requested-with-signed-agent-card.json",
@@ -125,6 +128,21 @@ EXAMPLE_PAIRS = [
         "conformance/al2-vate-v0.3/conformance-case.schema.json",
     ),
 ]
+
+
+def value_at_path(value: object, path: tuple[object, ...]) -> object:
+    current = value
+    for part in path:
+        current = current[part]  # type: ignore[index]
+    return current
+
+
+def path_exists(value: object, path: tuple[object, ...]) -> bool:
+    try:
+        value_at_path(value, path)
+        return True
+    except (KeyError, IndexError, TypeError):
+        return False
 
 
 def iter_example_pairs() -> list[tuple[str, str]]:
@@ -598,11 +616,10 @@ def check_al2_corpus_docs_synced() -> None:
         raise RuntimeError("v0.3.0 release notes implementer case-count text must preserve the archived count")
 
     release_notes = " ".join(V031_RELEASE_NOTES.read_text(encoding="utf-8").split())
-    case_count = len(case_paths)
-    if f"{case_count}-case AL2 v0.3 draft conformance corpus" not in release_notes:
-        raise RuntimeError("v0.3.1 release notes case-count summary is stale")
-    if f"{case_count} AL2 v0.3 cases" not in release_notes:
-        raise RuntimeError("v0.3.1 release notes implementer case-count text is stale")
+    if "66-case AL2 v0.3 draft conformance corpus" not in release_notes:
+        raise RuntimeError("v0.3.1 release notes must preserve the archived 66-case corpus count")
+    if "66 AL2 v0.3 cases" not in release_notes:
+        raise RuntimeError("v0.3.1 release notes implementer case-count text must preserve the archived count")
 
 
 def check_evidence_vocabulary_registry() -> None:
@@ -772,6 +789,92 @@ def check_transport_bound_fixture_coverage() -> None:
         raise RuntimeError("deny-mcp-oauth-upstream-denied must deny with ACTION_NOT_PERMITTED then FAIL_CLOSED")
     if "scope_missing" not in evidence_results:
         raise RuntimeError("deny-mcp-oauth-upstream-denied must record an OAuth scope_missing verification result")
+
+    required_cases = {
+        "deny-token-passthrough-as-authority": {
+            "reason_codes": ["TOKEN_AUTHORITY_INSUFFICIENT", "FAIL_CLOSED"],
+            "status_result": "token_present_without_authority",
+            "request_checks": {
+                ("constraints", "transport", "oauth", "token_present"): True,
+            },
+            "forbidden_receipt_paths": [
+                ("request", "transport", "oauth", "access_token"),
+                ("evidence", 0, "verification", "full_token"),
+                ("evidence", 0, "verification", "tool_payload"),
+                ("evidence", 0, "verification", "prompt"),
+            ],
+            "required_redaction": {
+                ("evidence", 0, "verification", "redaction", "token_material"): "omitted",
+                ("evidence", 0, "verification", "redaction", "tool_payload"): "omitted",
+                ("evidence", 0, "verification", "redaction", "resource_description"): "omitted",
+            },
+        },
+        "deny-resource-indicator-drift": {
+            "reason_codes": ["RESOURCE_INDICATOR_MISMATCH", "FAIL_CLOSED"],
+            "status_result": "resource_indicator_mismatch",
+            "request_checks": {
+                ("constraints", "transport", "oauth", "protected_resource"): "https://mcp.crm.example/resources/case-search",
+            },
+            "forbidden_receipt_paths": [
+                ("evidence", 0, "verification", "full_token"),
+                ("evidence", 0, "verification", "tool_payload"),
+                ("evidence", 0, "verification", "prompt"),
+            ],
+            "required_redaction": {
+                ("evidence", 0, "verification", "redaction", "token_material"): "omitted",
+                ("evidence", 0, "verification", "redaction", "tool_payload"): "omitted",
+                ("evidence", 0, "verification", "redaction", "resource_description"): "omitted",
+            },
+        },
+        "deny-mcp-tool-class-mismatch": {
+            "reason_codes": ["TOOL_CLASS_MISMATCH", "FAIL_CLOSED"],
+            "status_result": "tool_class_mismatch",
+            "request_checks": {
+                ("constraints", "transport", "mcp", "authorized_tool_class"): "read",
+                ("constraints", "transport", "mcp", "requested_tool_class"): "write",
+            },
+            "forbidden_receipt_paths": [
+                ("evidence", 0, "verification", "full_token"),
+                ("evidence", 0, "verification", "tool_payload"),
+                ("evidence", 0, "verification", "prompt"),
+            ],
+            "required_redaction": {
+                ("evidence", 0, "verification", "redaction", "token_material"): "omitted",
+                ("evidence", 0, "verification", "redaction", "tool_payload"): "omitted",
+                ("evidence", 0, "verification", "redaction", "resource_description"): "omitted",
+            },
+        },
+    }
+    for case_id, requirements in required_cases.items():
+        extra_case_path = case_dir / f"{case_id}.json"
+        if not extra_case_path.exists():
+            raise RuntimeError(f"MCP/OAuth authority-confusion coverage is missing {case_id}")
+        extra_case = json.loads(extra_case_path.read_text(encoding="utf-8"))
+        extra_artifacts = extra_case.get("artifacts", {})
+        request = json.loads((ROOT / extra_artifacts["admission_request"]).read_text(encoding="utf-8"))
+        receipt = json.loads((ROOT / extra_artifacts["admission_receipt"]).read_text(encoding="utf-8"))
+        if receipt.get("decision", {}).get("reason_codes") != requirements["reason_codes"]:
+            raise RuntimeError(f"{case_id} must use reason_codes {requirements['reason_codes']}")
+        if extra_case.get("expected", {}).get("reason_codes") != requirements["reason_codes"]:
+            raise RuntimeError(f"{case_id} expected.reason_codes must match the receipt")
+        status_results = [
+            item.get("verification", {}).get("status_result")
+            for item in receipt.get("evidence", [])
+            if item.get("type") == "oauth_access_token"
+        ]
+        if requirements["status_result"] not in status_results:
+            raise RuntimeError(f"{case_id} must record {requirements['status_result']} on OAuth evidence")
+        for path, expected_value in requirements["request_checks"].items():
+            actual_value = value_at_path(request, path)
+            if actual_value != expected_value:
+                raise RuntimeError(f"{case_id} must set {'.'.join(str(part) for part in path)} to {expected_value}")
+        for path in requirements["forbidden_receipt_paths"]:
+            if path_exists(receipt, path):
+                raise RuntimeError(f"{case_id} must not echo sensitive diagnostic data at {path}")
+        for path, expected_value in requirements["required_redaction"].items():
+            actual_value = value_at_path(receipt, path)
+            if actual_value != expected_value:
+                raise RuntimeError(f"{case_id} must mark {'.'.join(str(part) for part in path)} as {expected_value}")
 
 
 def check_status_freshness_boundary_coverage() -> None:

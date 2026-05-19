@@ -2,6 +2,15 @@
 
 This file records dated public changes to the discussion draft.
 
+## 2026-05-19
+
+- Added review-driven MCP/OAuth negative fixtures for token passthrough,
+  resource-indicator drift, and MCP tool-class mismatch while keeping VATE as a
+  verifier-side admission layer rather than an MCP/OAuth semantics replacement.
+- Added typed denial reason codes for those authority-confusion cases and kept
+  denial diagnostics redacted from full token, tool payload, and prompt-like
+  resource-description data.
+
 ## 2026-05-14
 
 - Started the v0.3.1 credibility and reviewability patch.

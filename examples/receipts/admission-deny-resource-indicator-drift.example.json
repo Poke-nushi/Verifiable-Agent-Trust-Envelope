@@ -1,0 +1,114 @@
+{
+  "version": "vate-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-20260519-resource-drift-001",
+  "issued_at": "2026-05-19T10:10:08Z",
+  "expires_at": "2026-05-19T10:15:00Z",
+  "verifier": {
+    "id": "did:web:verifier.example",
+    "key_id": "did:web:verifier.example#key-1"
+  },
+  "request": {
+    "request_id": "areq-20260519-resource-drift-001",
+    "transaction_id": "txn-20260519-resource-drift-001",
+    "action": "crm.case.update",
+    "input_hash": "sha-256:b8b222b7adcd95c57eea313f8d9ee1d3005b73b6b64e765e8bd366d56ff13ac0",
+    "audience": "https://mcp.crm.example",
+    "target_audience": "https://mcp.crm.example",
+    "target_resource": "mcp://crm.example/tools/cases.update",
+    "transport": {
+      "protocol": "mcp",
+      "oauth": {
+        "issuer": "https://auth.example",
+        "audience": "https://mcp.crm.example",
+        "resource": "mcp://crm.example/tools/cases.search",
+        "protected_resource": "https://mcp.crm.example/resources/case-search",
+        "proof_of_possession": "dpop-jkt:base64url-thumbprint"
+      },
+      "openid": {
+        "issuer": "https://auth.example",
+        "subject": "did:web:user.example",
+        "client_id": "did:web:agent.example"
+      }
+    }
+  },
+  "subject": {
+    "principal": "did:web:user.example",
+    "actor": "did:web:agent.example",
+    "runtime": "spiffe://agent.example/workload/case-agent"
+  },
+  "evidence": [
+    {
+      "type": "oauth_access_token",
+      "protocol_hint": "mcp-oauth",
+      "uri": "https://auth.example/token-introspection/tok-20260519-resource-drift-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "219e37389bfb3f30ea13509fa14d3dda5a8ffa036e4c631817a270419cb473c7"
+      },
+      "verification": {
+        "result": "failed",
+        "checked_at": "2026-05-19T10:10:01Z",
+        "method": "oauth-resource-indicator-binding-check",
+        "status_result": "resource_indicator_mismatch",
+        "failure_reason": "The OAuth audience is plausible, but the protected resource indicator resolves to case-search while the admitted target is cases.update.",
+        "diagnostic_code": "resource_indicator_drift",
+        "redaction": {
+          "token_material": "omitted",
+          "tool_payload": "omitted",
+          "resource_description": "omitted"
+        }
+      }
+    },
+    {
+      "type": "openid_subject",
+      "protocol_hint": "openid-connect",
+      "uri": "https://auth.example/openid/session/sub-20260519-resource-drift-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "5deaae9979fb9578d68db9e186a8e346a4b6efac0531122df75a5a5957997922"
+      },
+      "verification": {
+        "result": "verified",
+        "checked_at": "2026-05-19T10:10:02Z",
+        "method": "openid-claims-binding",
+        "status_result": "active"
+      }
+    },
+    {
+      "type": "runtime_attestation",
+      "protocol_hint": "spiffe",
+      "uri": "https://agent.example/attestations/runtime/rp-20260519-resource-drift-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "a67f4b05dc993f0a0824086798e029bdee54eedcaf29ba0d6c0071e6825a6867"
+      },
+      "verification": {
+        "result": "verified",
+        "checked_at": "2026-05-19T10:10:03Z",
+        "method": "workload-attestation",
+        "status_result": "active"
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "al2-mcp-crm-case-update",
+    "policy_version": "2026-05-19.1",
+    "policy_ref": "https://verifier.example/policies/al2-mcp-crm-case-update/2026-05-19.1"
+  },
+  "decision": {
+    "outcome": "deny",
+    "reason_codes": [
+      "RESOURCE_INDICATOR_MISMATCH",
+      "FAIL_CLOSED"
+    ],
+    "human_readable_summary": "The request is denied because the OAuth protected resource indicator does not match the MCP target resource being admitted."
+  },
+  "proof": {
+    "format": "detached_jws",
+    "alg": "ES256",
+    "kid": "did:web:verifier.example#key-1",
+    "signature_ref": "https://verifier.example/vate/signatures/admrec-20260519-resource-drift-001.jws"
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "version": "vate-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-20260519-token-passthrough-001",
+  "issued_at": "2026-05-19T10:00:08Z",
+  "expires_at": "2026-05-19T10:05:00Z",
+  "verifier": {
+    "id": "did:web:verifier.example",
+    "key_id": "did:web:verifier.example#key-1"
+  },
+  "request": {
+    "request_id": "areq-20260519-token-passthrough-001",
+    "transaction_id": "txn-20260519-token-passthrough-001",
+    "action": "crm.case.update",
+    "input_hash": "sha-256:37754d9b7e6241dac9bc6283f29cefe774d5299a236bd5d1e9028051c5b4f54f",
+    "audience": "https://mcp.crm.example",
+    "target_audience": "https://mcp.crm.example",
+    "target_resource": "mcp://crm.example/tools/cases.update",
+    "transport": {
+      "protocol": "mcp",
+      "oauth": {
+        "issuer": "https://auth.example",
+        "audience": "https://mcp.crm.example",
+        "token_present": true,
+        "token_kind": "bearer",
+        "proof_of_possession": "none"
+      },
+      "openid": {
+        "issuer": "https://auth.example",
+        "subject": "did:web:user.example",
+        "client_id": "did:web:agent.example"
+      }
+    }
+  },
+  "subject": {
+    "principal": "did:web:user.example",
+    "actor": "did:web:agent.example",
+    "runtime": "spiffe://agent.example/workload/case-agent"
+  },
+  "evidence": [
+    {
+      "type": "oauth_access_token",
+      "protocol_hint": "mcp-oauth",
+      "uri": "https://auth.example/token-introspection/tok-20260519-token-passthrough-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "9c9c5534f728aa479ea922db9bdf6aae84510503038ca4bacae85a5d4f0256dc"
+      },
+      "verification": {
+        "result": "failed",
+        "checked_at": "2026-05-19T10:00:01Z",
+        "method": "oauth-authority-binding-check",
+        "status_result": "token_present_without_authority",
+        "failure_reason": "The request presented an OAuth bearer token, but no matching resource or tool authorization evidence for crm.case.update was available to the verifier.",
+        "diagnostic_code": "token_passthrough_not_authority",
+        "redaction": {
+          "token_material": "omitted",
+          "tool_payload": "omitted",
+          "resource_description": "omitted"
+        }
+      }
+    },
+    {
+      "type": "openid_subject",
+      "protocol_hint": "openid-connect",
+      "uri": "https://auth.example/openid/session/sub-20260519-token-passthrough-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "0058687a3ded7e11a01f31b614069d803099760d36728b0f559eb6df18fa37e2"
+      },
+      "verification": {
+        "result": "verified",
+        "checked_at": "2026-05-19T10:00:02Z",
+        "method": "openid-claims-binding",
+        "status_result": "active"
+      }
+    },
+    {
+      "type": "runtime_attestation",
+      "protocol_hint": "spiffe",
+      "uri": "https://agent.example/attestations/runtime/rp-20260519-token-passthrough-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "ecf514696cc6ebed79062f9e4f5d146027c71e2357bd4528bb720e4e846964a4"
+      },
+      "verification": {
+        "result": "verified",
+        "checked_at": "2026-05-19T10:00:03Z",
+        "method": "workload-attestation",
+        "status_result": "active"
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "al2-mcp-crm-case-update",
+    "policy_version": "2026-05-19.1",
+    "policy_ref": "https://verifier.example/policies/al2-mcp-crm-case-update/2026-05-19.1"
+  },
+  "decision": {
+    "outcome": "deny",
+    "reason_codes": [
+      "TOKEN_AUTHORITY_INSUFFICIENT",
+      "FAIL_CLOSED"
+    ],
+    "human_readable_summary": "The request is denied because token presence alone is not verifier admission authority for the requested MCP action."
+  },
+  "proof": {
+    "format": "detached_jws",
+    "alg": "ES256",
+    "kid": "did:web:verifier.example#key-1",
+    "signature_ref": "https://verifier.example/vate/signatures/admrec-20260519-token-passthrough-001.jws"
+  }
+}
