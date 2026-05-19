@@ -800,12 +800,31 @@ def check_transport_bound_fixture_coverage() -> None:
             "status_result": "token_present_without_authority",
             "request_checks": {
                 ("constraints", "transport", "oauth", "token_present"): True,
+                ("constraints", "transport", "oauth", "resource"): "mcp://crm.example/tools/cases.update",
+                ("constraints", "transport", "oauth", "protected_resource"): "mcp://crm.example/tools/cases.update",
                 ("constraints", "transport", "oauth", "upstream_authorization"): "missing",
                 ("constraints", "transport", "oauth", "resource_binding"): "missing",
+                ("constraints", "transport", "oauth", "required_scope"): "crm.case.update",
+                ("constraints", "transport", "oauth", "scopes"): ["crm.case.update"],
+                ("constraints", "transport", "oauth", "proof_of_possession"): "dpop-jkt:base64url-thumbprint",
+                ("constraints", "transport", "mcp", "authorized_tool"): "cases.update",
+                ("constraints", "transport", "mcp", "authorized_tool_class"): "write",
+                ("constraints", "transport", "mcp", "requested_tool"): "cases.update",
+                ("constraints", "transport", "mcp", "requested_tool_class"): "write",
+                ("constraints", "requested_tool_class"): "write",
             },
             "receipt_checks": {
+                ("request", "transport", "oauth", "resource"): "mcp://crm.example/tools/cases.update",
+                ("request", "transport", "oauth", "protected_resource"): "mcp://crm.example/tools/cases.update",
                 ("request", "transport", "oauth", "upstream_authorization"): "missing",
                 ("request", "transport", "oauth", "resource_binding"): "missing",
+                ("request", "transport", "oauth", "required_scope"): "crm.case.update",
+                ("request", "transport", "oauth", "scopes"): ["crm.case.update"],
+                ("request", "transport", "oauth", "proof_of_possession"): "dpop-jkt:base64url-thumbprint",
+                ("request", "transport", "mcp", "authorized_tool"): "cases.update",
+                ("request", "transport", "mcp", "authorized_tool_class"): "write",
+                ("request", "transport", "mcp", "requested_tool"): "cases.update",
+                ("request", "transport", "mcp", "requested_tool_class"): "write",
             },
             "forbidden_receipt_paths": [
                 ("request", "transport", "oauth", "access_token"),
@@ -824,10 +843,25 @@ def check_transport_bound_fixture_coverage() -> None:
             "status_result": "resource_indicator_mismatch",
             "request_checks": {
                 ("constraints", "transport", "oauth", "protected_resource"): "https://mcp.crm.example/resources/case-search",
+                ("constraints", "transport", "oauth", "resource_binding"): "mismatched",
+                ("constraints", "transport", "oauth", "required_scope"): "crm.case.update",
+                ("constraints", "transport", "oauth", "scopes"): ["crm.case.update"],
+                ("constraints", "transport", "mcp", "authorized_tool"): "cases.update",
+                ("constraints", "transport", "mcp", "authorized_tool_class"): "write",
+                ("constraints", "transport", "mcp", "requested_tool"): "cases.update",
+                ("constraints", "transport", "mcp", "requested_tool_class"): "write",
                 ("requested_target_resource", "normalized"): "mcp://crm.example/tools/cases.update",
+                ("constraints", "requested_tool_class"): "write",
             },
             "receipt_checks": {
                 ("request", "requested_target_resource", "normalized"): "mcp://crm.example/tools/cases.update",
+                ("request", "transport", "oauth", "resource_binding"): "mismatched",
+                ("request", "transport", "oauth", "required_scope"): "crm.case.update",
+                ("request", "transport", "oauth", "scopes"): ["crm.case.update"],
+                ("request", "transport", "mcp", "authorized_tool"): "cases.update",
+                ("request", "transport", "mcp", "authorized_tool_class"): "write",
+                ("request", "transport", "mcp", "requested_tool"): "cases.update",
+                ("request", "transport", "mcp", "requested_tool_class"): "write",
             },
             "forbidden_receipt_paths": [
                 ("evidence", 0, "verification", "full_token"),
@@ -844,8 +878,14 @@ def check_transport_bound_fixture_coverage() -> None:
             "reason_codes": ["TOOL_CLASS_MISMATCH", "FAIL_CLOSED"],
             "status_result": "tool_class_mismatch",
             "request_checks": {
+                ("constraints", "transport", "oauth", "required_scope"): "crm.case.update",
+                ("constraints", "transport", "oauth", "scopes"): ["crm.case.update"],
                 ("constraints", "transport", "mcp", "authorized_tool_class"): "read",
                 ("constraints", "transport", "mcp", "requested_tool_class"): "write",
+            },
+            "receipt_checks": {
+                ("request", "transport", "oauth", "required_scope"): "crm.case.update",
+                ("request", "transport", "oauth", "scopes"): ["crm.case.update"],
             },
             "forbidden_receipt_paths": [
                 ("evidence", 0, "verification", "full_token"),
@@ -1008,6 +1048,222 @@ def check_transport_bound_fixture_coverage() -> None:
             )
             if not request_issued_at <= checked_at <= request_expires_at:
                 raise RuntimeError(f"{case_id} evidence[{index}] check must fall inside the request freshness window")
+
+    common_request_stable_paths = [
+        ("actor",),
+        ("principal",),
+        ("runtime",),
+        ("audience",),
+        ("action",),
+        ("target", "resource"),
+        ("target", "audience"),
+        ("issued_at",),
+        ("expires_at",),
+        ("constraints", "expected_runtime"),
+        ("constraints", "requested_tool"),
+        ("constraints", "requested_tool_class"),
+        ("constraints", "tool_allowlist"),
+    ]
+    common_receipt_stable_paths = [
+        ("subject", "actor"),
+        ("subject", "principal"),
+        ("subject", "runtime"),
+        ("request", "action"),
+        ("request", "target_resource"),
+        ("request", "target_audience"),
+        ("request", "transport", "mcp", "requested_tool"),
+        ("request", "transport", "mcp", "requested_tool_class"),
+        ("policy", "policy_id"),
+        ("policy", "policy_version"),
+        ("policy", "policy_ref"),
+        ("issued_at",),
+        ("expires_at",),
+    ]
+    authority_pairs = {
+        "mcp-oauth-token-authority": {
+            "negative": "deny-token-passthrough-as-authority",
+            "positive": "allow-mcp-oauth-token-authority-bound",
+            "mutation_axis": "oauth_authority_binding",
+            "request_stable_paths": common_request_stable_paths + [
+                ("constraints", "transport", "oauth", "issuer"),
+                ("constraints", "transport", "oauth", "audience"),
+                ("constraints", "transport", "oauth", "resource"),
+                ("constraints", "transport", "oauth", "protected_resource"),
+                ("constraints", "transport", "oauth", "token_present"),
+                ("constraints", "transport", "oauth", "token_kind"),
+                ("constraints", "transport", "oauth", "required_scope"),
+                ("constraints", "transport", "oauth", "scopes"),
+                ("constraints", "transport", "oauth", "proof_of_possession"),
+                ("constraints", "transport", "mcp", "authorized_tool"),
+                ("constraints", "transport", "mcp", "authorized_tool_class"),
+                ("constraints", "transport", "mcp", "requested_tool"),
+                ("constraints", "transport", "mcp", "requested_tool_class"),
+            ],
+            "receipt_stable_paths": common_receipt_stable_paths + [
+                ("request", "transport", "oauth", "issuer"),
+                ("request", "transport", "oauth", "audience"),
+                ("request", "transport", "oauth", "resource"),
+                ("request", "transport", "oauth", "protected_resource"),
+                ("request", "transport", "oauth", "token_present"),
+                ("request", "transport", "oauth", "token_kind"),
+                ("request", "transport", "oauth", "required_scope"),
+                ("request", "transport", "oauth", "scopes"),
+                ("request", "transport", "oauth", "proof_of_possession"),
+                ("request", "transport", "mcp", "authorized_tool"),
+                ("request", "transport", "mcp", "authorized_tool_class"),
+            ],
+            "request_mutations": [
+                (("constraints", "transport", "oauth", "upstream_authorization"), "missing", "matched"),
+                (("constraints", "transport", "oauth", "resource_binding"), "missing", "matched"),
+            ],
+            "receipt_mutations": [
+                (("request", "transport", "oauth", "upstream_authorization"), "missing", "matched"),
+                (("request", "transport", "oauth", "resource_binding"), "missing", "matched"),
+            ],
+        },
+        "mcp-oauth-resource-indicator": {
+            "negative": "deny-resource-indicator-drift",
+            "positive": "allow-resource-indicator-aligned",
+            "mutation_axis": "oauth_resource_indicator_binding",
+            "request_stable_paths": common_request_stable_paths + [
+                ("requested_target_resource", "normalized"),
+                ("constraints", "transport", "oauth", "issuer"),
+                ("constraints", "transport", "oauth", "audience"),
+                ("constraints", "transport", "oauth", "required_scope"),
+                ("constraints", "transport", "oauth", "scopes"),
+                ("constraints", "transport", "oauth", "proof_of_possession"),
+                ("constraints", "transport", "mcp", "authorized_tool"),
+                ("constraints", "transport", "mcp", "authorized_tool_class"),
+                ("constraints", "transport", "mcp", "requested_tool"),
+                ("constraints", "transport", "mcp", "requested_tool_class"),
+            ],
+            "receipt_stable_paths": common_receipt_stable_paths + [
+                ("request", "requested_target_resource", "normalized"),
+                ("request", "transport", "oauth", "issuer"),
+                ("request", "transport", "oauth", "audience"),
+                ("request", "transport", "oauth", "required_scope"),
+                ("request", "transport", "oauth", "scopes"),
+                ("request", "transport", "oauth", "proof_of_possession"),
+                ("request", "transport", "mcp", "authorized_tool"),
+                ("request", "transport", "mcp", "authorized_tool_class"),
+            ],
+            "request_mutations": [
+                (("constraints", "transport", "oauth", "resource"), "mcp://crm.example/tools/cases.search", "mcp://crm.example/tools/cases.update"),
+                (("constraints", "transport", "oauth", "protected_resource"), "https://mcp.crm.example/resources/case-search", "mcp://crm.example/tools/cases.update"),
+                (("constraints", "transport", "oauth", "resource_binding"), "mismatched", "matched"),
+            ],
+            "receipt_mutations": [
+                (("request", "transport", "oauth", "resource"), "mcp://crm.example/tools/cases.search", "mcp://crm.example/tools/cases.update"),
+                (("request", "transport", "oauth", "protected_resource"), "https://mcp.crm.example/resources/case-search", "mcp://crm.example/tools/cases.update"),
+                (("request", "transport", "oauth", "resource_binding"), "mismatched", "matched"),
+            ],
+        },
+        "mcp-oauth-tool-class": {
+            "negative": "deny-mcp-tool-class-mismatch",
+            "positive": "allow-mcp-tool-class-aligned",
+            "mutation_axis": "mcp_tool_class_binding",
+            "request_stable_paths": common_request_stable_paths + [
+                ("constraints", "transport", "oauth", "issuer"),
+                ("constraints", "transport", "oauth", "audience"),
+                ("constraints", "transport", "oauth", "resource"),
+                ("constraints", "transport", "oauth", "required_scope"),
+                ("constraints", "transport", "oauth", "scopes"),
+                ("constraints", "transport", "oauth", "proof_of_possession"),
+                ("constraints", "transport", "mcp", "requested_tool"),
+                ("constraints", "transport", "mcp", "requested_tool_class"),
+            ],
+            "receipt_stable_paths": common_receipt_stable_paths + [
+                ("request", "transport", "oauth", "issuer"),
+                ("request", "transport", "oauth", "audience"),
+                ("request", "transport", "oauth", "resource"),
+                ("request", "transport", "oauth", "required_scope"),
+                ("request", "transport", "oauth", "scopes"),
+                ("request", "transport", "oauth", "proof_of_possession"),
+            ],
+            "request_mutations": [
+                (("constraints", "transport", "mcp", "authorized_tool"), "cases.search", "cases.update"),
+                (("constraints", "transport", "mcp", "authorized_tool_class"), "read", "write"),
+            ],
+            "receipt_mutations": [
+                (("request", "transport", "mcp", "authorized_tool"), "cases.search", "cases.update"),
+                (("request", "transport", "mcp", "authorized_tool_class"), "read", "write"),
+            ],
+        },
+    }
+    corpus = json.loads((ROOT / "conformance" / "al2-vate-v0.3" / "corpus.json").read_text(encoding="utf-8"))
+    corpus_cases = {item.get("case_id"): item for item in corpus.get("cases", [])}
+    negative_inferred_authority_request_paths = [
+        ("request", "transport", "oauth", "inferred_resource_authority"),
+        ("request", "transport", "mcp", "inferred_tool_authority"),
+    ]
+    negative_inferred_authority_evidence_paths = [
+        ("verification", "inferred_resource_authority"),
+        ("verification", "inferred_tool_authority"),
+    ]
+    for pair_id, pair in authority_pairs.items():
+        negative_case = json.loads((case_dir / f"{pair['negative']}.json").read_text(encoding="utf-8"))
+        positive_case = json.loads((case_dir / f"{pair['positive']}.json").read_text(encoding="utf-8"))
+        negative_request = json.loads((ROOT / negative_case["artifacts"]["admission_request"]).read_text(encoding="utf-8"))
+        positive_request = json.loads((ROOT / positive_case["artifacts"]["admission_request"]).read_text(encoding="utf-8"))
+        negative_receipt = json.loads((ROOT / negative_case["artifacts"]["admission_receipt"]).read_text(encoding="utf-8"))
+        positive_receipt = json.loads((ROOT / positive_case["artifacts"]["admission_receipt"]).read_text(encoding="utf-8"))
+
+        expected_stable_fields = negative_case.get("pairing", {}).get("stable_fields")
+        expected_mutated_fields = negative_case.get("pairing", {}).get("mutated_fields")
+        expected_negative_pairing = {
+            "pair_id": pair_id,
+            "role": "negative",
+            "paired_case_id": pair["positive"],
+            "mutation_axis": pair["mutation_axis"],
+            "stable_fields": expected_stable_fields,
+            "mutated_fields": expected_mutated_fields,
+        }
+        expected_positive_pairing = {
+            "pair_id": pair_id,
+            "role": "positive",
+            "paired_case_id": pair["negative"],
+            "mutation_axis": pair["mutation_axis"],
+            "stable_fields": expected_stable_fields,
+            "mutated_fields": expected_mutated_fields,
+        }
+        if negative_case.get("pairing") != expected_negative_pairing:
+            raise RuntimeError(f"{pair['negative']} pairing metadata is not the expected mutation-minimal shape")
+        if positive_case.get("pairing") != expected_positive_pairing:
+            raise RuntimeError(f"{pair['positive']} pairing metadata is not the expected mutation-minimal shape")
+        if corpus_cases.get(pair["negative"], {}).get("pairing") != negative_case.get("pairing"):
+            raise RuntimeError(f"corpus index must expose the complete {pair['negative']} pairing metadata")
+        if corpus_cases.get(pair["positive"], {}).get("pairing") != positive_case.get("pairing"):
+            raise RuntimeError(f"corpus index must expose the complete {pair['positive']} pairing metadata")
+
+        for path in pair["request_stable_paths"]:
+            negative_value = value_at_path(negative_request, path)
+            positive_value = value_at_path(positive_request, path)
+            if negative_value != positive_value:
+                raise RuntimeError(f"{pair_id} request stable field {'.'.join(str(part) for part in path)} drifted")
+        for path in pair["receipt_stable_paths"]:
+            negative_value = value_at_path(negative_receipt, path)
+            positive_value = value_at_path(positive_receipt, path)
+            if negative_value != positive_value:
+                raise RuntimeError(f"{pair_id} receipt stable field {'.'.join(str(part) for part in path)} drifted")
+
+        for path, negative_expected, positive_expected in pair["request_mutations"]:
+            if value_at_path(negative_request, path) != negative_expected:
+                raise RuntimeError(f"{pair['negative']} must set mutation field {'.'.join(str(part) for part in path)} to {negative_expected}")
+            if value_at_path(positive_request, path) != positive_expected:
+                raise RuntimeError(f"{pair['positive']} must set mutation field {'.'.join(str(part) for part in path)} to {positive_expected}")
+        for path, negative_expected, positive_expected in pair["receipt_mutations"]:
+            if value_at_path(negative_receipt, path) != negative_expected:
+                raise RuntimeError(f"{pair['negative']} receipt must set mutation field {'.'.join(str(part) for part in path)} to {negative_expected}")
+            if value_at_path(positive_receipt, path) != positive_expected:
+                raise RuntimeError(f"{pair['positive']} receipt must set mutation field {'.'.join(str(part) for part in path)} to {positive_expected}")
+
+        for path in negative_inferred_authority_request_paths:
+            if path_exists(negative_receipt, path):
+                raise RuntimeError(f"{pair['negative']} must not record inferred authority at {path}")
+        for index, evidence in enumerate(negative_receipt.get("evidence", [])):
+            for path in negative_inferred_authority_evidence_paths:
+                if path_exists(evidence, path):
+                    raise RuntimeError(f"{pair['negative']} evidence[{index}] must not record inferred authority at {path}")
 
 
 def check_status_freshness_boundary_coverage() -> None:

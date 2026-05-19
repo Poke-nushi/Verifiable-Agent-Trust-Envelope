@@ -259,7 +259,7 @@ def case_index_entry(case_path: Path) -> dict[str, Any]:
         expected_outcome_value = str(
             expected.get("admission_decision", expected.get("post_execution_outcome", "missing"))
         )
-    return {
+    entry = {
         "case_id": case["case_id"],
         "path": display_path(case_path.resolve()),
         "category": case["category"],
@@ -271,6 +271,9 @@ def case_index_entry(case_path: Path) -> dict[str, Any]:
         "validation_focus": case.get("validation_focus", []),
         "artifacts": case.get("artifacts", {}),
     }
+    if "pairing" in case:
+        entry["pairing"] = case["pairing"]
+    return entry
 
 
 def category_counts(cases: list[dict[str, Any]]) -> dict[str, int]:
@@ -915,6 +918,20 @@ def bool_for_named_check(
         if admission is None:
             return False
         return any(has_path(item, "verification.failure_reason") for item in admission.get("evidence", []))
+    if name == "admission_receipt.evidence.verification.inferred_resource_authority":
+        if admission is None:
+            return False
+        return any(
+            has_path(item, "verification.inferred_resource_authority")
+            for item in admission.get("evidence", [])
+        )
+    if name == "admission_receipt.evidence.verification.inferred_tool_authority":
+        if admission is None:
+            return False
+        return any(
+            has_path(item, "verification.inferred_tool_authority")
+            for item in admission.get("evidence", [])
+        )
     if name == "policy.policy_version":
         return admission is not None and has_path(admission, "policy.policy_version")
     if name == "post_execution_receipt":

@@ -22,16 +22,28 @@
       "oauth": {
         "issuer": "https://auth.example",
         "audience": "https://mcp.crm.example",
+        "resource": "mcp://crm.example/tools/cases.update",
+        "protected_resource": "mcp://crm.example/tools/cases.update",
         "token_present": true,
         "token_kind": "bearer",
         "upstream_authorization": "missing",
         "resource_binding": "missing",
-        "proof_of_possession": "none"
+        "required_scope": "crm.case.update",
+        "scopes": [
+          "crm.case.update"
+        ],
+        "proof_of_possession": "dpop-jkt:base64url-thumbprint"
       },
       "openid": {
         "issuer": "https://auth.example",
         "subject": "did:web:user.example",
         "client_id": "did:web:agent.example"
+      },
+      "mcp": {
+        "authorized_tool": "cases.update",
+        "authorized_tool_class": "write",
+        "requested_tool": "cases.update",
+        "requested_tool_class": "write"
       }
     }
   },
@@ -54,7 +66,7 @@
         "checked_at": "2026-05-19T10:00:01Z",
         "method": "oauth-authority-binding-check",
         "status_result": "token_present_without_authority",
-        "failure_reason": "The request presented an OAuth bearer token, but no matching resource or tool authorization evidence for crm.case.update was available to the verifier.",
+        "failure_reason": "The request presented an OAuth bearer token, but the verifier did not have a matched upstream authorization and resource-binding result for crm.case.update.",
         "diagnostic_code": "token_passthrough_not_authority",
         "redaction": {
           "token_material": "omitted",

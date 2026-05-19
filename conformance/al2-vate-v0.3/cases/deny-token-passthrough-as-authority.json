@@ -9,6 +9,32 @@
     "admission_request": "examples/transport/mcp-oauth-token-passthrough-admission-request.example.json",
     "admission_receipt": "examples/receipts/admission-deny-token-passthrough-as-authority.example.json"
   },
+  "pairing": {
+    "pair_id": "mcp-oauth-token-authority",
+    "role": "negative",
+    "paired_case_id": "allow-mcp-oauth-token-authority-bound",
+    "mutation_axis": "oauth_authority_binding",
+    "stable_fields": [
+      "actor",
+      "principal",
+      "target.resource",
+      "requested_tool",
+      "requested_tool_class",
+      "constraints.transport.oauth.resource",
+      "constraints.transport.oauth.protected_resource",
+      "constraints.transport.oauth.required_scope",
+      "constraints.transport.oauth.scopes",
+      "constraints.transport.mcp.authorized_tool",
+      "constraints.transport.mcp.authorized_tool_class",
+      "policy.policy_id",
+      "issued_at",
+      "expires_at"
+    ],
+    "mutated_fields": [
+      "constraints.transport.oauth.upstream_authorization",
+      "constraints.transport.oauth.resource_binding"
+    ]
+  },
   "expected": {
     "admission_decision": "deny",
     "should_execute": false,
@@ -47,6 +73,22 @@
       },
       {
         "name": "admission_receipt.evidence[0].verification.prompt",
+        "expected": "absent"
+      },
+      {
+        "name": "admission_receipt.request.transport.oauth.inferred_resource_authority",
+        "expected": "absent"
+      },
+      {
+        "name": "admission_receipt.request.transport.mcp.inferred_tool_authority",
+        "expected": "absent"
+      },
+      {
+        "name": "admission_receipt.evidence.verification.inferred_resource_authority",
+        "expected": "absent"
+      },
+      {
+        "name": "admission_receipt.evidence.verification.inferred_tool_authority",
         "expected": "absent"
       }
     ]

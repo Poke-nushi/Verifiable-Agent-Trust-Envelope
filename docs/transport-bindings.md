@@ -200,6 +200,17 @@ input:
 - `examples/receipts/admission-allow-mcp-oauth-tool-class-aligned.example.json`
 - `conformance/al2-vate-v0.3/cases/allow-mcp-tool-class-aligned.json`
 
+The paired cases carry `pairing` metadata in the corpus index. Each pair keeps
+the actor, requested target resource, requested action class, local policy, and
+freshness window stable, then flips the intended authority boundary fact:
+
+- token authority binding: `missing` versus `matched` upstream authority and
+  resource binding
+- resource indicator binding: mismatched versus matched OAuth resource and
+  protected-resource indicators
+- tool-class binding: read/search authority versus write authority for the
+  requested tool class
+
 The fixture treats OAuth and OpenID artifacts as verifier evidence.
 It does not define a new MCP authorization flow.
 The verifier-visible requirement is narrower:

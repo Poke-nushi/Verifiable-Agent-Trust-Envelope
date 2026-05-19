@@ -13,6 +13,9 @@ This file records dated public changes to the discussion draft.
 - Added paired positive-control fixtures for the token authority, resource
   indicator, and MCP tool-class cases so reviewers can distinguish boundary
   mismatches from blanket fail-closed treatment.
+- Tightened those positive/negative pairs with explicit corpus pairing metadata,
+  stable actor/resource/action/policy/freshness fields, and negative-case checks
+  against inferred resource or tool authority.
 
 ## 2026-05-14
 

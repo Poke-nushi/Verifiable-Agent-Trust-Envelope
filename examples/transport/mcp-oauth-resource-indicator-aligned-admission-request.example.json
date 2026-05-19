@@ -3,8 +3,8 @@
   "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "request_id": "areq-20260519-resource-aligned-001",
   "transaction_id": "txn-20260519-resource-aligned-001",
-  "issued_at": "2026-05-19T10:40:00Z",
-  "expires_at": "2026-05-19T10:45:00Z",
+  "issued_at": "2026-05-19T10:10:00Z",
+  "expires_at": "2026-05-19T10:15:00Z",
   "action": "crm.case.update",
   "target": {
     "resource": "mcp://crm.example/tools/cases.update",

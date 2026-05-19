@@ -28,12 +28,23 @@
         "audience": "https://mcp.crm.example",
         "resource": "mcp://crm.example/tools/cases.search",
         "protected_resource": "https://mcp.crm.example/resources/case-search",
+        "resource_binding": "mismatched",
+        "required_scope": "crm.case.update",
+        "scopes": [
+          "crm.case.update"
+        ],
         "proof_of_possession": "dpop-jkt:base64url-thumbprint"
       },
       "openid": {
         "issuer": "https://auth.example",
         "subject": "did:web:user.example",
         "client_id": "did:web:agent.example"
+      },
+      "mcp": {
+        "authorized_tool": "cases.update",
+        "authorized_tool_class": "write",
+        "requested_tool": "cases.update",
+        "requested_tool_class": "write"
       }
     }
   },

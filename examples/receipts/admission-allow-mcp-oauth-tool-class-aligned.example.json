@@ -3,8 +3,8 @@
   "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "receipt_type": "admission",
   "receipt_id": "admrec-20260519-tool-class-aligned-001",
-  "issued_at": "2026-05-19T10:50:08Z",
-  "expires_at": "2026-05-19T10:55:00Z",
+  "issued_at": "2026-05-19T10:20:08Z",
+  "expires_at": "2026-05-19T10:25:00Z",
   "verifier": {
     "id": "did:web:verifier.example",
     "key_id": "did:web:verifier.example#key-1"
@@ -58,7 +58,7 @@
       },
       "verification": {
         "result": "verified",
-        "checked_at": "2026-05-19T10:50:01Z",
+        "checked_at": "2026-05-19T10:20:01Z",
         "method": "mcp-tool-class-boundary-check",
         "status_result": "active"
       }
@@ -73,7 +73,7 @@
       },
       "verification": {
         "result": "verified",
-        "checked_at": "2026-05-19T10:50:02Z",
+        "checked_at": "2026-05-19T10:20:02Z",
         "method": "openid-claims-binding",
         "status_result": "active"
       }
@@ -88,7 +88,7 @@
       },
       "verification": {
         "result": "verified",
-        "checked_at": "2026-05-19T10:50:03Z",
+        "checked_at": "2026-05-19T10:20:03Z",
         "method": "workload-attestation",
         "status_result": "active"
       }

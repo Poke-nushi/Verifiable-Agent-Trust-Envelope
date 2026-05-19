@@ -9,6 +9,26 @@
     "admission_request": "examples/transport/mcp-oauth-tool-class-mismatch-admission-request.example.json",
     "admission_receipt": "examples/receipts/admission-deny-mcp-tool-class-mismatch.example.json"
   },
+  "pairing": {
+    "pair_id": "mcp-oauth-tool-class",
+    "role": "negative",
+    "paired_case_id": "allow-mcp-tool-class-aligned",
+    "mutation_axis": "mcp_tool_class_binding",
+    "stable_fields": [
+      "actor",
+      "principal",
+      "target.resource",
+      "requested_tool",
+      "requested_tool_class",
+      "policy.policy_id",
+      "issued_at",
+      "expires_at"
+    ],
+    "mutated_fields": [
+      "constraints.transport.mcp.authorized_tool",
+      "constraints.transport.mcp.authorized_tool_class"
+    ]
+  },
   "expected": {
     "admission_decision": "deny",
     "should_execute": false,
@@ -51,6 +71,14 @@
       },
       {
         "name": "admission_receipt.evidence[0].verification.prompt",
+        "expected": "absent"
+      },
+      {
+        "name": "admission_receipt.request.transport.mcp.inferred_tool_authority",
+        "expected": "absent"
+      },
+      {
+        "name": "admission_receipt.evidence.verification.inferred_tool_authority",
         "expected": "absent"
       }
     ]

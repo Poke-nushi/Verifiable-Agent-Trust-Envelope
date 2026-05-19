@@ -3,8 +3,8 @@
   "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "request_id": "areq-20260519-token-authority-bound-001",
   "transaction_id": "txn-20260519-token-authority-bound-001",
-  "issued_at": "2026-05-19T10:30:00Z",
-  "expires_at": "2026-05-19T10:35:00Z",
+  "issued_at": "2026-05-19T10:00:00Z",
+  "expires_at": "2026-05-19T10:05:00Z",
   "action": "crm.case.update",
   "target": {
     "resource": "mcp://crm.example/tools/cases.update",

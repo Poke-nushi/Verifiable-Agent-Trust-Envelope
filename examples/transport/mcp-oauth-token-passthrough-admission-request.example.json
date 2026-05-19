@@ -21,23 +21,36 @@
       "oauth": {
         "issuer": "https://auth.example",
         "audience": "https://mcp.crm.example",
+        "resource": "mcp://crm.example/tools/cases.update",
+        "protected_resource": "mcp://crm.example/tools/cases.update",
         "token_present": true,
         "token_kind": "bearer",
         "upstream_authorization": "missing",
         "resource_binding": "missing",
-        "proof_of_possession": "none"
+        "required_scope": "crm.case.update",
+        "scopes": [
+          "crm.case.update"
+        ],
+        "proof_of_possession": "dpop-jkt:base64url-thumbprint"
       },
       "openid": {
         "issuer": "https://auth.example",
         "subject": "did:web:user.example",
         "client_id": "did:web:agent.example"
+      },
+      "mcp": {
+        "authorized_tool": "cases.update",
+        "authorized_tool_class": "write",
+        "requested_tool": "cases.update",
+        "requested_tool_class": "write"
       }
     },
     "expected_runtime": "spiffe://agent.example/workload/case-agent",
     "tool_allowlist": [
       "cases.update"
     ],
-    "requested_tool": "cases.update"
+    "requested_tool": "cases.update",
+    "requested_tool_class": "write"
   },
   "correlation": {
     "mcp_session_id": "mcp-session-deny-token-passthrough-as-authority",

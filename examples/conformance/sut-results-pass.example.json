@@ -2,7 +2,7 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "ff57d6d70a592624989b9ac265e3aafbef5a66176198f485f93ff5b4c85a7956"
+      "value": "a3cd00883312e3ad45b8a20c8efe8ff0bfb07f3dc480650321c2cad3a05c16b6"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.3"
   },
@@ -96,7 +96,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "2a044a7725fd4654b32612f60f00392591a58ffd5e1e11ffb3305271d1c63e79"
+            "value": "dadd219fbb569df6ab8c585bbe14a69afc14128b89b64e6ab0947667cbfee05b"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-allow-mcp-oauth-token-authority-bound.example.json"
@@ -154,7 +154,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "420c98e3e4ca170b928c90d6200318733aa88fa4d5d78945d240c41cfc68c261"
+            "value": "336acea254aa549b54085906964611ae01799ad144efe68b09ce310a5f9a20ae"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-allow-mcp-oauth-tool-class-aligned.example.json"
@@ -204,7 +204,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "d1e584a1259acf2ba85747535e46c619a3630c259f189948cb1a23fb3db0c3b6"
+            "value": "bc55a0c77341e2fe7c85446279777581237f08b155d557df99aefeb6804a89e8"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-allow-mcp-oauth-resource-indicator-aligned.example.json"
@@ -1852,7 +1852,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "2307c223cfdf707d2b297d775c85febf49b8a49e515d833581fe279f1b406936"
+            "value": "7d09453e553a70f41685eae83dcd2ecbd13bd15b849904c72298f9ca019dd5f3"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-token-passthrough-as-authority.example.json"
@@ -1891,6 +1891,22 @@
         {
           "name": "admission_receipt.evidence[0].verification.prompt",
           "pass": true
+        },
+        {
+          "name": "admission_receipt.request.transport.oauth.inferred_resource_authority",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.request.transport.mcp.inferred_tool_authority",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.evidence.verification.inferred_resource_authority",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.evidence.verification.inferred_tool_authority",
+          "pass": true
         }
       ],
       "outcome": "deny",
@@ -1906,7 +1922,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "049f4bc7f77364696d00da5cdfa329af25aa85e83f5adfe092a3d8e965dbbf05"
+            "value": "cc5e1cf1e992c728a804e29746fb4ddd3dd9fc4f0ecf4d39aa11c3ff0f012acc"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-resource-indicator-drift.example.json"
@@ -1949,6 +1965,14 @@
         {
           "name": "admission_receipt.evidence[0].verification.prompt",
           "pass": true
+        },
+        {
+          "name": "admission_receipt.request.transport.oauth.inferred_resource_authority",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.evidence.verification.inferred_resource_authority",
+          "pass": true
         }
       ],
       "outcome": "deny",
@@ -1964,7 +1988,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "0dc5ead7a649b96174ee9d42bbc57896a5e2cde91beb00b4b70eca821099575a"
+            "value": "d2bf39f0aad2cc3f5d94af8caed6027d552e193c0b119bfeacdf981c2505e65c"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-mcp-tool-class-mismatch.example.json"
@@ -2006,6 +2030,14 @@
         },
         {
           "name": "admission_receipt.evidence[0].verification.prompt",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.request.transport.mcp.inferred_tool_authority",
+          "pass": true
+        },
+        {
+          "name": "admission_receipt.evidence.verification.inferred_tool_authority",
           "pass": true
         }
       ],

@@ -22,8 +22,9 @@
         "issuer": "https://auth.example",
         "audience": "https://mcp.crm.example",
         "resource": "mcp://crm.example/tools/cases.update",
+        "required_scope": "crm.case.update",
         "scopes": [
-          "crm.case.read"
+          "crm.case.update"
         ],
         "proof_of_possession": "dpop-jkt:base64url-thumbprint"
       },

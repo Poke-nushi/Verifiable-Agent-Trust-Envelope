@@ -87,6 +87,32 @@
         "POLICY_MATCH"
       ],
       "expected_should_execute": true,
+      "pairing": {
+        "mutated_fields": [
+          "constraints.transport.oauth.upstream_authorization",
+          "constraints.transport.oauth.resource_binding"
+        ],
+        "mutation_axis": "oauth_authority_binding",
+        "pair_id": "mcp-oauth-token-authority",
+        "paired_case_id": "deny-token-passthrough-as-authority",
+        "role": "positive",
+        "stable_fields": [
+          "actor",
+          "principal",
+          "target.resource",
+          "requested_tool",
+          "requested_tool_class",
+          "constraints.transport.oauth.resource",
+          "constraints.transport.oauth.protected_resource",
+          "constraints.transport.oauth.required_scope",
+          "constraints.transport.oauth.scopes",
+          "constraints.transport.mcp.authorized_tool",
+          "constraints.transport.mcp.authorized_tool_class",
+          "policy.policy_id",
+          "issued_at",
+          "expires_at"
+        ]
+      },
       "path": "conformance/al2-vate-v0.3/cases/allow-mcp-oauth-token-authority-bound.json",
       "title": "Allow token evidence with matched upstream authority",
       "validation_focus": [
@@ -133,6 +159,26 @@
         "POLICY_MATCH"
       ],
       "expected_should_execute": true,
+      "pairing": {
+        "mutated_fields": [
+          "constraints.transport.mcp.authorized_tool",
+          "constraints.transport.mcp.authorized_tool_class"
+        ],
+        "mutation_axis": "mcp_tool_class_binding",
+        "pair_id": "mcp-oauth-tool-class",
+        "paired_case_id": "deny-mcp-tool-class-mismatch",
+        "role": "positive",
+        "stable_fields": [
+          "actor",
+          "principal",
+          "target.resource",
+          "requested_tool",
+          "requested_tool_class",
+          "policy.policy_id",
+          "issued_at",
+          "expires_at"
+        ]
+      },
       "path": "conformance/al2-vate-v0.3/cases/allow-mcp-tool-class-aligned.json",
       "title": "Allow aligned MCP tool class",
       "validation_focus": [
@@ -177,6 +223,27 @@
         "POLICY_MATCH"
       ],
       "expected_should_execute": true,
+      "pairing": {
+        "mutated_fields": [
+          "constraints.transport.oauth.resource",
+          "constraints.transport.oauth.protected_resource",
+          "constraints.transport.oauth.resource_binding"
+        ],
+        "mutation_axis": "oauth_resource_indicator_binding",
+        "pair_id": "mcp-oauth-resource-indicator",
+        "paired_case_id": "deny-resource-indicator-drift",
+        "role": "positive",
+        "stable_fields": [
+          "actor",
+          "principal",
+          "target.resource",
+          "requested_tool",
+          "requested_tool_class",
+          "policy.policy_id",
+          "issued_at",
+          "expires_at"
+        ]
+      },
       "path": "conformance/al2-vate-v0.3/cases/allow-resource-indicator-aligned.json",
       "title": "Allow aligned OAuth resource indicator",
       "validation_focus": [
@@ -942,6 +1009,26 @@
         "FAIL_CLOSED"
       ],
       "expected_should_execute": false,
+      "pairing": {
+        "mutated_fields": [
+          "constraints.transport.mcp.authorized_tool",
+          "constraints.transport.mcp.authorized_tool_class"
+        ],
+        "mutation_axis": "mcp_tool_class_binding",
+        "pair_id": "mcp-oauth-tool-class",
+        "paired_case_id": "allow-mcp-tool-class-aligned",
+        "role": "negative",
+        "stable_fields": [
+          "actor",
+          "principal",
+          "target.resource",
+          "requested_tool",
+          "requested_tool_class",
+          "policy.policy_id",
+          "issued_at",
+          "expires_at"
+        ]
+      },
       "path": "conformance/al2-vate-v0.3/cases/deny-mcp-tool-class-mismatch.json",
       "title": "Deny MCP tool class mismatch",
       "validation_focus": [
@@ -1051,6 +1138,27 @@
         "FAIL_CLOSED"
       ],
       "expected_should_execute": false,
+      "pairing": {
+        "mutated_fields": [
+          "constraints.transport.oauth.resource",
+          "constraints.transport.oauth.protected_resource",
+          "constraints.transport.oauth.resource_binding"
+        ],
+        "mutation_axis": "oauth_resource_indicator_binding",
+        "pair_id": "mcp-oauth-resource-indicator",
+        "paired_case_id": "allow-resource-indicator-aligned",
+        "role": "negative",
+        "stable_fields": [
+          "actor",
+          "principal",
+          "target.resource",
+          "requested_tool",
+          "requested_tool_class",
+          "policy.policy_id",
+          "issued_at",
+          "expires_at"
+        ]
+      },
       "path": "conformance/al2-vate-v0.3/cases/deny-resource-indicator-drift.json",
       "title": "Deny OAuth resource indicator drift",
       "validation_focus": [
@@ -1203,6 +1311,32 @@
         "FAIL_CLOSED"
       ],
       "expected_should_execute": false,
+      "pairing": {
+        "mutated_fields": [
+          "constraints.transport.oauth.upstream_authorization",
+          "constraints.transport.oauth.resource_binding"
+        ],
+        "mutation_axis": "oauth_authority_binding",
+        "pair_id": "mcp-oauth-token-authority",
+        "paired_case_id": "allow-mcp-oauth-token-authority-bound",
+        "role": "negative",
+        "stable_fields": [
+          "actor",
+          "principal",
+          "target.resource",
+          "requested_tool",
+          "requested_tool_class",
+          "constraints.transport.oauth.resource",
+          "constraints.transport.oauth.protected_resource",
+          "constraints.transport.oauth.required_scope",
+          "constraints.transport.oauth.scopes",
+          "constraints.transport.mcp.authorized_tool",
+          "constraints.transport.mcp.authorized_tool_class",
+          "policy.policy_id",
+          "issued_at",
+          "expires_at"
+        ]
+      },
       "path": "conformance/al2-vate-v0.3/cases/deny-token-passthrough-as-authority.json",
       "title": "Deny token passthrough as admission authority",
       "validation_focus": [
@@ -1603,7 +1737,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "ff57d6d70a592624989b9ac265e3aafbef5a66176198f485f93ff5b4c85a7956"
+    "value": "a3cd00883312e3ad45b8a20c8efe8ff0bfb07f3dc480650321c2cad3a05c16b6"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -1632,7 +1766,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-mcp-oauth-token-authority-bound.json",
-      "sha256": "27c7ee306d90a89a494413fd450fc2b894a1f5e4850ee8fb436a44c8cc2012a9"
+      "sha256": "2c9f388fa9bcbb73e181ac0637405ca63dda34ee2008ffcf87205aa01311ce7e"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-mcp-oauth-transport-bound.json",
@@ -1640,7 +1774,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-mcp-tool-class-aligned.json",
-      "sha256": "a3979343754ed92910310f78b3173fbbe7cbcdcbd83e70b52bb12e897ade35a3"
+      "sha256": "e5956bf14f78fe5aa836fd0730232f52644ddc9e9cef3ea3c3a863a5ffeb572a"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-replay-state-unused.json",
@@ -1648,7 +1782,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-resource-indicator-aligned.json",
-      "sha256": "9c04fc00d3e98833faf48d4babfd587933edf7e9090134ddf34485628cb155a2"
+      "sha256": "48f91f04466bdfcce37008e1918754d3178302def5396fb84fed0c8d68dc7a2c"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-status-fresh-at-boundary.json",
@@ -1784,7 +1918,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-mcp-tool-class-mismatch.json",
-      "sha256": "3944282a63f20f8c60bc618148b82749150afcf166948cf3e462b87cc2502b1b"
+      "sha256": "7c4081cb0dec246840298cc144f6a07cff68931f75d5989fcec173ca1d0d3a35"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-not-yet-valid-permit.json",
@@ -1804,7 +1938,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-resource-indicator-drift.json",
-      "sha256": "6aa8ccf77aa403323e30f7fc673382d0272fc0ece34aa6976074bc9719806125"
+      "sha256": "c6f6d0bf3a87533481566753e196fb285d36f8c4e2b5a203f72e3214cf26e1df"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-runtime-mismatch.json",
@@ -1832,7 +1966,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-token-passthrough-as-authority.json",
-      "sha256": "22a41eb855a84b454b305fd86d085aa3030c4637068e3d1198621cfa2480220e"
+      "sha256": "d639a453b9b4e5edcb3785dc53d0bb050a0101c6c9d0d087507a47d878369f41"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-trust-anchor-expired.json",
@@ -2120,15 +2254,15 @@
     },
     {
       "path": "examples/receipts/admission-allow-mcp-oauth-resource-indicator-aligned.example.json",
-      "sha256": "d1e584a1259acf2ba85747535e46c619a3630c259f189948cb1a23fb3db0c3b6"
+      "sha256": "bc55a0c77341e2fe7c85446279777581237f08b155d557df99aefeb6804a89e8"
     },
     {
       "path": "examples/receipts/admission-allow-mcp-oauth-token-authority-bound.example.json",
-      "sha256": "2a044a7725fd4654b32612f60f00392591a58ffd5e1e11ffb3305271d1c63e79"
+      "sha256": "dadd219fbb569df6ab8c585bbe14a69afc14128b89b64e6ab0947667cbfee05b"
     },
     {
       "path": "examples/receipts/admission-allow-mcp-oauth-tool-class-aligned.example.json",
-      "sha256": "420c98e3e4ca170b928c90d6200318733aa88fa4d5d78945d240c41cfc68c261"
+      "sha256": "336acea254aa549b54085906964611ae01799ad144efe68b09ce310a5f9a20ae"
     },
     {
       "path": "examples/receipts/admission-allow-policy-snapshot.example.json",
@@ -2252,7 +2386,7 @@
     },
     {
       "path": "examples/receipts/admission-deny-mcp-tool-class-mismatch.example.json",
-      "sha256": "0dc5ead7a649b96174ee9d42bbc57896a5e2cde91beb00b4b70eca821099575a"
+      "sha256": "d2bf39f0aad2cc3f5d94af8caed6027d552e193c0b119bfeacdf981c2505e65c"
     },
     {
       "path": "examples/receipts/admission-deny-not-yet-valid-permit.example.json",
@@ -2272,7 +2406,7 @@
     },
     {
       "path": "examples/receipts/admission-deny-resource-indicator-drift.example.json",
-      "sha256": "049f4bc7f77364696d00da5cdfa329af25aa85e83f5adfe092a3d8e965dbbf05"
+      "sha256": "cc5e1cf1e992c728a804e29746fb4ddd3dd9fc4f0ecf4d39aa11c3ff0f012acc"
     },
     {
       "path": "examples/receipts/admission-deny-runtime-mismatch.example.json",
@@ -2300,7 +2434,7 @@
     },
     {
       "path": "examples/receipts/admission-deny-token-passthrough-as-authority.example.json",
-      "sha256": "2307c223cfdf707d2b297d775c85febf49b8a49e515d833581fe279f1b406936"
+      "sha256": "7d09453e553a70f41685eae83dcd2ecbd13bd15b849904c72298f9ca019dd5f3"
     },
     {
       "path": "examples/receipts/admission-deny-trust-anchor-expired.example.json",
@@ -2368,27 +2502,27 @@
     },
     {
       "path": "examples/transport/mcp-oauth-resource-indicator-aligned-admission-request.example.json",
-      "sha256": "94487db75ad56444bc5d209ef5c941c3e294ee4ab74ab95ab0d656448e997f1b"
+      "sha256": "1034785be94e959499f988d84a4fb76babee9716d40e1398ee05ddf5ef1276ae"
     },
     {
       "path": "examples/transport/mcp-oauth-resource-indicator-drift-admission-request.example.json",
-      "sha256": "94269d4415eddbbca1101f31fd5bff7e1a1e07d2cecd38657a5e648309973605"
+      "sha256": "4b9f8cd4071253d884a7449259172b5c74bb511184bbe50d382164b9460a22ad"
     },
     {
       "path": "examples/transport/mcp-oauth-token-authority-bound-admission-request.example.json",
-      "sha256": "27fe8e9e5d2a232dada179b409ee5f0343964685458cb28a3f7fdaf2fb87ac61"
+      "sha256": "99d76adef054ca6d4c2ad9bc2fa88371444cdbfddac2f911e95cfbd25d119388"
     },
     {
       "path": "examples/transport/mcp-oauth-token-passthrough-admission-request.example.json",
-      "sha256": "5e33b6c041dbe414b06afb4f987e410266cc134191369ba5fc2a0185a7e95bbe"
+      "sha256": "7d88fbcbd27a466dce9a90cafe8a6bec37dbd5ca3fad9dd09bf6d3adac6a2cd8"
     },
     {
       "path": "examples/transport/mcp-oauth-tool-class-aligned-admission-request.example.json",
-      "sha256": "729f19fdf5631c0b1c4c325d94039bf988ef04497b51bf2f72571d941c7f17cd"
+      "sha256": "af3984d52c271b87f97206f4f4dc13e2ec208a7e28f3cefe4c769def1c5aef72"
     },
     {
       "path": "examples/transport/mcp-oauth-tool-class-mismatch-admission-request.example.json",
-      "sha256": "93003c67640cc69deca89910b8ce9d37d797e4cf10aaaeee796c9896dc4269fe"
+      "sha256": "fd3868b63c6dfc9bd0ede6da9663f56e5e93c98fd6c1f8d84e34c0cedf2da111"
     },
     {
       "path": "examples/transport/mcp-oauth-upstream-denied-admission-request.example.json",
