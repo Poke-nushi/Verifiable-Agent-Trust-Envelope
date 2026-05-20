@@ -28,6 +28,11 @@ public intake thread:
 The issue was opened during the v0.3.0 review cycle and remains the intake
 thread for the current v0.3.x corpus line.
 
+If you are not ready to write a full adapter, start with the
+[one-hour external SUT or corpus review request](external-sut-ask-1-hour.md).
+It is intended for lightweight corpus review, unclear-case reports, and draft
+or partial SUT result attempts.
+
 ## Inputs
 
 Use these files as the contract surface:

@@ -48,17 +48,20 @@ The current public review surface is:
 
 Near-term public work should happen in this order:
 
-1. Collect at least one SUT result from an implementation that is not the
+1. Keep the lightweight
+   [one-hour external SUT or corpus review request](docs/conformance/external-sut-ask-1-hour.md)
+   visible for reviewers who are not ready to produce a full adapter.
+2. Collect at least one SUT result from an implementation that is not the
    repository reference runner, against the `v0.3` corpus snapshot.
-2. Ask that implementer to publish generated artifacts or a controlled artifact
+3. Ask that implementer to publish generated artifacts or a controlled artifact
    bundle, not only a hand-written result summary.
-3. Generate or collect a conformance report, implementation report, and local
+4. Generate or collect a conformance report, implementation report, and local
    `verify-bundle` report for the same corpus snapshot.
-4. Use the result to identify unclear corpus cases, reason-code friction,
+5. Use the result to identify unclear corpus cases, reason-code friction,
    missing artifact bindings, or publication metadata gaps.
-5. Make a small `v0.3.2` patch only if that evidence exposes concrete
+6. Make a small `v0.3.2` patch only if that evidence exposes concrete
    schema/corpus/docs/runner drift. Do not cut a release for typo-only edits.
-6. Reserve `v0.4.0` for a real profile-surface expansion, such as a new
+7. Reserve `v0.4.0` for a real profile-surface expansion, such as a new
    adjacent-protocol profile, a proof-profile decision, or a materially changed
    conformance contract.
 

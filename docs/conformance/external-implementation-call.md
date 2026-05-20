@@ -8,6 +8,12 @@ This is a short call for independent implementation review of the
 It is not a certification program, endorsement process, production approval, or
 official compatibility claim.
 
+If a full SUT adapter or implementation report is too much for a first pass,
+start with the
+[one-hour external SUT or corpus review request](external-sut-ask-1-hour.md).
+Partial, failing, or critical review notes are useful when they identify where
+the corpus, reason codes, artifact bindings, or report path are unclear.
+
 ## What We Are Asking For
 
 The useful next evidence is one non-reference verifier run against the current

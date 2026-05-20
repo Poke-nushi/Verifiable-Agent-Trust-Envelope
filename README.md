@@ -34,6 +34,9 @@ main-branch work after it, start here:
 
 - [Public claim boundary](docs/public-claim-boundary.md) - what this repo can
   and cannot claim publicly
+- [One-hour external SUT or corpus review request](docs/conformance/external-sut-ask-1-hour.md) -
+  smallest useful external review path for unclear cases, reason codes,
+  artifact binding, or draft SUT results
 - [Independent implementation review issue](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2) -
   public intake thread for external SUT questions, partial results, and
   implementation report links
