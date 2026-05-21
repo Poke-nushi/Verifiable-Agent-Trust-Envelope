@@ -99,15 +99,27 @@
         "stable_fields": [
           "actor",
           "principal",
+          "runtime",
+          "audience",
+          "action",
           "target.resource",
+          "target.audience",
           "requested_tool",
           "requested_tool_class",
+          "constraints.expected_runtime",
+          "constraints.transport.oauth.issuer",
+          "constraints.transport.oauth.audience",
           "constraints.transport.oauth.resource",
           "constraints.transport.oauth.protected_resource",
+          "constraints.transport.oauth.token_present",
+          "constraints.transport.oauth.token_kind",
           "constraints.transport.oauth.required_scope",
           "constraints.transport.oauth.scopes",
+          "constraints.transport.oauth.proof_of_possession",
           "constraints.transport.mcp.authorized_tool",
           "constraints.transport.mcp.authorized_tool_class",
+          "constraints.transport.mcp.requested_tool",
+          "constraints.transport.mcp.requested_tool_class",
           "policy.policy_id",
           "issued_at",
           "expires_at"
@@ -161,7 +173,6 @@
       "expected_should_execute": true,
       "pairing": {
         "mutated_fields": [
-          "constraints.transport.mcp.authorized_tool",
           "constraints.transport.mcp.authorized_tool_class"
         ],
         "mutation_axis": "mcp_tool_class_binding",
@@ -171,9 +182,23 @@
         "stable_fields": [
           "actor",
           "principal",
+          "runtime",
+          "audience",
+          "action",
           "target.resource",
+          "target.audience",
           "requested_tool",
           "requested_tool_class",
+          "constraints.expected_runtime",
+          "constraints.transport.oauth.issuer",
+          "constraints.transport.oauth.audience",
+          "constraints.transport.oauth.resource",
+          "constraints.transport.oauth.required_scope",
+          "constraints.transport.oauth.scopes",
+          "constraints.transport.oauth.proof_of_possession",
+          "constraints.transport.mcp.authorized_tool",
+          "constraints.transport.mcp.requested_tool",
+          "constraints.transport.mcp.requested_tool_class",
           "policy.policy_id",
           "issued_at",
           "expires_at"
@@ -236,9 +261,24 @@
         "stable_fields": [
           "actor",
           "principal",
+          "runtime",
+          "audience",
+          "action",
           "target.resource",
+          "target.audience",
+          "requested_target_resource.normalized",
           "requested_tool",
           "requested_tool_class",
+          "constraints.expected_runtime",
+          "constraints.transport.oauth.issuer",
+          "constraints.transport.oauth.audience",
+          "constraints.transport.oauth.required_scope",
+          "constraints.transport.oauth.scopes",
+          "constraints.transport.oauth.proof_of_possession",
+          "constraints.transport.mcp.authorized_tool",
+          "constraints.transport.mcp.authorized_tool_class",
+          "constraints.transport.mcp.requested_tool",
+          "constraints.transport.mcp.requested_tool_class",
           "policy.policy_id",
           "issued_at",
           "expires_at"
@@ -1011,7 +1051,6 @@
       "expected_should_execute": false,
       "pairing": {
         "mutated_fields": [
-          "constraints.transport.mcp.authorized_tool",
           "constraints.transport.mcp.authorized_tool_class"
         ],
         "mutation_axis": "mcp_tool_class_binding",
@@ -1021,9 +1060,23 @@
         "stable_fields": [
           "actor",
           "principal",
+          "runtime",
+          "audience",
+          "action",
           "target.resource",
+          "target.audience",
           "requested_tool",
           "requested_tool_class",
+          "constraints.expected_runtime",
+          "constraints.transport.oauth.issuer",
+          "constraints.transport.oauth.audience",
+          "constraints.transport.oauth.resource",
+          "constraints.transport.oauth.required_scope",
+          "constraints.transport.oauth.scopes",
+          "constraints.transport.oauth.proof_of_possession",
+          "constraints.transport.mcp.authorized_tool",
+          "constraints.transport.mcp.requested_tool",
+          "constraints.transport.mcp.requested_tool_class",
           "policy.policy_id",
           "issued_at",
           "expires_at"
@@ -1151,9 +1204,24 @@
         "stable_fields": [
           "actor",
           "principal",
+          "runtime",
+          "audience",
+          "action",
           "target.resource",
+          "target.audience",
+          "requested_target_resource.normalized",
           "requested_tool",
           "requested_tool_class",
+          "constraints.expected_runtime",
+          "constraints.transport.oauth.issuer",
+          "constraints.transport.oauth.audience",
+          "constraints.transport.oauth.required_scope",
+          "constraints.transport.oauth.scopes",
+          "constraints.transport.oauth.proof_of_possession",
+          "constraints.transport.mcp.authorized_tool",
+          "constraints.transport.mcp.authorized_tool_class",
+          "constraints.transport.mcp.requested_tool",
+          "constraints.transport.mcp.requested_tool_class",
           "policy.policy_id",
           "issued_at",
           "expires_at"
@@ -1323,15 +1391,27 @@
         "stable_fields": [
           "actor",
           "principal",
+          "runtime",
+          "audience",
+          "action",
           "target.resource",
+          "target.audience",
           "requested_tool",
           "requested_tool_class",
+          "constraints.expected_runtime",
+          "constraints.transport.oauth.issuer",
+          "constraints.transport.oauth.audience",
           "constraints.transport.oauth.resource",
           "constraints.transport.oauth.protected_resource",
+          "constraints.transport.oauth.token_present",
+          "constraints.transport.oauth.token_kind",
           "constraints.transport.oauth.required_scope",
           "constraints.transport.oauth.scopes",
+          "constraints.transport.oauth.proof_of_possession",
           "constraints.transport.mcp.authorized_tool",
           "constraints.transport.mcp.authorized_tool_class",
+          "constraints.transport.mcp.requested_tool",
+          "constraints.transport.mcp.requested_tool_class",
           "policy.policy_id",
           "issued_at",
           "expires_at"
@@ -1737,7 +1817,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "a3cd00883312e3ad45b8a20c8efe8ff0bfb07f3dc480650321c2cad3a05c16b6"
+    "value": "73ff8357631e79a97c918095188ad548e38b9d820aa3bdf6465d3f2ed7b94a1e"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -1766,7 +1846,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-mcp-oauth-token-authority-bound.json",
-      "sha256": "2c9f388fa9bcbb73e181ac0637405ca63dda34ee2008ffcf87205aa01311ce7e"
+      "sha256": "991d566ab7c9a903d60c43674c5b2b9d632e04fe27d2c6214569e0f31681fd6e"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-mcp-oauth-transport-bound.json",
@@ -1774,7 +1854,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-mcp-tool-class-aligned.json",
-      "sha256": "e5956bf14f78fe5aa836fd0730232f52644ddc9e9cef3ea3c3a863a5ffeb572a"
+      "sha256": "44f24c193f3613a4aea717d937520c98868b9e5717dfbd5ecbbc3ea1b202be35"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-replay-state-unused.json",
@@ -1782,7 +1862,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-resource-indicator-aligned.json",
-      "sha256": "48f91f04466bdfcce37008e1918754d3178302def5396fb84fed0c8d68dc7a2c"
+      "sha256": "4ab5a270400c103e3f9d25099e5e8b5afc03cd854612d1ef025b04027269b215"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-status-fresh-at-boundary.json",
@@ -1918,7 +1998,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-mcp-tool-class-mismatch.json",
-      "sha256": "7c4081cb0dec246840298cc144f6a07cff68931f75d5989fcec173ca1d0d3a35"
+      "sha256": "4d2ba27e409fa9515ad43ac600934c9fdb168092b13bfae3982ae3c0ed7f428d"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-not-yet-valid-permit.json",
@@ -1938,7 +2018,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-resource-indicator-drift.json",
-      "sha256": "c6f6d0bf3a87533481566753e196fb285d36f8c4e2b5a203f72e3214cf26e1df"
+      "sha256": "8ac13c3f15ae02eb9027291d7a73242052d5d73cf33a1276069768081ce0e696"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-runtime-mismatch.json",
@@ -1966,7 +2046,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-token-passthrough-as-authority.json",
-      "sha256": "d639a453b9b4e5edcb3785dc53d0bb050a0101c6c9d0d087507a47d878369f41"
+      "sha256": "91eb95c626e7886e49c7f4b8c96752fc86db2cacb1241455db77d8df197836e9"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-trust-anchor-expired.json",
@@ -2386,7 +2466,7 @@
     },
     {
       "path": "examples/receipts/admission-deny-mcp-tool-class-mismatch.example.json",
-      "sha256": "d2bf39f0aad2cc3f5d94af8caed6027d552e193c0b119bfeacdf981c2505e65c"
+      "sha256": "f1633a4fb4140544a38a7f8f22255ba5f576f7d42e55c1a7eecd5410a40c7cb5"
     },
     {
       "path": "examples/receipts/admission-deny-not-yet-valid-permit.example.json",
@@ -2522,7 +2602,7 @@
     },
     {
       "path": "examples/transport/mcp-oauth-tool-class-mismatch-admission-request.example.json",
-      "sha256": "fd3868b63c6dfc9bd0ede6da9663f56e5e93c98fd6c1f8d84e34c0cedf2da111"
+      "sha256": "4b22d298240d8ed2720bf900dda494ddf05ff355c537b96684d9a829e09fcaaf"
     },
     {
       "path": "examples/transport/mcp-oauth-upstream-denied-admission-request.example.json",

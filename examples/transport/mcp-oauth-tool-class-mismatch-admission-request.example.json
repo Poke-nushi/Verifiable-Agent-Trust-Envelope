@@ -34,7 +34,7 @@
         "client_id": "did:web:agent.example"
       },
       "mcp": {
-        "authorized_tool": "cases.search",
+        "authorized_tool": "cases.update",
         "authorized_tool_class": "read",
         "requested_tool": "cases.update",
         "requested_tool_class": "write"

@@ -35,7 +35,7 @@
         "client_id": "did:web:agent.example"
       },
       "mcp": {
-        "authorized_tool": "cases.search",
+        "authorized_tool": "cases.update",
         "authorized_tool_class": "read",
         "requested_tool": "cases.update",
         "requested_tool_class": "write"
@@ -61,7 +61,7 @@
         "checked_at": "2026-05-19T10:20:01Z",
         "method": "mcp-tool-class-boundary-check",
         "status_result": "tool_class_mismatch",
-        "failure_reason": "The MCP/OAuth evidence authorizes read/search tool use, but the requested action is write/side-effecting on the same provider.",
+        "failure_reason": "The MCP/OAuth evidence authorizes only read-class use of cases.update, but the requested action is write/side-effecting on the same tool and provider.",
         "diagnostic_code": "mcp_tool_class_mismatch",
         "redaction": {
           "token_material": "omitted",
@@ -112,7 +112,7 @@
       "TOOL_CLASS_MISMATCH",
       "FAIL_CLOSED"
     ],
-    "human_readable_summary": "The request is denied because provider and resource similarity is not enough to convert read/search MCP authority into write/execute authority."
+    "human_readable_summary": "The request is denied because matching tool identity is not enough to convert read-class MCP authority into write/execute authority."
   },
   "proof": {
     "format": "detached_jws",
