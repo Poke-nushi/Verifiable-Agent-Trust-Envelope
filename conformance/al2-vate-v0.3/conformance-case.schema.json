@@ -43,6 +43,58 @@
       "type": "string",
       "minLength": 1
     },
+    "pairing": {
+      "type": "object",
+      "description": "Optional reciprocal pair metadata for mutation-minimal positive/negative cases. This is a corpus review aid, not a production compatibility claim.",
+      "required": [
+        "pair_id",
+        "role",
+        "paired_case_id",
+        "mutation_axis",
+        "stable_fields",
+        "mutated_fields"
+      ],
+      "properties": {
+        "pair_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "positive",
+            "negative"
+          ]
+        },
+        "paired_case_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mutation_axis": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stable_fields": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "mutated_fields": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
     "artifacts": {
       "type": "object",
       "properties": {
