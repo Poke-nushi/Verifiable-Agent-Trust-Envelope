@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Repository checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python validation dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      - name: Compile Python scripts
+        run: python -m py_compile scripts/vate_conformance.py scripts/check_repo.py scripts/check_repo_strict.py
+
+      - name: Run conformance corpus checks
+        run: |
+          python scripts/vate_conformance.py run \
+            --corpus-root conformance/al2-vate-v0.3 \
+            --report /tmp/vate-ci-run.json
+
+          python scripts/vate_conformance.py compare \
+            --corpus-root conformance/al2-vate-v0.3 \
+            --sut-results examples/conformance/sut-results-pass.example.json \
+            --report /tmp/vate-ci-compare.json
+
+          python scripts/vate_conformance.py compare \
+            --corpus-root conformance/al2-vate-v0.3 \
+            --sut-results examples/conformance/sut-results-pass.example.json \
+            --report /tmp/vate-ci-compare-report.json \
+            --implementation-report /tmp/vate-ci-implementation-report.json \
+            --conformance-report-uri /tmp/vate-ci-compare-report.json \
+            --implementation-report-uri /tmp/vate-ci-implementation-report.json
+
+          python scripts/vate_conformance.py verify-bundle \
+            --corpus-root conformance/al2-vate-v0.3 \
+            --sut-results examples/conformance/sut-results-pass.example.json \
+            --conformance-report /tmp/vate-ci-compare-report.json \
+            --implementation-report /tmp/vate-ci-implementation-report.json \
+            --report /tmp/vate-ci-bundle-verification.json
+
+      - name: Run repository sanity checks
+        run: |
+          python scripts/check_repo.py
+          python scripts/check_repo_strict.py
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Check TypeScript helpers
+        run: |
+          npm run ts:check
+          npm run ts:test
+
+      - name: Check whitespace
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            git fetch --no-tags origin "$BASE_REF"
+            git diff --check "FETCH_HEAD...HEAD"
+          elif [ -n "$BEFORE_SHA" ] && [ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ]; then
+            git diff --check "$BEFORE_SHA..$HEAD_SHA"
+          else
+            git diff --check
+          fi
