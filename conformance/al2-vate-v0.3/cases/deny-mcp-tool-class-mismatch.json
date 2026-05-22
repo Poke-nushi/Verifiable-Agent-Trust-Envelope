@@ -4,7 +4,7 @@
   "case_id": "deny-mcp-tool-class-mismatch",
   "title": "Deny MCP tool class mismatch",
   "category": "negative",
-  "purpose": "A verifier should fail closed when MCP evidence authorizes read, search, or inspect tool use but the admitted action is write, execute, or otherwise side-effecting on the same provider.",
+  "purpose": "A verifier should fail closed when MCP evidence authorizes only read-class use but the admitted action is write, execute, or otherwise side-effecting on the same tool and provider.",
   "artifacts": {
     "admission_request": "examples/transport/mcp-oauth-tool-class-mismatch-admission-request.example.json",
     "admission_receipt": "examples/receipts/admission-deny-mcp-tool-class-mismatch.example.json"
@@ -17,15 +17,28 @@
     "stable_fields": [
       "actor",
       "principal",
+      "runtime",
+      "audience",
+      "action",
       "target.resource",
+      "target.audience",
       "requested_tool",
       "requested_tool_class",
+      "constraints.expected_runtime",
+      "constraints.transport.oauth.issuer",
+      "constraints.transport.oauth.audience",
+      "constraints.transport.oauth.resource",
+      "constraints.transport.oauth.required_scope",
+      "constraints.transport.oauth.scopes",
+      "constraints.transport.oauth.proof_of_possession",
+      "constraints.transport.mcp.authorized_tool",
+      "constraints.transport.mcp.requested_tool",
+      "constraints.transport.mcp.requested_tool_class",
       "policy.policy_id",
       "issued_at",
       "expires_at"
     ],
     "mutated_fields": [
-      "constraints.transport.mcp.authorized_tool",
       "constraints.transport.mcp.authorized_tool_class"
     ]
   },

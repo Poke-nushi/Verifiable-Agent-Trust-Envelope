@@ -208,8 +208,8 @@ freshness window stable, then flips the intended authority boundary fact:
   resource binding
 - resource indicator binding: mismatched versus matched OAuth resource and
   protected-resource indicators
-- tool-class binding: read/search authority versus write authority for the
-  requested tool class
+- tool-class binding: read-class authority versus write authority for the same
+  requested tool
 
 The fixture treats OAuth and OpenID artifacts as verifier evidence.
 It does not define a new MCP authorization flow.

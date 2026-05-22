@@ -2,7 +2,7 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "a3cd00883312e3ad45b8a20c8efe8ff0bfb07f3dc480650321c2cad3a05c16b6"
+      "value": "73ff8357631e79a97c918095188ad548e38b9d820aa3bdf6465d3f2ed7b94a1e"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.3"
   },
@@ -1988,7 +1988,7 @@
         "admission_receipt": {
           "digest": {
             "alg": "sha-256",
-            "value": "d2bf39f0aad2cc3f5d94af8caed6027d552e193c0b119bfeacdf981c2505e65c"
+            "value": "f1633a4fb4140544a38a7f8f22255ba5f576f7d42e55c1a7eecd5410a40c7cb5"
           },
           "media_type": "application/vate-admission-receipt+json",
           "uri": "examples/receipts/admission-deny-mcp-tool-class-mismatch.example.json"

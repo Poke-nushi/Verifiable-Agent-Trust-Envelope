@@ -880,12 +880,18 @@ def check_transport_bound_fixture_coverage() -> None:
             "request_checks": {
                 ("constraints", "transport", "oauth", "required_scope"): "crm.case.update",
                 ("constraints", "transport", "oauth", "scopes"): ["crm.case.update"],
+                ("constraints", "transport", "mcp", "authorized_tool"): "cases.update",
                 ("constraints", "transport", "mcp", "authorized_tool_class"): "read",
+                ("constraints", "transport", "mcp", "requested_tool"): "cases.update",
                 ("constraints", "transport", "mcp", "requested_tool_class"): "write",
             },
             "receipt_checks": {
                 ("request", "transport", "oauth", "required_scope"): "crm.case.update",
                 ("request", "transport", "oauth", "scopes"): ["crm.case.update"],
+                ("request", "transport", "mcp", "authorized_tool"): "cases.update",
+                ("request", "transport", "mcp", "authorized_tool_class"): "read",
+                ("request", "transport", "mcp", "requested_tool"): "cases.update",
+                ("request", "transport", "mcp", "requested_tool_class"): "write",
             },
             "forbidden_receipt_paths": [
                 ("evidence", 0, "verification", "full_token"),
@@ -1084,6 +1090,38 @@ def check_transport_bound_fixture_coverage() -> None:
             "negative": "deny-token-passthrough-as-authority",
             "positive": "allow-mcp-oauth-token-authority-bound",
             "mutation_axis": "oauth_authority_binding",
+            "metadata_stable_fields": [
+                "actor",
+                "principal",
+                "runtime",
+                "audience",
+                "action",
+                "target.resource",
+                "target.audience",
+                "requested_tool",
+                "requested_tool_class",
+                "constraints.expected_runtime",
+                "constraints.transport.oauth.issuer",
+                "constraints.transport.oauth.audience",
+                "constraints.transport.oauth.resource",
+                "constraints.transport.oauth.protected_resource",
+                "constraints.transport.oauth.token_present",
+                "constraints.transport.oauth.token_kind",
+                "constraints.transport.oauth.required_scope",
+                "constraints.transport.oauth.scopes",
+                "constraints.transport.oauth.proof_of_possession",
+                "constraints.transport.mcp.authorized_tool",
+                "constraints.transport.mcp.authorized_tool_class",
+                "constraints.transport.mcp.requested_tool",
+                "constraints.transport.mcp.requested_tool_class",
+                "policy.policy_id",
+                "issued_at",
+                "expires_at",
+            ],
+            "metadata_mutated_fields": [
+                "constraints.transport.oauth.upstream_authorization",
+                "constraints.transport.oauth.resource_binding",
+            ],
             "request_stable_paths": common_request_stable_paths + [
                 ("constraints", "transport", "oauth", "issuer"),
                 ("constraints", "transport", "oauth", "audience"),
@@ -1125,6 +1163,36 @@ def check_transport_bound_fixture_coverage() -> None:
             "negative": "deny-resource-indicator-drift",
             "positive": "allow-resource-indicator-aligned",
             "mutation_axis": "oauth_resource_indicator_binding",
+            "metadata_stable_fields": [
+                "actor",
+                "principal",
+                "runtime",
+                "audience",
+                "action",
+                "target.resource",
+                "target.audience",
+                "requested_target_resource.normalized",
+                "requested_tool",
+                "requested_tool_class",
+                "constraints.expected_runtime",
+                "constraints.transport.oauth.issuer",
+                "constraints.transport.oauth.audience",
+                "constraints.transport.oauth.required_scope",
+                "constraints.transport.oauth.scopes",
+                "constraints.transport.oauth.proof_of_possession",
+                "constraints.transport.mcp.authorized_tool",
+                "constraints.transport.mcp.authorized_tool_class",
+                "constraints.transport.mcp.requested_tool",
+                "constraints.transport.mcp.requested_tool_class",
+                "policy.policy_id",
+                "issued_at",
+                "expires_at",
+            ],
+            "metadata_mutated_fields": [
+                "constraints.transport.oauth.resource",
+                "constraints.transport.oauth.protected_resource",
+                "constraints.transport.oauth.resource_binding",
+            ],
             "request_stable_paths": common_request_stable_paths + [
                 ("requested_target_resource", "normalized"),
                 ("constraints", "transport", "oauth", "issuer"),
@@ -1162,6 +1230,33 @@ def check_transport_bound_fixture_coverage() -> None:
             "negative": "deny-mcp-tool-class-mismatch",
             "positive": "allow-mcp-tool-class-aligned",
             "mutation_axis": "mcp_tool_class_binding",
+            "metadata_stable_fields": [
+                "actor",
+                "principal",
+                "runtime",
+                "audience",
+                "action",
+                "target.resource",
+                "target.audience",
+                "requested_tool",
+                "requested_tool_class",
+                "constraints.expected_runtime",
+                "constraints.transport.oauth.issuer",
+                "constraints.transport.oauth.audience",
+                "constraints.transport.oauth.resource",
+                "constraints.transport.oauth.required_scope",
+                "constraints.transport.oauth.scopes",
+                "constraints.transport.oauth.proof_of_possession",
+                "constraints.transport.mcp.authorized_tool",
+                "constraints.transport.mcp.requested_tool",
+                "constraints.transport.mcp.requested_tool_class",
+                "policy.policy_id",
+                "issued_at",
+                "expires_at",
+            ],
+            "metadata_mutated_fields": [
+                "constraints.transport.mcp.authorized_tool_class",
+            ],
             "request_stable_paths": common_request_stable_paths + [
                 ("constraints", "transport", "oauth", "issuer"),
                 ("constraints", "transport", "oauth", "audience"),
@@ -1169,6 +1264,7 @@ def check_transport_bound_fixture_coverage() -> None:
                 ("constraints", "transport", "oauth", "required_scope"),
                 ("constraints", "transport", "oauth", "scopes"),
                 ("constraints", "transport", "oauth", "proof_of_possession"),
+                ("constraints", "transport", "mcp", "authorized_tool"),
                 ("constraints", "transport", "mcp", "requested_tool"),
                 ("constraints", "transport", "mcp", "requested_tool_class"),
             ],
@@ -1179,19 +1275,29 @@ def check_transport_bound_fixture_coverage() -> None:
                 ("request", "transport", "oauth", "required_scope"),
                 ("request", "transport", "oauth", "scopes"),
                 ("request", "transport", "oauth", "proof_of_possession"),
+                ("request", "transport", "mcp", "authorized_tool"),
             ],
             "request_mutations": [
-                (("constraints", "transport", "mcp", "authorized_tool"), "cases.search", "cases.update"),
                 (("constraints", "transport", "mcp", "authorized_tool_class"), "read", "write"),
             ],
             "receipt_mutations": [
-                (("request", "transport", "mcp", "authorized_tool"), "cases.search", "cases.update"),
                 (("request", "transport", "mcp", "authorized_tool_class"), "read", "write"),
             ],
         },
     }
     corpus = json.loads((ROOT / "conformance" / "al2-vate-v0.3" / "corpus.json").read_text(encoding="utf-8"))
     corpus_cases = {item.get("case_id"): item for item in corpus.get("cases", [])}
+    forbidden_semantic_stable_fields = {
+        "request_id",
+        "transaction_id",
+        "input_hash",
+        "correlation.mcp_session_id",
+        "correlation.mcp_request_id",
+        "evidence_refs.uri",
+        "evidence_refs.digest",
+        "receipt_id",
+        "proof.signature_ref",
+    }
     negative_inferred_authority_request_paths = [
         ("request", "transport", "oauth", "inferred_resource_authority"),
         ("request", "transport", "mcp", "inferred_tool_authority"),
@@ -1210,6 +1316,26 @@ def check_transport_bound_fixture_coverage() -> None:
 
         expected_stable_fields = negative_case.get("pairing", {}).get("stable_fields")
         expected_mutated_fields = negative_case.get("pairing", {}).get("mutated_fields")
+        if not isinstance(expected_stable_fields, list) or not all(isinstance(field, str) for field in expected_stable_fields):
+            raise RuntimeError(f"{pair['negative']} pairing.stable_fields must be a string array")
+        if not isinstance(expected_mutated_fields, list) or not all(isinstance(field, str) for field in expected_mutated_fields):
+            raise RuntimeError(f"{pair['negative']} pairing.mutated_fields must be a string array")
+        missing_metadata_stable_fields = sorted(set(pair["metadata_stable_fields"]) - set(expected_stable_fields))
+        if missing_metadata_stable_fields:
+            raise RuntimeError(
+                f"{pair_id} pairing.stable_fields must expose route-card lane fields: "
+                f"{missing_metadata_stable_fields}"
+            )
+        forbidden_metadata_stable_fields = sorted(forbidden_semantic_stable_fields & set(expected_stable_fields))
+        if forbidden_metadata_stable_fields:
+            raise RuntimeError(
+                f"{pair_id} pairing.stable_fields must not include fixture identity fields: "
+                f"{forbidden_metadata_stable_fields}"
+            )
+        if expected_mutated_fields != pair["metadata_mutated_fields"]:
+            raise RuntimeError(
+                f"{pair_id} pairing.mutated_fields must declare only {pair['metadata_mutated_fields']}"
+            )
         expected_negative_pairing = {
             "pair_id": pair_id,
             "role": "negative",
