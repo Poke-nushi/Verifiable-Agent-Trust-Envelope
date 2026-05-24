@@ -10,9 +10,12 @@ If it grows into every adjacent layer, it becomes a vague platform idea instead 
 - a universal agent ID registry
 - a single global passport issuer
 - a transport protocol that replaces A2A, MCP, or HTTP
+- a prompt framework
 - a multi-agent control plane
 - an orchestration broker
+- a connector permission system
 - a marketplace, scanner, or registry product
+- a human approval UI or human-in-the-loop (HITL) workflow product
 - a gateway or API management product
 - an eval, observability, or A/B testing suite
 - a payment settlement rail
@@ -24,6 +27,7 @@ If it grows into every adjacent layer, it becomes a vague platform idea instead 
 - a global policy language
 - an A2A core state-machine extension
 - an MCP authorization replacement
+- a replacement for OAuth, MCP, A2A, AP2, x402, or adjacent protocol families
 - a runtime disclosure manifest format
 - a mandatory real-name identity system for every assurance level
 - a forced blockchain, cloud, DID method, or PKI topology
@@ -69,6 +73,16 @@ Vendors are already building:
 - marketplaces and registries
 
 If this draft chases those layers directly, the protocol boundary becomes blurry.
+
+### 4. HITL-compatible, not HITL-centered
+
+Human review can be represented as one policy or evidence pattern in a VATE
+admission decision or receipt.
+
+VATE does not define reviewer queues, approval UIs, escalation workflows,
+staffing models, or operational approval tooling. Its center is the
+verifier-side admission decision and receipt linkage for risky external digital
+actions.
 
 ## What This Draft Does Try To Standardize
 
