@@ -12,6 +12,11 @@ A2A carries the task.
 MCP, OAuth, AP2, VC, and related systems provide evidence.
 VATE records the verifier decision: `allow`, `attenuate`, or `deny`.
 
+VATE is not a human-in-the-loop (HITL) workflow product.
+HITL review can be one policy or evidence pattern.
+VATE focuses on verifier-side admission decisions and receipts for risky
+external digital actions.
+
 Read this as a discussion draft and gap-analysis question for the boundary
 around risky writes and other external digital actions, not as a replacement for
 adjacent protocols.
@@ -121,8 +126,11 @@ evidence can be checked against the narrowed authority.
 This draft is not trying to become:
 
 - an agent platform
+- a prompt framework
 - a multi-agent control plane
 - an MCP or A2A connector suite
+- a connector permission system
+- a human approval UI or HITL workflow product
 - a gateway or API management product
 - a universal identity registry
 - a single global issuer
