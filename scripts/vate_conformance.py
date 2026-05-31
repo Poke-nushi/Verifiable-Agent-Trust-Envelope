@@ -200,13 +200,9 @@ def corpus_pairing_failures(corpus_root: Path) -> list[str]:
         if isinstance(role, str) and role not in PAIRING_ROLES:
             failures.append(f"{case_id}.pairing.role: expected one of {sorted(PAIRING_ROLES)}")
         category = case.get("category")
-        if (
-            isinstance(category, str)
-            and category in PAIRING_ROLES
-            and isinstance(role, str)
-            and role in PAIRING_ROLES
-            and role != category
-        ):
+        if category not in PAIRING_ROLES:
+            failures.append(f"{case_id}.pairing.category: expected positive or negative case category")
+        elif isinstance(role, str) and role in PAIRING_ROLES and role != category:
             failures.append(f"{case_id}.pairing.role: expected {category} to match case category")
 
         failures.extend(pairing_string_array_failures(case_id, pairing, "stable_fields"))
@@ -2493,6 +2489,12 @@ def summary_status(summary: Any) -> str:
     return "pass"
 
 
+def conformance_report_status(report: dict[str, Any]) -> str:
+    if report.get("fatal_errors"):
+        return "fail"
+    return summary_status(report.get("summary"))
+
+
 def implementation_case_results_match(
     conformance_report: dict[str, Any],
     implementation_report: dict[str, Any],
@@ -2648,8 +2650,8 @@ def verify_report_bundle(
     add_bundle_check(
         checks,
         "implementation_report.status",
-        implementation_report.get("status") == summary_status(conformance_report.get("summary")),
-        expected=summary_status(conformance_report.get("summary")),
+        implementation_report.get("status") == conformance_report_status(conformance_report),
+        expected=conformance_report_status(conformance_report),
         actual=implementation_report.get("status"),
     )
     add_bundle_check(
@@ -2824,11 +2826,7 @@ def make_implementation_report(args: argparse.Namespace, conformance_report: dic
         "version": IMPLEMENTATION_REPORT_VERSION,
         "profile": PROFILE,
         "generated_at": conformance_report["checked_at"],
-        "status": (
-            "fail"
-            if conformance_report.get("fatal_errors")
-            else summary_status(conformance_report["summary"])
-        ),
+        "status": conformance_report_status(conformance_report),
         "implementation": implementation_metadata(args, conformance_report),
         "corpus": {
             "name": corpus_root.name,
