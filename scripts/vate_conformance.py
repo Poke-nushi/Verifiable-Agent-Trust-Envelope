@@ -36,6 +36,28 @@ PROFILE_HASH_RE = re.compile(r"^sha-256:[0-9a-f]{64}$")
 CANONICAL_MONEY_VALUE_RE = re.compile(r"^(0|[1-9][0-9]*)(\.[0-9]+)?$")
 EVIDENCE_VOCABULARY_PATH = ROOT / "registries" / "evidence-vocabulary.v0.3.json"
 TERMINAL_REASON_CODES = {"FAIL_CLOSED", "POLICY_MATCH"}
+PAIRING_REQUIRED_FIELDS = (
+    "pair_id",
+    "role",
+    "paired_case_id",
+    "mutation_axis",
+    "stable_fields",
+    "mutated_fields",
+)
+PAIRING_ROLES = {"positive", "negative"}
+PAIRING_FORBIDDEN_STABLE_FIELDS = frozenset(
+    {
+        "request_id",
+        "transaction_id",
+        "input_hash",
+        "correlation.mcp_session_id",
+        "correlation.mcp_request_id",
+        "evidence_refs.uri",
+        "evidence_refs.digest",
+        "receipt_id",
+        "proof.signature_ref",
+    }
+)
 
 
 def load_evidence_vocabulary() -> tuple[frozenset[str], frozenset[str], dict[str, frozenset[str]]]:
@@ -122,6 +144,127 @@ def read_json(path: Path) -> dict[str, Any]:
 def write_json(path: Path, data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def pairing_string_array_failures(case_id: str, pairing: dict[str, Any], field: str) -> list[str]:
+    value = pairing.get(field)
+    if not isinstance(value, list):
+        return [f"{case_id}.pairing.{field}: expected non-empty string array"]
+    failures: list[str] = []
+    if not value:
+        failures.append(f"{case_id}.pairing.{field}: expected at least one field")
+    for index, item in enumerate(value):
+        if not isinstance(item, str) or not item:
+            failures.append(f"{case_id}.pairing.{field}[{index}]: expected non-empty string")
+    string_items = [item for item in value if isinstance(item, str)]
+    if len(set(string_items)) != len(string_items):
+        failures.append(f"{case_id}.pairing.{field}: duplicate field names are not allowed")
+    return failures
+
+
+def corpus_pairing_failures(corpus_root: Path) -> list[str]:
+    case_paths = sorted((corpus_root / "cases").glob("*.json"))
+    cases_by_id: dict[str, dict[str, Any]] = {}
+    pairing_case_ids: list[str] = []
+    pair_members: dict[str, set[str]] = {}
+    failures: list[str] = []
+
+    for case_path in case_paths:
+        case = read_json(case_path)
+        case_id = case.get("case_id")
+        if not isinstance(case_id, str) or not case_id:
+            failures.append(f"{display_path(case_path.resolve())}: missing string case_id")
+            continue
+        if case_id in cases_by_id:
+            failures.append(f"case_id {case_id}: duplicate case id")
+            continue
+        cases_by_id[case_id] = case
+
+    for case_id in sorted(cases_by_id):
+        case = cases_by_id[case_id]
+        pairing = case.get("pairing")
+        if pairing is None:
+            continue
+        pairing_case_ids.append(case_id)
+        if not isinstance(pairing, dict):
+            failures.append(f"{case_id}.pairing: expected object")
+            continue
+        for field in PAIRING_REQUIRED_FIELDS:
+            if field not in pairing:
+                failures.append(f"{case_id}.pairing.{field}: required")
+        for field in ("pair_id", "role", "paired_case_id", "mutation_axis"):
+            value = pairing.get(field)
+            if not isinstance(value, str) or not value:
+                failures.append(f"{case_id}.pairing.{field}: expected non-empty string")
+        role = pairing.get("role")
+        if isinstance(role, str) and role not in PAIRING_ROLES:
+            failures.append(f"{case_id}.pairing.role: expected one of {sorted(PAIRING_ROLES)}")
+        category = case.get("category")
+        if category not in PAIRING_ROLES:
+            failures.append(f"{case_id}.pairing.category: expected positive or negative case category")
+        elif isinstance(role, str) and role in PAIRING_ROLES and role != category:
+            failures.append(f"{case_id}.pairing.role: expected {category} to match case category")
+
+        failures.extend(pairing_string_array_failures(case_id, pairing, "stable_fields"))
+        failures.extend(pairing_string_array_failures(case_id, pairing, "mutated_fields"))
+        stable_fields = pairing.get("stable_fields")
+        mutated_fields = pairing.get("mutated_fields")
+        if isinstance(stable_fields, list) and isinstance(mutated_fields, list):
+            stable_set = {item for item in stable_fields if isinstance(item, str)}
+            mutated_set = {item for item in mutated_fields if isinstance(item, str)}
+            overlap = sorted(stable_set & mutated_set)
+            if overlap:
+                failures.append(f"{case_id}.pairing: stable_fields and mutated_fields overlap: {overlap}")
+            forbidden_stable_fields = sorted(stable_set & PAIRING_FORBIDDEN_STABLE_FIELDS)
+            if forbidden_stable_fields:
+                failures.append(
+                    f"{case_id}.pairing.stable_fields: fixture identity fields are not stable semantics: "
+                    f"{forbidden_stable_fields}"
+                )
+
+        pair_id = pairing.get("pair_id")
+        if isinstance(pair_id, str) and pair_id:
+            pair_members.setdefault(pair_id, set()).add(case_id)
+
+    for case_id in sorted(pairing_case_ids):
+        pairing = cases_by_id[case_id].get("pairing")
+        if not isinstance(pairing, dict):
+            continue
+        paired_case_id = pairing.get("paired_case_id")
+        if not isinstance(paired_case_id, str) or not paired_case_id:
+            continue
+        if paired_case_id == case_id:
+            failures.append(f"{case_id}.pairing.paired_case_id: must not point to itself")
+            continue
+        paired_case = cases_by_id.get(paired_case_id)
+        if paired_case is None:
+            failures.append(f"{case_id}.pairing.paired_case_id: unknown case_id {paired_case_id}")
+            continue
+        paired_pairing = paired_case.get("pairing")
+        if not isinstance(paired_pairing, dict):
+            failures.append(f"{case_id}.pairing.paired_case_id: paired case {paired_case_id} has no pairing object")
+            continue
+        if paired_pairing.get("paired_case_id") != case_id:
+            failures.append(f"{case_id}.pairing: paired case {paired_case_id} does not point back")
+        role = pairing.get("role")
+        paired_role = paired_pairing.get("role")
+        if (
+            isinstance(role, str)
+            and role in PAIRING_ROLES
+            and isinstance(paired_role, str)
+            and paired_role in PAIRING_ROLES
+            and role == paired_role
+        ):
+            failures.append(f"{case_id}.pairing.role: paired case {paired_case_id} must use the opposite role")
+        for field in ("pair_id", "mutation_axis", "stable_fields", "mutated_fields"):
+            if paired_pairing.get(field) != pairing.get(field):
+                failures.append(f"{case_id}.pairing.{field}: does not match paired case {paired_case_id}")
+
+    for pair_id, members in sorted(pair_members.items()):
+        if len(members) != 2:
+            failures.append(f"pairing {pair_id}: expected exactly 2 cases, found {len(members)}")
+
+    return failures
 
 
 def iso_now() -> str:
@@ -286,6 +429,9 @@ def category_counts(cases: list[dict[str, Any]]) -> dict[str, int]:
 
 def make_corpus_index(corpus_root: Path) -> dict[str, Any]:
     case_paths = sorted((corpus_root / "cases").glob("*.json"))
+    pairing_failures = corpus_pairing_failures(corpus_root)
+    if pairing_failures:
+        raise RuntimeError("invalid corpus pairing metadata:\n- " + "\n- ".join(pairing_failures))
     cases = [case_index_entry(path) for path in case_paths]
     manifest, digest = corpus_manifest(corpus_root)
     return {
@@ -1629,6 +1775,7 @@ def run_corpus(corpus_root: Path) -> dict[str, Any]:
     case_paths = sorted((corpus_root / "cases").glob("*.json"))
     cases = [evaluate_case(path) for path in case_paths]
     manifest, digest = corpus_manifest(corpus_root)
+    fatal_errors = corpus_pairing_failures(corpus_root)
     failed = sum(1 for item in cases if not item["pass"])
     report = {
         "version": CONFORMANCE_REPORT_VERSION,
@@ -1649,7 +1796,9 @@ def run_corpus(corpus_root: Path) -> dict[str, Any]:
         "cases": cases,
     }
     if not case_paths:
-        report["fatal_errors"] = ["no conformance case files found"]
+        fatal_errors.append("no conformance case files found")
+    if fatal_errors:
+        report["fatal_errors"] = fatal_errors
     return report
 
 
@@ -2129,10 +2278,11 @@ def sut_result_artifact_failures(result: dict[str, Any], requirements: dict[str,
 
 def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, Any]:
     sut_results = read_json(sut_results_path)
+    pairing_failures = corpus_pairing_failures(corpus_root)
     expectations = load_case_expectations(corpus_root)
     manifest, digest = corpus_manifest(corpus_root)
 
-    fatal_errors: list[str] = []
+    fatal_errors: list[str] = list(pairing_failures)
     if not isinstance(sut_results, dict):
         fatal_errors.append("sut_results: expected object")
         sut_results = {}
@@ -2339,6 +2489,12 @@ def summary_status(summary: Any) -> str:
     return "pass"
 
 
+def conformance_report_status(report: dict[str, Any]) -> str:
+    if report.get("fatal_errors"):
+        return "fail"
+    return summary_status(report.get("summary"))
+
+
 def implementation_case_results_match(
     conformance_report: dict[str, Any],
     implementation_report: dict[str, Any],
@@ -2494,8 +2650,8 @@ def verify_report_bundle(
     add_bundle_check(
         checks,
         "implementation_report.status",
-        implementation_report.get("status") == summary_status(conformance_report.get("summary")),
-        expected=summary_status(conformance_report.get("summary")),
+        implementation_report.get("status") == conformance_report_status(conformance_report),
+        expected=conformance_report_status(conformance_report),
         actual=implementation_report.get("status"),
     )
     add_bundle_check(
@@ -2670,11 +2826,7 @@ def make_implementation_report(args: argparse.Namespace, conformance_report: dic
         "version": IMPLEMENTATION_REPORT_VERSION,
         "profile": PROFILE,
         "generated_at": conformance_report["checked_at"],
-        "status": (
-            "fail"
-            if conformance_report.get("fatal_errors")
-            else summary_status(conformance_report["summary"])
-        ),
+        "status": conformance_report_status(conformance_report),
         "implementation": implementation_metadata(args, conformance_report),
         "corpus": {
             "name": corpus_root.name,

@@ -115,6 +115,22 @@ A non-reference implementation can run the corpus without importing Python code:
 
 Implementations MAY use the reference runner as a comparison oracle, but the corpus index is the portable contract.
 
+## Paired Mutation Cases
+
+Some positive and negative cases publish a `pairing` object to identify a
+mutation-minimal pair. In the current AL2 v0.3 corpus this is used for
+MCP/OAuth route-card authority checks.
+
+The `pairing` object names the reciprocal case, the mutation axis, and the
+fields expected to remain stable or intentionally change. The reference runner
+checks that paired cases point back to each other, use opposite positive /
+negative roles, share the same `pair_id`, `mutation_axis`, `stable_fields`, and
+`mutated_fields`, and do not list fixture identity fields as stable semantics.
+
+This metadata is a corpus review aid. It does not imply production
+compatibility, endorsement, or a complete semantic equivalence proof between
+the paired artifacts.
+
 ## Profile-Specific Checks
 
 Some cases include profile-specific check arrays in addition to the `expected`
