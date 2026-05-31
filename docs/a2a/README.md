@@ -50,6 +50,7 @@ Related schema:
 Related conformance and implementation review aids:
 
 - `conformance/al2-vate-v0.3/`
+- `docs/interop/payment-evidence-frame-crosswalk.md`
 - `docs/conformance/external-sut-quickstart.md`
 - `docs/conformance/sut-adapter-contract.md`
 - `docs/conformance/report-integrity.md`
