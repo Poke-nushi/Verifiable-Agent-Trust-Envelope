@@ -316,10 +316,14 @@ compatibility claim.
   Package-private TypeScript helpers for the reference-only A2A metadata binding
 - [docs/interop/oap-aport-crosswalk.md](docs/interop/oap-aport-crosswalk.md)
   OAP / APort decision evidence crosswalk for VATE admission receipts
+- [docs/interop/aae-crosswalk.md](docs/interop/aae-crosswalk.md)
+  Agent Authorization Envelope evidence crosswalk for VATE admission receipts
 - [docs/interop/ap2-ucp-commerce-crosswalk.md](docs/interop/ap2-ucp-commerce-crosswalk.md)
   AP2 / UCP commerce evidence crosswalk for VATE admission receipts
 - [docs/interop/ap2-human-not-present-evidence.md](docs/interop/ap2-human-not-present-evidence.md)
   AP2 Human Not Present payment-authority evidence fixtures
+- [docs/interop/payment-evidence-frame-crosswalk.md](docs/interop/payment-evidence-frame-crosswalk.md)
+  Payment Evidence Frame evidence crosswalk for VATE admission and post-execution linkage
 - [docs/known-gaps.md](docs/known-gaps.md)
   Current unresolved design gaps
 - [reference/minimal-al2-demo/README.md](reference/minimal-al2-demo/README.md)
@@ -412,6 +416,8 @@ production approval and do not add production JOSE/JCS verification.
 - [docs/threat-model.md](docs/threat-model.md)
 - [docs/status-network-model.md](docs/status-network-model.md)
 - [docs/conformance-and-negative-tests.md](docs/conformance-and-negative-tests.md)
+- [docs/interop/aae-crosswalk.md](docs/interop/aae-crosswalk.md)
+- [docs/interop/payment-evidence-frame-crosswalk.md](docs/interop/payment-evidence-frame-crosswalk.md)
 
 ## Authoring Note
 
