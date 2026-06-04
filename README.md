@@ -7,6 +7,7 @@ may perform a risky external digital action.
 
 It does not replace A2A, MCP, OAuth, OpenID, VC, SPIFFE, AP2, x402, or payment
 mandates.
+It is not an A2A core proposal or a universal trust layer.
 
 A2A carries the task.
 MCP, OAuth, AP2, VC, and related systems provide evidence.
@@ -27,6 +28,7 @@ adjacent protocols.
 - `v0.3.1 archived May 14, 2026 credibility and reviewability patch`
 - `not production-ready`
 - `not an official A2A extension, endorsement, certification, SDK, middleware package, or general compatibility proof`
+- `not an A2A core proposal or universal trust layer`
 - `no production approval implied`
 - `seeking critique on boundary, verifier order, gap analysis, and artifact semantics`
 
@@ -132,6 +134,7 @@ This draft is not trying to become:
 - a connector permission system
 - a human approval UI or HITL workflow product
 - a gateway or API management product
+- a universal trust layer
 - a universal identity registry
 - a single global issuer
 

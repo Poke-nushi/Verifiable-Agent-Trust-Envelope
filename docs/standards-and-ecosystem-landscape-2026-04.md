@@ -96,7 +96,7 @@ The following are not standards, but they do show where the ecosystem is moving.
 | Anthropic MCP product integration | MCP is integrated across Claude products and APIs | Tool-connected agents are already a product reality |
 | OpenAI AgentKit / Connector Registry | connectors, MCP, approvals, and multi-agent workflows are productized | Admin, connector governance, and agent operations are becoming first-class product concerns |
 | Microsoft A2A / MCP support | Microsoft has publicly supported open agent interoperability patterns | Vendor-neutral interoperability is gaining enterprise legitimacy |
-| Salesforce Headless 360 (2026-04-15) | Salesforce capabilities are exposed as APIs, MCP tools, and CLI commands, with a new experience layer across surfaces | this draft should position itself as a portable trust layer that composes with those surfaces rather than as another platform UI or execution shell |
+| Salesforce Headless 360 (2026-04-15) | Salesforce capabilities are exposed as APIs, MCP tools, and CLI commands, with a new experience layer across surfaces | this draft should position itself as a portable verifier-side admission and receipt profile that composes with those surfaces rather than as another platform UI or execution shell |
 | Salesforce Agent Fabric expansion (2026-04-15) | discovery, deterministic orchestration, MCP Bridge, AI Gateway, and centralized LLM governance are framed as a trusted control plane | enterprise demand for governed multi-vendor control planes is real, but this draft should not expand its core into a control plane product |
 | MuleSoft Trusted Agent Identity | authenticated user context is propagated with on-behalf-of delegation, gateway enforcement, and optional step-up verification | validates the delegated identity problem, while leaving room for the distinct runtime proof, mission permit, receipt, and status artifact model in this draft |
 | Cloudflare Web Bot Auth | signed automated traffic can be verified at the web edge | Transport-level proof for automated callers is becoming practical |
@@ -189,7 +189,8 @@ The strongest framing for public release is:
 
 - this draft is **not** a universal agent ID registry
 - this draft is **not** a replacement for A2A or MCP
-- this draft is a proposal for the missing **trust, permission, and accountability layer**
+- this draft is **not** a universal trust layer
+- this draft is a proposal for a verifier-side **admission, attenuation, and receipt profile**
 - this draft composes existing standards instead of discarding them
 - this draft should stay small at the core and let profiles / extensions handle domain-specific concerns
 

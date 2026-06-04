@@ -1,6 +1,6 @@
 # Contributing to Verifiable Agent Trust Envelope
 
-Verifiable Agent Trust Envelope is an open discussion draft about trust, permission, and accountability for AI agent systems.
+Verifiable Agent Trust Envelope is an open discussion draft about verifier-side admission decisions and receipts for risky external AI-agent actions.
 This repository is intended to evolve into a clearer protocol discussion space for specifications, profiles, schemas, and conformance-oriented artifacts.
 
 ## Contributions That Help Most
@@ -16,6 +16,7 @@ This repository is intended to evolve into a clearer protocol discussion space f
 ## Ground Rules
 
 - this draft is **not** a replacement for A2A or MCP
+- this draft is **not** an A2A core proposal or universal trust layer
 - this draft is **not** a rejection of OAuth, OpenID, or VC
 - the core should stay small
 - domain-specific concerns should move into profiles or extensions

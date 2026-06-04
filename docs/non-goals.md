@@ -17,6 +17,7 @@ If it grows into every adjacent layer, it becomes a vague platform idea instead 
 - a marketplace, scanner, or registry product
 - a human approval UI or human-in-the-loop (HITL) workflow product
 - a gateway or API management product
+- a universal trust layer
 - an eval, observability, or A/B testing suite
 - a payment settlement rail
 - an agent checkout protocol
