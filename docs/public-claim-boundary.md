@@ -10,6 +10,7 @@ and related systems, while recording the relying party's pre-execution decision:
 
 It does not replace, validate, certify, or officially extend those adjacent
 protocols.
+It is not an A2A core proposal or a universal trust layer.
 
 ## Safe Summary
 
@@ -19,6 +20,7 @@ Use this summary when a short public description is needed:
 > risky AI-agent actions. It records the relying party's pre-execution decision
 > - allow, attenuate, or deny - using digest-bound evidence references, without
 > replacing or officially extending A2A, MCP/OAuth, AP2, VC, or related systems.
+> It is not an A2A core proposal or a universal trust layer.
 
 ## What The Repository Is
 
@@ -41,6 +43,8 @@ Do not describe this repository as:
 - a certification program;
 - an endorsement, approval, or compatibility badge;
 - an official A2A extension;
+- an A2A core proposal;
+- a universal trust layer;
 - an MCP, OAuth, AP2, VC, or OpenID replacement;
 - a complete security review;
 - a production JOSE/JCS, PKI, Sigstore, or signed-git verification profile;
@@ -105,6 +109,8 @@ Do not use these as public claims for the current repository state:
 - "official compatibility"
 - "A2A-approved"
 - "A2A official extension"
+- "A2A core proposal"
+- "universal trust layer"
 - "AP2 validates VATE"
 - "VATE solves MCP authorization"
 - "VATE provides agent identity"
@@ -129,4 +135,3 @@ Use this mental model:
 Adjacent artifacts are evidence inputs. They are not sufficient authority by
 themselves unless the selected VATE profile and local verifier policy evaluate
 them as sufficient for the requested action.
-

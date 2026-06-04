@@ -2,7 +2,7 @@
 
 ## What Is This Draft In One Sentence?
 
-Verifiable Agent Trust Envelope is an early discussion draft for the verifier-side trust / permit / receipt boundary that appears when an external agent wants to perform a risky write against a remote system.
+Verifiable Agent Trust Envelope is an early discussion draft for the verifier-side admission and receipt boundary that appears when an external agent wants to perform a risky write against a remote system.
 
 ## What Public Claims Are Safe?
 
@@ -18,6 +18,7 @@ The safe short version is:
 - It composes with A2A, MCP/OAuth, AP2, VC, and related evidence sources.
 - It is not production-ready, not a certification program, not an endorsement,
   and not an official A2A extension.
+- It is not an A2A core proposal or a universal trust layer.
 
 ## What Exact Moment Is This Repo About?
 
