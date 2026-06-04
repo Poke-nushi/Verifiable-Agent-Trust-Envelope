@@ -219,7 +219,9 @@ The most useful feedback for this draft is currently:
 - **Immediate next action**: collect one SUT result from an implementation that
   is not the repository reference runner, plus generated artifacts or a
   controlled artifact bundle, an implementation report, and a local bundle
-  verification report for one `v0.3` corpus snapshot
+  verification report for one `v0.3` corpus snapshot; if that is too heavy for a
+  first reviewer, collect a three-case corpus review that identifies unclear
+  boundaries, reason codes, or artifact requirements
 - **Planned later**: pairwise presentation profile, richer capability registry, formal `AID`, physical `ABS` profiles
 
 The conformance artifacts record one implementation run against one corpus

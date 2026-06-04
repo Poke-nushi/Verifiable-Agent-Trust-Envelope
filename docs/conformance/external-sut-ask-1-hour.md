@@ -34,6 +34,22 @@ Any one of these is useful:
 
 You do not need to produce a passing report for the review to be useful.
 
+## Smallest Useful Review
+
+If a full adapter or full-corpus pass is too much for a first review, pick three
+cases and report where the boundary is unclear.
+
+Suggested starter set:
+
+- `allow-valid-admission`
+- `attenuate-max-amount`
+- `deny-digest-mismatch-before-policy`
+
+That is enough to test whether the basic `allow`, `attenuate`, and fail-closed
+paths are understandable without treating the Python reference runner as the
+primary specification. A reviewer may choose different cases if another boundary
+looks more important.
+
 ## Scope
 
 - Target corpus: `conformance/al2-vate-v0.3`
@@ -79,6 +95,7 @@ Implementation language or tool:
 Corpus snapshot:
 Used the repository reference runner: yes/no
 Attempted cases:
+If this was a three-case review, why these cases:
 Produced SUT result file: yes/no
 Produced generated artifacts or bundle: yes/no
 Ran compare: yes/no

@@ -243,6 +243,19 @@ and [VATE JOSE Proof Profile Notes 2026-07](../profiles/vate-jose-proof-profile-
 No normative v0.3 production JOSE/JCS proof profile exists yet. The current AL2
 corpus still uses dependency-free byte-level proof fixtures only.
 
+## Open Review Questions
+
+- Should a future profile describe digest-bound attenuation proposal artifacts
+  for interactive attenuation review, or keep all narrowing represented only as
+  final admission receipt semantics?
+- If interactive attenuation is supported, should acceptance be represented as a
+  follow-up A2A interaction with the same context and a new
+  `admission_requested` reference, rather than as new VATE metadata phases or
+  inline proposal bodies?
+- Which conformance cases would be needed to fail closed when a proposal is
+  ignored, expired, or accepted with an `effective_request_hash` that does not
+  match the admitted effective request?
+
 ## Examples
 
 Agent Card and metadata examples:
