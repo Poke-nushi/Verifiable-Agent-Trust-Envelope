@@ -346,6 +346,10 @@ The minimal phases are:
 
 This distinction matters because a verifier often has to release an admission decision before the remote action has finished.
 The post-execution receipt can then link back to the admission receipt using `admission_receipt_ref`, `attestation_id`, or a profile-defined `correlation` object.
+A profile may also carry a content-addressed `action_binding` digest for the
+action preimage. That binding identifies the action or request being evaluated;
+it complements, but does not replace, explicit admission-to-post-execution
+linkage such as an admission receipt reference and digest.
 
 #### Required fields
 - receipt_id
@@ -376,6 +380,7 @@ For a `post_execution` receipt, those fields describe the execution window and e
 - principal when present
 - input hash/ref
 - output hash/ref
+- action_binding when a profile defines a reproducible action preimage digest
 - evidence references
 - artifact digests
 - admission_receipt_ref on post-execution receipts

@@ -91,11 +91,15 @@ For verifier-signed admission receipts, AL2 should also include:
 - `decision`: `allow`, `attenuate`, or `deny`
 - `attenuation` with structured `changes` when the effective constraints differ
   from the original permit constraints
+- `reason_visibility` or an equivalent profile field when the verifier must
+  keep the concrete policy or evidence basis opaque or withheld
 
 For post-execution receipts, AL2 should include `admission_receipt_ref` when an admission receipt was issued.
 
 Optional but strongly recommended:
 
+- profile-defined `action_binding` when a receiver must reproduce the action
+  preimage digest independently
 - evidence references
 - delegated chain references
 - artifact digests

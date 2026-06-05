@@ -66,6 +66,10 @@ The draft now distinguishes admission receipts from post-execution receipts, but
 - dispute and audit expectations
 - chain linkage across delegated execution
 - canonical correlation rules for `admission_receipt_ref`, `attestation_id`, and profile-specific correlation objects
+- how profile-defined content-addressed `action_binding` values compose with
+  explicit admission-to-post-execution receipt linkage
+- how much reason-basis detail regulated or sensitive profiles may disclose in
+  portable receipts versus protected audit material
 - when an admission receipt should be inline, dereferenceable, or both
 
 The v0.3 AL2 verifier admission profile adds separate admission and post-execution receipt schemas.

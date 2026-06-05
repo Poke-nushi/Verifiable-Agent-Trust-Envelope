@@ -137,11 +137,70 @@
             "type": "string",
             "minLength": 1
           },
+          "reason_visibility": {
+            "type": "string",
+            "description": "Whether the verifier can disclose the concrete basis for this attenuation reason.",
+            "enum": [
+              "disclosed",
+              "opaque",
+              "withheld"
+            ]
+          },
+          "reason_withheld": {
+            "type": "boolean",
+            "description": "Compatibility flag for profiles that need a boolean marker; true requires reason_visibility to be opaque or withheld."
+          },
           "source_status_ref": {
             "type": "string",
             "minLength": 1
           }
         },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "reason_visibility": {
+                  "const": "disclosed"
+                }
+              },
+              "required": [
+                "reason_visibility"
+              ]
+            },
+            "then": {
+              "properties": {
+                "reason_withheld": {
+                  "const": false
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "reason_withheld": {
+                  "const": true
+                }
+              },
+              "required": [
+                "reason_withheld"
+              ]
+            },
+            "then": {
+              "required": [
+                "reason_visibility"
+              ],
+              "properties": {
+                "reason_visibility": {
+                  "enum": [
+                    "opaque",
+                    "withheld"
+                  ]
+                }
+              }
+            }
+          }
+        ],
         "additionalProperties": true
       }
     },
@@ -155,6 +214,108 @@
     },
     "correlation": {
       "type": "object",
+      "additionalProperties": true
+    },
+    "action_binding": {
+      "type": "object",
+      "description": "Optional profile-defined content-addressed binding for the admitted action preimage. This complements, but does not replace, admission_receipt_ref or other phase-linkage fields.",
+      "required": [
+        "type",
+        "digest"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "canonical_request_digest",
+            "profile_defined_digest",
+            "external_reference"
+          ]
+        },
+        "canonicalization": {
+          "type": "string",
+          "minLength": 1
+        },
+        "preimage_profile": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "type": "object",
+          "required": [
+            "alg",
+            "value"
+          ],
+          "properties": {
+            "alg": {
+              "type": "string",
+              "const": "sha-256"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "canonical_request_digest"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "canonicalization"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "profile_defined_digest"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "preimage_profile"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "external_reference"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "uri"
+            ]
+          }
+        }
+      ],
       "additionalProperties": true
     },
     "evidence_refs": {
