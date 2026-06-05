@@ -54,7 +54,17 @@ Each change SHOULD include:
 - `from`
 - `to`
 - `reason_code`
+- `reason_visibility` when the concrete basis is opaque or withheld
 - `source_evidence_ref` when the narrowing came from a specific evidence item
+
+The `reason_code` remains machine-readable even when the verifier cannot safely
+disclose the full basis for a change. Regulated or sensitive verifier profiles
+may emit a generic code such as `REASON_BASIS_WITHHELD` and mark
+`reason_visibility` as `opaque` or `withheld`, while keeping the detailed basis
+in verifier-controlled audit material, policy evidence, or protected logs.
+Portable receipts should not force sanctions, abuse, fraud, or other sensitive
+screening details into signed bytes when the applicable profile forbids
+disclosure.
 
 ## Interpretation
 

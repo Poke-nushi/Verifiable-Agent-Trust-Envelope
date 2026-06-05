@@ -199,6 +199,9 @@ policy_snapshot.digest, reason_codes
 
 A2A metadata should still carry only the digest-bound admission receipt
 reference. The full attenuation object belongs in the VATE admission receipt.
+If the concrete attenuation or denial basis is sensitive, the receipt may carry
+an opaque or withheld reason signal while protected audit material keeps the
+full basis outside A2A metadata.
 
 ## Failure Mapping
 

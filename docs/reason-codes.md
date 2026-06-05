@@ -14,6 +14,25 @@ Reason codes use `SCREAMING_SNAKE_CASE`.
 Implementations MUST preserve exact spelling in conformance reports.
 Implementations MAY include additional profile-specific reason codes, but the canonical codes below should be preferred when they fit.
 
+## Reason Visibility
+
+Reason codes are still required for machine-readable comparison, but a portable
+receipt does not always need to disclose the concrete policy or evidence basis.
+Some regulated or sensitive verifier profiles may need to report an opaque or
+withheld basis while keeping the detailed rationale in verifier-controlled audit
+material, policy evidence, or protected logs.
+
+Receipts and attenuation changes may use `reason_visibility` values:
+
+- `disclosed` - the receipt can disclose the relevant reason basis
+- `opaque` - the receipt exposes only a profile-defined opaque token or category
+- `withheld` - the receipt intentionally withholds the concrete basis
+
+When the basis is withheld, the verifier should still emit a stable
+machine-readable reason code, such as `REASON_BASIS_WITHHELD`, alongside the
+primary decision code. This preserves comparable admission and receipt behavior
+without forcing sensitive basis details into portable receipt bytes.
+
 ## Canonical Codes
 
 ### Success And Policy Match
@@ -32,6 +51,10 @@ Implementations MAY include additional profile-specific reason codes, but the ca
 - `LOCAL_POLICY_MAX_AMOUNT_NARROWED` - local policy lowered the requested amount
 - `TARGET_SCOPE_NARROWED` - local policy narrowed the target resource or audience
 - `NEW_PERMIT_REQUIRED` - the requested action requires a fresh or narrower permit before execution
+
+### Reason Disclosure
+
+- `REASON_BASIS_WITHHELD` - the verifier emitted a machine-readable outcome but withheld the concrete policy or evidence basis because the applicable profile, regulation, or local policy does not allow disclosure
 
 ### Schema, Digest, And Proof
 

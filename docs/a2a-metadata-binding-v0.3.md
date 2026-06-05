@@ -85,6 +85,12 @@ The object should contain:
 The metadata object should not contain the full receipt body by default.
 It should also avoid carrying policy semantics directly.
 When audit traceability requires the concrete policy basis, use an optional digest-bound `policy_snapshot` reference rather than embedding policy rules in A2A metadata.
+When a profile cannot disclose the concrete reason basis, the portable receipt
+can carry an opaque or withheld reason signal; A2A metadata should still avoid
+embedding the sensitive basis itself.
+When a profile defines an `action_binding` digest, A2A metadata may point to the
+artifact that contains that binding, but the binding does not replace the
+admission receipt reference or post-execution receipt reference.
 The v0.3 metadata schema closes the core object; future fields should live under
 explicit `extensions` or `annotations` rather than appearing beside normative
 fields.

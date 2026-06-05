@@ -27,6 +27,93 @@
       "type": "string",
       "description": "Profile-defined SHA-256 hash string for AL2 request and execution binding fields.",
       "pattern": "^sha-256:[0-9a-f]{64}$"
+    },
+    "actionBinding": {
+      "type": "object",
+      "description": "Optional profile-defined content-addressed binding for the action preimage. This complements, but does not replace, the admission receipt digest link.",
+      "required": [
+        "type",
+        "digest"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "canonical_request_digest",
+            "profile_defined_digest",
+            "external_reference"
+          ]
+        },
+        "canonicalization": {
+          "type": "string",
+          "minLength": 1
+        },
+        "preimage_profile": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "#/$defs/digestDescriptor"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "canonical_request_digest"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "canonicalization"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "profile_defined_digest"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "preimage_profile"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "external_reference"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "uri"
+            ]
+          }
+        }
+      ],
+      "additionalProperties": true
     }
   },
   "required": [
@@ -150,6 +237,9 @@
         },
         "effective_request_hash": {
           "$ref": "#/$defs/profileHash"
+        },
+        "action_binding": {
+          "$ref": "#/$defs/actionBinding"
         },
         "runtime": {
           "type": "string",

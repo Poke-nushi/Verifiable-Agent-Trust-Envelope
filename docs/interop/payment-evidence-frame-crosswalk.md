@@ -64,6 +64,18 @@ Do not silently substitute them for the VATE `digest` descriptor unless a profil
 For AL2 v0.3 review artifacts, the VATE `digest` descriptor should bind the exact artifact bytes or the profile-defined canonical artifact basis used by the VATE evidence reference.
 PEF identifiers can be preserved as adjacent evidence metadata, but the VATE receipt should remain clear about which digest basis was checked.
 
+## Adjacent Payment Receipt Profiles
+
+Payment-specific receipt frames, settlement attestations, compliance receipts,
+and composite verdicts are candidate adjacent evidence artifacts.
+VATE does not treat any specific payment receipt profile, settlement rail,
+wallet, chain, or draft as a normative dependency unless a future
+domain-specific profile explicitly says so.
+Those artifacts can still be useful evidence inputs when they are bound to the
+admitted action, verified under their own profile rules, and linked to the
+VATE admission or post-execution receipt by digest or another profile-defined
+stable reference.
+
 ## A2A Boundary
 
 A2A can carry task flow and may carry or reference payment evidence artifacts.
