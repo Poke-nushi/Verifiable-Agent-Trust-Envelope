@@ -34,6 +34,15 @@ adjacent protocols.
 
 [![DOI](https://zenodo.org/badge/1214949350.svg)](https://doi.org/10.5281/zenodo.19839768)
 
+## Try It In 60 Seconds
+
+```bash
+python3 reference/quickstart-demo/run_demo.py
+```
+
+No dependencies. It narrates three committed v0.3 corpus cases: allow,
+attenuate, and a fail-closed deny.
+
 ## Reviewer Entry Points
 
 If you are reviewing the current `v0.3.1` discussion-draft snapshot or

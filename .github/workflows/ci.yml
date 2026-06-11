@@ -35,6 +35,9 @@ jobs:
       - name: Compile Python scripts
         run: python -m py_compile scripts/vate_conformance.py scripts/check_repo.py scripts/check_repo_strict.py
 
+      - name: Run quickstart demo
+        run: python reference/quickstart-demo/run_demo.py
+
       - name: Run conformance corpus checks
         run: |
           python scripts/vate_conformance.py run \
