@@ -160,13 +160,70 @@ VATE review question:
   bytes and digest without redefining AP2 or treating AP2's descriptor as VATE's
   descriptor?
 
-## Deferred: service_trust_v0
+## Deferred Candidate: service_trust_v0
 
-`service_trust_v0` is not pinned in this first slice.
+`service_trust_v0` is not pinned in this first slice. It is recorded here as a
+deferred second-slice candidate for signed service trust evidence or
+verifier-side service admission evidence.
 
 Reason:
 
-- The mapping to a specific VATE case or review question is not yet defined.
-- The name alone should not be used to infer A2A equivalence.
-- A future pin should identify the selected evidence object, descriptor basis,
-  signature or trust boundary, and exact VATE case mapping.
+- The first pinned slice remains limited to the three non-normative review
+  inputs listed above.
+- This candidate has a richer signed-provider shape than the unsigned
+  content-addressed sets in the first slice.
+- A future pin should still identify the exact VATE case or review question
+  before treating it as part of an external review slice.
+
+Path:
+
+- `vectors/service_trust_v0/service_trust_v0.json`
+
+Candidate vector names:
+
+- `known-service-scored`
+- `unknown-service-null`
+- `timestamp-ms-canonicalization`
+- `null-score-not-default`
+- `batch-composition`
+
+Candidate VATE track:
+
+- signed service trust evidence
+- verifier-side service admission evidence
+
+Selected evidence object:
+
+- per-service signed trust verdict over the `service_url` input and scored
+  result
+
+Provider and provenance:
+
+- provider: `did:web:supership.crestsystems.ai`
+- operator: Supership / Crest Deployment Systems LLC
+- category: `service_trust`
+- provenance caveat: this is a third-party provider set; AlgoVoi provides the
+  conformance vectors, not the trust scoring itself
+
+Discovery and verification boundary:
+
+- risk-check discovery: `https://supership.crestsystems.ai/.well-known/risk-check.json`
+- JWKS: `https://supership.crestsystems.ai/.well-known/jwks.json`
+- signing: EdDSA / Ed25519
+- canonicalization: JCS RFC 8785 + SHA-256
+- `canon_version`: `jcs-rfc8785-v1`
+
+Adjacent references:
+
+- x402 risk-check thread: `https://github.com/x402-foundation/x402/issues/2421`
+- pinned external vector metadata also references x402 risk-check extension PR
+  `#2422` and shared canonicalization PR `#2436`
+
+Descriptor boundary:
+
+- `service_trust` remains its own descriptor.
+- A VATE SUT may bind the canonical JSON bytes of the selected trust verdict
+  and may verify the EdDSA signature against the provider JWKS, but it must
+  still emit its own VATE admission result.
+- This candidate does not imply VATE endorsement of the provider, the trust
+  scoring method, the x402 risk-check extension, or any A2A equivalence.
