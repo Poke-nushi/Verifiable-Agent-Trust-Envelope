@@ -9,6 +9,9 @@ External vectors can help reviewers test whether adjacent evidence artifacts are
 byte-stable and practical for SUT authors. They do not, by themselves, change
 the VATE claim boundary.
 
+Pinned review slices are recorded in
+`docs/interop/external-evidence-vector-pins.md`.
+
 ## Non-Goals
 
 Referencing an external vector set does not imply:
