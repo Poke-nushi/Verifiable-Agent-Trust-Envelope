@@ -156,6 +156,9 @@ The corpus index follows:
 For this dependency-free fixture runner, digest checks use canonical JSON bytes produced by sorting object keys and removing insignificant whitespace before applying SHA-256.
 The digest value is encoded as lowercase hexadecimal in the policy snapshot fixtures.
 Future profiles may replace this with a named external canonicalization scheme, but conformance cases must state which digest basis they use.
+For the digest-basis vocabulary used by the corpus, SUT result contract,
+embedded evidence-object bindings, and report-bundle checks, see
+`docs/conformance/digest-basis.md`.
 
 This v0.3 digest basis is limited to fixtures. It does not define duplicate-key
 handling, Unicode normalization, floating-point normalization, or a production

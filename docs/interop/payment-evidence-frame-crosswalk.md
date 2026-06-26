@@ -12,6 +12,8 @@ Relevant adjacent references:
 - IETF Datatracker Payment Evidence Frame Internet-Draft: <https://datatracker.ietf.org/doc/draft-hopley-x402-payment-evidence-frame/>
 - IETF announcement for `draft-hopley-x402-payment-evidence-frame-00`: <https://mailarchive.ietf.org/arch/msg/i-d-announce/ukGutzxbT6ATCtmiSriCRmSR9fg/>
 - A2A protocol specification: <https://a2a-protocol.org/latest/specification/>
+- VATE digest-basis terminology: `docs/conformance/digest-basis.md`
+- External evidence vector intake rules: `docs/interop/external-evidence-vector-intake.md`
 
 ## Boundary
 
@@ -63,6 +65,15 @@ Do not silently substitute them for the VATE `digest` descriptor unless a profil
 
 For AL2 v0.3 review artifacts, the VATE `digest` descriptor should bind the exact artifact bytes or the profile-defined canonical artifact basis used by the VATE evidence reference.
 PEF identifiers can be preserved as adjacent evidence metadata, but the VATE receipt should remain clear about which digest basis was checked.
+For the current v0.3.x corpus, embedded JSON evidence-object digests use the
+VATE v0.3 fixture JSON byte basis unless a later case or profile names another
+basis. A future production-oriented profile may select RFC 8785 / JCS or exact
+media bytes, but that is not implied by merely consuming a PEF artifact.
+
+External PEF or payment-lifecycle vector sets can be useful review inputs when
+they identify exact paths, vector IDs, commit or tag, license, selected evidence
+object, and digest basis. Treat those vectors as non-normative optional
+interoperability aids unless a future VATE profile explicitly adopts them.
 
 ## Adjacent Payment Receipt Profiles
 

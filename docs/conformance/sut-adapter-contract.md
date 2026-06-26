@@ -11,6 +11,10 @@ For a shorter command-first path, start with
 `docs/conformance/external-sut-quickstart.md`, then return to this contract for
 field-level requirements.
 
+Digest-basis terminology is defined in `docs/conformance/digest-basis.md`.
+This contract uses that terminology rather than relying on an unnamed
+"canonical JSON" scheme.
+
 ## Goal
 
 An external verifier should be able to:
@@ -99,10 +103,22 @@ Each `context_bindings[]` entry names a `role` and `source_artifact`.
 Artifact roles such as `admission_receipt` and `admission_request` carry the raw
 artifact SHA-256 digest. Value roles such as `transaction_id` and `runtime`
 carry the source path and observed value. Evidence roles carry the source path,
-evidence type, and canonical JSON digest of the evidence object embedded in the
-source artifact. This lets `compare` detect SUT reports that cite a context
-fixture without binding it back to the request, receipt, transaction, runtime,
-or evidence it was supposed to validate.
+evidence type, and digest of the selected evidence object embedded in the source
+artifact. For the current v0.3.x comparison path, that embedded evidence-object
+digest uses the VATE v0.3 fixture JSON byte basis defined in
+`docs/conformance/digest-basis.md`: object keys sorted, insignificant whitespace
+removed, UTF-8 bytes, and SHA-256 lowercase hexadecimal.
+
+The selected evidence object must be identified by the case or profile. Do not
+use ordinary language-runtime JSON serialization as an implicit canonicalization
+scheme, and do not silently substitute adjacent protocol identifiers such as PEF
+`frame_id`, PEF `receipt_hash`, AP2 mandate hashes, or A2A artifact identifiers
+for a VATE digest descriptor unless a VATE profile explicitly defines that
+equivalence.
+
+This lets `compare` detect SUT reports that cite a context fixture without
+binding it back to the request, receipt, transaction, runtime, or evidence it was
+supposed to validate.
 
 When the corpus case includes `jose_checks`, the result entry must include
 `artifacts.proof_artifacts[]` entries for each referenced `proof_package`,

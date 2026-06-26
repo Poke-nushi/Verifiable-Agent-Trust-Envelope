@@ -53,6 +53,13 @@ An admission receipt with `deny` is still useful.
 It records why execution did not proceed.
 If a referenced policy snapshot digest does not match the policy artifact used as the decision basis, the verifier should deny or fail closed with `POLICY_SNAPSHOT_MISMATCH`.
 
+When an admission receipt uses `reason_visibility: withheld`, the portable
+receipt should still be a digest-bound record over the fields it discloses. The
+hidden policy or evidence basis can remain in verifier-controlled audit
+material, protected logs, or a digest-bound policy snapshot reference, but it is
+not automatically proven by the portable receipt unless a profile defines that
+commitment.
+
 ## Post-Execution Receipt
 
 A post-execution receipt is issued after execution, cancellation, or failure.
@@ -162,6 +169,8 @@ A receipt may be packaged as:
 
 Profiles and deployments decide which packaging forms they accept.
 For AL2, signed or digest-bound receipts are strongly recommended.
+Digest-basis terminology for receipts, embedded evidence objects, and report
+bundles is defined in `docs/conformance/digest-basis.md`.
 For a reviewer-facing path through admission receipts, post-execution receipts,
 policy snapshots, and implementation report bundles, see
 `docs/receipt-audit-walkthrough-v0.3.1.md`.
