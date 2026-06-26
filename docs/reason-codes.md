@@ -33,6 +33,13 @@ machine-readable reason code, such as `REASON_BASIS_WITHHELD`, alongside the
 primary decision code. This preserves comparable admission and receipt behavior
 without forcing sensitive basis details into portable receipt bytes.
 
+Withholding the concrete basis does not make the portable receipt an opaque
+assertion. The disclosed receipt surface should remain digest-bound and
+recomputable under its stated digest basis. Hidden policy or evidence basis
+material is not proven by the portable receipt bytes unless a profile also
+supplies a protected audit reference, policy snapshot reference, or another
+digest-bound commitment to that hidden material.
+
 ## Canonical Codes
 
 ### Success And Policy Match

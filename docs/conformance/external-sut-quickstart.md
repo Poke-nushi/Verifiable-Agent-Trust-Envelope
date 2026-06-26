@@ -112,6 +112,9 @@ case.
 
 The JSON Schema checks the portable shape. The `compare` command enforces the
 case-dependent artifact requirements and digest matches.
+For the digest-basis vocabulary used by raw artifact references, embedded
+evidence-object bindings, corpus digests, and report-bundle checks, see
+`docs/conformance/digest-basis.md`.
 
 ## Artifact Origin Boundary
 

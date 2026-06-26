@@ -303,6 +303,8 @@ compatibility claim.
   Trust-bundle checks for issuer, key, algorithm, evidence type, status, and validity windows
 - [docs/conformance/corpus-format.md](docs/conformance/corpus-format.md)
   Language-neutral corpus index and digest rules for non-reference implementations
+- [docs/conformance/digest-basis.md](docs/conformance/digest-basis.md)
+  Digest-basis terminology for corpus, SUT results, evidence objects, receipts, and report bundles
 - [docs/conformance/artifact-versioning.md](docs/conformance/artifact-versioning.md)
   Date-stamped conformance artifact versioning rules for the July 2026 target line
 - [docs/conformance/sut-adapter-contract.md](docs/conformance/sut-adapter-contract.md)
@@ -338,6 +340,8 @@ compatibility claim.
   AP2 Human Not Present payment-authority evidence fixtures
 - [docs/interop/payment-evidence-frame-crosswalk.md](docs/interop/payment-evidence-frame-crosswalk.md)
   Payment Evidence Frame evidence crosswalk for VATE admission and post-execution linkage
+- [docs/interop/external-evidence-vector-intake.md](docs/interop/external-evidence-vector-intake.md)
+  Non-normative intake rules for external evidence vector slices
 - [docs/known-gaps.md](docs/known-gaps.md)
   Current unresolved design gaps
 - [reference/minimal-al2-demo/README.md](reference/minimal-al2-demo/README.md)

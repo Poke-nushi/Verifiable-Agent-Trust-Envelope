@@ -43,6 +43,9 @@ The index contains:
 
 ## Digest Basis
 
+For the digest-basis vocabulary used by the corpus, SUT result contract, and
+report-bundle checks, see `docs/conformance/digest-basis.md`.
+
 The corpus index digest is computed over the sorted `manifest` array.
 
 The manifest includes:
@@ -64,6 +67,8 @@ This is a v0.3 fixture digest basis, not a production canonicalization profile.
 It keeps the dependency-free corpus reproducible, but it does not define
 duplicate-key rejection, Unicode normalization, floating-point number
 normalization, streaming payload handling, or a general signed-JSON profile.
+It is also distinct from any future production-oriented evidence-object profile
+that may choose RFC 8785 / JCS or exact media bytes.
 
 Until a production profile is selected, fixture artifacts SHOULD avoid:
 
@@ -75,6 +80,9 @@ Until a production profile is selected, fixture artifacts SHOULD avoid:
 Future production-oriented profiles should either name a standard JSON
 canonicalization profile, such as RFC 8785 / JCS, or bind signatures and digests
 to exact media bytes without reserializing JSON.
+Moving selected evidence-object digests to such a profile would be a contract
+change and should update the runner, fixtures, examples, and comparison rules
+together.
 
 ## Digest Strictness Boundary
 
