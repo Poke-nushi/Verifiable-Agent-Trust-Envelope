@@ -26,6 +26,7 @@ adjacent protocols.
 - `v0.2.0 archived May 5, 2026 review snapshot`
 - `v0.3.0 archived May 10, 2026 AL2 verifier admission hardening snapshot`
 - `v0.3.1 archived May 14, 2026 credibility and reviewability patch`
+- `v0.3.2 external review portability and reproducibility patch candidate`
 - `not production-ready`
 - `not an official A2A extension, endorsement, certification, SDK, middleware package, or general compatibility proof`
 - `not an A2A core proposal or universal trust layer`
@@ -45,7 +46,7 @@ attenuate, and a fail-closed deny.
 
 ## Reviewer Entry Points
 
-If you are reviewing the current `v0.3.1` discussion-draft snapshot or
+If you are reviewing the current `v0.3.2` discussion-draft release candidate or
 main-branch work after it, start here:
 
 - [Public claim boundary](docs/public-claim-boundary.md) - what this repo can
@@ -228,7 +229,9 @@ The most useful feedback for this draft is currently:
 - **Primary language**: English
 - **Roadmap refresh date**: 2026-07-07
 - **Primary battlefield**: `AL2` external digital write
-- **Current archived snapshot**: `v0.3.1` credibility and reviewability patch
+- **Current release candidate**: `v0.3.2` external review portability and
+  reproducibility patch
+- **Latest archived snapshot with version DOI**: `v0.3.1` credibility and reviewability patch
 - **Implemented artifacts**: v0.3 schemas and examples; runnable AL2 fixture corpus with negative cases; SUT comparison and implementation-reporting formats; dependency-free verifier core and A2A-shaped adapter demo; package-private TypeScript reference helpers for digest-bound artifacts, SUT result shaping, and A2A metadata shape checks; focused adjacent evidence fixtures and crosswalk notes
 - **Immediate next action**: use the first externally supplied three-case
   adapter-run bundle to improve reproducibility and reviewer onboarding, then
@@ -284,6 +287,8 @@ compatibility claim.
   pre-release
 - [docs/release-notes/v0.3.1.md](docs/release-notes/v0.3.1.md)
   Archived notes for the v0.3.1 credibility and reviewability patch
+- [docs/release-notes/v0.3.2.md](docs/release-notes/v0.3.2.md)
+  Release notes draft for the v0.3.2 external review portability and reproducibility patch
 - [docs/a2a-issue-update-2026-05.md](docs/a2a-issue-update-2026-05.md)
   Short A2A-adjacent issue update draft after the runnable v0.2 artifacts
 - [docs/a2a-metadata-binding-v0.3.md](docs/a2a-metadata-binding-v0.3.md)
@@ -459,6 +464,10 @@ reviewability patch, cite:
 If you reference unarchived main-branch changes after `v0.3.1`, cite the
 repository URL and exact commit SHA in addition to the latest applicable
 archived version DOI.
+
+If you reference the `v0.3.2` GitHub pre-release before its Zenodo record is
+available, cite the repository URL and exact release target commit SHA. After
+Zenodo ingests the release, cite the `v0.3.2` version DOI for reproducibility.
 
 If you reference the archived May 10, 2026 `v0.3.0` discussion-draft
 pre-release snapshot, cite:

@@ -9,10 +9,11 @@ For public wording rules, see
 
 ## Current Direction
 
-### `post-v0.3.1-independent-implementation-evidence`
+### `post-v0.3.2-additional-implementation-evidence`
 
-The archived `v0.3.1` patch completed the immediate credibility and
-reviewability cleanup for the current AL2 verifier-admission discussion draft.
+The `v0.3.2` patch records the first limited external adapter-run bundle and
+the portability fixes that bundle surfaced. The priority now is additional
+independent implementation evidence and reproducibility across implementers.
 
 The next work should not broaden VATE beyond the
 `VATE-AL2-Verifier-Admission-v0.3` boundary. The priority is to move from
@@ -25,6 +26,8 @@ The current public review surface is:
   <https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.3.1>
 - archived `v0.3.1` version DOI:
   `10.5281/zenodo.20173995`
+- `v0.3.2` release notes draft:
+  [docs/release-notes/v0.3.2.md](docs/release-notes/v0.3.2.md)
 - archived `v0.3.0` discussion-draft release:
   <https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.3.0>
 - public claim boundary:
@@ -53,22 +56,17 @@ Near-term public work should happen in this order:
 1. Keep the lightweight
    [one-hour external SUT or corpus review request](docs/conformance/external-sut-ask-1-hour.md)
    visible for reviewers who are not ready to produce a full adapter.
-2. Use the first externally supplied three-case adapter-run bundle to improve
-   reproducibility, publication metadata, and reviewer onboarding.
-3. Provide a small external SUT template so the next reviewer can start from the
-   same SUT result, compare report, implementation report, and bundle-check
-   shape.
-4. Collect additional SUT results from implementations that are not the
+2. Use the first externally supplied three-case adapter-run bundle and the
+   external SUT starter template as the reference path for additional reviewers.
+3. Collect additional SUT results from implementations that are not the
    repository reference runner, against the `v0.3` corpus snapshot.
-5. Ask implementers to publish generated artifacts or a controlled artifact
+4. Ask implementers to publish generated artifacts or a controlled artifact
    bundle, not only a hand-written result summary.
-6. Generate or collect a conformance report, implementation report, and local
+5. Generate or collect a conformance report, implementation report, and local
    `verify-bundle` report for each submitted corpus snapshot.
-7. Use those results to identify unclear corpus cases, reason-code friction,
+6. Use those results to identify unclear corpus cases, reason-code friction,
    missing artifact bindings, or publication metadata gaps.
-8. Make a small `v0.3.2` patch only if that evidence exposes concrete
-   schema/corpus/docs/runner drift. Do not cut a release for typo-only edits.
-9. Reserve `v0.4.0` for a real profile-surface expansion, such as a new
+7. Reserve `v0.4.0` for a real profile-surface expansion, such as a new
    adjacent-protocol profile, a proof-profile decision, or a materially changed
    conformance contract.
 
@@ -160,7 +158,7 @@ The `v0.3.0` package includes:
 
 ## External Review Target
 
-The current post-`v0.3.1` target is to move from author-run artifacts toward
+The current post-`v0.3.2` target is to move from author-run artifacts toward
 independent implementation evidence. The priority is not a broader protocol
 surface.
 

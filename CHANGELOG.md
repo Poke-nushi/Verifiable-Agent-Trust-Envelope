@@ -2,6 +2,24 @@
 
 This file records dated public changes to the discussion draft.
 
+## 2026-07-07
+
+- Prepared the v0.3.2 external review portability and reproducibility patch.
+- Recorded the first externally supplied three-case adapter-run bundle, with
+  pinned gist revision, artifact digests, compare result, and local
+  `verify-bundle` result.
+- Added an external SUT starter template for the three starter cases:
+  `allow-valid-admission`, `attenuate-max-amount`, and
+  `deny-digest-mismatch-before-policy`.
+- Fixed cross-platform corpus digest portability by pinning LF checkout bytes
+  and serializing corpus manifest paths with repository-relative POSIX `/`
+  separators.
+- Refreshed the TypeScript workspace lockfile so Vitest resolves Vite `8.0.16`
+  through its existing dependency range and `npm audit` is clean for reviewers.
+- Acknowledged `@chopmob-cloud` / AlgoVoi for external adapter-run review and
+  portability feedback, without implying certification, endorsement, production
+  approval, or a passing full-corpus claim.
+
 ## 2026-05-19
 
 - Added review-driven MCP/OAuth negative fixtures for token passthrough,
