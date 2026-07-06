@@ -330,9 +330,9 @@ def sha256_file(path: Path) -> str:
 
 def display_path(path: Path) -> str:
     try:
-        return str(path.resolve().relative_to(ROOT))
+        return path.resolve().relative_to(ROOT).as_posix()
     except ValueError:
-        return str(path)
+        return path.as_posix()
 
 
 def resolve_artifact_path(case: dict[str, Any], key_or_path: str) -> Path:

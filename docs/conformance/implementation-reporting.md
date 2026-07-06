@@ -80,7 +80,7 @@ An implementation report includes a digest of the conformance report and a diges
 The runner records `conformance_report.digest_basis=json-sorted-no-whitespace`
 for its canonical JSON digest.
 The corpus digest is computed over the sorted `corpus.manifest` array.
-Each manifest entry records a repository-relative artifact path and the artifact's raw file SHA-256 digest.
+Each manifest entry records a repository-relative POSIX `/` path and the artifact's raw file SHA-256 digest.
 The committed `corpus.json` uses the same manifest and digest basis.
 For external SUT comparisons, the conformance report also records
 `sut_results.digest` using the same `json-sorted-no-whitespace` basis.
