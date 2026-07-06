@@ -20,7 +20,7 @@ import sys
 import tempfile
 import time
 from datetime import datetime
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from urllib.request import urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -396,6 +396,24 @@ def load_vate_core_module():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def check_vate_conformance_display_paths_are_portable() -> None:
+    conformance = load_vate_conformance_module()
+
+    class WindowsLikePath:
+        def resolve(self) -> "WindowsLikePath":
+            return self
+
+        def relative_to(self, root: Path) -> PureWindowsPath:
+            return PureWindowsPath("conformance/al2-vate-v0.3/corpus.json")
+
+    path = conformance.display_path(WindowsLikePath())
+    if path != "conformance/al2-vate-v0.3/corpus.json":
+        raise RuntimeError(
+            "vate_conformance display_path must use POSIX separators in "
+            f"digest-addressed report and corpus paths, got {path!r}"
+        )
 
 
 def load_a2a_adapter_module():
@@ -1675,6 +1693,7 @@ def main() -> int:
     check_replay_boundary_coverage()
     check_p1_5_fixture_coverage()
     check_p2_public_artifact_boundary()
+    check_vate_conformance_display_paths_are_portable()
     check_a2a_adapter_local_uri_boundary()
     check_a2a_adapter_malformed_metadata_fail_closed()
     check_al2_corpus_docs_synced()

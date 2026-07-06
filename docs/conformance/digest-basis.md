@@ -24,6 +24,9 @@ basis for another.
 | Future production-oriented JSON profile | RFC 8785 / JCS, or exact media bytes, when explicitly selected by a future profile | Candidate future/profile basis | Production-oriented cross-runtime or signed-object stability |
 | Adjacent protocol-native digest | Adjacent protocol-defined values such as PEF `receipt_hash`, PEF `frame_id`, AP2 mandate hashes, or A2A artifact identifiers | Adjacent metadata by default | Adjacent evidence integrity or correlation |
 
+Corpus manifest paths are repository-relative paths serialized with POSIX `/`
+separators, independent of the operating system running the reference runner.
+
 ## Current VATE v0.3 Fixture JSON Byte Basis
 
 The current dependency-free runner serializes selected JSON values with sorted
