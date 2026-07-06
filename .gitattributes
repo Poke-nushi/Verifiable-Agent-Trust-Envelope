@@ -1,0 +1,3 @@
+# Keep digest-addressed corpus and fixture bytes stable across platforms.
+conformance/** text eol=lf
+examples/** text eol=lf

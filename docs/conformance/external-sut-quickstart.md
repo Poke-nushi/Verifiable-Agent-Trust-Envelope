@@ -116,6 +116,33 @@ For the digest-basis vocabulary used by raw artifact references, embedded
 evidence-object bindings, corpus digests, and report-bundle checks, see
 `docs/conformance/digest-basis.md`.
 
+## Starter Case Check Names
+
+For `checks[]`, `compare` matches entries by exact `name` against the selected
+case's `expected.checks[]`. A result with different names may describe a
+reasonable local check, but it will not satisfy the corpus comparison contract.
+
+For the three starter cases in the one-hour review path, the required check
+names are:
+
+- `allow-valid-admission`
+  - `decision.outcome`
+  - `evidence.verification.result`
+  - `policy.policy_version`
+- `attenuate-max-amount`
+  - `attenuation.original_request_hash`
+  - `attenuation.effective_request_hash`
+  - `attenuation.changes[0].path`
+  - `a2a_metadata.admission_receipt.digest`
+  - `a2a_metadata.policy_snapshot.digest`
+- `deny-digest-mismatch-before-policy`
+  - `decision.outcome`
+  - `evidence.verification.failure_reason`
+  - `policy.policy_version`
+
+Use the case file's `expected.checks[]` as the source of truth for any other
+case.
+
 ## Artifact Origin Boundary
 
 The passing sample SUT result may point at repository fixture paths because it
