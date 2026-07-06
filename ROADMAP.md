@@ -39,6 +39,8 @@ The current public review surface is:
   [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)
 - report publication and bundle integrity guidance:
   [docs/conformance/report-integrity.md](docs/conformance/report-integrity.md)
+- external SUT run records:
+  [docs/conformance/external-sut-run-records.md](docs/conformance/external-sut-run-records.md)
 - receipt audit walkthrough:
   [docs/receipt-audit-walkthrough-v0.3.1.md](docs/receipt-audit-walkthrough-v0.3.1.md)
 - A2A-shaped metadata review package:
@@ -51,17 +53,22 @@ Near-term public work should happen in this order:
 1. Keep the lightweight
    [one-hour external SUT or corpus review request](docs/conformance/external-sut-ask-1-hour.md)
    visible for reviewers who are not ready to produce a full adapter.
-2. Collect at least one SUT result from an implementation that is not the
+2. Use the first externally supplied three-case adapter-run bundle to improve
+   reproducibility, publication metadata, and reviewer onboarding.
+3. Provide a small external SUT template so the next reviewer can start from the
+   same SUT result, compare report, implementation report, and bundle-check
+   shape.
+4. Collect additional SUT results from implementations that are not the
    repository reference runner, against the `v0.3` corpus snapshot.
-3. Ask that implementer to publish generated artifacts or a controlled artifact
+5. Ask implementers to publish generated artifacts or a controlled artifact
    bundle, not only a hand-written result summary.
-4. Generate or collect a conformance report, implementation report, and local
-   `verify-bundle` report for the same corpus snapshot.
-5. Use the result to identify unclear corpus cases, reason-code friction,
+6. Generate or collect a conformance report, implementation report, and local
+   `verify-bundle` report for each submitted corpus snapshot.
+7. Use those results to identify unclear corpus cases, reason-code friction,
    missing artifact bindings, or publication metadata gaps.
-6. Make a small `v0.3.2` patch only if that evidence exposes concrete
+8. Make a small `v0.3.2` patch only if that evidence exposes concrete
    schema/corpus/docs/runner drift. Do not cut a release for typo-only edits.
-7. Reserve `v0.4.0` for a real profile-surface expansion, such as a new
+9. Reserve `v0.4.0` for a real profile-surface expansion, such as a new
    adjacent-protocol profile, a proof-profile decision, or a materially changed
    conformance contract.
 
@@ -153,12 +160,18 @@ The `v0.3.0` package includes:
 
 ## External Review Target
 
-The May-June 2026 target is to move from author-run artifacts toward independent
-implementation evidence. The priority is not a broader protocol surface.
+The current post-`v0.3.1` target is to move from author-run artifacts toward
+independent implementation evidence. The priority is not a broader protocol
+surface.
+
+The first limited external adapter-run bundle has been recorded in
+[docs/conformance/external-sut-run-records.md](docs/conformance/external-sut-run-records.md).
+It covers three starter cases, not the full corpus, and remains bounded as one
+implementation run against one corpus snapshot.
 
 Useful external evidence would include:
 
-- one or more SUT result files from implementations that are not the repository
+- additional SUT result files from implementations that are not the repository
   reference runner;
 - generated artifacts or controlled artifact bundles from the implementer;
 - implementation reports tied to the same corpus snapshot;
