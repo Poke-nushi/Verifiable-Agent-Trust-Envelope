@@ -1,0 +1,180 @@
+{
+  "version": "vate-sut-results-2026-07",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "generated_at": "2026-07-07T00:00:00Z",
+  "implementation": {
+    "name": "replace-with-your-implementation-name",
+    "type": "external-verifier-template",
+    "version": "replace-with-version",
+    "language": "replace-with-language",
+    "source": "https://example.invalid/replace-with-your-repository-or-release",
+    "commit": "replace-with-commit-or-build-id"
+  },
+  "corpus": {
+    "profile": "VATE-AL2-Verifier-Admission-v0.3",
+    "digest": {
+      "alg": "sha-256",
+      "value": "835864092b7afde1c751c4e2cad40aa8265b4ebb95234873c9b8d20f664cb2f6"
+    }
+  },
+  "results": [
+    {
+      "case_id": "allow-valid-admission",
+      "status": "completed",
+      "outcome": "allow",
+      "should_execute": true,
+      "reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.result",
+          "pass": true
+        },
+        {
+          "name": "policy.policy_version",
+          "pass": true
+        }
+      ],
+      "artifacts": {
+        "admission_receipt": {
+          "uri": "examples/receipts/admission-allow.example.json",
+          "media_type": "application/vate-admission-receipt+json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "ddf27a01edcbaf6130470bc52309ee757c9c5a2b39f300444c2b767256ee5015"
+          }
+        },
+        "verification_context": [
+          {
+            "kind": "binding",
+            "case_artifact": "runtime_context",
+            "uri": "conformance/al2-vate-v0.3/fixtures/runtime-binding-match-context.json",
+            "media_type": "application/json",
+            "digest": {
+              "alg": "sha-256",
+              "value": "6d2ce8f39cf1ebc56a893f01abb83f586cc9a851ac2cdb854064d2b391e361db"
+            },
+            "context_bindings": [
+              {
+                "role": "admission_receipt",
+                "source_artifact": "admission_receipt",
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "ddf27a01edcbaf6130470bc52309ee757c9c5a2b39f300444c2b767256ee5015"
+                }
+              },
+              {
+                "role": "transaction_id",
+                "source_artifact": "admission_receipt",
+                "path": "request.transaction_id",
+                "value": "txn-20260504-allow-001"
+              },
+              {
+                "role": "runtime",
+                "source_artifact": "admission_receipt",
+                "path": "subject.runtime",
+                "value": "spiffe://agent.example/workload/case-agent"
+              },
+              {
+                "role": "evidence",
+                "source_artifact": "admission_receipt",
+                "path": "evidence[1]",
+                "evidence_type": "runtime_attestation",
+                "digest": {
+                  "alg": "sha-256",
+                  "value": "61693a846ba790fac993da02608fee292b847947586aa81e1a916587b08dba76"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "attenuate-max-amount",
+      "status": "completed",
+      "outcome": "attenuate",
+      "should_execute": true,
+      "reason_codes": [
+        "PAYMENT_TOKEN_LIMIT",
+        "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+      ],
+      "checks": [
+        {
+          "name": "attenuation.original_request_hash",
+          "pass": true
+        },
+        {
+          "name": "attenuation.effective_request_hash",
+          "pass": true
+        },
+        {
+          "name": "attenuation.changes[0].path",
+          "pass": true
+        },
+        {
+          "name": "a2a_metadata.admission_receipt.digest",
+          "pass": true
+        },
+        {
+          "name": "a2a_metadata.policy_snapshot.digest",
+          "pass": true
+        }
+      ],
+      "artifacts": {
+        "admission_receipt": {
+          "uri": "examples/receipts/admission-attenuate-max-amount.example.json",
+          "media_type": "application/vate-admission-receipt+json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "3fc16f29508874c0ff813e52eb069b39b49a2ad544d5418ecc26fc7f2c68d580"
+          }
+        }
+      }
+    },
+    {
+      "case_id": "deny-digest-mismatch-before-policy",
+      "status": "completed",
+      "outcome": "deny",
+      "should_execute": false,
+      "reason_codes": [
+        "DIGEST_MISMATCH",
+        "FAIL_CLOSED"
+      ],
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        },
+        {
+          "name": "policy.policy_version",
+          "pass": true
+        }
+      ],
+      "artifacts": {
+        "admission_receipt": {
+          "uri": "examples/receipts/admission-deny-digest-mismatch-before-policy.example.json",
+          "media_type": "application/vate-admission-receipt+json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "066a5b1a95abed928777cfb49f1fc56d68d60e9e6d896dff4726809322f785af"
+          }
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Template shape only. This file points at repository fixtures and must not be submitted unchanged as independent implementation evidence.",
+    "A real external SUT result should replace implementation identity, artifact URIs, artifact digests, and generated artifact references with material controlled by the implementation maintainer."
+  ]
+}
