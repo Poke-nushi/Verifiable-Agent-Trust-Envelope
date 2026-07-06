@@ -56,6 +56,8 @@ main-branch work after it, start here:
 - [Independent implementation review issue](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2) -
   public intake thread for external SUT questions, partial results, and
   implementation report links
+- [External SUT run records](docs/conformance/external-sut-run-records.md) -
+  pinned records of externally supplied SUT run artifacts used for review
 - [External implementation call](docs/conformance/external-implementation-call.md) -
   short request for result files from implementations other than the repository
   reference runner, plus generated artifacts and implementation reports
@@ -224,16 +226,16 @@ The most useful feedback for this draft is currently:
 - **Repository type**: protocol discussion draft
 - **Document maturity**: early draft
 - **Primary language**: English
-- **Roadmap refresh date**: 2026-05-14
+- **Roadmap refresh date**: 2026-07-07
 - **Primary battlefield**: `AL2` external digital write
 - **Current archived snapshot**: `v0.3.1` credibility and reviewability patch
 - **Implemented artifacts**: v0.3 schemas and examples; runnable AL2 fixture corpus with negative cases; SUT comparison and implementation-reporting formats; dependency-free verifier core and A2A-shaped adapter demo; package-private TypeScript reference helpers for digest-bound artifacts, SUT result shaping, and A2A metadata shape checks; focused adjacent evidence fixtures and crosswalk notes
-- **Immediate next action**: collect one SUT result from an implementation that
-  is not the repository reference runner, plus generated artifacts or a
-  controlled artifact bundle, an implementation report, and a local bundle
-  verification report for one `v0.3` corpus snapshot; if that is too heavy for a
-  first reviewer, collect a three-case corpus review that identifies unclear
-  boundaries, reason codes, or artifact requirements
+- **Immediate next action**: use the first externally supplied three-case
+  adapter-run bundle to improve reproducibility and reviewer onboarding, then
+  collect additional SUT results from implementations that are not the
+  repository reference runner, ideally with generated artifacts or a controlled
+  artifact bundle, an implementation report, and a local bundle verification
+  report for one `v0.3` corpus snapshot
 - **Planned later**: pairwise presentation profile, richer capability registry, formal `AID`, physical `ABS` profiles
 
 The conformance artifacts record one implementation run against one corpus
@@ -314,6 +316,8 @@ compatibility claim.
   intake thread for questions and result links
 - [docs/conformance/external-sut-quickstart.md](docs/conformance/external-sut-quickstart.md)
   Short path for external SUT authors to produce, compare, and bundle-check implementation reports
+- [docs/conformance/external-sut-run-records.md](docs/conformance/external-sut-run-records.md)
+  Pinned records of externally supplied SUT run artifacts used for review
 - [docs/profiles/vate-jose-proof-profile-notes-2026-07.md](docs/profiles/vate-jose-proof-profile-notes-2026-07.md)
   Production JOSE proof profile notes and current detached fixture boundary
 - [conformance/al2-vate-v0.3/README.md](conformance/al2-vate-v0.3/README.md)
