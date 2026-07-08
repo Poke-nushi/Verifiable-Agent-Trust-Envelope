@@ -143,8 +143,35 @@ When both the admission receipt and A2A metadata carry `policy_snapshot`, the `u
 The digest should cover the canonical policy snapshot artifact, not a human-readable policy label or mutable policy URL.
 The current conformance fixtures use SHA-256 over sorted-key compact JSON and encode the digest value as lowercase hexadecimal.
 
-The verifier must not treat an A2A Agent Card as sufficient proof of current task authority.
-The verifier must evaluate the referenced artifacts against local policy before accepting a risky external write.
+The verifier must not treat an A2A Agent Card as sufficient proof of current
+task authority.
+The verifier must evaluate the referenced artifacts against local policy before
+accepting a risky external write.
+
+## A2A-Facing Authority Test
+
+For each new A2A-facing field, use this acceptance test:
+
+> If a receiver copies only the A2A metadata and never dereferences or verifies
+> the referenced artifact, it still has no authority to execute the risky write.
+
+This keeps the A2A-visible surface as discovery, correlation, and review
+metadata rather than authority by itself.
+
+Apply the test through these guardrails:
+
+- Agent Card extension declarations advertise support; they do not prove current
+  task authority.
+- `admission_issued` and `post_execution_receipt_issued` stay separate phases.
+  The first records permission to attempt a risky action; the second records
+  evidence of what happened after execution was attempted.
+- Conformance-facing AL2 evidence uses digest-bound references. Pure URIs can
+  be useful discovery hints, but they are not AL2 authority.
+- `decision` in A2A metadata is a routing or review hint. The attenuation
+  object, effective constraints, policy basis, and reason visibility live in
+  the admission receipt.
+- `disclosed`, `opaque`, and `withheld` remain reason-visibility terms, not
+  payload-shape terms.
 
 ## Signed Agent Card Digest Target
 

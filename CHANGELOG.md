@@ -18,6 +18,9 @@ This file records dated public changes to the discussion draft.
   through its existing dependency range and `npm audit` is clean for reviewers.
 - Updated citation metadata and README citation guidance for the `v0.3.2`
   Zenodo version DOI: `10.5281/zenodo.21226254`.
+- Recorded an A2A-facing authority acceptance test for metadata fields: copied
+  metadata without dereferencing and verifying the referenced artifact is not
+  authority to execute a risky write.
 - Acknowledged `@chopmob-cloud` / AlgoVoi for external adapter-run review and
   portability feedback, without implying certification, endorsement, production
   approval, or a passing full-corpus claim.
