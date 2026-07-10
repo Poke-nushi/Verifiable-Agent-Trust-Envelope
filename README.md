@@ -348,6 +348,8 @@ compatibility claim.
   AP2 Human Not Present payment-authority evidence fixtures
 - [docs/interop/payment-evidence-frame-crosswalk.md](docs/interop/payment-evidence-frame-crosswalk.md)
   Payment Evidence Frame evidence crosswalk for VATE admission and post-execution linkage
+- [docs/interop/ep-aps-can-execution-admission-crosswalk.md](docs/interop/ep-aps-can-execution-admission-crosswalk.md)
+  EP-AEC, EP-AEG, APS, and CAN boundary crosswalk for VATE execution admission
 - [docs/interop/external-evidence-vector-intake.md](docs/interop/external-evidence-vector-intake.md)
   Non-normative intake rules for external evidence vector slices
 - [docs/interop/external-evidence-vector-pins.md](docs/interop/external-evidence-vector-pins.md)
