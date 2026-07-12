@@ -91,6 +91,29 @@ reported with the most specific applicable post-execution reason code, such as
 `POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED`. `POST_EXEC_LINKAGE_MISMATCH` remains
 a generic fallback for older or underspecified fixtures.
 
+## Request-to-Admission-to-Effect Binding Invariant
+
+A post-execution artifact belongs to an admission only when it binds to both
+the specific admission receipt and the admitted effective request. When
+attenuation changes the request, the admission receipt must preserve a
+verifiable transformation from `original_request_hash` to
+`effective_request_hash`.
+
+This is a binding chain rather than one shared digest across every phase:
+
+`original request -> attenuation decision and effective constraints -> effective request -> specific admission receipt -> post-execution artifact`
+
+For digest-based edges, the verifier must recompute the applicable
+profile-defined digest over the referenced artifact or selected structured
+object rather than trust a declared digest value. Identifiers and other linkage
+fields, including the admission receipt id, decision, transaction, and runtime,
+must be compared under the applicable profile. The validity window, replay
+state, and effective constraints must be validated separately.
+
+A matching digest establishes content linkage, not current authority by itself.
+The verifier still evaluates status or revocation, freshness, and the remaining
+admission and post-execution conditions before accepting the artifact set.
+
 The admission receipt top-level `issued_at` and `expires_at` are the authoritative
 post-execution linkage window in the v0.3 corpus: execution must start no earlier
 than `issued_at` and must finish no later than `expires_at`. If an attenuation

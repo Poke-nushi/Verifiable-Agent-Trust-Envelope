@@ -2,6 +2,17 @@
 
 This file records dated public changes to the discussion draft.
 
+## 2026-07-13
+
+- Added a named request-to-admission-to-effect binding invariant that preserves
+  the distinct original and effective request hashes across attenuation.
+- Clarified that digest-based binding edges are verified by recomputation under
+  the applicable profile-defined basis rather than by trusting declared digest
+  values.
+- Recorded the clarification after external review from `@chopmob-cloud` /
+  AlgoVoi without changing schemas, corpus cases, runner behavior, or the
+  conformance claim.
+
 ## 2026-07-07
 
 - Prepared the v0.3.2 external review portability and reproducibility patch.
