@@ -99,6 +99,11 @@ include `artifacts.verification_context[]` entries with:
 - `context_bindings[]` - the receipt, request, transaction, runtime, and
   evidence objects that the context check was evaluated against
 
+Each `verification_context[]` entry must use a distinct logical key formed by
+(`case_artifact`, `kind`). `compare` rejects duplicate logical keys even when
+their digest or nested bindings differ, so array order cannot select the
+context used for comparison.
+
 Each `context_bindings[]` entry names a `role` and `source_artifact`.
 Artifact roles such as `admission_receipt` and `admission_request` carry the raw
 artifact SHA-256 digest. Value roles such as `transaction_id` and `runtime`
@@ -108,6 +113,36 @@ artifact. For the current v0.3.x comparison path, that embedded evidence-object
 digest uses the VATE v0.3 fixture JSON byte basis defined in
 `docs/conformance/digest-basis.md`: object keys sorted, insignificant whitespace
 removed, UTF-8 bytes, and SHA-256 lowercase hexadecimal.
+
+For the current v0.3.x comparison path, the required binding subset is derived
+from the artifacts present in each case:
+
+- when the case includes an `admission_receipt`, bind its raw artifact digest
+  and its `request.transaction_id` value when present;
+- when the case includes an `admission_request`, bind its raw artifact digest;
+- for a `binding` context check, bind `subject.runtime` from the admission
+  receipt when present;
+- identify the context evidence type using the first matching rule: a
+  `runtime_attestation` or `status_bundle` source selects that same type;
+  otherwise a runtime `binding` check selects `runtime_attestation`, and a
+  `replay` check selects `admission_request`; and
+- bind every matching evidence object from admission receipt `evidence[]` and
+  admission request `evidence_refs[]` with its source path and digest.
+
+`compare` requires every binding derived by these rules. Additional
+schema-valid bindings are allowed only when they use a distinct logical key;
+they do not replace a missing required binding. A binding's logical key is the
+tuple (`role`, `source_artifact`, `path`, `evidence_type`), with omitted fields
+represented as absent. Two entries with the same logical key are rejected even
+when their digest or value differs, so array order never selects a winning
+binding. JSON Schema validates each entry's shape, while `compare` enforces this
+composite uniqueness rule. The required subset therefore depends on both the
+context check and the case artifacts; the check `kind` alone is not sufficient.
+
+For example, `deny-runtime-proof-stale` requires five bindings: the admission
+receipt digest, its transaction id, the admission request digest, the embedded
+`runtime_attestation` evidence in the receipt, and the corresponding
+`runtime_attestation` evidence reference in the request.
 
 The selected evidence object must be identified by the case or profile. Do not
 use ordinary language-runtime JSON serialization as an implicit canonicalization
@@ -131,6 +166,10 @@ When the corpus case includes `jose_checks`, the result entry must include
 - `media_type`
 - `digest.alg` set to `sha-256`
 - `digest.value` as lowercase SHA-256 hex
+
+Each `proof_artifacts[]` entry must likewise use a distinct logical key formed
+by (`case_artifact`, `kind`). `compare` rejects duplicate logical keys rather
+than selecting one by array order.
 
 The current comparison command validates the presence and descriptor shape of
 these artifact references, and checks their SHA-256 digest values against the
