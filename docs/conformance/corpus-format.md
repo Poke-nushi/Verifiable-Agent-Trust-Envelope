@@ -139,6 +139,53 @@ This metadata is a corpus review aid. It does not imply production
 compatibility, endorsement, or a complete semantic equivalence proof between
 the paired artifacts.
 
+## Expected Named Checks
+
+Entries in `expected.checks[]` project selected fixture observations into the
+SUT result. For boolean named checks, `pass` and `present` require the named
+observation to be true; `fail` and `absent` require it to be false.
+
+For the v0.3.x corpus line, the following table is the complete registry of
+named checks with special semantics. The reference runner and this table must
+remain aligned; a new semantic check requires an entry here.
+
+| Name | True condition in the current reference runner |
+| --- | --- |
+| `jose.protected_header` | The protected header object and its base64url value match the runner's canonical JSON bytes. |
+| `jose.detached_payload_digest` | The detached payload base64url value and SHA-256 descriptor match the canonical fixture payload. |
+| `jose.signing_input` | The declared SHA-256 digest matches the bytes of `<protected_b64u>.<payload_b64u>`. |
+| `decision.outcome` | An admission receipt exists and its decision is `allow` or `attenuate`. |
+| `evidence.verification.result` | An admission receipt exists and every item in its `evidence[]` array has `verification.result: verified`; this check does not itself require a non-empty array. |
+| `evidence.verification.failure_reason` | At least one admission receipt evidence item contains `verification.failure_reason`. |
+| `admission_receipt.evidence.verification.inferred_resource_authority` | At least one admission receipt evidence item contains `verification.inferred_resource_authority`. |
+| `admission_receipt.evidence.verification.inferred_tool_authority` | At least one admission receipt evidence item contains `verification.inferred_tool_authority`. |
+| `policy.policy_version` | An admission receipt exists and contains `policy.policy_version`. |
+| `post_execution_receipt` | A post-execution receipt exists. |
+| `request.audience` or `target.audience` | An admission receipt exists and `request.audience` equals `request.target_audience`. |
+| `result.policy_violations` | A post-execution receipt exists and `result.policy_violations` is exactly an empty array. |
+
+The three listed `jose.*` names are the only registered JOSE named checks;
+other `jose.*` names evaluate false. These checks validate the documented
+fixture byte relationships and do not claim production signature or PKI
+verification.
+
+All names not listed above use path-presence semantics. Names beginning with
+`admission_receipt.`, `post_execution.`, or `a2a_metadata.` select that artifact
+and remove the prefix before checking the path. Any other unqualified name uses
+the admission receipt as its artifact. Consequently,
+`post_execution.result.policy_violations` tests only that the path exists,
+whereas the exact unqualified `result.policy_violations` name uses the special
+empty-array rule above.
+
+This distinction is intentional in
+`post-execution-effective-constraints-aggregate-exceeded`.
+`post_execution.result.policy_violations` with expected `pass` asserts only
+that the observed receipt contains the field; it does not accept the empty list
+as proof that no violation occurred. The case's `effective_constraints`
+linkage check independently applies the current profile-registered `max_amount`
+aggregate check to the recorded side effects and derives
+`POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED`.
+
 ## Profile-Specific Checks
 
 Some cases include profile-specific check arrays in addition to the `expected`

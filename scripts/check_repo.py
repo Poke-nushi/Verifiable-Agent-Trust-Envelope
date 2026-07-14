@@ -275,6 +275,16 @@ def run_expect_failure(cmd: list[str], *, cwd: Path = ROOT) -> subprocess.Comple
     return result
 
 
+def assert_report_error_contains(path: Path, expected: str) -> None:
+    report = json.loads(path.read_text(encoding="utf-8"))
+    errors = [str(error) for error in report.get("fatal_errors", [])]
+    for case in report.get("cases", []):
+        if isinstance(case, dict):
+            errors.extend(str(error) for error in case.get("failures", []))
+    if not any(expected in error for error in errors):
+        raise AssertionError(f"{path}: expected report error containing {expected!r}")
+
+
 def canonical_json_bytes(value) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
@@ -321,6 +331,73 @@ def write_sut_result_without_context_bindings(path: Path) -> None:
             if isinstance(context, dict):
                 context.pop("context_bindings", None)
     path.write_text(json.dumps(sut_results, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def write_sut_result_with_conflicting_duplicate_context_binding(
+    path: Path,
+    *,
+    conflicting_first: bool,
+) -> None:
+    sut_results = json.loads((ROOT / "examples" / "conformance" / "sut-results-pass.example.json").read_text())
+    for result in sut_results.get("results", []):
+        artifacts = result.get("artifacts")
+        if not isinstance(artifacts, dict):
+            continue
+        contexts = artifacts.get("verification_context")
+        if not isinstance(contexts, list):
+            continue
+        for context in contexts:
+            if not isinstance(context, dict):
+                continue
+            bindings = context.get("context_bindings")
+            if not isinstance(bindings, list):
+                continue
+            for index, binding in enumerate(bindings):
+                if not isinstance(binding, dict):
+                    continue
+                digest = binding.get("digest")
+                if not isinstance(digest, dict) or not isinstance(digest.get("value"), str):
+                    continue
+                correct = json.loads(json.dumps(binding))
+                conflicting = json.loads(json.dumps(binding))
+                current_digest = conflicting["digest"]["value"]
+                conflicting["digest"]["value"] = "f" * 64 if current_digest == "0" * 64 else "0" * 64
+                replacement = [conflicting, correct] if conflicting_first else [correct, conflicting]
+                bindings[index:index + 1] = replacement
+                path.write_text(json.dumps(sut_results, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+                return
+    raise AssertionError("passing SUT result has no digest-bound verification context entry")
+
+
+def write_sut_result_with_conflicting_duplicate_artifact_entry(
+    path: Path,
+    *,
+    artifact_field: str,
+    conflicting_first: bool,
+) -> None:
+    sut_results = json.loads((ROOT / "examples" / "conformance" / "sut-results-pass.example.json").read_text())
+    for result in sut_results.get("results", []):
+        artifacts = result.get("artifacts")
+        if not isinstance(artifacts, dict):
+            continue
+        entries = artifacts.get(artifact_field)
+        if not isinstance(entries, list):
+            continue
+        for index, entry in enumerate(entries):
+            if not isinstance(entry, dict):
+                continue
+            digest = entry.get("digest")
+            if not isinstance(digest, dict) or not isinstance(digest.get("value"), str):
+                continue
+            correct = json.loads(json.dumps(entry))
+            conflicting = json.loads(json.dumps(entry))
+            current_digest = conflicting["digest"]["value"]
+            conflicting["digest"]["value"] = "f" * 64 if current_digest == "0" * 64 else "0" * 64
+            replacement = [conflicting, correct] if conflicting_first else [correct, conflicting]
+            entries[index:index + 1] = replacement
+            path.write_text(json.dumps(sut_results, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            return
+    raise AssertionError(f"passing SUT result has no digest-bound {artifact_field} entry")
 
 
 def find_free_port() -> int:
@@ -1853,6 +1930,59 @@ def main() -> int:
                 str(tmp_dir / "vate-sut-missing-context-bindings-report.json"),
             ]
         )
+        for conflicting_first, order_label in (
+            (False, "correct-then-conflicting"),
+            (True, "conflicting-then-correct"),
+        ):
+            duplicate_bindings = tmp_dir / f"sut-results-duplicate-context-binding-{order_label}.json"
+            duplicate_report = tmp_dir / f"vate-sut-duplicate-context-binding-{order_label}-report.json"
+            write_sut_result_with_conflicting_duplicate_context_binding(
+                duplicate_bindings,
+                conflicting_first=conflicting_first,
+            )
+            run_expect_failure(
+                [
+                    sys.executable,
+                    str(VATE_CONFORMANCE),
+                    "compare",
+                    "--corpus-root",
+                    str(ROOT / "conformance" / "al2-vate-v0.3"),
+                    "--sut-results",
+                    str(duplicate_bindings),
+                    "--report",
+                    str(duplicate_report),
+                ]
+            )
+            assert_report_error_contains(duplicate_report, "duplicate logical binding key")
+        for artifact_field in ("verification_context", "proof_artifacts"):
+            for conflicting_first, order_label in (
+                (False, "correct-then-conflicting"),
+                (True, "conflicting-then-correct"),
+            ):
+                duplicate_artifacts = tmp_dir / f"sut-results-duplicate-{artifact_field}-{order_label}.json"
+                duplicate_report = tmp_dir / f"vate-sut-duplicate-{artifact_field}-{order_label}-report.json"
+                write_sut_result_with_conflicting_duplicate_artifact_entry(
+                    duplicate_artifacts,
+                    artifact_field=artifact_field,
+                    conflicting_first=conflicting_first,
+                )
+                run_expect_failure(
+                    [
+                        sys.executable,
+                        str(VATE_CONFORMANCE),
+                        "compare",
+                        "--corpus-root",
+                        str(ROOT / "conformance" / "al2-vate-v0.3"),
+                        "--sut-results",
+                        str(duplicate_artifacts),
+                        "--report",
+                        str(duplicate_report),
+                    ]
+                )
+                assert_report_error_contains(
+                    duplicate_report,
+                    f"artifacts.{artifact_field}[1]: duplicate logical artifact key",
+                )
         run(
             [
                 sys.executable,

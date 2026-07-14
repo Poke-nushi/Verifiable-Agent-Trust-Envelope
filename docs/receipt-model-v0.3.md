@@ -142,6 +142,19 @@ profile registers them. If a future profile needs both total and per-effect
 caps, it should add a separate field such as `max_amount_per_side_effect`
 rather than changing `max_amount`.
 
+`result.policy_violations[]` is an observed declaration in the post-execution
+artifact, not proof that the admitted constraints were evaluated correctly. A
+post-execution verifier or auditor may apply profile-registered derived checks
+even when that list is empty, and then compare any declared violation tokens
+with the derived result. In the current v0.3 runner, that independent
+side-effect-derived check is the `max_amount` aggregate described above. The
+`post-execution-effective-constraints-aggregate-exceeded` case intentionally
+uses two individually permitted amounts whose sum exceeds `max_amount` while
+the receipt declares an empty `policy_violations` list. This distinguishes the
+registered aggregate check from merely echoing the receipt. It does not claim
+that the runner independently derives or exhaustively checks `tool_allowlist`,
+`target_resource`, `approval`, or every admitted constraint from side effects.
+
 An attenuated admission receipt can still be non-executable. In particular,
 `attenuation.require_new_permit: true` means the verifier found a narrower or
 fresh-permit path, but execution should not proceed until that new permit is

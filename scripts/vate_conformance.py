@@ -2041,8 +2041,23 @@ def sut_verification_context_failures(value: Any, label: str) -> list[str]:
     if not isinstance(raw_bindings, list) or not raw_bindings:
         failures.append(f"{label}.context_bindings: expected non-empty array")
     else:
+        seen_binding_keys: dict[tuple[Any, Any, Any, Any], int] = {}
         for index, binding in enumerate(raw_bindings):
-            failures.extend(context_binding_shape_failures(binding, f"{label}.context_bindings[{index}]"))
+            binding_label = f"{label}.context_bindings[{index}]"
+            shape_failures = context_binding_shape_failures(binding, binding_label)
+            failures.extend(shape_failures)
+            if shape_failures or not isinstance(binding, dict):
+                continue
+            key = context_binding_key(binding)
+            first_index = seen_binding_keys.get(key)
+            if first_index is not None:
+                failures.append(
+                    f"{binding_label}: duplicate logical binding key "
+                    f"role={key[0]} source_artifact={key[1]} path={key[2]} "
+                    f"evidence_type={key[3]}; first used at index {first_index}"
+                )
+            else:
+                seen_binding_keys[key] = index
     return failures
 
 
@@ -2093,14 +2108,21 @@ def context_binding_match_failures(
     if not isinstance(actual_bindings, list):
         return [f"{label}: expected context binding array"]
 
-    actual_by_key: dict[tuple[Any, Any, Any, Any], dict[str, Any]] = {
-        context_binding_key(binding): binding
-        for binding in actual_bindings
-        if isinstance(binding, dict)
-    }
+    actual_by_key: dict[tuple[Any, Any, Any, Any], dict[str, Any]] = {}
+    duplicate_keys: set[tuple[Any, Any, Any, Any]] = set()
+    for binding in actual_bindings:
+        if not isinstance(binding, dict):
+            continue
+        key = context_binding_key(binding)
+        if key in actual_by_key:
+            duplicate_keys.add(key)
+        else:
+            actual_by_key[key] = binding
     failures: list[str] = []
     for expected in expected_bindings:
         key = context_binding_key(expected)
+        if key in duplicate_keys:
+            continue
         actual = actual_by_key.get(key)
         if actual is None:
             failures.append(
@@ -2125,6 +2147,37 @@ def sut_proof_artifact_failures(value: Any, label: str) -> list[str]:
     if not isinstance(case_artifact, str) or not case_artifact:
         failures.append(f"{label}.case_artifact: expected non-empty string")
     return failures
+
+
+def artifact_entries_by_logical_key(
+    entries: list[Any],
+    label: str,
+) -> tuple[dict[tuple[str, str], dict[str, Any]], set[tuple[str, str]], list[str]]:
+    available: dict[tuple[str, str], dict[str, Any]] = {}
+    duplicate_keys: set[tuple[str, str]] = set()
+    first_index_by_key: dict[tuple[str, str], int] = {}
+    failures: list[str] = []
+    for index, entry in enumerate(entries):
+        if not isinstance(entry, dict):
+            continue
+        case_artifact = entry.get("case_artifact")
+        kind = entry.get("kind")
+        if not isinstance(case_artifact, str) or not case_artifact:
+            continue
+        if not isinstance(kind, str) or not kind:
+            continue
+        key = (case_artifact, kind)
+        first_index = first_index_by_key.get(key)
+        if first_index is not None:
+            duplicate_keys.add(key)
+            failures.append(
+                f"{label}[{index}]: duplicate logical artifact key "
+                f"case_artifact={key[0]} kind={key[1]}; first used at index {first_index}"
+            )
+        else:
+            first_index_by_key[key] = index
+            available[key] = entry
+    return available, duplicate_keys, failures
 
 
 def sut_result_artifact_failures(result: dict[str, Any], requirements: dict[str, Any]) -> list[str]:
@@ -2180,13 +2233,15 @@ def sut_result_artifact_failures(result: dict[str, Any], requirements: dict[str,
                 )
             )
 
-        available_contexts: dict[tuple[Any, Any], dict[str, Any]] = {
-            (context.get("case_artifact"), context.get("kind")): context
-            for context in raw_contexts
-            if isinstance(context, dict)
-        }
+        available_contexts, duplicate_context_keys, duplicate_context_failures = artifact_entries_by_logical_key(
+            raw_contexts,
+            "artifacts.verification_context",
+        )
+        failures.extend(duplicate_context_failures)
         for expected_context in required_contexts:
             key = (expected_context.get("case_artifact"), expected_context.get("kind"))
+            if key in duplicate_context_keys:
+                continue
             context_ref = available_contexts.get(key)
             if context_ref is None:
                 failures.append(
@@ -2223,6 +2278,11 @@ def sut_result_artifact_failures(result: dict[str, Any], requirements: dict[str,
                         f"artifacts.verification_context[{index}]",
                     )
                 )
+            _, _, duplicate_context_failures = artifact_entries_by_logical_key(
+                raw_contexts,
+                "artifacts.verification_context",
+            )
+            failures.extend(duplicate_context_failures)
 
     raw_proofs = artifacts.get("proof_artifacts", [])
     if required_proofs:
@@ -2240,13 +2300,15 @@ def sut_result_artifact_failures(result: dict[str, Any], requirements: dict[str,
                 )
             )
 
-        available_proofs: dict[tuple[Any, Any], dict[str, Any]] = {
-            (proof.get("case_artifact"), proof.get("kind")): proof
-            for proof in raw_proofs
-            if isinstance(proof, dict)
-        }
+        available_proofs, duplicate_proof_keys, duplicate_proof_failures = artifact_entries_by_logical_key(
+            raw_proofs,
+            "artifacts.proof_artifacts",
+        )
+        failures.extend(duplicate_proof_failures)
         for expected_proof in required_proofs:
             key = (expected_proof.get("case_artifact"), expected_proof.get("kind"))
+            if key in duplicate_proof_keys:
+                continue
             proof_ref = available_proofs.get(key)
             if proof_ref is None:
                 failures.append(
@@ -2272,6 +2334,11 @@ def sut_result_artifact_failures(result: dict[str, Any], requirements: dict[str,
                         f"artifacts.proof_artifacts[{index}]",
                     )
                 )
+            _, _, duplicate_proof_failures = artifact_entries_by_logical_key(
+                raw_proofs,
+                "artifacts.proof_artifacts",
+            )
+            failures.extend(duplicate_proof_failures)
 
     return failures
 
