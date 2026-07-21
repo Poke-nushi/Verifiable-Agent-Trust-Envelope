@@ -5,11 +5,11 @@
 This is a non-normative review aid for the
 `VATE-AL2-Verifier-Admission-v0.3` discussion draft.
 
-It compares the following work-in-progress revisions as of 2026-07-11:
+It compares the following work-in-progress revisions as of 2026-07-22:
 
-- EP-AEC `draft-schrock-ep-authorization-evidence-chain-02`
+- EP-AEC `draft-schrock-ep-authorization-evidence-chain-03`
 - EP-AEG `draft-schrock-ep-action-evidence-graph-00`
-- APS `draft-pidlisnyi-aps-02`
+- APS `draft-pidlisnyi-aps-03`
 - Agent Accountability Composition (CAN / WHO / WHAT / AUDIT question slots)
   `draft-mih-sato-agent-accountability-composition-00`
 
@@ -47,7 +47,7 @@ This is descriptive shorthand, not a new VATE artifact or schema field.
 
 | Work | Primary role in the cited revision | Material overlap with VATE | Remaining VATE boundary under review | When it can make VATE unnecessary |
 |---|---|---|---|---|
-| EP-AEC | Composes heterogeneous authorization receipts bound to one action digest and returns fail-closed `ALLOW` or `DENY`; optionally includes an executor-signed, operator-originated effect attestation | Verifier-side evidence composition, relying-party requirements, action binding, fail-closed results, and authorization-to-effect comparison | Local execution admission across actor, principal, runtime, status, and policy; machine-readable attenuation; exact effective-constraint and runtime comparison after execution | When binary evidence sufficiency is enough and the deployment already has an internal enforcement and audit contract for narrowing and execution linkage |
+| EP-AEC | Composes heterogeneous evidence verified under its native rules, checks same-action binding, and evaluates a relying-party-pinned requirement with a fail-closed `SATISFIED` or `UNSATISFIED` result; this is not a universal or local authorization decision, and the executor separately decides `AUTHORIZED` | Verifier-side evidence composition, relying-party requirements, same-action binding, and fail-closed evidence-satisfaction results, plus executor-side action-digest-keyed one-time consumption, immutable action snapshots, and durable atomic decision logging | A portable local admission and attenuation artifact; explicit runtime and transaction identity binding; and reason-specific post-execution comparison of observed effects against the admitted basis | When the deployment does not need a portable admission artifact and its executor provides equivalent narrowing, runtime and transaction binding, and reason-specific post-execution comparison |
 | EP-AEG | Builds a content-addressed evidence graph and replays relying-party policy to produce one of five closed evidence verdicts and an optional signed Reliance Result | Relying-party policy, freshness, revocation requirements, runtime-attestation inputs, reasoned verifier results, and post-execution evidence relationships | A concrete execution directive, a transformed effective request and constraints for the runtime, and reason-specific comparison against that admitted basis | When an EP-AEG profile or deployment contract produces and enforces the same narrowed execution basis and later comparison semantics |
 | APS | Defines identity, delegation, monotonic authority narrowing, `permit / deny / narrow`, a two-phase execution gate, execution-time rechecks, and signed completion receipts | Direct overlap with attenuation, execution gating, revocation rechecks, bounded approval artifacts, and authorization-to-completion linkage | A narrower protocol-neutral admission and receipt contract for deployments consuming heterogeneous non-APS evidence or crossing products and trust domains | In an end-to-end APS deployment where the APS authority, gate, and receipt model already cover every required verifier, runtime, and audit boundary |
 | Agent Accountability Composition | Defines composable CAN, WHO, WHAT, and AUDIT question slots joined by a shared action digest; the cited revision leaves the CAN profile text open | The CAN question, "was the agent permitted to act?", overlaps VATE's verifier-admission role | VATE can be evaluated as one candidate source of CAN-profile semantics, but no official mapping or slot ownership exists | When another CAN profile defines and gains adoption for equivalent admission, narrowing, runtime-binding, and completion-comparison semantics |
@@ -55,6 +55,30 @@ This is descriptive shorthand, not a new VATE artifact or schema field.
 The overlap is intentional to state. VATE should not claim that status checks,
 revocation, attenuation labels, signed decisions, or post-execution receipts are
 unique by themselves.
+
+## Revision-Specific Implementation Status
+
+The following is document-reported evidence for the cited revisions, not an
+independent verification or a ranking of implementation maturity:
+
+- **EP-AEC -03:** reports same-project JavaScript, Python, and Go reference
+  implementations agreeing on shared vectors; they are not independently
+  developed. It also cites a third party's execution and verification of the
+  published artifacts against a pinned commit.
+- **EP-AEG -00:** reports one Apache-2.0 reference implementation in the EMILIA
+  codebase covering graph evaluation, policy replay, signed Reliance Results,
+  all six policy packs, and tests of its fail-closed invariants.
+- **APS -03:** reports AEOESS-maintained TypeScript core coverage including
+  strict RFC 8785 canonicalization and native action-reference computation,
+  with TypeScript, Python, and Go sharing known-answer action-reference vectors
+  and public fixtures. The same appendix says these results do not establish
+  independent implementation or adoption, emitted TypeScript passport and
+  delegation records predate this revision's wire formats, and Python and Go
+  implement subsets. It specifies no A2A binding and calls the released A2A
+  adapter experimental.
+- **Agent Accountability Composition -00:** specifies no implementation; a
+  conformance vector freezes only after recomputation by at least two
+  independent implementations.
 
 ## Existing VATE Case Slice
 
