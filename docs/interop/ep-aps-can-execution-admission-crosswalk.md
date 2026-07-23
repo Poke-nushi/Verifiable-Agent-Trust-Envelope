@@ -78,12 +78,16 @@ That leaves a narrower, falsifiable hypothesis: where the AEB local decision
 must cross a component or trust boundary, VATE can be evaluated as a candidate
 contract for transporting that relying party's narrowed admission decision:
 
-- AEB Section 5.5 `AUTHORIZED` can be compared with VATE `allow` for the
-  original request, or with executable `attenuate` only when the narrower
-  effective request and `attenuation.effective_constraints` are the action
-  subsequently re-evaluated as required by AEB, frozen, and enforced. A
-  non-executable attenuation remains a request for fresh authority, not
-  authorization to invoke.
+- A VATE `attenuate` receipt is not AEB `AUTHORIZED` by itself. VATE `allow`
+  or executable `attenuate` can at most carry a candidate portable record of
+  the local admission basis. A component claiming AEB conformance must still
+  construct the complete effective observed action from trusted
+  boundary-controlled facts and apply the full ordered AEB Sections 5.1
+  through 5.7 lifecycle to that effective action: native verification, CAID
+  `MATCH`, AEC `SATISFIED`, a separate local `AUTHORIZED` decision, atomic
+  consumption or reservation, durable `DISPATCH_PENDING`, and frozen
+  invocation. A non-executable attenuation remains a request for fresh
+  authority, not authorization to invoke.
 - AEB refusal can be compared with VATE `deny`. These are candidate mappings,
   not vocabulary equivalence or an official AEB profile.
 - Under AEB Sections 5.8 and 5.9, VATE's admission-receipt to post-execution
@@ -91,6 +95,14 @@ contract for transporting that relying party's narrowed admission decision:
   admitted basis. VATE does not authenticate, certify, or confer authority on
   provider or system-of-record evidence; native verification and AEB's
   authoritative reconciliation rules remain outside that linkage layer.
+
+The current VATE v0.3 corpus binds original and effective request hashes,
+recorded changes, effective constraints, executability, and selected
+admission-to-post-execution comparisons. It does not demonstrate the complete
+AEB Sections 5.1 through 5.7 ordering, effect-boundary construction of every
+material field, durable consumption or reservation, `DISPATCH_PENDING`, or
+runtime enforcement. A passing VATE case is therefore not evidence of AEB
+conformance.
 
 At the document level, AEB -00 intentionally defines no common portable output
 format for local authorization or attenuation and no VATE-shaped conformance
@@ -106,28 +118,44 @@ reconciliation. This crosswalk makes no VATE mapping for that artifact.
 
 ## Revision-Specific Implementation Status
 
-The following is document-reported evidence for the cited revisions, not an
-independent verification or a ranking of implementation maturity:
+The following is revision-text or Datatracker-linked project evidence, not an
+independent verification, an adoption claim, or a ranking of implementation
+maturity:
 
 - **EP-AEC -04:** reports same-team TypeScript, Python, and Go implementations
   agreeing on shared vectors for the existing AEC envelope and evaluator. It
   also states that the combined -04 requirement and replay contract is not yet
   covered by that three-language vector suite, so the repository is not a
   complete conforming -04 implementation.
-- **AEB -00:** defines processing-order and deployment-claim conformance
-  requirements and links source and related implementation repositories in
-  Datatracker metadata. The draft contains no separate implementation-status
-  section and makes no revision-specific portable-output implementation claim.
-- **CAID -01:** specifies two author-maintained machine-readable registries and
-  recommends positive, negative, and indeterminate vectors for mapping
-  profiles. The draft contains no separate implementation-status section or
-  revision-specific conformance result.
+- **AEB -00:** Datatracker links the EMILIA Protocol repository and Gate
+  implementation. The linked code and tests include a durable AEB consumption
+  store, proposal-to-effect processing, reservation and indeterminate-outcome
+  handling, and authenticated reconciliation examples. This is relevant
+  implementation evidence, but it does not establish the complete Section 5
+  ordered lifecycle for every protected invocation, all Section 8 deployment
+  claims, complete mediation, or revision-scoped independent conformance.
+- **CAID -01:** Datatracker links the CAID reference implementations,
+  machine-readable action-type and suite registries, and shared core and
+  mapping vectors. JavaScript, Python, and Go implementations consume those
+  vectors, providing cross-language consistency evidence. They are maintained
+  by the same team in one repository, not independent implementations, and
+  mapping completeness still depends on the relying party's review of each
+  profile's material-field model.
 - **Authorization Receipts -08:** reports three same-repository reference
   verifiers agreeing on published vectors and a separately authored Rust
   verifier passing a time-pinned 16-suite, 164-vector bundle. It also lists
   normative mechanisms not yet exercised by the reference implementation or
   vectors, formal-model exclusions, and why the Rust result is not current
   clean-room acceptance for the whole specification.
+- **Revocation Statement -00:** Appendix A reports Apache-2.0 JavaScript,
+  Python, and Go verifiers, a JSON Schema, attack-catalogue vectors, and an
+  executable suite with 19 real-signature cases agreeing across the three
+  languages. These are same-team ports, not independent implementations. The
+  generic verifiers can validate the closed Trust Program `commit` target, but
+  no end-to-end adapter yet derives that target, verifies the portable
+  statement, and commits revocation-versus-claim in one durable transaction;
+  the draft makes no completed implementation or independent-interoperability
+  claim for that profile.
 - **EP-AEG -00:** reports one Apache-2.0 reference implementation in the EMILIA
   codebase covering graph evaluation, policy replay, signed Reliance Results,
   all six policy packs, and tests of its fail-closed invariants. Its
