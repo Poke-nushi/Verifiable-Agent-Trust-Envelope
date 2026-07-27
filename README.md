@@ -227,17 +227,18 @@ The most useful feedback for this draft is currently:
 - **Repository type**: protocol discussion draft
 - **Document maturity**: early draft
 - **Primary language**: English
-- **Roadmap refresh date**: 2026-07-07
+- **Roadmap refresh date**: 2026-07-27
 - **Primary battlefield**: `AL2` external digital write
 - **Current archived snapshot with version DOI**: `v0.3.2` external review
   portability and reproducibility patch
 - **Implemented artifacts**: v0.3 schemas and examples; runnable AL2 fixture corpus with negative cases; SUT comparison and implementation-reporting formats; dependency-free verifier core and A2A-shaped adapter demo; package-private TypeScript reference helpers for digest-bound artifacts, SUT result shaping, and A2A metadata shape checks; focused adjacent evidence fixtures and crosswalk notes
-- **Immediate next action**: use the first externally supplied three-case
-  adapter-run bundle to improve reproducibility and reviewer onboarding, then
-  collect additional SUT results from implementations that are not the
-  repository reference runner, ideally with generated artifacts or a controlled
-  artifact bundle, an implementation report, and a local bundle verification
-  report for one `v0.3` corpus snapshot
+- **Immediate next action**: use the recorded three-case starter bundle and
+  deeper eight-case bundle from the same AlgoVoi implementation line to improve
+  reproducibility and reviewer onboarding, then collect a result from another
+  independently maintained implementation line distinct from both the
+  repository reference runner and the recorded AlgoVoi line, ideally with
+  generated artifacts or a controlled artifact bundle, an implementation
+  report, and a local bundle verification report for one `v0.3` corpus snapshot
 - **Planned later**: pairwise presentation profile, richer capability registry, formal `AID`, physical `ABS` profiles
 
 The conformance artifacts record one implementation run against one corpus

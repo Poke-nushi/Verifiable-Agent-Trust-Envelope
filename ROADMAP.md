@@ -11,9 +11,11 @@ For public wording rules, see
 
 ### `post-v0.3.2-additional-implementation-evidence`
 
-The `v0.3.2` patch records the first limited external adapter-run bundle and
-the portability fixes that bundle surfaced. The priority now is additional
-independent implementation evidence and reproducibility across implementers.
+The `v0.3.2` patch records the initial three-case external adapter-run bundle
+and the portability fixes that bundle surfaced. The run ledger now also records
+a deeper eight-case slice from the same AlgoVoi implementation line. The
+priority now is evidence from a distinct implementation line and
+reproducibility across implementers.
 
 The next work should not broaden VATE beyond the
 `VATE-AL2-Verifier-Admission-v0.3` boundary. The priority is to move from
@@ -56,10 +58,13 @@ Near-term public work should happen in this order:
 1. Keep the lightweight
    [one-hour external SUT or corpus review request](docs/conformance/external-sut-ask-1-hour.md)
    visible for reviewers who are not ready to produce a full adapter.
-2. Use the first externally supplied three-case adapter-run bundle and the
-   external SUT starter template as the reference path for additional reviewers.
-3. Collect additional SUT results from implementations that are not the
-   repository reference runner, against the `v0.3` corpus snapshot.
+2. Use the recorded three-case starter bundle, the deeper eight-case bundle,
+   and the external SUT starter template as the reference path for additional
+   reviewers. Treat the two bundles as slices from the same AlgoVoi
+   implementation line, not two independent SUTs.
+3. Collect a SUT result from another independently maintained implementation
+   line, distinct from both the repository reference runner and the recorded
+   AlgoVoi line, against the `v0.3` corpus snapshot.
 4. Ask implementers to publish generated artifacts or a controlled artifact
    bundle, not only a hand-written result summary.
 5. Generate or collect a conformance report, implementation report, and local
@@ -162,10 +167,12 @@ The current post-`v0.3.2` target is to move from author-run artifacts toward
 independent implementation evidence. The priority is not a broader protocol
 surface.
 
-The first limited external adapter-run bundle has been recorded in
-[docs/conformance/external-sut-run-records.md](docs/conformance/external-sut-run-records.md).
-It covers three starter cases, not the full corpus, and remains bounded as one
-implementation run against one corpus snapshot.
+The recorded AlgoVoi evidence in
+[docs/conformance/external-sut-run-records.md](docs/conformance/external-sut-run-records.md)
+now includes an initial three-case starter bundle and a deeper eight-case
+bundle. The two slices come from the same implementation line and overlap on
+`attenuate-max-amount`. The deeper result covers `8/72` cases, not the full
+corpus, and is not a second independent SUT result.
 
 Useful external evidence would include:
 
