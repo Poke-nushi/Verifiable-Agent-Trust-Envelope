@@ -56,6 +56,11 @@ Prepare your SUT result file first. The passing example is:
 examples/conformance/sut-results-pass.example.json
 ```
 
+That example uses `artifact_mode: corpus-fixture-validation`. Its `artifacts`
+contain references whose digests match the exact committed fixture bytes. The
+match does not establish that an external SUT evaluated them, and they are not
+claimed as SUT-generated receipts.
+
 Compare your SUT result against the same corpus snapshot:
 
 ```bash
@@ -95,6 +100,8 @@ Each result entry must report:
 - case-specific `checks[]` when the corpus expects them
 - required `artifacts` when the case depends on concrete receipts, AL2 context,
   or JOSE proof-package fixture artifacts
+- `artifact_mode: generated-receipts` plus `generated_artifacts` when claiming
+  that the SUT produced its own admission or post-execution receipt bytes
 
 For artifact-backed cases, include digest-bound references. At minimum, those
 references carry:
@@ -143,18 +150,45 @@ names are:
 Use the case file's `expected.checks[]` as the source of truth for any other
 case.
 
-## Artifact Origin Boundary
+## Artifact Roles And Origin Boundary
 
-The passing sample SUT result may point at repository fixture paths because it
-is a local contract example. For an independent implementation review, artifact
-references should identify SUT-produced artifacts or a controlled publication
-package from the SUT maintainer.
+Keep `results[].artifacts` as references whose digests match the exact corpus
+artifacts submitted as SUT inputs. Those fields remain byte-identical
+fixed-vector references even for an independent implementation. Do not replace
+them with a newly generated receipt digest. Digest matching alone does not prove
+that the SUT read or evaluated the referenced bytes.
 
-`compare` checks the submitted result values against the corpus snapshot. It
-does not prove artifact provenance, does not fetch arbitrary remote URIs, and
-does not prove that the SUT runtime generated the referenced receipts. A SUT
-result that only cites copied repository fixtures can demonstrate result-file
-shape, but it is not enough evidence for an independent implementation run.
+When the SUT issues receipt output, set `artifact_mode` to
+`generated-receipts` and add `results[].generated_artifacts`. Each generated
+reference needs the normal `uri`, `media_type`, and digest fields. If `uri` is a
+remote publication URL, also provide a relative `local_path` under the directory
+that contains the SUT result so `compare` can read the bytes without fetching
+the network. Absolute paths, parent traversal, symlink escapes, and files over
+8 MiB are rejected. Generated admission and post-execution
+references must use `application/vate-admission-receipt+json` and
+`application/vate-post-execution-receipt+json`, respectively.
+
+In generated mode, `compare` verifies the generated file's raw digest, selected
+schema-aligned receipt shape checks, and a bounded semantic projection. Independent
+receipt ids, verifier or issuer identity, proof packaging, human-readable
+summary, and concrete generated admission links may differ where documented.
+The admission-link relationship must preserve the case's intended match or
+mismatch, and the post-execution `admission.uri` must equal the submitted
+generated admission artifact `uri`. Decision visibility fields, ordered reason codes, fixed case clock,
+request/evidence/policy/attenuation semantics, and post-execution linkage must
+still match the case. Extra or unknown generated receipt roles are rejected.
+
+A top-level `generated-receipts` default cannot be downgraded per case. To mix
+the modes, keep the top-level default at `corpus-fixture-validation` and opt
+selected cases into `generated-receipts`. Compare and implementation reports
+record each effective case mode and aggregate mode counts.
+
+A result that stays in `corpus-fixture-validation` shows only that the submitted
+result and corpus fixture digests matched the fixed-vector comparison contract.
+It does not establish that the SUT read or evaluated those bytes. A
+generated-receipts pass checks additional submitted output bytes, but still does
+not prove artifact provenance, controlled publication origin, source
+independence, or production signature validation.
 
 When publishing review material, include the SUT result, the generated receipt
 artifacts or controlled artifact bundle, and stable maintainer-controlled URIs
@@ -194,7 +228,9 @@ python3 scripts/vate_conformance.py verify-bundle \
 `verify-bundle` checks that the local corpus, SUT result, conformance report,
 and implementation report digests still line up. It is not a production
 signature profile and does not replace JOSE, PKI, Sigstore, signed git tags, or
-other external proofs.
+other external proofs. For `generated-receipts` results it also rereads the
+local `generated_artifacts` and reruns their raw-digest, bounded-semantic, and
+linkage checks.
 
 ## Optional TypeScript Helpers
 

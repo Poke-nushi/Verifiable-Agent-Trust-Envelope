@@ -11,6 +11,7 @@ export type JsonValue =
 
 export interface DigestBoundReference {
   uri: string;
+  local_path?: string;
   media_type: string;
   digest: DigestDescriptor;
 }
@@ -31,6 +32,10 @@ export type SutOutcome = AdmissionDecision | PostExecutionOutcome;
 
 export type SutCaseStatus = "completed" | "skipped" | "error";
 
+export type SutArtifactMode =
+  | "corpus-fixture-validation"
+  | "generated-receipts";
+
 export type ProofArtifactKind =
   | "jose_proof_package"
   | "jose_detached_payload"
@@ -49,13 +54,20 @@ export interface SutResultArtifacts {
   [key: string]: unknown;
 }
 
+export interface SutGeneratedArtifacts {
+  admission_receipt?: DigestBoundReference;
+  post_execution_receipt?: DigestBoundReference;
+}
+
 export interface SutResultEntry {
   case_id: string;
+  artifact_mode?: SutArtifactMode;
   status: SutCaseStatus;
   outcome: SutOutcome;
   should_execute: boolean;
   reason_codes: string[];
   artifacts?: SutResultArtifacts;
+  generated_artifacts?: SutGeneratedArtifacts;
   checks?: Array<{
     name: string;
     pass: boolean;

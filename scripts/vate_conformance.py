@@ -12,8 +12,10 @@ from __future__ import annotations
 import argparse
 import base64
 import binascii
+import copy
 import hashlib
 import json
+import math
 import re
 import sys
 from datetime import datetime, timezone
@@ -31,6 +33,17 @@ CORPUS_INDEX_VERSION = "vate-conformance-corpus-2026-07"
 CORPUS_INDEX_FILENAME = "corpus.json"
 SUT_RESULTS_VERSION = "vate-sut-results-2026-07"
 EVIDENCE_VOCABULARY_VERSION = "vate-evidence-vocabulary-2026-07"
+SUT_ARTIFACT_MODE_CORPUS = "corpus-fixture-validation"
+SUT_ARTIFACT_MODE_GENERATED = "generated-receipts"
+SUT_ARTIFACT_MODES = {
+    SUT_ARTIFACT_MODE_CORPUS,
+    SUT_ARTIFACT_MODE_GENERATED,
+}
+GENERATED_ARTIFACT_NAMES = {
+    "admission_receipt",
+    "post_execution_receipt",
+}
+MAX_GENERATED_ARTIFACT_BYTES = 8 * 1024 * 1024
 SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 PROFILE_HASH_RE = re.compile(r"^sha-256:[0-9a-f]{64}$")
 CANONICAL_MONEY_VALUE_RE = re.compile(r"^(0|[1-9][0-9]*)(\.[0-9]+)?$")
@@ -60,8 +73,27 @@ PAIRING_FORBIDDEN_STABLE_FIELDS = frozenset(
 )
 
 
+def reject_non_finite_json_constant(value: str) -> None:
+    raise ValueError(f"non-finite JSON number {value} is not allowed")
+
+
+def parse_finite_json_float(value: str) -> float:
+    parsed = float(value)
+    if not math.isfinite(parsed):
+        raise ValueError(f"non-finite JSON number {value} is not allowed")
+    return parsed
+
+
+def strict_json_loads(value: str | bytes | bytearray) -> Any:
+    return json.loads(
+        value,
+        parse_constant=reject_non_finite_json_constant,
+        parse_float=parse_finite_json_float,
+    )
+
+
 def load_evidence_vocabulary() -> tuple[frozenset[str], frozenset[str], dict[str, frozenset[str]]]:
-    registry = json.loads(EVIDENCE_VOCABULARY_PATH.read_text(encoding="utf-8"))
+    registry = strict_json_loads(EVIDENCE_VOCABULARY_PATH.read_text(encoding="utf-8"))
     if registry.get("version") != EVIDENCE_VOCABULARY_VERSION:
         raise RuntimeError("evidence vocabulary registry version does not match the runner")
     if registry.get("profile") != PROFILE:
@@ -137,13 +169,16 @@ POLICY_VIOLATION_REASON_CODES = {
 CANONICAL_POLICY_VIOLATION_TOKENS = set(POLICY_VIOLATION_REASON_CODES)
 
 
-def read_json(path: Path) -> dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8"))
+def read_json(path: Path) -> Any:
+    return strict_json_loads(path.read_text(encoding="utf-8"))
 
 
 def write_json(path: Path, data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(data, allow_nan=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
 
 
 def pairing_string_array_failures(case_id: str, pairing: dict[str, Any], field: str) -> list[str]:
@@ -285,7 +320,12 @@ def try_parse_time(value: Any) -> datetime | None:
 
 
 def canonical_bytes(value: Any) -> bytes:
-    return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return json.dumps(
+        value,
+        allow_nan=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
 
 
 def b64url_encode_bytes(value: bytes) -> str:
@@ -344,11 +384,44 @@ def resolve_artifact_path(case: dict[str, Any], key_or_path: str) -> Path:
     return ROOT / path
 
 
+def read_case_artifact(
+    case: dict[str, Any],
+    key_or_path: str,
+) -> tuple[Any | None, str | None]:
+    if not isinstance(key_or_path, str) or not key_or_path:
+        return None, "artifact reference must be a non-empty string"
+    try:
+        path = resolve_artifact_path(case, key_or_path)
+    except (TypeError, ValueError):
+        return None, "artifact reference is invalid"
+    if not path.is_file():
+        return None, "artifact missing"
+    try:
+        artifact = read_json(path)
+    except (OSError, UnicodeDecodeError, ValueError):
+        return None, "artifact is not readable strict JSON"
+    if not isinstance(artifact, dict):
+        return None, "artifact must be a JSON object"
+    return artifact, None
+
+
+def case_artifact_sha256(case: dict[str, Any], key_or_path: str) -> str | None:
+    _, artifact_failure = read_case_artifact(case, key_or_path)
+    if artifact_failure:
+        return None
+    path = resolve_artifact_path(case, key_or_path)
+    try:
+        return sha256_file(path)
+    except OSError:
+        return None
+
+
 def load_artifact(case: dict[str, Any], key: str) -> dict[str, Any] | None:
     rel = case.get("artifacts", {}).get(key)
-    if not rel:
+    if not isinstance(rel, str) or not rel:
         return None
-    return read_json(resolve_artifact_path(case, key))
+    artifact, _ = read_case_artifact(case, key)
+    return artifact
 
 
 def referenced_paths(case: dict[str, Any]) -> list[Path]:
@@ -369,27 +442,48 @@ def referenced_paths(case: dict[str, Any]) -> list[Path]:
     return paths
 
 
-def corpus_manifest(corpus_root: Path) -> tuple[list[dict[str, str]], dict[str, str]]:
+def corpus_manifest(
+    corpus_root: Path,
+) -> tuple[list[dict[str, str]], dict[str, str], list[str]]:
     corpus_index_path = (corpus_root / CORPUS_INDEX_FILENAME).resolve()
-    paths: set[Path] = set(
-        path.resolve()
-        for path in corpus_root.rglob("*.json")
-        if path.resolve() != corpus_index_path
-    )
+    paths: set[Path] = set()
+    failures: set[str] = set()
+
+    def add_manifest_path(path: Path) -> None:
+        resolved = path.resolve()
+        if resolved == corpus_index_path:
+            return
+        if not resolved.is_file():
+            failures.add(
+                "corpus manifest artifact is not a readable regular file: "
+                f"{display_path(resolved)}"
+            )
+            return
+        paths.add(resolved)
+
+    for path in corpus_root.rglob("*.json"):
+        add_manifest_path(path)
     for case_path in sorted((corpus_root / "cases").glob("*.json")):
         case = read_json(case_path)
         for path in referenced_paths(case):
-            if path.exists():
-                paths.add(path.resolve())
+            add_manifest_path(path)
 
-    manifest = [
-        {
-            "path": display_path(path),
-            "sha256": sha256_file(path),
-        }
-        for path in sorted(paths, key=display_path)
-    ]
-    return manifest, {"alg": "sha-256", "value": sha256_value(manifest)}
+    manifest: list[dict[str, str]] = []
+    for path in sorted(paths, key=display_path):
+        try:
+            digest = sha256_file(path)
+        except OSError as exc:
+            failures.add(
+                "corpus manifest artifact could not be hashed: "
+                f"{display_path(path)} ({type(exc).__name__})"
+            )
+            continue
+        manifest.append({"path": display_path(path), "sha256": digest})
+    return (
+        manifest,
+        {"alg": "sha-256", "value": sha256_value(manifest)},
+        sorted(failures),
+    )
 
 
 def case_index_entry(case_path: Path) -> dict[str, Any]:
@@ -433,7 +527,9 @@ def make_corpus_index(corpus_root: Path) -> dict[str, Any]:
     if pairing_failures:
         raise RuntimeError("invalid corpus pairing metadata:\n- " + "\n- ".join(pairing_failures))
     cases = [case_index_entry(path) for path in case_paths]
-    manifest, digest = corpus_manifest(corpus_root)
+    manifest, digest, manifest_failures = corpus_manifest(corpus_root)
+    if manifest_failures:
+        raise RuntimeError("invalid corpus manifest:\n- " + "\n- ".join(manifest_failures))
     return {
         "version": CORPUS_INDEX_VERSION,
         "profile": PROFILE,
@@ -493,14 +589,23 @@ def has_path(value: Any, dotted_path: str) -> bool:
 def actual_decision(admission_receipt: dict[str, Any] | None) -> str:
     if admission_receipt is None:
         return "missing"
-    return str(admission_receipt.get("decision", {}).get("outcome", "missing"))
+    decision = admission_receipt.get("decision")
+    if not isinstance(decision, dict):
+        return "missing"
+    outcome = decision.get("outcome")
+    return outcome if isinstance(outcome, str) else "missing"
 
 
 def actual_reason_codes(admission_receipt: dict[str, Any] | None) -> list[str]:
     if admission_receipt is None:
         return []
-    codes = admission_receipt.get("decision", {}).get("reason_codes", [])
-    return [str(code) for code in codes]
+    decision = admission_receipt.get("decision")
+    if not isinstance(decision, dict):
+        return []
+    codes = decision.get("reason_codes")
+    if not isinstance(codes, list):
+        return []
+    return [code for code in codes if isinstance(code, str)]
 
 
 def primary_reason_code(reason_codes: list[str]) -> str | None:
@@ -603,7 +708,11 @@ def attenuation_validation_failures(
         return ["attenuation must be an object"]
 
     mode = attenuation.get("mode")
-    if mode not in {"narrow", "require_new_permit", "deny_if_not_accepted"}:
+    if not isinstance(mode, str) or mode not in {
+        "narrow",
+        "require_new_permit",
+        "deny_if_not_accepted",
+    }:
         failures.append("mode must be a supported attenuation mode")
 
     original_hash = attenuation.get("original_request_hash")
@@ -627,7 +736,8 @@ def attenuation_validation_failures(
             if not isinstance(change, dict):
                 failures.append(f"changes[{index}] must be an object")
                 continue
-            if change.get("op") not in {"add", "remove", "replace"}:
+            operation = change.get("op")
+            if not isinstance(operation, str) or operation not in {"add", "remove", "replace"}:
                 failures.append(f"changes[{index}].op must be add, remove, or replace")
             for failure in safe_attenuation_path_failures(change.get("path")):
                 failures.append(f"changes[{index}].path: {failure}")
@@ -708,12 +818,17 @@ def expected_should_execute(case: dict[str, Any]) -> bool:
 def actual_should_execute(admission_receipt: dict[str, Any] | None) -> bool:
     if admission_receipt is None:
         return False
-    outcome = admission_receipt.get("decision", {}).get("outcome")
+    decision = admission_receipt.get("decision")
+    if not isinstance(decision, dict):
+        return False
+    outcome = decision.get("outcome")
     if outcome == "deny":
         return False
-    if outcome == "attenuate" and admission_receipt.get("attenuation", {}).get("require_new_permit") is True:
-        return False
-    return outcome in {"allow", "attenuate"}
+    if outcome == "attenuate":
+        attenuation = admission_receipt.get("attenuation")
+        if not isinstance(attenuation, dict) or attenuation.get("require_new_permit") is True:
+            return False
+    return isinstance(outcome, str) and outcome in {"allow", "attenuate"}
 
 
 def append_unique(items: list[str], item: str) -> None:
@@ -726,6 +841,9 @@ def actual_linkage_reason_codes(
     admission_receipt: dict[str, Any] | None,
     post_execution_receipt: dict[str, Any] | None,
 ) -> list[str]:
+    if admission_receipt is None or post_execution_receipt is None:
+        return ["POST_EXEC_LINKAGE_MISMATCH"]
+
     violation_codes: list[str] = []
     for check in case.get("linkage_checks", []):
         if not isinstance(check, dict):
@@ -741,7 +859,8 @@ def actual_linkage_reason_codes(
         return ["POST_EXEC_LINKAGE_MISMATCH"]
 
     codes = ["ADMISSION_RECEIPT_LINKED", "EFFECTIVE_REQUEST_HASH_MATCH"]
-    if post_execution_receipt.get("result", {}).get("policy_violations") == []:
+    result = post_execution_receipt.get("result")
+    if isinstance(result, dict) and result.get("policy_violations") == []:
         codes.append("NO_POLICY_VIOLATIONS")
     return codes
 
@@ -795,27 +914,34 @@ def linkage_check_contract_failures(index: int, check: Any) -> list[str]:
 def post_execution_policy_violation_token_failures(post_execution: dict[str, Any] | None) -> list[str]:
     if post_execution is None:
         return []
-    violations = post_execution.get("result", {}).get("policy_violations")
+    result = post_execution.get("result")
+    if not isinstance(result, dict):
+        return ["post_execution.result: expected object"]
+    violations = result.get("policy_violations")
     if not isinstance(violations, list):
         return ["post_execution.result.policy_violations: expected array"]
     failures: list[str] = []
     for index, token in enumerate(violations):
-        if token not in CANONICAL_POLICY_VIOLATION_TOKENS:
+        if not isinstance(token, str) or token not in CANONICAL_POLICY_VIOLATION_TOKENS:
             failures.append(f"post_execution.result.policy_violations[{index}]: unknown token {token!r}")
     return failures
 
 
 def admitted_effective_request_hash(admission_receipt: dict[str, Any]) -> Any:
     if actual_decision(admission_receipt) == "attenuate":
-        return admission_receipt.get("attenuation", {}).get("effective_request_hash")
-    return admission_receipt.get("request", {}).get("input_hash")
+        attenuation = admission_receipt.get("attenuation")
+        return attenuation.get("effective_request_hash") if isinstance(attenuation, dict) else None
+    request = admission_receipt.get("request")
+    return request.get("input_hash") if isinstance(request, dict) else None
 
 
 def admitted_effective_constraints(admission_receipt: dict[str, Any]) -> dict[str, Any]:
-    attenuation_constraints = admission_receipt.get("attenuation", {}).get("effective_constraints")
+    attenuation = admission_receipt.get("attenuation")
+    attenuation_constraints = attenuation.get("effective_constraints") if isinstance(attenuation, dict) else None
     if isinstance(attenuation_constraints, dict):
         return attenuation_constraints
-    request_constraints = admission_receipt.get("request", {}).get("constraints")
+    request = admission_receipt.get("request")
+    request_constraints = request.get("constraints") if isinstance(request, dict) else None
     if isinstance(request_constraints, dict):
         return request_constraints
     return {}
@@ -839,9 +965,9 @@ def post_execution_linkage_failures(
         failures.append("post-execution receipt must not link to a denied admission")
     if admission_decision not in {"allow", "attenuate"}:
         failures.append("admission decision must be allow or attenuate for post-execution linkage")
-    if (
-        admission_decision == "attenuate"
-        and admission_receipt.get("attenuation", {}).get("require_new_permit") is True
+    attenuation = admission_receipt.get("attenuation")
+    if admission_decision == "attenuate" and (
+        not isinstance(attenuation, dict) or attenuation.get("require_new_permit") is True
     ):
         failures.append("post-execution receipt must not link to an admission requiring a new permit")
 
@@ -852,8 +978,10 @@ def post_execution_linkage_failures(
     if admission_block.get("digest") != {"alg": "sha-256", "value": sha256_value(admission_receipt)}:
         failures.append("admission digest mismatch")
 
-    request = admission_receipt.get("request", {})
-    subject = admission_receipt.get("subject", {})
+    raw_request = admission_receipt.get("request")
+    raw_subject = admission_receipt.get("subject")
+    request = raw_request if isinstance(raw_request, dict) else {}
+    subject = raw_subject if isinstance(raw_subject, dict) else {}
     if execution.get("transaction_id") != request.get("transaction_id"):
         failures.append("transaction_id mismatch")
     if execution.get("runtime") != subject.get("runtime"):
@@ -903,7 +1031,10 @@ def post_execution_side_effect_failures(
     max_decimal = Decimal(str(max_value))
     total_decimal = Decimal("0")
 
-    side_effects = post_execution_receipt.get("result", {}).get("side_effects", [])
+    result = post_execution_receipt.get("result")
+    if not isinstance(result, dict):
+        return ["post_execution.result must be an object"]
+    side_effects = result.get("side_effects", [])
     if not isinstance(side_effects, list):
         failures.append("side_effects must be an array")
         return failures
@@ -934,10 +1065,10 @@ def admission_executable_for_post_execution(admission_receipt: dict[str, Any]) -
     admission_decision = actual_decision(admission_receipt)
     if admission_decision not in {"allow", "attenuate"}:
         return False
-    return not (
-        admission_decision == "attenuate"
-        and admission_receipt.get("attenuation", {}).get("require_new_permit") is True
-    )
+    if admission_decision != "attenuate":
+        return True
+    attenuation = admission_receipt.get("attenuation")
+    return isinstance(attenuation, dict) and attenuation.get("require_new_permit") is not True
 
 
 def admission_time_window_valid(
@@ -983,7 +1114,9 @@ def linkage_check_violation(
             return left != right, None
         if kind == "admission_digest":
             artifact_name = check.get("artifact", "admission_receipt")
-            artifact = read_json(resolve_artifact_path(case, artifact_name))
+            artifact, artifact_failure = read_case_artifact(case, artifact_name)
+            if artifact_failure:
+                return True, f"{artifact_name}: {artifact_failure}"
             expected_digest = {"alg": "sha-256", "value": sha256_value(artifact)}
             actual_digest = get_path(post_execution, check.get("post_execution_path", "admission.digest"))
             return actual_digest != expected_digest, None
@@ -1010,7 +1143,7 @@ def linkage_check_violation(
             if not isinstance(expected_value, str) or not expected_value:
                 return True, "policy_violation check requires value"
             return expected_value in violations, None
-    except (KeyError, IndexError, TypeError, ValueError) as exc:
+    except (AttributeError, KeyError, IndexError, TypeError, ValueError) as exc:
         return True, f"{kind} linkage check path missing: {exc}"
     return True, f"unsupported linkage check kind {kind}"
 
@@ -1036,12 +1169,14 @@ def observed_outcome(case: dict[str, Any], admission: dict[str, Any] | None, pos
     if case["category"] == "linkage":
         if post_execution is None:
             return "missing"
-        return str(post_execution.get("result", {}).get("outcome", "missing"))
+        result = post_execution.get("result")
+        return str(result.get("outcome", "missing")) if isinstance(result, dict) else "missing"
     if "admission_decision" in case["expected"]:
         return actual_decision(admission)
     if post_execution is None:
         return "missing"
-    return str(post_execution.get("result", {}).get("outcome", "missing"))
+    result = post_execution.get("result")
+    return str(result.get("outcome", "missing")) if isinstance(result, dict) else "missing"
 
 
 def bool_for_named_check(
@@ -1138,7 +1273,11 @@ def evaluate_expected_check(
 def evaluate_integrity_checks(case: dict[str, Any]) -> list[str]:
     failures: list[str] = []
     for check in case.get("integrity_checks", []):
-        artifact = read_json(resolve_artifact_path(case, check["artifact"]))
+        artifact_name = check["artifact"]
+        artifact, artifact_failure = read_case_artifact(case, artifact_name)
+        if artifact_failure:
+            failures.append(f"integrity {artifact_name}: {artifact_failure}")
+            continue
         actual = sha256_value(artifact)
         expected_digest = check["expected_digest"]["value"]
         expect_match = bool(check.get("expect_match", True))
@@ -1153,7 +1292,11 @@ def evaluate_integrity_checks(case: dict[str, Any]) -> list[str]:
 def evaluate_trust_checks(case: dict[str, Any]) -> list[str]:
     failures: list[str] = []
     for check in case.get("trust_checks", []):
-        bundle = read_json(resolve_artifact_path(case, check["trust_bundle"]))
+        bundle_name = check["trust_bundle"]
+        bundle, artifact_failure = read_case_artifact(case, bundle_name)
+        if artifact_failure:
+            failures.append(f"trust {bundle_name}: {artifact_failure}")
+            continue
         trusted, failure_reason = evaluate_trust_check(bundle, check)
         expect_trusted = bool(check.get("expect_trusted", True))
         if trusted != expect_trusted:
@@ -1260,9 +1403,19 @@ def evaluate_jose_checks(case: dict[str, Any]) -> tuple[dict[str, bool], list[st
     aggregate_results: dict[str, bool] = {}
     failures: list[str] = []
     for check in case.get("jose_checks", []):
-        proof = read_json(resolve_artifact_path(case, check["proof_package"]))
-        detached_payload = read_json(resolve_artifact_path(case, check["detached_payload"]))
-        trust_bundle = read_json(resolve_artifact_path(case, check["trust_bundle"]))
+        loaded: dict[str, Any] = {}
+        for field in ("proof_package", "detached_payload", "trust_bundle"):
+            artifact_name = check[field]
+            artifact, artifact_failure = read_case_artifact(case, artifact_name)
+            if artifact_failure:
+                failures.append(f"jose {artifact_name}: {artifact_failure}")
+            else:
+                loaded[field] = artifact
+        if len(loaded) != 3:
+            continue
+        proof = loaded["proof_package"]
+        detached_payload = loaded["detached_payload"]
+        trust_bundle = loaded["trust_bundle"]
         valid, failure_reason, check_results = evaluate_jose_check(proof, detached_payload, trust_bundle, check)
         for name, result in check_results.items():
             aggregate_results[name] = aggregate_results.get(name, True) and result
@@ -1305,8 +1458,8 @@ def evaluate_jose_check(
     if decoded_protected is None:
         return False, "SCHEMA_INVALID", check_results
     try:
-        decoded_protected_json = json.loads(decoded_protected.decode("utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError):
+        decoded_protected_json = strict_json_loads(decoded_protected.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
         return False, "SCHEMA_INVALID", check_results
     if protected_b64u != expected_protected_b64u or decoded_protected_json != protected:
         return False, "SCHEMA_INVALID", check_results
@@ -1429,7 +1582,11 @@ def evaluate_policy_snapshot_checks(
 ) -> list[str]:
     failures: list[str] = []
     for check in case.get("policy_snapshot_checks", []):
-        artifact = read_json(resolve_artifact_path(case, check["artifact"]))
+        artifact_name = check["artifact"]
+        artifact, artifact_failure = read_case_artifact(case, artifact_name)
+        if artifact_failure:
+            failures.append(f"policy_snapshot {artifact_name}: {artifact_failure}")
+            continue
         artifact_digest = {
             "alg": "sha-256",
             "value": sha256_value(artifact),
@@ -1498,7 +1655,10 @@ def evaluate_artifact_reference_checks(
     }
     for check in case.get("artifact_reference_checks", []):
         artifact_name = check["artifact"]
-        artifact = read_json(resolve_artifact_path(case, artifact_name))
+        artifact, artifact_failure = read_case_artifact(case, artifact_name)
+        if artifact_failure:
+            failures.append(f"artifact_ref {artifact_name}: {artifact_failure}")
+            continue
         artifact_digest = {
             "alg": "sha-256",
             "value": sha256_value(artifact),
@@ -1534,7 +1694,11 @@ def evaluate_attenuation_checks(case: dict[str, Any], admission: dict[str, Any] 
             failures.append(f"attenuation: {failure}")
 
     for check in case.get("attenuation_checks", []):
-        artifact = read_json(resolve_artifact_path(case, check["artifact"]))
+        artifact_name = check["artifact"]
+        artifact, artifact_failure = read_case_artifact(case, artifact_name)
+        if artifact_failure:
+            failures.append(f"attenuation {artifact_name}: {artifact_failure}")
+            continue
         source_path = check.get("source_path")
         if source_path:
             try:
@@ -1616,7 +1780,11 @@ def validate_evidence_vocab_object(value: Any, *, label: str) -> list[str]:
 def evaluate_al2_context_checks(case: dict[str, Any]) -> list[str]:
     failures: list[str] = []
     for check in case.get("al2_context_checks", []):
-        artifact = read_json(resolve_artifact_path(case, check["artifact"]))
+        artifact_name = check["artifact"]
+        artifact, artifact_failure = read_case_artifact(case, artifact_name)
+        if artifact_failure:
+            failures.append(f"al2_context {artifact_name}: {artifact_failure}")
+            continue
         kind = check.get("kind")
         if kind == "freshness":
             failures.extend(evaluate_context_freshness_check(check, artifact))
@@ -1774,8 +1942,8 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
 def run_corpus(corpus_root: Path) -> dict[str, Any]:
     case_paths = sorted((corpus_root / "cases").glob("*.json"))
     cases = [evaluate_case(path) for path in case_paths]
-    manifest, digest = corpus_manifest(corpus_root)
-    fatal_errors = corpus_pairing_failures(corpus_root)
+    manifest, digest, manifest_failures = corpus_manifest(corpus_root)
+    fatal_errors = corpus_pairing_failures(corpus_root) + manifest_failures
     failed = sum(1 for item in cases if not item["pass"])
     report = {
         "version": CONFORMANCE_REPORT_VERSION,
@@ -1823,6 +1991,7 @@ def load_case_expectations(corpus_root: Path) -> list[dict[str, Any]]:
                     for check in case["expected"].get("checks", [])
                 ],
                 "required_artifacts": required_sut_artifacts(case),
+                "case": case,
             }
         )
     return expectations
@@ -1836,7 +2005,7 @@ def required_sut_artifacts(case: dict[str, Any]) -> dict[str, Any]:
             receipt_artifacts.append(
                 {
                     "name": artifact_name,
-                    "expected_digest": sha256_file(resolve_artifact_path(case, artifact_name)),
+                    "expected_digest": case_artifact_sha256(case, artifact_name),
                 }
             )
 
@@ -1851,7 +2020,7 @@ def required_sut_artifacts(case: dict[str, Any]) -> dict[str, Any]:
                 {
                     "case_artifact": artifact_name,
                     "kind": kind,
-                    "expected_digest": sha256_file(resolve_artifact_path(case, artifact_name)),
+                    "expected_digest": case_artifact_sha256(case, artifact_name),
                     "context_bindings": required_context_bindings(case, check),
                 }
             )
@@ -1872,7 +2041,7 @@ def required_sut_artifacts(case: dict[str, Any]) -> dict[str, Any]:
                     {
                         "case_artifact": artifact_name,
                         "kind": kind,
-                        "expected_digest": sha256_file(resolve_artifact_path(case, artifact_name)),
+                        "expected_digest": case_artifact_sha256(case, artifact_name),
                     }
                 )
 
@@ -1883,13 +2052,20 @@ def required_sut_artifacts(case: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def artifact_file_binding(case: dict[str, Any], role: str, source_artifact: str) -> dict[str, Any]:
+def artifact_file_binding(
+    case: dict[str, Any],
+    role: str,
+    source_artifact: str,
+) -> dict[str, Any] | None:
+    digest = case_artifact_sha256(case, source_artifact)
+    if digest is None:
+        return None
     return {
         "role": role,
         "source_artifact": source_artifact,
         "digest": {
             "alg": "sha-256",
-            "value": sha256_file(resolve_artifact_path(case, source_artifact)),
+            "value": digest,
         },
     }
 
@@ -1964,11 +2140,13 @@ def required_context_bindings(case: dict[str, Any], check: dict[str, Any]) -> li
         append_binding_once(bindings, artifact_file_binding(case, "admission_request", "admission_request"))
 
     context_artifact_name = check.get("artifact")
-    context_artifact = (
-        read_json(resolve_artifact_path(case, context_artifact_name))
+    context_artifact, _ = (
+        read_case_artifact(case, context_artifact_name)
         if isinstance(context_artifact_name, str) and context_artifact_name
-        else {}
+        else ({}, None)
     )
+    if not isinstance(context_artifact, dict):
+        context_artifact = {}
     if check.get("kind") == "binding" and admission_receipt is not None:
         append_binding_once(
             bindings,
@@ -2066,19 +2244,25 @@ def context_binding_shape_failures(value: Any, label: str) -> list[str]:
     if not isinstance(value, dict):
         return [f"{label}: expected object"]
     role = value.get("role")
-    if role not in {"admission_receipt", "admission_request", "transaction_id", "runtime", "evidence"}:
+    if not isinstance(role, str) or role not in {
+        "admission_receipt",
+        "admission_request",
+        "transaction_id",
+        "runtime",
+        "evidence",
+    }:
         failures.append(f"{label}.role: expected known context binding role")
     source_artifact = value.get("source_artifact")
     if not isinstance(source_artifact, str) or not source_artifact:
         failures.append(f"{label}.source_artifact: expected non-empty string")
 
-    if role in {"admission_receipt", "admission_request", "evidence"}:
+    if isinstance(role, str) and role in {"admission_receipt", "admission_request", "evidence"}:
         failures.extend(digest_descriptor_failures(value.get("digest"), f"{label}.digest"))
-    if role in {"transaction_id", "runtime", "evidence"}:
+    if isinstance(role, str) and role in {"transaction_id", "runtime", "evidence"}:
         path = value.get("path")
         if not isinstance(path, str) or not path:
             failures.append(f"{label}.path: expected non-empty string")
-    if role in {"transaction_id", "runtime"}:
+    if isinstance(role, str) and role in {"transaction_id", "runtime"}:
         bound_value = value.get("value")
         if not isinstance(bound_value, str) or not bound_value:
             failures.append(f"{label}.value: expected non-empty string")
@@ -2114,6 +2298,8 @@ def context_binding_match_failures(
         if not isinstance(binding, dict):
             continue
         key = context_binding_key(binding)
+        if any(item is not None and not isinstance(item, str) for item in key):
+            continue
         if key in actual_by_key:
             duplicate_keys.add(key)
         else:
@@ -2141,7 +2327,11 @@ def sut_proof_artifact_failures(value: Any, label: str) -> list[str]:
     if not isinstance(value, dict):
         return failures
     kind = value.get("kind")
-    if kind not in {"jose_proof_package", "jose_detached_payload", "jose_trust_bundle"}:
+    if not isinstance(kind, str) or kind not in {
+        "jose_proof_package",
+        "jose_detached_payload",
+        "jose_trust_bundle",
+    }:
         failures.append(f"{label}.kind: expected JOSE proof artifact kind")
     case_artifact = value.get("case_artifact")
     if not isinstance(case_artifact, str) or not case_artifact:
@@ -2343,13 +2533,573 @@ def sut_result_artifact_failures(result: dict[str, Any], requirements: dict[str,
     return failures
 
 
+def resolve_sut_generated_artifact_path(
+    value: dict[str, Any],
+    sut_results_path: Path,
+    label: str,
+) -> tuple[Path | None, list[str]]:
+    local_path = value.get("local_path")
+    if local_path is not None and (not isinstance(local_path, str) or not local_path):
+        return None, [f"{label}.local_path: expected non-empty string when present"]
+
+    path_value = local_path if isinstance(local_path, str) and local_path else value.get("uri")
+    if not isinstance(path_value, str) or not path_value:
+        return None, [f"{label}: local artifact path is unavailable"]
+    if "://" in path_value:
+        return None, [f"{label}.local_path: required when uri is not a local path"]
+
+    raw_path = Path(path_value)
+    if raw_path.is_absolute():
+        return None, [f"{label}.local_path: absolute paths are not allowed"]
+    if ".." in raw_path.parts:
+        return None, [f"{label}.local_path: parent traversal is not allowed"]
+
+    artifact_root = sut_results_path.parent.resolve()
+    candidate = (artifact_root / raw_path).resolve()
+    if not candidate.is_relative_to(artifact_root):
+        return None, [f"{label}.local_path: resolved path escapes the SUT result directory"]
+    if not candidate.is_file():
+        return None, [f"{label}: generated artifact file not found under {artifact_root.as_posix()}"]
+    return candidate, []
+
+
+def load_sut_generated_artifact(
+    value: Any,
+    sut_results_path: Path,
+    label: str,
+) -> tuple[dict[str, Any] | None, Path | None, list[str]]:
+    failures = sut_artifact_ref_failures(value, label, require_media_type=True)
+    if not isinstance(value, dict):
+        return None, None, failures
+
+    path, path_failures = resolve_sut_generated_artifact_path(value, sut_results_path, label)
+    failures.extend(path_failures)
+    if path is None:
+        return None, None, failures
+
+    try:
+        file_size = path.stat().st_size
+    except OSError as exc:
+        failures.append(f"{label}: unable to inspect generated artifact: {exc}")
+        return None, path, failures
+    if file_size > MAX_GENERATED_ARTIFACT_BYTES:
+        failures.append(
+            f"{label}: generated artifact exceeds {MAX_GENERATED_ARTIFACT_BYTES} byte limit"
+        )
+        return None, path, failures
+
+    try:
+        with path.open("rb") as artifact_file:
+            raw_bytes = artifact_file.read(MAX_GENERATED_ARTIFACT_BYTES + 1)
+    except OSError as exc:
+        failures.append(f"{label}: unable to read generated artifact: {exc}")
+        return None, path, failures
+    if len(raw_bytes) > MAX_GENERATED_ARTIFACT_BYTES:
+        failures.append(
+            f"{label}: generated artifact exceeds {MAX_GENERATED_ARTIFACT_BYTES} byte limit"
+        )
+        return None, path, failures
+
+    digest = value.get("digest")
+    submitted_digest = digest.get("value") if isinstance(digest, dict) else None
+    actual_digest = hashlib.sha256(raw_bytes).hexdigest()
+    if submitted_digest != actual_digest:
+        failures.append(
+            f"{label}.digest.value: expected submitted artifact digest {submitted_digest} actual {actual_digest}"
+        )
+
+    try:
+        artifact_text = raw_bytes.decode("utf-8")
+        artifact = strict_json_loads(artifact_text)
+    except (UnicodeDecodeError, ValueError) as exc:
+        failures.append(f"{label}: generated artifact must be a UTF-8 JSON object: {exc}")
+        return None, path, failures
+    if not isinstance(artifact, dict):
+        failures.append(f"{label}: generated artifact must be a JSON object")
+        return None, path, failures
+    return artifact, path, failures
+
+
+def semantic_projection_failures(
+    expected: Any,
+    actual: Any,
+    label: str,
+    *,
+    limit: int = 8,
+) -> list[str]:
+    failures: list[str] = []
+
+    def visit(expected_value: Any, actual_value: Any, path: str) -> None:
+        if len(failures) >= limit:
+            return
+        if isinstance(expected_value, dict):
+            if not isinstance(actual_value, dict):
+                failures.append(f"{path}: expected object actual {type(actual_value).__name__}")
+                return
+            for key in sorted(set(expected_value) | set(actual_value)):
+                if key not in expected_value:
+                    failures.append(f"{path}.{key}: unexpected semantic field")
+                elif key not in actual_value:
+                    failures.append(f"{path}.{key}: required semantic field missing")
+                else:
+                    visit(expected_value[key], actual_value[key], f"{path}.{key}")
+                if len(failures) >= limit:
+                    return
+            return
+        if isinstance(expected_value, list):
+            if not isinstance(actual_value, list):
+                failures.append(f"{path}: expected array actual {type(actual_value).__name__}")
+                return
+            if len(expected_value) != len(actual_value):
+                failures.append(f"{path}: expected {len(expected_value)} items actual {len(actual_value)}")
+                return
+            for index, (expected_item, actual_item) in enumerate(zip(expected_value, actual_value)):
+                visit(expected_item, actual_item, f"{path}[{index}]")
+                if len(failures) >= limit:
+                    return
+            return
+        if expected_value != actual_value:
+            failures.append(f"{path}: expected {expected_value!r} actual {actual_value!r}")
+
+    visit(expected, actual, label)
+    return failures
+
+
+def admission_receipt_semantic_projection(receipt: dict[str, Any]) -> dict[str, Any]:
+    decision = receipt.get("decision")
+    projected_decision: Any
+    if isinstance(decision, dict):
+        projected_decision = {
+            "outcome": decision.get("outcome"),
+            "reason_codes": decision.get("reason_codes"),
+            "reason_visibility": decision.get("reason_visibility"),
+            "reason_withheld": decision.get("reason_withheld"),
+        }
+    else:
+        projected_decision = decision
+    return {
+        "version": receipt.get("version"),
+        "profile": receipt.get("profile"),
+        "receipt_type": receipt.get("receipt_type"),
+        "issued_at": receipt.get("issued_at"),
+        "expires_at": receipt.get("expires_at"),
+        "request": receipt.get("request"),
+        "subject": receipt.get("subject"),
+        "evidence": receipt.get("evidence"),
+        "policy": receipt.get("policy"),
+        "decision": projected_decision,
+        "attenuation": receipt.get("attenuation"),
+    }
+
+
+def post_execution_receipt_semantic_projection(receipt: dict[str, Any]) -> dict[str, Any]:
+    admission = receipt.get("admission")
+    projected_admission: Any
+    if isinstance(admission, dict):
+        projected_admission = {"decision": admission.get("decision")}
+    else:
+        projected_admission = admission
+    return {
+        "version": receipt.get("version"),
+        "profile": receipt.get("profile"),
+        "receipt_type": receipt.get("receipt_type"),
+        "issued_at": receipt.get("issued_at"),
+        "admission": projected_admission,
+        "execution": receipt.get("execution"),
+        "result": receipt.get("result"),
+    }
+
+
+def non_empty_string_field_failures(
+    value: dict[str, Any],
+    field: str,
+    label: str,
+    *,
+    required: bool = True,
+) -> list[str]:
+    if field not in value and not required:
+        return []
+    field_value = value.get(field)
+    if not isinstance(field_value, str) or not field_value:
+        return [f"{label}.{field}: expected non-empty string"]
+    return []
+
+
+def generated_proof_shape_failures(value: Any, label: str) -> list[str]:
+    if not isinstance(value, dict):
+        return [f"{label}: expected object when present"]
+
+    failures: list[str] = []
+    proof_format = value.get("format")
+    if "format" in value and (
+        not isinstance(proof_format, str)
+        or proof_format not in {
+            "detached_jws",
+            "jwt",
+            "vc_proof",
+            "external",
+            "none",
+        }
+    ):
+        failures.append(f"{label}.format: unsupported proof format {proof_format!r}")
+    for field in ("alg", "kid", "signature_ref"):
+        failures.extend(non_empty_string_field_failures(value, field, label, required=False))
+    return failures
+
+
+def generated_decision_shape_failures(value: Any, label: str) -> list[str]:
+    if not isinstance(value, dict):
+        return [f"{label}: expected object"]
+
+    failures: list[str] = []
+    outcome = value.get("outcome")
+    if not isinstance(outcome, str) or outcome not in {"allow", "attenuate", "deny"}:
+        failures.append(f"{label}.outcome: expected allow, attenuate, or deny")
+    reason_codes = value.get("reason_codes")
+    if not isinstance(reason_codes, list):
+        failures.append(f"{label}.reason_codes: expected array")
+    else:
+        for index, reason_code in enumerate(reason_codes):
+            if not isinstance(reason_code, str) or not reason_code:
+                failures.append(f"{label}.reason_codes[{index}]: expected non-empty string")
+
+    visibility = value.get("reason_visibility")
+    if "reason_visibility" in value and (
+        not isinstance(visibility, str)
+        or visibility not in {"disclosed", "opaque", "withheld"}
+    ):
+        failures.append(f"{label}.reason_visibility: expected disclosed, opaque, or withheld")
+    reason_withheld = value.get("reason_withheld")
+    if "reason_withheld" in value and not isinstance(reason_withheld, bool):
+        failures.append(f"{label}.reason_withheld: expected boolean when present")
+    if visibility == "disclosed" and reason_withheld is True:
+        failures.append(f"{label}.reason_withheld: disclosed reasons cannot be withheld")
+    if reason_withheld is True and visibility not in {"opaque", "withheld"}:
+        failures.append(f"{label}.reason_visibility: true reason_withheld requires opaque or withheld")
+    failures.extend(
+        non_empty_string_field_failures(value, "human_readable_summary", label, required=False)
+    )
+    return failures
+
+
+def generated_admission_receipt_shape_failures(receipt: dict[str, Any], label: str) -> list[str]:
+    failures: list[str] = []
+    verifier = receipt.get("verifier")
+    if not isinstance(verifier, dict):
+        failures.append(f"{label}.verifier: expected object")
+    else:
+        failures.extend(non_empty_string_field_failures(verifier, "id", f"{label}.verifier"))
+        failures.extend(
+            non_empty_string_field_failures(
+                verifier,
+                "key_id",
+                f"{label}.verifier",
+                required=False,
+            )
+        )
+    decision = receipt.get("decision")
+    failures.extend(generated_decision_shape_failures(decision, f"{label}.decision"))
+    if "attenuation" in receipt:
+        decision_codes = (
+            decision.get("reason_codes")
+            if isinstance(decision, dict) and isinstance(decision.get("reason_codes"), list)
+            else None
+        )
+        for failure in attenuation_validation_failures(
+            receipt.get("attenuation"),
+            decision_reason_codes=decision_codes,
+        ):
+            failures.append(f"{label}.attenuation: {failure}")
+    if "proof" in receipt:
+        failures.extend(generated_proof_shape_failures(receipt.get("proof"), f"{label}.proof"))
+    return failures
+
+
+def generated_post_execution_receipt_shape_failures(
+    receipt: dict[str, Any],
+    label: str,
+) -> list[str]:
+    failures: list[str] = []
+    issuer = receipt.get("issuer")
+    if not isinstance(issuer, dict):
+        failures.append(f"{label}.issuer: expected object")
+    else:
+        failures.extend(non_empty_string_field_failures(issuer, "id", f"{label}.issuer"))
+        issuer_role = issuer.get("role")
+        if not isinstance(issuer_role, str) or issuer_role not in {
+            "runtime",
+            "agent",
+            "verifier",
+            "broker",
+        }:
+            failures.append(f"{label}.issuer.role: expected runtime, agent, verifier, or broker")
+        failures.extend(
+            non_empty_string_field_failures(
+                issuer,
+                "key_id",
+                f"{label}.issuer",
+                required=False,
+            )
+        )
+
+    admission = receipt.get("admission")
+    if not isinstance(admission, dict):
+        failures.append(f"{label}.admission: expected object")
+    else:
+        for field in ("receipt_id", "uri"):
+            failures.extend(non_empty_string_field_failures(admission, field, f"{label}.admission"))
+        failures.extend(digest_descriptor_failures(admission.get("digest"), f"{label}.admission.digest"))
+        admission_decision = admission.get("decision")
+        if not isinstance(admission_decision, str) or admission_decision not in {"allow", "attenuate"}:
+            failures.append(f"{label}.admission.decision: expected allow or attenuate")
+
+    if "proof" in receipt:
+        failures.extend(generated_proof_shape_failures(receipt.get("proof"), f"{label}.proof"))
+    return failures
+
+
+def generated_receipt_identity_failures(receipt: dict[str, Any], label: str, receipt_type: str) -> list[str]:
+    failures: list[str] = []
+    if receipt.get("receipt_type") != receipt_type:
+        failures.append(f"{label}.receipt_type: expected {receipt_type} actual {receipt.get('receipt_type')}")
+    receipt_id = receipt.get("receipt_id")
+    if not isinstance(receipt_id, str) or not receipt_id:
+        failures.append(f"{label}.receipt_id: expected non-empty string")
+    issued_at = receipt.get("issued_at")
+    if try_parse_time(issued_at) is None:
+        failures.append(f"{label}.issued_at: expected RFC3339 timestamp")
+    if receipt_type == "admission":
+        expires_at = receipt.get("expires_at")
+        issued = try_parse_time(issued_at)
+        expires = try_parse_time(expires_at)
+        if expires is None:
+            failures.append(f"{label}.expires_at: expected RFC3339 timestamp")
+        elif issued is not None and expires < issued:
+            failures.append(f"{label}.expires_at: must not precede issued_at")
+    return failures
+
+
+def admission_link_relation_state(
+    admission_receipt: dict[str, Any],
+    post_execution_receipt: dict[str, Any],
+) -> dict[str, bool]:
+    admission_block = post_execution_receipt.get("admission")
+    if not isinstance(admission_block, dict):
+        return {
+            "receipt_id_match": False,
+            "decision_match": False,
+            "digest_match": False,
+        }
+    return {
+        "receipt_id_match": admission_block.get("receipt_id") == admission_receipt.get("receipt_id"),
+        "decision_match": admission_block.get("decision") == actual_decision(admission_receipt),
+        "digest_match": admission_block.get("digest") == digest_descriptor(admission_receipt),
+    }
+
+
+def generated_link_relation_failures(
+    expected_admission: dict[str, Any],
+    expected_post: dict[str, Any],
+    generated_admission: dict[str, Any],
+    generated_post: dict[str, Any],
+    generated_admission_uri: Any,
+) -> list[str]:
+    expected_state = admission_link_relation_state(expected_admission, expected_post)
+    generated_state = admission_link_relation_state(generated_admission, generated_post)
+    failures: list[str] = []
+    for relation in sorted(expected_state):
+        if generated_state[relation] != expected_state[relation]:
+            failures.append(
+                "generated_artifacts.linkage."
+                f"{relation}: expected relation {expected_state[relation]} actual {generated_state[relation]}"
+            )
+    generated_admission_block = generated_post.get("admission")
+    linked_uri = (
+        generated_admission_block.get("uri")
+        if isinstance(generated_admission_block, dict)
+        else None
+    )
+    if not isinstance(generated_admission_uri, str) or linked_uri != generated_admission_uri:
+        failures.append(
+            "generated_artifacts.linkage.uri_match: post-execution admission.uri must equal "
+            "generated_artifacts.admission_receipt.uri"
+        )
+    return failures
+
+
+def generated_sut_artifact_failures(
+    result: dict[str, Any],
+    expected: dict[str, Any],
+    sut_results_path: Path,
+) -> list[str]:
+    failures: list[str] = []
+    generated = result.get("generated_artifacts")
+    if not isinstance(generated, dict):
+        return ["generated_artifacts: expected object for generated-receipts mode"]
+
+    case = expected["case"]
+    requirements = expected["required_artifacts"]
+    required_receipt_names = {
+        item.get("name")
+        for item in requirements.get("receipt_artifacts", [])
+        if isinstance(item, dict) and item.get("name") in GENERATED_ARTIFACT_NAMES
+    }
+    unknown_names = set(generated) - GENERATED_ARTIFACT_NAMES
+    for name in sorted(unknown_names):
+        failures.append(f"generated_artifacts.{name}: unsupported generated artifact name")
+    unexpected_names = (set(generated) & GENERATED_ARTIFACT_NAMES) - required_receipt_names
+    for name in sorted(unexpected_names):
+        failures.append(f"generated_artifacts.{name}: not applicable to case {expected['case_id']}")
+
+    generated_admission: dict[str, Any] | None = None
+    generated_admission_path: Path | None = None
+    expected_admission: dict[str, Any] | None = None
+    if "admission_receipt" in required_receipt_names:
+        label = "generated_artifacts.admission_receipt"
+        if "admission_receipt" not in generated:
+            failures.append(f"{label}: required for generated-receipts mode")
+        else:
+            generated_admission, generated_admission_path, load_failures = load_sut_generated_artifact(
+                generated.get("admission_receipt"),
+                sut_results_path,
+                label,
+            )
+            failures.extend(load_failures)
+            admission_ref = generated.get("admission_receipt")
+            if (
+                isinstance(admission_ref, dict)
+                and admission_ref.get("media_type") != "application/vate-admission-receipt+json"
+            ):
+                failures.append(
+                    f"{label}.media_type: expected application/vate-admission-receipt+json "
+                    f"actual {admission_ref.get('media_type')}"
+                )
+            if generated_admission is not None:
+                failures.extend(generated_receipt_identity_failures(generated_admission, label, "admission"))
+                failures.extend(generated_admission_receipt_shape_failures(generated_admission, label))
+                expected_admission = load_artifact(case, "admission_receipt")
+                if expected_admission is None:
+                    failures.append(f"{label}: corpus admission receipt is unavailable")
+                else:
+                    failures.extend(
+                        semantic_projection_failures(
+                            admission_receipt_semantic_projection(expected_admission),
+                            admission_receipt_semantic_projection(generated_admission),
+                            f"{label}.semantics",
+                        )
+                    )
+                if case.get("category") != "linkage":
+                    if actual_decision(generated_admission) != expected["expected_outcome"]:
+                        failures.append(
+                            f"{label}.decision.outcome: expected {expected['expected_outcome']} "
+                            f"actual {actual_decision(generated_admission)}"
+                        )
+                    generated_codes = actual_reason_codes(generated_admission)
+                    if generated_codes != expected["expected_reason_codes"]:
+                        failures.append(
+                            f"{label}.decision.reason_codes: expected {expected['expected_reason_codes']} "
+                            f"actual {generated_codes}"
+                        )
+                generated_execute = actual_should_execute(generated_admission)
+                if generated_execute != expected["expected_should_execute"]:
+                    failures.append(
+                        f"{label}.should_execute: expected {expected['expected_should_execute']} "
+                        f"actual {generated_execute}"
+                    )
+
+    generated_post: dict[str, Any] | None = None
+    expected_post: dict[str, Any] | None = None
+    if "post_execution_receipt" in required_receipt_names:
+        label = "generated_artifacts.post_execution_receipt"
+        if "post_execution_receipt" not in generated:
+            failures.append(f"{label}: required for generated-receipts mode")
+        else:
+            generated_post, _, load_failures = load_sut_generated_artifact(
+                generated.get("post_execution_receipt"),
+                sut_results_path,
+                label,
+            )
+            failures.extend(load_failures)
+            post_ref = generated.get("post_execution_receipt")
+            if (
+                isinstance(post_ref, dict)
+                and post_ref.get("media_type") != "application/vate-post-execution-receipt+json"
+            ):
+                failures.append(
+                    f"{label}.media_type: expected application/vate-post-execution-receipt+json "
+                    f"actual {post_ref.get('media_type')}"
+                )
+            if generated_post is not None:
+                failures.extend(generated_receipt_identity_failures(generated_post, label, "post_execution"))
+                failures.extend(generated_post_execution_receipt_shape_failures(generated_post, label))
+                expected_post = load_artifact(case, "post_execution_receipt")
+                if expected_post is None:
+                    failures.append(f"{label}: corpus post-execution receipt is unavailable")
+                else:
+                    failures.extend(
+                        semantic_projection_failures(
+                            post_execution_receipt_semantic_projection(expected_post),
+                            post_execution_receipt_semantic_projection(generated_post),
+                            f"{label}.semantics",
+                        )
+                    )
+
+    if (
+        case.get("category") == "linkage"
+        and generated_admission is not None
+        and generated_post is not None
+        and expected_admission is not None
+        and expected_post is not None
+    ):
+        failures.extend(
+            generated_link_relation_failures(
+                expected_admission,
+                expected_post,
+                generated_admission,
+                generated_post,
+                (
+                    generated.get("admission_receipt", {}).get("uri")
+                    if isinstance(generated.get("admission_receipt"), dict)
+                    else None
+                ),
+            )
+        )
+        generated_case = copy.deepcopy(case)
+        generated_case.setdefault("artifacts", {})["admission_receipt"] = str(generated_admission_path)
+        generated_codes = actual_linkage_reason_codes(generated_case, generated_admission, generated_post)
+        if generated_codes != expected["expected_reason_codes"]:
+            failures.append(
+                "generated_artifacts.linkage.reason_codes: "
+                f"expected {expected['expected_reason_codes']} actual {generated_codes}"
+            )
+        generated_outcome = observed_outcome(generated_case, generated_admission, generated_post)
+        if generated_outcome != expected["expected_outcome"]:
+            failures.append(
+                "generated_artifacts.post_execution_receipt.result.outcome: "
+                f"expected {expected['expected_outcome']} actual {generated_outcome}"
+            )
+        for failure in evaluate_linkage_checks(generated_case, generated_admission, generated_post):
+            failures.append(f"generated_artifacts.linkage: {failure}")
+        for failure in post_execution_policy_violation_token_failures(generated_post):
+            failures.append(f"generated_artifacts.post_execution_receipt: {failure}")
+
+    return failures
+
+
 def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, Any]:
-    sut_results = read_json(sut_results_path)
     pairing_failures = corpus_pairing_failures(corpus_root)
     expectations = load_case_expectations(corpus_root)
-    manifest, digest = corpus_manifest(corpus_root)
+    manifest, digest, manifest_failures = corpus_manifest(corpus_root)
 
-    fatal_errors: list[str] = list(pairing_failures)
+    fatal_errors: list[str] = list(pairing_failures) + manifest_failures
+    try:
+        sut_results = read_json(sut_results_path)
+    except (OSError, UnicodeDecodeError, ValueError) as exc:
+        fatal_errors.append(
+            "sut_results: invalid strict JSON input "
+            f"({type(exc).__name__}: {exc})"
+        )
+        sut_results = {}
     if not isinstance(sut_results, dict):
         fatal_errors.append("sut_results: expected object")
         sut_results = {}
@@ -2357,6 +3107,14 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
         fatal_errors.append(f"sut_results.version: expected {SUT_RESULTS_VERSION} actual {sut_results.get('version')}")
     if sut_results.get("profile") != PROFILE:
         fatal_errors.append(f"sut_results.profile: expected {PROFILE} actual {sut_results.get('profile')}")
+
+    default_artifact_mode = sut_results.get("artifact_mode", SUT_ARTIFACT_MODE_CORPUS)
+    if not isinstance(default_artifact_mode, str) or default_artifact_mode not in SUT_ARTIFACT_MODES:
+        fatal_errors.append(
+            "sut_results.artifact_mode: expected one of "
+            f"{sorted(SUT_ARTIFACT_MODES)} actual {default_artifact_mode}"
+        )
+        default_artifact_mode = SUT_ARTIFACT_MODE_CORPUS
 
     sut_corpus = sut_results.get("corpus", {})
     if not isinstance(sut_corpus, dict):
@@ -2401,12 +3159,27 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
     for expected in expectations:
         result = result_by_case.get(expected["case_id"])
         failures: list[str] = []
+        artifact_mode = default_artifact_mode
         if result is None:
             actual_outcome = "missing"
             actual_should_execute_value = None
             actual_reason_codes: list[str] = []
             failures.append("sut result missing")
         else:
+            artifact_mode = result.get("artifact_mode", default_artifact_mode)
+            if not isinstance(artifact_mode, str) or artifact_mode not in SUT_ARTIFACT_MODES:
+                failures.append(
+                    "artifact_mode: expected one of "
+                    f"{sorted(SUT_ARTIFACT_MODES)} actual {artifact_mode}"
+                )
+                artifact_mode = default_artifact_mode
+            if (
+                default_artifact_mode == SUT_ARTIFACT_MODE_GENERATED
+                and artifact_mode != SUT_ARTIFACT_MODE_GENERATED
+            ):
+                failures.append(
+                    "artifact_mode: a generated-receipts default cannot be downgraded per case"
+                )
             actual_outcome = str(result.get("outcome", "missing"))
             raw_should_execute = result.get("should_execute")
             if isinstance(raw_should_execute, bool):
@@ -2462,11 +3235,19 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
             if not isinstance(raw_checks, list):
                 failures.append("checks: expected array")
                 raw_checks = []
-            check_results = {
-                check.get("name"): check
-                for check in raw_checks
-                if isinstance(check, dict)
-            }
+            check_results: dict[str, dict[str, Any]] = {}
+            for check_index, check in enumerate(raw_checks):
+                if not isinstance(check, dict):
+                    failures.append(f"checks[{check_index}]: expected object")
+                    continue
+                check_name = check.get("name")
+                if not isinstance(check_name, str) or not check_name:
+                    failures.append(f"checks[{check_index}].name: expected non-empty string")
+                    continue
+                if check_name in check_results:
+                    failures.append(f"checks[{check_index}].name: duplicate check name {check_name}")
+                    continue
+                check_results[check_name] = check
             for check in expected["expected_checks"]:
                 actual_check = check_results.get(check["name"])
                 if actual_check is None:
@@ -2475,11 +3256,18 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
                 if actual_check.get("pass") is not True:
                     failures.append(f"check {check['name']}: expected pass")
             failures.extend(sut_result_artifact_failures(result, expected["required_artifacts"]))
+            if artifact_mode == SUT_ARTIFACT_MODE_GENERATED:
+                failures.extend(generated_sut_artifact_failures(result, expected, sut_results_path))
+            elif "generated_artifacts" in result:
+                failures.append(
+                    "generated_artifacts: set artifact_mode to generated-receipts before claiming generated output"
+                )
 
         cases.append(
             {
                 "case_id": expected["case_id"],
                 "category": expected["category"],
+                "artifact_mode": artifact_mode,
                 "expected_outcome": expected["expected_outcome"],
                 "actual_outcome": actual_outcome,
                 "expected_should_execute": expected["expected_should_execute"],
@@ -2495,6 +3283,10 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
 
     failed = sum(1 for case in cases if not case["pass"])
     skipped = sum(1 for result in result_by_case.values() if result.get("status") == "skipped")
+    artifact_mode_counts = {
+        mode: sum(1 for case in cases if case.get("artifact_mode") == mode)
+        for mode in sorted(SUT_ARTIFACT_MODES)
+    }
     report = {
         "version": CONFORMANCE_REPORT_VERSION,
         "profile": PROFILE,
@@ -2515,6 +3307,8 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
             "path": display_path(sut_results_path.resolve()),
             "digest": digest_descriptor(sut_results),
             "digest_basis": "json-sorted-no-whitespace",
+            "artifact_mode": default_artifact_mode,
+            "artifact_mode_counts": artifact_mode_counts,
             "implementation": sut_implementation,
         },
         "cases": cases,
@@ -2546,6 +3340,116 @@ def add_bundle_check(
     checks.append(check)
 
 
+def add_generated_artifact_bundle_checks(
+    checks: list[dict[str, Any]],
+    sut_results: dict[str, Any],
+    sut_results_path: Path,
+    corpus_root: Path,
+) -> None:
+    default_mode = sut_results.get("artifact_mode", SUT_ARTIFACT_MODE_CORPUS)
+    if not isinstance(default_mode, str) or default_mode not in SUT_ARTIFACT_MODES:
+        add_bundle_check(
+            checks,
+            "sut_results.artifact_mode",
+            False,
+            expected=sorted(SUT_ARTIFACT_MODES),
+            actual=default_mode,
+        )
+        default_mode = SUT_ARTIFACT_MODE_CORPUS
+
+    expectations = {
+        expected["case_id"]: expected
+        for expected in load_case_expectations(corpus_root)
+    }
+    results = sut_results.get("results")
+    if not isinstance(results, list):
+        add_bundle_check(
+            checks,
+            "sut_results.results.shape",
+            False,
+            expected="array",
+            actual=type(results).__name__,
+        )
+        return
+
+    for index, result in enumerate(results):
+        if not isinstance(result, dict):
+            continue
+        mode = result.get("artifact_mode", default_mode)
+        if not isinstance(mode, str) or mode not in SUT_ARTIFACT_MODES:
+            add_bundle_check(
+                checks,
+                f"sut_results.artifact_mode.result_{index}",
+                False,
+                expected=sorted(SUT_ARTIFACT_MODES),
+                actual=mode,
+            )
+            continue
+        if default_mode == SUT_ARTIFACT_MODE_GENERATED and mode != SUT_ARTIFACT_MODE_GENERATED:
+            add_bundle_check(
+                checks,
+                f"sut_results.artifact_mode.result_{index}",
+                False,
+                expected=SUT_ARTIFACT_MODE_GENERATED,
+                actual=mode,
+                details="a generated-receipts default cannot be downgraded per case",
+            )
+            continue
+        if mode != SUT_ARTIFACT_MODE_GENERATED:
+            if "generated_artifacts" in result:
+                add_bundle_check(
+                    checks,
+                    f"sut_results.generated_artifacts.result_{index}",
+                    False,
+                    details="generated_artifacts requires artifact_mode generated-receipts",
+                )
+            continue
+        case_id = result.get("case_id")
+        expected = expectations.get(case_id) if isinstance(case_id, str) else None
+        if expected is None:
+            add_bundle_check(
+                checks,
+                f"sut_results.generated_artifacts.result_{index}",
+                False,
+                details=f"generated-receipts result has unknown case_id {case_id!r}",
+            )
+            continue
+        failures = generated_sut_artifact_failures(result, expected, sut_results_path)
+        add_bundle_check(
+            checks,
+            f"sut_results.generated_artifacts.{case_id}",
+            not failures,
+            details=(
+                "generated receipt digests, bounded semantics, and linkage revalidated"
+                if not failures
+                else "; ".join(failures)
+            ),
+        )
+
+
+def effective_sut_artifact_mode_counts(
+    sut_results: dict[str, Any],
+    corpus_root: Path,
+) -> dict[str, int]:
+    default_mode = sut_results.get("artifact_mode", SUT_ARTIFACT_MODE_CORPUS)
+    if not isinstance(default_mode, str) or default_mode not in SUT_ARTIFACT_MODES:
+        default_mode = SUT_ARTIFACT_MODE_CORPUS
+    raw_results = sut_results.get("results")
+    results_by_case = {
+        result.get("case_id"): result
+        for result in raw_results
+        if isinstance(result, dict) and isinstance(result.get("case_id"), str)
+    } if isinstance(raw_results, list) else {}
+    counts = {mode: 0 for mode in sorted(SUT_ARTIFACT_MODES)}
+    for expected in load_case_expectations(corpus_root):
+        result = results_by_case.get(expected["case_id"])
+        mode = result.get("artifact_mode", default_mode) if isinstance(result, dict) else default_mode
+        if not isinstance(mode, str) or mode not in SUT_ARTIFACT_MODES:
+            mode = default_mode
+        counts[mode] += 1
+    return counts
+
+
 def summary_status(summary: Any) -> str:
     if not isinstance(summary, dict):
         return "fail"
@@ -2562,6 +3466,23 @@ def conformance_report_status(report: dict[str, Any]) -> str:
     return summary_status(report.get("summary"))
 
 
+def implementation_case_result(case: dict[str, Any]) -> dict[str, Any]:
+    result = {
+        "case_id": case.get("case_id"),
+        "expected_outcome": case.get("expected_outcome"),
+        "actual_outcome": case.get("actual_outcome"),
+        "expected_should_execute": case.get("expected_should_execute"),
+        "actual_should_execute": case.get("actual_should_execute"),
+        "expected_primary_reason_code": case.get("expected_primary_reason_code"),
+        "actual_primary_reason_code": case.get("actual_primary_reason_code"),
+        "pass": case.get("pass"),
+    }
+    artifact_mode = case.get("artifact_mode")
+    if isinstance(artifact_mode, str) and artifact_mode in SUT_ARTIFACT_MODES:
+        result["artifact_mode"] = artifact_mode
+    return result
+
+
 def implementation_case_results_match(
     conformance_report: dict[str, Any],
     implementation_report: dict[str, Any],
@@ -2570,19 +3491,9 @@ def implementation_case_results_match(
     implementation_cases = implementation_report.get("case_results")
     if not isinstance(conformance_cases, list) or not isinstance(implementation_cases, list):
         return False
-    expected = [
-        {
-            "case_id": case.get("case_id"),
-            "expected_outcome": case.get("expected_outcome"),
-            "actual_outcome": case.get("actual_outcome"),
-            "expected_should_execute": case.get("expected_should_execute"),
-            "actual_should_execute": case.get("actual_should_execute"),
-            "expected_primary_reason_code": case.get("expected_primary_reason_code"),
-            "actual_primary_reason_code": case.get("actual_primary_reason_code"),
-            "pass": case.get("pass"),
-        }
-        for case in conformance_cases
-    ]
+    if not all(isinstance(case, dict) for case in conformance_cases):
+        return False
+    expected = [implementation_case_result(case) for case in conformance_cases]
     return implementation_cases == expected
 
 
@@ -2600,18 +3511,57 @@ def json_object_or_empty(value: Any, checks: list[dict[str, Any]], label: str) -
     return {}
 
 
+def read_bundle_json_or_empty(
+    path: Path,
+    checks: list[dict[str, Any]],
+    label: str,
+) -> Any:
+    try:
+        return read_json(path)
+    except (OSError, UnicodeDecodeError, ValueError) as exc:
+        add_bundle_check(
+            checks,
+            f"{label}.json",
+            False,
+            expected="strict UTF-8 JSON",
+            actual=type(exc).__name__,
+            details=f"input could not be parsed as strict JSON: {exc}",
+        )
+        return {}
+
+
 def verify_report_bundle(
     corpus_root: Path,
     conformance_report_path: Path,
     implementation_report_path: Path,
     sut_results_path: Path | None,
 ) -> dict[str, Any]:
-    raw_conformance_report = read_json(conformance_report_path)
-    raw_implementation_report = read_json(implementation_report_path)
-    raw_sut_results = read_json(sut_results_path) if sut_results_path else None
-    manifest, corpus_digest = corpus_manifest(corpus_root)
-
     checks: list[dict[str, Any]] = []
+    raw_conformance_report = read_bundle_json_or_empty(
+        conformance_report_path,
+        checks,
+        "conformance_report",
+    )
+    raw_implementation_report = read_bundle_json_or_empty(
+        implementation_report_path,
+        checks,
+        "implementation_report",
+    )
+    raw_sut_results = (
+        read_bundle_json_or_empty(sut_results_path, checks, "sut_results")
+        if sut_results_path
+        else None
+    )
+    manifest, corpus_digest, manifest_failures = corpus_manifest(corpus_root)
+    for index, failure in enumerate(manifest_failures):
+        add_bundle_check(
+            checks,
+            f"corpus.manifest[{index}]",
+            False,
+            expected="readable regular file",
+            actual=failure,
+        )
+
     conformance_report = json_object_or_empty(raw_conformance_report, checks, "conformance_report")
     implementation_report = json_object_or_empty(raw_implementation_report, checks, "implementation_report")
     sut_results = (
@@ -2729,9 +3679,45 @@ def verify_report_bundle(
     )
 
     conformance_sut = conformance_report.get("sut_results")
+    if isinstance(conformance_sut, dict):
+        conformance_mode_counts = conformance_sut.get("artifact_mode_counts")
+        raw_conformance_cases = conformance_report.get("cases")
+        conformance_cases_for_counts = raw_conformance_cases if isinstance(raw_conformance_cases, list) else []
+        case_mode_counts = {
+            mode: sum(
+                1
+                for case in conformance_cases_for_counts
+                if isinstance(case, dict) and case.get("artifact_mode") == mode
+            )
+            for mode in sorted(SUT_ARTIFACT_MODES)
+        }
+        add_bundle_check(
+            checks,
+            "conformance_report.sut_results.artifact_mode_counts",
+            conformance_mode_counts == case_mode_counts,
+            expected=case_mode_counts,
+            actual=conformance_mode_counts,
+        )
+        add_bundle_check(
+            checks,
+            "implementation_report.artifact_mode_counts",
+            implementation_report.get("artifact_mode_counts") == conformance_mode_counts,
+            expected=conformance_mode_counts,
+            actual=implementation_report.get("artifact_mode_counts"),
+        )
     if sut_results_path:
         sut_digest = digest_descriptor(sut_results)
         sut_corpus = sut_results.get("corpus", {}) if isinstance(sut_results, dict) else {}
+        submitted_default_mode = (
+            sut_results.get("artifact_mode", SUT_ARTIFACT_MODE_CORPUS)
+            if isinstance(sut_results, dict)
+            else None
+        )
+        submitted_mode_counts = (
+            effective_sut_artifact_mode_counts(sut_results, corpus_root)
+            if isinstance(sut_results, dict)
+            else None
+        )
         add_bundle_check(
             checks,
             "sut_results.version",
@@ -2777,6 +3763,33 @@ def verify_report_bundle(
             expected=sut_results.get("implementation") if isinstance(sut_results, dict) else None,
             actual=conformance_sut.get("implementation") if isinstance(conformance_sut, dict) else None,
         )
+        add_bundle_check(
+            checks,
+            "conformance_report.sut_results.artifact_mode",
+            isinstance(conformance_sut, dict)
+            and conformance_sut.get("artifact_mode") == submitted_default_mode,
+            expected=submitted_default_mode,
+            actual=conformance_sut.get("artifact_mode") if isinstance(conformance_sut, dict) else None,
+        )
+        add_bundle_check(
+            checks,
+            "conformance_report.sut_results.submitted_artifact_mode_counts",
+            isinstance(conformance_sut, dict)
+            and conformance_sut.get("artifact_mode_counts") == submitted_mode_counts,
+            expected=submitted_mode_counts,
+            actual=(
+                conformance_sut.get("artifact_mode_counts")
+                if isinstance(conformance_sut, dict)
+                else None
+            ),
+        )
+        if isinstance(sut_results, dict):
+            add_generated_artifact_bundle_checks(
+                checks,
+                sut_results,
+                sut_results_path,
+                corpus_root,
+            )
     else:
         add_bundle_check(
             checks,
@@ -2887,7 +3900,7 @@ def add_optional_integrity_metadata(report: dict[str, Any], args: argparse.Names
 
 def make_implementation_report(args: argparse.Namespace, conformance_report: dict[str, Any]) -> dict[str, Any]:
     corpus_root = Path(args.corpus_root)
-    manifest, digest = corpus_manifest(corpus_root)
+    manifest, digest, _ = corpus_manifest(corpus_root)
 
     report = {
         "version": IMPLEMENTATION_REPORT_VERSION,
@@ -2914,16 +3927,7 @@ def make_implementation_report(args: argparse.Namespace, conformance_report: dic
         },
         "summary": conformance_report["summary"],
         "case_results": [
-            {
-                "case_id": case["case_id"],
-                "expected_outcome": case["expected_outcome"],
-                "actual_outcome": case["actual_outcome"],
-                "expected_should_execute": case["expected_should_execute"],
-                "actual_should_execute": case["actual_should_execute"],
-                "expected_primary_reason_code": case["expected_primary_reason_code"],
-                "actual_primary_reason_code": case["actual_primary_reason_code"],
-                "pass": case["pass"],
-            }
+            implementation_case_result(case)
             for case in conformance_report["cases"]
         ],
         "limitations": [
@@ -2931,6 +3935,11 @@ def make_implementation_report(args: argparse.Namespace, conformance_report: dic
             "Passing cases do not imply production readiness or endorsement.",
         ],
     }
+    conformance_sut = conformance_report.get("sut_results")
+    if isinstance(conformance_sut, dict):
+        mode_counts = conformance_sut.get("artifact_mode_counts")
+        if isinstance(mode_counts, dict):
+            report["artifact_mode_counts"] = copy.deepcopy(mode_counts)
     add_optional_integrity_metadata(report, args)
     return report
 

@@ -2,6 +2,7 @@
   "version": "vate-sut-results-2026-07",
   "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "generated_at": "2026-07-07T00:00:00Z",
+  "artifact_mode": "corpus-fixture-validation",
   "implementation": {
     "name": "replace-with-your-implementation-name",
     "type": "external-verifier-template",
@@ -14,7 +15,7 @@
     "profile": "VATE-AL2-Verifier-Admission-v0.3",
     "digest": {
       "alg": "sha-256",
-      "value": "835864092b7afde1c751c4e2cad40aa8265b4ebb95234873c9b8d20f664cb2f6"
+      "value": "0eb1969ea3763e0fec123de5ea0dacb225eb48a28d76866bbec56dc61d16cf8f"
     }
   },
   "results": [
@@ -175,6 +176,6 @@
   ],
   "limitations": [
     "Template shape only. This file points at repository fixtures and must not be submitted unchanged as independent implementation evidence.",
-    "A real external SUT result should replace implementation identity, artifact URIs, artifact digests, and generated artifact references with material controlled by the implementation maintainer."
+    "Keep artifacts bound to the exact corpus fixtures evaluated. For SUT-produced receipts, use artifact_mode generated-receipts and add generated_artifacts with locally readable files controlled by the implementation maintainer."
   ]
 }

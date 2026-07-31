@@ -40,6 +40,8 @@ Required top-level fields:
 - `version` - currently `vate-sut-results-2026-07`
 - `profile` - currently `VATE-AL2-Verifier-Admission-v0.3`
 - `generated_at`
+- optional `artifact_mode` - `corpus-fixture-validation` by default, or
+  `generated-receipts` when the SUT also submits its own receipt bytes
 - `implementation`
 - `corpus.digest`
 - `results`
@@ -55,6 +57,8 @@ Each result entry represents one corpus case:
   non-terminal code
 - optional `checks` - case-specific check names with `pass: true` when the expected check was satisfied
 - required `artifacts` when the corpus case depends on receipt or context artifacts
+- optional per-case `artifact_mode` override
+- required `generated_artifacts` when the effective mode is `generated-receipts`
 - optional `limitations`
 
 The example file is:
@@ -70,7 +74,25 @@ helper for constructing schema-shaped result entries. It is an implementation
 aid only; `compare` remains the repository comparison command for external SUT
 review.
 
-## Artifact References
+## Artifact Roles
+
+The result contract separates two artifact roles that must not be conflated:
+
+1. `results[].artifacts` identifies the exact committed corpus artifacts that
+   the submitter declares as the result's evaluated-input references. `compare`
+   requires their raw SHA-256 digests to match the selected corpus snapshot; it
+   does not establish that the SUT actually read or evaluated those bytes.
+2. `results[].generated_artifacts` identifies receipt bytes produced by the
+   SUT. These fields are required only in `generated-receipts` mode and are
+   never required to be byte-identical to the corpus receipt fixtures.
+
+The default `corpus-fixture-validation` mode preserves the existing fixed-vector
+comparison path. It checks that submitted references match the corpus fixture
+digests; it does not establish that the SUT evaluated those bytes or issued a
+receipt. An independent receipt-generation result should opt into
+`generated-receipts` explicitly.
+
+## Evaluated Corpus Artifact References
 
 SUT results must be artifact-backed for cases that depend on concrete receipts,
 AL2 execution context, or JOSE proof-package inputs. This keeps the comparison
@@ -172,18 +194,70 @@ by (`case_artifact`, `kind`). `compare` rejects duplicate logical keys rather
 than selecting one by array order.
 
 The current comparison command validates the presence and descriptor shape of
-these artifact references, and checks their SHA-256 digest values against the
-corpus artifacts required by the case. It does not fetch arbitrary remote URIs
-or verify external signatures. For local report-bundle digest-chain
+these evaluated corpus artifact references, and checks their SHA-256 digest
+values against the corpus artifacts required by the case. It does not fetch
+arbitrary remote URIs or verify external signatures. For local report-bundle digest-chain
 verification, use `scripts/vate_conformance.py verify-bundle` as documented in
 `docs/conformance/report-integrity.md`.
 
-For an independent review, `uri` values should identify SUT-produced artifacts
-or a controlled publication package from the SUT maintainer. The passing example
-SUT file may cite repository fixtures because it is a local contract example.
-That demonstrates shape and digest matching only. It does not prove that the
-SUT generated the referenced artifact, does not prove artifact provenance, and
-does not make copied repository fixtures an implementation result.
+The passing example SUT file uses `corpus-fixture-validation`; its `artifacts`
+therefore cite repository fixtures intentionally. Replacing those digest values
+with independently generated receipt digests is incorrect because these fields
+name the evaluated fixed vectors.
+
+## Generated Receipt Artifacts
+
+For a case that exercises SUT-produced receipt output, set either the top-level
+or per-result `artifact_mode` to `generated-receipts` and add:
+
+```json
+{
+  "artifact_mode": "generated-receipts",
+  "generated_artifacts": {
+    "admission_receipt": {
+      "uri": "https://implementation.example/vate/admission/receipt-1.json",
+      "local_path": "artifacts/receipt-1.json",
+      "media_type": "application/vate-admission-receipt+json",
+      "digest": { "alg": "sha-256", "value": "<raw-file-sha256>" }
+    }
+  }
+}
+```
+
+`uri` is the publication identifier. `local_path` is required when `uri` is
+remote and must be a relative path contained by the directory holding the SUT
+result. Absolute paths, parent traversal, symlink escapes, and files over 8 MiB
+are rejected. `compare` does not fetch the network. It reads the bounded local
+bytes, verifies their raw SHA-256 digest, parses the JSON object, and checks a
+selected schema-aligned shape plus bounded semantic projection against the case.
+Generated admission and post-execution references
+must use `application/vate-admission-receipt+json` and
+`application/vate-post-execution-receipt+json`, respectively.
+
+For admission receipts, `receipt_id`, verifier identity, proof packaging, and
+human-readable summary may differ. The fixed case clock, request, subject,
+evidence, policy, ordered reason codes, decision visibility fields, decision,
+and attenuation remain part of the semantic comparison. For post-execution
+receipts, receipt id, issuer, proof packaging, and the concrete admission
+URI/id/digest may differ, but the relationship between the generated admission
+and post-execution pair must preserve the case's intended match or mismatch.
+The post-execution `admission.uri` must equal the generated admission artifact
+reference `uri`.
+The case's linkage checks are then rerun against that pair. This permits
+independent identifiers without weakening transaction, runtime,
+effective-request, decision, expiry, or side-effect linkage checks.
+
+Only generated admission and post-execution receipt roles required by the case
+are accepted. Extra or unknown generated artifact keys fail closed. A top-level
+`generated-receipts` default cannot be downgraded per case. For a mixed result,
+use `corpus-fixture-validation` as the default and opt selected cases into
+`generated-receipts`. The conformance and implementation reports expose the
+effective per-case mode and aggregate mode counts.
+
+A generated receipt pass does not prove who produced the file, verify its
+signature, or establish a controlled publication origin. Publish the generated
+files and implementation source or build reference with the report when
+provenance matters.
 
 The JSON Schema validates the portable result shape only. It does not know which
 artifacts are required by a particular corpus case and, by itself, does not prove
@@ -217,6 +291,8 @@ It exits non-zero when:
 - a case id is duplicated or unknown
 - a case is skipped or errored
 - outcome, `should_execute`, reason codes, or required checks do not match the corpus expectation
+- a generated-receipts case omits local generated receipt bytes, submits the
+  wrong digest, changes bounded semantics, or fails post-execution linkage
 
 ## Check Semantics
 

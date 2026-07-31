@@ -47,14 +47,21 @@ valid when they preserve digest-bound reviewability:
 - an implementer publishes a controlled artifact bundle for external SUT review.
 
 Independent review should prefer maintainer-controlled origins, release assets,
-content-addressed bundles, or signed release material. Local paths, temporary
-uploads, or copied repository fixtures are not enough by themselves to prove that
-an external SUT produced the referenced artifacts.
+content-addressed bundles, or signed release material. In a SUT result,
+`artifacts` intentionally records references matching the exact corpus fixture
+bytes submitted as evaluated inputs; digest matching does not establish runtime
+evaluation. Those fixed vectors are not claimed as SUT output. A
+`generated-receipts` result instead carries SUT output under
+`generated_artifacts`. Local paths or temporary uploads still do not prove who
+produced those generated files.
 
 ## Audit Path
 
 1. Start from the submitted metadata, SUT result, or implementation report.
-2. Find the `admission_receipt` artifact reference.
+2. Determine the result's `artifact_mode`. Treat
+   `artifacts.admission_receipt` as the submitted fixed-vector reference and, for
+   `generated-receipts`, treat `generated_artifacts.admission_receipt` as the
+   submitted SUT output.
 3. Fetch or locate the referenced admission receipt artifact according to local
    dereference policy.
 4. Check that the fetched bytes match `digest.alg: "sha-256"` and the expected

@@ -175,6 +175,17 @@ conformance result.
 against the same corpus snapshot. Independent implementation review should use
 `compare`, not `run` alone.
 
+Within a SUT result, `artifacts` records references whose digests must match the
+exact corpus fixture bytes submitted as evaluated inputs. The comparison does
+not establish that the SUT actually evaluated those bytes. It is not the
+generated-output channel. A SUT that
+also issues independent receipt bytes uses `artifact_mode: generated-receipts`
+and submits those files under `generated_artifacts`; `compare` then verifies
+their raw digests, schema-aligned bounded receipt semantics, and post-execution
+linkage where applicable. Generated files must stay inside the SUT result
+directory, are limited to the receipt roles required by the case, and are
+reported by effective mode count.
+
 ## Detached JWS Fixture Checks
 
 The `jose_checks` cases do not perform production signature verification.

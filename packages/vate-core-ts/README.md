@@ -16,7 +16,8 @@ The package currently covers:
 - sorted-key compact JSON bytes for the v0.3 fixture digest basis;
 - SHA-256 digest descriptors using lowercase hexadecimal values;
 - digest-bound artifact reference checks against caller-supplied bytes;
-- schema-shaped SUT result entries for `schemas/sut-result.schema.json`.
+- schema-shaped SUT result entries for `schemas/sut-result.schema.json`;
+- distinct `corpus-fixture-validation` and `generated-receipts` evidence fields;
 
 The helper deliberately does not:
 

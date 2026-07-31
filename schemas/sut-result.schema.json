@@ -25,6 +25,15 @@
       "type": "string",
       "format": "date-time"
     },
+    "artifact_mode": {
+      "type": "string",
+      "description": "Default artifact evidence mode. corpus-fixture-validation records references matching committed corpus artifacts. generated-receipts additionally requires locally verifiable receipt artifacts submitted as SUT output and cannot be downgraded by a per-case override.",
+      "enum": [
+        "corpus-fixture-validation",
+        "generated-receipts"
+      ],
+      "default": "corpus-fixture-validation"
+    },
     "implementation": {
       "type": "object",
       "required": [
@@ -94,6 +103,14 @@
             "type": "string",
             "minLength": 1
           },
+          "artifact_mode": {
+            "type": "string",
+            "description": "Optional per-case override of the top-level artifact evidence mode. A corpus-fixture-validation default may opt selected cases into generated-receipts; a generated-receipts default cannot be downgraded.",
+            "enum": [
+              "corpus-fixture-validation",
+              "generated-receipts"
+            ]
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -142,7 +159,7 @@
           },
           "artifacts": {
             "type": "object",
-            "description": "Artifact references used to support the reported result for this case.",
+            "description": "Exact corpus fixture artifacts evaluated by the SUT. Their digests must match the selected corpus snapshot; they are not SUT-generated output artifacts.",
             "properties": {
               "admission_receipt": {
                 "$ref": "#/$defs/receiptArtifactRef"
@@ -164,6 +181,19 @@
               }
             },
             "additionalProperties": true
+          },
+          "generated_artifacts": {
+            "type": "object",
+            "description": "Receipt artifacts submitted as SUT output and used only with artifact_mode generated-receipts. compare reads the local artifact bytes, verifies their submitted digests, and checks their schema-aligned bounded semantic projection.",
+            "properties": {
+              "admission_receipt": {
+                "$ref": "#/$defs/receiptArtifactRef"
+              },
+              "post_execution_receipt": {
+                "$ref": "#/$defs/receiptArtifactRef"
+              }
+            },
+            "additionalProperties": false
           },
           "limitations": {
             "type": "array",
@@ -213,6 +243,11 @@
       "properties": {
         "uri": {
           "type": "string",
+          "minLength": 1
+        },
+        "local_path": {
+          "type": "string",
+          "description": "Optional relative path used by compare to read generated artifact bytes when uri is a remote publication identifier. It resolves only within the directory containing the SUT result; absolute paths, parent traversal, and symlink escapes are rejected.",
           "minLength": 1
         },
         "media_type": {

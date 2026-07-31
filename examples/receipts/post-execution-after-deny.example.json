@@ -13,7 +13,7 @@
     "uri": "https://verifier.example/vate/admission-receipts/admrec-20260504-deny-audience-001",
     "digest": {
       "alg": "sha-256",
-      "value": "93394c52eed07ce84f5b9fe95175f255b699c81227579d5b7c35b8b8656e70fa"
+      "value": "88bf73b06a6633b9bc134bf04c2b2811975208ccc29526e946d5dfd7e7a0bb12"
     },
     "decision": "allow"
   },

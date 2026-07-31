@@ -394,7 +394,11 @@ python3 scripts/vate_conformance.py compare \
 
 `compare` checks an external SUT result file against the same corpus snapshot.
 Independent implementation review should use the SUT adapter contract and the
-`compare` path. External SUT authors can start with
+`compare` path. The default `corpus-fixture-validation` mode checks submitted
+artifact references against the fixed-vector bytes; it does not establish that
+the SUT evaluated them. `generated-receipts` keeps separately submitted receipt
+bytes distinct and rechecks their digest, bounded semantics, and post-execution
+linkage. External SUT authors can start with
 [docs/conformance/external-sut-quickstart.md](docs/conformance/external-sut-quickstart.md).
 Questions, partial results, unsupported-case reports, and implementation report
 links can be shared in

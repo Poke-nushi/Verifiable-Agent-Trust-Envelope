@@ -26,10 +26,17 @@ For a useful early review, an implementer should publish three things:
 3. an implementation report.
 
 The SUT result file lets this repository run `compare`.
-The generated artifacts or bundle let reviewers see that the result is not only
-copied from repository fixtures.
+The generated artifacts or bundle let reviewers inspect separately submitted
+receipt bytes instead of inferring receipt generation from corpus references.
 The implementation report ties the run to one implementation, one corpus
 snapshot, and one comparison report.
+
+Use `artifact_mode: generated-receipts` for cases where the implementation
+issues its own receipt bytes. Keep `results[].artifacts` matched to the exact
+corpus fixture digests submitted as inputs, and put separately generated
+outputs under `results[].generated_artifacts`. A
+`corpus-fixture-validation` result remains
+useful fixed-vector evidence, but it is not generated-receipt evidence.
 
 ## Where To Send Questions Or Results
 
@@ -74,6 +81,8 @@ At minimum, include:
 - ordered reason codes and `should_execute` values;
 - digest-bound artifact references for receipt, context, and proof-package
   cases where the corpus requires them;
+- `generated_artifacts` with locally readable bytes for each case claimed under
+  `generated-receipts` mode;
 - limitations for skipped, unsupported, or intentionally unimplemented cases.
 
 ## Compare Flow
