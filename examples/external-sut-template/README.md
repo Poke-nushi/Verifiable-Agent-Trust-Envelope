@@ -13,11 +13,11 @@ production approval, or a general compatibility claim.
   - `attenuate-max-amount`
   - `deny-digest-mismatch-before-policy`
 
-The template deliberately points at repository fixture artifacts so reviewers
-can inspect the expected SUT result shape and run the comparison command. A real
-external submission should replace the implementation identity, artifact URIs,
-artifact digests, and any generated receipt or context artifacts with material
-controlled by the implementation maintainer.
+The template deliberately uses `artifact_mode: corpus-fixture-validation` and
+points `artifacts` at repository fixtures. Those references identify the exact
+fixed vectors submitted as SUT inputs, so a real submission must keep their
+corpus digests rather than replacing them with generated receipt digests. The
+digest match does not establish runtime evaluation.
 
 Do not submit the template unchanged as independent implementation evidence.
 
@@ -67,12 +67,19 @@ Replace at least:
 
 - `implementation.name`, `type`, `version`, `language`, `source`, and `commit`
 - `generated_at`
-- `artifacts.*.uri`
-- `artifacts.*.digest.value`
-- any `verification_context[]` entries and `context_bindings[]` values that your
-  implementation generates or controls
 - report publication URIs passed through `--conformance-report-uri` and
   `--implementation-report-uri`
+
+Keep `artifacts`, `verification_context[]`, and their binding digests matched to
+the exact corpus fixtures submitted as evaluated inputs. That digest match does
+not itself establish runtime evaluation. If the SUT produces its own receipt bytes:
+
+- set the top-level or per-case `artifact_mode` to `generated-receipts`;
+- add `generated_artifacts.admission_receipt` and, for linkage cases,
+  `generated_artifacts.post_execution_receipt`;
+- use a maintainer-controlled publication `uri` plus a locally readable
+  relative `local_path` contained by the SUT result directory; and
+- publish those generated files with the result bundle.
 
 Keep the claim narrow: one implementation run against one corpus snapshot. A
 partial starter result is useful, but it is not a passing full-corpus claim.

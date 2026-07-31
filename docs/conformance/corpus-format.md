@@ -109,6 +109,12 @@ itself, evidence that an independent implementation passed the corpus. External
 implementation review should use `compare` with a SUT result file matching
 `schemas/sut-result.schema.json`.
 
+`compare` keeps submitted fixed-vector references and SUT-produced outputs
+separate. `results[].artifacts` records references whose digests must match the
+exact corpus bytes; that match alone does not establish runtime evaluation. A result that also
+claims receipt generation uses `artifact_mode: generated-receipts` and puts its
+own locally readable receipt files under `results[].generated_artifacts`.
+
 ## Implementation Flow
 
 A non-reference implementation can run the corpus without importing Python code:
@@ -118,8 +124,11 @@ A non-reference implementation can run the corpus without importing Python code:
 3. Resolve any case `artifacts` relative to the repository root.
 4. Execute the verifier behavior implied by the case.
 5. Compare the verifier output to the case `expected` block and profile-specific checks.
-6. Write a report matching `schemas/conformance-report.schema.json`.
-7. Optionally publish an implementation report matching `schemas/implementation-report.schema.json`.
+6. Record digest-bound corpus artifact references in `results[].artifacts`.
+7. If the verifier emits receipts, record those separate files under
+   `results[].generated_artifacts` and opt into `generated-receipts` mode.
+8. Write a report matching `schemas/conformance-report.schema.json`.
+9. Optionally publish an implementation report matching `schemas/implementation-report.schema.json`.
 
 Implementations MAY use the reference runner as a comparison oracle, but the corpus index is the portable contract.
 

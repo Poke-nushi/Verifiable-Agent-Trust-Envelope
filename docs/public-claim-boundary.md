@@ -61,6 +61,15 @@ Use these meanings consistently:
 - `compare` checks an external SUT result file against one corpus snapshot. A
   passing comparison means the submitted SUT result matched that snapshot under
   the repository comparison rules.
+- A `corpus-fixture-validation` comparison checks that submitted artifact
+  references match exact corpus fixture digests. It does not prove that the SUT
+  read or evaluated those bytes, and it is not evidence that the SUT issued
+  receipts.
+- A `generated-receipts` comparison additionally checks locally supplied
+  receipt digests, schema-aligned bounded receipt semantics, and applicable
+  post-execution linkage. The submitting party identifies those files as SUT
+  output; the comparison does not prove execution, authorship, provenance,
+  signature validity, source independence, or production readiness.
 - `verify-bundle` checks the local digest chain among the corpus, SUT result,
   conformance report, and implementation report. It is not a production
   signature profile and does not replace external proofs.

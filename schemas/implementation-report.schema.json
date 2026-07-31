@@ -264,6 +264,10 @@
       },
       "additionalProperties": true
     },
+    "artifact_mode_counts": {
+      "$ref": "#/$defs/artifactModeCounts",
+      "description": "Effective per-case artifact evidence mode counts for compare reports. Omitted for reference-run implementation reports."
+    },
     "case_results": {
       "type": "array",
       "items": {
@@ -282,6 +286,14 @@
           "case_id": {
             "type": "string",
             "minLength": 1
+          },
+          "artifact_mode": {
+            "type": "string",
+            "description": "Effective artifact evidence mode for this compared case. Omitted for reference-run implementation reports.",
+            "enum": [
+              "corpus-fixture-validation",
+              "generated-receipts"
+            ]
           },
           "expected_outcome": {
             "type": "string",
@@ -331,7 +343,45 @@
       }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "artifact_mode_counts"
+        ]
+      },
+      "then": {
+        "properties": {
+          "case_results": {
+            "items": {
+              "required": [
+                "artifact_mode"
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
+    "artifactModeCounts": {
+      "type": "object",
+      "required": [
+        "corpus-fixture-validation",
+        "generated-receipts"
+      ],
+      "properties": {
+        "corpus-fixture-validation": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "generated-receipts": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
     "digest": {
       "type": "object",
       "required": [

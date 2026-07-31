@@ -51,4 +51,25 @@ describe("SUT result helpers", () => {
       reason_codes: ["POST_EXEC_ADMISSION_DENIED"],
     });
   });
+
+  it("keeps evaluated corpus artifacts separate from generated receipts", () => {
+    const generatedReceipt = {
+      uri: "https://implementation.example/vate/admission/receipt-1.json",
+      local_path: "artifacts/receipt-1.json",
+      media_type: "application/vate-admission-receipt+json",
+      digest: { alg: "sha-256" as const, value: "1".repeat(64) },
+    };
+    const entry = createSutResultEntry({
+      caseId: "allow-valid-admission",
+      artifactMode: "generated-receipts",
+      outcome: "allow",
+      shouldExecute: true,
+      reasonCodes: ["EVIDENCE_VERIFIED", "POLICY_MATCH"],
+      generatedArtifacts: { admission_receipt: generatedReceipt },
+    });
+
+    expect(entry.artifact_mode).toBe("generated-receipts");
+    expect(entry.generated_artifacts?.admission_receipt).toEqual(generatedReceipt);
+    expect(entry.artifacts).toBeUndefined();
+  });
 });

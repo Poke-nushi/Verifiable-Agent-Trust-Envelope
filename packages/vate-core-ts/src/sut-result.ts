@@ -1,5 +1,7 @@
 import type {
   ProofArtifactReference,
+  SutArtifactMode,
+  SutGeneratedArtifacts,
   SutResultArtifacts,
   SutResultEntry,
   SutCaseStatus,
@@ -12,7 +14,9 @@ export interface CreateSutResultEntryInput {
   outcome: SutOutcome;
   shouldExecute: boolean;
   reasonCodes: string[];
+  artifactMode?: SutArtifactMode;
   artifacts?: SutResultArtifacts;
+  generatedArtifacts?: SutGeneratedArtifacts;
   checks?: SutResultEntry["checks"];
   proofArtifacts?: ProofArtifactReference[];
   limitations?: string[];
@@ -39,12 +43,16 @@ export function createSutResultEntry(
 
   return {
     case_id: input.caseId,
+    ...(input.artifactMode ? { artifact_mode: input.artifactMode } : {}),
     status: input.status ?? "completed",
     outcome: input.outcome,
     should_execute: input.shouldExecute,
     reason_codes: input.reasonCodes,
     ...(input.checks && input.checks.length > 0 ? { checks: input.checks } : {}),
     ...(artifacts ? { artifacts } : {}),
+    ...(input.generatedArtifacts
+      ? { generated_artifacts: input.generatedArtifacts }
+      : {}),
     ...(limitations.length > 0 ? { limitations } : {}),
   };
 }

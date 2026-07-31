@@ -190,6 +190,27 @@ Remaining work includes:
 - side-effect checks beyond simple amount limits
 - independent implementation reports that exercise the linkage checks
 
+The external SUT contract now separates digest-matched corpus artifact
+references from receipt bytes submitted as SUT output. `generated-receipts`
+mode verifies local generated
+file digests and a bounded semantic projection, including rerunning the case's
+post-execution linkage checks against the generated pair. It is not a general
+semantic-equivalence engine. The current projection deliberately keeps the
+fixed fixture clock and normative request, evidence, policy, attenuation, and
+execution fields stable while permitting implementation-specific receipt ids,
+verifier or issuer identity, proof packaging, summaries, and correctly
+recomputed admission links.
+
+Remaining generated-artifact work includes:
+
+- deciding whether a later profile defines additional non-deterministic fields;
+- adding a production schema-validation and signature-proof layer for generated
+  artifacts rather than relying on the current dependency-free bounded checks;
+- defining a fetch and controlled-origin verification policy, if any, for
+  remote publication URIs; and
+- collecting a full independent `generated-receipts` result rather than
+  treating fixed-vector validation as receipt-generation evidence.
+
 The reference core's local decimal-size bounds are defensive guardrails only.
 The v0.3 corpus checks aggregate `max_amount` semantics, currency mismatch, and
 finite non-negative amount handling, but it does not require every

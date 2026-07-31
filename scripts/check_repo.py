@@ -13,6 +13,7 @@ import base64
 import hashlib
 import importlib.util
 import json
+import math
 import shutil
 import socket
 import subprocess
@@ -84,6 +85,7 @@ EXAMPLE_PAIRS = [
     ("examples/implementation-report.example.json", "schemas/implementation-report.schema.json"),
     ("examples/report-bundle-verification.example.json", "schemas/report-bundle-verification.schema.json"),
     ("examples/conformance/sut-results-pass.example.json", "schemas/sut-result.schema.json"),
+    ("examples/external-sut-template/starter-sut-result.template.json", "schemas/sut-result.schema.json"),
     ("conformance/al2-vate-v0.3/corpus.json", "schemas/conformance-corpus.schema.json"),
     ("examples/policies/merchant-purchase-al2-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),
     ("examples/policies/al2-repo-merge-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),
@@ -285,6 +287,20 @@ def assert_report_error_contains(path: Path, expected: str) -> None:
         raise AssertionError(f"{path}: expected report error containing {expected!r}")
 
 
+def assert_bundle_check(path: Path, name: str, expected_pass: bool) -> None:
+    report = json.loads(path.read_text(encoding="utf-8"))
+    check = next(
+        (
+            item
+            for item in report.get("checks", [])
+            if isinstance(item, dict) and item.get("name") == name
+        ),
+        None,
+    )
+    if check is None or check.get("pass") is not expected_pass:
+        raise AssertionError(f"{path}: expected bundle check {name!r} pass={expected_pass}")
+
+
 def canonical_json_bytes(value) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
@@ -400,6 +416,274 @@ def write_sut_result_with_conflicting_duplicate_artifact_entry(
     raise AssertionError(f"passing SUT result has no digest-bound {artifact_field} entry")
 
 
+def generated_receipt_ref(path: Path, media_type: str) -> dict:
+    return {
+        "uri": f"https://independent.example/vate/{path.name}",
+        "local_path": path.name,
+        "media_type": media_type,
+        "digest": {
+            "alg": "sha-256",
+            "value": hashlib.sha256(path.read_bytes()).hexdigest(),
+        },
+    }
+
+
+def write_sut_result_with_generated_receipts(
+    path: Path,
+    *,
+    tamper_allow_outcome: bool,
+) -> None:
+    sut_results = json.loads((ROOT / "examples" / "conformance" / "sut-results-pass.example.json").read_text())
+    results = {
+        result.get("case_id"): result
+        for result in sut_results.get("results", [])
+        if isinstance(result, dict)
+    }
+
+    generated_allow = json.loads((ROOT / "examples" / "receipts" / "admission-allow.example.json").read_text())
+    generated_allow["receipt_id"] = "admrec-independent-allow-001"
+    generated_allow["verifier"] = {
+        "id": "did:web:independent.example",
+        "key_id": "did:web:independent.example#key-1",
+    }
+    generated_allow["decision"]["human_readable_summary"] = "Independent verifier produced the same decision."
+    if tamper_allow_outcome:
+        generated_allow["decision"]["outcome"] = "deny"
+    generated_allow_path = path.parent / (
+        "generated-admission-allow-tampered.json" if tamper_allow_outcome else "generated-admission-allow.json"
+    )
+    generated_allow_path.write_text(json.dumps(generated_allow, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    allow_result = results["allow-valid-admission"]
+    allow_result["artifact_mode"] = "generated-receipts"
+    allow_result["generated_artifacts"] = {
+        "admission_receipt": generated_receipt_ref(
+            generated_allow_path,
+            "application/vate-admission-receipt+json",
+        )
+    }
+
+    generated_linkage_admission = json.loads(
+        (ROOT / "examples" / "receipts" / "admission-attenuate-max-amount.example.json").read_text()
+    )
+    generated_linkage_admission["receipt_id"] = "admrec-independent-linkage-001"
+    generated_linkage_admission["verifier"] = {
+        "id": "did:web:independent.example",
+        "key_id": "did:web:independent.example#key-1",
+    }
+    generated_linkage_admission["decision"]["human_readable_summary"] = (
+        "Independent verifier produced the same attenuation decision."
+    )
+    generated_linkage_admission_path = path.parent / "generated-admission-linkage.json"
+    generated_linkage_admission_path.write_text(
+        json.dumps(generated_linkage_admission, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    generated_linkage_admission_ref = generated_receipt_ref(
+        generated_linkage_admission_path,
+        "application/vate-admission-receipt+json",
+    )
+
+    generated_post = json.loads(
+        (ROOT / "examples" / "receipts" / "post-execution-success.example.json").read_text()
+    )
+    generated_post["receipt_id"] = "postrec-independent-linkage-001"
+    generated_post["issuer"] = {
+        "id": "spiffe://independent.example/runtime",
+        "role": "runtime",
+    }
+    generated_post["admission"]["receipt_id"] = generated_linkage_admission["receipt_id"]
+    generated_post["admission"]["uri"] = generated_linkage_admission_ref["uri"]
+    generated_post["admission"]["digest"] = {
+        "alg": "sha-256",
+        "value": hashlib.sha256(canonical_json_bytes(generated_linkage_admission)).hexdigest(),
+    }
+    generated_post_path = path.parent / "generated-post-execution-linkage.json"
+    generated_post_path.write_text(json.dumps(generated_post, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    linkage_result = results["post-execution-linkage-success"]
+    linkage_result["artifact_mode"] = "generated-receipts"
+    linkage_result["generated_artifacts"] = {
+        "admission_receipt": generated_linkage_admission_ref,
+        "post_execution_receipt": generated_receipt_ref(
+            generated_post_path,
+            "application/vate-post-execution-receipt+json",
+        ),
+    }
+    path.write_text(json.dumps(sut_results, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def set_nested_json_value(value: dict, path: tuple[str, ...], replacement) -> None:
+    current = value
+    for part in path[:-1]:
+        current = current[part]
+    current[path[-1]] = replacement
+
+
+def assert_strict_json_file(path: Path) -> dict:
+    def reject_non_finite(value: str) -> None:
+        raise AssertionError(f"{path}: non-finite JSON constant {value} was emitted")
+
+    def parse_finite_float(value: str) -> float:
+        parsed = float(value)
+        if not math.isfinite(parsed):
+            raise AssertionError(f"{path}: non-finite JSON number {value} was emitted")
+        return parsed
+
+    return json.loads(
+        path.read_text(encoding="utf-8"),
+        parse_constant=reject_non_finite,
+        parse_float=parse_finite_float,
+    )
+
+
+def assert_generated_receipt_mutation_fails(
+    tmp_dir: Path,
+    *,
+    label: str,
+    case_id: str,
+    artifact_name: str,
+    artifact_filename: str,
+    field_path: tuple[str, ...],
+    replacement,
+    expected_error: str,
+) -> None:
+    variant_dir = tmp_dir / f"generated-shape-{label}"
+    variant_dir.mkdir()
+    sut_results_path = variant_dir / "sut-results.json"
+    compare_report_path = variant_dir / "compare-report.json"
+    implementation_report_path = variant_dir / "implementation-report.json"
+    bundle_report_path = variant_dir / "bundle-report.json"
+    write_sut_result_with_generated_receipts(sut_results_path, tamper_allow_outcome=False)
+
+    artifact_path = variant_dir / artifact_filename
+    artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+    set_nested_json_value(artifact, field_path, replacement)
+    artifact_path.write_text(
+        json.dumps(artifact, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    sut_results = json.loads(sut_results_path.read_text(encoding="utf-8"))
+    result = next(
+        item
+        for item in sut_results["results"]
+        if isinstance(item, dict) and item.get("case_id") == case_id
+    )
+    result["generated_artifacts"][artifact_name]["digest"]["value"] = hashlib.sha256(
+        artifact_path.read_bytes()
+    ).hexdigest()
+    sut_results_path.write_text(
+        json.dumps(sut_results, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    compare_result = run_expect_failure(
+        [
+            sys.executable,
+            str(VATE_CONFORMANCE),
+            "compare",
+            "--corpus-root",
+            str(ROOT / "conformance" / "al2-vate-v0.3"),
+            "--sut-results",
+            str(sut_results_path),
+            "--report",
+            str(compare_report_path),
+            "--implementation-report",
+            str(implementation_report_path),
+            "--conformance-report-uri",
+            str(compare_report_path),
+            "--implementation-report-uri",
+            str(implementation_report_path),
+        ]
+    )
+    if "Traceback" in compare_result.stderr:
+        raise AssertionError(f"{label}: compare emitted a traceback")
+    assert_strict_json_file(compare_report_path)
+    assert_strict_json_file(implementation_report_path)
+    assert_report_error_contains(compare_report_path, expected_error)
+
+    bundle_result = run_expect_failure(
+        [
+            sys.executable,
+            str(VATE_CONFORMANCE),
+            "verify-bundle",
+            "--corpus-root",
+            str(ROOT / "conformance" / "al2-vate-v0.3"),
+            "--sut-results",
+            str(sut_results_path),
+            "--conformance-report",
+            str(compare_report_path),
+            "--implementation-report",
+            str(implementation_report_path),
+            "--report",
+            str(bundle_report_path),
+        ]
+    )
+    if "Traceback" in bundle_result.stderr:
+        raise AssertionError(f"{label}: verify-bundle emitted a traceback")
+    assert_strict_json_file(bundle_report_path)
+    assert_bundle_check(
+        bundle_report_path,
+        f"sut_results.generated_artifacts.{case_id}",
+        False,
+    )
+
+
+def write_sut_result_with_generated_linkage_case(path: Path, case_id: str) -> None:
+    sut_results = json.loads((ROOT / "examples" / "conformance" / "sut-results-pass.example.json").read_text())
+    result = next(
+        item
+        for item in sut_results["results"]
+        if isinstance(item, dict) and item.get("case_id") == case_id
+    )
+    case = json.loads(
+        (ROOT / "conformance" / "al2-vate-v0.3" / "cases" / f"{case_id}.json").read_text()
+    )
+    generated_admission = json.loads((ROOT / case["artifacts"]["admission_receipt"]).read_text())
+    generated_post = json.loads((ROOT / case["artifacts"]["post_execution_receipt"]).read_text())
+
+    generated_admission["receipt_id"] = f"admrec-independent-{case_id}"
+    generated_admission["verifier"] = {
+        "id": "did:web:independent.example",
+        "key_id": "did:web:independent.example#key-1",
+    }
+    generated_post["receipt_id"] = f"postrec-independent-{case_id}"
+    generated_post["issuer"] = {
+        "id": "spiffe://independent.example/runtime",
+        "role": "runtime",
+    }
+    generated_post["admission"]["receipt_id"] = generated_admission["receipt_id"]
+    generated_post["admission"]["digest"] = {
+        "alg": "sha-256",
+        "value": hashlib.sha256(canonical_json_bytes(generated_admission)).hexdigest(),
+    }
+
+    admission_path = path.parent / f"generated-{case_id}-admission.json"
+    post_path = path.parent / f"generated-{case_id}-post-execution.json"
+    admission_path.write_text(
+        json.dumps(generated_admission, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    admission_ref = generated_receipt_ref(
+        admission_path,
+        "application/vate-admission-receipt+json",
+    )
+    generated_post["admission"]["uri"] = admission_ref["uri"]
+    post_path.write_text(
+        json.dumps(generated_post, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    result["artifact_mode"] = "generated-receipts"
+    result["generated_artifacts"] = {
+        "admission_receipt": admission_ref,
+        "post_execution_receipt": generated_receipt_ref(
+            post_path,
+            "application/vate-post-execution-receipt+json",
+        ),
+    }
+    path.write_text(json.dumps(sut_results, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
 def find_free_port() -> int:
     with socket.socket() as sock:
         sock.bind(("127.0.0.1", 0))
@@ -491,6 +775,351 @@ def check_vate_conformance_display_paths_are_portable() -> None:
             "vate_conformance display_path must use POSIX separators in "
             f"digest-addressed report and corpus paths, got {path!r}"
         )
+
+
+def check_linkage_missing_artifacts_fail_closed() -> None:
+    conformance = load_vate_conformance_module()
+    case = json.loads(
+        (
+            ROOT
+            / "conformance"
+            / "al2-vate-v0.3"
+            / "cases"
+            / "post-execution-linkage-success.json"
+        ).read_text(encoding="utf-8")
+    )
+    admission = json.loads((ROOT / case["artifacts"]["admission_receipt"]).read_text(encoding="utf-8"))
+    post_execution = json.loads(
+        (ROOT / case["artifacts"]["post_execution_receipt"]).read_text(encoding="utf-8")
+    )
+    expected = ["POST_EXEC_LINKAGE_MISMATCH"]
+    if conformance.actual_linkage_reason_codes(case, None, post_execution) != expected:
+        raise RuntimeError("missing admission receipt must fail with the generic linkage reason")
+    if conformance.actual_linkage_reason_codes(case, admission, None) != expected:
+        raise RuntimeError("missing post-execution receipt must fail with the generic linkage reason")
+
+    for missing_artifact in ("admission_receipt", "post_execution_receipt"):
+        for variant_name in (
+            "missing-key",
+            "missing-path",
+            "invalid-json",
+            "json-array",
+            "json-number",
+            "directory",
+        ):
+            with tempfile.TemporaryDirectory(
+                prefix=f"vate-{variant_name}-{missing_artifact}-"
+            ) as tmp:
+                tmp_path = Path(tmp)
+                corpus_root = Path(tmp) / "corpus"
+                case_dir = corpus_root / "cases"
+                case_dir.mkdir(parents=True)
+                missing_case = json.loads(json.dumps(case))
+                if variant_name == "missing-key":
+                    missing_case["artifacts"].pop(missing_artifact)
+                    expected_artifact_failure = "artifact missing"
+                elif variant_name == "missing-path":
+                    missing_case["artifacts"][missing_artifact] = (
+                        f"examples/receipts/does-not-exist-{missing_artifact}.json"
+                    )
+                    expected_artifact_failure = "artifact missing"
+                else:
+                    malformed_artifact = tmp_path / f"{variant_name}-{missing_artifact}.json"
+                    if variant_name == "invalid-json":
+                        malformed_artifact.write_text("{not-json\n", encoding="utf-8")
+                        expected_artifact_failure = "artifact is not readable strict JSON"
+                    elif variant_name == "json-array":
+                        malformed_artifact.write_text("[]\n", encoding="utf-8")
+                        expected_artifact_failure = "artifact must be a JSON object"
+                    elif variant_name == "json-number":
+                        malformed_artifact.write_text("7\n", encoding="utf-8")
+                        expected_artifact_failure = "artifact must be a JSON object"
+                    else:
+                        malformed_artifact.mkdir()
+                        expected_artifact_failure = "artifact missing"
+                    missing_case["artifacts"][missing_artifact] = str(malformed_artifact)
+                (case_dir / "post-execution-linkage-success.json").write_text(
+                    json.dumps(missing_case, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8",
+                )
+                report_path = Path(tmp) / "report.json"
+                result = run_expect_failure(
+                    [
+                        sys.executable,
+                        str(VATE_CONFORMANCE),
+                        "run",
+                        "--corpus-root",
+                        str(corpus_root),
+                        "--report",
+                        str(report_path),
+                    ]
+                )
+                if "Traceback" in result.stderr:
+                    raise RuntimeError(
+                        f"{variant_name} {missing_artifact} must not emit a traceback"
+                    )
+                report = json.loads(report_path.read_text(encoding="utf-8"))
+                cases = report.get("cases", [])
+                if len(cases) != 1 or cases[0].get("actual_reason_codes") != expected:
+                    raise RuntimeError(
+                        f"{variant_name} {missing_artifact} must reach the CLI report "
+                        "with the generic linkage reason"
+                    )
+                expected_failure = (
+                    f"artifact_ref {missing_artifact}: {expected_artifact_failure}"
+                )
+                if expected_failure not in cases[0].get("failures", []):
+                    raise RuntimeError(
+                        f"{variant_name} {missing_artifact} must record a machine-readable "
+                        "artifact failure"
+                    )
+
+    for direct_artifact in ("admission_receipt", "post_execution_receipt"):
+        with tempfile.TemporaryDirectory(prefix=f"vate-direct-path-{direct_artifact}-") as tmp:
+            corpus_root = Path(tmp) / "corpus"
+            case_dir = corpus_root / "cases"
+            case_dir.mkdir(parents=True)
+            direct_path_case = json.loads(json.dumps(case))
+            direct_path = direct_path_case["artifacts"][direct_artifact]
+            for check in direct_path_case["artifact_reference_checks"]:
+                if check["artifact"] == direct_artifact:
+                    check["artifact"] = direct_path
+            (case_dir / "post-execution-linkage-success.json").write_text(
+                json.dumps(direct_path_case, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            report_path = Path(tmp) / "report.json"
+            run(
+                [
+                    sys.executable,
+                    str(VATE_CONFORMANCE),
+                    "run",
+                    "--corpus-root",
+                    str(corpus_root),
+                    "--report",
+                    str(report_path),
+                ]
+            )
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+            if report.get("summary") != {"total": 1, "passed": 1, "failed": 0, "skipped": 0}:
+                raise RuntimeError(
+                    f"artifact_reference_checks must preserve repo-relative path support for {direct_artifact}"
+                )
+
+
+def check_case_artifact_readers_fail_closed() -> None:
+    reader_cases = (
+        (
+            "allow-ap2-hnp-preauthorized-mandate.json",
+            "ap2_mandate",
+            "integrity ap2_mandate",
+        ),
+        ("deny-alg-not-allowed.json", "trust_bundle", "trust trust_bundle"),
+        (
+            "allow-jose-detached-runtime-attestation.json",
+            "jose_proof",
+            "jose jose_proof",
+        ),
+        (
+            "allow-valid-with-policy-snapshot.json",
+            "policy_snapshot",
+            "policy_snapshot policy_snapshot",
+        ),
+        (
+            "deny-attenuation-max-amount-type-edge.json",
+            "bad_attenuation",
+            "attenuation bad_attenuation",
+        ),
+        ("allow-valid-admission.json", "runtime_context", "al2_context runtime_context"),
+    )
+    case_dir = ROOT / "conformance" / "al2-vate-v0.3" / "cases"
+
+    for case_filename, artifact_name, failure_label in reader_cases:
+        source_case = json.loads((case_dir / case_filename).read_text(encoding="utf-8"))
+        source_case.pop("pairing", None)
+        for variant_name in (
+            "missing-key",
+            "missing-path",
+            "invalid-json",
+            "json-array",
+            "json-number",
+            "directory",
+        ):
+            with tempfile.TemporaryDirectory(
+                prefix=f"vate-{variant_name}-{artifact_name}-"
+            ) as tmp:
+                tmp_path = Path(tmp)
+                corpus_root = tmp_path / "corpus"
+                temp_case_dir = corpus_root / "cases"
+                temp_case_dir.mkdir(parents=True)
+                variant = json.loads(json.dumps(source_case))
+                if variant_name == "missing-key":
+                    variant["artifacts"].pop(artifact_name)
+                    expected_reason = "artifact missing"
+                elif variant_name == "missing-path":
+                    variant["artifacts"][artifact_name] = (
+                        f"examples/does-not-exist-{artifact_name}.json"
+                    )
+                    expected_reason = "artifact missing"
+                else:
+                    invalid_artifact = tmp_path / f"{variant_name}-{artifact_name}.json"
+                    if variant_name == "invalid-json":
+                        invalid_artifact.write_text("{not-json\n", encoding="utf-8")
+                        expected_reason = "artifact is not readable strict JSON"
+                    elif variant_name == "json-array":
+                        invalid_artifact.write_text("[]\n", encoding="utf-8")
+                        expected_reason = "artifact must be a JSON object"
+                    elif variant_name == "json-number":
+                        invalid_artifact.write_text("7\n", encoding="utf-8")
+                        expected_reason = "artifact must be a JSON object"
+                    else:
+                        invalid_artifact.mkdir()
+                        expected_reason = "artifact missing"
+                    variant["artifacts"][artifact_name] = str(invalid_artifact)
+
+                (temp_case_dir / case_filename).write_text(
+                    json.dumps(variant, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8",
+                )
+                report_path = tmp_path / "report.json"
+                result = run_expect_failure(
+                    [
+                        sys.executable,
+                        str(VATE_CONFORMANCE),
+                        "run",
+                        "--corpus-root",
+                        str(corpus_root),
+                        "--report",
+                        str(report_path),
+                    ]
+                )
+                if "Traceback" in result.stderr:
+                    raise RuntimeError(
+                        f"{variant_name} {artifact_name} must not emit a traceback"
+                    )
+                assert_strict_json_file(report_path)
+                assert_report_error_contains(
+                    report_path,
+                    f"{failure_label}: {expected_reason}",
+                )
+
+
+def check_corpus_manifest_non_file_fails_closed() -> None:
+    source_case = json.loads(
+        (
+            ROOT
+            / "conformance"
+            / "al2-vate-v0.3"
+            / "cases"
+            / "allow-ap2-hnp-preauthorized-mandate.json"
+        ).read_text(encoding="utf-8")
+    )
+    source_case.pop("pairing", None)
+
+    with tempfile.TemporaryDirectory(prefix="vate-manifest-non-file-") as tmp:
+        tmp_path = Path(tmp)
+        corpus_root = tmp_path / "corpus"
+        case_dir = corpus_root / "cases"
+        artifact_dir = corpus_root / "artifacts" / "non-file-ap2-mandate.json"
+        case_dir.mkdir(parents=True)
+        artifact_dir.mkdir(parents=True)
+        shutil.copy2(
+            ROOT / "conformance" / "al2-vate-v0.3" / "corpus.json",
+            corpus_root / "corpus.json",
+        )
+
+        variant = json.loads(json.dumps(source_case))
+        variant["artifacts"]["ap2_mandate"] = str(artifact_dir)
+        (case_dir / "allow-ap2-hnp-preauthorized-mandate.json").write_text(
+            json.dumps(variant, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        sut_results_path = tmp_path / "sut-results.json"
+        sut_results_path.write_text("{}\n", encoding="utf-8")
+
+        report_paths = {
+            "run": tmp_path / "run-report.json",
+            "compare": tmp_path / "compare-report.json",
+            "verify-bundle": tmp_path / "bundle-report.json",
+        }
+        commands = {
+            "run": [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "run",
+                "--corpus-root",
+                str(corpus_root),
+                "--report",
+                str(report_paths["run"]),
+            ],
+            "compare": [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(corpus_root),
+                "--sut-results",
+                str(sut_results_path),
+                "--report",
+                str(report_paths["compare"]),
+            ],
+            "verify-bundle": [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "verify-bundle",
+                "--corpus-root",
+                str(corpus_root),
+                "--conformance-report",
+                str(ROOT / "examples" / "conformance-report.example.json"),
+                "--implementation-report",
+                str(ROOT / "examples" / "implementation-report.example.json"),
+                "--report",
+                str(report_paths["verify-bundle"]),
+            ],
+        }
+
+        for command_name, command in commands.items():
+            result = run_expect_failure(command)
+            if "Traceback" in result.stderr:
+                raise RuntimeError(
+                    f"{command_name} must not traceback for a non-file corpus artifact"
+                )
+            assert_strict_json_file(report_paths[command_name])
+
+        manifest_error = "corpus manifest artifact is not a readable regular file"
+        assert_report_error_contains(report_paths["run"], manifest_error)
+        assert_report_error_contains(report_paths["compare"], manifest_error)
+        assert_bundle_check(report_paths["verify-bundle"], "corpus.manifest[0]", False)
+
+
+def check_generated_artifact_utf8_boundary() -> None:
+    conformance = load_vate_conformance_module()
+    with tempfile.TemporaryDirectory(prefix="vate-generated-artifact-encoding-") as tmp:
+        tmp_path = Path(tmp)
+        sut_results_path = tmp_path / "sut-results.json"
+        sut_results_path.write_text("{}\n", encoding="utf-8")
+        artifact_path = tmp_path / "generated-admission-utf16.json"
+        artifact_path.write_bytes(
+            json.dumps({"receipt_type": "admission"}).encode("utf-16")
+        )
+        reference = {
+            "uri": "https://independent.example/vate/generated-admission-utf16.json",
+            "local_path": artifact_path.name,
+            "media_type": "application/vate-admission-receipt+json",
+            "digest": {
+                "alg": "sha-256",
+                "value": hashlib.sha256(artifact_path.read_bytes()).hexdigest(),
+            },
+        }
+        artifact, resolved_path, failures = conformance.load_sut_generated_artifact(
+            reference,
+            sut_results_path,
+            "generated_artifacts.admission_receipt",
+        )
+        if artifact is not None or resolved_path != artifact_path.resolve():
+            raise RuntimeError("UTF-16 generated artifact must not be accepted as UTF-8 JSON")
+        if not any("must be a UTF-8 JSON object" in failure for failure in failures):
+            raise RuntimeError("UTF-16 generated artifact must fail with the encoding boundary")
 
 
 def load_a2a_adapter_module():
@@ -805,11 +1434,37 @@ def check_artifact_versioning_docs() -> None:
 def check_post_execution_linkage_kind_coverage() -> None:
     case_dir = ROOT / "conformance" / "al2-vate-v0.3" / "cases"
     observed_kinds: set[str] = set()
+    conformance = load_vate_conformance_module()
     for case_path in case_dir.glob("post-execution-*.json"):
         case = json.loads(case_path.read_text(encoding="utf-8"))
         for check in case.get("linkage_checks", []):
             if isinstance(check, dict) and isinstance(check.get("kind"), str):
                 observed_kinds.add(check["kind"])
+        artifacts = case.get("artifacts")
+        if not isinstance(artifacts, dict):
+            continue
+        admission_path = artifacts.get("admission_receipt")
+        post_path = artifacts.get("post_execution_receipt")
+        if not isinstance(admission_path, str) or not isinstance(post_path, str):
+            continue
+        admission = json.loads((ROOT / admission_path).read_text(encoding="utf-8"))
+        post_execution = json.loads((ROOT / post_path).read_text(encoding="utf-8"))
+        admission_block = post_execution.get("admission")
+        if not isinstance(admission_block, dict):
+            continue
+        explicitly_broken_digest = any(
+            isinstance(check, dict)
+            and check.get("kind") == "admission_digest"
+            and check.get("expect_match") is False
+            for check in case.get("linkage_checks", [])
+        )
+        digest_matches = admission_block.get("digest") == conformance.digest_descriptor(admission)
+        if digest_matches == explicitly_broken_digest:
+            expected_state = "mismatch" if explicitly_broken_digest else "match"
+            raise RuntimeError(
+                f"{case['case_id']}: admission digest must {expected_state}; "
+                "unrelated linkage failures must not leak into a single-purpose case"
+            )
     required_kinds = {
         "admission_receipt_id",
         "admission_decision",
@@ -818,7 +1473,6 @@ def check_post_execution_linkage_kind_coverage() -> None:
     if missing:
         raise RuntimeError(f"post-execution linkage cases are missing explicit linkage kinds: {missing}")
 
-    conformance = load_vate_conformance_module()
     admission = json.loads((ROOT / "examples" / "receipts" / "admission-attenuate-max-amount.example.json").read_text())
     post_execution = json.loads((ROOT / "examples" / "receipts" / "post-execution-success.example.json").read_text())
     receipt_check = {
@@ -847,6 +1501,36 @@ def check_post_execution_linkage_kind_coverage() -> None:
     violation, failure = conformance.linkage_check_violation({}, decision_check, admission, mismatched_decision)
     if not violation or failure:
         raise RuntimeError("admission_decision linkage kind did not detect a mismatched admission decision")
+
+    missing_post_codes = conformance.actual_linkage_reason_codes(
+        {
+            "linkage_checks": [
+                {
+                    "kind": "admission_receipt_id",
+                    "expect_match": True,
+                }
+            ]
+        },
+        admission,
+        None,
+    )
+    if missing_post_codes != ["POST_EXEC_LINKAGE_MISMATCH"]:
+        raise RuntimeError("missing post-execution artifacts must return a generic linkage mismatch without crashing")
+
+    missing_admission_codes = conformance.actual_linkage_reason_codes(
+        {
+            "linkage_checks": [
+                {
+                    "kind": "admission_receipt_id",
+                    "expect_match": True,
+                }
+            ]
+        },
+        None,
+        post_execution,
+    )
+    if missing_admission_codes != ["POST_EXEC_LINKAGE_MISMATCH"]:
+        raise RuntimeError("missing admission artifacts must return a generic linkage mismatch without crashing")
 
 
 def check_transport_bound_fixture_coverage() -> None:
@@ -1652,14 +2336,17 @@ def check_p2_public_artifact_boundary() -> None:
             "jose-detached-a2a-agent-card.example.json",
         ],
         EXTERNAL_SUT_QUICKSTART_DOC: [
-            "sut-produced artifacts",
+            "corpus-fixture-validation",
+            "generated-receipts",
+            "generated_artifacts",
             "does not prove artifact provenance",
-            "copied repository fixtures",
         ],
         SUT_ADAPTER_CONTRACT_DOC: [
-            "sut-produced artifacts",
-            "does not prove that the sut generated",
-            "artifact provenance",
+            "corpus-fixture-validation",
+            "generated-receipts",
+            "generated_artifacts",
+            "bounded semantic projection",
+            "does not prove who produced",
         ],
     }
     for path, phrases in required_docs.items():
@@ -1771,6 +2458,10 @@ def main() -> int:
     check_p1_5_fixture_coverage()
     check_p2_public_artifact_boundary()
     check_vate_conformance_display_paths_are_portable()
+    check_linkage_missing_artifacts_fail_closed()
+    check_case_artifact_readers_fail_closed()
+    check_corpus_manifest_non_file_fails_closed()
+    check_generated_artifact_utf8_boundary()
     check_a2a_adapter_local_uri_boundary()
     check_a2a_adapter_malformed_metadata_fail_closed()
     check_al2_corpus_docs_synced()
@@ -1900,6 +2591,811 @@ def main() -> int:
             ]
         )
         assert_primary_reason_codes(tmp_dir / "vate-sut-compare-report.json")
+        generated_sut_results = tmp_dir / "sut-results-generated-receipts.json"
+        generated_compare_report = tmp_dir / "vate-sut-generated-receipts-report.json"
+        generated_implementation_report = tmp_dir / "vate-sut-generated-receipts-implementation-report.json"
+        generated_bundle_report = tmp_dir / "vate-sut-generated-receipts-bundle-report.json"
+        write_sut_result_with_generated_receipts(
+            generated_sut_results,
+            tamper_allow_outcome=False,
+        )
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(generated_sut_results),
+                "--report",
+                str(generated_compare_report),
+                "--implementation-report",
+                str(generated_implementation_report),
+                "--conformance-report-uri",
+                str(generated_compare_report),
+                "--implementation-report-uri",
+                str(generated_implementation_report),
+            ]
+        )
+        generated_report = json.loads(generated_compare_report.read_text(encoding="utf-8"))
+        if generated_report.get("summary") != {"total": 72, "passed": 72, "failed": 0, "skipped": 0}:
+            raise AssertionError("schema-valid independently identified generated receipts must pass compare")
+        generated_cases = {
+            case.get("case_id"): case
+            for case in generated_report.get("cases", [])
+            if isinstance(case, dict)
+        }
+        for case_id in ("allow-valid-admission", "post-execution-linkage-success"):
+            case_result = generated_cases.get(case_id, {})
+            if case_result.get("artifact_mode") != "generated-receipts" or case_result.get("pass") is not True:
+                raise AssertionError(f"{case_id}: generated-receipts comparison did not pass")
+        expected_mode_counts = {
+            "corpus-fixture-validation": 70,
+            "generated-receipts": 2,
+        }
+        if generated_report.get("sut_results", {}).get("artifact_mode_counts") != expected_mode_counts:
+            raise AssertionError("conformance report must expose effective artifact mode counts")
+        generated_implementation = json.loads(generated_implementation_report.read_text(encoding="utf-8"))
+        if generated_implementation.get("artifact_mode_counts") != expected_mode_counts:
+            raise AssertionError("implementation report must expose effective artifact mode counts")
+        implementation_cases = {
+            case.get("case_id"): case
+            for case in generated_implementation.get("case_results", [])
+            if isinstance(case, dict)
+        }
+        for case_id in ("allow-valid-admission", "post-execution-linkage-success"):
+            if implementation_cases.get(case_id, {}).get("artifact_mode") != "generated-receipts":
+                raise AssertionError(f"{case_id}: implementation report lost the effective artifact mode")
+
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "verify-bundle",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(generated_sut_results),
+                "--conformance-report",
+                str(generated_compare_report),
+                "--implementation-report",
+                str(generated_implementation_report),
+                "--report",
+                str(generated_bundle_report),
+            ]
+        )
+        for case_id in ("allow-valid-admission", "post-execution-linkage-success"):
+            assert_bundle_check(
+                generated_bundle_report,
+                f"sut_results.generated_artifacts.{case_id}",
+                True,
+            )
+        assert_bundle_check(
+            generated_bundle_report,
+            "conformance_report.sut_results.artifact_mode_counts",
+            True,
+        )
+        assert_bundle_check(
+            generated_bundle_report,
+            "implementation_report.artifact_mode_counts",
+            True,
+        )
+
+        generated_shape_variants = (
+            (
+                "decision-outcome-array",
+                "allow-valid-admission",
+                "admission_receipt",
+                "generated-admission-allow.json",
+                ("decision", "outcome"),
+                [],
+                "decision.outcome: expected allow, attenuate, or deny",
+            ),
+            (
+                "decision-visibility-array",
+                "allow-valid-admission",
+                "admission_receipt",
+                "generated-admission-allow.json",
+                ("decision", "reason_visibility"),
+                [],
+                "decision.reason_visibility: expected disclosed, opaque, or withheld",
+            ),
+            (
+                "proof-format-array",
+                "allow-valid-admission",
+                "admission_receipt",
+                "generated-admission-allow.json",
+                ("proof", "format"),
+                [],
+                "proof.format: unsupported proof format",
+            ),
+            (
+                "attenuation-mode-array",
+                "post-execution-linkage-success",
+                "admission_receipt",
+                "generated-admission-linkage.json",
+                ("attenuation", "mode"),
+                [],
+                "attenuation: mode must be a supported attenuation mode",
+            ),
+            (
+                "issuer-role-array",
+                "post-execution-linkage-success",
+                "post_execution_receipt",
+                "generated-post-execution-linkage.json",
+                ("issuer", "role"),
+                [],
+                "issuer.role: expected runtime, agent, verifier, or broker",
+            ),
+            (
+                "post-admission-decision-array",
+                "post-execution-linkage-success",
+                "post_execution_receipt",
+                "generated-post-execution-linkage.json",
+                ("admission", "decision"),
+                [],
+                "admission.decision: expected allow or attenuate",
+            ),
+            (
+                "policy-violation-token-array",
+                "post-execution-linkage-success",
+                "post_execution_receipt",
+                "generated-post-execution-linkage.json",
+                ("result", "policy_violations"),
+                [[]],
+                "policy_violations[0]: unknown token",
+            ),
+            (
+                "generated-non-finite-json",
+                "allow-valid-admission",
+                "admission_receipt",
+                "generated-admission-allow.json",
+                ("ignored_extension_value",),
+                float("nan"),
+                "generated artifact must be a UTF-8 JSON object",
+            ),
+        )
+        for (
+            label,
+            case_id,
+            artifact_name,
+            artifact_filename,
+            field_path,
+            replacement,
+            expected_error,
+        ) in generated_shape_variants:
+            assert_generated_receipt_mutation_fails(
+                tmp_dir,
+                label=label,
+                case_id=case_id,
+                artifact_name=artifact_name,
+                artifact_filename=artifact_filename,
+                field_path=field_path,
+                replacement=replacement,
+                expected_error=expected_error,
+            )
+
+        enum_shape_variants = generated_shape_variants[:6]
+        for invalid_label, invalid_value in (
+            ("object", {}),
+            ("null", None),
+            ("number", 7),
+        ):
+            for (
+                label,
+                case_id,
+                artifact_name,
+                artifact_filename,
+                field_path,
+                _,
+                expected_error,
+            ) in enum_shape_variants:
+                assert_generated_receipt_mutation_fails(
+                    tmp_dir,
+                    label=f"{label}-{invalid_label}",
+                    case_id=case_id,
+                    artifact_name=artifact_name,
+                    artifact_filename=artifact_filename,
+                    field_path=field_path,
+                    replacement=invalid_value,
+                    expected_error=expected_error,
+                )
+
+        for invalid_label, invalid_token in (
+            ("object", {}),
+            ("null", None),
+            ("number", 7),
+        ):
+            assert_generated_receipt_mutation_fails(
+                tmp_dir,
+                label=f"policy-violation-token-{invalid_label}",
+                case_id="post-execution-linkage-success",
+                artifact_name="post_execution_receipt",
+                artifact_filename="generated-post-execution-linkage.json",
+                field_path=("result", "policy_violations"),
+                replacement=[invalid_token],
+                expected_error="policy_violations[0]: unknown token",
+            )
+
+        for non_finite_label, non_finite_token in (
+            ("nan-literal", "NaN"),
+            ("positive-exponent-overflow", "1e400"),
+            ("negative-exponent-overflow", "-1e400"),
+        ):
+            non_finite_sut_dir = tmp_dir / f"non-finite-sut-json-{non_finite_label}"
+            non_finite_sut_dir.mkdir()
+            non_finite_sut_path = non_finite_sut_dir / "sut-results.json"
+            non_finite_report_path = non_finite_sut_dir / "compare-report.json"
+            non_finite_implementation_path = non_finite_sut_dir / "implementation-report.json"
+            non_finite_bundle_path = non_finite_sut_dir / "bundle-report.json"
+            non_finite_sut = json.loads(
+                (ROOT / "examples" / "conformance" / "sut-results-pass.example.json").read_text()
+            )
+            sentinel = "__NON_FINITE_JSON_NUMBER__"
+            non_finite_sut["implementation"]["non_finite_probe"] = sentinel
+            raw_sut = json.dumps(non_finite_sut, indent=2, sort_keys=True) + "\n"
+            encoded_sentinel = json.dumps(sentinel)
+            if raw_sut.count(encoded_sentinel) != 1:
+                raise AssertionError("non-finite JSON sentinel must occur exactly once")
+            non_finite_sut_path.write_text(
+                raw_sut.replace(encoded_sentinel, non_finite_token),
+                encoding="utf-8",
+            )
+            non_finite_compare = run_expect_failure(
+                [
+                    sys.executable,
+                    str(VATE_CONFORMANCE),
+                    "compare",
+                    "--corpus-root",
+                    str(ROOT / "conformance" / "al2-vate-v0.3"),
+                    "--sut-results",
+                    str(non_finite_sut_path),
+                    "--report",
+                    str(non_finite_report_path),
+                    "--implementation-report",
+                    str(non_finite_implementation_path),
+                    "--conformance-report-uri",
+                    str(non_finite_report_path),
+                    "--implementation-report-uri",
+                    str(non_finite_implementation_path),
+                ]
+            )
+            if "Traceback" in non_finite_compare.stderr:
+                raise AssertionError(
+                    f"{non_finite_label} SUT JSON caused compare traceback"
+                )
+            assert_strict_json_file(non_finite_report_path)
+            assert_strict_json_file(non_finite_implementation_path)
+            assert_report_error_contains(non_finite_report_path, "invalid strict JSON input")
+            non_finite_bundle = run_expect_failure(
+                [
+                    sys.executable,
+                    str(VATE_CONFORMANCE),
+                    "verify-bundle",
+                    "--corpus-root",
+                    str(ROOT / "conformance" / "al2-vate-v0.3"),
+                    "--sut-results",
+                    str(non_finite_sut_path),
+                    "--conformance-report",
+                    str(non_finite_report_path),
+                    "--implementation-report",
+                    str(non_finite_implementation_path),
+                    "--report",
+                    str(non_finite_bundle_path),
+                ]
+            )
+            if "Traceback" in non_finite_bundle.stderr:
+                raise AssertionError(
+                    f"{non_finite_label} SUT JSON caused verify-bundle traceback"
+                )
+            assert_strict_json_file(non_finite_bundle_path)
+            assert_bundle_check(non_finite_bundle_path, "sut_results.json", False)
+
+        malformed_mode_dir = tmp_dir / "malformed-artifact-mode"
+        malformed_mode_dir.mkdir()
+        malformed_mode_sut_path = malformed_mode_dir / "sut-results.json"
+        malformed_mode_report_path = malformed_mode_dir / "compare-report.json"
+        malformed_mode_implementation_path = malformed_mode_dir / "implementation-report.json"
+        malformed_mode_bundle_path = malformed_mode_dir / "bundle-report.json"
+        malformed_mode_sut = json.loads(
+            (ROOT / "examples" / "conformance" / "sut-results-pass.example.json").read_text()
+        )
+        malformed_mode_sut["artifact_mode"] = {}
+        malformed_mode_sut_path.write_text(
+            json.dumps(malformed_mode_sut, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        malformed_mode_compare = run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(malformed_mode_sut_path),
+                "--report",
+                str(malformed_mode_report_path),
+                "--implementation-report",
+                str(malformed_mode_implementation_path),
+                "--conformance-report-uri",
+                str(malformed_mode_report_path),
+                "--implementation-report-uri",
+                str(malformed_mode_implementation_path),
+            ]
+        )
+        if "Traceback" in malformed_mode_compare.stderr:
+            raise AssertionError("malformed artifact_mode caused compare traceback")
+        assert_report_error_contains(malformed_mode_report_path, "sut_results.artifact_mode")
+        malformed_mode_bundle = run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "verify-bundle",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(malformed_mode_sut_path),
+                "--conformance-report",
+                str(malformed_mode_report_path),
+                "--implementation-report",
+                str(malformed_mode_implementation_path),
+                "--report",
+                str(malformed_mode_bundle_path),
+            ]
+        )
+        if "Traceback" in malformed_mode_bundle.stderr:
+            raise AssertionError("malformed artifact_mode caused verify-bundle traceback")
+        assert_strict_json_file(malformed_mode_bundle_path)
+        assert_bundle_check(malformed_mode_bundle_path, "sut_results.artifact_mode", False)
+
+        malformed_check_sut = json.loads(
+            (ROOT / "examples" / "conformance" / "sut-results-pass.example.json").read_text()
+        )
+        malformed_check_sut["results"][0]["checks"][0]["name"] = []
+        malformed_check_sut_path = tmp_dir / "sut-results-malformed-check-name.json"
+        malformed_check_report_path = tmp_dir / "compare-report-malformed-check-name.json"
+        malformed_check_sut_path.write_text(
+            json.dumps(malformed_check_sut, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        malformed_check_result = run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(malformed_check_sut_path),
+                "--report",
+                str(malformed_check_report_path),
+            ]
+        )
+        if "Traceback" in malformed_check_result.stderr:
+            raise AssertionError("malformed check name caused compare traceback")
+        assert_strict_json_file(malformed_check_report_path)
+        assert_report_error_contains(malformed_check_report_path, "checks[0].name: expected non-empty string")
+
+        negative_linkage_dir = tmp_dir / "negative-linkage"
+        negative_linkage_dir.mkdir()
+        negative_linkage_sut = negative_linkage_dir / "sut-results.json"
+        negative_linkage_report = negative_linkage_dir / "compare-report.json"
+        write_sut_result_with_generated_linkage_case(
+            negative_linkage_sut,
+            "post-execution-runtime-mismatch",
+        )
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(negative_linkage_sut),
+                "--report",
+                str(negative_linkage_report),
+            ]
+        )
+        broken_link_results = json.loads(negative_linkage_sut.read_text(encoding="utf-8"))
+        broken_link_entry = next(
+            result
+            for result in broken_link_results["results"]
+            if result["case_id"] == "post-execution-runtime-mismatch"
+        )
+        broken_post_path = negative_linkage_dir / "generated-post-execution-runtime-mismatch-post-execution.json"
+        broken_post = json.loads(broken_post_path.read_text(encoding="utf-8"))
+        broken_post["admission"]["receipt_id"] = "admrec-unrelated"
+        broken_post["admission"]["uri"] = "https://independent.example/vate/admission/unrelated"
+        broken_post["admission"]["digest"]["value"] = "0" * 64
+        broken_post_path.write_text(
+            json.dumps(broken_post, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        broken_link_entry["generated_artifacts"]["post_execution_receipt"]["digest"]["value"] = (
+            hashlib.sha256(broken_post_path.read_bytes()).hexdigest()
+        )
+        broken_link_sut = negative_linkage_dir / "sut-results-broken-admission-link.json"
+        broken_link_sut.write_text(
+            json.dumps(broken_link_results, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        broken_link_report = negative_linkage_dir / "compare-report-broken-admission-link.json"
+        run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(broken_link_sut),
+                "--report",
+                str(broken_link_report),
+            ]
+        )
+        assert_report_error_contains(broken_link_report, "generated_artifacts.linkage.digest_match")
+        assert_report_error_contains(broken_link_report, "generated_artifacts.linkage.receipt_id_match")
+        assert_report_error_contains(broken_link_report, "generated_artifacts.linkage.uri_match")
+
+        shape_dir = tmp_dir / "invalid-generated-shape"
+        shape_dir.mkdir()
+        invalid_shape_sut = shape_dir / "sut-results.json"
+        write_sut_result_with_generated_receipts(invalid_shape_sut, tamper_allow_outcome=False)
+        invalid_shape_receipt_path = shape_dir / "generated-admission-allow.json"
+        invalid_shape_receipt = json.loads(invalid_shape_receipt_path.read_text(encoding="utf-8"))
+        invalid_shape_receipt["verifier"] = {}
+        invalid_shape_receipt["decision"]["reason_visibility"] = "secret-ish"
+        invalid_shape_receipt["decision"]["reason_withheld"] = "yes"
+        invalid_shape_receipt_path.write_text(
+            json.dumps(invalid_shape_receipt, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        invalid_shape_results = json.loads(invalid_shape_sut.read_text(encoding="utf-8"))
+        invalid_shape_entry = next(
+            result
+            for result in invalid_shape_results["results"]
+            if result["case_id"] == "allow-valid-admission"
+        )
+        invalid_shape_entry["generated_artifacts"]["admission_receipt"]["digest"]["value"] = (
+            hashlib.sha256(invalid_shape_receipt_path.read_bytes()).hexdigest()
+        )
+        invalid_shape_sut.write_text(
+            json.dumps(invalid_shape_results, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        invalid_shape_report = shape_dir / "compare-report.json"
+        run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(invalid_shape_sut),
+                "--report",
+                str(invalid_shape_report),
+            ]
+        )
+        assert_report_error_contains(invalid_shape_report, "generated_artifacts.admission_receipt.verifier.id")
+        assert_report_error_contains(
+            invalid_shape_report,
+            "generated_artifacts.admission_receipt.decision.reason_visibility",
+        )
+        assert_report_error_contains(
+            invalid_shape_report,
+            "generated_artifacts.admission_receipt.decision.reason_withheld",
+        )
+
+        malformed_decision_dir = tmp_dir / "malformed-generated-decision"
+        malformed_decision_dir.mkdir()
+        malformed_decision_sut = malformed_decision_dir / "sut-results.json"
+        write_sut_result_with_generated_receipts(malformed_decision_sut, tamper_allow_outcome=False)
+        malformed_decision_receipt_path = malformed_decision_dir / "generated-admission-allow.json"
+        malformed_decision_receipt = json.loads(
+            malformed_decision_receipt_path.read_text(encoding="utf-8")
+        )
+        malformed_decision_receipt["decision"] = "allow"
+        malformed_decision_receipt_path.write_text(
+            json.dumps(malformed_decision_receipt, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        malformed_decision_results = json.loads(malformed_decision_sut.read_text(encoding="utf-8"))
+        malformed_decision_entry = next(
+            result
+            for result in malformed_decision_results["results"]
+            if result["case_id"] == "allow-valid-admission"
+        )
+        malformed_decision_entry["generated_artifacts"]["admission_receipt"]["digest"]["value"] = (
+            hashlib.sha256(malformed_decision_receipt_path.read_bytes()).hexdigest()
+        )
+        malformed_decision_sut.write_text(
+            json.dumps(malformed_decision_results, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        malformed_decision_report = malformed_decision_dir / "compare-report.json"
+        run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(malformed_decision_sut),
+                "--report",
+                str(malformed_decision_report),
+            ]
+        )
+        assert_report_error_contains(
+            malformed_decision_report,
+            "generated_artifacts.admission_receipt.decision: expected object",
+        )
+
+        extra_artifact_dir = tmp_dir / "extra-generated-artifact"
+        extra_artifact_dir.mkdir()
+        extra_artifact_sut = extra_artifact_dir / "sut-results.json"
+        write_sut_result_with_generated_receipts(extra_artifact_sut, tamper_allow_outcome=False)
+        extra_artifact_results = json.loads(extra_artifact_sut.read_text(encoding="utf-8"))
+        extra_artifact_entry = next(
+            result
+            for result in extra_artifact_results["results"]
+            if result["case_id"] == "allow-valid-admission"
+        )
+        extra_artifact_entry["generated_artifacts"]["post_execution_receipt"] = {
+            "uri": "https://independent.example/vate/nonexistent.json",
+            "local_path": "nonexistent.json",
+            "media_type": "application/vate-post-execution-receipt+json",
+            "digest": {"alg": "sha-256", "value": "0" * 64},
+        }
+        extra_artifact_sut.write_text(
+            json.dumps(extra_artifact_results, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        extra_artifact_report = extra_artifact_dir / "compare-report.json"
+        run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(extra_artifact_sut),
+                "--report",
+                str(extra_artifact_report),
+            ]
+        )
+        assert_report_error_contains(
+            extra_artifact_report,
+            "generated_artifacts.post_execution_receipt: not applicable",
+        )
+
+        downgrade_results = json.loads(
+            (ROOT / "examples" / "conformance" / "sut-results-pass.example.json").read_text()
+        )
+        downgrade_results["artifact_mode"] = "generated-receipts"
+        for result in downgrade_results["results"]:
+            result["artifact_mode"] = "corpus-fixture-validation"
+        downgrade_sut = tmp_dir / "sut-results-generated-default-downgrade.json"
+        downgrade_sut.write_text(
+            json.dumps(downgrade_results, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        downgrade_report = tmp_dir / "compare-report-generated-default-downgrade.json"
+        run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(downgrade_sut),
+                "--report",
+                str(downgrade_report),
+            ]
+        )
+        assert_report_error_contains(
+            downgrade_report,
+            "a generated-receipts default cannot be downgraded per case",
+        )
+
+        traversal_root = tmp_dir / "generated-path-boundary"
+        traversal_sut_dir = traversal_root / "submission"
+        traversal_sut_dir.mkdir(parents=True)
+        traversal_sut = traversal_sut_dir / "sut-results.json"
+        write_sut_result_with_generated_receipts(traversal_sut, tamper_allow_outcome=False)
+        outside_receipt_path = traversal_root / "outside-receipt.json"
+        outside_receipt = json.loads(
+            (traversal_sut_dir / "generated-admission-allow.json").read_text(encoding="utf-8")
+        )
+        outside_receipt["receipt_id"] = "SENSITIVE-CANARY-MUST-NOT-BE-READ"
+        outside_receipt_path.write_text(
+            json.dumps(outside_receipt, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        traversal_results = json.loads(traversal_sut.read_text(encoding="utf-8"))
+        traversal_entry = next(
+            result
+            for result in traversal_results["results"]
+            if result["case_id"] == "allow-valid-admission"
+        )
+        traversal_ref = traversal_entry["generated_artifacts"]["admission_receipt"]
+        traversal_ref["local_path"] = "../outside-receipt.json"
+        traversal_ref["digest"]["value"] = hashlib.sha256(outside_receipt_path.read_bytes()).hexdigest()
+        traversal_sut.write_text(
+            json.dumps(traversal_results, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        traversal_report = traversal_sut_dir / "compare-report.json"
+        run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(traversal_sut),
+                "--report",
+                str(traversal_report),
+            ]
+        )
+        assert_report_error_contains(traversal_report, "parent traversal is not allowed")
+        if "SENSITIVE-CANARY-MUST-NOT-BE-READ" in traversal_report.read_text(encoding="utf-8"):
+            raise AssertionError("generated artifact path rejection leaked data from outside the submission root")
+
+        wrong_media_results = json.loads(generated_sut_results.read_text(encoding="utf-8"))
+        wrong_media_entry = next(
+            result
+            for result in wrong_media_results["results"]
+            if result["case_id"] == "allow-valid-admission"
+        )
+        wrong_media_entry["generated_artifacts"]["admission_receipt"]["media_type"] = "application/json"
+        wrong_media_sut_results = tmp_dir / "sut-results-generated-receipts-wrong-media.json"
+        wrong_media_sut_results.write_text(
+            json.dumps(wrong_media_results, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        wrong_media_report = tmp_dir / "vate-sut-generated-receipts-wrong-media-report.json"
+        run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(wrong_media_sut_results),
+                "--report",
+                str(wrong_media_report),
+            ]
+        )
+        assert_report_error_contains(
+            wrong_media_report,
+            "generated_artifacts.admission_receipt.media_type",
+        )
+
+        generated_allow_path = tmp_dir / "generated-admission-allow.json"
+        generated_allow = json.loads(generated_allow_path.read_text(encoding="utf-8"))
+        generated_allow["decision"]["human_readable_summary"] = "Changed after the result digest was recorded."
+        generated_allow_path.write_text(
+            json.dumps(generated_allow, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        digest_tampered_report = tmp_dir / "vate-sut-generated-receipts-digest-tampered-report.json"
+        run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(generated_sut_results),
+                "--report",
+                str(digest_tampered_report),
+            ]
+        )
+        assert_report_error_contains(
+            digest_tampered_report,
+            "generated_artifacts.admission_receipt.digest.value",
+        )
+        digest_tampered_bundle_report = tmp_dir / "vate-sut-generated-receipts-digest-tampered-bundle.json"
+        run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "verify-bundle",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(generated_sut_results),
+                "--conformance-report",
+                str(generated_compare_report),
+                "--implementation-report",
+                str(generated_implementation_report),
+                "--report",
+                str(digest_tampered_bundle_report),
+            ]
+        )
+        assert_bundle_check(
+            digest_tampered_bundle_report,
+            "sut_results.generated_artifacts.allow-valid-admission",
+            False,
+        )
+
+        write_sut_result_with_generated_receipts(
+            generated_sut_results,
+            tamper_allow_outcome=False,
+        )
+        generated_post_path = tmp_dir / "generated-post-execution-linkage.json"
+        generated_post = json.loads(generated_post_path.read_text(encoding="utf-8"))
+        generated_post["admission"]["digest"]["value"] = "0" * 64
+        generated_post_path.write_text(
+            json.dumps(generated_post, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        linkage_tampered_results = json.loads(generated_sut_results.read_text(encoding="utf-8"))
+        linkage_entry = next(
+            result
+            for result in linkage_tampered_results["results"]
+            if result["case_id"] == "post-execution-linkage-success"
+        )
+        linkage_entry["generated_artifacts"]["post_execution_receipt"]["digest"]["value"] = hashlib.sha256(
+            generated_post_path.read_bytes()
+        ).hexdigest()
+        linkage_tampered_sut_results = tmp_dir / "sut-results-generated-receipts-linkage-tampered.json"
+        linkage_tampered_sut_results.write_text(
+            json.dumps(linkage_tampered_results, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        linkage_tampered_report = tmp_dir / "vate-sut-generated-receipts-linkage-tampered-report.json"
+        run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(linkage_tampered_sut_results),
+                "--report",
+                str(linkage_tampered_report),
+            ]
+        )
+        assert_report_error_contains(
+            linkage_tampered_report,
+            "generated_artifacts.linkage.reason_codes",
+        )
+
+        tampered_generated_sut_results = tmp_dir / "sut-results-generated-receipts-tampered.json"
+        tampered_generated_report = tmp_dir / "vate-sut-generated-receipts-tampered-report.json"
+        write_sut_result_with_generated_receipts(
+            tampered_generated_sut_results,
+            tamper_allow_outcome=True,
+        )
+        run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(tampered_generated_sut_results),
+                "--report",
+                str(tampered_generated_report),
+            ]
+        )
+        assert_report_error_contains(
+            tampered_generated_report,
+            "generated_artifacts.admission_receipt.semantics.decision.outcome",
+        )
         missing_jose_proofs = tmp_dir / "sut-results-missing-jose-proof-artifacts.json"
         write_sut_result_without_jose_proof_artifacts(missing_jose_proofs)
         run_expect_failure(

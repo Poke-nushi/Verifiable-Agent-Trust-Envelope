@@ -18,8 +18,10 @@ Report reviewers should assume these failure modes:
 - an implementation identity is copied from another project
 - a mutable URL is later replaced with different results
 - a conformance report is separated from the SUT result or implementation report
-- a SUT result cites copied repository fixtures instead of SUT-produced
-  artifacts
+- a result presents its required evaluated corpus fixture references as if they
+  proved receipt generation
+- a `generated-receipts` result points at bytes that were not locally checked
+  against the submitted digest and bounded receipt semantics
 
 ## Minimum Publication Package
 
@@ -32,6 +34,12 @@ For an independent implementation review, publish these artifacts together:
 - the implementation report matching `schemas/implementation-report.schema.json`
 - the corpus digest and, preferably, the exact `corpus.json`
 - any detached proof or release signature used by the implementer
+
+In the SUT result, `artifacts` records references whose digests match exact
+corpus fixtures submitted as evaluated inputs; it does not prove runtime
+evaluation. Receipt output submitted by the SUT belongs in `generated_artifacts` under
+`artifact_mode: generated-receipts`. Include each generated file beside the SUT
+result; use `local_path` for local comparison and a stable `uri` for publication.
 
 The implementation report should reference the conformance report through
 `conformance_report.uri` and `conformance_report.digest`.
@@ -68,6 +76,10 @@ For external SUT comparison bundles, `verify-bundle` checks:
   conformance report file
 - the implementation report summary, status, and case projection against the
   conformance report
+- the conformance and implementation report effective artifact mode counts
+  against their per-case modes and the supplied SUT result
+- for `generated-receipts` cases, the local generated receipt digests, bounded
+  receipt semantics, and post-execution linkage
 
 For reference-run bundles without a SUT result file, omit `--sut-results`.
 The command still verifies the corpus, conformance report, and implementation
@@ -77,7 +89,10 @@ report chain.
 the command line and compares their canonical JSON digests, corpus digest,
 manifest, summaries, and case projections. It does not fetch arbitrary remote
 URIs, prove that a URI is maintainer-controlled, or verify external signatures.
-Those checks belong to the publication and proof review steps below.
+For `generated-receipts` results it rereads local `generated_artifacts` and
+reruns their raw-digest, bounded-semantic, and linkage checks. Controlled origin
+and external proof checks still belong to the publication and proof review steps
+below.
 
 ## Controlled Origin
 

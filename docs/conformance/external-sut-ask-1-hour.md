@@ -32,6 +32,11 @@ Any one of these is useful:
 5. Report that the task was too ambiguous or too expensive to complete, with
    notes about where the instructions failed.
 
+For a first fixed-vector review, use `corpus-fixture-validation`. If your SUT
+issues its own receipt bytes, use `generated-receipts` and keep those outputs in
+`generated_artifacts` rather than replacing the exact corpus references in
+`artifacts`.
+
 You do not need to produce a passing report for the review to be useful.
 
 ## Smallest Useful Review

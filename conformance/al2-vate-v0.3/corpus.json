@@ -1817,7 +1817,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "835864092b7afde1c751c4e2cad40aa8265b4ebb95234873c9b8d20f664cb2f6"
+    "value": "0eb1969ea3763e0fec123de5ea0dacb225eb48a28d76866bbec56dc61d16cf8f"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -2538,31 +2538,31 @@
     },
     {
       "path": "examples/receipts/post-execution-after-admission-expiry.example.json",
-      "sha256": "3815cf95fe9d40798dd500f05c3ea368abc79cc4ab88658052e518b39b8b68e8"
+      "sha256": "40ebd3c9d297a6d32d9643fc52772c18fe4dde79744192d960c00a33502ecf34"
     },
     {
       "path": "examples/receipts/post-execution-after-deny.example.json",
-      "sha256": "3a1272a842c12cf9f0ea2d2d2fa150ecd3fcf36257204e18ad117e0080f02211"
+      "sha256": "eb216c238c57a9c599bbc7bf8db4604f7d075aa9e51fb3130874b814d37f5d87"
     },
     {
       "path": "examples/receipts/post-execution-effective-constraints-aggregate-exceeded.example.json",
-      "sha256": "6853ad9d334b427ccf891e928cad84c9d6e86b79e01cd0030fd951748ee9784a"
+      "sha256": "1d97365947f0027c0ed1c779bf213c8b019491ad20f4ccf17e0364f8931cfe00"
     },
     {
       "path": "examples/receipts/post-execution-effective-constraints-exceeded.example.json",
-      "sha256": "7fcdb1161aec3ca7bc4408bafafac4e68e1d6c0fd8bff0c0a679e988ad104db1"
+      "sha256": "af8a3ae55d0466d792f83cb3cd29a2434a7bd635c432fe0fb585ec462523cf5f"
     },
     {
       "path": "examples/receipts/post-execution-finish-after-admission-expiry.example.json",
-      "sha256": "ecf64c16e89155b4ecc228e66aabf8e8d9692f035d7205df800a3d22dd716ffd"
+      "sha256": "c86706166f28a2d0684d702d30a1b6fee63a249ca2254f40415fbf163954fa94"
     },
     {
       "path": "examples/receipts/post-execution-linkage-mismatch.example.json",
-      "sha256": "44591a1f0ffe8be02a265ddac5807deb3e8ba1e827ee87a49eca2c032b146230"
+      "sha256": "5303fa3dd273d76c213dea72ac106956282bb3269166577c2380ff43f3ad55d9"
     },
     {
       "path": "examples/receipts/post-execution-runtime-mismatch.example.json",
-      "sha256": "7793044864a0a6ecf69a9c5c276f5440b8918625df41dc294fd7e7133659a45c"
+      "sha256": "0f900192431d18f2534aa8f8610f6025ed85e66141d927745381b902b4b73336"
     },
     {
       "path": "examples/receipts/post-execution-success.example.json",
@@ -2570,7 +2570,7 @@
     },
     {
       "path": "examples/receipts/post-execution-transaction-mismatch.example.json",
-      "sha256": "ad6ca5f12c21c9e301e9b8d83a247e25e18c7ce79e647acdf5f2d5b76a628d74"
+      "sha256": "f492dda77565e3acafce58e70b125b6e8920417babc3f727deb547756f94e0c1"
     },
     {
       "path": "examples/transport/mcp-oauth-admission-request.example.json",

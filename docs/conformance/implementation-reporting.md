@@ -105,10 +105,15 @@ generates the implementation report.
 
 For external SUT comparisons, the implementation report records the submitted
 SUT result and comparison output. It does not independently prove that the SUT
-generated every artifact referenced by the SUT result. When artifact provenance
-matters, publish the SUT-produced artifacts or a controlled artifact bundle
-alongside the reports and identify the maintainer-controlled origin in the
-publication metadata.
+generated every output artifact referenced by the SUT result. The SUT result's
+`artifacts` block records references matching submitted corpus fixture digests;
+that match does not establish runtime evaluation. Receipt outputs belong under
+`generated_artifacts` with `artifact_mode: generated-receipts`. Compare reports
+and their implementation reports carry each effective case mode and aggregate
+`artifact_mode_counts`. When
+artifact provenance matters, publish those generated files or a controlled
+artifact bundle alongside the reports and identify the maintainer-controlled
+origin in the publication metadata.
 
 To verify that the local report bundle is still tied together, run:
 
