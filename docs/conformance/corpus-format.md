@@ -115,6 +115,42 @@ exact corpus bytes; that match alone does not establish runtime evaluation. A re
 claims receipt generation uses `artifact_mode: generated-receipts` and puts its
 own locally readable receipt files under `results[].generated_artifacts`.
 
+## Validation Focus Boundary
+
+Case-level `validation_focus[]` entries are descriptive review prompts. A
+listed focus does not become machine-verified merely because it appears in that
+array. A property is machine-checked only to the extent that the case represents
+it through an `expected` value or a profile-specific check and the selected
+command actually evaluates it. `run` and `compare` do not automatically prove
+the same implementation behavior.
+
+For example, `deny-digest-mismatch-before-policy` declares `evaluation order`
+as a review focus. In the reference path, `run` independently checks that the
+committed `base_artifact` has the configured failing digest relation and that
+the committed admission receipt matches the expected terminal outcome,
+execution gate, ordered reason codes, and named checks. It does not prove that
+a runtime verifier produced that receipt because of the mismatch.
+
+For an external result, `compare` does not execute this case's
+`integrity_checks`. In `corpus-fixture-validation` mode it compares the
+submitted result's `deny` outcome, `should_execute: false`, ordered
+`DIGEST_MISMATCH` / `FAIL_CLOSED` reason codes, required named-check statuses,
+and digest-bound reference to the fixed corpus admission receipt. In
+`generated-receipts` mode it also reads the generated receipt and checks its
+raw digest and bounded semantic projection. Neither mode observes the SUT's
+internal gate order. The case's security expectation is that a failed integrity
+binding cannot be overridden by local policy or attenuation to produce an
+executable admission.
+
+The current case does not carry or evaluate a gate trace proving that the
+integrity check ran before every local policy computation. An implementation
+may therefore match the submitted terminal result while using a different
+internal gate order. Such a result must not be cited as proof of strict
+pre-policy evaluation order. A reviewer may report that ordering difference as
+`partial` or as an implementation limitation. A future profile that requires
+strict ordering evidence should add an explicit machine-readable trace or
+check rather than infer it from `validation_focus` or reason-code order.
+
 ## Implementation Flow
 
 A non-reference implementation can run the corpus without importing Python code:

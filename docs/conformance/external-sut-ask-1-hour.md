@@ -55,6 +55,17 @@ paths are understandable without treating the Python reference runner as the
 primary specification. A reviewer may choose different cases if another boundary
 looks more important.
 
+For `deny-digest-mismatch-before-policy`, distinguish the terminal admission
+guarantee from internal evaluation order. The current v0.3 expectation is that
+a digest failure cannot be overridden by policy or attenuation to permit
+execution. `compare` matches the submitted result and required artifact
+bindings; it does not rerun the SUT's digest check or observe its gate sequence.
+A matching result therefore does not prove that no policy computation occurred
+before the failure was detected. If an implementation runs policy first but a
+later integrity denial remains non-overridable and occurs before the upstream
+call, report both the matching terminal result and the ordering limitation;
+`partial` is an acceptable review classification.
+
 ## Scope
 
 - Target corpus: `conformance/al2-vate-v0.3`
