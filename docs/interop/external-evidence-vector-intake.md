@@ -9,6 +9,10 @@ External vectors can help reviewers test whether adjacent evidence artifacts are
 byte-stable and practical for SUT authors. They do not, by themselves, change
 the VATE claim boundary.
 
+Recording an external vector's native `canon_pin`, `canon_version`, or digest
+basis describes the reviewed source artifact. That metadata alone does not make
+the external canonicalisation discipline a VATE digest profile or dependency.
+
 Pinned review slices are recorded in
 `docs/interop/external-evidence-vector-pins.md`.
 

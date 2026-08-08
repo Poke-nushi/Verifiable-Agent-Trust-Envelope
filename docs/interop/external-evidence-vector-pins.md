@@ -10,6 +10,11 @@ conformance corpus, do not imply VATE certification, do not create a dependency
 on the external project, and do not substitute adjacent protocol identifiers for
 VATE digest descriptors.
 
+Any `canon_pin`, `canon_version`, or other native canonicalisation identifier
+recorded below is source metadata for referenced or candidate external material.
+It is not a VATE canonicalisation profile, does not alter the VATE digest basis,
+and does not by itself make that canonicalisation discipline a VATE dependency.
+
 ## AlgoVoi JCS Conformance Vectors - First Slice
 
 Source repository:
