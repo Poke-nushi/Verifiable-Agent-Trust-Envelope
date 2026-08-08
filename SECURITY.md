@@ -31,14 +31,11 @@ Do not treat the demo as a drop-in security component.
 
 ## Reporting
 
-This repository does not yet publish a dedicated security email address.
-
 For non-sensitive issues, open a normal GitHub issue.
 For anything that would expose real secrets, credentials, production exploit details, or a live attack path:
 
 - do not post the raw material publicly
-- prefer GitHub private vulnerability reporting if it is enabled for the repository
-- maintainers should enable GitHub private vulnerability reporting for the public repository as early as possible
-- otherwise contact the repository owner privately before disclosure
+- use [GitHub private vulnerability reporting](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/security/advisories/new), which is enabled for this repository; or
+- email `vate@rognalia.com`
 
-Until a dedicated channel exists, treat private coordination as preferred for anything that would materially help an attacker.
+The canonical RFC 9116 security contact URL is <https://vate.rognalia.com/.well-known/security.txt>.
