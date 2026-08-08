@@ -2,6 +2,8 @@
 
 **Verifier admission receipts for risky external digital actions**
 
+**Official website:** [vate.rognalia.com](https://vate.rognalia.com/)
+
 VATE is a verifier-side profile for deciding and recording whether an AI agent
 may perform a risky external digital action.
 
