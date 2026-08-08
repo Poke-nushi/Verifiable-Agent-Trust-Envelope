@@ -14,6 +14,20 @@ Each record identifies the external artifact location, the reviewed revision or
 digest, the corpus snapshot, the local comparison result, and the boundary under
 which the result was used.
 
+## Snapshot Applicability
+
+The two AlgoVoi records below were evaluated against corpus digest
+`835864092b7afde1c751c4e2cad40aa8265b4ebb95234873c9b8d20f664cb2f6`,
+the digest recorded by the archived `v0.3.2` release. They remain review
+evidence for that exact pinned snapshot.
+
+A later `main` snapshot recorded corpus digest
+`0eb1969ea3763e0fec123de5ea0dacb225eb48a28d76866bbec56dc61d16cf8f`.
+The AlgoVoi records do not validate that later snapshot or any future corpus
+bytes. Reviewers should resolve the current digest from
+`conformance/al2-vate-v0.3/corpus.json`; a submission for a different digest
+requires its own comparison record.
+
 ## AlgoVoi Three-Case External Adapter Run
 
 Source discussion:
