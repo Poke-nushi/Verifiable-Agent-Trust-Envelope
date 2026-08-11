@@ -1,9 +1,11 @@
 cff-version: 1.2.0
 title: "Verifiable Agent Trust Envelope"
-message: "This citation metadata describes the archived v0.3.2 discussion-draft pre-release snapshot. For unarchived main-branch changes after v0.3.2, cite the repository URL and exact commit SHA in addition to the latest applicable archived version DOI."
+message: "This citation metadata describes the archived v0.3.2 discussion-draft pre-release snapshot. Takao Sato is the author; Poke-nushi is the same author's public maintainer alias and also appears in archived artifacts and historical repository records. For unarchived main-branch changes after v0.3.2, cite the repository URL and exact commit SHA in addition to the latest applicable archived version DOI."
 type: software
 authors:
-  - family-names: "Poke-nushi"
+  - given-names: "Takao"
+    family-names: "Sato"
+    alias: "Poke-nushi"
 repository-code: "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope"
 url: "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope"
 license: Apache-2.0

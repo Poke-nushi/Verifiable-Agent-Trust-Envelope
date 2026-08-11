@@ -458,6 +458,9 @@ production approval and do not add production JOSE/JCS verification.
 
 ## Authoring Note
 
+The author and maintainer is **Takao Sato (Poke-nushi)**.
+`Poke-nushi` is the same author's public maintainer alias and also appears in
+archived artifacts and historical repository records.
 AI tools were used to assist drafting, review, and reference implementation work in this repository.
 The maintainer is responsible for the final structure, scope decisions, and published contents.
 
