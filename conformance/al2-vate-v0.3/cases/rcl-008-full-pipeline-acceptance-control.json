@@ -1,0 +1,158 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "rcl-008-full-pipeline-acceptance-control",
+  "title": "Accept the RCL-008 full-pipeline projection control",
+  "category": "linkage",
+  "purpose": "A derived VATE full-pipeline acceptance control should preserve the valid admission, matching action binding, and successful settled result so reject-everything behavior cannot pass this slice.",
+  "artifacts": {
+    "source_fixture": "conformance/al2-vate-v0.3/external/rcl/rcl-oracle-fixtures.v1.json",
+    "projection_map": "examples/interop/rcl-to-vate/rcl-005-006-008-projection-map.v1.json",
+    "request_basis": "examples/interop/rcl-to-vate/request-basis.derived-vate-projection.json",
+    "result_basis": "examples/interop/rcl-to-vate/result-basis-settled.derived-vate-projection.json",
+    "action": "examples/interop/rcl-to-vate/action-transfer.derived-vate-projection.json",
+    "action_params": "examples/interop/rcl-to-vate/action-params.derived-vate-projection.json",
+    "admission_request": "examples/interop/rcl-to-vate/vate-admission-request-rcl-005-006-008.derived-vate-projection.json",
+    "admission_receipt": "examples/interop/rcl-to-vate/vate-admission-receipt-rcl-006-008.derived-vate-projection.json",
+    "post_execution_receipt": "examples/interop/rcl-to-vate/vate-post-execution-receipt-rcl-008.derived-vate-projection.json"
+  },
+  "artifact_reference_checks": [
+    {
+      "artifact": "projection_map",
+      "expect_match": true,
+      "reference_paths": [
+        {
+          "artifact": "admission_request",
+          "path": "evidence_refs[0].digest"
+        },
+        {
+          "artifact": "admission_receipt",
+          "path": "evidence[0].digest"
+        }
+      ]
+    },
+    {
+      "artifact": "action",
+      "expect_match": true,
+      "reference_paths": [
+        {
+          "artifact": "admission_receipt",
+          "path": "request.action_binding.digest"
+        },
+        {
+          "artifact": "post_execution_receipt",
+          "path": "execution.action_binding.digest"
+        }
+      ]
+    },
+    {
+      "artifact": "action_params",
+      "expect_match": true,
+      "reference_paths": [
+        {
+          "artifact": "admission_receipt",
+          "path": "request.mapping_only.source_authorization.params_digest"
+        }
+      ]
+    },
+    {
+      "artifact": "admission_receipt",
+      "expect_match": true,
+      "reference_paths": [
+        {
+          "artifact": "post_execution_receipt",
+          "path": "admission.digest"
+        }
+      ]
+    }
+  ],
+  "linkage_checks": [
+    {
+      "kind": "admission_digest",
+      "artifact": "admission_receipt",
+      "post_execution_path": "admission.digest",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_ADMISSION_DIGEST_MISMATCH"
+    },
+    {
+      "kind": "admission_receipt_id",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_LINKAGE_MISMATCH"
+    },
+    {
+      "kind": "admission_decision",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_LINKAGE_MISMATCH"
+    },
+    {
+      "kind": "transaction_id",
+      "admission_path": "request.transaction_id",
+      "post_execution_path": "execution.transaction_id",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_TRANSACTION_MISMATCH"
+    },
+    {
+      "kind": "runtime",
+      "admission_path": "subject.runtime",
+      "post_execution_path": "execution.runtime",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_RUNTIME_MISMATCH"
+    },
+    {
+      "kind": "effective_request_hash",
+      "admission_path": "request.input_hash",
+      "post_execution_path": "execution.effective_request_hash",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH"
+    },
+    {
+      "kind": "path_match",
+      "admission_path": "request.action_binding.digest",
+      "post_execution_path": "execution.action_binding.digest",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_LINKAGE_MISMATCH"
+    },
+    {
+      "kind": "admission_time_window",
+      "expect_valid": true,
+      "reason_code": "POST_EXEC_ADMISSION_EXPIRED"
+    }
+  ],
+  "expected": {
+    "admission_decision": "allow",
+    "post_execution_outcome": "success",
+    "should_execute": true,
+    "reason_codes": [
+      "ADMISSION_RECEIPT_LINKED",
+      "EFFECTIVE_REQUEST_HASH_MATCH",
+      "NO_POLICY_VIOLATIONS"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "pass"
+      },
+      {
+        "name": "post_execution.execution.action_binding.digest",
+        "expected": "present"
+      },
+      {
+        "name": "post_execution.result.outcome",
+        "expected": "present"
+      },
+      {
+        "name": "result.policy_violations",
+        "expected": "pass"
+      }
+    ]
+  },
+  "validation_focus": [
+    "derived VATE projection boundary",
+    "source full-file byte integrity",
+    "full-pipeline positive control",
+    "matching action-binding path",
+    "settled result preserved as success",
+    "reject-everything resistance",
+    "VATE request hashes remain separate from source action digests"
+  ]
+}

@@ -2447,6 +2447,566 @@ def check_p2_public_artifact_boundary() -> None:
         raise RuntimeError("A2A signed Agent Card trust bundle public_key_ref kid must match the trust anchor kid")
 
 
+def check_rcl_projection_package() -> None:
+    source_fixture_path = (
+        ROOT
+        / "conformance"
+        / "al2-vate-v0.3"
+        / "external"
+        / "rcl"
+        / "rcl-oracle-fixtures.v1.json"
+    )
+    projection_root = ROOT / "examples" / "interop" / "rcl-to-vate"
+    projection_map_path = projection_root / "rcl-005-006-008-projection-map.v1.json"
+    projection_doc_path = ROOT / "docs" / "interop" / "rcl-receipt-claim-projection.md"
+    case_root = ROOT / "conformance" / "al2-vate-v0.3" / "cases"
+    expected_source_sha256 = "4164151383605d9d68230d81cc9ae1dd31eb5cfb3fb1348289abf71ee64773ea"
+    source_fixture_commit = "825986680dc53fa776038db814b8d1da1dfcba9c"
+    source_harness_commit = "d6b7184e0d205672463f7f3284571e9e6a3e797d"
+    source_fixture_rel = "conformance/al2-vate-v0.3/external/rcl/rcl-oracle-fixtures.v1.json"
+    case_files = {
+        "RCL-005": case_root / "rcl-005-authorization-params-mismatch.json",
+        "RCL-006": case_root / "rcl-006-occurrence-action-linkage-mismatch.json",
+        "RCL-008": case_root / "rcl-008-full-pipeline-acceptance-control.json",
+    }
+
+    if hashlib.sha256(source_fixture_path.read_bytes()).hexdigest() != expected_source_sha256:
+        raise RuntimeError("RCL source fixture full-file SHA-256 drifted from the pinned source bytes")
+    source_fixture = json.loads(source_fixture_path.read_text(encoding="utf-8"))
+    fixtures = source_fixture.get("fixtures")
+    if not isinstance(fixtures, list):
+        raise RuntimeError("RCL source fixture must expose a fixtures array")
+    fixtures_by_id = {
+        fixture.get("id"): fixture
+        for fixture in fixtures
+        if isinstance(fixture, dict) and isinstance(fixture.get("id"), str)
+    }
+    expected_pointers = {"RCL-005": 4, "RCL-006": 5, "RCL-008": 7}
+    for source_case_id, index in expected_pointers.items():
+        if index >= len(fixtures) or fixtures[index].get("id") != source_case_id:
+            raise RuntimeError(f"{source_case_id} source pointer /fixtures/{index} drifted")
+
+    rcl_005 = fixtures_by_id["RCL-005"]
+    rcl_006 = fixtures_by_id["RCL-006"]
+    rcl_008 = fixtures_by_id["RCL-008"]
+    if rcl_005.get("expected") != {
+        "verdict": "reject",
+        "claim_family": "authorization",
+        "reason": "authorization: params do not match the action",
+    }:
+        raise RuntimeError("RCL-005 source expectation drifted")
+    if rcl_006.get("expected") != {
+        "verdict": "reject",
+        "claim_family": "occurrence",
+        "reason": "occurrence: acknowledgment bound to another action",
+    }:
+        raise RuntimeError("RCL-006 source expectation drifted")
+    if rcl_008.get("expected") != {
+        "verdict": "accept",
+        "claim_family": None,
+        "reason": "all four properties independently supported",
+    }:
+        raise RuntimeError("RCL-008 source acceptance-control expectation drifted")
+
+    rcl_005_receipt = json.loads(json.dumps(rcl_005["receipt"]))
+    rcl_008_receipt = json.loads(json.dumps(rcl_008["receipt"]))
+    rcl_005_params_digest = rcl_005_receipt["claims"]["authorization"]["params_digest"]
+    rcl_008_params_digest = rcl_008_receipt["claims"]["authorization"]["params_digest"]
+    if rcl_005_params_digest == rcl_008_params_digest:
+        raise RuntimeError("RCL-005 must change the authorization params digest relative to RCL-008")
+    for receipt in (rcl_005_receipt, rcl_008_receipt):
+        receipt["claims"]["authorization"].pop("sig", None)
+        receipt.pop("envelope_sig", None)
+    rcl_005_receipt["claims"]["authorization"]["params_digest"] = rcl_008_params_digest
+    if rcl_005_receipt != rcl_008_receipt:
+        raise RuntimeError("RCL-005 changed source semantics beyond params_digest and dependent signatures")
+
+    rcl_006_receipt = json.loads(json.dumps(rcl_006["receipt"]))
+    rcl_008_receipt = json.loads(json.dumps(rcl_008["receipt"]))
+    rcl_006_occurrence_digest = rcl_006_receipt["claims"]["occurrence"]["action_digest"]
+    rcl_008_occurrence_digest = rcl_008_receipt["claims"]["occurrence"]["action_digest"]
+    if rcl_006_occurrence_digest == rcl_008_occurrence_digest:
+        raise RuntimeError("RCL-006 must change the occurrence action digest relative to RCL-008")
+    for receipt in (rcl_006_receipt, rcl_008_receipt):
+        receipt["claims"]["occurrence"].pop("sig", None)
+        receipt.pop("envelope_sig", None)
+    rcl_006_receipt["claims"]["occurrence"]["action_digest"] = rcl_008_occurrence_digest
+    if rcl_006_receipt != rcl_008_receipt:
+        raise RuntimeError("RCL-006 changed source semantics beyond occurrence.action_digest and dependent signatures")
+
+    projection_map = json.loads(projection_map_path.read_text(encoding="utf-8"))
+    expected_source_metadata = {
+        "repository": "https://github.com/msaleme/red-team-blue-team-agent-fabric",
+        "license": "Apache-2.0",
+    }
+    for field, expected in expected_source_metadata.items():
+        if projection_map.get("source", {}).get(field) != expected:
+            raise RuntimeError(f"RCL projection source {field} drifted")
+    fixture_metadata = projection_map.get("source", {}).get("fixture", {})
+    harness_metadata = projection_map.get("source", {}).get("harness", {})
+    if fixture_metadata.get("commit") != source_fixture_commit:
+        raise RuntimeError("RCL projection fixture commit drifted")
+    if fixture_metadata.get("path") != "fixtures/rcl/rcl-oracle-fixtures.v1.json":
+        raise RuntimeError("RCL projection fixture source path drifted")
+    if fixture_metadata.get("raw_sha256") != expected_source_sha256:
+        raise RuntimeError("RCL projection provenance lost the full-file source digest")
+    if fixture_metadata.get("vendored_path") != source_fixture_rel:
+        raise RuntimeError("RCL projection provenance lost the vendored source path")
+    if fixture_metadata.get("carriage") != "verbatim-full-file-bytes":
+        raise RuntimeError("RCL source fixture must remain labelled as verbatim full-file bytes")
+    if harness_metadata != {
+        "commit": source_harness_commit,
+        "path": "protocol_tests/receipt_claim_harness.py",
+    }:
+        raise RuntimeError("RCL source harness provenance drifted")
+    if projection_map.get("source", {}).get("case_pointers") != {
+        "RCL-005": "/fixtures/4",
+        "RCL-006": "/fixtures/5",
+        "RCL-008": "/fixtures/7",
+    }:
+        raise RuntimeError("RCL source case pointers drifted")
+
+    expected_projection_paths = {
+        "examples/interop/rcl-to-vate/action-transfer.derived-vate-projection.json",
+        "examples/interop/rcl-to-vate/action-params.derived-vate-projection.json",
+        "examples/interop/rcl-to-vate/action-other.derived-vate-projection.json",
+        "examples/interop/rcl-to-vate/request-basis.derived-vate-projection.json",
+        "examples/interop/rcl-to-vate/result-basis-settled.derived-vate-projection.json",
+        "examples/interop/rcl-to-vate/vate-admission-request-rcl-005-006-008.derived-vate-projection.json",
+        "examples/interop/rcl-to-vate/vate-admission-receipt-rcl-005.derived-vate-projection.json",
+        "examples/interop/rcl-to-vate/vate-admission-receipt-rcl-006-008.derived-vate-projection.json",
+        "examples/interop/rcl-to-vate/vate-post-execution-receipt-rcl-006.derived-vate-projection.json",
+        "examples/interop/rcl-to-vate/vate-post-execution-receipt-rcl-008.derived-vate-projection.json",
+    }
+    projection_entries = projection_map.get("projection_artifacts")
+    if not isinstance(projection_entries, list):
+        raise RuntimeError("RCL projection map must list projection_artifacts")
+    actual_projection_paths = {
+        entry.get("path")
+        for entry in projection_entries
+        if isinstance(entry, dict) and isinstance(entry.get("path"), str)
+    }
+    if actual_projection_paths != expected_projection_paths:
+        raise RuntimeError("RCL derived projection artifact inventory drifted")
+    for entry in projection_entries:
+        path = entry.get("path")
+        if entry.get("classification") != "derived-vate-projection":
+            raise RuntimeError(f"{path}: must remain labelled as a derived VATE projection")
+        if not isinstance(path, str) or not path.endswith(".derived-vate-projection.json"):
+            raise RuntimeError(f"{path}: derived projection filename is not explicit")
+        if not (ROOT / path).is_file():
+            raise RuntimeError(f"{path}: derived projection artifact is missing")
+        if not entry.get("source_case_pointers") or not entry.get("selected_preimage") or not entry.get("digest_basis"):
+            raise RuntimeError(f"{path}: projection provenance is incomplete")
+
+    action = json.loads((projection_root / "action-transfer.derived-vate-projection.json").read_text())
+    action_params = json.loads((projection_root / "action-params.derived-vate-projection.json").read_text())
+    other_action = json.loads((projection_root / "action-other.derived-vate-projection.json").read_text())
+    request_basis = json.loads((projection_root / "request-basis.derived-vate-projection.json").read_text())
+    result_basis = json.loads((projection_root / "result-basis-settled.derived-vate-projection.json").read_text())
+    admission_request = json.loads(
+        (projection_root / "vate-admission-request-rcl-005-006-008.derived-vate-projection.json").read_text()
+    )
+    deny_admission = json.loads(
+        (projection_root / "vate-admission-receipt-rcl-005.derived-vate-projection.json").read_text()
+    )
+    allow_admission = json.loads(
+        (projection_root / "vate-admission-receipt-rcl-006-008.derived-vate-projection.json").read_text()
+    )
+    mismatch_post = json.loads(
+        (projection_root / "vate-post-execution-receipt-rcl-006.derived-vate-projection.json").read_text()
+    )
+    control_post = json.loads(
+        (projection_root / "vate-post-execution-receipt-rcl-008.derived-vate-projection.json").read_text()
+    )
+
+    def contains_object_key(value: object, forbidden_key: str) -> bool:
+        if isinstance(value, dict):
+            return forbidden_key in value or any(
+                contains_object_key(child, forbidden_key) for child in value.values()
+            )
+        if isinstance(value, list):
+            return any(contains_object_key(child, forbidden_key) for child in value)
+        return False
+
+    projection_values = {
+        "projection_map": projection_map,
+        "action": action,
+        "action_params": action_params,
+        "other_action": other_action,
+        "request_basis": request_basis,
+        "result_basis": result_basis,
+        "admission_request": admission_request,
+        "deny_admission": deny_admission,
+        "allow_admission": allow_admission,
+        "mismatch_post": mismatch_post,
+        "control_post": control_post,
+    }
+    for label, value in projection_values.items():
+        for forbidden_key in ("pairing", "recomputation_boundary"):
+            if contains_object_key(value, forbidden_key):
+                raise RuntimeError(f"RCL {label} must not contain {forbidden_key}")
+
+    def descriptor(value: object) -> dict[str, str]:
+        return {
+            "alg": "sha-256",
+            "value": hashlib.sha256(canonical_json_bytes(value)).hexdigest(),
+        }
+
+    action_descriptor = descriptor(action)
+    params_descriptor = descriptor(action_params)
+    other_action_descriptor = descriptor(other_action)
+    map_descriptor = descriptor(projection_map)
+    if action != fixtures_by_id["RCL-008"]["receipt"]["action"]:
+        raise RuntimeError("RCL selected action projection drifted from the source value")
+    if action_params != action.get("params"):
+        raise RuntimeError("RCL selected action-params projection drifted")
+    if action_descriptor["value"] != fixtures_by_id["RCL-008"]["receipt"]["action_digest"]:
+        raise RuntimeError("RCL selected action preimage no longer reproduces the source action digest")
+    if params_descriptor["value"] != rcl_008_params_digest:
+        raise RuntimeError("RCL selected params preimage no longer reproduces the control authorization digest")
+    if other_action_descriptor["value"] != fixtures_by_id["RCL-006"]["receipt"]["claims"]["occurrence"]["action_digest"]:
+        raise RuntimeError("RCL other-action preimage no longer reproduces the occurrence digest")
+
+    request_hash = "sha-256:" + hashlib.sha256(canonical_json_bytes(request_basis)).hexdigest()
+    result_hash = "sha-256:" + hashlib.sha256(canonical_json_bytes(result_basis)).hexdigest()
+    if admission_request.get("input_hash") != request_hash:
+        raise RuntimeError("RCL derived admission request input_hash lost its VATE request-basis preimage")
+    for receipt in (deny_admission, allow_admission):
+        if receipt.get("request", {}).get("input_hash") != request_hash:
+            raise RuntimeError("RCL admission receipt input_hash lost its VATE request-basis preimage")
+    for receipt in (mismatch_post, control_post):
+        if receipt.get("execution", {}).get("effective_request_hash") != request_hash:
+            raise RuntimeError("RCL post-execution effective_request_hash lost its VATE request-basis preimage")
+        if receipt.get("result", {}).get("output_hash") != result_hash:
+            raise RuntimeError("RCL post-execution output_hash lost its derived settled-result preimage")
+    source_digest_values = {
+        rcl_005_params_digest,
+        rcl_008_params_digest,
+        fixtures_by_id["RCL-008"]["receipt"]["action_digest"],
+        fixtures_by_id["RCL-006"]["receipt"]["claims"]["occurrence"]["action_digest"],
+        fixtures_by_id["RCL-008"]["receipt"]["claims"]["occurrence"]["outcome_digest"],
+    }
+    if request_hash in {"sha-256:" + value for value in source_digest_values}:
+        raise RuntimeError("RCL source digest was projected into a VATE request hash field")
+    if result_hash in {"sha-256:" + value for value in source_digest_values}:
+        raise RuntimeError("RCL source digest was projected into the VATE output_hash field")
+
+    for artifact in (admission_request, deny_admission, allow_admission):
+        evidence = artifact.get("evidence_refs", artifact.get("evidence", []))
+        if not evidence or evidence[0].get("digest") != map_descriptor:
+            raise RuntimeError("RCL projection artifact is not bound to the projection map")
+    if deny_admission["request"]["action_binding"]["digest"] != action_descriptor:
+        raise RuntimeError("RCL-005 overloaded the admitted action binding with the authorization digest")
+    if deny_admission["request"]["mapping_only"]["source_authorization"]["params_digest"] != {
+        "alg": "sha-256",
+        "value": rcl_005_params_digest,
+    }:
+        raise RuntimeError("RCL-005 mapping-only authorization descriptor drifted")
+    if allow_admission["request"]["action_binding"]["digest"] != action_descriptor:
+        raise RuntimeError("RCL-006/RCL-008 admitted action binding drifted")
+    if allow_admission["request"]["mapping_only"]["source_authorization"]["params_digest"] != params_descriptor:
+        raise RuntimeError("RCL-006/RCL-008 authorization control descriptor drifted")
+    if mismatch_post["execution"]["action_binding"]["digest"] != other_action_descriptor:
+        raise RuntimeError("RCL-006 occurrence binding no longer carries the other-action digest")
+    if control_post["execution"]["action_binding"]["digest"] != action_descriptor:
+        raise RuntimeError("RCL-008 occurrence binding no longer matches the admitted action")
+    if mismatch_post.get("result", {}).get("outcome") != "success":
+        raise RuntimeError("RCL-006 must preserve the settled occurrence as a successful result")
+
+    cases = {
+        source_case_id: json.loads(path.read_text(encoding="utf-8"))
+        for source_case_id, path in case_files.items()
+    }
+    expected_case_results = {
+        "RCL-005": {
+            "admission_decision": "deny",
+            "should_execute": False,
+            "reason_codes": ["ACTION_NOT_PERMITTED", "FAIL_CLOSED"],
+        },
+        "RCL-006": {
+            "admission_decision": "allow",
+            "post_execution_outcome": "success",
+            "should_execute": True,
+            "reason_codes": ["POST_EXEC_LINKAGE_MISMATCH"],
+        },
+        "RCL-008": {
+            "admission_decision": "allow",
+            "post_execution_outcome": "success",
+            "should_execute": True,
+            "reason_codes": [
+                "ADMISSION_RECEIPT_LINKED",
+                "EFFECTIVE_REQUEST_HASH_MATCH",
+                "NO_POLICY_VIOLATIONS",
+            ],
+        },
+    }
+    for source_case_id, case in cases.items():
+        for forbidden_key in ("pairing", "recomputation_boundary"):
+            if contains_object_key(case, forbidden_key):
+                raise RuntimeError(f"{source_case_id} projection must not contain {forbidden_key}")
+        if case.get("artifacts", {}).get("source_fixture") != source_fixture_rel:
+            raise RuntimeError(f"{source_case_id} projection lost the complete pinned source fixture")
+        if case.get("expected") != {
+            **expected_case_results[source_case_id],
+            "checks": case.get("expected", {}).get("checks", []),
+        }:
+            raise RuntimeError(f"{source_case_id} expected outcome or reason ordering drifted")
+        if case.get("jose_checks") or case.get("trust_checks"):
+            raise RuntimeError(f"{source_case_id} must keep source-profile validation outside the VATE projection")
+    if "post_execution_receipt" in cases["RCL-005"].get("artifacts", {}):
+        raise RuntimeError("RCL-005 projection must stop at admission")
+
+    def has_artifact_check(
+        case: dict,
+        *,
+        artifact: str,
+        expect_match: bool,
+        reference_artifact: str,
+        path: str,
+    ) -> bool:
+        return any(
+            check.get("artifact") == artifact
+            and check.get("expect_match") is expect_match
+            and {"artifact": reference_artifact, "path": path} in check.get("reference_paths", [])
+            for check in case.get("artifact_reference_checks", [])
+            if isinstance(check, dict)
+        )
+
+    if not has_artifact_check(
+        cases["RCL-005"],
+        artifact="action_params",
+        expect_match=False,
+        reference_artifact="admission_receipt",
+        path="request.mapping_only.source_authorization.params_digest",
+    ):
+        raise RuntimeError("RCL-005 lost its expected authorization params mismatch recomputation")
+    if not has_artifact_check(
+        cases["RCL-005"],
+        artifact="action",
+        expect_match=True,
+        reference_artifact="admission_receipt",
+        path="request.action_binding.digest",
+    ):
+        raise RuntimeError("RCL-005 lost its correct admitted action binding")
+    for artifact, expect_match, reference_artifact, path in (
+        ("action", True, "admission_receipt", "request.action_binding.digest"),
+        ("action", False, "post_execution_receipt", "execution.action_binding.digest"),
+        ("other_action", False, "admission_receipt", "request.action_binding.digest"),
+        ("other_action", True, "post_execution_receipt", "execution.action_binding.digest"),
+    ):
+        if not has_artifact_check(
+            cases["RCL-006"],
+            artifact=artifact,
+            expect_match=expect_match,
+            reference_artifact=reference_artifact,
+            path=path,
+        ):
+            raise RuntimeError("RCL-006 lost its admitted/occurrence action recomputation matrix")
+    rcl_006_path_match = [
+        check
+        for check in cases["RCL-006"].get("linkage_checks", [])
+        if check.get("kind") == "path_match"
+    ]
+    if rcl_006_path_match != [
+        {
+            "kind": "path_match",
+            "admission_path": "request.action_binding.digest",
+            "post_execution_path": "execution.action_binding.digest",
+            "expect_match": False,
+            "reason_code": "POST_EXEC_LINKAGE_MISMATCH",
+        }
+    ]:
+        raise RuntimeError("RCL-006 path_match contract drifted")
+    rcl_008_path_match = [
+        check
+        for check in cases["RCL-008"].get("linkage_checks", [])
+        if check.get("kind") == "path_match"
+    ]
+    if len(rcl_008_path_match) != 1 or rcl_008_path_match[0].get("expect_match") is not True:
+        raise RuntimeError("RCL-008 must retain a matching full-pipeline action-binding control")
+
+    conformance = load_vate_conformance_module()
+    for source_case_id, path in case_files.items():
+        result = conformance.evaluate_case(path)
+        if result.get("pass") is not True:
+            raise RuntimeError(f"{source_case_id} committed VATE projection does not pass: {result.get('failures')}")
+
+    with tempfile.TemporaryDirectory(prefix="vate-rcl-projection-regression-") as tmp:
+        tmp_root = Path(tmp)
+
+        fixed_rcl_005_receipt = json.loads(json.dumps(deny_admission))
+        fixed_rcl_005_receipt["request"]["mapping_only"]["source_authorization"]["params_digest"] = params_descriptor
+        fixed_rcl_005_receipt_path = tmp_root / "rcl-005-fixed-receipt.json"
+        fixed_rcl_005_receipt_path.write_text(
+            json.dumps(fixed_rcl_005_receipt, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        fixed_rcl_005_case = json.loads(json.dumps(cases["RCL-005"]))
+        fixed_rcl_005_case["artifacts"]["admission_receipt"] = str(fixed_rcl_005_receipt_path)
+        fixed_rcl_005_case_path = tmp_root / "rcl-005-fixed-case.json"
+        fixed_rcl_005_case_path.write_text(json.dumps(fixed_rcl_005_case, indent=2) + "\n", encoding="utf-8")
+        fixed_rcl_005_result = conformance.evaluate_case(fixed_rcl_005_case_path)
+        expected_rcl_005_failure = (
+            "artifact_ref action_params/admission_receipt: "
+            "expected digest match=False actual match=True"
+        )
+        if (
+            fixed_rcl_005_result.get("pass") is True
+            or expected_rcl_005_failure not in fixed_rcl_005_result.get("failures", [])
+        ):
+            raise RuntimeError(
+                "RCL-005 params-mismatch repair did not fail for the intended recomputation condition: "
+                f"{fixed_rcl_005_result.get('failures')}"
+            )
+
+        fixed_rcl_006_post = json.loads(json.dumps(mismatch_post))
+        fixed_rcl_006_post["execution"]["action_binding"] = json.loads(
+            json.dumps(allow_admission["request"]["action_binding"])
+        )
+        fixed_rcl_006_post_path = tmp_root / "rcl-006-fixed-post.json"
+        fixed_rcl_006_post_path.write_text(json.dumps(fixed_rcl_006_post, indent=2) + "\n", encoding="utf-8")
+        fixed_rcl_006_case = json.loads(json.dumps(cases["RCL-006"]))
+        fixed_rcl_006_case["artifacts"]["post_execution_receipt"] = str(fixed_rcl_006_post_path)
+        fixed_rcl_006_case_path = tmp_root / "rcl-006-fixed-case.json"
+        fixed_rcl_006_case_path.write_text(json.dumps(fixed_rcl_006_case, indent=2) + "\n", encoding="utf-8")
+        fixed_rcl_006_result = conformance.evaluate_case(fixed_rcl_006_case_path)
+        expected_rcl_006_failures = {
+            "linkage[6] path_match: expected violation=True actual violation=False",
+            "artifact_ref action/post_execution_receipt: expected digest match=False actual match=True",
+            "artifact_ref other_action/post_execution_receipt: expected digest match=True actual match=False",
+        }
+        actual_rcl_006_failures = set(fixed_rcl_006_result.get("failures", []))
+        if (
+            fixed_rcl_006_result.get("pass") is True
+            or not expected_rcl_006_failures.issubset(actual_rcl_006_failures)
+        ):
+            raise RuntimeError(
+                "RCL-006 action-linkage repair did not fail for the intended linkage conditions: "
+                f"{fixed_rcl_006_result.get('failures')}"
+            )
+
+        reject_control_sut_results = json.loads(
+            (ROOT / "examples" / "conformance" / "sut-results-pass.example.json").read_text()
+        )
+        reject_control_results = [
+            result
+            for result in reject_control_sut_results.get("results", [])
+            if isinstance(result, dict)
+            and result.get("case_id") == "rcl-008-full-pipeline-acceptance-control"
+        ]
+        if len(reject_control_results) != 1:
+            raise RuntimeError("passing SUT example must contain exactly one RCL-008 result")
+        reject_control_result = reject_control_results[0]
+        reject_control_result["outcome"] = "deny"
+        reject_control_result["should_execute"] = False
+        reject_control_result["reason_codes"] = ["FAIL_CLOSED"]
+
+        sut_result_schema = json.loads((ROOT / "schemas" / "sut-result.schema.json").read_text())
+        reject_control_schema_errors = check(
+            sut_result_schema,
+            sut_result_schema,
+            reject_control_sut_results,
+        )
+        if reject_control_schema_errors:
+            raise RuntimeError(
+                "RCL-008 reject-everything SUT mutation must remain schema-valid: "
+                f"{reject_control_schema_errors}"
+            )
+
+        reject_control_sut_path = tmp_root / "rcl-008-reject-all-sut-results.json"
+        reject_control_sut_path.write_text(
+            json.dumps(reject_control_sut_results, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        reject_control_report = conformance.compare_sut_results(
+            ROOT / "conformance" / "al2-vate-v0.3",
+            reject_control_sut_path,
+        )
+        if reject_control_report.get("fatal_errors"):
+            raise RuntimeError(
+                "RCL-008 reject-everything SUT comparison produced fatal errors: "
+                f"{reject_control_report['fatal_errors']}"
+            )
+        if reject_control_report.get("summary") != {
+            "total": 75,
+            "passed": 74,
+            "failed": 1,
+            "skipped": 0,
+        }:
+            raise RuntimeError(
+                "RCL-008 reject-everything SUT comparison must report 74/75 passed: "
+                f"{reject_control_report.get('summary')}"
+            )
+        reject_control_failed_cases = [
+            case
+            for case in reject_control_report.get("cases", [])
+            if isinstance(case, dict) and case.get("pass") is not True
+        ]
+        expected_reject_control_failures = [
+            "should_execute: expected True actual False",
+            "outcome: expected success actual deny",
+            "reason_codes: expected ['ADMISSION_RECEIPT_LINKED', "
+            "'EFFECTIVE_REQUEST_HASH_MATCH', 'NO_POLICY_VIOLATIONS'] actual ['FAIL_CLOSED']",
+            "primary_reason_code: expected ADMISSION_RECEIPT_LINKED actual None",
+            "actual_reason_codes: FAIL_CLOSED must follow a primary denial reason",
+        ]
+        if len(reject_control_failed_cases) != 1:
+            raise RuntimeError(
+                "RCL-008 reject-everything SUT mutation must fail exactly one case: "
+                f"{reject_control_failed_cases}"
+            )
+        reject_control_failure = reject_control_failed_cases[0]
+        if (
+            reject_control_failure.get("case_id") != "rcl-008-full-pipeline-acceptance-control"
+            or reject_control_failure.get("actual_outcome") != "deny"
+            or reject_control_failure.get("actual_should_execute") is not False
+            or reject_control_failure.get("actual_reason_codes") != ["FAIL_CLOSED"]
+            or reject_control_failure.get("failures") != expected_reject_control_failures
+        ):
+            raise RuntimeError(
+                "RCL-008 reject-everything SUT mutation must fail only the expected outcome, "
+                "execution-gate, and reason comparisons: "
+                f"{reject_control_failure}"
+            )
+
+    corpus = json.loads((ROOT / "conformance" / "al2-vate-v0.3" / "corpus.json").read_text(encoding="utf-8"))
+    if corpus.get("summary", {}).get("case_count") != 75:
+        raise RuntimeError("canonical VATE corpus must contain 75 cases after the RCL projection slice")
+    corpus_case_ids = {entry.get("case_id") for entry in corpus.get("cases", []) if isinstance(entry, dict)}
+    expected_case_ids = {case["case_id"] for case in cases.values()}
+    if not expected_case_ids.issubset(corpus_case_ids):
+        raise RuntimeError("canonical corpus index is missing an RCL projection case")
+    source_manifest_entry = next(
+        (entry for entry in corpus.get("manifest", []) if entry.get("path") == source_fixture_rel),
+        None,
+    )
+    if source_manifest_entry != {"path": source_fixture_rel, "sha256": expected_source_sha256}:
+        raise RuntimeError("canonical corpus manifest lost the exact RCL source fixture bytes")
+    sut_results = json.loads((ROOT / "examples" / "conformance" / "sut-results-pass.example.json").read_text())
+    sut_case_ids = {entry.get("case_id") for entry in sut_results.get("results", []) if isinstance(entry, dict)}
+    if not expected_case_ids.issubset(sut_case_ids):
+        raise RuntimeError("passing SUT example is missing an RCL projection case")
+
+    normalized_doc = " ".join(projection_doc_path.read_text(encoding="utf-8").split()).lower()
+    required_doc_phrases = [
+        source_fixture_commit,
+        source_harness_commit,
+        expected_source_sha256,
+        "apache-2.0",
+        "derived vate projection",
+        "source-profile validation",
+        "not an external sut run",
+        "not rfc 8785/jcs",
+        "issuecomment-5209176439",
+        "issuecomment-5281915833",
+        "issuecomment-5282295933",
+    ]
+    missing_doc_phrases = [phrase for phrase in required_doc_phrases if phrase not in normalized_doc]
+    if missing_doc_phrases:
+        raise RuntimeError(f"RCL projection documentation lost required boundaries: {missing_doc_phrases}")
+
+
 def main() -> int:
     validate_examples()
     check_evidence_vocabulary_registry()
@@ -2457,6 +3017,7 @@ def main() -> int:
     check_replay_boundary_coverage()
     check_p1_5_fixture_coverage()
     check_p2_public_artifact_boundary()
+    check_rcl_projection_package()
     check_vate_conformance_display_paths_are_portable()
     check_linkage_missing_artifacts_fail_closed()
     check_case_artifact_readers_fail_closed()
@@ -2619,7 +3180,7 @@ def main() -> int:
             ]
         )
         generated_report = json.loads(generated_compare_report.read_text(encoding="utf-8"))
-        if generated_report.get("summary") != {"total": 72, "passed": 72, "failed": 0, "skipped": 0}:
+        if generated_report.get("summary") != {"total": 75, "passed": 75, "failed": 0, "skipped": 0}:
             raise AssertionError("schema-valid independently identified generated receipts must pass compare")
         generated_cases = {
             case.get("case_id"): case
@@ -2631,7 +3192,7 @@ def main() -> int:
             if case_result.get("artifact_mode") != "generated-receipts" or case_result.get("pass") is not True:
                 raise AssertionError(f"{case_id}: generated-receipts comparison did not pass")
         expected_mode_counts = {
-            "corpus-fixture-validation": 70,
+            "corpus-fixture-validation": 73,
             "generated-receipts": 2,
         }
         if generated_report.get("sut_results", {}).get("artifact_mode_counts") != expected_mode_counts:

@@ -2,6 +2,21 @@
 
 This file records dated public changes to the discussion draft.
 
+## 2026-08-14
+
+- Added the source-pinned RCL-005, RCL-006, and RCL-008 carry-plus-projection
+  slice to the canonical AL2 v0.3 corpus.
+- Carried the complete Apache-2.0 source fixture with its exact raw SHA-256 and
+  recorded every smaller request, receipt, action, params, and preimage object
+  as a derived VATE projection.
+- Kept source-profile Ed25519 validation separate from VATE projection checks,
+  preserved RCL-005 as admission-only, preserved RCL-006's settled result as
+  successful while rejecting its action linkage, and retained RCL-008 as the
+  full-pipeline acceptance control.
+- Added repository regressions for source-byte and provenance drift, mapping
+  labels, reason order, accidental pairing, source-digest leakage into VATE
+  request hashes, and reject-everything behavior.
+
 ## 2026-07-13
 
 - Added a named request-to-admission-to-effect binding invariant that preserves

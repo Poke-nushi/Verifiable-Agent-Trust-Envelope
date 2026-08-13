@@ -36,13 +36,13 @@ python3 scripts/vate_conformance.py compare \
 ```
 
 The command exits non-zero because the template covers only three cases from the
-72-case corpus. The expected landing is:
+75-case corpus. The expected landing is:
 
 ```text
-3 passed / 69 failed / 0 skipped / 72 total
+3 passed / 72 failed / 0 skipped / 75 total
 ```
 
-The 69 failures should be `sut result missing`.
+The 72 failures should be `sut result missing`.
 
 ## Verify The Local Bundle
 

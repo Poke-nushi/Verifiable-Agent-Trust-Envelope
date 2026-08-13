@@ -1,0 +1,88 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "rcl-005-authorization-params-mismatch",
+  "title": "Deny the RCL-005 authorization-parameter mismatch projection",
+  "category": "negative",
+  "purpose": "A derived VATE admission projection should keep the requested action binding correct while denying when the source authorization params digest does not match the selected action-params preimage.",
+  "artifacts": {
+    "source_fixture": "conformance/al2-vate-v0.3/external/rcl/rcl-oracle-fixtures.v1.json",
+    "projection_map": "examples/interop/rcl-to-vate/rcl-005-006-008-projection-map.v1.json",
+    "request_basis": "examples/interop/rcl-to-vate/request-basis.derived-vate-projection.json",
+    "action": "examples/interop/rcl-to-vate/action-transfer.derived-vate-projection.json",
+    "action_params": "examples/interop/rcl-to-vate/action-params.derived-vate-projection.json",
+    "admission_request": "examples/interop/rcl-to-vate/vate-admission-request-rcl-005-006-008.derived-vate-projection.json",
+    "admission_receipt": "examples/interop/rcl-to-vate/vate-admission-receipt-rcl-005.derived-vate-projection.json"
+  },
+  "artifact_reference_checks": [
+    {
+      "artifact": "projection_map",
+      "expect_match": true,
+      "reference_paths": [
+        {
+          "artifact": "admission_request",
+          "path": "evidence_refs[0].digest"
+        },
+        {
+          "artifact": "admission_receipt",
+          "path": "evidence[0].digest"
+        }
+      ]
+    },
+    {
+      "artifact": "action",
+      "expect_match": true,
+      "reference_paths": [
+        {
+          "artifact": "admission_receipt",
+          "path": "request.action_binding.digest"
+        }
+      ]
+    },
+    {
+      "artifact": "action_params",
+      "expect_match": false,
+      "reference_paths": [
+        {
+          "artifact": "admission_receipt",
+          "path": "request.mapping_only.source_authorization.params_digest"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "ACTION_NOT_PERMITTED",
+      "FAIL_CLOSED"
+    ],
+    "checks": [
+      {
+        "name": "decision.outcome",
+        "expected": "fail"
+      },
+      {
+        "name": "evidence.verification.result",
+        "expected": "pass"
+      },
+      {
+        "name": "request.action_binding.digest",
+        "expected": "present"
+      },
+      {
+        "name": "request.mapping_only.source_authorization.params_digest",
+        "expected": "present"
+      }
+    ]
+  },
+  "validation_focus": [
+    "derived VATE projection boundary",
+    "source full-file byte integrity",
+    "mapping-only authorization descriptor",
+    "action-params digest recomputation",
+    "correct admitted action binding",
+    "ordered fail-closed reasons",
+    "admission-only execution gate"
+  ]
+}

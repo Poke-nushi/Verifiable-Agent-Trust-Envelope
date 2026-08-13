@@ -1,0 +1,7 @@
+{
+  "tool": "transfer",
+  "params": {
+    "to": "acct-A",
+    "amount": 100
+  }
+}

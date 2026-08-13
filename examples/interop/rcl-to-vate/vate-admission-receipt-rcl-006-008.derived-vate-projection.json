@@ -1,0 +1,69 @@
+{
+  "version": "vate-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-rcl-006-008-projection-001",
+  "issued_at": "2026-08-14T00:00:05Z",
+  "expires_at": "2026-08-14T00:10:00Z",
+  "verifier": {
+    "id": "did:example:vate-rcl-projection-verifier"
+  },
+  "request": {
+    "request_id": "areq-rcl-projection-001",
+    "transaction_id": "txn-rcl-projection-001",
+    "action": "transfer",
+    "input_hash": "sha-256:321381dbb06b6f377b71ae4a4ed1824d5ac8adbee346ed9aedf15a040436fb50",
+    "action_binding": {
+      "type": "external_reference",
+      "canonicalization": "json-sorted-key-minified-utf8",
+      "uri": "examples/interop/rcl-to-vate/action-transfer.derived-vate-projection.json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "357499b8cc7e421263cfffa710d3e7186cb72eef6a0f257736899fd3626d1e7b"
+      }
+    },
+    "mapping_only": {
+      "classification": "case-local-source-claim-descriptor",
+      "source_authorization": {
+        "params_digest": {
+          "alg": "sha-256",
+          "value": "29b774d0a454b86f6375f55fd90c804e6ba03b2eaee1e88f07a19afa73c70174"
+        }
+      }
+    }
+  },
+  "subject": {
+    "principal": "did:example:rcl-projection-principal",
+    "actor": "did:example:rcl-projection-agent",
+    "runtime": "urn:vate:rcl-projection:runtime"
+  },
+  "evidence": [
+    {
+      "type": "local_policy",
+      "uri": "examples/interop/rcl-to-vate/rcl-005-006-008-projection-map.v1.json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "93a47ddb3723533cad414015cdd6e64cdd02bf4f6c165d7fc15e629ad334e7c0"
+      },
+      "verification": {
+        "result": "verified",
+        "checked_at": "2026-08-14T00:00:04Z",
+        "method": "vate-rcl-projection-map-integrity"
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "vate-rcl-source-projection-review",
+    "policy_version": "1",
+    "policy_ref": "docs/interop/rcl-receipt-claim-projection.md"
+  },
+  "decision": {
+    "outcome": "allow",
+    "reason_codes": [
+      "EVIDENCE_VERIFIED",
+      "POLICY_MATCH"
+    ],
+    "reason_visibility": "disclosed",
+    "human_readable_summary": "The derived VATE projection admits the selected action; source-profile claim validation remains a separate check."
+  }
+}

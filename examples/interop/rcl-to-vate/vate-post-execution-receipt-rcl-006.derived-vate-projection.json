@@ -1,0 +1,42 @@
+{
+  "version": "vate-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "receipt_type": "post_execution",
+  "receipt_id": "postrec-rcl-006-008-projection-001",
+  "issued_at": "2026-08-14T00:01:10Z",
+  "issuer": {
+    "id": "did:example:rcl-projection-agent",
+    "role": "runtime"
+  },
+  "admission": {
+    "receipt_id": "admrec-rcl-006-008-projection-001",
+    "uri": "examples/interop/rcl-to-vate/vate-admission-receipt-rcl-006-008.derived-vate-projection.json",
+    "digest": {
+      "alg": "sha-256",
+      "value": "63d6db547bf2055492f8a17872f7ddddd6e74a9b7f99c1e67cd386d6d6b49c34"
+    },
+    "decision": "allow"
+  },
+  "execution": {
+    "transaction_id": "txn-rcl-projection-001",
+    "started_at": "2026-08-14T00:01:00Z",
+    "finished_at": "2026-08-14T00:01:05Z",
+    "effective_request_hash": "sha-256:321381dbb06b6f377b71ae4a4ed1824d5ac8adbee346ed9aedf15a040436fb50",
+    "action_binding": {
+      "type": "external_reference",
+      "canonicalization": "json-sorted-key-minified-utf8",
+      "uri": "examples/interop/rcl-to-vate/action-other.derived-vate-projection.json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "369931621f322d545ad0ab97f873e20e5c8a0f43c0b49915d5c979b32e4a6d7f"
+      }
+    },
+    "runtime": "urn:vate:rcl-projection:runtime"
+  },
+  "result": {
+    "outcome": "success",
+    "output_hash": "sha-256:c90265c018130bd4226dbe678fc5ae4fe9b76d878a3a92a9e57391db417bcdc2",
+    "side_effects": [],
+    "policy_violations": []
+  }
+}

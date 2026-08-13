@@ -357,6 +357,9 @@ compatibility claim.
   Non-normative intake rules for external evidence vector slices
 - [docs/interop/external-evidence-vector-pins.md](docs/interop/external-evidence-vector-pins.md)
   Pinned non-normative external evidence vector slices for review
+- [docs/interop/rcl-receipt-claim-projection.md](docs/interop/rcl-receipt-claim-projection.md)
+  Source-pinned RCL-005/006/008 carry-plus-projection boundary and canonical
+  VATE case mapping
 - [docs/known-gaps.md](docs/known-gaps.md)
   Current unresolved design gaps
 - [reference/minimal-al2-demo/README.md](reference/minimal-al2-demo/README.md)

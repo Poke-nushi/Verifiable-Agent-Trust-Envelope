@@ -1,0 +1,13 @@
+{
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "projection_id": "rcl-005-006-008",
+  "operation": {
+    "action": "transfer",
+    "target": "urn:vate:rcl-projection:account-transfer"
+  },
+  "authority_context": {
+    "actor": "did:example:rcl-projection-agent",
+    "principal": "did:example:rcl-projection-principal",
+    "runtime": "urn:vate:rcl-projection:runtime"
+  }
+}
