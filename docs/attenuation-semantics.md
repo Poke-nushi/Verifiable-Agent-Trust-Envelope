@@ -160,6 +160,22 @@ authority. `attenuation.require_new_permit` is the execution gate used by the
 AL2 corpus. If an approval mode is intended to block execution until a fresh
 permit is presented, the emitted receipt must set `require_new_permit: true`.
 
+The current profile distinguishes two execution-gate outcomes.
+
+For `require_new_permit: false`, one admission receipt preserves the
+original/effective request relationship by recording both profile hashes, the
+machine-readable changes, and the effective constraints together. When
+execution proceeds, the v0.3 linkage checks bind the post-execution receipt to
+the specific admission receipt digest and the admitted effective request hash.
+
+For `require_new_permit: true`, the first admission receipt records the current
+narrowing decision, both request hashes, the changes, the effective constraints,
+and the closed execution gate. The v0.3 profile does not require or validate a
+typed predecessor/successor relationship from that receipt to a fresh permit,
+follow-on request, or later admission receipt, and no corpus fixture exercises
+such a chain. Deployment-specific correlation does not establish portable
+re-admission lineage under this profile.
+
 ## Conformance Expectations
 
 The runnable conformance corpus checks that an attenuated receipt includes:
