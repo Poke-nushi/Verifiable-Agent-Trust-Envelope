@@ -167,6 +167,11 @@ Remaining work includes:
 
 - deciding whether future profiles keep `require_new_permit` as an `attenuate`
   outcome with `should_execute: false`, or introduce a deny/defer-style outcome
+- standardizing and fixture-testing a typed predecessor/successor relationship
+  from a `require_new_permit: true` admission receipt to the fresh permit,
+  follow-on request, and later admission receipt; the existing generic
+  `supersedes` properties in status and standalone attenuation-effect schemas
+  do not define or validate that re-admission lineage
 - extending execution-gate checks beyond fixture-level admission receipts into
   adapter behavior and post-execution receipt validation
 - adding more fixtures where an admission decision exists but execution must not
