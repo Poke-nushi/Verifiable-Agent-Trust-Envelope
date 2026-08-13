@@ -1,0 +1,190 @@
+{
+  "record_version": "vate-rcl-projection-map-1",
+  "classification": "source-to-vate-projection-record",
+  "status": "Case-local review artifact; not a generic VATE schema field and not a source RCL artifact.",
+  "source": {
+    "repository": "https://github.com/msaleme/red-team-blue-team-agent-fabric",
+    "license": "Apache-2.0",
+    "fixture": {
+      "commit": "825986680dc53fa776038db814b8d1da1dfcba9c",
+      "path": "fixtures/rcl/rcl-oracle-fixtures.v1.json",
+      "raw_sha256": "4164151383605d9d68230d81cc9ae1dd31eb5cfb3fb1348289abf71ee64773ea",
+      "vendored_path": "conformance/al2-vate-v0.3/external/rcl/rcl-oracle-fixtures.v1.json",
+      "carriage": "verbatim-full-file-bytes"
+    },
+    "harness": {
+      "commit": "d6b7184e0d205672463f7f3284571e9e6a3e797d",
+      "path": "protocol_tests/receipt_claim_harness.py"
+    },
+    "case_pointers": {
+      "RCL-005": "/fixtures/4",
+      "RCL-006": "/fixtures/5",
+      "RCL-008": "/fixtures/7"
+    }
+  },
+  "digest_bases": {
+    "source_full_file": "SHA-256 over the complete pinned fixture file bytes.",
+    "source_selected_object": "SHA-256 over json.dumps(value, sort_keys=True, separators=(',', ':')).encode('utf-8'); this is not RFC 8785/JCS.",
+    "vate_fixture_object": "SHA-256 over JSON object keys sorted with insignificant whitespace removed and encoded as UTF-8; this is the current VATE v0.3 fixture basis, not RFC 8785/JCS.",
+    "vate_profile_hash": "sha-256:<lowercase hex> over the named derived VATE request or result basis object, using the VATE fixture-object basis."
+  },
+  "projection_boundaries": [
+    "Only the vendored full fixture file is carried as the literal byte-stable source artifact.",
+    "Every other file listed in projection_artifacts is a VATE-authored derived projection, even when its selected JSON value equals a source value.",
+    "The VATE runner does not verify the source Ed25519 profile or source authority-independence rules; source-profile validation stays separate.",
+    "The mapping-only source authorization descriptor is case-local data selected by artifact_reference_checks. It is not a generic VATE authorization field and cannot grant authority.",
+    "The VATE input_hash and effective_request_hash use request-basis.derived-vate-projection.json, not a source RCL action digest.",
+    "The VATE output_hash uses result-basis-settled.derived-vate-projection.json, not the source occurrence outcome_digest.",
+    "No projection result is an external VATE SUT run, semantic-equivalence result, compatibility claim, adoption signal, endorsement, certification, or production approval."
+  ],
+  "mapping_record": {
+    "path": "examples/interop/rcl-to-vate/rcl-005-006-008-projection-map.v1.json",
+    "classification": "source-to-vate-projection-record",
+    "digest_basis": "vate_fixture_object"
+  },
+  "projection_artifacts": [
+    {
+      "path": "examples/interop/rcl-to-vate/action-transfer.derived-vate-projection.json",
+      "classification": "derived-vate-projection",
+      "role": "selected-action-preimage",
+      "source_case_pointers": ["/fixtures/4", "/fixtures/5", "/fixtures/7"],
+      "selected_preimage": "receipt.action",
+      "digest_basis": "source_selected_object"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/action-params.derived-vate-projection.json",
+      "classification": "derived-vate-projection",
+      "role": "selected-action-params-preimage",
+      "source_case_pointers": ["/fixtures/4", "/fixtures/5", "/fixtures/7"],
+      "selected_preimage": "receipt.action.params",
+      "digest_basis": "source_selected_object"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/action-other.derived-vate-projection.json",
+      "classification": "derived-vate-projection",
+      "role": "occurrence-other-action-preimage",
+      "source_case_pointers": ["/fixtures/5"],
+      "selected_preimage": "receipt_claim_harness.rcl_006_wrong_action_ack: {'tool': 'other', 'params': {}}",
+      "digest_basis": "source_selected_object"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/request-basis.derived-vate-projection.json",
+      "classification": "derived-vate-projection",
+      "role": "vate-request-chain-preimage",
+      "source_case_pointers": ["/fixtures/4", "/fixtures/5", "/fixtures/7"],
+      "selected_preimage": "$",
+      "digest_basis": "vate_profile_hash"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/result-basis-settled.derived-vate-projection.json",
+      "classification": "derived-vate-projection",
+      "role": "vate-result-preimage",
+      "source_case_pointers": ["/fixtures/5", "/fixtures/7"],
+      "selected_preimage": "receipt_claim_harness.build_valid_receipt: {'status': 'settled'} mapped to VATE result.outcome success",
+      "digest_basis": "vate_profile_hash"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/vate-admission-request-rcl-005-006-008.derived-vate-projection.json",
+      "classification": "derived-vate-projection",
+      "role": "vate-admission-request",
+      "source_case_pointers": ["/fixtures/4", "/fixtures/5", "/fixtures/7"],
+      "selected_preimage": "request-basis.derived-vate-projection.json for input_hash; projection map for evidence_refs[0]",
+      "digest_basis": "vate_fixture_object"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/vate-admission-receipt-rcl-005.derived-vate-projection.json",
+      "classification": "derived-vate-projection",
+      "role": "vate-admission-receipt",
+      "source_case_pointers": ["/fixtures/4"],
+      "selected_preimage": "receipt.action plus receipt.claims.authorization.params_digest mapped through the case-local descriptor path",
+      "digest_basis": "vate_fixture_object"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/vate-admission-receipt-rcl-006-008.derived-vate-projection.json",
+      "classification": "derived-vate-projection",
+      "role": "vate-admission-receipt",
+      "source_case_pointers": ["/fixtures/5", "/fixtures/7"],
+      "selected_preimage": "receipt.action for request.action_binding plus receipt.action.params for the case-local authorization control descriptor",
+      "digest_basis": "vate_fixture_object"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/vate-post-execution-receipt-rcl-006.derived-vate-projection.json",
+      "classification": "derived-vate-projection",
+      "role": "vate-post-execution-receipt",
+      "source_case_pointers": ["/fixtures/5"],
+      "selected_preimage": "receipt.claims.occurrence.action_digest plus the harness other-action preimage for execution.action_binding",
+      "digest_basis": "vate_fixture_object"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/vate-post-execution-receipt-rcl-008.derived-vate-projection.json",
+      "classification": "derived-vate-projection",
+      "role": "vate-post-execution-receipt",
+      "source_case_pointers": ["/fixtures/7"],
+      "selected_preimage": "receipt.action plus the settled result basis",
+      "digest_basis": "vate_fixture_object"
+    }
+  ],
+  "case_mappings": [
+    {
+      "source_case_id": "RCL-005",
+      "source_case_pointer": "/fixtures/4",
+      "source_claim_path": "receipt.claims.authorization.params_digest",
+      "selected_preimage": "receipt.action.params",
+      "vate_case_id": "rcl-005-authorization-params-mismatch",
+      "phase": "admission-only",
+      "mapping_only_descriptor_path": "request.mapping_only.source_authorization.params_digest",
+      "action_binding_path": "request.action_binding.digest",
+      "expected": {
+        "admission_decision": "deny",
+        "should_execute": false,
+        "reason_codes": ["ACTION_NOT_PERMITTED", "FAIL_CLOSED"]
+      }
+    },
+    {
+      "source_case_id": "RCL-006",
+      "source_case_pointer": "/fixtures/5",
+      "source_claim_paths": [
+        "receipt.claims.authorization.params_digest",
+        "receipt.claims.occurrence.action_digest"
+      ],
+      "selected_preimage": "receipt.action for admission; receipt_claim_harness.rcl_006_wrong_action_ack other-action object for occurrence",
+      "vate_case_id": "rcl-006-occurrence-action-linkage-mismatch",
+      "phase": "full-pipeline",
+      "admission_binding_path": "request.action_binding.digest",
+      "mapping_only_descriptor_path": "request.mapping_only.source_authorization.params_digest",
+      "post_execution_binding_path": "execution.action_binding.digest",
+      "linkage_kind": "path_match",
+      "expected": {
+        "admission_decision": "allow",
+        "should_execute": true,
+        "post_execution_outcome": "success",
+        "reason_codes": ["POST_EXEC_LINKAGE_MISMATCH"]
+      }
+    },
+    {
+      "source_case_id": "RCL-008",
+      "source_case_pointer": "/fixtures/7",
+      "source_claim_paths": [
+        "receipt.claims.authorization.params_digest",
+        "receipt.claims.occurrence.action_digest"
+      ],
+      "selected_preimage": "receipt.action and receipt.action.params",
+      "vate_case_id": "rcl-008-full-pipeline-acceptance-control",
+      "phase": "full-pipeline-acceptance-control",
+      "admission_binding_path": "request.action_binding.digest",
+      "mapping_only_descriptor_path": "request.mapping_only.source_authorization.params_digest",
+      "post_execution_binding_path": "execution.action_binding.digest",
+      "linkage_kind": "path_match",
+      "expected": {
+        "admission_decision": "allow",
+        "should_execute": true,
+        "post_execution_outcome": "success",
+        "reason_codes": ["ADMISSION_RECEIPT_LINKED", "EFFECTIVE_REQUEST_HASH_MATCH", "NO_POLICY_VIOLATIONS"]
+      }
+    }
+  ],
+  "validation_split": {
+    "source_profile": "Run the pinned source harness or an equivalent source-profile verifier separately; VATE run does not perform this validation.",
+    "vate_projection": "Run the three canonical VATE cases with the VATE reference runner; this validates only the bounded VATE projection and committed fixture relations."
+  }
+}

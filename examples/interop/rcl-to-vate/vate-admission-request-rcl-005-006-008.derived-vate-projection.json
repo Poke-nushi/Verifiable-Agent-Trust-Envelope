@@ -1,0 +1,32 @@
+{
+  "version": "vate-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "request_id": "areq-rcl-projection-001",
+  "transaction_id": "txn-rcl-projection-001",
+  "issued_at": "2026-08-14T00:00:00Z",
+  "expires_at": "2026-08-14T00:10:00Z",
+  "action": "transfer",
+  "target": {
+    "resource": "urn:vate:rcl-projection:account-transfer",
+    "audience": "urn:vate:rcl-projection:verifier"
+  },
+  "actor": "did:example:rcl-projection-agent",
+  "principal": "did:example:rcl-projection-principal",
+  "runtime": "urn:vate:rcl-projection:runtime",
+  "audience": "urn:vate:rcl-projection:verifier",
+  "input_hash": "sha-256:321381dbb06b6f377b71ae4a4ed1824d5ac8adbee346ed9aedf15a040436fb50",
+  "correlation": {
+    "projection_id": "rcl-005-006-008"
+  },
+  "evidence_refs": [
+    {
+      "type": "local_policy",
+      "uri": "examples/interop/rcl-to-vate/rcl-005-006-008-projection-map.v1.json",
+      "media_type": "application/vnd.vate.rcl-projection-map+json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "93a47ddb3723533cad414015cdd6e64cdd02bf4f6c165d7fc15e629ad334e7c0"
+      }
+    }
+  ]
+}

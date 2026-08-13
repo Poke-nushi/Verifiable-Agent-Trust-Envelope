@@ -1812,12 +1812,111 @@
         "post-execution linkage",
         "transaction id mismatch"
       ]
+    },
+    {
+      "artifacts": {
+        "action": "examples/interop/rcl-to-vate/action-transfer.derived-vate-projection.json",
+        "action_params": "examples/interop/rcl-to-vate/action-params.derived-vate-projection.json",
+        "admission_receipt": "examples/interop/rcl-to-vate/vate-admission-receipt-rcl-005.derived-vate-projection.json",
+        "admission_request": "examples/interop/rcl-to-vate/vate-admission-request-rcl-005-006-008.derived-vate-projection.json",
+        "projection_map": "examples/interop/rcl-to-vate/rcl-005-006-008-projection-map.v1.json",
+        "request_basis": "examples/interop/rcl-to-vate/request-basis.derived-vate-projection.json",
+        "source_fixture": "conformance/al2-vate-v0.3/external/rcl/rcl-oracle-fixtures.v1.json"
+      },
+      "case_id": "rcl-005-authorization-params-mismatch",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_primary_reason_code": "ACTION_NOT_PERMITTED",
+      "expected_reason_codes": [
+        "ACTION_NOT_PERMITTED",
+        "FAIL_CLOSED"
+      ],
+      "expected_should_execute": false,
+      "path": "conformance/al2-vate-v0.3/cases/rcl-005-authorization-params-mismatch.json",
+      "title": "Deny the RCL-005 authorization-parameter mismatch projection",
+      "validation_focus": [
+        "derived VATE projection boundary",
+        "source full-file byte integrity",
+        "mapping-only authorization descriptor",
+        "action-params digest recomputation",
+        "correct admitted action binding",
+        "ordered fail-closed reasons",
+        "admission-only execution gate"
+      ]
+    },
+    {
+      "artifacts": {
+        "action": "examples/interop/rcl-to-vate/action-transfer.derived-vate-projection.json",
+        "action_params": "examples/interop/rcl-to-vate/action-params.derived-vate-projection.json",
+        "admission_receipt": "examples/interop/rcl-to-vate/vate-admission-receipt-rcl-006-008.derived-vate-projection.json",
+        "admission_request": "examples/interop/rcl-to-vate/vate-admission-request-rcl-005-006-008.derived-vate-projection.json",
+        "other_action": "examples/interop/rcl-to-vate/action-other.derived-vate-projection.json",
+        "post_execution_receipt": "examples/interop/rcl-to-vate/vate-post-execution-receipt-rcl-006.derived-vate-projection.json",
+        "projection_map": "examples/interop/rcl-to-vate/rcl-005-006-008-projection-map.v1.json",
+        "request_basis": "examples/interop/rcl-to-vate/request-basis.derived-vate-projection.json",
+        "result_basis": "examples/interop/rcl-to-vate/result-basis-settled.derived-vate-projection.json",
+        "source_fixture": "conformance/al2-vate-v0.3/external/rcl/rcl-oracle-fixtures.v1.json"
+      },
+      "case_id": "rcl-006-occurrence-action-linkage-mismatch",
+      "category": "linkage",
+      "expected_outcome": "success",
+      "expected_primary_reason_code": "POST_EXEC_LINKAGE_MISMATCH",
+      "expected_reason_codes": [
+        "POST_EXEC_LINKAGE_MISMATCH"
+      ],
+      "expected_should_execute": true,
+      "path": "conformance/al2-vate-v0.3/cases/rcl-006-occurrence-action-linkage-mismatch.json",
+      "title": "Reject the RCL-006 occurrence-to-action linkage projection",
+      "validation_focus": [
+        "derived VATE projection boundary",
+        "source full-file byte integrity",
+        "valid admission before execution",
+        "admitted action digest recomputation",
+        "occurrence other-action digest recomputation",
+        "action-binding path mismatch",
+        "settled result preserved as success",
+        "VATE request hashes remain separate from source action digests"
+      ]
+    },
+    {
+      "artifacts": {
+        "action": "examples/interop/rcl-to-vate/action-transfer.derived-vate-projection.json",
+        "action_params": "examples/interop/rcl-to-vate/action-params.derived-vate-projection.json",
+        "admission_receipt": "examples/interop/rcl-to-vate/vate-admission-receipt-rcl-006-008.derived-vate-projection.json",
+        "admission_request": "examples/interop/rcl-to-vate/vate-admission-request-rcl-005-006-008.derived-vate-projection.json",
+        "post_execution_receipt": "examples/interop/rcl-to-vate/vate-post-execution-receipt-rcl-008.derived-vate-projection.json",
+        "projection_map": "examples/interop/rcl-to-vate/rcl-005-006-008-projection-map.v1.json",
+        "request_basis": "examples/interop/rcl-to-vate/request-basis.derived-vate-projection.json",
+        "result_basis": "examples/interop/rcl-to-vate/result-basis-settled.derived-vate-projection.json",
+        "source_fixture": "conformance/al2-vate-v0.3/external/rcl/rcl-oracle-fixtures.v1.json"
+      },
+      "case_id": "rcl-008-full-pipeline-acceptance-control",
+      "category": "linkage",
+      "expected_outcome": "success",
+      "expected_primary_reason_code": "ADMISSION_RECEIPT_LINKED",
+      "expected_reason_codes": [
+        "ADMISSION_RECEIPT_LINKED",
+        "EFFECTIVE_REQUEST_HASH_MATCH",
+        "NO_POLICY_VIOLATIONS"
+      ],
+      "expected_should_execute": true,
+      "path": "conformance/al2-vate-v0.3/cases/rcl-008-full-pipeline-acceptance-control.json",
+      "title": "Accept the RCL-008 full-pipeline projection control",
+      "validation_focus": [
+        "derived VATE projection boundary",
+        "source full-file byte integrity",
+        "full-pipeline positive control",
+        "matching action-binding path",
+        "settled result preserved as success",
+        "reject-everything resistance",
+        "VATE request hashes remain separate from source action digests"
+      ]
     }
   ],
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "0eb1969ea3763e0fec123de5ea0dacb225eb48a28d76866bbec56dc61d16cf8f"
+    "value": "988aae7d03dd5bb743e8e03e6ab1120ce8735a4837ac818ffd9d665de0c1e370"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -2121,8 +2220,24 @@
       "sha256": "d270a84b06373b0bdfb35eeae6c412a7b0a2ec3cb1c277f917eb46150cb8f51b"
     },
     {
+      "path": "conformance/al2-vate-v0.3/cases/rcl-005-authorization-params-mismatch.json",
+      "sha256": "f842f8b9bb9b243443874cd8f6ba0407c80a4c2c2e161ae6ab3781112fd84530"
+    },
+    {
+      "path": "conformance/al2-vate-v0.3/cases/rcl-006-occurrence-action-linkage-mismatch.json",
+      "sha256": "59bc1b751656eac95fa77fb4a521562e7dc1d76e026c6b65d87eacbe89262aad"
+    },
+    {
+      "path": "conformance/al2-vate-v0.3/cases/rcl-008-full-pipeline-acceptance-control.json",
+      "sha256": "34083699e9b4b5ba8ad632e3c99254bf6e530e0f6d1cde40b9a259aa6627f913"
+    },
+    {
       "path": "conformance/al2-vate-v0.3/conformance-case.schema.json",
       "sha256": "837996aacc30adb469b5f39b22dcd5ff07a4b56a77b67e8402fc537702429ab1"
+    },
+    {
+      "path": "conformance/al2-vate-v0.3/external/rcl/rcl-oracle-fixtures.v1.json",
+      "sha256": "4164151383605d9d68230d81cc9ae1dd31eb5cfb3fb1348289abf71ee64773ea"
     },
     {
       "path": "conformance/al2-vate-v0.3/fixtures/attenuation-approval-string.json",
@@ -2283,6 +2398,50 @@
     {
       "path": "examples/interop/oap-to-vate/vate-admission-request-from-oap.example.json",
       "sha256": "94af2a2c0196a0abf2cb590b77bb584f8d667df7b2f2be9a0fc35f689742c941"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/action-other.derived-vate-projection.json",
+      "sha256": "2d6a7160d8362150491a9c6bfb7c5d4e1847140438a3a49f55bbafc4f31a2ff0"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/action-params.derived-vate-projection.json",
+      "sha256": "6cc82e38bb7626cc24b5b3aa75a823f03e275a988819f94d02b886fb1f1808b1"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/action-transfer.derived-vate-projection.json",
+      "sha256": "956c135e7eff7533c61e2f84c0a23c02251ecc9b246abe5258c4d50780ddc313"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/rcl-005-006-008-projection-map.v1.json",
+      "sha256": "c2cf0ee55bbbc40393d8598fbe2d65558a19856f8a8e63c3628951d39e4e238c"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/request-basis.derived-vate-projection.json",
+      "sha256": "de01ed9b22b923f3a76f681a2f23b54085613b2b80f24c66529c49242a563974"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/result-basis-settled.derived-vate-projection.json",
+      "sha256": "3b86398b8cef2e25fb5c4fd6201f6596e8d00a81418142f2ca797c022a41cfa3"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/vate-admission-receipt-rcl-005.derived-vate-projection.json",
+      "sha256": "f5e12fb8884230dc40a37b272cc49c42c48253bbf00bb864692f00c7d37a7355"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/vate-admission-receipt-rcl-006-008.derived-vate-projection.json",
+      "sha256": "dea518ceb00a59d43e41f3eb7d9194661a6588d5956ec06ea0e9d6e9afef8733"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/vate-admission-request-rcl-005-006-008.derived-vate-projection.json",
+      "sha256": "4aaf702493980de69e8bf4f7fdc58afbecb6e46c3c88bfb8659ab8027c296181"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/vate-post-execution-receipt-rcl-006.derived-vate-projection.json",
+      "sha256": "d26a402d6c5c581842d42557421d3ff8fd44dde1747ad5307dd89d6df02106b8"
+    },
+    {
+      "path": "examples/interop/rcl-to-vate/vate-post-execution-receipt-rcl-008.derived-vate-projection.json",
+      "sha256": "e42bf114245eb7bd01b3644fca64f9639a823a42c8163fa0239252756560be9a"
     },
     {
       "path": "examples/jose/detached-runtime-attestation-payload.json",
@@ -2629,11 +2788,11 @@
     "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.3 --out conformance/al2-vate-v0.3/corpus.json"
   },
   "summary": {
-    "artifact_count": 197,
-    "case_count": 72,
+    "artifact_count": 212,
+    "case_count": 75,
     "category_counts": {
-      "linkage": 12,
-      "negative": 41,
+      "linkage": 14,
+      "negative": 42,
       "positive": 19
     }
   },

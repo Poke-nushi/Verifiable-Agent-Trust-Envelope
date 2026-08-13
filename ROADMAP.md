@@ -171,8 +171,9 @@ The recorded AlgoVoi evidence in
 [docs/conformance/external-sut-run-records.md](docs/conformance/external-sut-run-records.md)
 now includes an initial three-case starter bundle and a deeper eight-case
 bundle. The two slices come from the same implementation line and overlap on
-`attenuate-max-amount`. The deeper result covers `8/72` cases, not the full
-corpus, and is not a second independent SUT result.
+`attenuate-max-amount`. The deeper result covers eight cases from the then
+72-case pinned snapshot, does not validate the current full corpus, and is not
+a second independent SUT result.
 
 Useful external evidence would include:
 

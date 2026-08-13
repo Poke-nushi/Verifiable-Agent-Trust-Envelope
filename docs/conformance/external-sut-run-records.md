@@ -21,9 +21,12 @@ The two AlgoVoi records below were evaluated against corpus digest
 the digest recorded by the archived `v0.3.2` release. They remain review
 evidence for that exact pinned snapshot.
 
-A later `main` snapshot recorded corpus digest
+A later 72-case `main` snapshot recorded corpus digest
 `0eb1969ea3763e0fec123de5ea0dacb225eb48a28d76866bbec56dc61d16cf8f`.
-The AlgoVoi records do not validate that later snapshot or any future corpus
+The 75-case snapshot introduced by the RCL carry-plus-projection change records
+corpus digest
+`988aae7d03dd5bb743e8e03e6ab1120ce8735a4837ac818ffd9d665de0c1e370`.
+The AlgoVoi records validate neither subsequent snapshot nor any future corpus
 bytes. Reviewers should resolve the current digest from
 `conformance/al2-vate-v0.3/corpus.json`; a submission for a different digest
 requires its own comparison record.

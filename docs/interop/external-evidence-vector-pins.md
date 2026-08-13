@@ -5,10 +5,13 @@
 This document records pinned external evidence vector slices that may be useful
 for VATE corpus review.
 
-These slices are non-normative review inputs. They are not part of the VATE
-conformance corpus, do not imply VATE certification, do not create a dependency
-on the external project, and do not substitute adjacent protocol identifiers for
-VATE digest descriptors.
+These source slices are non-normative review inputs and do not imply VATE
+certification, create a dependency on the external project, or substitute
+adjacent protocol identifiers for VATE digest descriptors. Unless a section
+explicitly says otherwise, they are referenced rather than carried in the VATE
+conformance corpus. A carried source file binds only the named bytes; any VATE
+case derived from it remains a separately labelled VATE projection and does not
+adopt the external project's full semantics.
 
 Any `canon_pin`, `canon_version`, or other native canonicalisation identifier
 recorded below is source metadata for referenced or candidate external material.
@@ -164,6 +167,96 @@ VATE review question:
 - Can a VATE SUT bind an embedded AP2 mandate evidence object by selected-object
   bytes and digest without redefining AP2 or treating AP2's descriptor as VATE's
   descriptor?
+
+## Agent Security Harness RCL - Carry-Plus-Projection Slice
+
+Source repository:
+
+- `https://github.com/msaleme/red-team-blue-team-agent-fabric`
+
+Discussion and handoff record:
+
+- `https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/30`
+- mapping correction:
+  `https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/30#issuecomment-5209176439`
+- source-author handoff:
+  `https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/30#issuecomment-5281915833`
+- VATE acknowledgement:
+  `https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/30#issuecomment-5282295933`
+
+License:
+
+- Apache-2.0
+
+Pinned complete source fixture:
+
+- commit: `825986680dc53fa776038db814b8d1da1dfcba9c`
+- source path: `fixtures/rcl/rcl-oracle-fixtures.v1.json`
+- raw full-file SHA-256:
+  `4164151383605d9d68230d81cc9ae1dd31eb5cfb3fb1348289abf71ee64773ea`
+- carried path:
+  `conformance/al2-vate-v0.3/external/rcl/rcl-oracle-fixtures.v1.json`
+- carriage: vendored complete file with exact source bytes
+
+Pinned source harness:
+
+- commit: `d6b7184e0d205672463f7f3284571e9e6a3e797d`
+- path: `protocol_tests/receipt_claim_harness.py`
+
+Selected vector IDs and source pointers:
+
+- RCL-005: `/fixtures/4`
+- RCL-006: `/fixtures/5`
+- RCL-008: `/fixtures/7`
+
+Selected objects and claims:
+
+- `receipt.action`
+- `receipt.action.params`
+- `receipt.claims.authorization.params_digest`
+- `receipt.claims.occurrence.action_digest`
+- the other-action and settled-result preimages named by the pinned harness
+
+Named source object basis:
+
+- SHA-256 over
+  `json.dumps(value, sort_keys=True, separators=(',', ':')).encode('utf-8')`
+- not RFC 8785 / JCS
+
+VATE review questions:
+
+- Can an authorization claim for different parameters deny admission without
+  corrupting the admitted action binding?
+- Can a successful settled occurrence be rejected for binding to another
+  action without describing execution itself as failed?
+- Does a full-pipeline positive control prevent reject-everything behavior from
+  passing the slice?
+
+Corpus use:
+
+- the complete source file is raw-byte-bound by the corpus manifest;
+- the canonical VATE cases are `rcl-005-authorization-params-mismatch`,
+  `rcl-006-occurrence-action-linkage-mismatch`, and
+  `rcl-008-full-pipeline-acceptance-control`;
+- all requests, receipts, post-execution receipts, action/params objects, and
+  selected preimages outside the complete source file are labelled derived
+  VATE projections;
+- the projection record is
+  `examples/interop/rcl-to-vate/rcl-005-006-008-projection-map.v1.json`;
+- the detailed boundary is documented in
+  `docs/interop/rcl-receipt-claim-projection.md`.
+
+Descriptor and validation boundary:
+
+- source-profile Ed25519 and authority checks remain separate from VATE
+  projection validation;
+- the source action digests are not substituted into VATE `input_hash` or
+  `execution.effective_request_hash`;
+- the case-local RCL-005 mapping descriptor is not a generic VATE field;
+- there is no `pairing` in this three-case slice;
+- this is not an external SUT run, independent implementation result,
+  compatibility claim, adoption signal, endorsement, certification, or
+  production approval.
 
 ## Deferred Candidate: service_trust_v0
 

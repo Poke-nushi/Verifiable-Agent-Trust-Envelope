@@ -21,6 +21,11 @@ The corpus makes the v0.3 draft easier to evaluate by naming the minimum expecte
 - deny stale, revoked, replayed, tampered, mismatched, and untrusted inputs
 - consume AP2 Human Not Present payment-authority evidence without redefining AP2
 - link a post-execution receipt back to the admitted effective request
+- deny the RCL-005 authorization-params mismatch without corrupting the admitted
+  action binding
+- reject the RCL-006 occurrence action-linkage mismatch while preserving a
+  successful settled result
+- retain RCL-008 as a full-pipeline acceptance control
 
 Schema-invalid admission request receipts may include a digest-bound reference to
 the rejected admission request solely as rejected-input binding. That reference
@@ -104,6 +109,17 @@ array condition while keeping `SCHEMA_INVALID` as the normative reason code.
 - `cases/interop-oap-decision-evidence.json`
 - `cases/post-execution-linkage-success.json`
 - `cases/post-execution-linkage-mismatch.json`
+- `cases/rcl-005-authorization-params-mismatch.json`
+- `cases/rcl-006-occurrence-action-linkage-mismatch.json`
+- `cases/rcl-008-full-pipeline-acceptance-control.json`
+- `external/rcl/rcl-oracle-fixtures.v1.json` - complete pinned source fixture;
+  raw-byte-bound by the corpus manifest
+
+The RCL source/projection boundary, source license, exact pins, selected
+preimages, and digest bases are documented in
+`docs/interop/rcl-receipt-claim-projection.md`. The VATE runner validates only
+the derived VATE projection and committed fixture relations; it does not run
+the source Ed25519 claim profile.
 
 ## Run
 
