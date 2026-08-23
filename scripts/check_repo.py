@@ -907,6 +907,133 @@ def check_linkage_missing_artifacts_fail_closed() -> None:
                 )
 
 
+def check_admission_handoff_semantics_fail_closed() -> None:
+    conformance = load_vate_conformance_module()
+
+    allow_receipt = json.loads(
+        (ROOT / "examples" / "receipts" / "admission-allow.example.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    attenuate_receipt = json.loads(
+        (
+            ROOT
+            / "examples"
+            / "receipts"
+            / "admission-attenuate-max-amount.example.json"
+        ).read_text(encoding="utf-8")
+    )
+    allow_receipt["request"]["constraints"] = {
+        "max_amount": {"currency": "USD", "value": "10.00"}
+    }
+    allow_receipt["attenuation"] = attenuate_receipt["attenuation"]
+
+    expected_constraints = allow_receipt["request"]["constraints"]
+    if conformance.admitted_effective_constraints(allow_receipt) != expected_constraints:
+        raise RuntimeError("allow decisions must not use stray attenuation constraints")
+
+    expected_attenuation_failure = (
+        "attenuation: must be absent unless decision.outcome is attenuate"
+    )
+    if expected_attenuation_failure not in conformance.evaluate_attenuation_checks(
+        {}, allow_receipt
+    ):
+        raise RuntimeError("reference evaluation must reject attenuation on allow decisions")
+
+    generated_failures = conformance.generated_admission_receipt_shape_failures(
+        allow_receipt,
+        "generated_artifacts.admission_receipt",
+    )
+    expected_generated_failure = (
+        "generated_artifacts.admission_receipt.attenuation: "
+        "must be absent unless decision.outcome is attenuate"
+    )
+    if expected_generated_failure not in generated_failures:
+        raise RuntimeError("generated receipt checks must reject attenuation on allow decisions")
+
+    valid_issued_at = allow_receipt["issued_at"]
+    valid_expires_at = allow_receipt["expires_at"]
+    timestamp_cases = (
+        (
+            "2026-07-01T00:00:00",
+            "2026-07-01T00:10:00",
+            {"issued_at", "expires_at"},
+        ),
+        ("2026-07-01T00:00:00", valid_expires_at, {"issued_at"}),
+        (valid_issued_at, "2026-07-01T00:10:00", {"expires_at"}),
+        ("2026-07-01", "2026-07-02", {"issued_at", "expires_at"}),
+    )
+    for issued_at, expires_at, expected_fields in timestamp_cases:
+        invalid_generated = json.loads(json.dumps(allow_receipt))
+        invalid_generated["issued_at"] = issued_at
+        invalid_generated["expires_at"] = expires_at
+        identity_failures = conformance.generated_receipt_identity_failures(
+            invalid_generated,
+            "generated_artifacts.admission_receipt",
+            "admission",
+        )
+        for field in expected_fields:
+            expected_failure = (
+                f"generated_artifacts.admission_receipt.{field}: "
+                "expected RFC3339 timestamp"
+            )
+            if expected_failure not in identity_failures:
+                raise RuntimeError(
+                    "generated receipt identity checks must reject timezone-less timestamps"
+                )
+
+    linkage_case = json.loads(
+        (
+            ROOT
+            / "conformance"
+            / "al2-vate-v0.3"
+            / "cases"
+            / "post-execution-linkage-success.json"
+        ).read_text(encoding="utf-8")
+    )
+    admission = json.loads(
+        (ROOT / linkage_case["artifacts"]["admission_receipt"]).read_text(
+            encoding="utf-8"
+        )
+    )
+    post_execution = json.loads(
+        (ROOT / linkage_case["artifacts"]["post_execution_receipt"]).read_text(
+            encoding="utf-8"
+        )
+    )
+    for invalid_time in ("not-a-time", "2026-07-01T00:00:00", "2026-07-01"):
+        invalid_admission = json.loads(json.dumps(admission))
+        invalid_admission["issued_at"] = invalid_time
+        invalid_admission["expires_at"] = invalid_time
+        valid, failure = conformance.admission_time_window_valid(
+            invalid_admission,
+            post_execution,
+        )
+        if valid or failure != "admission timestamps must be valid":
+            raise RuntimeError("invalid admission timestamps must close the linkage window")
+        if "admission timestamps must be valid" not in conformance.post_execution_linkage_failures(
+            invalid_admission,
+            post_execution,
+        ):
+            raise RuntimeError("post-execution linkage must reject invalid admission timestamps")
+
+    for invalid_time in ("2026-07-01T00:00:00", "2026-07-01"):
+        invalid_post_execution = json.loads(json.dumps(post_execution))
+        invalid_post_execution["execution"]["started_at"] = invalid_time
+        invalid_post_execution["execution"]["finished_at"] = invalid_time
+        valid, failure = conformance.admission_time_window_valid(
+            admission,
+            invalid_post_execution,
+        )
+        if valid or failure != "execution timestamps must be valid":
+            raise RuntimeError("timezone-less execution timestamps must fail closed")
+        if "execution timestamps must be valid" not in conformance.post_execution_linkage_failures(
+            admission,
+            invalid_post_execution,
+        ):
+            raise RuntimeError("post-execution linkage must reject timezone-less execution timestamps")
+
+
 def check_case_artifact_readers_fail_closed() -> None:
     reader_cases = (
         (
@@ -3020,6 +3147,7 @@ def main() -> int:
     check_rcl_projection_package()
     check_vate_conformance_display_paths_are_portable()
     check_linkage_missing_artifacts_fail_closed()
+    check_admission_handoff_semantics_fail_closed()
     check_case_artifact_readers_fail_closed()
     check_corpus_manifest_non_file_fails_closed()
     check_generated_artifact_utf8_boundary()

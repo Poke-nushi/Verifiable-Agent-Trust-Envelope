@@ -758,6 +758,13 @@
         "required": [
           "attenuation"
         ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "attenuation"
+          ]
+        }
       }
     }
   ],
