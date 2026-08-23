@@ -3,333 +3,304 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Where Verifiable Agent Trust Envelope Fits</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Where VATE Fits — Local Admission and Linked Outcome Evidence</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     :root {
       color-scheme: dark;
+      --bg: #050507;
+      --surface: #0b0b12;
+      --surface-strong: #10101a;
+      --text: #f6f2ff;
+      --muted: #bbb4c8;
+      --fine: #8e879d;
+      --line: #332d43;
+      --purple: #b892ff;
+      --allow: #7fd8a4;
+      --attenuate: #ebc970;
+      --deny: #ff8fa0;
+      --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
     }
 
     body {
-      font-family: "JetBrains Mono", monospace;
-      min-height: 100vh;
-      padding: 28px;
-      color: #f8fafc;
-      background:
-        radial-gradient(circle at top left, rgba(34, 211, 238, 0.10), transparent 28%),
-        radial-gradient(circle at top right, rgba(251, 191, 36, 0.08), transparent 24%),
-        linear-gradient(180deg, #020617 0%, #020617 54%, #040b18 100%);
-    }
-
-    .container {
-      max-width: 1240px;
-      margin: 0 auto;
-    }
-
-    .header {
-      margin-bottom: 22px;
-    }
-
-    .header-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
-
-    .pulse-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 999px;
-      background: #22d3ee;
-      box-shadow: 0 0 18px rgba(34, 211, 238, 0.45);
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        opacity: 1;
-        transform: scale(1);
-      }
-
-      50% {
-        opacity: 0.55;
-        transform: scale(0.94);
-      }
-    }
-
-    h1 {
-      font-size: 1.48rem;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-    }
-
-    .subtitle {
-      margin-left: 24px;
-      max-width: 980px;
-      color: #94a3b8;
-      font-size: 0.88rem;
-      line-height: 1.6;
-    }
-
-    .diagram-container {
-      padding: 22px;
-      border: 1px solid rgba(30, 41, 59, 0.95);
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(15, 23, 42, 0.74), rgba(15, 23, 42, 0.54));
-      box-shadow: inset 0 1px 0 rgba(148, 163, 184, 0.08);
-      overflow-x: auto;
+      overflow: auto;
+      font-family: var(--sans);
     }
 
     svg {
-      width: 100%;
-      min-width: 1080px;
       display: block;
+      width: 100%;
+      min-width: 1200px;
+      height: auto;
+      background: var(--bg);
     }
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 14px;
-      margin-top: 22px;
+    .mobile-board { display: none; }
+
+    .region-label {
+      fill: var(--fine);
+      font-family: var(--mono);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
     }
 
-    .card {
-      padding: 18px;
-      border-radius: 16px;
-      border: 1px solid rgba(30, 41, 59, 0.95);
-      background: rgba(15, 23, 42, 0.62);
+    .step {
+      fill: var(--purple);
+      font-family: var(--mono);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
     }
 
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
+    .title {
+      fill: var(--text);
+      font-family: var(--sans);
+      font-size: 30px;
+      font-weight: 720;
+      letter-spacing: -0.02em;
     }
 
-    .card-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      flex: 0 0 auto;
+    .title-large {
+      fill: var(--text);
+      font-family: var(--sans);
+      font-size: 36px;
+      font-weight: 760;
+      letter-spacing: -0.025em;
     }
 
-    .card-dot.cyan { background: #22d3ee; }
-    .card-dot.emerald { background: #34d399; }
-    .card-dot.amber { background: #fbbf24; }
-
-    .card h3 {
-      font-size: 0.88rem;
-      font-weight: 600;
+    .copy {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 19px;
     }
 
-    .card ul {
-      list-style: none;
-      color: #94a3b8;
-      font-size: 0.76rem;
-      line-height: 1.65;
+    .copy-small {
+      fill: var(--fine);
+      font-family: var(--sans);
+      font-size: 20px;
+      font-weight: 520;
     }
 
-    .card li + li {
-      margin-top: 6px;
+    .outcome {
+      font-family: var(--mono);
+      font-size: 18px;
+      font-weight: 750;
     }
 
-    .footer {
-      margin-top: 16px;
-      text-align: center;
-      color: #475569;
-      font-size: 0.74rem;
+    .branch {
+      font-family: var(--mono);
+      font-size: 20px;
+      font-weight: 650;
     }
 
-    @media (max-width: 720px) {
-      body {
-        padding: 20px;
-      }
+    .mobile-step {
+      fill: var(--purple);
+      font-family: var(--mono);
+      font-size: 30px;
+      font-weight: 750;
+      letter-spacing: 0.1em;
+    }
 
-      h1 {
-        font-size: 1.26rem;
-      }
+    .mobile-title {
+      fill: var(--text);
+      font-family: var(--sans);
+      font-size: 46px;
+      font-weight: 760;
+      letter-spacing: -0.025em;
+    }
 
-      .subtitle {
-        margin-left: 0;
+    .mobile-copy {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 34px;
+    }
+
+    .mobile-branch {
+      font-family: var(--mono);
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 1000px) {
+      .desktop-board { display: none; }
+      .mobile-board {
+        display: block;
+        min-width: 720px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <div class="header-row">
-        <div class="pulse-dot"></div>
-        <h1>Where Verifiable Agent Trust Envelope Fits</h1>
-      </div>
-      <p class="subtitle">
-        This draft composes with discovery, authorization, credential, and runtime layers while adding portable trust / permit / receipt semantics
-        for external agent actions across vendors and surfaces.
-      </p>
-    </div>
+  <svg class="desktop-board" viewBox="0 0 1600 900" role="img" aria-labelledby="desktop-title desktop-desc">
+    <title id="desktop-title">Where VATE fits</title>
+    <desc id="desktop-desc">
+      One concrete request basis and digest-addressed evidence references enter
+      local VATE admission at the consequence-owning relying party. Integrity,
+      authority, and policy checks produce an admission receipt with allow,
+      attenuate, or deny. A separate implementation-owned handoff gate passes
+      allow and eligible attenuation to the target, while deny, invalid input,
+      and attenuation requiring a fresh permit stop. Later outcome evidence links
+      to the admission receipt id and digest, transaction and runtime, and
+      effective request hash.
+    </desc>
+    <defs>
+      <linearGradient id="bg-glow" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#0b0811"/>
+        <stop offset="0.5" stop-color="#050507"/>
+        <stop offset="1" stop-color="#090610"/>
+      </linearGradient>
+      <radialGradient id="admission-glow" cx="50%" cy="48%" r="58%">
+        <stop offset="0" stop-color="#6f3bd4" stop-opacity="0.2"/>
+        <stop offset="1" stop-color="#6f3bd4" stop-opacity="0"/>
+      </radialGradient>
+      <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+        <path d="M48 0H0V48" fill="none" stroke="#1b1724" stroke-width="1"/>
+      </pattern>
+      <marker id="arrow" markerWidth="12" markerHeight="10" refX="11" refY="5" orient="auto">
+        <path d="M0 0L12 5L0 10Z" fill="#9b93a9"/>
+      </marker>
+      <marker id="arrow-purple" markerWidth="12" markerHeight="10" refX="11" refY="5" orient="auto">
+        <path d="M0 0L12 5L0 10Z" fill="#b892ff"/>
+      </marker>
+      <marker id="arrow-go" markerWidth="12" markerHeight="10" refX="11" refY="5" orient="auto">
+        <path d="M0 0L12 5L0 10Z" fill="#7fd8a4"/>
+      </marker>
+    </defs>
 
-    <div class="diagram-container">
-      <svg viewBox="0 0 1180 760" role="img" aria-label="Where Verifiable Agent Trust Envelope fits in the agent stack">
-        <defs>
-          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-            <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
-          </marker>
-          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
-          </pattern>
-        </defs>
+    <rect width="1600" height="900" fill="url(#bg-glow)"/>
+    <rect width="1600" height="900" fill="url(#grid)" opacity="0.55"/>
+    <ellipse cx="800" cy="430" rx="450" ry="390" fill="url(#admission-glow)"/>
 
-        <rect width="1180" height="760" fill="#020617" />
-        <rect width="1180" height="760" fill="url(#grid)" />
+    <!-- Region boundaries stay behind the directional flow. -->
+    <line x1="470" y1="90" x2="470" y2="810" stroke="#302a3f" stroke-width="2"/>
+    <line x1="1060" y1="90" x2="1060" y2="810" stroke="#302a3f" stroke-width="2"/>
 
-        <path d="M290 140 L385 140" fill="none" stroke="#64748b" stroke-width="2.25" marker-end="url(#arrowhead)" />
-        <path d="M290 220 L385 220" fill="none" stroke="#64748b" stroke-width="2.25" marker-end="url(#arrowhead)" />
-        <path d="M290 300 L385 300" fill="none" stroke="#64748b" stroke-width="2.25" marker-end="url(#arrowhead)" />
-        <path d="M290 380 L385 380" fill="none" stroke="#64748b" stroke-width="2.25" marker-end="url(#arrowhead)" />
-        <path d="M290 460 L385 460" fill="none" stroke="#64748b" stroke-width="2.25" marker-end="url(#arrowhead)" />
+    <!-- Connection layer: above region boundaries, below opaque boxes. -->
+    <path d="M418 448H515" fill="none" stroke="#9b93a9" stroke-width="3" marker-end="url(#arrow)"/>
+    <path d="M760 408V495" fill="none" stroke="#b892ff" stroke-width="4" marker-end="url(#arrow-purple)"/>
+    <path d="M1005 560H1035V340H1090" fill="none" stroke="#b892ff" stroke-width="4" marker-end="url(#arrow-purple)"/>
+    <path d="M1375 525V610" fill="none" stroke="#7fd8a4" stroke-width="3" marker-end="url(#arrow-go)"/>
+    <path d="M1090 774H1040V690H1005" fill="none" stroke="#b892ff" stroke-width="3" stroke-dasharray="11 10" marker-end="url(#arrow-purple)"/>
 
-        <path d="M735 180 L835 180" fill="none" stroke="#64748b" stroke-width="2.25" marker-end="url(#arrowhead)" />
-        <path d="M735 290 L835 290" fill="none" stroke="#64748b" stroke-width="2.25" marker-end="url(#arrowhead)" />
-        <path d="M735 400 L835 400" fill="none" stroke="#64748b" stroke-width="2.25" marker-end="url(#arrowhead)" />
+    <text class="region-label" x="70" y="92">SUPPLIED BASIS</text>
+    <text class="region-label" x="515" y="92">CONSEQUENCE-OWNING RELYING PARTY</text>
+    <text class="region-label" x="1090" y="92">IMPLEMENTATION + OUTCOME</text>
 
-        <path d="M960 240 L960 540" fill="none" stroke="#64748b" stroke-width="2.2" marker-end="url(#arrowhead)" />
+    <rect x="70" y="300" width="348" height="296" rx="6" fill="#0b0b12"/>
+    <rect x="70" y="300" width="348" height="296" rx="6" fill="none" stroke="#5a5368" stroke-width="2"/>
+    <text class="step" x="104" y="345">01</text>
+    <text class="title" x="104" y="400">One concrete request</text>
+    <text class="title" x="104" y="438">+ evidence references</text>
+    <line x1="104" y1="470" x2="384" y2="470" stroke="#302a3f" stroke-width="2"/>
+    <text class="copy" x="104" y="514">declared input hash</text>
+    <text class="copy" x="104" y="552">digest-addressed refs</text>
 
-        <rect x="60" y="60" width="1060" height="560" rx="12" fill="rgba(251, 191, 36, 0.05)" stroke="#fbbf24" stroke-width="1.2" stroke-dasharray="8,4"/>
-        <text x="74" y="79" fill="#fbbf24" font-size="10" font-weight="600">This draft composes with adjacent layers rather than replacing them</text>
+    <rect x="515" y="205" width="490" height="203" rx="6" fill="#10101a"/>
+    <rect x="515" y="205" width="490" height="203" rx="6" fill="none" stroke="#b892ff" stroke-width="3"/>
+    <text class="step" x="552" y="252">02</text>
+    <text class="title-large" x="552" y="312">Local VATE admission</text>
+    <text class="copy" x="552" y="362">Integrity  →  authority  →  policy</text>
 
-        <text x="175" y="112" fill="#cbd5e1" font-size="11" font-weight="600" text-anchor="middle">Adjacent layers</text>
-        <text x="560" y="112" fill="#cbd5e1" font-size="11" font-weight="600" text-anchor="middle">Portable trust envelope</text>
-        <text x="960" y="112" fill="#cbd5e1" font-size="11" font-weight="600" text-anchor="middle">Execution and governance surfaces</text>
-        <text x="960" y="530" fill="#cbd5e1" font-size="11" font-weight="600" text-anchor="middle">Outcomes</text>
+    <rect x="515" y="495" width="490" height="210" rx="6" fill="#10101a"/>
+    <rect x="515" y="495" width="490" height="210" rx="6" fill="none" stroke="#b892ff" stroke-width="3"/>
+    <text class="step" x="552" y="542">03</text>
+    <text class="title-large" x="552" y="599">Admission receipt</text>
+    <rect x="552" y="629" width="96" height="40" rx="3" fill="none" stroke="#7fd8a4" stroke-width="2"/>
+    <text class="outcome" x="570" y="655" fill="#7fd8a4">allow</text>
+    <rect x="662" y="629" width="140" height="40" rx="3" fill="none" stroke="#ebc970" stroke-width="2"/>
+    <text class="outcome" x="680" y="655" fill="#ebc970">attenuate</text>
+    <rect x="816" y="629" width="88" height="40" rx="3" fill="none" stroke="#ff8fa0" stroke-width="2"/>
+    <text class="outcome" x="834" y="655" fill="#ff8fa0">deny</text>
 
-        <rect x="90" y="125" width="200" height="52" rx="6" fill="#0f172a"/>
-        <rect x="90" y="125" width="200" height="52" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
-        <text x="190" y="146" fill="white" font-size="11" font-weight="600" text-anchor="middle">A2A</text>
-        <text x="190" y="162" fill="#94a3b8" font-size="8" text-anchor="middle">discovery / delegation</text>
+    <rect x="1090" y="170" width="460" height="355" rx="6" fill="#0b0b12"/>
+    <rect x="1090" y="170" width="460" height="355" rx="6" fill="none" stroke="#5a5368" stroke-width="2"/>
+    <text class="step" x="1125" y="215">04</text>
+    <text class="title" x="1125" y="270">Implementation-owned</text>
+    <text class="title" x="1125" y="308">handoff gate</text>
+    <line x1="1125" y1="338" x2="1515" y2="338" stroke="#302a3f" stroke-width="2"/>
+    <text class="branch" x="1125" y="375" fill="#7fd8a4">GO · allow</text>
+    <text class="branch" x="1125" y="407" fill="#7fd8a4">GO · attenuate + no new permit</text>
+    <text class="branch" x="1125" y="442" fill="#ff8fa0">STOP · deny / invalid</text>
+    <text class="branch" x="1125" y="477" fill="#ff8fa0">STOP · attenuate</text>
+    <text class="branch" x="1125" y="507" fill="#ff8fa0">+ fresh permit required</text>
 
-        <rect x="90" y="205" width="200" height="52" rx="6" fill="#0f172a"/>
-        <rect x="90" y="205" width="200" height="52" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
-        <text x="190" y="226" fill="white" font-size="11" font-weight="600" text-anchor="middle">MCP</text>
-        <text x="190" y="242" fill="#94a3b8" font-size="8" text-anchor="middle">tool and resource access</text>
+    <rect x="1320" y="552" width="110" height="36" rx="3" fill="#050507"/>
+    <text class="copy-small" x="1375" y="577" text-anchor="middle">TARGET</text>
+    <rect x="1090" y="610" width="460" height="220" rx="6" fill="#0b0b12"/>
+    <rect x="1090" y="610" width="460" height="220" rx="6" fill="none" stroke="#b892ff" stroke-width="3"/>
+    <text class="step" x="1125" y="650">05</text>
+    <text class="title" x="1125" y="700">Linked outcome evidence</text>
+    <text class="copy-small" x="1125" y="744">receipt ID + digest</text>
+    <text class="copy-small" x="1125" y="778">transaction + runtime</text>
+    <text class="copy-small" x="1125" y="812">effective request hash · selected fields</text>
+  </svg>
 
-        <rect x="90" y="285" width="200" height="52" rx="6" fill="#0f172a"/>
-        <rect x="90" y="285" width="200" height="52" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
-        <text x="190" y="306" fill="white" font-size="11" font-weight="600" text-anchor="middle">OAuth / OpenID</text>
-        <text x="190" y="322" fill="#94a3b8" font-size="8" text-anchor="middle">delegated auth / federation</text>
+  <svg class="mobile-board" viewBox="0 0 900 1200" role="img" aria-labelledby="mobile-title mobile-desc">
+    <title id="mobile-title">Where VATE fits, mobile overview</title>
+    <desc id="mobile-desc">
+      Three bands show the supplied request and evidence references, local VATE
+      admission and its admission receipt, and the implementation-owned handoff
+      gate followed by linked outcome evidence.
+    </desc>
+    <defs>
+      <linearGradient id="mobile-bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#0b0811"/>
+        <stop offset="0.55" stop-color="#050507"/>
+        <stop offset="1" stop-color="#090610"/>
+      </linearGradient>
+      <pattern id="mobile-grid" width="48" height="48" patternUnits="userSpaceOnUse">
+        <path d="M48 0H0V48" fill="none" stroke="#1b1724" stroke-width="1"/>
+      </pattern>
+      <marker id="mobile-arrow" markerWidth="12" markerHeight="10" refX="11" refY="5" orient="auto">
+        <path d="M0 0L12 5L0 10Z" fill="#b892ff"/>
+      </marker>
+    </defs>
+    <rect width="900" height="1200" fill="url(#mobile-bg)"/>
+    <rect width="900" height="1200" fill="url(#mobile-grid)" opacity="0.55"/>
 
-        <rect x="90" y="365" width="200" height="52" rx="6" fill="#0f172a"/>
-        <rect x="90" y="365" width="200" height="52" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
-        <text x="190" y="386" fill="white" font-size="11" font-weight="600" text-anchor="middle">VC / JWT</text>
-        <text x="190" y="402" fill="#94a3b8" font-size="8" text-anchor="middle">signed credentials</text>
+    <!-- Connection layer. -->
+    <path d="M450 346V402" fill="none" stroke="#b892ff" stroke-width="5" marker-end="url(#mobile-arrow)"/>
+    <path d="M450 762V800" fill="none" stroke="#b892ff" stroke-width="5" marker-end="url(#mobile-arrow)"/>
 
-        <rect x="90" y="445" width="200" height="52" rx="6" fill="#0f172a"/>
-        <rect x="90" y="445" width="200" height="52" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
-        <text x="190" y="466" fill="white" font-size="11" font-weight="600" text-anchor="middle">Workload identity</text>
-        <text x="190" y="482" fill="#94a3b8" font-size="8" text-anchor="middle">runtime trust anchors</text>
+    <rect x="60" y="58" width="780" height="288" rx="8" fill="#0b0b12"/>
+    <rect x="60" y="58" width="780" height="288" rx="8" fill="none" stroke="#5a5368" stroke-width="3"/>
+    <text class="mobile-step" x="104" y="112">01 · SUPPLIED BASIS</text>
+    <text class="mobile-title" x="104" y="177">One request + evidence refs</text>
+    <text class="mobile-copy" x="104" y="244">declared input hash</text>
+    <text class="mobile-copy" x="104" y="296">digest-addressed references</text>
 
-        <rect x="385" y="125" width="350" height="390" rx="10" fill="#0f172a"/>
-        <rect x="385" y="125" width="350" height="390" rx="10" fill="rgba(8, 51, 68, 0.22)" stroke="#22d3ee" stroke-width="1.6" stroke-dasharray="6,4"/>
-        <text x="400" y="146" fill="#22d3ee" font-size="9" font-weight="600">portable trust context across surfaces</text>
+    <rect x="60" y="402" width="780" height="360" rx="8" fill="#10101a"/>
+    <rect x="60" y="402" width="780" height="360" rx="8" fill="none" stroke="#b892ff" stroke-width="4"/>
+    <text class="mobile-step" x="104" y="456">02 · LOCAL DECISION</text>
+    <text class="mobile-title" x="104" y="521">Local VATE admission</text>
+    <text class="mobile-copy" x="104" y="583">Integrity → authority → policy</text>
+    <line x1="104" y1="624" x2="796" y2="624" stroke="#332d43" stroke-width="3"/>
+    <text class="mobile-title" x="104" y="687">Admission receipt</text>
+    <text class="mobile-branch" x="104" y="736" fill="#7fd8a4">allow</text>
+    <text class="mobile-branch" x="238" y="736" fill="#ebc970">attenuate</text>
+    <text class="mobile-branch" x="452" y="736" fill="#ff8fa0">deny</text>
 
-        <rect x="450" y="150" width="220" height="60" rx="6" fill="#0f172a"/>
-        <rect x="450" y="150" width="220" height="60" rx="6" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5"/>
-        <text x="560" y="173" fill="white" font-size="11" font-weight="600" text-anchor="middle">Actor / principal / runtime</text>
-        <text x="560" y="190" fill="#94a3b8" font-size="8" text-anchor="middle">who acts, for whom, in which runtime</text>
-
-        <rect x="450" y="260" width="220" height="60" rx="6" fill="#0f172a"/>
-        <rect x="450" y="260" width="220" height="60" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
-        <text x="560" y="283" fill="white" font-size="11" font-weight="600" text-anchor="middle">Mission permit</text>
-        <text x="560" y="300" fill="#94a3b8" font-size="8" text-anchor="middle">task-scoped authority for this action</text>
-
-        <rect x="450" y="370" width="220" height="60" rx="6" fill="#0f172a"/>
-        <rect x="450" y="370" width="220" height="60" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
-        <text x="560" y="393" fill="white" font-size="11" font-weight="600" text-anchor="middle">Execution receipt</text>
-        <text x="560" y="410" fill="#94a3b8" font-size="8" text-anchor="middle">what happened and what can be proven later</text>
-
-        <rect x="450" y="450" width="220" height="60" rx="6" fill="#0f172a"/>
-        <rect x="450" y="450" width="220" height="60" rx="6" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1.5"/>
-        <text x="560" y="473" fill="white" font-size="11" font-weight="600" text-anchor="middle">Status / attenuation</text>
-        <text x="560" y="490" fill="#94a3b8" font-size="8" text-anchor="middle">whether authority is still usable or narrowed</text>
-
-        <rect x="835" y="150" width="250" height="60" rx="6" fill="#0f172a"/>
-        <rect x="835" y="150" width="250" height="60" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
-        <text x="960" y="173" fill="white" font-size="11" font-weight="600" text-anchor="middle">Verifier / relying party</text>
-        <text x="960" y="190" fill="#94a3b8" font-size="8" text-anchor="middle">evaluates context before action</text>
-
-        <rect x="835" y="260" width="250" height="60" rx="6" fill="#0f172a"/>
-        <rect x="835" y="260" width="250" height="60" rx="6" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1.5"/>
-        <text x="960" y="283" fill="white" font-size="11" font-weight="600" text-anchor="middle">Gateway / delegated identity</text>
-        <text x="960" y="300" fill="#94a3b8" font-size="8" text-anchor="middle">policy enforcement / on-behalf-of context</text>
-
-        <rect x="835" y="370" width="250" height="60" rx="6" fill="#0f172a"/>
-        <rect x="835" y="370" width="250" height="60" rx="6" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
-        <text x="960" y="393" fill="white" font-size="11" font-weight="600" text-anchor="middle">Control plane / vendor surfaces</text>
-        <text x="960" y="410" fill="#94a3b8" font-size="8" text-anchor="middle">orchestration / governance / UX</text>
-
-        <rect x="775" y="560" width="95" height="42" rx="6" fill="#0f172a"/>
-        <rect x="775" y="560" width="95" height="42" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.4"/>
-        <text x="822" y="585" fill="white" font-size="10" font-weight="600" text-anchor="middle">Allow</text>
-
-        <rect x="885" y="560" width="95" height="42" rx="6" fill="#0f172a"/>
-        <rect x="885" y="560" width="95" height="42" rx="6" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1.4"/>
-        <text x="932" y="585" fill="white" font-size="10" font-weight="600" text-anchor="middle">Attenuate</text>
-
-        <rect x="995" y="560" width="95" height="42" rx="6" fill="#0f172a"/>
-        <rect x="995" y="560" width="95" height="42" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.4"/>
-        <text x="1042" y="585" fill="white" font-size="10" font-weight="600" text-anchor="middle">Deny</text>
-
-        <rect x="885" y="612" width="205" height="42" rx="6" fill="#0f172a"/>
-        <rect x="885" y="612" width="205" height="42" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.4"/>
-        <text x="988" y="637" fill="white" font-size="10" font-weight="600" text-anchor="middle">Record receipt</text>
-      </svg>
-    </div>
-
-    <div class="cards">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-dot cyan"></div>
-          <h3>What This Draft Adds</h3>
-        </div>
-        <ul>
-          <li>- actor / principal / runtime separation</li>
-          <li>- portable permit / receipt / status semantics</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-dot emerald"></div>
-          <h3>What This Draft Does Not Replace</h3>
-        </div>
-        <ul>
-          <li>- A2A, MCP, OAuth, VC, and workload identity stay in place</li>
-          <li>- This draft composes with them instead of re-specifying them</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-dot amber"></div>
-          <h3>Why It Matters</h3>
-        </div>
-        <ul>
-          <li>- external agent actions need portable trust context across vendors and surfaces</li>
-          <li>- verifiers need more than discovery and raw credentials alone</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="footer">
-      README positioning figure for Verifiable Agent Trust Envelope | Built from the same visual system as the reference architecture | Updated 2026-04-19
-    </div>
-  </div>
+    <rect x="60" y="800" width="780" height="360" rx="8" fill="#0b0b12"/>
+    <rect x="60" y="800" width="780" height="360" rx="8" fill="none" stroke="#b892ff" stroke-width="4"/>
+    <text class="mobile-step" x="104" y="845">03 · HANDOFF + OUTCOME</text>
+    <text class="mobile-title" x="104" y="900">Implementation-owned gate</text>
+    <text class="mobile-branch" x="104" y="946" fill="#7fd8a4">GO · allow</text>
+    <text class="mobile-branch" x="104" y="982" fill="#7fd8a4">GO · attenuate + no new permit</text>
+    <text class="mobile-branch" x="104" y="1018" fill="#ff8fa0">STOP · deny / invalid</text>
+    <text class="mobile-branch" x="104" y="1054" fill="#ff8fa0">STOP · attenuate + fresh permit required</text>
+    <text class="mobile-title" x="104" y="1114" style="font-size: 40px">Target → linked outcome evidence</text>
+  </svg>
 </body>
 </html>

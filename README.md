@@ -1,28 +1,74 @@
 # Verifiable Agent Trust Envelope
 
-**Verifier admission receipts for risky external digital actions**
+**Local admission receipts for risky external digital actions.**
 
-**Official website:** [vate.rognalia.com](https://vate.rognalia.com/)
+VATE gives the party that owns the consequence a portable record of why one
+agent action was allowed, narrowed, or denied. It carries a declared input hash
+and digest-addressed evidence references into local admission, then links the
+resulting receipt to later outcome evidence.
 
-VATE is a verifier-side profile for deciding and recording whether an AI agent
-may perform a risky external digital action.
+[Official website](https://vate.rognalia.com/) ·
+[v0.3 in 5 minutes](docs/v0.3-in-5-minutes.md) ·
+[60-second demo](#try-it-in-60-seconds) ·
+[AL2 verifier admission profile](docs/profiles/vate-al2-verifier-admission-profile-v0.3.md)
 
-It does not replace A2A, MCP, OAuth, OpenID, VC, SPIFFE, AP2, x402, or payment
-mandates.
-It is not an A2A core proposal or a universal trust layer.
+[![DOI](https://zenodo.org/badge/1214949350.svg)](https://doi.org/10.5281/zenodo.19839768)
 
-A2A carries the task.
-MCP, OAuth, AP2, VC, and related systems provide evidence.
-VATE records the verifier decision: `allow`, `attenuate`, or `deny`.
+<picture>
+  <source media="(max-width: 600px)" srcset="docs/figures/where-trust-envelope-fits-readme-mobile.png" width="900" height="1200">
+  <img src="docs/figures/where-trust-envelope-fits-readme.png" width="1600" height="900" alt="One request and evidence references flow into local VATE admission and an allow, attenuate, or deny receipt; an implementation-owned handoff gate reaches a target or stops, and later outcome evidence links back to the admission receipt.">
+</picture>
 
-VATE is not a human-in-the-loop (HITL) workflow product.
-HITL review can be one policy or evidence pattern.
-VATE focuses on verifier-side admission decisions and receipts for risky
-external digital actions.
+[Open the accessible HTML diagram](docs/figures/where-trust-envelope-fits.html).
 
-Read this as a discussion draft and gap-analysis question for the boundary
-around risky writes and other external digital actions, not as a replacement for
-adjacent protocols.
+## Try It in 60 Seconds
+
+```bash
+python3 reference/quickstart-demo/run_demo.py
+```
+
+No dependencies. The demo narrates three committed v0.3 corpus cases: `allow`,
+`attenuate`, and a fail-closed `deny`.
+
+## What VATE Records
+
+- **One admission basis**: action, target, any requested constraints, actor, principal,
+  runtime, audience, a declared input hash, and digest-addressed evidence
+  references.
+- **One local decision**: policy basis, evidence verification results, reason
+  codes, validity, and an `allow`, `attenuate`, or `deny` outcome.
+- **Explicit attenuation**: original and effective request hashes, applied
+  changes, effective constraints, and whether a fresh permit is required.
+- **Decision data for handoff**: the outcome and `require_new_permit` state
+  distinguish immediate handoff candidates from `deny`, invalid state, and
+  cases requiring a fresh permit; the gate remains implementation-owned.
+- **Linked outcome evidence**: the later receipt links the admission receipt ID
+  and digest, transaction, runtime, effective request hash, and selected result
+  fields.
+
+Attenuation is a first-class outcome. A request for a USD 10000 transfer can be
+admitted only with a USD 500 maximum, approval above USD 100, and a short
+execution window. The receipt records the declared original and effective
+request hashes so later evidence can be checked against the narrowed basis.
+
+## Status and Scope
+
+VATE is a public Apache-2.0 protocol discussion draft. The current archived
+review anchor is `v0.3.2`; `main` contains subsequent work on the same AL2
+verifier-admission line.
+
+**Current public status:** discussion draft · archived `v0.3.2` review anchor ·
+not production-ready · no production approval implied.
+
+VATE composes with A2A, MCP, OAuth, OpenID, VC, SPIFFE, AP2, x402, and payment
+mandates. Those systems retain their own validation and execution semantics;
+VATE records the consequence-owning relying party's local admission decision
+and receipt linkage. Human review may supply policy or evidence, but VATE is not
+a human-in-the-loop workflow product.
+
+<details>
+<summary>Version history and detailed repository state</summary>
+
 
 - `v0.1 discussion draft`
 - `v0.2.0 archived May 5, 2026 review snapshot`
@@ -35,124 +81,113 @@ adjacent protocols.
 - `no production approval implied`
 - `seeking critique on boundary, verifier order, gap analysis, and artifact semantics`
 
-[![DOI](https://zenodo.org/badge/1214949350.svg)](https://doi.org/10.5281/zenodo.19839768)
+Current repository state:
 
-## Try It In 60 Seconds
+- **Repository type**: protocol discussion draft
+- **Document maturity**: early draft
+- **Primary language**: English
+- **Roadmap refresh date**: 2026-07-27
+- **Primary battlefield**: `AL2` external digital write
+- **Current archived snapshot with version DOI**: `v0.3.2` external review
+  portability and reproducibility patch
+- **Implemented artifacts**: v0.3 schemas and examples; a runnable AL2 fixture
+  corpus with negative cases; SUT comparison and implementation-reporting
+  formats; a dependency-free verifier core and A2A-shaped adapter demo;
+  package-private TypeScript reference helpers; focused adjacent-evidence
+  fixtures and crosswalk notes
+- **Evidence target**: collect results from independently maintained
+  implementation lines distinct from the repository reference runner, ideally
+  with generated artifacts or a controlled artifact bundle, an implementation
+  report, and a local bundle verification report for one v0.3 corpus snapshot
+- **Planned later**: pairwise presentation profile, richer capability registry,
+  formal `AID`, and physical `ABS` profiles
 
-```bash
-python3 reference/quickstart-demo/run_demo.py
-```
+Conformance artifacts record one implementation run against one corpus
+snapshot. They do not imply endorsement, production approval, or a general
+compatibility claim.
 
-No dependencies. It narrates three committed v0.3 corpus cases: allow,
-attenuate, and a fail-closed deny.
+</details>
 
 ## Reviewer Entry Points
 
-If you are reviewing the current archived `v0.3.2` discussion-draft snapshot or
-main-branch work after it, start here:
+If you are reviewing the archived `v0.3.2` snapshot or later main-branch work,
+start here:
 
-- [Public claim boundary](docs/public-claim-boundary.md) - what this repo can
-  and cannot claim publicly
+- [Public claim boundary](docs/public-claim-boundary.md) - what this repository
+  can and cannot claim publicly
 - [One-hour external SUT or corpus review request](docs/conformance/external-sut-ask-1-hour.md) -
-  smallest useful external review path for unclear cases, reason codes,
-  artifact binding, or draft SUT results
+  the smallest useful path for unclear cases, reason codes, artifact binding,
+  or draft SUT results
 - [Independent implementation review issue](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2) -
-  public intake thread for external SUT questions, partial results, and
-  implementation report links
+  public intake for external SUT questions, partial results, and implementation
+  report links
 - [External SUT run records](docs/conformance/external-sut-run-records.md) -
-  pinned records of externally supplied SUT run artifacts used for review
+  pinned externally supplied run artifacts used for review
 - [External implementation call](docs/conformance/external-implementation-call.md) -
-  short request for result files from implementations other than the repository
-  reference runner, plus generated artifacts and implementation reports
-- [External SUT quickstart](docs/conformance/external-sut-quickstart.md) - how
-  a non-reference implementation can submit a result for `compare`
-- [Implementation reporting](docs/conformance/implementation-reporting.md) -
-  how to publish one implementation run against one corpus snapshot
+  the request for result files, generated artifacts, and implementation reports
+- [External SUT quickstart](docs/conformance/external-sut-quickstart.md) - how a
+  non-reference implementation can submit a result for `compare`
+- [Implementation reporting](docs/conformance/implementation-reporting.md) - how
+  to publish one implementation run against one corpus snapshot
 - [A2A review package](docs/a2a/README.md) - metadata-only admission and receipt
   references for A2A-shaped flows
 - [Known gaps](docs/known-gaps.md) - unresolved work and residual limitations
 
 ## The Problem
 
-An external agent wants to perform a risky write against a remote system.
-That risky write is one example of a broader risky external digital action: a
-side effect that leaves the agent runtime and changes a relying party's
-resource, record, payment state, or account state.
+An external agent wants to perform a risky write against a remote system. That
+write changes a relying party's resource, record, payment state, or account
+state outside the agent runtime.
 
-In that moment, the relying party often needs more than:
+At that boundary, discovery metadata, a valid access token, and a stable
+identity label may not answer:
 
-- discovery metadata
-- a valid access token
-- a stable identity label
-
-It may also need to know:
-
-- which actor is acting
-- on whose behalf it acts
+- which actor is acting and on whose behalf
 - whether the current runtime is fresh and genuine
-- what task-scoped authority exists right now
-- whether current status has narrowed or revoked that authority
-- what receipt should exist after execution
+- what task-scoped authority exists now
+- whether status has narrowed or revoked that authority
+- what was admitted before execution
+- how later outcome evidence links to that admission
 
-This draft proposes a portable admission-and-receipt layer for that boundary.
-The current repository makes that boundary concrete through a verifier-centered
-`AL2` HTTP wedge that evaluates:
+The current AL2 profile makes this boundary concrete. Its semantic decision
+basis is:
 
 `status -> identity -> runtime -> permit -> policy`
 
-That sequence is the semantic decision basis. An implementation still needs to
-perform structural parsing, digest checks, proof / trust-anchor checks, and
-freshness checks before it treats any input as authoritative or runs expensive
-policy evaluation.
+Before those inputs become authoritative, an implementation still performs
+structural parsing, digest checks, proof and trust-anchor checks, freshness
+checks, and replay checks. The local verifier then records `allow`, `attenuate`,
+or `deny` in a machine-readable admission receipt.
 
-and returns `allow`, `attenuate`, or `deny` with a machine-readable admission
-receipt.
-
-The `v0.3` work keeps that verifier-side boundary but narrows the next deliverable to the [VATE AL2 Verifier Admission Profile v0.3](docs/profiles/vate-al2-verifier-admission-profile-v0.3.md).
-That profile treats A2A, MCP, OAuth, VC, DID, OID4VP, Web Bot Auth, AP2, x402, ACP, and payment-token systems as adjacent layers that can provide evidence.
-VATE defines how a relying party evaluates those inputs before execution and records the decision.
-The open design question is which facts belong in task flow, transport
-authorization, or adjacent evidence, and which facts belong in verifier-side
-admission and receipt semantics.
-For A2A reviewers, start with the A2A review package in
-[docs/a2a/README.md](docs/a2a/README.md).
-
-![Where Verifiable Agent Trust Envelope Fits](docs/figures/where-trust-envelope-fits-readme.png)
+The [VATE AL2 Verifier Admission Profile v0.3](docs/profiles/vate-al2-verifier-admission-profile-v0.3.md)
+treats A2A, MCP, OAuth, VC, DID, OID4VP, Web Bot Auth, AP2, x402, ACP, and
+payment-token systems as adjacent evidence sources. It defines how a relying
+party evaluates referenced evidence for one local action decision; it does not
+declare those source artifacts valid by mapping alone. A2A reviewers can start
+with the [A2A review package](docs/a2a/README.md).
 
 ## What This Draft Adds
 
-This draft is intentionally narrow.
-It is strongest on the following boundary:
+The draft's center of gravity is:
 
 - separating **controller**, **principal**, **actor**, and **runtime**
-- modeling **APC**, **ARP**, **AMP**, **AER**, and **ASN** as first-class artifacts
-- making verifier-side ordering explicit for external digital write decisions
-- treating **status** and **attenuation** as protocol concerns rather than afterthoughts
-- separating verifier-signed **admission receipts** from later **post-execution receipts** where later evidence matters
-- defining a reference-only **A2A metadata binding** for VATE admission and receipt artifacts
-
-Attenuation is a first-class outcome. For example, a verifier can record that a
-request for a USD 10000 transfer was admitted only with a USD 500 maximum,
-approval above USD 100, and a short execution window. The receipt records both
-the original request hash and the effective request hash so later execution
-evidence can be checked against the narrowed authority.
+- recording a declared request hash and digest-addressed evidence references in
+  one admission basis
+- binding actor, principal, runtime, permit or mandate, status, and local policy
+  to one action decision
+- making verifier-side ordering explicit for external digital writes
+- treating **status** and **attenuation** as protocol concerns
+- separating verifier-issued **admission receipts** from linked
+  **post-execution receipts**
+- defining a reference-only **A2A metadata binding** for VATE artifact references
 
 ## What This Draft Does Not Replace
 
-This draft is not trying to become:
+VATE is not an agent platform, prompt framework, multi-agent control plane,
+connector suite, human-approval UI, gateway, universal trust layer, identity
+registry, or global issuer.
 
-- an agent platform
-- a prompt framework
-- a multi-agent control plane
-- an MCP or A2A connector suite
-- a connector permission system
-- a human approval UI or HITL workflow product
-- a gateway or API management product
-- a universal trust layer
-- a universal identity registry
-- a single global issuer
-
-It is meant to compose with adjacent layers such as:
+It composes with:
 
 - `A2A` for discovery and delegation flow
 - `MCP + OAuth` for tool and resource authorization
@@ -161,32 +196,25 @@ It is meant to compose with adjacent layers such as:
 - `SPIFFE / workload identity / cloud attestation` for runtime authenticity anchors
 - `AP2 / x402 / ACP / payment tokens` for commerce and payment authorization evidence
 
-For the explicit non-goals, see [docs/non-goals.md](docs/non-goals.md).
+See the explicit [non-goals](docs/non-goals.md).
 
 ## Close Adjacent Work
 
-The public work most likely to be read as overlapping is:
+The public work most likely to be read as overlapping includes:
 
-- **Agent Permission Protocol (Crittora)**: explicit execution-time permission policy and enforcement gate
+- **Agent Permission Protocol (Crittora)**: execution-time permission policy and enforcement
 - **Open Agent Passport / APort**: passport and decision objects with policy enforcement
-- **Agent Passport System (APS / AEOESS)**: broader identity, delegation, governance, and commerce stack
+- **Agent Passport System (APS / AEOESS)**: identity, delegation, governance, and commerce
 - **AgentROA**: policy enforcement around MCP-routed agent actions
-- **Agent Auth / AIP drafts**: identity-first work around agent authentication and trust
+- **Agent Auth / AIP drafts**: identity-first agent authentication and trust work
 
-This draft should not be presented as if those do not exist.
-The intended claim is narrower:
-
-- this repo is a reviewable draft for a specific verifier-side boundary
-- its center of gravity is the composite artifact model across identity, runtime proof, task-scoped permit, status, and receipt
-- it is not claiming to replace the adjacent standards or product layers above
-
-Direct comparison note:
-
-- [docs/close-adjacent-work-2026-04.md](docs/close-adjacent-work-2026-04.md)
+VATE's center of gravity is the composite admission record across identity,
+runtime proof, task-scoped authority, status, local policy, and receipt linkage.
+See the [direct comparison note](docs/close-adjacent-work-2026-04.md).
 
 ## Read This In 5 Minutes
 
-If you are new to the repo, the fastest path is:
+If you are new to the repository, follow:
 
 1. this `README.md`
 2. [docs/public-claim-boundary.md](docs/public-claim-boundary.md)
@@ -206,46 +234,22 @@ If you are new to the repo, the fastest path is:
 16. section `0` and section `1` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md)
 17. [reference/http-verifier-demo/README.md](reference/http-verifier-demo/README.md)
 
-If you want the visual system view, see section `11` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md).
-
-If you want the shortest list of unresolved issues, read [docs/known-gaps.md](docs/known-gaps.md).
+For the visual system view, see section `11` of
+[docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md).
+For the shortest unresolved-work list, read [docs/known-gaps.md](docs/known-gaps.md).
 
 ## Review Questions
 
-The most useful feedback for this draft is currently:
+The most useful feedback is:
 
-- is the verifier-side boundary clear enough
+- is the verifier-side boundary clear
 - is the semantic `status -> identity -> runtime -> permit -> policy` ordering
-  sound once proof, digest, trust, and freshness gates have failed closed
-- are permit, receipt, status, and attenuation semantics coherent together
-- is the difference from close adjacent work stated honestly and precisely enough
-- can an external SUT produce digest-bound artifacts, a comparison report, and
-  an implementation report without relying on the Python reference runner as
+  sound after proof, digest, trust, freshness, and replay gates fail closed
+- are permit, receipt, status, attenuation, and handoff semantics coherent
+- can an external SUT produce digest-addressed artifacts, a comparison report,
+  and an implementation report without treating the Python reference runner as
   the primary specification
 - what should remain core versus move into profiles or extensions
-
-## Current Status
-
-- **Repository type**: protocol discussion draft
-- **Document maturity**: early draft
-- **Primary language**: English
-- **Roadmap refresh date**: 2026-07-27
-- **Primary battlefield**: `AL2` external digital write
-- **Current archived snapshot with version DOI**: `v0.3.2` external review
-  portability and reproducibility patch
-- **Implemented artifacts**: v0.3 schemas and examples; runnable AL2 fixture corpus with negative cases; SUT comparison and implementation-reporting formats; dependency-free verifier core and A2A-shaped adapter demo; package-private TypeScript reference helpers for digest-bound artifacts, SUT result shaping, and A2A metadata shape checks; focused adjacent evidence fixtures and crosswalk notes
-- **Immediate next action**: use the recorded three-case starter bundle and
-  deeper eight-case bundle from the same AlgoVoi implementation line to improve
-  reproducibility and reviewer onboarding, then collect a result from another
-  independently maintained implementation line distinct from both the
-  repository reference runner and the recorded AlgoVoi line, ideally with
-  generated artifacts or a controlled artifact bundle, an implementation
-  report, and a local bundle verification report for one `v0.3` corpus snapshot
-- **Planned later**: pairwise presentation profile, richer capability registry, formal `AID`, physical `ABS` profiles
-
-The conformance artifacts record one implementation run against one corpus
-snapshot. They do not imply endorsement, production approval, or a general
-compatibility claim.
 
 ## Repository Map
 
