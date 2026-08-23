@@ -6,7 +6,12 @@
 This document defines the v0.3 receipt model for the AL2 verifier admission profile.
 It does not remove the existing `schemas/execution-receipt.schema.json` v0.1 AER schema.
 
-In v0.3, the generic v0.1 AER shape remains a legacy-compatible receipt.
+The generic v0.1 AER schema remains available as a legacy artifact. The v0.3
+profile does not define field, phase, structural, or signature compatibility
+between that schema and the two v0.3 receipt schemas. They are not
+interchangeable unless a profile supplies explicit mapping and proof
+transformation rules.
+
 The profile adds two narrower schemas:
 
 - `schemas/admission-receipt.schema.json`
@@ -33,7 +38,7 @@ An admission receipt is normally issued by the verifier before execution.
 
 It records:
 
-- the request being evaluated
+- the declared request basis being evaluated
 - actor, principal, and runtime binding
 - evidence references and verification results
 - policy id and policy version
@@ -60,6 +65,34 @@ material, protected logs, or a digest-bound policy snapshot reference, but it is
 not automatically proven by the portable receipt unless a profile defines that
 commitment.
 
+## Admission-To-Handoff
+
+The admission receipt records a verifier decision; it does not invoke the
+target or command a production runtime. Immediate handoff depends on the
+decision and on an implementation-owned execution gate:
+
+- a profile-valid `allow` receipt makes the unchanged request identified by
+  `request.input_hash` a handoff candidate, subject to remaining validity,
+  freshness, replay, status, target-side, and implementation checks
+- a profile-valid `attenuate` receipt with
+  `attenuation.require_new_permit: false` makes only the narrowed request
+  identified by the declared `attenuation.effective_request_hash` and described
+  by `attenuation.changes` and `attenuation.effective_constraints` a handoff
+  candidate, subject to the same remaining checks
+- an `attenuate` receipt with `attenuation.require_new_permit: true`, a `deny`
+  receipt, or an invalid required admission check leaves no request eligible for
+  immediate handoff
+
+`should_execute` is the conformance-corpus and external-SUT result projection
+of that immediate eligibility. It is not an admission-receipt field, a
+production command, or proof that the implementation-owned gate passed its
+remaining checks.
+
+The v0.3 profile does not define or validate a portable predecessor/successor
+relationship from a `require_new_permit: true` receipt to a fresh authority,
+follow-on request, or later admission receipt. Any such re-admission lineage is
+implementation-defined in the current profile.
+
 ## Post-Execution Receipt
 
 A post-execution receipt is issued after execution, cancellation, or failure.
@@ -78,13 +111,15 @@ It records:
 - error details when execution failed
 
 A post-execution receipt must not silently change the admitted request.
-The `effective_request_hash` should match the request admitted by the admission receipt.
+Its `execution.effective_request_hash` must equal `request.input_hash` for an
+`allow` admission or the declared `attenuation.effective_request_hash` for an
+`attenuate` admission.
 For the AL2 v0.3 profile, `input_hash`, `output_hash`,
 `original_request_hash`, and `effective_request_hash` use the same profile hash
 grammar: `sha-256:` followed by a lowercase 64-character hexadecimal digest.
 For the AL2 conformance corpus, post-execution linkage also binds the admission
-receipt digest, admission decision, transaction id, runtime id, admission expiry,
-and attenuated effective constraints. A mismatch on any of those fields is
+receipt id and digest, admission decision, transaction id, runtime id, admission
+window, and effective constraints. A mismatch on any of those fields is
 reported with the most specific applicable post-execution reason code, such as
 `POST_EXEC_ADMISSION_DIGEST_MISMATCH`,
 `POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH`, `POST_EXEC_RUNTIME_MISMATCH`, or
@@ -93,22 +128,34 @@ a generic fallback for older or underspecified fixtures.
 
 ## Request-to-Admission-to-Effect Binding Invariant
 
-A post-execution artifact belongs to an admission only when it binds to both
-the specific admission receipt and the admitted effective request. When
-attenuation changes the request, the admission receipt must preserve a
-verifiable transformation from `original_request_hash` to
-`effective_request_hash`.
+A post-execution artifact belongs to an admission only when the selected
+profile verifies its linkage to both the specific admission receipt and the
+declared admitted-request basis. When attenuation changes the request, the
+admission receipt records `original_request_hash`, `effective_request_hash`,
+the applied `changes`, and `effective_constraints`.
 
-This is a binding chain rather than one shared digest across every phase:
+This records a phase-specific linkage chain rather than one shared digest across
+every phase:
 
-`original request -> attenuation decision and effective constraints -> effective request -> specific admission receipt -> post-execution artifact`
+`declared original request basis -> attenuation decision, changes, and effective constraints -> declared effective request basis -> specific admission receipt -> post-execution artifact`
 
-For digest-based edges, the verifier must recompute the applicable
-profile-defined digest over the referenced artifact or selected structured
-object rather than trust a declared digest value. Identifiers and other linkage
-fields, including the admission receipt id, decision, transaction, and runtime,
-must be compared under the applicable profile. The validity window, replay
-state, and effective constraints must be validated separately.
+For the admission-receipt content edge, the verifier must recompute the receipt
+digest under the applicable profile basis rather than trust the declared digest
+value. Identifiers and other linkage fields, including the admission receipt id,
+decision, transaction, runtime, and effective request hash, must be compared
+under the applicable profile. The validity window, replay state, and effective
+constraints must be validated separately.
+
+The current reference runner validates the required attenuation structure,
+checks that the declared original and effective hashes use the profile hash
+grammar and differ, and carries the declared `effective_request_hash` into
+post-execution equality checks. It does not verify that
+`original_request_hash` equals the admission receipt's `request.input_hash`,
+receive or reconstruct the original and effective request preimages, apply
+`changes` to produce an effective request, or recompute
+`effective_request_hash` from such an object. The recorded hashes, changes, and
+constraints therefore describe the verifier's narrowing decision; they are not,
+by themselves, proof that the transformation was executed.
 
 A matching digest establishes content linkage, not current authority by itself.
 The verifier still evaluates status or revocation, freshness, and the remaining
@@ -156,9 +203,9 @@ that the runner independently derives or exhaustively checks `tool_allowlist`,
 `target_resource`, `approval`, or every admitted constraint from side effects.
 
 An attenuated admission receipt can still be non-executable. In particular,
-`attenuation.require_new_permit: true` means the verifier found a narrower or
-fresh-permit path, but execution should not proceed until that new permit is
-available.
+`attenuation.require_new_permit: true` closes immediate handoff under that
+receipt. The current profile does not establish that a later permit exists or
+bind it to a successor request or admission.
 
 ## Attenuation
 

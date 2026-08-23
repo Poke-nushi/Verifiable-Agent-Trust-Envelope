@@ -621,42 +621,156 @@ Different assurance / jurisdiction / industry profiles SHOULD be composable.
 
 ## 11. Reference Architecture
 
-![Trust envelope reference architecture](figures/trust-envelope-reference-architecture.png)
+<picture>
+  <source media="(max-width: 600px)" srcset="figures/where-trust-envelope-fits-readme-mobile.png">
+  <img src="figures/where-trust-envelope-fits-readme.png" alt="One request and evidence basis enters local VATE admission, producing an admission receipt for an implementation-owned gate that reaches the target or stops and links outcome evidence">
+</picture>
 
-Figure 1. Reference architecture view of this draft as a portable trust / permit / receipt layer across controller, principal, runtime, permit, status, verifier, and receipt semantics.
+Figure 1. Current verifier-side admission and receipt-linkage view for the
+`VATE-AL2-Verifier-Admission-v0.3` profile.
 
-Source file: [figures/trust-envelope-reference-architecture.html](figures/trust-envelope-reference-architecture.html)
+Overview source: [figures/where-trust-envelope-fits.html](figures/where-trust-envelope-fits.html)
+
+Detailed reference architecture:
+[HTML](figures/trust-envelope-reference-architecture.html) ·
+[PNG](figures/trust-envelope-reference-architecture.png)
+
+This is a profile-facing architecture view, not a claim that VATE owns the
+adjacent transport, identity, authorization, payment, attestation, permission,
+execution, or provenance systems shown around it.
+
+The `APC`, `ARP`, `AMP`, `ASN`, and `AER` names remain part of the
+v0.1 artifact vocabulary. The current v0.3 profile flow makes the narrower
+verifier boundary concrete as:
+
+`admission request -> local verification -> admission receipt -> execution gate -> effective request -> post-execution receipt`
+
+The execution gate and effective-request representation are implementation
+responsibilities. The current reference runner derives a review-time
+`should_execute` projection; it does not release an executable request.
+
+This document does not currently define structural or signature compatibility
+between the v0.3 receipt schemas and the v0.1 AER schema.
 
 ### 11.1 Components
 
-#### Agent Wallet / Holder
-A local or hosted holder system managed by an individual or a team.  
-It manages subject identifiers, APC, keys, pairwise identifiers, permit requests, and receipts.
+#### Requesting-Side Roles
 
-#### Passport Authority
-Credential issuer.  
-It manages controller binding, assurance profiles, and revocation roots.
+The architecture keeps controller, principal, actor, and runtime distinct.
 
-#### Runtime Attestor
-Verifies the authenticity of the running runtime and issues ARP.
+- the **controller** owns or operates the actor and may hold recovery authority
+- the **principal** is the person or workflow for whom the task is performed
+- the **actor** is the agent requesting the external action
+- the **runtime** is the concrete execution instance associated with that actor
 
-#### Permit Broker / Transaction Token Service
-Issues AMP based on principal, actor, resource, and policy context.
+The v0.3 admission request requires actor, principal, and runtime identifiers.
+Controller remains part of the broader v0.1 role model but is not a required
+top-level field in the v0.3 admission-request schema.
 
-#### Registry / Resolver
-Discovery and resolution layer.  
-Public information such as A2A Agent Cards may be linked here, but this draft does not require a central registry.
+#### Protocol-Native Evidence Systems
 
-#### Status Network
-Credential status lists plus incident push signaling.  
-Handles revocation and risk attenuation.
+A2A, MCP, HTTP, OAuth, OpenID, VC, DID, SPIFFE, runtime attestation, status,
+permission, AP2, x402, ACP, UCP, and related systems remain adjacent systems.
+They issue or carry evidence under their own validation, freshness, trust, and
+revocation rules.
 
-#### Receipt Log / Transparency Log
-Stores receipts in append-only form, or at minimum anchors their hashes.
+VATE does not declare those artifacts valid by mapping them. The admission
+request references supplied artifacts by URI, media type, and digest so the
+verifier can record how they informed one concrete action decision.
 
-#### Physical Body / Device Controller
-The body-side controller for physical AI systems.  
-May include secure elements, maintenance records, and operator binding.
+#### Admission Request
+
+The admission request records one concrete request basis: the requested action,
+target, actor, principal, runtime, audience, any requested constraints, a
+declared profile `input_hash`, and digest-addressed evidence references. The
+current schema does not require the request payload bytes to be embedded in the
+admission request, and the reference runner does not reconstruct those bytes
+from `input_hash`.
+
+It is the input to one verifier-side admission decision. It is not a replacement
+for an A2A task, MCP call, OAuth token, payment mandate, or upstream credential.
+
+#### Consequence-Owning Relying Party / Verifier
+
+The relying party that owns the consequence of the action performs the local
+admission decision.
+
+Before treating any input as authoritative, an implementation needs structural,
+digest, proof / trust-anchor, time, replay, and freshness gates. The verifier
+then evaluates the dependency-aware semantic basis across status, identity,
+runtime, permit or mandate constraints, and local policy.
+
+#### Admission Receipt
+
+The verifier records `allow`, `attenuate`, or `deny` in an admission
+receipt before execution.
+
+The receipt records the decision against the declared request basis, subject
+and runtime context, evidence checks, policy basis, reason codes, validity
+window, and any machine-readable attenuation. An attenuation records declared
+original and effective request hashes, explicit changes, and effective
+constraints; it does not, by itself, prove that applying those changes produced
+the effective request object.
+
+#### Execution Gate And Target Surface
+
+An admission decision and immediate executability are related but distinct.
+The implementation-owned gate applies these branches:
+
+- a profile-valid `allow` receipt makes the unchanged request identified by
+  `request.input_hash` a handoff candidate, subject to remaining validity,
+  freshness, replay, status, target-side, and implementation checks
+- a profile-valid `attenuate` receipt with
+  `attenuation.require_new_permit: false` makes only the narrowed request
+  identified by the declared `attenuation.effective_request_hash` and described
+  by its changes and effective constraints a handoff candidate, subject to the
+  same remaining checks
+- an `attenuate` receipt with `attenuation.require_new_permit: true`, a `deny`
+  receipt, or an invalid required admission check leaves no request eligible for
+  immediate handoff
+
+For reference-corpus evaluation and generated-receipt comparison, the runner
+derives `should_execute` from the admission receipt. External SUT results carry
+the boolean separately for comparison with the corpus expectation.
+`should_execute` is not an admission-receipt field, a production execution
+command, or proof that the implementation-owned gate passed its remaining
+checks.
+
+An implementation-specific gate owns the concrete request object and may
+release only an object it associates with the original or narrowed request basis
+recorded by the admission receipt into an API, MCP tool, remote agent action, or
+other execution environment.
+
+The current runner validates the required attenuation structure, checks that
+the declared original and effective hashes use the profile hash grammar and
+differ, and uses the declared effective hash in post-execution equality checks.
+It does not verify that the declared original hash equals `request.input_hash`,
+reconstruct an effective request from an original request preimage, apply the
+declared changes, or recompute the declared effective request hash. The current
+profile also does not define a portable predecessor/successor relationship from
+a `require_new_permit: true` receipt to a fresh authority, follow-on request, or
+later admission receipt. Production gate integration and re-admission lineage
+remain implementation-defined.
+
+#### Outcome Evidence And Post-Execution Receipt
+
+Outcome evidence records what happened after execution, cancellation, or
+failure. A post-execution receipt links that evidence to the specific admission
+using the admission receipt id and digest, admission decision, transaction,
+runtime, effective request hash, admission window, result, side effects, and
+effective-constraint checks required by the selected profile. For `allow`, the
+effective request hash is `request.input_hash`; for `attenuate`, it is the
+declared `attenuation.effective_request_hash`.
+
+#### Storage, Publication, And External Proofs
+
+Receipts may be stored or published according to deployment policy. Append-only
+logs, transparency systems, detached signatures, signed releases, and external
+proof services are optional adjacent mechanisms.
+
+The current reference runner verifies a local digest chain for a bounded report
+bundle. It does not prove a maintainer-controlled publication origin or verify
+production signatures.
 
 ---
 
@@ -744,15 +858,16 @@ Mission permit flow.
 Admission and post-execution receipt schema and emission flow.
 
 #### Inputs
-- AMP
-- ARP
+- admission request
+- permit, mandate, runtime, status, and other accepted evidence references
 - verifier decision metadata
-- execution metadata
-- evidence references
+- execution metadata where execution proceeds
 
 #### Outputs
-- admission-phase AER
-- post-execution AER where execution proceeds
+- v0.3 admission receipt before execution
+- v0.3 post-execution receipt after execution, cancellation, or failure
+- optional v0.1 AER representation only when a profile defines explicit field,
+  phase, and proof transformation rules
 - optional receipt anchor / transparency proof
 
 ### 13.5 Status
@@ -947,7 +1062,14 @@ sequenceDiagram
     R-->>W: runtime ready
 ```
 
-### 15.3 External Agent Call Flow
+### 15.3 Legacy v0.1 External Agent Call Flow (Non-Normative)
+
+The sequence below preserves the original v0.1 `APC`, `ARP`, `AMP`, and `AER`
+vocabulary for historical context. It is not the current v0.3
+verifier-admission runtime path and does not authorize bypassing the admission
+receipt, implementation-specific execution gate, effective request, or
+post-execution receipt. For v0.3, use the path in [Section 11](#11-reference-architecture)
+and the [VATE AL2 Verifier Admission Profile v0.3](profiles/vate-al2-verifier-admission-profile-v0.3.md).
 
 ```mermaid
 sequenceDiagram
@@ -957,6 +1079,8 @@ sequenceDiagram
     participant V as Verifier / Remote Agent
     participant ST as Status Network
     participant RL as Receipt Log
+
+    Note over P,RL: Legacy v0.1 context only; not the v0.3 admission and execution-gate path
 
     P->>A: do task
     A->>V: request
@@ -970,6 +1094,9 @@ sequenceDiagram
     V-->>A: task accepted/result
     V->>RL: write AER
 ```
+
+The current v0.3 sequence remains:
+`admission request -> local verification -> admission receipt -> execution gate -> effective request -> post-execution receipt`.
 
 ### 15.4 Delegated Multi-Agent Flow
 
