@@ -114,6 +114,38 @@ For AL2, it should include:
 - side effects
 - policy violations, if any
 
+### Post-Execution Linkage Invariants
+
+A post-execution receipt is attributable to one admission only when the
+applicable linkage relations below hold. These relations bind the observed
+effect to a specific admission receipt and admitted request; they do not make a
+matching artifact current authority by themselves.
+
+| Binding | Admission source | Post-execution source | Required relation |
+| --- | --- | --- | --- |
+| Receipt identity | `receipt_id` | `admission.receipt_id` | Exact match |
+| Receipt content | The complete admission receipt under the digest basis selected by the applicable profile or binding | `admission.digest` | Recomputed digest match |
+| Admission decision | `decision.outcome` | `admission.decision` | Exact match; post-execution linkage accepts only an `allow` admission or an `attenuate` admission that does not require a new permit |
+| Transaction | `request.transaction_id` | `execution.transaction_id` | Exact match |
+| Runtime | `subject.runtime` | `execution.runtime` | Exact match |
+| Effective request for `allow` | `request.input_hash` | `execution.effective_request_hash` | Exact match |
+| Effective request for `attenuate` | `attenuation.effective_request_hash` | `execution.effective_request_hash` | Exact match |
+| Admission window | `issued_at`, `expires_at` | `execution.started_at`, `execution.finished_at` | Execution starts no earlier than issuance, finishes no earlier than it starts, and finishes no later than expiry |
+| Effective constraints | `request.constraints` for `allow`; `attenuation.effective_constraints` for `attenuate` | Profile-registered observations in the post-execution receipt | Apply the checks registered by the selected profile |
+
+The current v0.3 runner independently derives the aggregate `max_amount` check
+from `result.side_effects[].amount`. It does not independently derive
+`tool_allowlist`, `target_resource`, `approval`, or all other
+effective-constraint results from observed side effects.
+
+For receipt-object comparisons, the current corpus uses the dependency-free
+`json-sorted-no-whitespace` fixture basis described in
+[the conformance digest-basis document](../conformance/digest-basis.md). That
+basis is not RFC 8785 / JCS or a production signature profile. Status,
+revocation, freshness, replay state, and any remaining profile-specific
+conditions must be evaluated separately by the applicable verifier or
+deployment.
+
 ## Verification Stages
 
 The earlier v0.1 shorthand was:
@@ -173,6 +205,48 @@ Examples:
 - missing approval
 - digest mismatch
 - unsupported attenuation effect
+
+## Admission-To-Handoff Conditions
+
+An admission decision records the verifier's result. It does not invoke the
+target, transfer execution responsibility to VATE, or by itself prove that a
+deployment-specific execution gate is open.
+
+The following table defines the current v0.3 admission condition exposed to an
+implementation-owned handoff boundary. `should_execute` is the corpus and
+external-SUT comparison projection of immediate handoff eligibility. It is not
+an admission-receipt field, a production execution command, or proof that a
+later post-execution artifact is valid.
+
+| Admission condition | Implementation-owned handoff condition | Conformance projection |
+| --- | --- | --- |
+| A profile-valid `allow` receipt | The unchanged admitted request is a handoff candidate, subject to the selected profile's remaining validity, freshness, replay, status, target-side, and implementation checks. | `should_execute: true` |
+| A profile-valid `attenuate` receipt with `attenuation.require_new_permit: false` | Only the narrowed effective request identified by the declared `attenuation.effective_request_hash` and described by `attenuation.changes` and `attenuation.effective_constraints` is a handoff candidate. The projection does not establish that deployment-specific acceptance or remaining gates passed. | `should_execute: true` |
+| An `attenuate` receipt with `attenuation.require_new_permit: true` | No request is eligible for immediate handoff under this receipt. This profile does not define or validate a portable predecessor/successor lineage from this receipt to any later authority, request, or admission. | `should_execute: false` |
+| `deny` | No request is eligible for handoff. | `should_execute: false` |
+| A required admission-time structure, authority, status, trust, freshness, integrity, or schema check is invalid, expired, stale, revoked, or unavailable under fail-closed policy | The verifier records `deny` with the applicable reason codes. No request is eligible for handoff. | `should_execute: false` |
+
+For reference-corpus evaluation and generated-receipt comparison, the runner
+derives the projection from the admission receipt. For an external SUT result
+without generated receipts, `compare` checks the SUT-reported boolean against
+the corpus expectation. Neither path continuously re-evaluates the current
+clock, later status or revocation changes, target-side state, or execution
+outcome. A case can therefore have `should_execute: true` for its pre-execution
+admission projection and still fail a later post-execution linkage or constraint
+check.
+
+The current runner checks the declared attenuation hashes, changes, and
+effective-constraint shape, and it carries the declared effective request hash
+into post-execution linkage comparison. It does not reconstruct the effective
+request by applying `attenuation.changes` to an original request preimage or
+recompute `attenuation.effective_request_hash` from such a reconstructed object.
+
+The current profile closes the immediate handoff condition when
+`require_new_permit` is true, but it does not define or validate a typed
+predecessor/successor relationship to a fresh permit, follow-on request, or
+later admission receipt. Production execution-gate integration and that
+portable re-admission lineage remain open work documented in
+[Known Gaps](../known-gaps.md).
 
 ## Status And Freshness
 

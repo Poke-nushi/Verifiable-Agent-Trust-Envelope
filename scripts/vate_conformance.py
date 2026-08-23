@@ -314,9 +314,12 @@ def try_parse_time(value: Any) -> datetime | None:
     if not isinstance(value, str):
         return None
     try:
-        return parse_time(value)
+        parsed = parse_time(value)
     except ValueError:
         return None
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        return None
+    return parsed
 
 
 def canonical_bytes(value: Any) -> bytes:
@@ -936,10 +939,13 @@ def admitted_effective_request_hash(admission_receipt: dict[str, Any]) -> Any:
 
 
 def admitted_effective_constraints(admission_receipt: dict[str, Any]) -> dict[str, Any]:
-    attenuation = admission_receipt.get("attenuation")
-    attenuation_constraints = attenuation.get("effective_constraints") if isinstance(attenuation, dict) else None
-    if isinstance(attenuation_constraints, dict):
-        return attenuation_constraints
+    if actual_decision(admission_receipt) == "attenuate":
+        attenuation = admission_receipt.get("attenuation")
+        attenuation_constraints = (
+            attenuation.get("effective_constraints") if isinstance(attenuation, dict) else None
+        )
+        if isinstance(attenuation_constraints, dict):
+            return attenuation_constraints
     request = admission_receipt.get("request")
     request_constraints = request.get("constraints") if isinstance(request, dict) else None
     if isinstance(request_constraints, dict):
@@ -999,6 +1005,8 @@ def post_execution_linkage_failures(
     finished_at = try_parse_time(execution.get("finished_at"))
     admission_issued_at = try_parse_time(admission_receipt.get("issued_at"))
     admission_expires_at = try_parse_time(admission_receipt.get("expires_at"))
+    if admission_issued_at is None or admission_expires_at is None:
+        failures.append("admission timestamps must be valid")
     if started_at is None or finished_at is None:
         failures.append("execution timestamps must be valid")
     else:
@@ -1082,6 +1090,8 @@ def admission_time_window_valid(
     finished_at = try_parse_time(execution.get("finished_at"))
     admission_issued_at = try_parse_time(admission_receipt.get("issued_at"))
     admission_expires_at = try_parse_time(admission_receipt.get("expires_at"))
+    if admission_issued_at is None or admission_expires_at is None:
+        return False, "admission timestamps must be valid"
     if started_at is None or finished_at is None:
         return False, "execution timestamps must be valid"
     if finished_at < started_at:
@@ -1686,12 +1696,15 @@ def evaluate_artifact_reference_checks(
 
 def evaluate_attenuation_checks(case: dict[str, Any], admission: dict[str, Any] | None) -> list[str]:
     failures: list[str] = []
-    if admission is not None and actual_decision(admission) == "attenuate":
-        for failure in attenuation_validation_failures(
-            admission.get("attenuation"),
-            decision_reason_codes=actual_reason_codes(admission),
-        ):
-            failures.append(f"attenuation: {failure}")
+    if admission is not None:
+        if actual_decision(admission) == "attenuate":
+            for failure in attenuation_validation_failures(
+                admission.get("attenuation"),
+                decision_reason_codes=actual_reason_codes(admission),
+            ):
+                failures.append(f"attenuation: {failure}")
+        elif "attenuation" in admission:
+            failures.append("attenuation: must be absent unless decision.outcome is attenuate")
 
     for check in case.get("attenuation_checks", []):
         artifact_name = check["artifact"]
@@ -2799,7 +2812,12 @@ def generated_admission_receipt_shape_failures(receipt: dict[str, Any], label: s
         )
     decision = receipt.get("decision")
     failures.extend(generated_decision_shape_failures(decision, f"{label}.decision"))
-    if "attenuation" in receipt:
+    decision_outcome = decision.get("outcome") if isinstance(decision, dict) else None
+    if decision_outcome == "attenuate" and "attenuation" not in receipt:
+        failures.append(f"{label}.attenuation: required when decision.outcome is attenuate")
+    elif decision_outcome != "attenuate" and "attenuation" in receipt:
+        failures.append(f"{label}.attenuation: must be absent unless decision.outcome is attenuate")
+    if decision_outcome == "attenuate" and "attenuation" in receipt:
         decision_codes = (
             decision.get("reason_codes")
             if isinstance(decision, dict) and isinstance(decision.get("reason_codes"), list)
