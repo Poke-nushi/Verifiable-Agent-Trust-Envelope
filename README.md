@@ -123,6 +123,8 @@ start here:
   report links
 - [External SUT run records](docs/conformance/external-sut-run-records.md) -
   pinned externally supplied run artifacts used for review
+- [AEE-native boundary review](docs/interop/aee-native-boundary-review.md) -
+  eight executable AEE-native vectors prompted by three pinned VATE cases
 - [External implementation call](docs/conformance/external-implementation-call.md) -
   the request for result files, generated artifacts, and implementation reports
 - [External SUT quickstart](docs/conformance/external-sut-quickstart.md) - how a
@@ -349,6 +351,8 @@ The most useful feedback is:
   OAP / APort decision evidence crosswalk for VATE admission receipts
 - [docs/interop/aae-crosswalk.md](docs/interop/aae-crosswalk.md)
   Agent Authorization Envelope evidence crosswalk for VATE admission receipts
+- [docs/interop/aee-native-boundary-review.md](docs/interop/aee-native-boundary-review.md)
+  Source-pinned AEE-native boundary vectors prompted by three VATE cases
 - [docs/interop/ap2-ucp-commerce-crosswalk.md](docs/interop/ap2-ucp-commerce-crosswalk.md)
   AP2 / UCP commerce evidence crosswalk for VATE admission receipts
 - [docs/interop/ap2-human-not-present-evidence.md](docs/interop/ap2-human-not-present-evidence.md)
