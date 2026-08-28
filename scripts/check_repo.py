@@ -28,6 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEMO = ROOT / "reference" / "minimal-al2-demo" / "trust_envelope_demo.py"
 HTTP_DEMO = ROOT / "reference" / "http-verifier-demo" / "http_verifier_demo.py"
 VATE_CONFORMANCE = ROOT / "scripts" / "vate_conformance.py"
+PULSE_EXTERNAL_SUT_STARTER_CHECK = ROOT / "scripts" / "check_pulse_external_sut_starter.py"
 VATE_CORE = ROOT / "reference" / "vate-verifier-core" / "vate_verifier_core.py"
 A2A_ADAPTER = ROOT / "reference" / "a2a-metadata-adapter-demo" / "a2a_metadata_adapter_demo.py"
 EVIDENCE_VOCABULARY = ROOT / "registries" / "evidence-vocabulary.v0.3.json"
@@ -86,6 +87,7 @@ EXAMPLE_PAIRS = [
     ("examples/report-bundle-verification.example.json", "schemas/report-bundle-verification.schema.json"),
     ("examples/conformance/sut-results-pass.example.json", "schemas/sut-result.schema.json"),
     ("examples/external-sut-template/starter-sut-result.template.json", "schemas/sut-result.schema.json"),
+    ("examples/external-sut-pulse-starter/pulse-sut-result.template.json", "schemas/sut-result.schema.json"),
     ("conformance/al2-vate-v0.3/corpus.json", "schemas/conformance-corpus.schema.json"),
     ("examples/policies/merchant-purchase-al2-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),
     ("examples/policies/al2-repo-merge-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),
@@ -3157,6 +3159,8 @@ def main() -> int:
     run([sys.executable, "-m", "py_compile", str(DEMO)])
     run([sys.executable, "-m", "py_compile", str(HTTP_DEMO)])
     run([sys.executable, "-m", "py_compile", str(VATE_CONFORMANCE)])
+    run([sys.executable, "-m", "py_compile", str(PULSE_EXTERNAL_SUT_STARTER_CHECK)])
+    run([sys.executable, str(PULSE_EXTERNAL_SUT_STARTER_CHECK), "--self-test"])
     run([sys.executable, "-m", "py_compile", str(VATE_CORE)])
     run([sys.executable, "-m", "py_compile", str(A2A_ADAPTER)])
 

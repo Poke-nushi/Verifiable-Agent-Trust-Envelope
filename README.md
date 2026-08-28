@@ -129,6 +129,9 @@ start here:
   the request for result files, generated artifacts, and implementation reports
 - [External SUT quickstart](docs/conformance/external-sut-quickstart.md) - how a
   non-reference implementation can submit a result for `compare`
+- [Pulse bounded-attempt starter](examples/external-sut-pulse-starter/README.md) -
+  exact-pin inputs, candidate-owned mapping worksheet, frozen-verifier command,
+  and unexecuted result/run-record template for the solicited reciprocal trial
 - [Implementation reporting](docs/conformance/implementation-reporting.md) - how
   to publish one implementation run against one corpus snapshot
 - [A2A review package](docs/a2a/README.md) - metadata-only admission and receipt
