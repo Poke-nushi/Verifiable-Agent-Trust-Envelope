@@ -28,6 +28,43 @@ The AEE-side provenance and interpretation are recorded in its pinned
 and machine-readable
 [`vectors/MANIFEST.json`](https://github.com/astrogilda/aee-conformance/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/MANIFEST.json).
 
+## Follow-up Correction
+
+The external record above remains the historical pin for the merged
+contribution. AEE later corrected the specific case-1 control pair without
+rewriting suiteRevision 26:
+
+| Field | Pinned value |
+|---|---|
+| Correction commit | [`297636c25472b207c56e90ab13b5a15cc40d6f25`](https://github.com/astrogilda/aee-conformance/commit/297636c25472b207c56e90ab13b5a15cc40d6f25) |
+| AEE suite at correction | suiteRevision 27, 258 vectors; corpus digest `12d27820ede985ac2cd43b5b4e6a6569ebd74a032f2748017022cb2735d282e9` |
+| Maintainer explanation | [PR #4 follow-up](https://github.com/astrogilda/aee-conformance/pull/4#issuecomment-5447244673) |
+| VATE owner confirmation | [verification comment](https://github.com/astrogilda/aee-conformance/pull/4#issuecomment-5447525943) |
+
+At that commit, the committed
+[`vate-1d`](https://github.com/astrogilda/aee-conformance/blob/297636c25472b207c56e90ab13b5a15cc40d6f25/vectors/accept/vate-1d-admission-receipt-as-sole-subject.json)
+and
+[`vate-1a`](https://github.com/astrogilda/aee-conformance/blob/297636c25472b207c56e90ab13b5a15cc40d6f25/vectors/reject/vate-1a-admission-receipt-substituted-splice.json)
+statements each have 38 scalar leaves and differ only at
+`subject[0].digest.sha256`. The reject generator reads the committed `vate-1d`
+accept vector and mutates that path instead of rebuilding a parallel parent
+fixture.
+
+The VATE owner confirmation records a 258/258 reference-rail result, a 20/20
+rail self-test, byte-identical regeneration of all 308 generated files under
+the declared generator environment, and a passing accept-anchor gate. With the
+accept parent removed in an isolated copy, the reject generator exited 1 with
+`FileNotFoundError` at that exact parent path; it did not reconstruct a
+fallback parent.
+
+This correction establishes a literal one-field relation only for the
+`vate-1d` / `vate-1a` control pair. suiteRevision 27 explicitly leaves
+separate-fixture divergence in the broader declared parent set, including
+`vate-1c` and `vate-3a`. The accept-anchor gate checks that a declared accept
+parent exists by whole-id membership; it is not a corpus-wide proof that every
+child differs from its parent by exactly one scalar leaf. These findings are
+pinned to the correction commit and do not describe later AEE `main`.
+
 ## VATE Source Pins
 
 The AEE vectors point back to this fixed VATE review surface:
@@ -70,9 +107,12 @@ subject. A producer-carried admission digest remains outside the AEE predicate;
 VATE's referenced-admission-receipt comparison remains a separate verifier-side
 check.
 
-The committed `vate-1a` and `vate-1d` files are not treated here as a literal
-one-field byte pair. Each vector is interpreted independently from its own
-bytes and its `vectors/MANIFEST.json` expectation.
+At the merged revision 26 pin
+`2aa5a23d0e0cf93921a59510a755ccfe1e103a47`, the committed `vate-1a` and
+`vate-1d` files are not a literal one-field byte pair and are not treated as
+one here. Each revision 26 vector is interpreted independently from its own
+bytes and its `vectors/MANIFEST.json` expectation. The later revision 27
+correction is recorded separately above.
 
 ### Aggregate Effective Constraints
 
@@ -128,5 +168,8 @@ or evidence that AEE implements the VATE schemas or runner contract. It does
 not imply endorsement, production approval, or general compatibility between
 the projects.
 
-The result applies to the fixed VATE corpus digest and AEE merged PR head named
-above. Later bytes require a new pinned review.
+The merged-contribution result applies to the fixed VATE corpus digest and AEE
+merged PR head named above. The follow-up records only the case-1 control
+correction and verification at `297636c25472b207c56e90ab13b5a15cc40d6f25`;
+it is not a review of later AEE `main` or of the later corpus as a whole. Other
+later bytes require a new pinned review.
