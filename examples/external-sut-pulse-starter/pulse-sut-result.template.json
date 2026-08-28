@@ -1,0 +1,406 @@
+{
+  "version": "vate-sut-results-2026-07",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "generated_at": "2026-08-28T00:00:00Z",
+  "artifact_mode": "corpus-fixture-validation",
+  "implementation": {
+    "name": "Pulse AP2-x402 external VATE attempt",
+    "type": "external-verifier-projection-template",
+    "version": "replace-with-candidate-owned-mapping-version",
+    "language": "TypeScript",
+    "source": "https://example.invalid/replace-with-candidate-controlled-mapping-repository",
+    "commit": "replace-with-candidate-owned-mapping-commit",
+    "environment": "Frozen Pulse verifyConformanceCase at e06a6cbfe3ddb965c8fc70f50838f5014ec2038e; offline candidate-owned mapping/projection executed only from a fresh tracked-regular commit export with an operator-selected absolute runtime",
+    "upstream_verifier": {
+      "source": "https://github.com/shibutatsu/pulse-ap2-x402-conformance",
+      "commit": "e06a6cbfe3ddb965c8fc70f50838f5014ec2038e",
+      "entry_point": "src/verifier.ts#verifyConformanceCase"
+    }
+  },
+  "corpus": {
+    "profile": "VATE-AL2-Verifier-Admission-v0.3",
+    "digest": {
+      "alg": "sha-256",
+      "value": "988aae7d03dd5bb743e8e03e6ab1120ce8735a4837ac818ffd9d665de0c1e370"
+    }
+  },
+  "results": [
+    {
+      "case_id": "allow-ap2-hnp-preauthorized-mandate",
+      "status": "skipped",
+      "outcome": "unmapped",
+      "should_execute": false,
+      "reason_codes": [
+        "PULSE_RESULT_NOT_RECORDED"
+      ],
+      "artifacts": {
+        "admission_receipt": {
+          "uri": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-valid.example.json",
+          "media_type": "application/json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "60ab3343833cb5840ed8070cc55b55dd715c72f04284a542c42c113290b2eae9"
+          }
+        }
+      },
+      "limitations": [
+        "Template sentinel only. Project only from the preserved raw Pulse report."
+      ]
+    },
+    {
+      "case_id": "attenuate-ap2-hnp-amount-overrun",
+      "status": "skipped",
+      "outcome": "unmapped",
+      "should_execute": false,
+      "reason_codes": [
+        "PULSE_RESULT_NOT_RECORDED"
+      ],
+      "artifacts": {
+        "admission_receipt": {
+          "uri": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-overrun.example.json",
+          "media_type": "application/json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "08803e26794f3513dc108f3f03c238e9acb17e7a23e1b4bdd62730cc6973c8f6"
+          }
+        }
+      },
+      "limitations": [
+        "Template sentinel only. Preserve Pulse reject/non-attenuate versus VATE attenuate as a mismatch."
+      ]
+    },
+    {
+      "case_id": "deny-ap2-hnp-stale-mandate",
+      "status": "skipped",
+      "outcome": "unmapped",
+      "should_execute": false,
+      "reason_codes": [
+        "PULSE_RESULT_NOT_RECORDED"
+      ],
+      "artifacts": {
+        "admission_receipt": {
+          "uri": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-stale.example.json",
+          "media_type": "application/json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "535294eaa7d3c6d0ae3844eb31314ab60657267d2889ba41b85ceaa787dcdff6"
+          }
+        }
+      },
+      "limitations": [
+        "Template sentinel only. Project only from the preserved raw Pulse report."
+      ]
+    }
+  ],
+  "external_run": {
+    "record_version": "vate-pulse-external-sut-run-record-0.6",
+    "status": "template",
+    "evidence_class": "unexecuted-template",
+    "vate_source_commit": "5a37f87de0190da44e619b1800261637e83dd7ed",
+    "pulse_verifier_commit": "e06a6cbfe3ddb965c8fc70f50838f5014ec2038e",
+    "source_policy": {
+      "vate_expected_used": false,
+      "vate_admission_receipt_used_as_source": false,
+      "vate_post_execution_receipt_used_as_source": false,
+      "case_id_verdict_lookup_used": false,
+      "unchanged_pulse_fixture_used": false,
+      "pulse_verifier_semantic_change": false,
+      "comparison_receipts_used_only_by_vate_compare": true,
+      "candidate_runtime_received_eligible_inputs_only": true,
+      "source_scan_is_primary_control": false
+    },
+    "comparison_contract": {
+      "corpus_case_count": 75,
+      "selected_case_count": 3,
+      "out_of_scope_case_count": 72,
+      "fixed_runner_treats_skipped_as_failure": true,
+      "completed_expected_summary": {
+        "passed": 2,
+        "failed": 73,
+        "skipped": 72
+      },
+      "selected_expected_relation_counts": {
+        "match": 2,
+        "mismatch": 1
+      },
+      "verify_bundle_is_integrity_only": true
+    },
+    "attempt": {
+      "stage": null,
+      "reason_code": null,
+      "details": null,
+      "completed_case_ids": [],
+      "incomplete_case_ids": [
+        "allow-ap2-hnp-preauthorized-mandate",
+        "attenuate-ap2-hnp-amount-overrun",
+        "deny-ap2-hnp-stale-mandate"
+      ],
+      "evidence": []
+    },
+    "starter_manifest": {
+      "path": null,
+      "raw_sha256": null
+    },
+    "mapping_source": {
+      "owner": "candidate_owned",
+      "repository": null,
+      "locator_verification": "local-git-origin-only-no-remote-fetch",
+      "commit": null,
+      "repository_path": null,
+      "entrypoint": null,
+      "command": null,
+      "bundle_path": null,
+      "raw_sha256": null
+    },
+    "worksheet": {
+      "path": null,
+      "raw_sha256": null
+    },
+    "eligible_input_manifest": {
+      "path": null,
+      "raw_sha256": null
+    },
+    "generated_records": {
+      "path": null,
+      "raw_sha256": null
+    },
+    "candidate_execution": {
+      "interface_version": "vate-pulse-candidate-executable-0.2",
+      "command": null,
+      "runtime": {
+        "logical_name": null,
+        "requested_absolute_path": null,
+        "requested_file_type": null,
+        "realpath": null,
+        "realpath_file_type": null,
+        "raw_sha256": null,
+        "version": null
+      },
+      "commit_export": {
+        "mode": "fresh-tracked-regular-commit-export-per-invocation",
+        "working_tree_scope": "identity-and-cleanliness-check-only-never-executed",
+        "file_count": null,
+        "total_bytes": null,
+        "file_inventory_sha256": null,
+        "inventory_basis": "sorted canonical JSON [{path,file_type,git_mode,raw_sha256,size}]",
+        "fresh_per_invocation": true,
+        "regular_files_only": true,
+        "live_checkout_executed": false,
+        "external_packages_available": false,
+        "runtime_network_allowed": false,
+        "export_write_allowed": false
+      },
+      "map_request": {
+        "path": null,
+        "raw_sha256": null
+      },
+      "map_output": {
+        "path": null,
+        "raw_sha256": null
+      },
+      "projection_request": {
+        "path": null,
+        "raw_sha256": null
+      },
+      "projection_output": {
+        "path": null,
+        "raw_sha256": null
+      },
+      "sensitivity_contract": {
+        "probe_dimensions": [
+          "amount",
+          "merchant",
+          "evaluation_time",
+          "replay_nonce"
+        ],
+        "randomized_per_validation": true,
+        "independent_recomputation": true,
+        "tamper_proof_claim": false
+      }
+    },
+    "case_runs": [
+      {
+        "case_id": "allow-ap2-hnp-preauthorized-mandate",
+        "vate_input_closure_sha256": "1a2058d71869f1530f461479b9b9f505da318702eedeef7bca4afd9e92c1d5a3",
+        "vate_inputs": [
+          {
+            "role": "case",
+            "artifact_key": "case",
+            "source_path": "conformance/al2-vate-v0.3/cases/allow-ap2-hnp-preauthorized-mandate.json",
+            "source_raw_sha256": "f81b1d7389905b6dc8d034dfcb3aa313b5ecb714235005f8e957bc8c6f4aa50b",
+            "bundle_path": null,
+            "bundle_raw_sha256": null
+          },
+          {
+            "role": "source",
+            "artifact_key": "admission_request",
+            "source_path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-valid.example.json",
+            "source_raw_sha256": "7f57ef2203fb04dba7a1365daf4359a77526eb497effedc84b100854af3fa165",
+            "bundle_path": null,
+            "bundle_raw_sha256": null
+          },
+          {
+            "role": "source",
+            "artifact_key": "ap2_mandate",
+            "source_path": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-valid.example.json",
+            "source_raw_sha256": "22abc3d0905eee01449327a56a384359c0701e753719bfc2b5cb500da62d0e72",
+            "bundle_path": null,
+            "bundle_raw_sha256": null
+          },
+          {
+            "role": "comparison-only",
+            "artifact_key": "admission_receipt",
+            "source_path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-valid.example.json",
+            "source_raw_sha256": "60ab3343833cb5840ed8070cc55b55dd715c72f04284a542c42c113290b2eae9",
+            "bundle_path": null,
+            "bundle_raw_sha256": null
+          }
+        ],
+        "pulse_input": {
+          "path": null,
+          "raw_sha256": null
+        },
+        "raw_report": {
+          "path": null,
+          "raw_sha256": null,
+          "report_index": 0
+        },
+        "projection": {
+          "result_index": 0,
+          "source_document": "raw_pulse_output",
+          "source_json_pointer": "/reports/0",
+          "observed_relation_to_vate": null,
+          "pulse_outcome_class": null,
+          "projected_vate_outcome": null,
+          "projected_should_execute": null,
+          "projected_reason_codes": null,
+          "projected_checks": null
+        }
+      },
+      {
+        "case_id": "attenuate-ap2-hnp-amount-overrun",
+        "vate_input_closure_sha256": "e0be368ae171cd9198aedaaf0713728537b6e16263268da2a1eed7c81fa04aa1",
+        "vate_inputs": [
+          {
+            "role": "case",
+            "artifact_key": "case",
+            "source_path": "conformance/al2-vate-v0.3/cases/attenuate-ap2-hnp-amount-overrun.json",
+            "source_raw_sha256": "683f1868b5b61ae48aa16ed0faed0e875b9ffa15dcbddfcab11ef5f71ab00dc6",
+            "bundle_path": null,
+            "bundle_raw_sha256": null
+          },
+          {
+            "role": "source",
+            "artifact_key": "admission_request",
+            "source_path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-overrun.example.json",
+            "source_raw_sha256": "6d0bc2cb8ad2f33841a17ea4393c99acfd04dfcfa25f3be697dc4b115726c47b",
+            "bundle_path": null,
+            "bundle_raw_sha256": null
+          },
+          {
+            "role": "source",
+            "artifact_key": "ap2_mandate",
+            "source_path": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-overrun.example.json",
+            "source_raw_sha256": "d36f54d452131a0280eec04dc85b6132d70dbd35a7d378e14c5b89a39c9d2351",
+            "bundle_path": null,
+            "bundle_raw_sha256": null
+          },
+          {
+            "role": "comparison-only",
+            "artifact_key": "admission_receipt",
+            "source_path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-overrun.example.json",
+            "source_raw_sha256": "08803e26794f3513dc108f3f03c238e9acb17e7a23e1b4bdd62730cc6973c8f6",
+            "bundle_path": null,
+            "bundle_raw_sha256": null
+          }
+        ],
+        "pulse_input": {
+          "path": null,
+          "raw_sha256": null
+        },
+        "raw_report": {
+          "path": null,
+          "raw_sha256": null,
+          "report_index": 1
+        },
+        "projection": {
+          "result_index": 1,
+          "source_document": "raw_pulse_output",
+          "source_json_pointer": "/reports/1",
+          "observed_relation_to_vate": null,
+          "pulse_outcome_class": null,
+          "projected_vate_outcome": null,
+          "projected_should_execute": null,
+          "projected_reason_codes": null,
+          "projected_checks": null
+        }
+      },
+      {
+        "case_id": "deny-ap2-hnp-stale-mandate",
+        "vate_input_closure_sha256": "fded9e057a80f78c4a3119d9232f34d3098594dad975ad8ad7eee56abd77f600",
+        "vate_inputs": [
+          {
+            "role": "case",
+            "artifact_key": "case",
+            "source_path": "conformance/al2-vate-v0.3/cases/deny-ap2-hnp-stale-mandate.json",
+            "source_raw_sha256": "aea9595be5683a5381c6333f0e3772cfaff7688e47ee16961db3c1bab71e76ec",
+            "bundle_path": null,
+            "bundle_raw_sha256": null
+          },
+          {
+            "role": "source",
+            "artifact_key": "admission_request",
+            "source_path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-stale.example.json",
+            "source_raw_sha256": "7950cf298f5ced91a1f169fbb72bbe51057c80c5df5a8495b9e3ce95d5f707ce",
+            "bundle_path": null,
+            "bundle_raw_sha256": null
+          },
+          {
+            "role": "source",
+            "artifact_key": "ap2_mandate",
+            "source_path": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-stale.example.json",
+            "source_raw_sha256": "3448d1900326b458f630e7a53f33e9e59d9c9cdb7808ba684a5a64298f866049",
+            "bundle_path": null,
+            "bundle_raw_sha256": null
+          },
+          {
+            "role": "comparison-only",
+            "artifact_key": "admission_receipt",
+            "source_path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-stale.example.json",
+            "source_raw_sha256": "535294eaa7d3c6d0ae3844eb31314ab60657267d2889ba41b85ceaa787dcdff6",
+            "bundle_path": null,
+            "bundle_raw_sha256": null
+          }
+        ],
+        "pulse_input": {
+          "path": null,
+          "raw_sha256": null
+        },
+        "raw_report": {
+          "path": null,
+          "raw_sha256": null,
+          "report_index": 2
+        },
+        "projection": {
+          "result_index": 2,
+          "source_document": "raw_pulse_output",
+          "source_json_pointer": "/reports/2",
+          "observed_relation_to_vate": null,
+          "pulse_outcome_class": null,
+          "projected_vate_outcome": null,
+          "projected_should_execute": null,
+          "projected_reason_codes": null,
+          "projected_checks": null
+        }
+      }
+    ]
+  },
+  "limitations": [
+    "This file is an unexecuted template, not an external SUT result.",
+    "The candidate owns final mapping and projection; VATE does not supply a completed Pulse adapter.",
+    "Candidate code must execute only from a fresh tracked-regular commit export with no external packages or runtime network; the live mapping checkout is not an execution source.",
+    "The candidate runtime must be selected by absolute CLI path and hash-bound in this record; this is an operator-recorded environment fact, not an OS supply-chain proof.",
+    "Pulse reject/non-attenuate for the amount-overrun case must remain a mismatch against VATE attenuate.",
+    "This bounded attempt is not organic adoption, audit, endorsement, certification, production approval, general compatibility, completion of Pulse Issue #18, or a Pulse security review."
+  ]
+}
