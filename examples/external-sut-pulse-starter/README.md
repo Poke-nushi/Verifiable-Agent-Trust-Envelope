@@ -147,6 +147,25 @@ candidate-owned mapping/projection source in the run record. Resolve each
 asset, decimals/conversion rule, EVM participants, fixture-key generation, and
 Pulse-to-VATE projection with the Pulse-side candidate.
 
+Worksheet `0.5` provenance records a leaf's **direct value origin**.
+`vate-derived` means that the leaf is copied or deterministically transformed
+directly from the eligible VATE admission-request or AP2-mandate bytes.
+`non-vate-scaffolding` means that the candidate directly selected or generated
+the value. A candidate-generated value does not automatically become
+`vate-derived` merely because VATE-derived inputs influence it transitively.
+For example, signatures, compact JWTs, `inputHash`, and synthetic settlement
+transactions may remain `non-vate-scaffolding` when their direct origin is a
+candidate generator. Record that transitive influence through leaf
+dependencies, generator records, and sensitivity replay instead.
+
+The template leaves execution date and the four payee name/website leaves with
+`provenance: open_mapping_decision`. If a candidate derives one directly from
+VATE `issued_at` or merchant bytes, its completed source pointer, dependencies,
+transform, and provenance must say so. If it uses fixed candidate metadata,
+those fields must instead retain the worksheet/scaffold source and
+`non-vate-scaffolding` provenance. Completed worksheets may contain only
+`vate-derived` or `non-vate-scaffolding`; the open sentinel is template-only.
+
 Keep that mapping/projection source in `PULSE_MAPPING_REPO` (or another
 candidate-controlled repository) at its own exact, clean commit. Do not advance
 or patch the separate `PULSE_REPO` frozen-verifier checkout to accommodate the
@@ -262,12 +281,20 @@ the recorded map/projection outputs. It independently recomputes:
 For candidate evidence, the validator also randomizes amount, merchant,
 evaluation time/window, and replay nonce one at a time for every completed
 case and reruns the mapper.
-The relevant independently recomputed destination must change correctly; the
-nonce probe must propagate through the generated closed reference to the
-EIP-3009 nonce, and unrelated work items must stay byte-identical. These checks
-reject a no-op or fixed hardcoded fixture on the tested paths, but do not imply
-an adversarial-proof guarantee. Source text scanning is defense in depth, not
-the primary control and not a claim that all obfuscation is detectable.
+The validator computes the diff across all 142 primitive leaves for every
+probe. If a changed leaf claims `source_document: worksheet` and
+`provenance: non-vate-scaffolding`, validation fails regardless of its recorded
+dependencies because the replay contradicts that worksheet-owned direct-origin
+claim.
+Candidate-generator descendants are not rejected on that basis; their
+transitive influence remains visible in the diff and dependency/generator
+records. The relevant independently recomputed destination must still change
+correctly; the nonce probe must propagate through the generated closed
+reference to the EIP-3009 nonce, and unrelated work items must stay
+byte-identical. These checks reject a no-op or fixed hardcoded fixture on the
+tested paths, but do not imply an adversarial-proof guarantee. Source text
+scanning is defense in depth, not the primary control and not a claim that all
+obfuscation is detectable.
 
 The completed source must implement the recorded rules, including:
 
@@ -292,6 +319,13 @@ Set the copied worksheet status and each resolved scaffolding section to
 `completed`, change every resolved row/inventory owner to `candidate_owned`,
 and replace nulls and `open_mapping_decision` instructions with the actual
 candidate rule. Do not edit the starter template in place.
+
+If sensitivity replay or another completed-contract check exposes an incorrect
+provenance declaration, do not rewrite the worksheet or generated records to
+make already captured evidence pass. Correct the candidate mapping source,
+then regenerate the worksheet, candidate map output, Pulse inputs, generated
+records, raw Pulse reports, projection output, and their hashes as one fresh
+evidence chain.
 
 The completed bundle also contains two closed, hash-bound records:
 

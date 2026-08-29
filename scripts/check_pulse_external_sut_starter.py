@@ -77,7 +77,7 @@ PULSE_REFERENCE_CASE_ID = "valid-base-sepolia-01"
 PULSE_LEAF_PATH_DIGEST = "8e7ea0b60120e84c5763cd6d80e512f8d27af26ea25edae0620c17c3f5edc0fe"
 PULSE_REQUIRED_EMPTY_CONTAINERS = ("/expected/failureCodes",)
 STARTER_MANIFEST_VERSION = "vate-pulse-external-sut-starter-manifest-0.6"
-WORKSHEET_VERSION = "vate-pulse-mapping-worksheet-0.4"
+WORKSHEET_VERSION = "vate-pulse-mapping-worksheet-0.5"
 RUN_RECORD_VERSION = "vate-pulse-external-sut-run-record-0.6"
 RAW_OUTPUT_VERSION = "vate-pulse-raw-verifier-output-0.3"
 ELIGIBLE_INPUT_VERSION = "vate-pulse-eligible-inputs-0.1"
@@ -1691,11 +1691,21 @@ def validate_worksheet(
             elif dependency_type == "pulse_leaf":
                 require(dependency_target != destination, f"worksheet generated leaf {destination}: self dependency is prohibited")
                 pulse_leaf_edges.setdefault(destination, []).append(dependency_target)
-        expect_nonempty_string(leaf.get("transform"), f"worksheet generated leaf {destination}.transform")
-        require(leaf.get("provenance") in {"vate-derived", "non-vate-scaffolding"}, f"worksheet generated leaf {destination}: invalid provenance")
-        require(leaf.get("ownership") in {"candidate_owned", "open_mapping_decision"}, f"worksheet generated leaf {destination}: invalid ownership")
+        transform = expect_nonempty_string(leaf.get("transform"), f"worksheet generated leaf {destination}.transform")
+        ownership = leaf.get("ownership")
+        require(ownership in {"candidate_owned", "open_mapping_decision"}, f"worksheet generated leaf {destination}: invalid ownership")
+        provenance = leaf.get("provenance")
+        allowed_provenance = {"vate-derived", "non-vate-scaffolding"}
+        if not completed and ownership == "open_mapping_decision":
+            allowed_provenance.add("open_mapping_decision")
+        require(provenance in allowed_provenance, f"worksheet generated leaf {destination}: invalid provenance")
+        if provenance == "open_mapping_decision":
+            require(
+                not completed and ownership == "open_mapping_decision" and "open_mapping_decision" in transform,
+                f"worksheet generated leaf {destination}: provenance sentinel is template-only",
+            )
         if completed:
-            require(leaf.get("ownership") == "candidate_owned", f"completed worksheet generated leaf {destination}: ownership must be candidate_owned")
+            require(ownership == "candidate_owned", f"completed worksheet generated leaf {destination}: ownership must be candidate_owned")
         inventory_destinations.append(destination)
         inventory_by_destination[destination] = leaf
     require(
@@ -2944,6 +2954,12 @@ def run_sensitivity_probes(
                         f"{label}: {case_id} {dimension} probe changed an unrelated work item",
                     )
             probe_value = probe_values[target_index]
+            validate_sensitivity_provenance_diff(
+                baseline_value,
+                probe_value,
+                worksheet,
+                f"{label} {case_id} {dimension} sensitivity provenance",
+            )
             validate_independent_mapping(
                 probe_value,
                 admission,
@@ -2975,6 +2991,44 @@ def run_sensitivity_probes(
                     ),
                     f"{label}: {case_id} replay-nonce sensitivity did not propagate through the generated closed reference to EIP-3009 nonce",
                 )
+
+
+def validate_sensitivity_provenance_diff(
+    baseline_value: dict[str, Any],
+    probe_value: dict[str, Any],
+    worksheet: dict[str, Any],
+    label: str,
+) -> tuple[str, ...]:
+    """Reject a completed leaf declaration contradicted by a VATE-input replay."""
+
+    require(worksheet.get("status") == "completed", f"{label}: sensitivity provenance requires a completed worksheet")
+    baseline_paths = tuple(sorted(primitive_leaf_paths(baseline_value)))
+    probe_paths = tuple(sorted(primitive_leaf_paths(probe_value)))
+    require(baseline_paths == PULSE_PRIMITIVE_LEAF_PATHS, f"{label}: baseline must retain all 142 primitive leaves")
+    require(probe_paths == PULSE_PRIMITIVE_LEAF_PATHS, f"{label}: probe must retain all 142 primitive leaves")
+    changed_paths = tuple(
+        path
+        for path in PULSE_PRIMITIVE_LEAF_PATHS
+        if canonical_json_bytes(json_pointer_value(baseline_value, path, f"{label} baseline"))
+        != canonical_json_bytes(json_pointer_value(probe_value, path, f"{label} probe"))
+    )
+    inventory = expect_array(worksheet.get("generated_field_inventory"), f"{label} worksheet inventory")
+    inventory_by_destination = {
+        expect_nonempty_string(leaf.get("pulse_destination"), f"{label} worksheet destination"): leaf
+        for leaf in (expect_object(item, f"{label} worksheet leaf") for item in inventory)
+    }
+    require(set(inventory_by_destination) == set(PULSE_PRIMITIVE_LEAF_PATHS), f"{label}: worksheet must retain all 142 primitive leaves")
+    for destination in changed_paths:
+        leaf = inventory_by_destination[destination]
+        declared_worksheet_origin = (
+            leaf.get("source_document") == "worksheet"
+            and leaf.get("provenance") == "non-vate-scaffolding"
+        )
+        require(
+            not declared_worksheet_origin,
+            f"{label}: VATE input probe changed {destination}, but the completed worksheet declares worksheet/non-vate-scaffolding direct origin",
+        )
+    return changed_paths
 
 
 def validate_attempt_contract(
@@ -5010,6 +5064,31 @@ def completed_self_test_worksheet(template: dict[str, Any]) -> dict[str, Any]:
     for leaf in worksheet["generated_field_inventory"]:
         leaf["ownership"] = "candidate_owned"
         leaf["transform"] = leaf["transform"].replace("open_mapping_decision:", "Candidate resolved:")
+    inventory_by_destination = {
+        leaf["pulse_destination"]: leaf for leaf in worksheet["generated_field_inventory"]
+    }
+    execution_date = inventory_by_destination["/ap2/closedMandate/execution_date"]
+    execution_date.update(
+        {
+            "source_document": "vate_admission_request",
+            "source_json_pointer": "/issued_at",
+            "dependencies": ["mapping_row:evaluation-time"],
+            "transform": "Copy the exact VATE admission request issued_at timestamp.",
+            "provenance": "vate-derived",
+        }
+    )
+    for destination in (
+        "/ap2/closedMandate/payee/name",
+        "/ap2/closedMandate/payee/website",
+        "/ap2/openMandate/constraints/3/allowed/0/name",
+        "/ap2/openMandate/constraints/3/allowed/0/website",
+    ):
+        inventory_by_destination[destination].update(
+            {
+                "transform": "Use fixed candidate-owned merchant display metadata.",
+                "provenance": "non-vate-scaffolding",
+            }
+        )
     worksheet["completion_requirements"] = [
         item.replace("open_mapping_decision", "candidate decision")
         for item in worksheet["completion_requirements"]
@@ -5924,6 +6003,117 @@ def run_self_tests(
         "exact-copy provenance flip",
         lambda: validate_worksheet(provenance_flip, selected, source=source),
         "exact-copy provenance",
+    )
+    open_provenance_destinations = {
+        leaf["pulse_destination"]
+        for leaf in worksheet["generated_field_inventory"]
+        if leaf["provenance"] == "open_mapping_decision"
+    }
+    require(
+        open_provenance_destinations
+        == {
+            "/ap2/closedMandate/execution_date",
+            "/ap2/closedMandate/payee/name",
+            "/ap2/closedMandate/payee/website",
+            "/ap2/openMandate/constraints/3/allowed/0/name",
+            "/ap2/openMandate/constraints/3/allowed/0/website",
+        },
+        "self-test template provenance sentinel closure mismatch",
+    )
+    candidate_owned_sentinel = copy.deepcopy(worksheet)
+    candidate_owned_sentinel["generated_field_inventory"][0]["ownership"] = "candidate_owned"
+    probe(
+        "template provenance sentinel with candidate ownership",
+        lambda: validate_worksheet(candidate_owned_sentinel, selected, source=source),
+        "invalid provenance",
+    )
+    completed_provenance = completed_self_test_worksheet(worksheet)
+    unresolved_completed = copy.deepcopy(completed_provenance)
+    unresolved_completed["generated_field_inventory"][0]["provenance"] = "open_mapping_decision"
+    probe(
+        "completed provenance sentinel",
+        lambda: validate_worksheet(unresolved_completed, selected, source=source, completed=True),
+        "unresolved completion sentinel",
+    )
+    sensitivity_baseline = build_synthetic_pulse_input(SELECTED_CASE_IDS[0])
+    provenance_contradiction_cases = (
+        (
+            "/ap2/closedMandate/execution_date",
+            "2026-08-28T00:00:17Z",
+            "/scaffolding_inputs/ap2_generation_profile/execution_date_transform",
+            "scaffold:ap2-generation-profile",
+            "mapping_row:evaluation-time",
+        ),
+        (
+            "/ap2/closedMandate/payee/name",
+            "probe-closed-payee-name",
+            "/scaffolding_inputs/merchant_profile/name_transform",
+            "scaffold:merchant-profile",
+            "mapping_row:merchant-payee-id",
+        ),
+        (
+            "/ap2/closedMandate/payee/website",
+            "https://probe-closed-payee.example",
+            "/scaffolding_inputs/merchant_profile/website_transform",
+            "scaffold:merchant-profile",
+            "mapping_row:merchant-payee-id",
+        ),
+        (
+            "/ap2/openMandate/constraints/3/allowed/0/name",
+            "probe-open-payee-name",
+            "/scaffolding_inputs/merchant_profile/name_transform",
+            "scaffold:merchant-profile",
+            "mapping_row:merchant-allowed-id",
+        ),
+        (
+            "/ap2/openMandate/constraints/3/allowed/0/website",
+            "https://probe-open-payee.example",
+            "/scaffolding_inputs/merchant_profile/website_transform",
+            "scaffold:merchant-profile",
+            "mapping_row:merchant-allowed-id",
+        ),
+    )
+    for destination, changed_value, source_pointer, scaffold_dependency, mapping_dependency in provenance_contradiction_cases:
+        sensitivity_probe = copy.deepcopy(sensitivity_baseline)
+        set_json_pointer_value(sensitivity_probe, destination, changed_value)
+        worksheet_contradiction = copy.deepcopy(completed_provenance)
+        contradiction_leaf = next(
+            leaf
+            for leaf in worksheet_contradiction["generated_field_inventory"]
+            if leaf["pulse_destination"] == destination
+        )
+        contradiction_leaf.update(
+            {
+                "source_document": "worksheet",
+                "source_json_pointer": source_pointer,
+                "dependencies": [scaffold_dependency, mapping_dependency],
+                "transform": "Use fixed candidate metadata despite the recorded VATE mapping dependency.",
+                "provenance": "non-vate-scaffolding",
+            }
+        )
+        validate_worksheet(worksheet_contradiction, selected, source=source, completed=True)
+        probe(
+            f"VATE-sensitive worksheet provenance contradiction {destination}",
+            lambda probe_value=sensitivity_probe, contradictory_worksheet=worksheet_contradiction, leaf_destination=destination: validate_sensitivity_provenance_diff(
+                sensitivity_baseline,
+                probe_value,
+                contradictory_worksheet,
+                f"worksheet provenance probe {leaf_destination}",
+            ),
+            "worksheet/non-vate-scaffolding direct origin",
+        )
+    generator_probe = copy.deepcopy(sensitivity_baseline)
+    generator_destination = "/ap2/verification/cryptographicEvidence/mandateChain"
+    set_json_pointer_value(generator_probe, generator_destination, "candidate-generated-probe-descendant")
+    require(
+        validate_sensitivity_provenance_diff(
+            sensitivity_baseline,
+            generator_probe,
+            completed_provenance,
+            "candidate generator descendant probe",
+        )
+        == (generator_destination,),
+        "self-test candidate generator descendant diff mismatch",
     )
 
     with tempfile.TemporaryDirectory(prefix="vate-pulse-run-bundle-self-test-") as run_temp_dir:
