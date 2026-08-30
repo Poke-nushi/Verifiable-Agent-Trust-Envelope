@@ -106,8 +106,10 @@ generates the implementation report.
 For external SUT comparisons, the implementation report records the submitted
 SUT result and comparison output. It does not independently prove that the SUT
 generated every output artifact referenced by the SUT result. The SUT result's
-`artifacts` block records references matching submitted corpus fixture digests;
-that match does not establish runtime evaluation. Receipt outputs belong under
+`artifacts` block records explicit `sut_inputs[]` or legacy case-derived input
+references matching submitted corpus fixture digests; an unlisted expected
+receipt is not an input. That match does not establish runtime evaluation.
+Receipt outputs belong under
 `generated_artifacts` with `artifact_mode: generated-receipts`. Compare reports
 and their implementation reports carry each effective case mode and aggregate
 `artifact_mode_counts`. When

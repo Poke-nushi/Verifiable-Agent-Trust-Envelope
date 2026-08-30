@@ -3,8 +3,8 @@
   "source": "status_bundle",
   "required": true,
   "availability": "available",
-  "status": "active",
-  "source_issued_at": "2026-07-01T00:00:00Z",
-  "checked_at": "2026-07-01T00:05:01Z",
+  "status": "revoked",
+  "source_issued_at": "2026-07-01T00:09:00Z",
+  "checked_at": "2026-07-01T00:09:05Z",
   "max_age_seconds": 300
 }

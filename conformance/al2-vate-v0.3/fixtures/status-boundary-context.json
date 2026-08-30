@@ -1,7 +1,10 @@
 {
+  "version": "vate-status-context-2026-07",
   "source": "status_bundle",
+  "required": true,
+  "availability": "available",
+  "status": "active",
   "source_issued_at": "2026-07-01T00:00:00Z",
   "checked_at": "2026-07-01T00:05:00Z",
-  "max_age_seconds": 300,
-  "failure_reason": null
+  "max_age_seconds": 300
 }

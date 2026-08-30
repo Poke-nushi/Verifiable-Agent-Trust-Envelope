@@ -22,6 +22,7 @@ import tempfile
 import time
 from datetime import datetime
 from pathlib import Path, PureWindowsPath
+from typing import Any
 from urllib.request import urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1133,6 +1134,201 @@ def check_case_artifact_readers_fail_closed() -> None:
                 )
 
 
+def check_nested_artifact_shapes_fail_closed() -> None:
+    conformance = load_vate_conformance_module()
+    evidence_check_names = (
+        "evidence.verification.result",
+        "evidence.verification.failure_reason",
+        "admission_receipt.evidence.verification.inferred_resource_authority",
+        "admission_receipt.evidence.verification.inferred_tool_authority",
+    )
+    malformed_admissions = (
+        (
+            {"request": {}, "evidence": [None]},
+            evidence_check_names,
+        ),
+        (
+            {"request": {}, "evidence": ["invalid"]},
+            evidence_check_names,
+        ),
+        (
+            {"request": {}, "evidence": [{"verification": []}]},
+            evidence_check_names,
+        ),
+        (
+            {"request": [], "evidence": [{"verification": {}}]},
+            ("request.audience", "target.audience"),
+        ),
+    )
+    for admission, check_names in malformed_admissions:
+        for check_name in check_names:
+            result = conformance.bool_for_named_check(
+                name=check_name,
+                admission=admission,
+                post_execution=None,
+                a2a_metadata=None,
+                jose_results=None,
+            )
+            if result is not False:
+                raise RuntimeError(
+                    f"malformed admission nested shape passed named check {check_name}"
+                )
+        if not conformance.directly_dereferenced_artifact_failures(
+            admission,
+            None,
+        ):
+            raise RuntimeError("malformed admission nested shape was not reported")
+
+    malformed_post_execution = {"result": []}
+    if conformance.bool_for_named_check(
+        name="result.policy_violations",
+        admission=None,
+        post_execution=malformed_post_execution,
+        a2a_metadata=None,
+        jose_results=None,
+    ):
+        raise RuntimeError("malformed post-execution result passed named check")
+    if not conformance.directly_dereferenced_artifact_failures(
+        None,
+        malformed_post_execution,
+    ):
+        raise RuntimeError("malformed post-execution result was not reported")
+
+    canonical_corpus = ROOT / "conformance" / "al2-vate-v0.3"
+    passing_sut = (
+        ROOT / "examples" / "conformance" / "sut-results-pass.example.json"
+    )
+    with tempfile.TemporaryDirectory(prefix="vate-nested-artifact-shape-") as temp_dir:
+        temp_root = Path(temp_dir)
+        baseline_report = temp_root / "baseline-report.json"
+        baseline_implementation = temp_root / "baseline-implementation.json"
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "run",
+                "--corpus-root",
+                str(canonical_corpus),
+                "--report",
+                str(baseline_report),
+                "--implementation-report",
+                str(baseline_implementation),
+                "--conformance-report-uri",
+                str(baseline_report),
+                "--implementation-report-uri",
+                str(baseline_implementation),
+            ]
+        )
+
+        variants = (
+            (
+                "evidence-null-item",
+                "allow-valid-admission.json",
+                "admission_receipt",
+                lambda artifact: artifact.__setitem__("evidence", [None]),
+                "admission_receipt.evidence[0]: expected object",
+            ),
+            (
+                "evidence-scalar-item",
+                "allow-valid-admission.json",
+                "admission_receipt",
+                lambda artifact: artifact.__setitem__("evidence", ["invalid"]),
+                "admission_receipt.evidence[0]: expected object",
+            ),
+            (
+                "verification-array",
+                "allow-valid-admission.json",
+                "admission_receipt",
+                lambda artifact: artifact["evidence"][0].__setitem__(
+                    "verification", []
+                ),
+                "admission_receipt.evidence[0].verification: expected object",
+            ),
+            (
+                "request-array",
+                "allow-valid-admission.json",
+                "admission_receipt",
+                lambda artifact: artifact.__setitem__("request", []),
+                "admission_receipt.request: expected object",
+            ),
+            (
+                "post-result-array",
+                "post-execution-linkage-success.json",
+                "post_execution_receipt",
+                lambda artifact: artifact.__setitem__("result", []),
+                "post_execution_receipt.result: expected object",
+            ),
+        )
+
+        for label, case_filename, artifact_key, mutate, expected_failure in variants:
+            corpus_root = temp_root / f"corpus-{label}"
+            shutil.copytree(canonical_corpus, corpus_root)
+            case_path = corpus_root / "cases" / case_filename
+            case = json.loads(case_path.read_text(encoding="utf-8"))
+            source_artifact_path = ROOT / case["artifacts"][artifact_key]
+            artifact = json.loads(source_artifact_path.read_text(encoding="utf-8"))
+            mutate(artifact)
+            artifact_path = temp_root / f"{label}-artifact.json"
+            artifact_path.write_text(
+                json.dumps(artifact, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            case["artifacts"][artifact_key] = str(artifact_path)
+            case_path.write_text(
+                json.dumps(case, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+
+            report_paths = {
+                "run": temp_root / f"{label}-run.json",
+                "compare": temp_root / f"{label}-compare.json",
+                "verify-bundle": temp_root / f"{label}-bundle.json",
+            }
+            commands = {
+                "run": [
+                    sys.executable,
+                    str(VATE_CONFORMANCE),
+                    "run",
+                    "--corpus-root",
+                    str(corpus_root),
+                    "--report",
+                    str(report_paths["run"]),
+                ],
+                "compare": [
+                    sys.executable,
+                    str(VATE_CONFORMANCE),
+                    "compare",
+                    "--corpus-root",
+                    str(corpus_root),
+                    "--sut-results",
+                    str(passing_sut),
+                    "--report",
+                    str(report_paths["compare"]),
+                ],
+                "verify-bundle": [
+                    sys.executable,
+                    str(VATE_CONFORMANCE),
+                    "verify-bundle",
+                    "--corpus-root",
+                    str(corpus_root),
+                    "--conformance-report",
+                    str(baseline_report),
+                    "--implementation-report",
+                    str(baseline_implementation),
+                    "--report",
+                    str(report_paths["verify-bundle"]),
+                ],
+            }
+            for command_name, command in commands.items():
+                process = run_expect_failure(command)
+                if "Traceback" in process.stderr:
+                    raise RuntimeError(
+                        f"{label} caused {command_name} traceback"
+                    )
+                assert_strict_json_file(report_paths[command_name])
+            assert_report_error_contains(report_paths["run"], expected_failure)
+
+
 def check_corpus_manifest_non_file_fails_closed() -> None:
     source_case = json.loads(
         (
@@ -1219,6 +1415,48 @@ def check_corpus_manifest_non_file_fails_closed() -> None:
         assert_report_error_contains(report_paths["run"], manifest_error)
         assert_report_error_contains(report_paths["compare"], manifest_error)
         assert_bundle_check(report_paths["verify-bundle"], "corpus.manifest[0]", False)
+
+
+def check_bundle_corpus_index_fails_closed() -> None:
+    variants = (
+        ("missing", None, "corpus_index.json"),
+        ("malformed", "{\n", "corpus_index.json"),
+        ("array", "[]\n", "corpus_index.shape"),
+        ("null", "null\n", "corpus_index.shape"),
+    )
+    with tempfile.TemporaryDirectory(prefix="vate-bundle-corpus-index-") as temp_dir:
+        temp_base = Path(temp_dir)
+        for label, replacement, expected_check in variants:
+            corpus_root = temp_base / f"corpus-{label}"
+            shutil.copytree(ROOT / "conformance" / "al2-vate-v0.3", corpus_root)
+            corpus_index_path = corpus_root / "corpus.json"
+            if replacement is None:
+                corpus_index_path.unlink()
+            else:
+                corpus_index_path.write_text(replacement, encoding="utf-8")
+
+            report_path = temp_base / f"bundle-{label}.json"
+            result = run_expect_failure(
+                [
+                    sys.executable,
+                    str(VATE_CONFORMANCE),
+                    "verify-bundle",
+                    "--corpus-root",
+                    str(corpus_root),
+                    "--conformance-report",
+                    str(ROOT / "examples" / "conformance-report.example.json"),
+                    "--implementation-report",
+                    str(ROOT / "examples" / "implementation-report.example.json"),
+                    "--report",
+                    str(report_path),
+                ]
+            )
+            if "Traceback" in result.stderr:
+                raise RuntimeError(
+                    f"verify-bundle must not traceback for corpus.json variant {label}"
+                )
+            assert_strict_json_file(report_path)
+            assert_bundle_check(report_path, expected_check, False)
 
 
 def check_generated_artifact_utf8_boundary() -> None:
@@ -2301,6 +2539,21 @@ def check_transport_bound_fixture_coverage() -> None:
 
 
 def check_status_freshness_boundary_coverage() -> None:
+    conformance = load_vate_conformance_module()
+    for accepted in (
+        "2026-07-01T00:00:00Z",
+        "2026-07-01T00:00:00.1z",
+        "2026-07-01T00:00:00.123456+00:00",
+    ):
+        if conformance.try_parse_time(accepted) is None:
+            raise RuntimeError(f"supported RFC3339 timestamp was rejected: {accepted}")
+    for rejected in (
+        "2026-07-01T00:00:00.1234567Z",
+        "2026-07-01T00:00:00.0000001+00:00",
+    ):
+        if conformance.try_parse_time(rejected) is not None:
+            raise RuntimeError(f"sub-microsecond RFC3339 timestamp was truncated: {rejected}")
+
     case_path = ROOT / "conformance" / "al2-vate-v0.3" / "cases" / "allow-status-fresh-at-boundary.json"
     if not case_path.exists():
         raise RuntimeError(
@@ -2318,6 +2571,3135 @@ def check_status_freshness_boundary_coverage() -> None:
         raise RuntimeError("allow-status-fresh-at-boundary must exercise the exact max_age_seconds boundary")
     if case.get("expected", {}).get("admission_decision") != "allow":
         raise RuntimeError("allow-status-fresh-at-boundary must allow the exact freshness boundary")
+
+    overprecision_context = json.loads(json.dumps(context))
+    overprecision_context["source_issued_at"] = "2026-07-01T00:00:00Z"
+    overprecision_context["checked_at"] = "2026-07-01T00:05:00.0000001Z"
+    overprecision_context["max_age_seconds"] = 300
+    freshness_check = next(
+        check
+        for check in case.get("al2_context_checks", [])
+        if isinstance(check, dict) and check.get("kind") == "freshness"
+    )
+    overprecision_failures = conformance.evaluate_context_freshness_check(
+        freshness_check,
+        overprecision_context,
+        require_status_context=True,
+    )
+    if not any(
+        "freshness timestamps must be valid" in failure
+        or "expected valid timestamp" in failure
+        for failure in overprecision_failures
+    ):
+        raise RuntimeError(
+            "300.0000001-second status age must be rejected, not truncated to fresh"
+        )
+
+
+def check_status_input_contract_coverage() -> None:
+    conformance = load_vate_conformance_module()
+    case_path = (
+        ROOT
+        / "conformance"
+        / "al2-vate-v0.3"
+        / "cases"
+        / "deny-status-revoked.json"
+    )
+    case = json.loads(case_path.read_text(encoding="utf-8"))
+    requirements = conformance.required_sut_artifacts(case)
+    expected_inputs = requirements.get("input_artifacts")
+    if not isinstance(expected_inputs, list) or len(expected_inputs) != 1:
+        raise RuntimeError("deny-status-revoked must declare exactly one authoritative SUT input")
+    if any(
+        requirements.get(field)
+        for field in ("receipt_artifacts", "verification_context", "proof_artifacts")
+    ):
+        raise RuntimeError(
+            "explicit status input contract must not treat expected receipts or legacy context fields as SUT inputs"
+        )
+
+    expected_input = expected_inputs[0]
+    case_artifact = expected_input.get("case_artifact")
+    role = expected_input.get("role")
+    expected_uri = expected_input.get("expected_uri")
+    expected_media_type = expected_input.get("expected_media_type")
+    expected_digest = expected_input.get("expected_digest")
+    if (
+        case_artifact != "status_context"
+        or role != "status_evidence"
+        or expected_uri != case["artifacts"]["status_context"]
+        or expected_media_type != "application/json"
+        or not isinstance(expected_digest, str)
+        or len(expected_digest) != 64
+    ):
+        raise RuntimeError("deny-status-revoked authoritative input contract drifted")
+
+    correct_ref = {
+        "case_artifact": case_artifact,
+        "role": role,
+        "uri": case["artifacts"][case_artifact],
+        "media_type": "application/json",
+        "digest": {
+            "alg": "sha-256",
+            "value": expected_digest,
+        },
+    }
+    valid_result = {"artifacts": {"input_artifacts": [correct_ref]}}
+    if conformance.sut_result_artifact_failures(valid_result, requirements):
+        raise RuntimeError("exact explicit status input reference must satisfy the SUT input contract")
+
+    missing_failures = conformance.sut_result_artifact_failures({"artifacts": {}}, requirements)
+    if not any("input_artifacts: required non-empty array" in failure for failure in missing_failures):
+        raise RuntimeError("explicit status input contract must reject a missing input reference")
+
+    wrong_digest_ref = json.loads(json.dumps(correct_ref))
+    wrong_digest_ref["digest"]["value"] = "0" * 64
+    wrong_digest_failures = conformance.sut_result_artifact_failures(
+        {"artifacts": {"input_artifacts": [wrong_digest_ref]}},
+        requirements,
+    )
+    if not any("expected corpus digest" in failure for failure in wrong_digest_failures):
+        raise RuntimeError("explicit status input contract must reject a digest mismatch")
+
+    wrong_uri_ref = json.loads(json.dumps(correct_ref))
+    wrong_uri_ref["uri"] = case["artifacts"]["admission_receipt"]
+    wrong_uri_failures = conformance.sut_result_artifact_failures(
+        {"artifacts": {"input_artifacts": [wrong_uri_ref]}},
+        requirements,
+    )
+    if not any("uri mismatch" in failure for failure in wrong_uri_failures):
+        raise RuntimeError("explicit status input contract must bind the declared input URI")
+
+    wrong_media_ref = json.loads(json.dumps(correct_ref))
+    wrong_media_ref["media_type"] = "application/vate-admission-receipt+json"
+    wrong_media_failures = conformance.sut_result_artifact_failures(
+        {"artifacts": {"input_artifacts": [wrong_media_ref]}},
+        requirements,
+    )
+    if not any("media_type mismatch" in failure for failure in wrong_media_failures):
+        raise RuntimeError("explicit status input contract must bind the declared media type")
+
+    extra_field_ref = json.loads(json.dumps(correct_ref))
+    extra_field_ref["expected_receipt"] = case["artifacts"]["admission_receipt"]
+    extra_field_failures = conformance.sut_result_artifact_failures(
+        {"artifacts": {"input_artifacts": [extra_field_ref]}},
+        requirements,
+    )
+    if not any("unsupported input artifact field" in failure for failure in extra_field_failures):
+        raise RuntimeError("explicit status input references must reject unknown fields")
+
+    extra_digest_field_ref = json.loads(json.dumps(correct_ref))
+    extra_digest_field_ref["digest"]["expected_receipt"] = case["artifacts"][
+        "admission_receipt"
+    ]
+    extra_digest_field_failures = conformance.sut_result_artifact_failures(
+        {"artifacts": {"input_artifacts": [extra_digest_field_ref]}},
+        requirements,
+    )
+    if not any(
+        "unsupported input digest field" in failure
+        for failure in extra_digest_field_failures
+    ):
+        raise RuntimeError(
+            "explicit status input digest descriptors must reject unknown fields"
+        )
+
+    duplicate_failures = conformance.sut_result_artifact_failures(
+        {"artifacts": {"input_artifacts": [correct_ref, correct_ref]}},
+        requirements,
+    )
+    if not any("duplicate logical input artifact key" in failure for failure in duplicate_failures):
+        raise RuntimeError("explicit status input contract must reject duplicate logical inputs")
+
+    unexpected_ref = json.loads(json.dumps(correct_ref))
+    unexpected_ref["case_artifact"] = "unexpected_context"
+    unexpected_ref["role"] = "unexpected_role"
+    unexpected_failures = conformance.sut_result_artifact_failures(
+        {"artifacts": {"input_artifacts": [correct_ref, unexpected_ref]}},
+        requirements,
+    )
+    if not any("unexpected case_artifact" in failure for failure in unexpected_failures):
+        raise RuntimeError("explicit status input contract must reject undeclared extra inputs")
+
+    legacy_failures = conformance.sut_result_artifact_failures(
+        {
+            "artifacts": {
+                "input_artifacts": [correct_ref],
+                "admission_receipt": {
+                    "uri": case["artifacts"]["admission_receipt"],
+                    "media_type": "application/vate-admission-receipt+json",
+                    "digest": {"alg": "sha-256", "value": "0" * 64},
+                },
+            }
+        },
+        requirements,
+    )
+    if not any(
+        "not allowed when the case declares authoritative sut_inputs" in failure
+        for failure in legacy_failures
+    ):
+        raise RuntimeError("explicit status input contract must reject legacy expected-receipt input fields")
+
+    aliased_receipt_failures = conformance.sut_result_artifact_failures(
+        {
+            "artifacts": {
+                "input_artifacts": [correct_ref],
+                "admission_receipt_fixture": {
+                    "uri": case["artifacts"]["admission_receipt"],
+                    "media_type": "application/vate-admission-receipt+json",
+                    "digest": {"alg": "sha-256", "value": "0" * 64},
+                },
+            }
+        },
+        requirements,
+    )
+    if not any(
+        "not allowed when the case declares authoritative sut_inputs" in failure
+        for failure in aliased_receipt_failures
+    ):
+        raise RuntimeError("explicit status input contract must reject aliased receipt fields")
+
+    legacy_case = json.loads(
+        (
+            ROOT
+            / "conformance"
+            / "al2-vate-v0.3"
+            / "cases"
+            / "allow-valid-admission.json"
+        ).read_text(encoding="utf-8")
+    )
+    legacy_requirements = conformance.required_sut_artifacts(legacy_case)
+    legacy_result = next(
+        result
+        for result in json.loads(
+            (
+                ROOT / "examples" / "conformance" / "sut-results-pass.example.json"
+            ).read_text(encoding="utf-8")
+        )["results"]
+        if result.get("case_id") == "allow-valid-admission"
+    )
+    legacy_result_with_input = json.loads(json.dumps(legacy_result))
+    legacy_result_with_input.setdefault("artifacts", {})["input_artifacts"] = [correct_ref]
+    legacy_input_failures = conformance.sut_result_artifact_failures(
+        legacy_result_with_input,
+        legacy_requirements,
+    )
+    if not any(
+        "not allowed when the case does not declare authoritative sut_inputs" in failure
+        for failure in legacy_input_failures
+    ):
+        raise RuntimeError("legacy cases must reject explicit input_artifacts")
+
+    legacy_case_without_artifacts = json.loads(json.dumps(legacy_case))
+    legacy_case_without_artifacts["artifacts"] = None
+    if conformance.sut_input_contract_failures(legacy_case_without_artifacts) != [
+        "artifacts: expected object"
+    ]:
+        raise RuntimeError("legacy cases must fail closed on a non-object artifacts field")
+
+    no_artifact_input_failures = conformance.sut_result_artifact_failures(
+        {"artifacts": {"input_artifacts": [correct_ref]}},
+        {
+            "input_artifacts": [],
+            "receipt_artifacts": [],
+            "verification_context": [],
+            "proof_artifacts": [],
+        },
+    )
+    if not any(
+        "not allowed when the case does not declare authoritative sut_inputs" in failure
+        for failure in no_artifact_input_failures
+    ):
+        raise RuntimeError("no-artifact cases must reject explicit input_artifacts")
+
+    revoked_context = json.loads(
+        (ROOT / case["artifacts"][case_artifact]).read_text(encoding="utf-8")
+    )
+    status_check = case["al2_context_checks"][0]
+    if conformance.evaluate_context_status_check(status_check, revoked_context):
+        raise RuntimeError("valid revoked status context must satisfy its status check")
+
+    unavailable_with_status = {
+        "required": True,
+        "availability": "unavailable",
+        "status": "active",
+    }
+    unavailable_failures = conformance.evaluate_context_status_check(
+        {
+            "kind": "status",
+            "artifact": "status_context",
+            "expect_status": "unavailable",
+            "expect_required": True,
+            "expected_failure_reason": "STATUS_UNAVAILABLE",
+        },
+        unavailable_with_status,
+    )
+    if not any("must not carry a status value" in failure for failure in unavailable_failures):
+        raise RuntimeError("unavailable status context must reject a carried status value")
+
+    optional_unavailable_context = {
+        "version": "vate-status-context-2026-07",
+        "source": "status_bundle",
+        "required": False,
+        "availability": "unavailable",
+        "checked_at": "2026-07-01T00:09:05Z",
+    }
+    optional_unavailable_failures = conformance.evaluate_context_status_check(
+        {
+            "kind": "status",
+            "artifact": "status_context",
+            "expect_status": "unavailable",
+            "expect_required": False,
+        },
+        optional_unavailable_context,
+    )
+    if optional_unavailable_failures:
+        raise RuntimeError(
+            "required=false unavailable status context must remain a valid "
+            f"non-failure result: {optional_unavailable_failures}"
+        )
+
+    unavailable_context = json.loads(
+        (
+            ROOT
+            / "conformance"
+            / "al2-vate-v0.3"
+            / "fixtures"
+            / "status-unavailable-context.json"
+        ).read_text(encoding="utf-8")
+    )
+    unavailable_case = json.loads(
+        (
+            ROOT
+            / "conformance"
+            / "al2-vate-v0.3"
+            / "cases"
+            / "deny-status-unavailable-fail-closed.json"
+        ).read_text(encoding="utf-8")
+    )
+    unavailable_check = unavailable_case["al2_context_checks"][0]
+    invalid_optional_timestamp = dict(unavailable_context)
+    invalid_optional_timestamp["source_issued_at"] = 42
+    if not any(
+        "source_issued_at: expected valid timestamp when present" in failure
+        for failure in conformance.evaluate_context_status_check(
+            unavailable_check,
+            invalid_optional_timestamp,
+        )
+    ):
+        raise RuntimeError("unavailable status context must validate optional source_issued_at")
+    invalid_optional_max_age = dict(unavailable_context)
+    invalid_optional_max_age["max_age_seconds"] = "300"
+    if not any(
+        "max_age_seconds: expected non-negative integer when present" in failure
+        for failure in conformance.evaluate_context_status_check(
+            unavailable_check,
+            invalid_optional_max_age,
+        )
+    ):
+        raise RuntimeError("unavailable status context must validate optional max_age_seconds")
+
+    status_case_paths = sorted(
+        (ROOT / "conformance" / "al2-vate-v0.3" / "cases").glob("*status*.json")
+    )
+    if len(status_case_paths) != 6:
+        raise RuntimeError(
+            f"expected 6 explicit status-input cases, found {len(status_case_paths)}"
+        )
+    for status_case_path in status_case_paths:
+        status_case = json.loads(status_case_path.read_text(encoding="utf-8"))
+        sut_inputs = status_case.get("sut_inputs")
+        if not isinstance(sut_inputs, list) or not sut_inputs:
+            raise RuntimeError(
+                f"{status_case['case_id']}: status cases must declare authoritative sut_inputs"
+            )
+        for sut_input in sut_inputs:
+            input_path = ROOT / status_case["artifacts"][sut_input["artifact"]]
+            input_text = input_path.read_text(encoding="utf-8")
+            if "failure_reason" in json.loads(input_text):
+                raise RuntimeError(f"{status_case['case_id']}: status input must not carry failure_reason")
+            for reason_code in status_case["expected"]["reason_codes"]:
+                if reason_code in input_text:
+                    raise RuntimeError(
+                        f"{status_case['case_id']}: status input leaks expected reason code {reason_code}"
+                    )
+
+    stale_case = json.loads(
+        (
+            ROOT
+            / "conformance"
+            / "al2-vate-v0.3"
+            / "cases"
+            / "deny-status-stale-fail-closed.json"
+        ).read_text(encoding="utf-8")
+    )
+    stale_context = json.loads(
+        (ROOT / stale_case["artifacts"]["status_context"]).read_text(encoding="utf-8")
+    )
+    stale_status_check = next(
+        check for check in stale_case["al2_context_checks"] if check["kind"] == "status"
+    )
+    not_required = dict(stale_context)
+    not_required["required"] = False
+    if not conformance.evaluate_context_status_check(stale_status_check, not_required):
+        raise RuntimeError("stale status case must reject required=false")
+    unavailable_stale = dict(stale_context)
+    unavailable_stale["availability"] = "unavailable"
+    unavailable_stale.pop("status", None)
+    freshness_check = next(
+        check for check in stale_case["al2_context_checks"] if check["kind"] == "freshness"
+    )
+    if not conformance.evaluate_context_freshness_check(freshness_check, unavailable_stale):
+        raise RuntimeError("status freshness must reject availability=unavailable")
+
+    wrong_version_with_answer = dict(stale_context)
+    wrong_version_with_answer["version"] = "vate-status-context-2026-06"
+    wrong_version_with_answer["failure_reason"] = "STATUS_STALE"
+    wrong_version_failures = conformance.evaluate_context_freshness_check(
+        freshness_check,
+        wrong_version_with_answer,
+        require_status_context=True,
+    )
+    if not any(".version: expected" in failure for failure in wrong_version_failures):
+        raise RuntimeError("status freshness must fail closed on a wrong status-context version")
+    if not any(
+        "failure_reason: unsupported status context field" in failure
+        for failure in wrong_version_failures
+    ):
+        raise RuntimeError("status freshness must reject an input-carried VATE failure reason")
+
+    uppercase_utc = conformance.try_parse_time("2026-07-15T00:00:00Z")
+    lowercase_utc = conformance.try_parse_time("2026-07-15T00:00:00z")
+    offset_utc = conformance.try_parse_time("2026-07-15T00:00:00+00:00")
+    if uppercase_utc is None or lowercase_utc is None or offset_utc is None:
+        raise RuntimeError("runner must accept RFC3339 UTC timestamps using Z, z, or +00:00")
+    if uppercase_utc != lowercase_utc or uppercase_utc != offset_utc:
+        raise RuntimeError("equivalent RFC3339 UTC timestamp spellings must resolve identically")
+    for invalid_timestamp in (
+        "2026-07-01T24:00:00Z",
+        "2026-W27-3T12:00:00Z",
+        "2026-02-30T12:00:00Z",
+        "not-a-time",
+    ):
+        if conformance.try_parse_time(invalid_timestamp) is not None:
+            raise RuntimeError(
+                f"runner must reject unsupported RFC3339 timestamp {invalid_timestamp}"
+            )
+        invalid_timestamp_context = json.loads(json.dumps(revoked_context))
+        invalid_timestamp_context["checked_at"] = invalid_timestamp
+        invalid_timestamp_failures = conformance.evaluate_context_status_check(
+            status_check,
+            invalid_timestamp_context,
+        )
+        if not any(
+            "checked_at: expected valid timestamp" in failure
+            for failure in invalid_timestamp_failures
+        ):
+            raise RuntimeError(
+                f"status evaluation must reject invalid checked_at={invalid_timestamp}"
+            )
+
+    extra_case_field = json.loads(json.dumps(case))
+    extra_case_field["sut_inputs"][0]["expected_failure_reason"] = "STATUS_REVOKED"
+    extra_case_field_failures = conformance.sut_input_contract_failures(extra_case_field)
+    if not any(
+        "unsupported SUT input field" in failure
+        for failure in extra_case_field_failures
+    ):
+        raise RuntimeError("case sut_inputs must reject unknown fields")
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_base = Path(temp_dir)
+        for source_status_case_path in status_case_paths:
+            case_id = source_status_case_path.stem
+            temp_root = temp_base / f"corpus-missing-sut-inputs-{case_id}"
+            shutil.copytree(ROOT / "conformance" / "al2-vate-v0.3", temp_root)
+            missing_case_path = temp_root / "cases" / source_status_case_path.name
+            missing_case = json.loads(missing_case_path.read_text(encoding="utf-8"))
+            missing_case.pop("sut_inputs", None)
+            missing_case_path.write_text(
+                json.dumps(missing_case, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            expected_failure = "sut_inputs: required for cases with status context checks"
+
+            try:
+                conformance.make_corpus_index(temp_root)
+            except RuntimeError as exc:
+                if expected_failure not in str(exc):
+                    raise RuntimeError(
+                        f"index returned the wrong missing sut_inputs failure for {case_id}"
+                    ) from exc
+            else:
+                raise RuntimeError(
+                    f"index must fail closed when {case_id} omits sut_inputs"
+                )
+
+            missing_run = conformance.run_corpus(temp_root)
+            if missing_run.get("cases") or not any(
+                expected_failure in failure
+                for failure in missing_run.get("fatal_errors", [])
+            ):
+                raise RuntimeError(
+                    f"run must fail closed when {case_id} omits sut_inputs"
+                )
+
+            _, missing_digest, _ = conformance.corpus_manifest(temp_root)
+            missing_sut = json.loads(
+                (
+                    ROOT / "examples" / "conformance" / "sut-results-pass.example.json"
+                ).read_text(encoding="utf-8")
+            )
+            missing_sut["corpus"]["digest"] = missing_digest
+            missing_sut_path = temp_base / f"sut-results-missing-{case_id}.json"
+            missing_sut_path.write_text(
+                json.dumps(missing_sut, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            missing_compare = conformance.compare_sut_results(
+                temp_root,
+                missing_sut_path,
+            )
+            if not any(
+                expected_failure in failure
+                for failure in missing_compare.get("fatal_errors", [])
+            ):
+                raise RuntimeError(
+                    f"compare must fail closed when {case_id} omits sut_inputs"
+                )
+
+            missing_bundle = conformance.verify_report_bundle(
+                temp_root,
+                ROOT / "examples" / "conformance-report.example.json",
+                ROOT / "examples" / "implementation-report.example.json",
+                missing_sut_path,
+            )
+            if not any(
+                check.get("name", "").startswith("corpus.sut_inputs[")
+                and check.get("pass") is False
+                and expected_failure in str(check.get("actual"))
+                for check in missing_bundle.get("checks", [])
+            ):
+                raise RuntimeError(
+                    f"verify-bundle must fail closed when {case_id} omits sut_inputs"
+                )
+
+        for label, malformed_inputs in (("empty", []), ("null", None)):
+            temp_root = temp_base / f"corpus-{label}"
+            shutil.copytree(ROOT / "conformance" / "al2-vate-v0.3", temp_root)
+            malformed_case_path = temp_root / "cases" / "deny-status-revoked.json"
+            malformed_case = json.loads(malformed_case_path.read_text(encoding="utf-8"))
+            malformed_case["sut_inputs"] = malformed_inputs
+            malformed_case_path.write_text(
+                json.dumps(malformed_case, indent=2) + "\n",
+                encoding="utf-8",
+            )
+
+            try:
+                conformance.make_corpus_index(temp_root)
+            except RuntimeError as exc:
+                if "sut_inputs: expected non-empty array" not in str(exc):
+                    raise RuntimeError(
+                        f"index returned the wrong {label} sut_inputs failure"
+                    ) from exc
+            else:
+                raise RuntimeError(f"index must fail closed on sut_inputs={malformed_inputs!r}")
+
+            malformed_run = conformance.run_corpus(temp_root)
+            if malformed_run.get("cases"):
+                raise RuntimeError(
+                    f"run must not evaluate cases after detecting sut_inputs={malformed_inputs!r}"
+                )
+            if not any(
+                "sut_inputs: expected non-empty array" in failure
+                for failure in malformed_run.get("fatal_errors", [])
+            ):
+                raise RuntimeError(f"run must fail closed on sut_inputs={malformed_inputs!r}")
+
+            _, malformed_digest, _ = conformance.corpus_manifest(temp_root)
+            malformed_sut = json.loads(
+                (
+                    ROOT / "examples" / "conformance" / "sut-results-pass.example.json"
+                ).read_text(encoding="utf-8")
+            )
+            malformed_sut["corpus"]["digest"] = malformed_digest
+            malformed_sut_path = temp_base / f"sut-results-{label}.json"
+            malformed_sut_path.write_text(
+                json.dumps(malformed_sut, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            malformed_report = conformance.compare_sut_results(temp_root, malformed_sut_path)
+            if not any(
+                "sut_inputs: expected non-empty array" in failure
+                for failure in malformed_report.get("fatal_errors", [])
+            ):
+                raise RuntimeError(f"compare must fail closed on sut_inputs={malformed_inputs!r}")
+
+            malformed_bundle = conformance.verify_report_bundle(
+                temp_root,
+                ROOT / "examples" / "conformance-report.example.json",
+                ROOT / "examples" / "implementation-report.example.json",
+                malformed_sut_path,
+            )
+            if not any(
+                check.get("name", "").startswith("corpus.sut_inputs[")
+                and check.get("pass") is False
+                and "sut_inputs: expected non-empty array" in str(check.get("actual"))
+                for check in malformed_bundle.get("checks", [])
+            ):
+                raise RuntimeError(
+                    f"verify-bundle must fail closed on sut_inputs={malformed_inputs!r}"
+                )
+
+        malformed_artifact_values = (
+            ("null", None),
+            ("array", []),
+            ("string", "not-an-object"),
+            ("number", 0),
+            ("boolean", False),
+        )
+        for label, malformed_artifacts in malformed_artifact_values:
+            temp_root = temp_base / f"corpus-artifacts-{label}"
+            shutil.copytree(ROOT / "conformance" / "al2-vate-v0.3", temp_root)
+            malformed_case_path = temp_root / "cases" / "deny-status-revoked.json"
+            malformed_case = json.loads(malformed_case_path.read_text(encoding="utf-8"))
+            malformed_case["artifacts"] = malformed_artifacts
+            malformed_case_path.write_text(
+                json.dumps(malformed_case, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            expected_failure = "artifacts: expected object"
+
+            try:
+                conformance.make_corpus_index(temp_root)
+            except RuntimeError as exc:
+                if expected_failure not in str(exc):
+                    raise RuntimeError(
+                        f"index returned the wrong artifacts={label} failure"
+                    ) from exc
+            else:
+                raise RuntimeError(f"index must fail closed on artifacts={label}")
+
+            malformed_run = conformance.run_corpus(temp_root)
+            if malformed_run.get("cases"):
+                raise RuntimeError(
+                    f"run must not evaluate cases after detecting artifacts={label}"
+                )
+            if not any(
+                expected_failure in failure
+                for failure in malformed_run.get("fatal_errors", [])
+            ):
+                raise RuntimeError(f"run must fail closed on artifacts={label}")
+
+            _, malformed_digest, _ = conformance.corpus_manifest(temp_root)
+            malformed_sut = json.loads(
+                (
+                    ROOT / "examples" / "conformance" / "sut-results-pass.example.json"
+                ).read_text(encoding="utf-8")
+            )
+            malformed_sut["corpus"]["digest"] = malformed_digest
+            malformed_sut_path = temp_base / f"sut-results-artifacts-{label}.json"
+            malformed_sut_path.write_text(
+                json.dumps(malformed_sut, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            malformed_report = conformance.compare_sut_results(
+                temp_root,
+                malformed_sut_path,
+            )
+            if not any(
+                expected_failure in failure
+                for failure in malformed_report.get("fatal_errors", [])
+            ):
+                raise RuntimeError(f"compare must fail closed on artifacts={label}")
+
+            malformed_bundle = conformance.verify_report_bundle(
+                temp_root,
+                ROOT / "examples" / "conformance-report.example.json",
+                ROOT / "examples" / "implementation-report.example.json",
+                malformed_sut_path,
+            )
+            if not any(
+                check.get("name") == "corpus.cases.envelope"
+                and check.get("pass") is False
+                and expected_failure in str(check.get("actual"))
+                for check in malformed_bundle.get("checks", [])
+            ):
+                raise RuntimeError(f"verify-bundle must fail closed on artifacts={label}")
+
+        legacy_sut = json.loads(
+            (
+                ROOT / "examples" / "conformance" / "sut-results-pass.example.json"
+            ).read_text(encoding="utf-8")
+        )
+        legacy_sut_result = next(
+            result
+            for result in legacy_sut["results"]
+            if result.get("case_id") == "allow-valid-admission"
+        )
+        legacy_sut_result.setdefault("artifacts", {})["input_artifacts"] = [correct_ref]
+        legacy_sut_path = temp_base / "sut-results-legacy-extra-input.json"
+        legacy_sut_path.write_text(
+            json.dumps(legacy_sut, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        legacy_compare = conformance.compare_sut_results(
+            ROOT / "conformance" / "al2-vate-v0.3",
+            legacy_sut_path,
+        )
+        legacy_case_result = next(
+            result
+            for result in legacy_compare["cases"]
+            if result.get("case_id") == "allow-valid-admission"
+        )
+        if legacy_case_result.get("pass") is not False or not any(
+            "not allowed when the case does not declare authoritative sut_inputs" in failure
+            for failure in legacy_case_result.get("failures", [])
+        ):
+            raise RuntimeError("compare must reject input_artifacts on a legacy case")
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_root = Path(temp_dir) / "corpus"
+        shutil.copytree(ROOT / "conformance" / "al2-vate-v0.3", temp_root)
+        status_fixture_path = temp_root / "fixtures" / "status-revoked-context.json"
+        lowercase_status = json.loads(status_fixture_path.read_text(encoding="utf-8"))
+        for field in ("source_issued_at", "checked_at"):
+            lowercase_status[field] = lowercase_status[field][:-1] + "z"
+        status_fixture_path.write_text(
+            json.dumps(lowercase_status, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        status_case_path = temp_root / "cases" / "deny-status-revoked.json"
+        lowercase_status_case = json.loads(status_case_path.read_text(encoding="utf-8"))
+        lowercase_status_case["artifacts"]["status_context"] = str(
+            status_fixture_path.resolve()
+        )
+        status_case_path.write_text(
+            json.dumps(lowercase_status_case, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        lowercase_status_run = conformance.run_corpus(temp_root)
+        lowercase_status_result = next(
+            item
+            for item in lowercase_status_run["cases"]
+            if item["case_id"] == "deny-status-revoked"
+        )
+        if lowercase_status_result.get("pass") is not True:
+            raise RuntimeError(
+                "runner must accept schema-valid lowercase RFC3339 UTC designators: "
+                f"{lowercase_status_result.get('failures')}"
+            )
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_root = Path(temp_dir) / "corpus"
+        shutil.copytree(ROOT / "conformance" / "al2-vate-v0.3", temp_root)
+        stale_fixture_path = temp_root / "fixtures" / "status-stale-context.json"
+        malformed_status = json.loads(stale_fixture_path.read_text(encoding="utf-8"))
+        malformed_status["version"] = "vate-status-context-2026-06"
+        malformed_status["failure_reason"] = "STATUS_STALE"
+        stale_fixture_path.write_text(
+            json.dumps(malformed_status, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        stale_case_path = temp_root / "cases" / "deny-status-stale-fail-closed.json"
+        copied_stale_case = json.loads(stale_case_path.read_text(encoding="utf-8"))
+        copied_stale_case["artifacts"]["status_context"] = str(
+            stale_fixture_path.resolve()
+        )
+        stale_case_path.write_text(
+            json.dumps(copied_stale_case, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        malformed_status_run = conformance.run_corpus(temp_root)
+        stale_result = next(
+            item
+            for item in malformed_status_run["cases"]
+            if item["case_id"] == "deny-status-stale-fail-closed"
+        )
+        if stale_result.get("pass") is not False or not any(
+            "unsupported status context field" in failure
+            or ".version: expected" in failure
+            for failure in stale_result.get("failures", [])
+        ):
+            raise RuntimeError(
+                "run must reject a wrong-version status context carrying the expected reason"
+            )
+
+
+def check_external_sut_template_partial_contract() -> None:
+    conformance = load_vate_conformance_module()
+    report = conformance.compare_sut_results(
+        ROOT / "conformance" / "al2-vate-v0.3",
+        ROOT / "examples" / "external-sut-template" / "starter-sut-result.template.json",
+    )
+    if report.get("fatal_errors"):
+        raise RuntimeError(
+            "external SUT starter template must match the current corpus digest without fatal errors: "
+            f"{report['fatal_errors']}"
+        )
+    if report.get("summary") != {
+        "total": 76,
+        "passed": 3,
+        "failed": 73,
+        "skipped": 0,
+    }:
+        raise RuntimeError(
+            "external SUT starter template must report 3/76 passing cases: "
+            f"{report.get('summary')}"
+        )
+    failed_cases = [case for case in report.get("cases", []) if case.get("pass") is not True]
+    if len(failed_cases) != 73 or any(
+        case.get("failures") != ["sut result missing"] for case in failed_cases
+    ):
+        raise RuntimeError(
+            "external SUT starter template failures must be exactly 73 missing result entries"
+        )
+
+
+def check_sut_result_envelope_fail_closed() -> None:
+    conformance = load_vate_conformance_module()
+    passing_path = ROOT / "examples" / "conformance" / "sut-results-pass.example.json"
+    passing = json.loads(passing_path.read_text(encoding="utf-8"))
+
+    for generated_at in (
+        None,
+        "2026-07-01T00:00:00.0000001Z",
+        "2026-07-01T24:00:00Z",
+        "2026-W27-3T12:00:00Z",
+        "2026-02-30T12:00:00Z",
+        "not-a-time",
+    ):
+        variant = json.loads(json.dumps(passing))
+        if generated_at is None:
+            variant.pop("generated_at", None)
+        else:
+            variant["generated_at"] = generated_at
+        failures = conformance.sut_result_envelope_failures(variant)
+        if not any("sut_results.generated_at" in failure for failure in failures):
+            raise RuntimeError(
+                f"SUT result envelope must reject generated_at={generated_at!r}"
+            )
+
+    for field in ("name", "type", "version", "language"):
+        for invalid_value in (None, "", 7, False):
+            variant = json.loads(json.dumps(passing))
+            if invalid_value is None:
+                variant["implementation"].pop(field, None)
+            else:
+                variant["implementation"][field] = invalid_value
+            failures = conformance.sut_result_envelope_failures(variant)
+            if not any(
+                f"sut_results.implementation.{field}" in failure
+                for failure in failures
+            ):
+                raise RuntimeError(
+                    f"SUT result envelope must reject implementation.{field}={invalid_value!r}"
+                )
+
+    for invalid_results in (None, {}, "not-an-array", 7, False):
+        variant = json.loads(json.dumps(passing))
+        if invalid_results is None:
+            variant.pop("results", None)
+        else:
+            variant["results"] = invalid_results
+        failures = conformance.sut_result_envelope_failures(variant)
+        if not any("sut_results.results" in failure for failure in failures):
+            raise RuntimeError(
+                f"SUT result envelope must reject results={invalid_results!r}"
+            )
+
+    with tempfile.TemporaryDirectory(prefix="vate-sut-envelope-") as temp_dir:
+        temp_root = Path(temp_dir)
+        malformed = json.loads(json.dumps(passing))
+        malformed.pop("generated_at", None)
+        malformed["implementation"] = {}
+        malformed_path = temp_root / "sut-results.json"
+        compare_path = temp_root / "compare-report.json"
+        implementation_path = temp_root / "implementation-report.json"
+        malformed_path.write_text(
+            json.dumps(malformed, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        result = run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(malformed_path),
+                "--report",
+                str(compare_path),
+                "--implementation-report",
+                str(implementation_path),
+                "--conformance-report-uri",
+                str(compare_path),
+                "--implementation-report-uri",
+                str(implementation_path),
+            ]
+        )
+        if "Traceback" in result.stderr:
+            raise RuntimeError("malformed SUT result envelope caused compare traceback")
+        compare_report = assert_strict_json_file(compare_path)
+        implementation_report = assert_strict_json_file(implementation_path)
+        if conformance.conformance_report_status(compare_report) != "fail":
+            raise RuntimeError("malformed SUT result envelope must not produce a passing report")
+        if implementation_report.get("status") != "fail":
+            raise RuntimeError(
+                "malformed SUT result envelope must produce a failed implementation report"
+            )
+        assert_report_error_contains(compare_path, "sut_results.generated_at")
+        for field in ("name", "type", "version", "language"):
+            assert_report_error_contains(
+                compare_path,
+                f"sut_results.implementation.{field}",
+            )
+
+        for index, invalid_results in enumerate((None, {}, "not-an-array", 7, False)):
+            malformed_results = json.loads(json.dumps(passing))
+            if invalid_results is None:
+                malformed_results.pop("results", None)
+            else:
+                malformed_results["results"] = invalid_results
+            malformed_results_path = temp_root / f"sut-results-malformed-{index}.json"
+            malformed_results_report_path = temp_root / f"compare-malformed-{index}.json"
+            malformed_results_implementation_path = (
+                temp_root / f"implementation-malformed-{index}.json"
+            )
+            malformed_results_path.write_text(
+                json.dumps(malformed_results, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            malformed_results_process = run_expect_failure(
+                [
+                    sys.executable,
+                    str(VATE_CONFORMANCE),
+                    "compare",
+                    "--corpus-root",
+                    str(ROOT / "conformance" / "al2-vate-v0.3"),
+                    "--sut-results",
+                    str(malformed_results_path),
+                    "--report",
+                    str(malformed_results_report_path),
+                    "--implementation-report",
+                    str(malformed_results_implementation_path),
+                    "--conformance-report-uri",
+                    str(malformed_results_report_path),
+                    "--implementation-report-uri",
+                    str(malformed_results_implementation_path),
+                ]
+            )
+            if "Traceback" in malformed_results_process.stderr:
+                raise RuntimeError("malformed results shape caused compare traceback")
+            malformed_results_report = assert_strict_json_file(
+                malformed_results_report_path
+            )
+            malformed_results_implementation = assert_strict_json_file(
+                malformed_results_implementation_path
+            )
+            if conformance.conformance_report_status(malformed_results_report) != "fail":
+                raise RuntimeError("malformed results shape must fail the conformance report")
+            if malformed_results_implementation.get("status") != "fail":
+                raise RuntimeError("malformed results shape must fail the implementation report")
+            assert_report_error_contains(
+                malformed_results_report_path,
+                "sut_results.results",
+            )
+
+        empty_corpus_root = temp_root / "empty-corpus"
+        (empty_corpus_root / "cases").mkdir(parents=True)
+        _, empty_digest, _ = conformance.corpus_manifest(empty_corpus_root)
+        empty_submission = json.loads(json.dumps(passing))
+        empty_submission.pop("results", None)
+        empty_submission["corpus"]["digest"] = empty_digest
+        empty_submission_path = temp_root / "empty-corpus-sut-results.json"
+        empty_report_path = temp_root / "empty-corpus-compare.json"
+        empty_implementation_path = temp_root / "empty-corpus-implementation.json"
+        empty_submission_path.write_text(
+            json.dumps(empty_submission, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        empty_process = run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(empty_corpus_root),
+                "--sut-results",
+                str(empty_submission_path),
+                "--report",
+                str(empty_report_path),
+                "--implementation-report",
+                str(empty_implementation_path),
+                "--conformance-report-uri",
+                str(empty_report_path),
+                "--implementation-report-uri",
+                str(empty_implementation_path),
+            ]
+        )
+        if "Traceback" in empty_process.stderr:
+            raise RuntimeError("empty corpus compare caused traceback")
+        empty_report = assert_strict_json_file(empty_report_path)
+        empty_implementation = assert_strict_json_file(empty_implementation_path)
+        if empty_report.get("summary") != {
+            "total": 0,
+            "passed": 0,
+            "failed": 0,
+            "skipped": 0,
+        }:
+            raise RuntimeError("empty corpus compare must retain an explicit 0/0 summary")
+        if conformance.conformance_report_status(empty_report) != "fail":
+            raise RuntimeError("empty corpus compare must fail despite its 0/0 summary")
+        if empty_implementation.get("status") != "fail":
+            raise RuntimeError("empty corpus compare must fail the implementation report")
+        assert_report_error_contains(empty_report_path, "no conformance case files found")
+        assert_report_error_contains(empty_report_path, "sut_results.results")
+
+
+def check_case_json_fail_closed() -> None:
+    canonical_corpus = ROOT / "conformance" / "al2-vate-v0.3"
+    passing_sut = ROOT / "examples" / "conformance" / "sut-results-pass.example.json"
+    with tempfile.TemporaryDirectory(prefix="vate-malformed-case-") as temp_dir:
+        temp_root = Path(temp_dir)
+        baseline_compare = temp_root / "baseline-compare.json"
+        baseline_implementation = temp_root / "baseline-implementation.json"
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(canonical_corpus),
+                "--sut-results",
+                str(passing_sut),
+                "--report",
+                str(baseline_compare),
+                "--implementation-report",
+                str(baseline_implementation),
+                "--conformance-report-uri",
+                str(baseline_compare),
+                "--implementation-report-uri",
+                str(baseline_implementation),
+            ]
+        )
+        malformed_corpus = temp_root / "corpus"
+        shutil.copytree(canonical_corpus, malformed_corpus)
+        target_case = malformed_corpus / "cases" / "allow-valid-admission.json"
+        canonical_case = json.loads(target_case.read_text(encoding="utf-8"))
+        expected_null = json.loads(json.dumps(canonical_case))
+        expected_null["expected"] = None
+        expected_array = json.loads(json.dumps(canonical_case))
+        expected_array["expected"] = []
+        expected_string = json.loads(json.dumps(canonical_case))
+        expected_string["expected"] = "invalid"
+        expected_number = json.loads(json.dumps(canonical_case))
+        expected_number["expected"] = 7
+        expected_bool = json.loads(json.dumps(canonical_case))
+        expected_bool["expected"] = False
+        expected_empty = json.loads(json.dumps(canonical_case))
+        expected_empty["expected"] = {}
+        reason_codes_null = json.loads(json.dumps(canonical_case))
+        reason_codes_null["expected"]["reason_codes"] = None
+        checks_null = json.loads(json.dumps(canonical_case))
+        checks_null["expected"]["checks"] = None
+        case_id_missing = json.loads(json.dumps(canonical_case))
+        case_id_missing.pop("case_id", None)
+        conformance = load_vate_conformance_module()
+        collection_fields = (
+            "validation_focus",
+            "integrity_checks",
+            "trust_checks",
+            "jose_checks",
+            "policy_snapshot_checks",
+            "artifact_reference_checks",
+            "linkage_checks",
+            "attenuation_checks",
+            "al2_context_checks",
+        )
+        malformed_collection_values = (
+            {},
+            None,
+            "invalid",
+            [None],
+            [{}],
+        )
+        for collection_field in collection_fields:
+            for malformed_value in malformed_collection_values:
+                malformed_case = json.loads(json.dumps(canonical_case))
+                malformed_case[collection_field] = malformed_value
+                collection_failures = conformance.case_envelope_failures(
+                    malformed_case
+                )
+                if not any(
+                    collection_field in failure
+                    for failure in collection_failures
+                ):
+                    raise RuntimeError(
+                        f"{collection_field} malformed value was not rejected: "
+                        f"{malformed_value!r}"
+                    )
+
+        for nested_label, collection_field, check_template, nested_field in (
+            (
+                "policy_snapshot_checks[0].reference_paths",
+                "policy_snapshot_checks",
+                {"artifact": "admission_receipt"},
+                "reference_paths",
+            ),
+            (
+                "policy_snapshot_checks[0].compare_fields",
+                "policy_snapshot_checks",
+                {"artifact": "admission_receipt"},
+                "compare_fields",
+            ),
+            (
+                "artifact_reference_checks[0].reference_paths",
+                "artifact_reference_checks",
+                {"artifact": "admission_receipt"},
+                "reference_paths",
+            ),
+        ):
+            for malformed_value in malformed_collection_values:
+                malformed_case = json.loads(json.dumps(canonical_case))
+                malformed_check = json.loads(json.dumps(check_template))
+                malformed_check[nested_field] = malformed_value
+                malformed_case[collection_field] = [malformed_check]
+                nested_failures = conformance.case_envelope_failures(
+                    malformed_case
+                )
+                if not any(
+                    nested_label in failure for failure in nested_failures
+                ):
+                    raise RuntimeError(
+                        f"{nested_label} malformed value was not rejected: "
+                        f"{malformed_value!r}"
+                    )
+
+        valid_pairing = {
+            "pair_id": "test-pair",
+            "role": "positive",
+            "paired_case_id": "paired-case",
+            "mutation_axis": "test-axis",
+            "stable_fields": ["expected.should_execute"],
+            "mutated_fields": ["artifacts.admission_receipt"],
+        }
+        for pairing_field in ("stable_fields", "mutated_fields"):
+            for malformed_value in malformed_collection_values:
+                malformed_case = json.loads(json.dumps(canonical_case))
+                malformed_pairing = json.loads(json.dumps(valid_pairing))
+                malformed_pairing[pairing_field] = malformed_value
+                malformed_case["pairing"] = malformed_pairing
+                pairing_failures = conformance.case_envelope_failures(
+                    malformed_case
+                )
+                if not any(
+                    f"pairing.{pairing_field}" in failure
+                    for failure in pairing_failures
+                ):
+                    raise RuntimeError(
+                        f"pairing.{pairing_field} malformed value was not rejected: "
+                        f"{malformed_value!r}"
+                    )
+
+        cli_collection_variants: list[tuple[str, str]] = []
+        for label, malformed_value in (
+            ("object", {}),
+            ("null", None),
+            ("scalar", "invalid"),
+            ("item-null", [None]),
+            ("item-empty", [{}]),
+        ):
+            malformed_case = json.loads(json.dumps(canonical_case))
+            malformed_case["integrity_checks"] = malformed_value
+            cli_collection_variants.append(
+                (
+                    f"integrity-checks-{label}",
+                    json.dumps(malformed_case) + "\n",
+                )
+            )
+        for collection_field in collection_fields:
+            if collection_field == "integrity_checks":
+                continue
+            malformed_case = json.loads(json.dumps(canonical_case))
+            malformed_case[collection_field] = [{}]
+            cli_collection_variants.append(
+                (
+                    f"{collection_field.replace('_', '-')}-item-empty",
+                    json.dumps(malformed_case) + "\n",
+                )
+            )
+        for label, collection_field, malformed_check in (
+            (
+                "policy-reference-paths-item-empty",
+                "policy_snapshot_checks",
+                {
+                    "artifact": "admission_receipt",
+                    "reference_paths": [{}],
+                },
+            ),
+            (
+                "policy-compare-fields-item-empty",
+                "policy_snapshot_checks",
+                {
+                    "artifact": "admission_receipt",
+                    "compare_fields": [{}],
+                },
+            ),
+            (
+                "artifact-reference-paths-item-empty",
+                "artifact_reference_checks",
+                {
+                    "artifact": "admission_receipt",
+                    "reference_paths": [{}],
+                },
+            ),
+        ):
+            malformed_case = json.loads(json.dumps(canonical_case))
+            malformed_case[collection_field] = [malformed_check]
+            cli_collection_variants.append(
+                (label, json.dumps(malformed_case) + "\n")
+            )
+
+        variants: tuple[tuple[str, str], ...] = (
+            ("array", "[]\n"),
+            ("null", "null\n"),
+            ("scalar", '"not-an-object"\n'),
+            ("malformed", '{"case_id":\n'),
+            ("expected-null", json.dumps(expected_null) + "\n"),
+            ("expected-array", json.dumps(expected_array) + "\n"),
+            ("expected-string", json.dumps(expected_string) + "\n"),
+            ("expected-number", json.dumps(expected_number) + "\n"),
+            ("expected-bool", json.dumps(expected_bool) + "\n"),
+            ("expected-empty", json.dumps(expected_empty) + "\n"),
+            ("reason-codes-null", json.dumps(reason_codes_null) + "\n"),
+            ("checks-null", json.dumps(checks_null) + "\n"),
+            ("case-id-missing", json.dumps(case_id_missing) + "\n"),
+            *cli_collection_variants,
+        )
+        for label, payload in variants:
+            target_case.write_text(payload, encoding="utf-8")
+            run_report = temp_root / f"run-{label}.json"
+            compare_report = temp_root / f"compare-{label}.json"
+            bundle_report = temp_root / f"bundle-{label}.json"
+            index_out = temp_root / f"index-{label}.json"
+
+            commands = (
+                (
+                    "run",
+                    [
+                        sys.executable,
+                        str(VATE_CONFORMANCE),
+                        "run",
+                        "--corpus-root",
+                        str(malformed_corpus),
+                        "--report",
+                        str(run_report),
+                    ],
+                    run_report,
+                ),
+                (
+                    "compare",
+                    [
+                        sys.executable,
+                        str(VATE_CONFORMANCE),
+                        "compare",
+                        "--corpus-root",
+                        str(malformed_corpus),
+                        "--sut-results",
+                        str(passing_sut),
+                        "--report",
+                        str(compare_report),
+                    ],
+                    compare_report,
+                ),
+                (
+                    "verify-bundle",
+                    [
+                        sys.executable,
+                        str(VATE_CONFORMANCE),
+                        "verify-bundle",
+                        "--corpus-root",
+                        str(malformed_corpus),
+                        "--sut-results",
+                        str(passing_sut),
+                        "--conformance-report",
+                        str(baseline_compare),
+                        "--implementation-report",
+                        str(baseline_implementation),
+                        "--report",
+                        str(bundle_report),
+                    ],
+                    bundle_report,
+                ),
+            )
+            for command_name, command, report_path in commands:
+                process = run_expect_failure(command)
+                if "Traceback" in process.stderr:
+                    raise RuntimeError(
+                        f"{command_name} traceback for {label} corpus case"
+                    )
+                report = assert_strict_json_file(report_path)
+                if command_name == "verify-bundle":
+                    if report.get("status") != "fail" and not report.get(
+                        "summary", {}
+                    ).get("failed"):
+                        raise RuntimeError(
+                            f"verify-bundle must fail for {label} corpus case"
+                        )
+                    if "corpus case" not in json.dumps(report):
+                        raise RuntimeError(
+                            f"verify-bundle report must identify {label} corpus case failure"
+                        )
+                else:
+                    assert_report_error_contains(report_path, "corpus case")
+
+            index_process = run_expect_failure(
+                [
+                    sys.executable,
+                    str(VATE_CONFORMANCE),
+                    "index",
+                    "--corpus-root",
+                    str(malformed_corpus),
+                    "--out",
+                    str(index_out),
+                ]
+            )
+            if "Traceback" in index_process.stderr:
+                raise RuntimeError(f"index traceback for {label} corpus case")
+            if "corpus case" not in index_process.stderr:
+                raise RuntimeError(f"index must identify {label} corpus case failure")
+
+
+def check_corpus_index_requires_cases() -> None:
+    canonical_corpus = ROOT / "conformance" / "al2-vate-v0.3"
+    canonical_index = canonical_corpus / "corpus.json"
+    with tempfile.TemporaryDirectory(prefix="vate-index-case-floor-") as temp_dir:
+        temp_root = Path(temp_dir)
+        regenerated_index = temp_root / "canonical-corpus.json"
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "index",
+                "--corpus-root",
+                str(canonical_corpus),
+                "--out",
+                str(regenerated_index),
+            ]
+        )
+        if regenerated_index.read_bytes() != canonical_index.read_bytes():
+            raise RuntimeError("canonical corpus index regeneration is not byte-identical")
+
+        missing_cases_root = temp_root / "missing-cases"
+        missing_cases_root.mkdir()
+        empty_cases_root = temp_root / "empty-cases"
+        (empty_cases_root / "cases").mkdir(parents=True)
+        for label, corpus_root in (
+            ("missing", missing_cases_root),
+            ("empty", empty_cases_root),
+        ):
+            output_path = temp_root / f"{label}-corpus.json"
+            process = run_expect_failure(
+                [
+                    sys.executable,
+                    str(VATE_CONFORMANCE),
+                    "index",
+                    "--corpus-root",
+                    str(corpus_root),
+                    "--out",
+                    str(output_path),
+                ]
+            )
+            if "Traceback" in process.stderr:
+                raise RuntimeError(f"index traceback for {label} cases directory")
+            if output_path.exists():
+                raise RuntimeError(f"index generated a zero-case corpus for {label} cases")
+            expected_error = (
+                "cases directory is missing" if label == "missing"
+                else "no conformance case files found"
+            )
+            if expected_error not in process.stderr:
+                raise RuntimeError(
+                    f"index did not report the {label} cases failure: {process.stderr}"
+                )
+
+
+def check_case_artifact_reference_fail_closed() -> None:
+    canonical_corpus = ROOT / "conformance" / "al2-vate-v0.3"
+    passing_sut = ROOT / "examples" / "conformance" / "sut-results-pass.example.json"
+    with tempfile.TemporaryDirectory(prefix="vate-case-artifact-contract-") as temp_dir:
+        temp_root = Path(temp_dir)
+        baseline_report = temp_root / "baseline-report.json"
+        baseline_implementation = temp_root / "baseline-implementation.json"
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(canonical_corpus),
+                "--sut-results",
+                str(passing_sut),
+                "--report",
+                str(baseline_report),
+                "--implementation-report",
+                str(baseline_implementation),
+                "--conformance-report-uri",
+                str(baseline_report),
+                "--implementation-report-uri",
+                str(baseline_implementation),
+            ]
+        )
+        malformed_corpus = temp_root / "corpus"
+        shutil.copytree(canonical_corpus, malformed_corpus)
+
+        def assert_corpus_rejected(
+            label: str,
+            *,
+            require_index_failure: bool = True,
+        ) -> None:
+            run_report = temp_root / f"{label}-run.json"
+            compare_report = temp_root / f"{label}-compare.json"
+            bundle_report = temp_root / f"{label}-bundle.json"
+            commands = (
+                (
+                    "run",
+                    [
+                        sys.executable,
+                        str(VATE_CONFORMANCE),
+                        "run",
+                        "--corpus-root",
+                        str(malformed_corpus),
+                        "--report",
+                        str(run_report),
+                    ],
+                    run_report,
+                ),
+                (
+                    "compare",
+                    [
+                        sys.executable,
+                        str(VATE_CONFORMANCE),
+                        "compare",
+                        "--corpus-root",
+                        str(malformed_corpus),
+                        "--sut-results",
+                        str(passing_sut),
+                        "--report",
+                        str(compare_report),
+                    ],
+                    compare_report,
+                ),
+                (
+                    "verify-bundle",
+                    [
+                        sys.executable,
+                        str(VATE_CONFORMANCE),
+                        "verify-bundle",
+                        "--corpus-root",
+                        str(malformed_corpus),
+                        "--sut-results",
+                        str(passing_sut),
+                        "--conformance-report",
+                        str(baseline_report),
+                        "--implementation-report",
+                        str(baseline_implementation),
+                        "--report",
+                        str(bundle_report),
+                    ],
+                    bundle_report,
+                ),
+            )
+            for command_name, command, report_path in commands:
+                process = run_expect_failure(command)
+                if "Traceback" in process.stderr:
+                    raise RuntimeError(
+                        f"{command_name} traceback for {label} artifact contract"
+                    )
+                report = assert_strict_json_file(report_path)
+                if command_name == "verify-bundle":
+                    if report.get("status") != "fail":
+                        raise RuntimeError(
+                            f"verify-bundle passed {label} artifact contract"
+                        )
+                elif report.get("summary", {}).get("failed", 0) == 0 and not report.get(
+                    "fatal_errors"
+                ):
+                    raise RuntimeError(
+                        f"{command_name} did not record {label} artifact failure"
+                    )
+            index_command = [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "index",
+                "--corpus-root",
+                str(malformed_corpus),
+                "--out",
+                str(temp_root / f"{label}-index.json"),
+            ]
+            if require_index_failure:
+                index_process = run_expect_failure(index_command)
+            else:
+                run(index_command)
+                index_process = None
+            if index_process is not None and "Traceback" in index_process.stderr:
+                raise RuntimeError(f"index traceback for {label} artifact contract")
+
+        base_artifact_case_path = (
+            malformed_corpus
+            / "cases"
+            / "deny-digest-mismatch-before-policy.json"
+        )
+        canonical_base_artifact_case = json.loads(
+            base_artifact_case_path.read_text(encoding="utf-8")
+        )
+        for label, malformed_value in (
+            ("artifact-object", {}),
+            ("artifact-null", None),
+            ("artifact-number", 7),
+            ("artifact-boolean", False),
+        ):
+            malformed_case = json.loads(json.dumps(canonical_base_artifact_case))
+            malformed_case["artifacts"]["base_artifact"] = malformed_value
+            base_artifact_case_path.write_text(
+                json.dumps(malformed_case, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            assert_corpus_rejected(label)
+        base_artifact_case_path.write_text(
+            json.dumps(
+                canonical_base_artifact_case,
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+        policy_case_path = (
+            malformed_corpus
+            / "cases"
+            / "allow-valid-with-policy-snapshot.json"
+        )
+        canonical_policy_case = json.loads(
+            policy_case_path.read_text(encoding="utf-8")
+        )
+        policy_case = json.loads(json.dumps(canonical_policy_case))
+        policy_case["policy_snapshot_checks"][0]["reference_paths"][0][
+            "path"
+        ] = "decision.outcome"
+        policy_case_path.write_text(
+            json.dumps(policy_case, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        assert_corpus_rejected("policy-reference-scalar")
+        policy_case = json.loads(json.dumps(canonical_policy_case))
+        policy_case["policy_snapshot_checks"][0]["reference_paths"][0][
+            "artifact"
+        ] = {}
+        policy_case_path.write_text(
+            json.dumps(policy_case, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        assert_corpus_rejected("policy-reference-artifact-object")
+        policy_case_path.write_text(
+            json.dumps(canonical_policy_case, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+
+        case_mutations = (
+            (
+                "category-object",
+                "allow-valid-admission.json",
+                lambda case: case.__setitem__("category", {}),
+            ),
+            (
+                "expected-check-enum-array",
+                "allow-valid-admission.json",
+                lambda case: case["expected"]["checks"][0].__setitem__(
+                    "expected", []
+                ),
+            ),
+            (
+                "pairing-role-object",
+                "deny-token-passthrough-as-authority.json",
+                lambda case: case["pairing"].__setitem__("role", {}),
+            ),
+            (
+                "al2-kind-array",
+                "allow-status-fresh-at-boundary.json",
+                lambda case: case["al2_context_checks"][0].__setitem__(
+                    "kind", []
+                ),
+            ),
+            (
+                "linkage-kind-object",
+                "post-execution-runtime-mismatch.json",
+                lambda case: case["linkage_checks"][0].__setitem__(
+                    "kind", {}
+                ),
+            ),
+        )
+        for label, filename, mutate in case_mutations:
+            case_path = malformed_corpus / "cases" / filename
+            canonical_case = json.loads(case_path.read_text(encoding="utf-8"))
+            malformed_case = json.loads(json.dumps(canonical_case))
+            mutate(malformed_case)
+            case_path.write_text(
+                json.dumps(malformed_case, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            assert_corpus_rejected(label)
+            case_path.write_text(
+                json.dumps(canonical_case, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+
+        status_case_path = (
+            malformed_corpus / "cases" / "allow-status-fresh-at-boundary.json"
+        )
+        canonical_status_case = json.loads(
+            status_case_path.read_text(encoding="utf-8")
+        )
+        malformed_status_case = json.loads(json.dumps(canonical_status_case))
+        canonical_status_context_path = ROOT / canonical_status_case["artifacts"][
+            "status_context"
+        ]
+        malformed_status_context = json.loads(
+            canonical_status_context_path.read_text(encoding="utf-8")
+        )
+        malformed_status_context["availability"] = {}
+        malformed_status_context_path = temp_root / "status-context-object.json"
+        malformed_status_context_path.write_text(
+            json.dumps(malformed_status_context, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        malformed_status_case["artifacts"]["status_context"] = str(
+            malformed_status_context_path
+        )
+        status_case_path.write_text(
+            json.dumps(malformed_status_case, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        assert_corpus_rejected(
+            "status-availability-object",
+            require_index_failure=False,
+        )
+
+
+def check_unhashable_validator_inputs_fail_closed() -> None:
+    conformance = load_vate_conformance_module()
+    canonical_case_path = (
+        ROOT
+        / "conformance"
+        / "al2-vate-v0.3"
+        / "cases"
+        / "allow-valid-admission.json"
+    )
+    canonical_case = json.loads(canonical_case_path.read_text(encoding="utf-8"))
+
+    direct_cases: list[tuple[str, Any, str]] = []
+    malformed_values = ({}, [], None, 7, False)
+    for value_index, malformed_value in enumerate(malformed_values):
+        category_case = json.loads(json.dumps(canonical_case))
+        category_case["category"] = malformed_value
+        direct_cases.append(
+            (
+                f"case category malformed {value_index}",
+                lambda case=category_case: conformance.case_envelope_failures(
+                    case
+                ),
+                "category",
+            )
+        )
+        check_enum_case = json.loads(json.dumps(canonical_case))
+        check_enum_case["expected"]["checks"][0][
+            "expected"
+        ] = malformed_value
+        direct_cases.append(
+            (
+                f"expected check enum malformed {value_index}",
+                lambda case=check_enum_case: conformance.case_envelope_failures(
+                    case
+                ),
+                "expected.checks",
+            )
+        )
+        policy_case = {
+            "policy_snapshot_checks": [
+                {
+                    "artifact": "policy_snapshot",
+                    "reference_paths": [
+                        {"artifact": malformed_value, "path": "policy"}
+                    ],
+                }
+            ]
+        }
+        direct_cases.append(
+            (
+                f"policy reference malformed {value_index}",
+                lambda case=policy_case: conformance.case_check_collection_failures(
+                    case
+                ),
+                "reference_paths",
+            )
+        )
+        pairing_case = {
+            "pairing": {
+                "pair_id": "pair",
+                "role": malformed_value,
+                "paired_case_id": "other",
+                "mutation_axis": "axis",
+                "stable_fields": ["field"],
+                "mutated_fields": ["other_field"],
+            }
+        }
+        direct_cases.append(
+            (
+                f"pairing role malformed {value_index}",
+                lambda case=pairing_case: conformance.case_check_collection_failures(
+                    case
+                ),
+                "pairing.role",
+            )
+        )
+        al2_case = {
+            "al2_context_checks": [
+                {"kind": malformed_value, "artifact": "context"}
+            ]
+        }
+        direct_cases.append(
+            (
+                f"AL2 kind malformed {value_index}",
+                lambda case=al2_case: conformance.case_check_collection_failures(
+                    case
+                ),
+                "al2_context_checks[0].kind",
+            )
+        )
+        linkage_case = {"linkage_checks": [{"kind": malformed_value}]}
+        direct_cases.append(
+            (
+                f"linkage kind malformed {value_index}",
+                lambda case=linkage_case: conformance.case_check_collection_failures(
+                    case
+                ),
+                "kind must be a string enum",
+            )
+        )
+        status_context = {"availability": malformed_value}
+        direct_cases.append(
+            (
+                f"status availability malformed {value_index}",
+                lambda context=status_context: conformance.status_context_shape_failures(
+                    context, "status"
+                ),
+                "availability",
+            )
+        )
+        implementation_status_report = {"status": malformed_value}
+        direct_cases.append(
+            (
+                f"implementation status malformed {value_index}",
+                lambda report=implementation_status_report: conformance.implementation_report_contract_failures(
+                    report
+                ),
+                "status",
+            )
+        )
+        conformance_artifact_mode_report = {
+            "sut_results": {"artifact_mode": malformed_value}
+        }
+        direct_cases.append(
+            (
+                f"report artifact mode malformed {value_index}",
+                lambda report=conformance_artifact_mode_report: conformance.conformance_report_contract_failures(
+                    report
+                ),
+                "artifact_mode",
+            )
+        )
+        implementation_digest_basis_report = {
+            "conformance_report": {"digest_basis": malformed_value}
+        }
+        direct_cases.append(
+            (
+                f"report digest basis malformed {value_index}",
+                lambda report=implementation_digest_basis_report: conformance.implementation_report_contract_failures(
+                    report
+                ),
+                "digest_basis",
+            )
+        )
+
+    for label, call, expected_fragment in direct_cases:
+        failures = call()
+        if not isinstance(failures, list) or not any(
+            expected_fragment in failure for failure in failures
+        ):
+            raise RuntimeError(
+                f"{label} did not produce the expected validator failure"
+            )
+
+
+def check_context_binding_key_contract() -> None:
+    conformance = load_vate_conformance_module()
+    passing_sut_path = (
+        ROOT / "examples" / "conformance" / "sut-results-pass.example.json"
+    )
+    passing_sut = json.loads(passing_sut_path.read_text(encoding="utf-8"))
+
+    canonical_by_role: dict[str, dict] = {}
+    for result in passing_sut["results"]:
+        artifacts = result.get("artifacts")
+        if not isinstance(artifacts, dict):
+            continue
+        for context in artifacts.get("verification_context", []):
+            if not isinstance(context, dict):
+                continue
+            for binding in context.get("context_bindings", []):
+                if isinstance(binding, dict) and isinstance(
+                    binding.get("role"), str
+                ):
+                    canonical_by_role.setdefault(binding["role"], binding)
+
+    expected_roles = {
+        "admission_receipt",
+        "admission_request",
+        "transaction_id",
+        "runtime",
+        "evidence",
+    }
+    if set(canonical_by_role) != expected_roles:
+        raise RuntimeError(
+            "passing SUT example does not cover every context binding role"
+        )
+    for role in sorted(expected_roles):
+        binding = json.loads(json.dumps(canonical_by_role[role]))
+        binding["extension_object"] = {"review": "preserved"}
+        binding["extension_string"] = "preserved"
+        key, failures = conformance.validated_context_binding_key(
+            binding,
+            f"canonical.{role}",
+        )
+        if key is None or failures:
+            raise RuntimeError(
+                f"canonical {role} binding or extension metadata was rejected: "
+                f"{failures}"
+            )
+
+    malformed_values = ([], {}, None, 7, False)
+    direct_probes = (
+        ("path", canonical_by_role["admission_receipt"]),
+        ("evidence_type", canonical_by_role["admission_receipt"]),
+    )
+    for field, canonical_binding in direct_probes:
+        for malformed_value in malformed_values:
+            binding = json.loads(json.dumps(canonical_binding))
+            binding[field] = malformed_value
+            key, failures = conformance.validated_context_binding_key(
+                binding,
+                f"malformed.{field}",
+            )
+            if key is not None or not any(
+                f".{field}: expected non-empty string" in failure
+                for failure in failures
+            ):
+                raise RuntimeError(
+                    f"malformed context binding {field}={malformed_value!r} "
+                    "did not fail the central key contract"
+                )
+            shape_failures = conformance.context_binding_shape_failures(
+                binding,
+                f"malformed.{field}",
+            )
+            if not any(
+                f".{field}: expected non-empty string" in failure
+                for failure in shape_failures
+            ):
+                raise RuntimeError(
+                    f"malformed optional context binding {field}="
+                    f"{malformed_value!r} passed direct shape validation"
+                )
+
+    with tempfile.TemporaryDirectory(prefix="vate-context-binding-key-") as tmp:
+        tmp_path = Path(tmp)
+        extension_sut = json.loads(json.dumps(passing_sut))
+        extension_sut["extension_object"] = {"review": "preserved"}
+        extension_sut["extension_string"] = "preserved"
+        extension_binding = None
+        for result in extension_sut["results"]:
+            artifacts = result.get("artifacts")
+            if not isinstance(artifacts, dict):
+                continue
+            for context in artifacts.get("verification_context", []):
+                if not isinstance(context, dict):
+                    continue
+                for binding in context.get("context_bindings", []):
+                    if (
+                        isinstance(binding, dict)
+                        and binding.get("role") == "admission_receipt"
+                    ):
+                        extension_binding = binding
+                        break
+                if extension_binding is not None:
+                    break
+            if extension_binding is not None:
+                break
+        if extension_binding is None:
+            raise RuntimeError(
+                "could not locate admission_receipt binding for extension probe"
+            )
+        extension_binding["extension_object"] = {"review": "preserved"}
+        extension_binding["extension_string"] = "preserved"
+        extension_sut_path = tmp_path / "extension-sut.json"
+        extension_report_path = tmp_path / "extension-report.json"
+        extension_sut_path.write_text(
+            json.dumps(extension_sut, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(ROOT / "conformance" / "al2-vate-v0.3"),
+                "--sut-results",
+                str(extension_sut_path),
+                "--report",
+                str(extension_report_path),
+            ]
+        )
+        extension_report = assert_strict_json_file(extension_report_path)
+        if extension_report.get("summary") != {
+            "total": 76,
+            "passed": 76,
+            "failed": 0,
+            "skipped": 0,
+        }:
+            raise RuntimeError(
+                "valid SUT/context binding extension metadata changed compare "
+                f"results: {extension_report.get('summary')}"
+            )
+
+        for field in ("path", "evidence_type"):
+            role = "admission_receipt"
+            for value_index, malformed_value in enumerate(malformed_values):
+                sut_results = json.loads(json.dumps(passing_sut))
+                mutated = False
+                for result in sut_results["results"]:
+                    artifacts = result.get("artifacts")
+                    if not isinstance(artifacts, dict):
+                        continue
+                    for context in artifacts.get("verification_context", []):
+                        if not isinstance(context, dict):
+                            continue
+                        for binding in context.get("context_bindings", []):
+                            if (
+                                isinstance(binding, dict)
+                                and binding.get("role") == role
+                            ):
+                                binding[field] = malformed_value
+                                mutated = True
+                                break
+                        if mutated:
+                            break
+                    if mutated:
+                        break
+                if not mutated:
+                    raise RuntimeError(
+                        f"could not locate {role} binding for {field} probe"
+                    )
+
+                sut_path = tmp_path / f"{field}-{value_index}-sut.json"
+                report_path = tmp_path / f"{field}-{value_index}-report.json"
+                sut_path.write_text(
+                    json.dumps(sut_results, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8",
+                )
+                process = run_expect_failure(
+                    [
+                        sys.executable,
+                        str(VATE_CONFORMANCE),
+                        "compare",
+                        "--corpus-root",
+                        str(ROOT / "conformance" / "al2-vate-v0.3"),
+                        "--sut-results",
+                        str(sut_path),
+                        "--report",
+                        str(report_path),
+                    ]
+                )
+                if "Traceback" in process.stderr:
+                    raise RuntimeError(
+                        f"context binding {field} probe caused traceback"
+                    )
+                report = assert_strict_json_file(report_path)
+                if report.get("summary", {}).get("failed", 0) < 1:
+                    raise RuntimeError(
+                        f"context binding {field} probe did not fail compare"
+                    )
+                assert_report_error_contains(
+                    report_path,
+                    f".{field}: expected non-empty string",
+                )
+
+
+def check_bundle_case_coverage_binding() -> None:
+    conformance = load_vate_conformance_module()
+    corpus_root = ROOT / "conformance" / "al2-vate-v0.3"
+    sut_results = ROOT / "examples" / "conformance" / "sut-results-pass.example.json"
+    with tempfile.TemporaryDirectory(prefix="vate-bundle-coverage-") as temp_dir:
+        temp_root = Path(temp_dir)
+        reference_report_path = temp_root / "reference-report.json"
+        reference_implementation_path = temp_root / "reference-implementation.json"
+        reference_bundle_path = temp_root / "reference-bundle.json"
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "run",
+                "--corpus-root",
+                str(corpus_root),
+                "--report",
+                str(reference_report_path),
+                "--implementation-report",
+                str(reference_implementation_path),
+                "--conformance-report-uri",
+                str(reference_report_path),
+                "--implementation-report-uri",
+                str(reference_implementation_path),
+            ]
+        )
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "verify-bundle",
+                "--corpus-root",
+                str(corpus_root),
+                "--conformance-report",
+                str(reference_report_path),
+                "--implementation-report",
+                str(reference_implementation_path),
+                "--report",
+                str(reference_bundle_path),
+            ]
+        )
+
+        external_report_path = temp_root / "external-report.json"
+        external_implementation_path = temp_root / "external-implementation.json"
+        external_bundle_path = temp_root / "external-bundle.json"
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(corpus_root),
+                "--sut-results",
+                str(sut_results),
+                "--report",
+                str(external_report_path),
+                "--implementation-report",
+                str(external_implementation_path),
+                "--conformance-report-uri",
+                str(external_report_path),
+                "--implementation-report-uri",
+                str(external_implementation_path),
+            ]
+        )
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "verify-bundle",
+                "--corpus-root",
+                str(corpus_root),
+                "--sut-results",
+                str(sut_results),
+                "--conformance-report",
+                str(external_report_path),
+                "--implementation-report",
+                str(external_implementation_path),
+                "--report",
+                str(external_bundle_path),
+            ]
+        )
+
+        reference_report = assert_strict_json_file(reference_report_path)
+        reference_implementation = assert_strict_json_file(
+            reference_implementation_path
+        )
+
+        def recompute_summary(cases: list[dict]) -> dict[str, int]:
+            return {
+                "total": len(cases),
+                "passed": sum(1 for case in cases if case.get("pass") is True),
+                "failed": sum(1 for case in cases if case.get("pass") is False),
+                "skipped": 0,
+            }
+
+        variants: list[tuple[str, dict, dict, str]] = []
+
+        zero_report = json.loads(json.dumps(reference_report))
+        zero_report["cases"] = []
+        zero_report["summary"] = {"total": 0, "passed": 0, "failed": 0, "skipped": 0}
+        zero_implementation = json.loads(json.dumps(reference_implementation))
+        variants.append(
+            ("zero", zero_report, zero_implementation, "conformance_report.cases.coverage")
+        )
+
+        partial_report = json.loads(json.dumps(reference_report))
+        partial_report["cases"] = partial_report["cases"][:-1]
+        partial_report["summary"] = recompute_summary(partial_report["cases"])
+        partial_implementation = json.loads(json.dumps(reference_implementation))
+        variants.append(
+            ("partial", partial_report, partial_implementation, "conformance_report.cases.coverage")
+        )
+
+        duplicate_report = json.loads(json.dumps(reference_report))
+        duplicate_report["cases"].append(
+            json.loads(json.dumps(duplicate_report["cases"][0]))
+        )
+        duplicate_report["summary"] = recompute_summary(duplicate_report["cases"])
+        duplicate_implementation = json.loads(json.dumps(reference_implementation))
+        variants.append(
+            ("duplicate", duplicate_report, duplicate_implementation, "conformance_report.cases.shape")
+        )
+
+        unknown_report = json.loads(json.dumps(reference_report))
+        unknown_report["cases"][0]["case_id"] = "unknown-case-id"
+        unknown_report["summary"] = recompute_summary(unknown_report["cases"])
+        unknown_implementation = json.loads(json.dumps(reference_implementation))
+        variants.append(
+            ("unknown", unknown_report, unknown_implementation, "conformance_report.cases.coverage")
+        )
+
+        expectation_report = json.loads(json.dumps(reference_report))
+        expectation_report["cases"][0]["expected_outcome"] = "tampered"
+        expectation_implementation = json.loads(json.dumps(reference_implementation))
+        variants.append(
+            (
+                "expectation-tamper",
+                expectation_report,
+                expectation_implementation,
+                "conformance_report.cases.expectations",
+            )
+        )
+
+        arithmetic_report = json.loads(json.dumps(reference_report))
+        arithmetic_report["summary"] = {
+            "total": 0,
+            "passed": 0,
+            "failed": 0,
+            "skipped": 0,
+        }
+        arithmetic_implementation = json.loads(json.dumps(reference_implementation))
+        variants.append(
+            (
+                "summary-arithmetic",
+                arithmetic_report,
+                arithmetic_implementation,
+                "conformance_report.summary.arithmetic",
+            )
+        )
+
+        implementation_count_report = json.loads(json.dumps(reference_report))
+        implementation_count_implementation = json.loads(
+            json.dumps(reference_implementation)
+        )
+        implementation_count_implementation["corpus"]["case_count"] = 0
+        variants.append(
+            (
+                "implementation-case-count",
+                implementation_count_report,
+                implementation_count_implementation,
+                "implementation_report.corpus.case_count",
+            )
+        )
+
+        implementation_partial_report = json.loads(json.dumps(reference_report))
+        implementation_partial_implementation = json.loads(
+            json.dumps(reference_implementation)
+        )
+        implementation_partial_implementation["case_results"] = (
+            implementation_partial_implementation["case_results"][:-1]
+        )
+        variants.append(
+            (
+                "implementation-partial",
+                implementation_partial_report,
+                implementation_partial_implementation,
+                "implementation_report.case_results.coverage",
+            )
+        )
+
+        for label, report, implementation, expected_failed_check in variants:
+            if label not in {"implementation-case-count", "implementation-partial"}:
+                implementation["summary"] = json.loads(json.dumps(report["summary"]))
+                implementation["case_results"] = [
+                    conformance.implementation_case_result(case)
+                    for case in report["cases"]
+                ]
+                implementation["corpus"]["case_count"] = len(report["cases"])
+            implementation["status"] = "pass"
+            implementation["conformance_report"]["digest"] = (
+                conformance.digest_descriptor(report)
+            )
+            report_path = temp_root / f"{label}-report.json"
+            implementation_path = temp_root / f"{label}-implementation.json"
+            bundle_path = temp_root / f"{label}-bundle.json"
+            report_path.write_text(
+                json.dumps(report, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            implementation_path.write_text(
+                json.dumps(implementation, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            process = run_expect_failure(
+                [
+                    sys.executable,
+                    str(VATE_CONFORMANCE),
+                    "verify-bundle",
+                    "--corpus-root",
+                    str(corpus_root),
+                    "--conformance-report",
+                    str(report_path),
+                    "--implementation-report",
+                    str(implementation_path),
+                    "--report",
+                    str(bundle_path),
+                ]
+            )
+            if "Traceback" in process.stderr:
+                raise RuntimeError(f"bundle coverage variant {label} caused traceback")
+            bundle = assert_strict_json_file(bundle_path)
+            if bundle.get("status") != "fail":
+                raise RuntimeError(f"bundle coverage variant {label} passed")
+            assert_bundle_check(bundle_path, expected_failed_check, False)
+
+        indexed_corpus = temp_root / "indexed-corpus"
+        shutil.copytree(corpus_root, indexed_corpus)
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "index",
+                "--corpus-root",
+                str(indexed_corpus),
+                "--out",
+                str(indexed_corpus / "corpus.json"),
+            ]
+        )
+        indexed_report = temp_root / "indexed-report.json"
+        indexed_implementation = temp_root / "indexed-implementation.json"
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "run",
+                "--corpus-root",
+                str(indexed_corpus),
+                "--report",
+                str(indexed_report),
+                "--implementation-report",
+                str(indexed_implementation),
+                "--conformance-report-uri",
+                str(indexed_report),
+                "--implementation-report-uri",
+                str(indexed_implementation),
+            ]
+        )
+        canonical_index = json.loads(
+            (indexed_corpus / "corpus.json").read_text(encoding="utf-8")
+        )
+        actual_artifact_count = canonical_index["summary"]["artifact_count"]
+        for label, artifact_count in (
+            ("zero", 0),
+            ("too-large", actual_artifact_count + 1),
+            ("wrong-type", "invalid"),
+        ):
+            tampered_artifact_count_index = json.loads(
+                json.dumps(canonical_index)
+            )
+            tampered_artifact_count_index["summary"][
+                "artifact_count"
+            ] = artifact_count
+            (indexed_corpus / "corpus.json").write_text(
+                json.dumps(
+                    tampered_artifact_count_index,
+                    indent=2,
+                    sort_keys=True,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            artifact_count_bundle = (
+                temp_root / f"artifact-count-{label}-bundle.json"
+            )
+            artifact_count_process = run_expect_failure(
+                [
+                    sys.executable,
+                    str(VATE_CONFORMANCE),
+                    "verify-bundle",
+                    "--corpus-root",
+                    str(indexed_corpus),
+                    "--conformance-report",
+                    str(indexed_report),
+                    "--implementation-report",
+                    str(indexed_implementation),
+                    "--report",
+                    str(artifact_count_bundle),
+                ]
+            )
+            if "Traceback" in artifact_count_process.stderr:
+                raise RuntimeError(
+                    f"corpus index artifact_count {label} caused traceback"
+                )
+            assert_bundle_check(
+                artifact_count_bundle,
+                "corpus_index.summary.artifact_count",
+                False,
+            )
+
+        for label, field, value in (
+            ("version-wrong", "version", "wrong-version"),
+            ("profile-empty", "profile", ""),
+            ("name-null", "name", None),
+            ("root-wrong", "root", "wrong/root"),
+            ("case-schema-empty", "case_schema", ""),
+            ("digest-basis-null", "digest_basis", None),
+        ):
+            tampered_identity_index = json.loads(json.dumps(canonical_index))
+            tampered_identity_index[field] = value
+            (indexed_corpus / "corpus.json").write_text(
+                json.dumps(
+                    tampered_identity_index,
+                    indent=2,
+                    sort_keys=True,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            identity_bundle = temp_root / f"identity-{label}-bundle.json"
+            identity_process = run_expect_failure(
+                [
+                    sys.executable,
+                    str(VATE_CONFORMANCE),
+                    "verify-bundle",
+                    "--corpus-root",
+                    str(indexed_corpus),
+                    "--conformance-report",
+                    str(indexed_report),
+                    "--implementation-report",
+                    str(indexed_implementation),
+                    "--report",
+                    str(identity_bundle),
+                ]
+            )
+            if "Traceback" in identity_process.stderr:
+                raise RuntimeError(
+                    f"corpus index identity {label} caused traceback"
+                )
+            assert_bundle_check(
+                identity_bundle,
+                "corpus_index.identity",
+                False,
+            )
+
+        tampered_index = json.loads(json.dumps(canonical_index))
+        tampered_index["cases"][0]["title"] = "tampered index title"
+        (indexed_corpus / "corpus.json").write_text(
+            json.dumps(tampered_index, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        tampered_index_bundle = temp_root / "tampered-index-bundle.json"
+        tampered_index_process = run_expect_failure(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "verify-bundle",
+                "--corpus-root",
+                str(indexed_corpus),
+                "--conformance-report",
+                str(indexed_report),
+                "--implementation-report",
+                str(indexed_implementation),
+                "--report",
+                str(tampered_index_bundle),
+            ]
+        )
+        if "Traceback" in tampered_index_process.stderr:
+            raise RuntimeError("tampered corpus index caused verify-bundle traceback")
+        assert_bundle_check(
+            tampered_index_bundle,
+            "corpus_index.cases.entries",
+            False,
+        )
+
+
+def check_bundle_sut_actual_projection_binding() -> None:
+    conformance = load_vate_conformance_module()
+    corpus_root = ROOT / "conformance" / "al2-vate-v0.3"
+    passing_sut_path = (
+        ROOT / "examples" / "conformance" / "sut-results-pass.example.json"
+    )
+    passing_sut = json.loads(passing_sut_path.read_text(encoding="utf-8"))
+
+    with tempfile.TemporaryDirectory(prefix="vate-bundle-sut-projection-") as temp_dir:
+        temp_root = Path(temp_dir)
+
+        def compare_variant(label: str, sut_results: dict) -> tuple[Path, Path, Path]:
+            sut_path = temp_root / f"{label}-sut.json"
+            report_path = temp_root / f"{label}-conformance.json"
+            implementation_path = temp_root / f"{label}-implementation.json"
+            sut_path.write_text(
+                json.dumps(sut_results, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            process = run_expect_failure(
+                [
+                    sys.executable,
+                    str(VATE_CONFORMANCE),
+                    "compare",
+                    "--corpus-root",
+                    str(corpus_root),
+                    "--sut-results",
+                    str(sut_path),
+                    "--report",
+                    str(report_path),
+                    "--implementation-report",
+                    str(implementation_path),
+                    "--conformance-report-uri",
+                    str(report_path),
+                    "--implementation-report-uri",
+                    str(implementation_path),
+                ]
+            )
+            if "Traceback" in process.stderr:
+                raise RuntimeError(f"{label}: compare emitted a traceback")
+            assert_strict_json_file(report_path)
+            assert_strict_json_file(implementation_path)
+            return sut_path, report_path, implementation_path
+
+        def verify_bundle(
+            label: str,
+            sut_path: Path,
+            report_path: Path,
+            implementation_path: Path,
+            *,
+            expected_pass: bool,
+            expected_failed_check: str | None = None,
+        ) -> dict:
+            bundle_path = temp_root / f"{label}-bundle.json"
+            command = [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "verify-bundle",
+                "--corpus-root",
+                str(corpus_root),
+                "--sut-results",
+                str(sut_path),
+                "--conformance-report",
+                str(report_path),
+                "--implementation-report",
+                str(implementation_path),
+                "--report",
+                str(bundle_path),
+            ]
+            process = run(command) if expected_pass else run_expect_failure(command)
+            if process is not None and "Traceback" in process.stderr:
+                raise RuntimeError(f"{label}: verify-bundle emitted a traceback")
+            bundle = assert_strict_json_file(bundle_path)
+            expected_status = "pass" if expected_pass else "fail"
+            if bundle.get("status") != expected_status:
+                raise RuntimeError(
+                    f"{label}: expected bundle {expected_status} actual {bundle.get('status')}"
+                )
+            if expected_failed_check is not None:
+                assert_bundle_check(bundle_path, expected_failed_check, False)
+            return bundle
+
+        def synchronized_implementation(
+            report: dict,
+            implementation: dict,
+        ) -> dict:
+            synchronized = json.loads(json.dumps(implementation))
+            synchronized["summary"] = json.loads(json.dumps(report["summary"]))
+            synchronized["status"] = conformance.conformance_report_status(report)
+            synchronized["case_results"] = [
+                conformance.implementation_case_result(case)
+                for case in report["cases"]
+            ]
+            report_sut = report.get("sut_results")
+            if isinstance(report_sut, dict):
+                synchronized["artifact_mode_counts"] = json.loads(
+                    json.dumps(report_sut["artifact_mode_counts"])
+                )
+            synchronized["conformance_report"]["digest"] = (
+                conformance.digest_descriptor(report)
+            )
+            return synchronized
+
+        pulse_shaped_sut = json.loads(json.dumps(passing_sut))
+        pulse_shaped_sut["results"][0]["outcome"] = "deny"
+        pulse_shaped_sut["results"][0]["should_execute"] = False
+        pulse_shaped_sut["results"][0]["reason_codes"] = ["FAIL_CLOSED"]
+        pulse_shaped_sut["results"][1]["status"] = "skipped"
+        pulse_paths = compare_variant("pulse-shaped", pulse_shaped_sut)
+        pulse_report = assert_strict_json_file(pulse_paths[1])
+        if (
+            pulse_report.get("summary", {}).get("failed", 0) < 2
+            or pulse_report.get("summary", {}).get("skipped") != 1
+        ):
+            raise RuntimeError(
+                "Pulse-shaped compare must preserve semantic failure and skipped state"
+            )
+        verify_bundle(
+            "pulse-shaped",
+            *pulse_paths,
+            expected_pass=True,
+        )
+
+        state_reports: dict[str, tuple[Path, Path, Path]] = {}
+        for state in ("missing", "skipped", "error"):
+            state_sut = json.loads(json.dumps(passing_sut))
+            if state == "missing":
+                state_sut["results"] = state_sut["results"][1:]
+            else:
+                state_sut["results"][0]["status"] = state
+            paths = compare_variant(f"state-{state}", state_sut)
+            state_reports[state] = paths
+            verify_bundle(
+                f"state-{state}",
+                *paths,
+                expected_pass=True,
+            )
+
+        for state, (sut_path, report_path, implementation_path) in state_reports.items():
+            report = assert_strict_json_file(report_path)
+            implementation = assert_strict_json_file(implementation_path)
+            affected_case = report["cases"][0]
+            affected_case["failures"] = [
+                "non-completed state detail intentionally omitted"
+            ]
+            hidden_report_path = temp_root / f"state-{state}-hidden-conformance.json"
+            hidden_implementation_path = (
+                temp_root / f"state-{state}-hidden-implementation.json"
+            )
+            hidden_report_path.write_text(
+                json.dumps(report, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            hidden_implementation_path.write_text(
+                json.dumps(
+                    synchronized_implementation(report, implementation),
+                    indent=2,
+                    sort_keys=True,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            verify_bundle(
+                f"state-{state}-hidden",
+                sut_path,
+                hidden_report_path,
+                hidden_implementation_path,
+                expected_pass=False,
+                expected_failed_check=(
+                    "conformance_report.cases.sut_actual_projection"
+                ),
+            )
+
+        baseline_report_path = temp_root / "baseline-conformance.json"
+        baseline_implementation_path = temp_root / "baseline-implementation.json"
+        run(
+            [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare",
+                "--corpus-root",
+                str(corpus_root),
+                "--sut-results",
+                str(passing_sut_path),
+                "--report",
+                str(baseline_report_path),
+                "--implementation-report",
+                str(baseline_implementation_path),
+                "--conformance-report-uri",
+                str(baseline_report_path),
+                "--implementation-report-uri",
+                str(baseline_implementation_path),
+            ]
+        )
+        baseline_report = assert_strict_json_file(baseline_report_path)
+        baseline_implementation = assert_strict_json_file(
+            baseline_implementation_path
+        )
+
+        source_tamper_sut = json.loads(json.dumps(passing_sut))
+        source_tamper_sut["results"][0]["outcome"] = "deny"
+        source_tamper_sut["results"][0]["should_execute"] = False
+        source_tamper_sut["results"][0]["reason_codes"] = ["FAIL_CLOSED"]
+        source_tamper_path = temp_root / "projection-source-tamper-sut.json"
+        source_tamper_report = json.loads(json.dumps(baseline_report))
+        source_tamper_implementation = json.loads(
+            json.dumps(baseline_implementation)
+        )
+        source_tamper_path.write_text(
+            json.dumps(source_tamper_sut, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        source_tamper_report["sut_results"]["digest"] = (
+            conformance.digest_descriptor(source_tamper_sut)
+        )
+        source_tamper_implementation = synchronized_implementation(
+            source_tamper_report,
+            source_tamper_implementation,
+        )
+        source_tamper_report_path = (
+            temp_root / "projection-source-tamper-conformance.json"
+        )
+        source_tamper_implementation_path = (
+            temp_root / "projection-source-tamper-implementation.json"
+        )
+        source_tamper_report_path.write_text(
+            json.dumps(source_tamper_report, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        source_tamper_implementation_path.write_text(
+            json.dumps(
+                source_tamper_implementation,
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        verify_bundle(
+            "projection-source-tamper",
+            source_tamper_path,
+            source_tamper_report_path,
+            source_tamper_implementation_path,
+            expected_pass=False,
+            expected_failed_check=(
+                "conformance_report.cases.sut_actual_projection"
+            ),
+        )
+
+        projection_mutations = (
+            ("outcome", {"actual_outcome": "tampered"}),
+            (
+                "execution",
+                {
+                    "actual_should_execute": not baseline_report["cases"][0][
+                        "actual_should_execute"
+                    ]
+                },
+            ),
+            (
+                "reasons",
+                {
+                    "actual_reason_codes": ["FAIL_CLOSED"],
+                    "actual_primary_reason_code": None,
+                },
+            ),
+            (
+                "artifact-mode",
+                {
+                    "artifact_mode": "generated-receipts",
+                },
+            ),
+        )
+        for label, replacements in projection_mutations:
+            report = json.loads(json.dumps(baseline_report))
+            implementation = json.loads(json.dumps(baseline_implementation))
+            case = report["cases"][0]
+            for field, value in replacements.items():
+                case[field] = value
+            case["pass"] = False
+            case["failures"] = ["reported SUT projection differs from expectation"]
+            report["summary"]["passed"] -= 1
+            report["summary"]["failed"] += 1
+            if label == "artifact-mode":
+                report["sut_results"]["artifact_mode_counts"][
+                    "corpus-fixture-validation"
+                ] -= 1
+                report["sut_results"]["artifact_mode_counts"][
+                    "generated-receipts"
+                ] += 1
+            implementation = synchronized_implementation(report, implementation)
+            report_path = temp_root / f"projection-{label}-conformance.json"
+            implementation_path = (
+                temp_root / f"projection-{label}-implementation.json"
+            )
+            report_path.write_text(
+                json.dumps(report, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            implementation_path.write_text(
+                json.dumps(implementation, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            verify_bundle(
+                f"projection-{label}",
+                passing_sut_path,
+                report_path,
+                implementation_path,
+                expected_pass=False,
+                expected_failed_check=(
+                    "conformance_report.cases.sut_actual_projection"
+                ),
+            )
+
+        structural_variants: list[tuple[str, dict]] = []
+        non_object_sut = json.loads(json.dumps(passing_sut))
+        non_object_sut["results"].append(None)
+        structural_variants.append(("non-object", non_object_sut))
+        missing_id_sut = json.loads(json.dumps(passing_sut))
+        missing_id_result = json.loads(json.dumps(missing_id_sut["results"][0]))
+        missing_id_result.pop("case_id", None)
+        missing_id_sut["results"].append(missing_id_result)
+        structural_variants.append(("missing-id", missing_id_sut))
+        invalid_id_sut = json.loads(json.dumps(passing_sut))
+        invalid_id_result = json.loads(json.dumps(invalid_id_sut["results"][0]))
+        invalid_id_result["case_id"] = 1
+        invalid_id_sut["results"].append(invalid_id_result)
+        structural_variants.append(("invalid-id", invalid_id_sut))
+        duplicate_sut = json.loads(json.dumps(passing_sut))
+        duplicate_sut["results"].append(
+            json.loads(json.dumps(duplicate_sut["results"][0]))
+        )
+        structural_variants.append(("duplicate", duplicate_sut))
+        unknown_sut = json.loads(json.dumps(passing_sut))
+        unknown_result = json.loads(json.dumps(unknown_sut["results"][0]))
+        unknown_result["case_id"] = "unknown-case-id"
+        unknown_sut["results"].append(unknown_result)
+        structural_variants.append(("unknown", unknown_sut))
+
+        for label, sut_results in structural_variants:
+            sut_path = temp_root / f"structure-{label}-sut.json"
+            report = json.loads(json.dumps(baseline_report))
+            implementation = json.loads(json.dumps(baseline_implementation))
+            sut_path.write_text(
+                json.dumps(sut_results, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            report["sut_results"]["digest"] = conformance.digest_descriptor(
+                sut_results
+            )
+            implementation = synchronized_implementation(report, implementation)
+            report_path = temp_root / f"structure-{label}-conformance.json"
+            implementation_path = (
+                temp_root / f"structure-{label}-implementation.json"
+            )
+            report_path.write_text(
+                json.dumps(report, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            implementation_path.write_text(
+                json.dumps(implementation, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            verify_bundle(
+                f"structure-{label}",
+                sut_path,
+                report_path,
+                implementation_path,
+                expected_pass=False,
+                expected_failed_check="sut_results.results.structure",
+            )
+
+
+def check_bundle_report_contract_fail_closed() -> None:
+    corpus_root = ROOT / "conformance" / "al2-vate-v0.3"
+    sut_results = ROOT / "examples" / "conformance" / "sut-results-pass.example.json"
+    with tempfile.TemporaryDirectory(prefix="vate-bundle-report-contract-") as temp_dir:
+        temp_root = Path(temp_dir)
+
+        def set_nested(document: dict, path: tuple[object, ...], value: object) -> None:
+            current: object = document
+            for part in path[:-1]:
+                if isinstance(part, int):
+                    current = current[part]  # type: ignore[index]
+                else:
+                    current = current[part]  # type: ignore[index]
+            final = path[-1]
+            if isinstance(final, int):
+                current[final] = value  # type: ignore[index]
+            else:
+                current[final] = value  # type: ignore[index]
+
+        for lane, include_sut in (("reference", False), ("external", True)):
+            conformance_path = temp_root / f"{lane}-conformance.json"
+            implementation_path = temp_root / f"{lane}-implementation.json"
+            command = [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "compare" if include_sut else "run",
+                "--corpus-root",
+                str(corpus_root),
+            ]
+            if include_sut:
+                command.extend(["--sut-results", str(sut_results)])
+            command.extend(
+                [
+                    "--report",
+                    str(conformance_path),
+                    "--implementation-report",
+                    str(implementation_path),
+                    "--conformance-report-uri",
+                    str(conformance_path),
+                    "--implementation-report-uri",
+                    str(implementation_path),
+                ]
+            )
+            run(command)
+            conformance = assert_strict_json_file(conformance_path)
+            implementation = assert_strict_json_file(implementation_path)
+
+            def verify_mutation(
+                label: str,
+                mutated_conformance: object,
+                mutated_implementation: object,
+                expected_failed_check: str,
+            ) -> None:
+                report_path = temp_root / f"{lane}-{label}-conformance.json"
+                implementation_report_path = (
+                    temp_root / f"{lane}-{label}-implementation.json"
+                )
+                bundle_path = temp_root / f"{lane}-{label}-bundle.json"
+                report_path.write_text(
+                    json.dumps(mutated_conformance, indent=2, sort_keys=True)
+                    + "\n",
+                    encoding="utf-8",
+                )
+                implementation_report_path.write_text(
+                    json.dumps(mutated_implementation, indent=2, sort_keys=True)
+                    + "\n",
+                    encoding="utf-8",
+                )
+                verify_command = [
+                    sys.executable,
+                    str(VATE_CONFORMANCE),
+                    "verify-bundle",
+                    "--corpus-root",
+                    str(corpus_root),
+                    "--conformance-report",
+                    str(report_path),
+                    "--implementation-report",
+                    str(implementation_report_path),
+                    "--report",
+                    str(bundle_path),
+                ]
+                if include_sut:
+                    verify_command.extend(["--sut-results", str(sut_results)])
+                process = run_expect_failure(verify_command)
+                if "Traceback" in process.stderr:
+                    raise RuntimeError(
+                        f"{lane} bundle report mutation {label} caused traceback"
+                    )
+                bundle = assert_strict_json_file(bundle_path)
+                if bundle.get("status") != "fail":
+                    raise RuntimeError(
+                        f"{lane} bundle report mutation {label} passed"
+                    )
+                assert_bundle_check(
+                    bundle_path,
+                    expected_failed_check,
+                    False,
+                )
+
+            for shape_label, malformed_report in (
+                ("null", None),
+                ("array", []),
+                ("scalar", "invalid"),
+            ):
+                verify_mutation(
+                    f"conformance-shape-{shape_label}",
+                    malformed_report,
+                    json.loads(json.dumps(implementation)),
+                    "conformance_report.shape",
+                )
+                verify_mutation(
+                    f"implementation-shape-{shape_label}",
+                    json.loads(json.dumps(conformance)),
+                    malformed_report,
+                    "implementation_report.shape",
+                )
+
+            missing_conformance_version = json.loads(json.dumps(conformance))
+            missing_conformance_version.pop("version", None)
+            verify_mutation(
+                "conformance-version-missing",
+                missing_conformance_version,
+                json.loads(json.dumps(implementation)),
+                "conformance_report.envelope",
+            )
+            conformance_mutations = (
+                ("checked-at-null", ("checked_at",), None),
+                ("corpus-null", ("corpus",), None),
+                ("summary-null", ("summary",), None),
+                ("cases-null", ("cases",), None),
+                ("case-outcome-null", ("cases", 0, "actual_outcome"), None),
+                (
+                    "case-reasons-null",
+                    ("cases", 0, "actual_reason_codes"),
+                    None,
+                ),
+                ("case-pass-string", ("cases", 0, "pass"), "true"),
+            )
+            for label, path, value in conformance_mutations:
+                mutated_conformance = json.loads(json.dumps(conformance))
+                set_nested(mutated_conformance, path, value)
+                verify_mutation(
+                    label,
+                    mutated_conformance,
+                    json.loads(json.dumps(implementation)),
+                    "conformance_report.envelope",
+                )
+            missing_nullable_conformance_field = json.loads(
+                json.dumps(conformance)
+            )
+            missing_nullable_conformance_field["cases"][0].pop(
+                "actual_should_execute", None
+            )
+            verify_mutation(
+                "case-actual-should-execute-missing",
+                missing_nullable_conformance_field,
+                json.loads(json.dumps(implementation)),
+                "conformance_report.envelope",
+            )
+            for case_id_label, malformed_case_id in (
+                ("list", []),
+                ("object", {}),
+                ("null", None),
+                ("number", 7),
+                ("boolean", False),
+            ):
+                malformed_case_id_conformance = json.loads(
+                    json.dumps(conformance)
+                )
+                malformed_case_id_conformance["cases"][0][
+                    "case_id"
+                ] = malformed_case_id
+                verify_mutation(
+                    f"conformance-case-id-{case_id_label}",
+                    malformed_case_id_conformance,
+                    json.loads(json.dumps(implementation)),
+                    "conformance_report.envelope",
+                )
+            if include_sut:
+                mutated_conformance = json.loads(json.dumps(conformance))
+                mutated_conformance["sut_results"] = None
+                verify_mutation(
+                    "sut-results-null",
+                    mutated_conformance,
+                    json.loads(json.dumps(implementation)),
+                    "conformance_report.envelope",
+                )
+                mutated_conformance = json.loads(json.dumps(conformance))
+                mutated_conformance["sut_results"]["artifact_mode"] = {}
+                verify_mutation(
+                    "sut-results-artifact-mode-object",
+                    mutated_conformance,
+                    json.loads(json.dumps(implementation)),
+                    "conformance_report.envelope",
+                )
+
+            pass_case_consistency_mutations = (
+                ("outcome", "actual_outcome", "deny"),
+                (
+                    "should-execute",
+                    "actual_should_execute",
+                    not conformance["cases"][0]["expected_should_execute"],
+                ),
+                (
+                    "primary-reason",
+                    "actual_primary_reason_code",
+                    "SCHEMA_INVALID",
+                ),
+                (
+                    "reason-codes",
+                    "actual_reason_codes",
+                    ["SCHEMA_INVALID", "FAIL_CLOSED"],
+                ),
+                ("failures", "failures", ["contradicts pass=true"]),
+                (
+                    "expected-primary-derived",
+                    "expected_primary_reason_code",
+                    "SCHEMA_INVALID",
+                ),
+            )
+            for label, field, value in pass_case_consistency_mutations:
+                mutated_conformance = json.loads(json.dumps(conformance))
+                mutated_conformance["cases"][0][field] = value
+                verify_mutation(
+                    f"pass-case-{label}-inconsistent",
+                    mutated_conformance,
+                    json.loads(json.dumps(implementation)),
+                    "conformance_report.cases.internal_consistency",
+                )
+
+            missing_implementation_version = json.loads(json.dumps(implementation))
+            missing_implementation_version.pop("version", None)
+            verify_mutation(
+                "implementation-version-missing",
+                json.loads(json.dumps(conformance)),
+                missing_implementation_version,
+                "implementation_report.envelope",
+            )
+            implementation_mutations = (
+                ("generated-at-null", ("generated_at",), None),
+                ("status-object", ("status",), {}),
+                ("implementation-null", ("implementation",), None),
+                ("implementation-name-empty", ("implementation", "name"), ""),
+                ("corpus-null", ("corpus",), None),
+                ("manifest-null", ("corpus", "manifest"), None),
+                ("summary-null", ("summary",), None),
+                ("case-results-null", ("case_results",), None),
+                (
+                    "case-outcome-null",
+                    ("case_results", 0, "actual_outcome"),
+                    None,
+                ),
+                ("case-pass-integer", ("case_results", 0, "pass"), 1),
+                ("conformance-report-null", ("conformance_report",), None),
+                (
+                    "conformance-report-digest-basis-object",
+                    ("conformance_report", "digest_basis"),
+                    {},
+                ),
+                ("limitations-null", ("limitations",), None),
+            )
+            for label, path, value in implementation_mutations:
+                mutated_implementation = json.loads(json.dumps(implementation))
+                set_nested(mutated_implementation, path, value)
+                verify_mutation(
+                    f"implementation-{label}",
+                    json.loads(json.dumps(conformance)),
+                    mutated_implementation,
+                    "implementation_report.envelope",
+                )
+
+            failed_conformance = json.loads(json.dumps(conformance))
+            failed_conformance["cases"][0]["pass"] = False
+            failed_conformance["cases"][0]["failures"] = [
+                "bounded comparison mismatch"
+            ]
+            failed_conformance["summary"]["passed"] -= 1
+            failed_conformance["summary"]["failed"] += 1
+            failed_implementation = json.loads(json.dumps(implementation))
+            conformance_module = load_vate_conformance_module()
+            failed_implementation["case_results"] = [
+                conformance_module.implementation_case_result(case)
+                for case in failed_conformance["cases"]
+            ]
+            failed_implementation["summary"] = json.loads(
+                json.dumps(failed_conformance["summary"])
+            )
+            failed_implementation["status"] = "fail"
+            failed_implementation["conformance_report"]["digest"] = {
+                "alg": "sha-256",
+                "value": hashlib.sha256(
+                    canonical_json_bytes(failed_conformance)
+                ).hexdigest(),
+            }
+            failed_conformance_path = temp_root / f"{lane}-valid-failed.json"
+            failed_implementation_path = (
+                temp_root / f"{lane}-valid-failed-implementation.json"
+            )
+            failed_bundle_path = temp_root / f"{lane}-valid-failed-bundle.json"
+            failed_conformance_path.write_text(
+                json.dumps(failed_conformance, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            failed_implementation_path.write_text(
+                json.dumps(failed_implementation, indent=2, sort_keys=True)
+                + "\n",
+                encoding="utf-8",
+            )
+            failed_verify_command = [
+                sys.executable,
+                str(VATE_CONFORMANCE),
+                "verify-bundle",
+                "--corpus-root",
+                str(corpus_root),
+                "--conformance-report",
+                str(failed_conformance_path),
+                "--implementation-report",
+                str(failed_implementation_path),
+                "--report",
+                str(failed_bundle_path),
+            ]
+            if include_sut:
+                failed_verify_command.extend(["--sut-results", str(sut_results)])
+            run(failed_verify_command)
+            failed_bundle = assert_strict_json_file(failed_bundle_path)
+            if failed_bundle.get("status") != "pass":
+                raise RuntimeError(
+                    f"{lane} internally consistent failed report did not preserve "
+                    "bundle integrity responsibility"
+                )
+            missing_nullable_implementation_field = json.loads(
+                json.dumps(implementation)
+            )
+            missing_nullable_implementation_field["case_results"][0].pop(
+                "actual_primary_reason_code", None
+            )
+            verify_mutation(
+                "implementation-case-primary-reason-missing",
+                json.loads(json.dumps(conformance)),
+                missing_nullable_implementation_field,
+                "implementation_report.envelope",
+            )
+            for case_id_label, malformed_case_id in (
+                ("list", []),
+                ("object", {}),
+                ("null", None),
+                ("number", 7),
+                ("boolean", False),
+            ):
+                malformed_case_id_implementation = json.loads(
+                    json.dumps(implementation)
+                )
+                malformed_case_id_implementation["case_results"][0][
+                    "case_id"
+                ] = malformed_case_id
+                verify_mutation(
+                    f"implementation-case-id-{case_id_label}",
+                    json.loads(json.dumps(conformance)),
+                    malformed_case_id_implementation,
+                    "implementation_report.envelope",
+                )
+
+            artifact_count = conformance["corpus"]["artifact_count"]
+            for count_label, count_value in (
+                ("zero", 0),
+                ("too-large", artifact_count + 1),
+                ("wrong-type", "invalid"),
+            ):
+                mutated_conformance = json.loads(json.dumps(conformance))
+                mutated_conformance["corpus"]["artifact_count"] = count_value
+                verify_mutation(
+                    f"conformance-artifact-count-{count_label}",
+                    mutated_conformance,
+                    json.loads(json.dumps(implementation)),
+                    "conformance_report.corpus.artifact_count",
+                )
+                mutated_implementation = json.loads(json.dumps(implementation))
+                mutated_implementation["corpus"]["artifact_count"] = count_value
+                verify_mutation(
+                    f"implementation-artifact-count-{count_label}",
+                    json.loads(json.dumps(conformance)),
+                    mutated_implementation,
+                    "implementation_report.corpus.artifact_count",
+                )
 
 
 def check_replay_boundary_coverage() -> None:
@@ -3058,13 +6440,13 @@ def check_rcl_projection_package() -> None:
                 f"{reject_control_report['fatal_errors']}"
             )
         if reject_control_report.get("summary") != {
-            "total": 75,
-            "passed": 74,
+            "total": 76,
+            "passed": 75,
             "failed": 1,
             "skipped": 0,
         }:
             raise RuntimeError(
-                "RCL-008 reject-everything SUT comparison must report 74/75 passed: "
+                "RCL-008 reject-everything SUT comparison must report 75/76 passed: "
                 f"{reject_control_report.get('summary')}"
             )
         reject_control_failed_cases = [
@@ -3100,8 +6482,8 @@ def check_rcl_projection_package() -> None:
             )
 
     corpus = json.loads((ROOT / "conformance" / "al2-vate-v0.3" / "corpus.json").read_text(encoding="utf-8"))
-    if corpus.get("summary", {}).get("case_count") != 75:
-        raise RuntimeError("canonical VATE corpus must contain 75 cases after the RCL projection slice")
+    if corpus.get("summary", {}).get("case_count") != 76:
+        raise RuntimeError("canonical VATE corpus must contain 76 cases after the status-input slice")
     corpus_case_ids = {entry.get("case_id") for entry in corpus.get("cases", []) if isinstance(entry, dict)}
     expected_case_ids = {case["case_id"] for case in cases.values()}
     if not expected_case_ids.issubset(corpus_case_ids):
@@ -3143,6 +6525,17 @@ def main() -> int:
     check_post_execution_linkage_kind_coverage()
     check_transport_bound_fixture_coverage()
     check_status_freshness_boundary_coverage()
+    check_status_input_contract_coverage()
+    check_sut_result_envelope_fail_closed()
+    check_case_json_fail_closed()
+    check_case_artifact_reference_fail_closed()
+    check_unhashable_validator_inputs_fail_closed()
+    check_context_binding_key_contract()
+    check_corpus_index_requires_cases()
+    check_bundle_case_coverage_binding()
+    check_bundle_sut_actual_projection_binding()
+    check_bundle_report_contract_fail_closed()
+    check_external_sut_template_partial_contract()
     check_replay_boundary_coverage()
     check_p1_5_fixture_coverage()
     check_p2_public_artifact_boundary()
@@ -3151,7 +6544,9 @@ def main() -> int:
     check_linkage_missing_artifacts_fail_closed()
     check_admission_handoff_semantics_fail_closed()
     check_case_artifact_readers_fail_closed()
+    check_nested_artifact_shapes_fail_closed()
     check_corpus_manifest_non_file_fails_closed()
+    check_bundle_corpus_index_fails_closed()
     check_generated_artifact_utf8_boundary()
     check_a2a_adapter_local_uri_boundary()
     check_a2a_adapter_malformed_metadata_fail_closed()
@@ -3312,7 +6707,7 @@ def main() -> int:
             ]
         )
         generated_report = json.loads(generated_compare_report.read_text(encoding="utf-8"))
-        if generated_report.get("summary") != {"total": 75, "passed": 75, "failed": 0, "skipped": 0}:
+        if generated_report.get("summary") != {"total": 76, "passed": 76, "failed": 0, "skipped": 0}:
             raise AssertionError("schema-valid independently identified generated receipts must pass compare")
         generated_cases = {
             case.get("case_id"): case
@@ -3324,7 +6719,7 @@ def main() -> int:
             if case_result.get("artifact_mode") != "generated-receipts" or case_result.get("pass") is not True:
                 raise AssertionError(f"{case_id}: generated-receipts comparison did not pass")
         expected_mode_counts = {
-            "corpus-fixture-validation": 73,
+            "corpus-fixture-validation": 74,
             "generated-receipts": 2,
         }
         if generated_report.get("sut_results", {}).get("artifact_mode_counts") != expected_mode_counts:

@@ -134,7 +134,8 @@
           "actual_primary_reason_code",
           "expected_reason_codes",
           "actual_reason_codes",
-          "pass"
+          "pass",
+          "failures"
         ],
         "properties": {
           "case_id": {
@@ -210,6 +211,34 @@
             }
           }
         },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "pass": {
+                  "const": true
+                }
+              },
+              "required": [
+                "pass"
+              ]
+            },
+            "then": {
+              "properties": {
+                "failures": {
+                  "maxItems": 0
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "failures": {
+                  "minItems": 1
+                }
+              }
+            }
+          }
+        ],
         "additionalProperties": true
       }
     },

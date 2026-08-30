@@ -39,10 +39,13 @@ Required top-level fields:
 
 - `version` - currently `vate-sut-results-2026-07`
 - `profile` - currently `VATE-AL2-Verifier-Admission-v0.3`
-- `generated_at`
+- `generated_at` - a valid RFC3339 date-time. The current runner accepts zero
+  through six fractional-second digits and rejects higher precision rather than
+  rounding or truncating it.
 - optional `artifact_mode` - `corpus-fixture-validation` by default, or
   `generated-receipts` when the SUT also submits its own receipt bytes
-- `implementation`
+- `implementation` - an object with non-empty `name`, `type`, `version`, and
+  `language` fields
 - `corpus.digest`
 - `results`
 
@@ -56,7 +59,7 @@ Each result entry represents one corpus case:
   comparison report derives `actual_primary_reason_code` from the first
   non-terminal code
 - optional `checks` - case-specific check names with `pass: true` when the expected check was satisfied
-- required `artifacts` when the corpus case depends on receipt or context artifacts
+- required `artifacts` for the case's declared or legacy-derived evaluated inputs
 - optional per-case `artifact_mode` override
 - required `generated_artifacts` when the effective mode is `generated-receipts`
 - optional `limitations`
@@ -76,13 +79,18 @@ review.
 
 ## Artifact Roles
 
-The result contract separates two artifact roles that must not be conflated:
+The result contract separates three artifact roles that must not be conflated:
 
-1. `results[].artifacts` identifies the exact committed corpus artifacts that
-   the submitter declares as the result's evaluated-input references. `compare`
-   requires their raw SHA-256 digests to match the selected corpus snapshot; it
-   does not establish that the SUT actually read or evaluated those bytes.
-2. `results[].generated_artifacts` identifies receipt bytes produced by the
+1. A case-level `sut_inputs[]` array, when present, is the authoritative list of
+   corpus artifacts supplied to the external SUT. The result records them in
+   `results[].artifacts.input_artifacts[]` with matching `case_artifact`, `role`,
+   corpus-relative `uri`, declared `media_type`, and raw SHA-256 digest. An
+   unlisted expected receipt is not an evaluated input.
+2. A case with a `kind: status` context check must declare `sut_inputs[]` and
+   include its status context with `role: status_evidence`. Non-status cases
+   without `sut_inputs[]` retain the legacy receipt, context, and proof
+   reference rules under `results[].artifacts`.
+3. `results[].generated_artifacts` identifies receipt bytes produced by the
    SUT. These fields are required only in `generated-receipts` mode and are
    never required to be byte-identical to the corpus receipt fixtures.
 
@@ -94,10 +102,35 @@ receipt. An independent receipt-generation result should opt into
 
 ## Evaluated Corpus Artifact References
 
-SUT results must be artifact-backed for cases that depend on concrete receipts,
-AL2 execution context, or JOSE proof-package inputs. This keeps the comparison
-report from becoming a bare assertion detached from the evidence the
-implementation evaluated.
+SUT results must be artifact-backed for the inputs declared by each case. This
+keeps the comparison report from becoming a bare assertion detached from the
+evidence the implementation evaluated.
+
+When a case defines `sut_inputs[]`, each listed entry requires one
+`artifacts.input_artifacts[]` reference with:
+
+- matching `case_artifact` and `role` values;
+- `uri` equal to the case artifact path and `media_type` equal to the value
+  declared by `sut_inputs[]`;
+- `digest.alg` set to `sha-256`; and
+- `digest.value` equal to the raw corpus artifact SHA-256.
+
+`compare` rejects duplicate (`case_artifact`, `role`) keys, unknown fields in an
+input reference or its digest descriptor, and every sibling field beside
+`input_artifacts` for that explicit case. This prevents an expected receipt
+from being silently reintroduced under either a legacy or aliased field name.
+
+Status-context inputs contain observed status and freshness facts. They do not
+contain expected VATE reason codes. The runner derives `STATUS_REVOKED`,
+`STATUS_STALE`, or `STATUS_UNAVAILABLE` from the declared checks and observed
+input values. Status-context timestamps use the same zero-through-six
+fractional-second digit limit as `generated_at`; higher precision fails closed
+instead of being truncated during freshness comparison. Status-context inputs
+must use the exact published context version
+and field set; unknown fields fail closed. Removing `sut_inputs[]` from a status
+case is invalid and does not downgrade that case to the legacy artifact lane.
+
+The following rules apply to legacy cases without `sut_inputs[]`.
 
 When the corpus case lists an `admission_receipt`, the result entry must include
 `artifacts.admission_receipt`. When it lists a `post_execution_receipt`, the
@@ -200,10 +233,10 @@ arbitrary remote URIs or verify external signatures. For local report-bundle dig
 verification, use `scripts/vate_conformance.py verify-bundle` as documented in
 `docs/conformance/report-integrity.md`.
 
-The passing example SUT file uses `corpus-fixture-validation`; its `artifacts`
-therefore cite repository fixtures intentionally. Replacing those digest values
-with independently generated receipt digests is incorrect because these fields
-name the evaluated fixed vectors.
+The passing example SUT file uses `corpus-fixture-validation`. Explicit-input
+status cases use `artifacts.input_artifacts[]`; legacy cases retain their prior
+artifact fields. Replacing corpus input digests with independently generated
+receipt digests remains incorrect.
 
 ## Generated Receipt Artifacts
 

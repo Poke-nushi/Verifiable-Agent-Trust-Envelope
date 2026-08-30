@@ -18,7 +18,7 @@ The corpus makes the v0.3 draft easier to evaluate by naming the minimum expecte
 - deny MCP/OAuth requests where token presence, resource indicators, or tool
   classes do not jointly authorize the same target action
 - deny stale runtime proof before policy or attenuation can admit execution
-- deny stale, revoked, replayed, tampered, mismatched, and untrusted inputs
+- deny stale, revoked, unavailable, replayed, tampered, mismatched, and untrusted inputs
 - consume AP2 Human Not Present payment-authority evidence without redefining AP2
 - link a post-execution receipt back to the admitted effective request
 - deny the RCL-005 authorization-params mismatch without corrupting the admitted
@@ -89,6 +89,7 @@ array condition while keeping `SCHEMA_INVALID` as the normative reason code.
 - `cases/deny-status-revoked.json`
 - `cases/deny-status-stale-fail-closed.json`
 - `cases/deny-status-stale-just-over-boundary.json`
+- `cases/deny-status-unavailable-fail-closed.json`
 - `cases/deny-replay-detected.json`
 - `cases/deny-replay-state-replayed.json`
 - `cases/interop-ap2-ucp-commerce-evidence.json`
@@ -192,12 +193,20 @@ against the same corpus snapshot. Independent implementation review should use
 `compare`, not `run` alone.
 
 Within a SUT result, `artifacts` records references whose digests must match the
-exact corpus fixture bytes submitted as evaluated inputs. The comparison does
-not establish that the SUT actually evaluated those bytes. It is not the
-generated-output channel. A SUT that
-also issues independent receipt bytes uses `artifact_mode: generated-receipts`
-and submits those files under `generated_artifacts`; `compare` then verifies
-their raw digests, schema-aligned bounded receipt semantics, and post-execution
+exact corpus fixture bytes submitted as evaluated inputs. For cases with
+`sut_inputs[]`, that case-level list is authoritative and the result uses
+`artifacts.input_artifacts[]`; each reference also matches the declared role,
+corpus-relative URI, and media type. No sibling artifact fields are allowed, and
+unlisted expected receipt fixtures are not SUT inputs. Status inputs contain
+observed facts rather than expected VATE reason codes. Status context checks
+require this explicit input lane and cannot be downgraded by deleting
+`sut_inputs[]`. Other cases without `sut_inputs[]` retain the legacy receipt,
+context, and proof reference rules. The comparison does not establish that the
+SUT actually evaluated those bytes. It is not the generated-output channel. A
+SUT that also issues independent receipt bytes uses
+`artifact_mode: generated-receipts` and
+submits those files under `generated_artifacts`; `compare` then verifies their
+raw digests, schema-aligned bounded receipt semantics, and post-execution
 linkage where applicable. Generated files must stay inside the SUT result
 directory, are limited to the receipt roles required by the case, and are
 reported by effective mode count.

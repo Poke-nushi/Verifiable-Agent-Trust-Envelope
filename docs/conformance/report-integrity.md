@@ -35,9 +35,10 @@ For an independent implementation review, publish these artifacts together:
 - the corpus digest and, preferably, the exact `corpus.json`
 - any detached proof or release signature used by the implementer
 
-In the SUT result, `artifacts` records references whose digests match exact
-corpus fixtures submitted as evaluated inputs; it does not prove runtime
-evaluation. Receipt output submitted by the SUT belongs in `generated_artifacts` under
+In the SUT result, `artifacts` records explicit `sut_inputs[]` or legacy-derived
+references whose digests match exact corpus fixtures submitted as evaluated
+inputs. An unlisted expected receipt remains comparison material. Digest matching
+does not prove runtime evaluation. Receipt output submitted by the SUT belongs in `generated_artifacts` under
 `artifact_mode: generated-receipts`. Include each generated file beside the SUT
 result; use `local_path` for local comparison and a stable `uri` for publication.
 
@@ -69,26 +70,53 @@ summary, implementation, or case-projection check failed.
 For external SUT comparison bundles, `verify-bundle` checks:
 
 - the committed corpus index digest and manifest against the recomputed corpus
+- the corpus index version, profile, name, root, case-schema path, and digest
+  basis against the recomputed canonical identity
+- the corpus index `summary.artifact_count` against the recomputed manifest
+  length
+- the non-empty canonical case set against `corpus.json`, with duplicate,
+  missing, and unknown case ids rejected
 - the conformance report corpus digest against the recomputed corpus
+- the conformance and implementation report envelopes against the
+  dependency-free required-field and type contract
+- each report's corpus `artifact_count` against the recomputed manifest length
+- complete conformance-report coverage of the canonical case set and summary
+  counts derived from the reported case results
+- conformance case internal consistency: passing cases must carry matching
+  expected and actual projections with an empty `failures` array, while failed
+  cases must carry at least one failure; primary reason codes are derived from
+  their corresponding reason-code arrays
 - the SUT result corpus digest against the recomputed corpus
 - the conformance report SUT result digest against the supplied SUT result file
+- each conformance case's actual outcome, execution decision, reason-code
+  projection, artifact mode, and non-completed state failure against the
+  supplied SUT result
 - the implementation report conformance report digest against the supplied
   conformance report file
 - the implementation report summary, status, and case projection against the
   conformance report
+- the implementation report corpus case count and case-result coverage against
+  the canonical case set
 - the conformance and implementation report effective artifact mode counts
   against their per-case modes and the supplied SUT result
 - for `generated-receipts` cases, the local generated receipt digests, bounded
   receipt semantics, and post-execution linkage
 
 For reference-run bundles without a SUT result file, omit `--sut-results`.
-The command still verifies the corpus, conformance report, and implementation
-report chain.
+The command still verifies the corpus, complete canonical case coverage,
+summary arithmetic, conformance report, and implementation report chain.
+An internally consistent conformance report may contain failed cases and still
+form a valid bundle; bundle integrity does not convert a failed comparison into
+a passing conformance result.
 
 `verify-bundle` is a local digest-chain verifier. It reads the files supplied on
 the command line and compares their canonical JSON digests, corpus digest,
 manifest, summaries, and case projections. It does not fetch arbitrary remote
 URIs, prove that a URI is maintainer-controlled, or verify external signatures.
+It verifies that the conformance report faithfully projects the supplied SUT
+result; it does not compare that actual-side projection to corpus expectations
+again or rerun the external SUT. Those semantic comparisons remain the
+responsibility of `compare`.
 For `generated-receipts` results it rereads local `generated_artifacts` and
 reruns their raw-digest, bounded-semantic, and linkage checks. Controlled origin
 and external proof checks still belong to the publication and proof review steps

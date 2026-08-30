@@ -9,11 +9,24 @@
     "admission_receipt": "examples/receipts/admission-allow-status-fresh.example.json",
     "status_context": "conformance/al2-vate-v0.3/fixtures/status-fresh-context.json"
   },
+  "sut_inputs": [
+    {
+      "artifact": "status_context",
+      "role": "status_evidence",
+      "media_type": "application/json"
+    }
+  ],
   "al2_context_checks": [
     {
       "kind": "freshness",
       "artifact": "status_context",
       "expect_fresh": true
+    },
+    {
+      "kind": "status",
+      "artifact": "status_context",
+      "expect_status": "active",
+      "expect_required": true
     }
   ],
   "expected": {

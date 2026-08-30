@@ -32,8 +32,9 @@ The implementation report ties the run to one implementation, one corpus
 snapshot, and one comparison report.
 
 Use `artifact_mode: generated-receipts` for cases where the implementation
-issues its own receipt bytes. Keep `results[].artifacts` matched to the exact
-corpus fixture digests submitted as inputs, and put separately generated
+issues its own receipt bytes. For cases with `sut_inputs[]`, keep
+`results[].artifacts.input_artifacts[]` limited to that explicit list. Legacy
+cases retain their case-derived input references. Put separately generated
 outputs under `results[].generated_artifacts`. A
 `corpus-fixture-validation` result remains
 useful fixed-vector evidence, but it is not generated-receipt evidence.

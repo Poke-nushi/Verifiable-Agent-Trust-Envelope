@@ -72,4 +72,164 @@ describe("SUT result helpers", () => {
     expect(entry.generated_artifacts?.admission_receipt).toEqual(generatedReceipt);
     expect(entry.artifacts).toBeUndefined();
   });
+
+  it("records explicit SUT input artifacts separately from expected receipts", () => {
+    const entry = createSutResultEntry({
+      caseId: "deny-status-revoked",
+      outcome: "deny",
+      shouldExecute: false,
+      reasonCodes: ["STATUS_REVOKED", "FAIL_CLOSED"],
+      artifacts: {
+        input_artifacts: [
+          {
+            case_artifact: "status_context",
+            role: "status_evidence",
+            uri: "conformance/al2-vate-v0.3/fixtures/status-revoked-context.json",
+            media_type: "application/json",
+            digest: { alg: "sha-256", value: "2".repeat(64) },
+          },
+        ],
+      },
+    });
+
+    expect(entry.artifacts?.input_artifacts).toHaveLength(1);
+    expect(entry.artifacts).not.toHaveProperty("admission_receipt");
+  });
+
+  it("rejects explicit SUT input artifacts combined with legacy siblings", () => {
+    expect(() =>
+      createSutResultEntry({
+        caseId: "deny-status-revoked",
+        outcome: "deny",
+        shouldExecute: false,
+        reasonCodes: ["STATUS_REVOKED", "FAIL_CLOSED"],
+        artifacts: {
+          input_artifacts: [
+            {
+              case_artifact: "status_context",
+              role: "status_evidence",
+              uri: "conformance/al2-vate-v0.3/fixtures/status-revoked-context.json",
+              media_type: "application/json",
+              digest: { alg: "sha-256", value: "2".repeat(64) },
+            },
+          ],
+          admission_receipt: {
+            uri: "expected-receipt.json",
+            media_type: "application/vate-admission-receipt+json",
+            digest: { alg: "sha-256", value: "3".repeat(64) },
+          },
+        } as never,
+      })
+    ).toThrow(/cannot be combined/);
+  });
+
+  it("rejects an empty explicit SUT input artifact list at runtime", () => {
+    expect(() =>
+      createSutResultEntry({
+        caseId: "deny-status-revoked",
+        outcome: "deny",
+        shouldExecute: false,
+        reasonCodes: ["STATUS_REVOKED", "FAIL_CLOSED"],
+        artifacts: {
+          input_artifacts: [],
+        },
+      } as never)
+    ).toThrow(/must be a non-empty array/);
+  });
+
+  it("rejects malformed runtime artifact containers and explicit input lists", () => {
+    const base = {
+      caseId: "deny-status-revoked",
+      outcome: "deny" as const,
+      shouldExecute: false,
+      reasonCodes: ["STATUS_REVOKED", "FAIL_CLOSED"],
+    };
+
+    for (const artifacts of [null, [], "invalid", 7, false]) {
+      expect(() =>
+        createSutResultEntry({
+          ...base,
+          artifacts,
+        } as never)
+      ).toThrow(/artifacts must be an object/);
+    }
+
+    for (const inputArtifacts of [null, {}, "invalid", 7, false]) {
+      expect(() =>
+        createSutResultEntry({
+          ...base,
+          artifacts: { input_artifacts: inputArtifacts },
+        } as never)
+      ).toThrow(/must be a non-empty array/);
+    }
+  });
+
+  it("rejects duplicate explicit SUT input logical keys", () => {
+    const reference = {
+      case_artifact: "status_context",
+      role: "status_evidence",
+      uri: "conformance/al2-vate-v0.3/fixtures/status-revoked-context.json",
+      media_type: "application/json",
+      digest: { alg: "sha-256" as const, value: "2".repeat(64) },
+    };
+
+    expect(() =>
+      createSutResultEntry({
+        caseId: "deny-status-revoked",
+        outcome: "deny",
+        shouldExecute: false,
+        reasonCodes: ["STATUS_REVOKED", "FAIL_CLOSED"],
+        artifacts: {
+          input_artifacts: [reference, { ...reference }],
+        },
+      })
+    ).toThrow(/duplicates case_artifact=status_context role=status_evidence/);
+  });
+
+  it("rejects schema-invalid fields inside explicit SUT input references", () => {
+    expect(() =>
+      createSutResultEntry({
+        caseId: "deny-status-revoked",
+        outcome: "deny",
+        shouldExecute: false,
+        reasonCodes: ["STATUS_REVOKED", "FAIL_CLOSED"],
+        artifacts: {
+          input_artifacts: [
+            {
+              case_artifact: "status_context",
+              role: "status_evidence",
+              uri: "conformance/al2-vate-v0.3/fixtures/status-revoked-context.json",
+              local_path: "expected-receipt.json",
+              media_type: "application/json",
+              digest: { alg: "sha-256", value: "2".repeat(64) },
+            },
+          ],
+        },
+      } as never)
+    ).toThrow(/unsupported fields: local_path/);
+
+    expect(() =>
+      createSutResultEntry({
+        caseId: "deny-status-revoked",
+        outcome: "deny",
+        shouldExecute: false,
+        reasonCodes: ["STATUS_REVOKED", "FAIL_CLOSED"],
+        artifacts: {
+          input_artifacts: [
+            {
+              case_artifact: "status_context",
+              role: "status_evidence",
+              uri: "conformance/al2-vate-v0.3/fixtures/status-revoked-context.json",
+              media_type: "application/json",
+              digest: {
+                alg: "sha-256",
+                value: "2".repeat(64),
+                expected_receipt: "must-not-be-an-input",
+              },
+            },
+          ],
+        },
+      } as never)
+    ).toThrow(/digest contains unsupported fields/);
+  });
 });

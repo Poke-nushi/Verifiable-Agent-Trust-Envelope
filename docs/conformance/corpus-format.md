@@ -27,6 +27,7 @@ For the v0.3 AL2 corpus:
 - index: `conformance/al2-vate-v0.3/corpus.json`
 - schema: `schemas/conformance-corpus.schema.json`
 - case schema: `conformance/al2-vate-v0.3/conformance-case.schema.json`
+- status evaluation input schema: `schemas/status-context.schema.json`
 - report schema: `schemas/conformance-report.schema.json`
 - implementation report schema: `schemas/implementation-report.schema.json`
 
@@ -34,7 +35,7 @@ The index contains:
 
 - corpus version and profile id
 - corpus root and case schema path
-- case count and category counts
+- case count, category counts, and the manifest artifact count
 - a digest basis for snapshot comparison
 - a sorted case list with expected outcome, execution gate, primary reason
   projection, and reason codes
@@ -109,9 +110,23 @@ itself, evidence that an independent implementation passed the corpus. External
 implementation review should use `compare` with a SUT result file matching
 `schemas/sut-result.schema.json`.
 
+Before evaluation or index generation, the dependency-free runner validates the
+case envelope and the item shape of every case-level check collection it reads,
+including integrity, trust, JOSE, policy snapshot, artifact reference, linkage,
+attenuation, and AL2 context checks. A malformed optional collection is a corpus
+contract failure; it is not treated as an absent collection.
+
 `compare` keeps submitted fixed-vector references and SUT-produced outputs
-separate. `results[].artifacts` records references whose digests must match the
-exact corpus bytes; that match alone does not establish runtime evaluation. A result that also
+separate. A case-level `sut_inputs[]` array is authoritative when present: only
+the listed corpus artifacts are external-SUT inputs, and their result references
+belong in `results[].artifacts.input_artifacts[]`. Each reference binds the
+declared role, corpus-relative artifact path, media type, and raw digest. Other
+case artifacts remain reference-run or expected-comparison fixtures. A case with
+a `kind: status` context check must declare its status context in `sut_inputs[]` with
+`role: status_evidence`; removing that key is invalid rather than a legacy
+downgrade. Other cases without `sut_inputs[]` retain the legacy case-derived
+artifact requirements. Digest matching alone does
+not establish runtime evaluation. A result that also
 claims receipt generation uses `artifact_mode: generated-receipts` and puts its
 own locally readable receipt files under `results[].generated_artifacts`.
 
@@ -157,10 +172,15 @@ A non-reference implementation can run the corpus without importing Python code:
 
 1. Load `corpus.json`.
 2. Load each case listed in `cases[].path`.
-3. Resolve any case `artifacts` relative to the repository root.
+3. When `sut_inputs[]` is present, resolve and evaluate exactly those named case
+   artifacts. Status context checks require this explicit lane. Otherwise follow
+   the legacy case-derived artifact requirements for non-status cases.
 4. Execute the verifier behavior implied by the case.
 5. Compare the verifier output to the case `expected` block and profile-specific checks.
-6. Record digest-bound corpus artifact references in `results[].artifacts`.
+6. Record explicit `sut_inputs[]` references in
+   `results[].artifacts.input_artifacts[]` with the declared role, artifact path,
+   media type, and raw digest; do not copy an unlisted expected receipt or an
+   aliased sibling field into the SUT input record.
 7. If the verifier emits receipts, record those separate files under
    `results[].generated_artifacts` and opt into `generated-receipts` mode.
 8. Write a report matching `schemas/conformance-report.schema.json`.
@@ -233,10 +253,15 @@ aggregate check to the recorded side effects and derives
 
 ## Profile-Specific Checks
 
+For every RFC3339 timestamp it evaluates, the dependency-free reference runner
+supports zero through six fractional-second digits. It rejects higher precision
+rather than rounding or truncating it before a comparison.
+
 Some cases include profile-specific check arrays in addition to the `expected`
 block. For the AL2 v0.3 corpus:
 
-- `integrity_checks` bind referenced artifacts to expected digests
+- `integrity_checks` bind referenced artifacts to SHA-256 over the runner's
+  canonical JSON bytes, not raw file bytes
 - `artifact_reference_checks` bind digest references across requests, receipts,
   and metadata
 - `trust_checks` bind issuer, key, algorithm, evidence type, and validity-window
@@ -248,10 +273,19 @@ block. For the AL2 v0.3 corpus:
 - `linkage_checks` bind post-execution receipts to admission digest,
   admission receipt id, admission decision, transaction, runtime, effective
   request hash, validity window, and side-effect constraints
-- `al2_context_checks` validate minimum freshness, replay, and binding context
-  and require external SUT reports to bind that context back to request, receipt,
-  transaction, runtime, and evidence inputs. Each check must state its expected
-  result explicitly with `expect_fresh`, `expect_match`, or `expect_replayed`.
+- `al2_context_checks` validate minimum freshness, status availability/state,
+  replay, and binding context. Explicit `sut_inputs[]` bind the exact submitted
+  context bytes and role in the SUT result; legacy binding contexts may also
+  carry `context_bindings[]`. These fixture references do not by themselves
+  prove runtime evaluation or complete request/receipt/evidence linkage. Each
+  status context records observed status and freshness facts, not expected VATE
+  reason codes; the runner derives the applicable status failure reason.
+  Timestamp inputs support zero through six fractional-second digits. Higher
+  precision is rejected rather than rounded or truncated before freshness is
+  evaluated.
+  Each check must state its expected result explicitly with `expect_fresh`,
+  `expect_status` plus `expect_required`, `expect_match`, or
+  `expect_replayed`.
   Replay context `state` values are restricted to `unused`, `consumed`, or
   `replayed`; unknown states fail the fixture check.
 - evidence vocabulary checks require canonical generic `type` values, registered
