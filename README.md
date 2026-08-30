@@ -123,6 +123,9 @@ start here:
   report links
 - [External SUT run records](docs/conformance/external-sut-run-records.md) -
   pinned externally supplied run artifacts used for review
+- [Pulse three-case bounded external SUT result](docs/conformance/external-sut-run-records.md#pulse-three-case-bounded-external-sut-run) -
+  candidate-owned mapping through a frozen Pulse verifier, with two matching
+  decisions and one preserved attenuation-versus-deny difference
 - [AEE-native boundary review](docs/interop/aee-native-boundary-review.md) -
   eight executable AEE-native vectors prompted by three pinned VATE cases
 - [External implementation call](docs/conformance/external-implementation-call.md) -
