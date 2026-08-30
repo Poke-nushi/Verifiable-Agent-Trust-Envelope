@@ -56,10 +56,12 @@ Prepare your SUT result file first. The passing example is:
 examples/conformance/sut-results-pass.example.json
 ```
 
-That example uses `artifact_mode: corpus-fixture-validation`. Its `artifacts`
-contain references whose digests match the exact committed fixture bytes. The
-match does not establish that an external SUT evaluated them, and they are not
-claimed as SUT-generated receipts.
+That example uses `artifact_mode: corpus-fixture-validation`. For cases with
+`sut_inputs[]`, its `artifacts.input_artifacts[]` contains only those explicit
+inputs. Status context checks always use this explicit input lane; non-status
+legacy cases retain their case-derived artifact references. Digest
+matching does not establish that an external SUT evaluated the bytes, and none
+of these references are claimed as SUT-generated receipts.
 
 Compare your SUT result against the same corpus snapshot:
 
@@ -98,8 +100,7 @@ Each result entry must report:
 - `should_execute`
 - `reason_codes`
 - case-specific `checks[]` when the corpus expects them
-- required `artifacts` when the case depends on concrete receipts, AL2 context,
-  or JOSE proof-package fixture artifacts
+- required `artifacts` for explicit `sut_inputs[]` or legacy-derived inputs
 - `artifact_mode: generated-receipts` plus `generated_artifacts` when claiming
   that the SUT produced its own admission or post-execution receipt bytes
 
@@ -111,7 +112,15 @@ references carry:
 - `digest.alg` set to `sha-256`
 - `digest.value` as lowercase 64-character SHA-256 hex
 
-For AL2 context checks, `artifacts.verification_context[]` also binds the
+For a case with `sut_inputs[]`, use `artifacts.input_artifacts[]` and copy the
+case's exact `artifact`, `role`, and `media_type` values. Set `uri` to the
+corpus-relative path referenced by the named case artifact. Do not include an
+unlisted expected receipt or any other sibling field under `artifacts`. Status
+input references and their digest descriptors do not accept extension fields.
+Status inputs contain observed facts only; expected VATE reason codes stay in
+the case expectation and SUT output. A status case without `sut_inputs[]` is
+invalid and does not fall back to the legacy lane. For legacy AL2 context checks,
+`artifacts.verification_context[]` also binds the
 context fixture back to request, receipt, transaction, runtime, and evidence
 sources. For JOSE fixture cases, `artifacts.proof_artifacts[]` records the
 proof package, detached payload, and trust bundle artifacts required by the
@@ -152,11 +161,14 @@ case.
 
 ## Artifact Roles And Origin Boundary
 
-Keep `results[].artifacts` as references whose digests match the exact corpus
-artifacts submitted as SUT inputs. Those fields remain byte-identical
-fixed-vector references even for an independent implementation. Do not replace
-them with a newly generated receipt digest. Digest matching alone does not prove
-that the SUT read or evaluated the referenced bytes.
+Keep `results[].artifacts` limited to exact corpus artifacts submitted as SUT
+inputs. `sut_inputs[]` is authoritative when present; an expected receipt not
+listed there is comparison material, not input. Those references remain
+byte-identical fixed-vector references even for an independent implementation.
+Their URI and media type must also match the case declaration. Do not replace
+them with a newly generated receipt digest or add receipt aliases beside
+`input_artifacts`. Digest matching alone does not prove that the SUT read or
+evaluated the referenced bytes.
 
 When the SUT issues receipt output, set `artifact_mode` to
 `generated-receipts` and add `results[].generated_artifacts`. Each generated

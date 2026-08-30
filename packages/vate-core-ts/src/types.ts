@@ -46,13 +46,34 @@ export interface ProofArtifactReference extends DigestBoundReference {
   case_artifact: string;
 }
 
-export interface SutResultArtifacts {
+export interface SutInputArtifactReference {
+  case_artifact: string;
+  role: string;
+  uri: string;
+  media_type: string;
+  digest: DigestDescriptor;
+}
+
+export interface SutExplicitInputArtifacts {
+  input_artifacts: [SutInputArtifactReference, ...SutInputArtifactReference[]];
+  admission_receipt?: never;
+  post_execution_receipt?: never;
+  verification_context?: never;
+  proof_artifacts?: never;
+}
+
+export interface SutLegacyResultArtifacts {
+  input_artifacts?: never;
   admission_receipt?: DigestBoundReference;
   post_execution_receipt?: DigestBoundReference;
   verification_context?: unknown[];
   proof_artifacts?: ProofArtifactReference[];
   [key: string]: unknown;
 }
+
+export type SutResultArtifacts =
+  | SutExplicitInputArtifacts
+  | SutLegacyResultArtifacts;
 
 export interface SutGeneratedArtifacts {
   admission_receipt?: DigestBoundReference;

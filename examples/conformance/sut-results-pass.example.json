@@ -3,7 +3,7 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "988aae7d03dd5bb743e8e03e6ab1120ce8735a4837ac818ffd9d665de0c1e370"
+      "value": "195aad6651911be243b5ccbc87fa93d5ca9e46b3ccde1b14cb4688b2089473d7"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.3"
   },
@@ -483,49 +483,15 @@
     },
     {
       "artifacts": {
-        "admission_receipt": {
-          "digest": {
-            "alg": "sha-256",
-            "value": "5805759bb6beb10cfae6719781acaf3cc729af6e80a136f460c3a0b89ceea286"
-          },
-          "media_type": "application/vate-admission-receipt+json",
-          "uri": "examples/receipts/admission-allow-status-boundary.example.json"
-        },
-        "verification_context": [
+        "input_artifacts": [
           {
             "case_artifact": "status_context",
-            "context_bindings": [
-              {
-                "role": "admission_receipt",
-                "source_artifact": "admission_receipt",
-                "digest": {
-                  "alg": "sha-256",
-                  "value": "5805759bb6beb10cfae6719781acaf3cc729af6e80a136f460c3a0b89ceea286"
-                }
-              },
-              {
-                "role": "transaction_id",
-                "source_artifact": "admission_receipt",
-                "path": "request.transaction_id",
-                "value": "txn-20260701-status-boundary-001"
-              },
-              {
-                "role": "evidence",
-                "source_artifact": "admission_receipt",
-                "path": "evidence[0]",
-                "evidence_type": "status_bundle",
-                "digest": {
-                  "alg": "sha-256",
-                  "value": "12381c277f6e7111e45f4d3a3b007598cd8133471a3f415a884e6bd2279c0022"
-                }
-              }
-            ],
             "digest": {
               "alg": "sha-256",
-              "value": "a90c4d2142135eb9a901a444660f08ea69cc900edab192141de4c1f4320a4a1c"
+              "value": "2e7c403c583e4942c52ecc9cf6b684120948b550f1eb4038f48bcf8a8a9f1d58"
             },
-            "kind": "freshness",
             "media_type": "application/json",
+            "role": "status_evidence",
             "uri": "conformance/al2-vate-v0.3/fixtures/status-boundary-context.json"
           }
         ]
@@ -689,49 +655,15 @@
     },
     {
       "artifacts": {
-        "admission_receipt": {
-          "digest": {
-            "alg": "sha-256",
-            "value": "c461cf51c1569d6d7876bdbc6b5e43284dad992484abc7c038e132ed4408af3e"
-          },
-          "media_type": "application/vate-admission-receipt+json",
-          "uri": "examples/receipts/admission-allow-status-fresh.example.json"
-        },
-        "verification_context": [
+        "input_artifacts": [
           {
             "case_artifact": "status_context",
-            "context_bindings": [
-              {
-                "role": "admission_receipt",
-                "source_artifact": "admission_receipt",
-                "digest": {
-                  "alg": "sha-256",
-                  "value": "c461cf51c1569d6d7876bdbc6b5e43284dad992484abc7c038e132ed4408af3e"
-                }
-              },
-              {
-                "role": "transaction_id",
-                "source_artifact": "admission_receipt",
-                "path": "request.transaction_id",
-                "value": "txn-20260701-status-fresh-001"
-              },
-              {
-                "role": "evidence",
-                "source_artifact": "admission_receipt",
-                "path": "evidence[0]",
-                "evidence_type": "status_bundle",
-                "digest": {
-                  "alg": "sha-256",
-                  "value": "8fe0a5395797c7fcf42814276d3160a8f6000a98a857083527039057661c00e3"
-                }
-              }
-            ],
             "digest": {
               "alg": "sha-256",
-              "value": "4967a00c0be2429cd16b2f5152c278d970efdf2f17c78bbb8fa5442f64a47f1c"
+              "value": "f497ea698c75b6ee07c67c1a22b361f139a98e68b417a04859351b57277524d1"
             },
-            "kind": "freshness",
             "media_type": "application/json",
+            "role": "status_evidence",
             "uri": "conformance/al2-vate-v0.3/fixtures/status-fresh-context.json"
           }
         ]
@@ -2451,14 +2383,18 @@
     },
     {
       "artifacts": {
-        "admission_receipt": {
-          "digest": {
-            "alg": "sha-256",
-            "value": "3e2257b1f59a5cc2401bb1820a627f0353e5450f91a2498eab324945360af246"
-          },
-          "media_type": "application/vate-admission-receipt+json",
-          "uri": "examples/receipts/admission-deny-status-revoked.example.json"
-        }
+        "input_artifacts": [
+          {
+            "case_artifact": "status_context",
+            "digest": {
+              "alg": "sha-256",
+              "value": "ec6af62717e6f5b08570b9ead1e7facd0bebffb03064f35b13885362ca52d866"
+            },
+            "media_type": "application/json",
+            "role": "status_evidence",
+            "uri": "conformance/al2-vate-v0.3/fixtures/status-revoked-context.json"
+          }
+        ]
       },
       "case_id": "deny-status-revoked",
       "checks": [
@@ -2481,49 +2417,15 @@
     },
     {
       "artifacts": {
-        "admission_receipt": {
-          "digest": {
-            "alg": "sha-256",
-            "value": "c1080250a5b99259d579b58349444e86345e17271d851c324d6ec8f63990996a"
-          },
-          "media_type": "application/vate-admission-receipt+json",
-          "uri": "examples/receipts/admission-deny-status-stale.example.json"
-        },
-        "verification_context": [
+        "input_artifacts": [
           {
             "case_artifact": "status_context",
-            "context_bindings": [
-              {
-                "role": "admission_receipt",
-                "source_artifact": "admission_receipt",
-                "digest": {
-                  "alg": "sha-256",
-                  "value": "c1080250a5b99259d579b58349444e86345e17271d851c324d6ec8f63990996a"
-                }
-              },
-              {
-                "role": "transaction_id",
-                "source_artifact": "admission_receipt",
-                "path": "request.transaction_id",
-                "value": "txn-20260701-status-stale-001"
-              },
-              {
-                "role": "evidence",
-                "source_artifact": "admission_receipt",
-                "path": "evidence[0]",
-                "evidence_type": "status_bundle",
-                "digest": {
-                  "alg": "sha-256",
-                  "value": "7d0705e7f2c7db6752d159246801a6d9366fac098fa1b967feea6b9fe6875886"
-                }
-              }
-            ],
             "digest": {
               "alg": "sha-256",
-              "value": "32464bac060eac870231d0ac4371327836c26a331ab48a57d85f355f4de30ba8"
+              "value": "a92c9b87b4d751c325ec6ec35aae8d9d04ecfb076b48b3c52c05f0a4bb5f577c"
             },
-            "kind": "freshness",
             "media_type": "application/json",
+            "role": "status_evidence",
             "uri": "conformance/al2-vate-v0.3/fixtures/status-stale-context.json"
           }
         ]
@@ -2549,49 +2451,15 @@
     },
     {
       "artifacts": {
-        "admission_receipt": {
-          "digest": {
-            "alg": "sha-256",
-            "value": "fb8a9352b8e86fb386b36f272ebee09c05b72b686806e535808f36192eea6166"
-          },
-          "media_type": "application/vate-admission-receipt+json",
-          "uri": "examples/receipts/admission-deny-status-stale-just-over-boundary.example.json"
-        },
-        "verification_context": [
+        "input_artifacts": [
           {
             "case_artifact": "status_context",
-            "context_bindings": [
-              {
-                "role": "admission_receipt",
-                "source_artifact": "admission_receipt",
-                "digest": {
-                  "alg": "sha-256",
-                  "value": "fb8a9352b8e86fb386b36f272ebee09c05b72b686806e535808f36192eea6166"
-                }
-              },
-              {
-                "role": "transaction_id",
-                "source_artifact": "admission_receipt",
-                "path": "request.transaction_id",
-                "value": "txn-20260701-status-stale-boundary-001"
-              },
-              {
-                "role": "evidence",
-                "source_artifact": "admission_receipt",
-                "path": "evidence[0]",
-                "evidence_type": "status_bundle",
-                "digest": {
-                  "alg": "sha-256",
-                  "value": "042e0052fdac657b240a1a971fa95c5998c137ca0cb33b83205bcb1ab495a71f"
-                }
-              }
-            ],
             "digest": {
               "alg": "sha-256",
-              "value": "c1012bedf2d6e0c8d7f0584c239dacd2c7e1ab5d98ea845573f630148cccdf31"
+              "value": "a83f8645b96fcaf6e1a4843a0098ec35963e4b05edc75593a2776dca12a55c90"
             },
-            "kind": "freshness",
             "media_type": "application/json",
+            "role": "status_evidence",
             "uri": "conformance/al2-vate-v0.3/fixtures/status-stale-just-over-boundary-context.json"
           }
         ]
@@ -2610,6 +2478,40 @@
       "outcome": "deny",
       "reason_codes": [
         "STATUS_STALE",
+        "FAIL_CLOSED"
+      ],
+      "should_execute": false,
+      "status": "completed"
+    },
+    {
+      "artifacts": {
+        "input_artifacts": [
+          {
+            "case_artifact": "status_context",
+            "digest": {
+              "alg": "sha-256",
+              "value": "9862f157f67306fe563bc0df55fe29037b4ae404fdd30c332f0afb8ef1a48dc2"
+            },
+            "media_type": "application/json",
+            "role": "status_evidence",
+            "uri": "conformance/al2-vate-v0.3/fixtures/status-unavailable-context.json"
+          }
+        ]
+      },
+      "case_id": "deny-status-unavailable-fail-closed",
+      "checks": [
+        {
+          "name": "decision.outcome",
+          "pass": true
+        },
+        {
+          "name": "evidence.verification.failure_reason",
+          "pass": true
+        }
+      ],
+      "outcome": "deny",
+      "reason_codes": [
+        "STATUS_UNAVAILABLE",
         "FAIL_CLOSED"
       ],
       "should_execute": false,

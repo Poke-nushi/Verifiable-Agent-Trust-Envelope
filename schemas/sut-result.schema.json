@@ -161,6 +161,14 @@
             "type": "object",
             "description": "Exact corpus fixture artifacts evaluated by the SUT. Their digests must match the selected corpus snapshot; they are not SUT-generated output artifacts.",
             "properties": {
+              "input_artifacts": {
+                "type": "array",
+                "description": "Exact evaluated inputs declared by a case sut_inputs contract. Expected receipt fixtures that are not listed by sut_inputs do not belong here.",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/inputArtifactRef"
+                }
+              },
               "admission_receipt": {
                 "$ref": "#/$defs/receiptArtifactRef"
               },
@@ -180,6 +188,31 @@
                 }
               }
             },
+            "allOf": [
+              {
+                "if": {
+                  "required": [
+                    "input_artifacts"
+                  ]
+                },
+                "then": {
+                  "type": "object",
+                  "required": [
+                    "input_artifacts"
+                  ],
+                  "properties": {
+                    "input_artifacts": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "$ref": "#/$defs/inputArtifactRef"
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            ],
             "additionalProperties": true
           },
           "generated_artifacts": {
@@ -233,6 +266,24 @@
       },
       "additionalProperties": true
     },
+    "inputDigest": {
+      "type": "object",
+      "required": [
+        "alg",
+        "value"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "const": "sha-256"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
     "receiptArtifactRef": {
       "type": "object",
       "required": [
@@ -259,6 +310,38 @@
         }
       },
       "additionalProperties": true
+    },
+    "inputArtifactRef": {
+      "type": "object",
+      "required": [
+        "case_artifact",
+        "role",
+        "uri",
+        "media_type",
+        "digest"
+      ],
+      "properties": {
+        "case_artifact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "media_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "#/$defs/inputDigest"
+        }
+      },
+      "additionalProperties": false
     },
     "verificationContextRef": {
       "type": "object",

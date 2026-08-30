@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:status-context:2026-07",
+  "title": "VATE Status Evaluation Context",
+  "description": "Fixture input describing whether a required status source was available and the status observed at verifier evaluation time. This is an evaluation input, not an admission receipt or a production status-list format.",
+  "type": "object",
+  "required": [
+    "version",
+    "source",
+    "required",
+    "availability",
+    "checked_at"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "vate-status-context-2026-07"
+    },
+    "source": {
+      "type": "string",
+      "const": "status_bundle"
+    },
+    "required": {
+      "type": "boolean"
+    },
+    "availability": {
+      "type": "string",
+      "enum": [
+        "available",
+        "unavailable"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "revoked"
+      ]
+    },
+    "source_issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "checked_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "max_age_seconds": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "availability": {
+            "const": "available"
+          }
+        },
+        "required": [
+          "availability"
+        ]
+      },
+      "then": {
+        "required": [
+          "status",
+          "source_issued_at",
+          "max_age_seconds"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "availability": {
+            "const": "unavailable"
+          }
+        },
+        "required": [
+          "availability"
+        ]
+      },
+      "then": {
+        "not": {
+          "required": [
+            "status"
+          ]
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

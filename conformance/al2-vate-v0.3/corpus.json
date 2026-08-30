@@ -307,6 +307,13 @@
       ],
       "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.3/cases/allow-status-fresh-at-boundary.json",
+      "sut_inputs": [
+        {
+          "artifact": "status_context",
+          "media_type": "application/json",
+          "role": "status_evidence"
+        }
+      ],
       "title": "Allow status evidence at the freshness boundary",
       "validation_focus": [
         "status freshness",
@@ -393,6 +400,13 @@
       ],
       "expected_should_execute": true,
       "path": "conformance/al2-vate-v0.3/cases/allow-valid-with-status-fresh.json",
+      "sut_inputs": [
+        {
+          "artifact": "status_context",
+          "media_type": "application/json",
+          "role": "status_evidence"
+        }
+      ],
       "title": "Allow with fresh status evidence",
       "validation_focus": [
         "status freshness",
@@ -1304,7 +1318,8 @@
     },
     {
       "artifacts": {
-        "admission_receipt": "examples/receipts/admission-deny-status-revoked.example.json"
+        "admission_receipt": "examples/receipts/admission-deny-status-revoked.example.json",
+        "status_context": "conformance/al2-vate-v0.3/fixtures/status-revoked-context.json"
       },
       "case_id": "deny-status-revoked",
       "category": "negative",
@@ -1316,6 +1331,13 @@
       ],
       "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.3/cases/deny-status-revoked.json",
+      "sut_inputs": [
+        {
+          "artifact": "status_context",
+          "media_type": "application/json",
+          "role": "status_evidence"
+        }
+      ],
       "title": "Deny revoked status",
       "validation_focus": [
         "revocation",
@@ -1337,6 +1359,13 @@
       ],
       "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.3/cases/deny-status-stale-fail-closed.json",
+      "sut_inputs": [
+        {
+          "artifact": "status_context",
+          "media_type": "application/json",
+          "role": "status_evidence"
+        }
+      ],
       "title": "Deny stale status under fail-closed policy",
       "validation_focus": [
         "status freshness",
@@ -1358,10 +1387,46 @@
       ],
       "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.3/cases/deny-status-stale-just-over-boundary.json",
+      "sut_inputs": [
+        {
+          "artifact": "status_context",
+          "media_type": "application/json",
+          "role": "status_evidence"
+        }
+      ],
       "title": "Deny status evidence just beyond the freshness boundary",
       "validation_focus": [
         "status freshness",
         "boundary condition",
+        "fail closed"
+      ]
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "examples/receipts/admission-deny-status-unavailable.example.json",
+        "status_context": "conformance/al2-vate-v0.3/fixtures/status-unavailable-context.json"
+      },
+      "case_id": "deny-status-unavailable-fail-closed",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_primary_reason_code": "STATUS_UNAVAILABLE",
+      "expected_reason_codes": [
+        "STATUS_UNAVAILABLE",
+        "FAIL_CLOSED"
+      ],
+      "expected_should_execute": false,
+      "path": "conformance/al2-vate-v0.3/cases/deny-status-unavailable-fail-closed.json",
+      "sut_inputs": [
+        {
+          "artifact": "status_context",
+          "media_type": "application/json",
+          "role": "status_evidence"
+        }
+      ],
+      "title": "Deny when required status is unavailable",
+      "validation_focus": [
+        "status availability",
+        "required evidence",
         "fail closed"
       ]
     },
@@ -1916,7 +1981,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "988aae7d03dd5bb743e8e03e6ab1120ce8735a4837ac818ffd9d665de0c1e370"
+    "value": "195aad6651911be243b5ccbc87fa93d5ca9e46b3ccde1b14cb4688b2089473d7"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -1965,7 +2030,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-status-fresh-at-boundary.json",
-      "sha256": "631a8aca684f25d1e41c7a5d0fd389c9fc3b2252e1f3a10596afa3c55830dc45"
+      "sha256": "b6502e59ea4f359f25ea05180837c7500d76eb0e94d8d72eb532f9f570417eed"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-valid-admission.json",
@@ -1981,7 +2046,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-valid-with-status-fresh.json",
-      "sha256": "10a285cec81b7344bbb6fe2f7034ec063cdcfcd1e800a29aa6611d2f78fc16a2"
+      "sha256": "e2e79785c279d9b4360f859eace8d91a1c26c5a20279fb12dde068a9fb14c52c"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/attenuate-ap2-hnp-amount-overrun.json",
@@ -2133,15 +2198,19 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-status-revoked.json",
-      "sha256": "96311d5c70a97a0633c624af47f03d5922d2e9912d47020839349746c1354059"
+      "sha256": "fbeaa086aa9f450833379712b2c333a5c55861360a08554258ae71908d6a90dc"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-status-stale-fail-closed.json",
-      "sha256": "45f8f6ce8590f04347af2a756b316d3405a5a164bc600c2add4b2f15242d7a7c"
+      "sha256": "0b59f027a8a6ef9ac753c1af40db9ea64e8e94bae5692905d539ffdaca6c2ad3"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-status-stale-just-over-boundary.json",
-      "sha256": "66b720da0ded7dec1033cb2777b7846dc327482b2d83a6c451631c1b2f7baafb"
+      "sha256": "ca550e94124773a5a5ab0ec5ea8167139f63c5511283468b01b13d5b4e440b21"
+    },
+    {
+      "path": "conformance/al2-vate-v0.3/cases/deny-status-unavailable-fail-closed.json",
+      "sha256": "7de960d9bc8a8b4cc07edc01b8ae481c5ac7a8daf296879620a7f4f2ebcaaa81"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-token-passthrough-as-authority.json",
@@ -2233,7 +2302,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/conformance-case.schema.json",
-      "sha256": "837996aacc30adb469b5f39b22dcd5ff07a4b56a77b67e8402fc537702429ab1"
+      "sha256": "69a905f13d9b03a2c7cc663bcfbc285ae8e502142d3b84022e7d251ff11677d5"
     },
     {
       "path": "conformance/al2-vate-v0.3/external/rcl/rcl-oracle-fixtures.v1.json",
@@ -2293,19 +2362,27 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/fixtures/status-boundary-context.json",
-      "sha256": "a90c4d2142135eb9a901a444660f08ea69cc900edab192141de4c1f4320a4a1c"
+      "sha256": "2e7c403c583e4942c52ecc9cf6b684120948b550f1eb4038f48bcf8a8a9f1d58"
     },
     {
       "path": "conformance/al2-vate-v0.3/fixtures/status-fresh-context.json",
-      "sha256": "4967a00c0be2429cd16b2f5152c278d970efdf2f17c78bbb8fa5442f64a47f1c"
+      "sha256": "f497ea698c75b6ee07c67c1a22b361f139a98e68b417a04859351b57277524d1"
+    },
+    {
+      "path": "conformance/al2-vate-v0.3/fixtures/status-revoked-context.json",
+      "sha256": "ec6af62717e6f5b08570b9ead1e7facd0bebffb03064f35b13885362ca52d866"
     },
     {
       "path": "conformance/al2-vate-v0.3/fixtures/status-stale-context.json",
-      "sha256": "32464bac060eac870231d0ac4371327836c26a331ab48a57d85f355f4de30ba8"
+      "sha256": "a92c9b87b4d751c325ec6ec35aae8d9d04ecfb076b48b3c52c05f0a4bb5f577c"
     },
     {
       "path": "conformance/al2-vate-v0.3/fixtures/status-stale-just-over-boundary-context.json",
-      "sha256": "c1012bedf2d6e0c8d7f0584c239dacd2c7e1ab5d98ea845573f630148cccdf31"
+      "sha256": "a83f8645b96fcaf6e1a4843a0098ec35963e4b05edc75593a2776dca12a55c90"
+    },
+    {
+      "path": "conformance/al2-vate-v0.3/fixtures/status-unavailable-context.json",
+      "sha256": "9862f157f67306fe563bc0df55fe29037b4ae404fdd30c332f0afb8ef1a48dc2"
     },
     {
       "path": "examples/a2a/agent-card-v1-vate-extension.example.json",
@@ -2672,6 +2749,10 @@
       "sha256": "c1080250a5b99259d579b58349444e86345e17271d851c324d6ec8f63990996a"
     },
     {
+      "path": "examples/receipts/admission-deny-status-unavailable.example.json",
+      "sha256": "2dcf52daccb4a32b7db06aaef99dd1a13cbe06cf94fb5d252aaad81e344051b2"
+    },
+    {
       "path": "examples/receipts/admission-deny-token-passthrough-as-authority.example.json",
       "sha256": "7d09453e553a70f41685eae83dcd2ecbd13bd15b849904c72298f9ca019dd5f3"
     },
@@ -2788,11 +2869,11 @@
     "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.3 --out conformance/al2-vate-v0.3/corpus.json"
   },
   "summary": {
-    "artifact_count": 212,
-    "case_count": 75,
+    "artifact_count": 216,
+    "case_count": 76,
     "category_counts": {
       "linkage": 14,
-      "negative": 42,
+      "negative": 43,
       "positive": 19
     }
   },

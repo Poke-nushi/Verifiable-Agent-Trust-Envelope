@@ -129,6 +129,34 @@
       },
       "additionalProperties": true
     },
+    "sut_inputs": {
+      "type": "array",
+      "description": "Optional authoritative list of corpus artifacts supplied to an external SUT. When present, artifacts not listed here remain reference-run or expected-comparison fixtures and MUST NOT be represented as evaluated SUT inputs.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "artifact",
+          "role",
+          "media_type"
+        ],
+        "properties": {
+          "artifact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          },
+          "media_type": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
     "expected": {
       "type": "object",
       "required": [
@@ -200,6 +228,45 @@
       "items": {
         "type": "string",
         "minLength": 1
+      }
+    },
+    "integrity_checks": {
+      "type": "array",
+      "description": "Checks SHA-256 over the runner's canonical JSON bytes for a named corpus artifact before policy evaluation.",
+      "items": {
+        "type": "object",
+        "required": [
+          "artifact",
+          "expected_digest"
+        ],
+        "properties": {
+          "artifact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_digest": {
+            "type": "object",
+            "required": [
+              "alg",
+              "value"
+            ],
+            "properties": {
+              "alg": {
+                "type": "string",
+                "const": "sha-256"
+              },
+              "value": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "additionalProperties": false
+          },
+          "expect_match": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": true
       }
     },
     "policy_snapshot_checks": {
@@ -810,7 +877,8 @@
             "enum": [
               "freshness",
               "binding",
-              "replay"
+              "replay",
+              "status"
             ]
           },
           "artifact": {
@@ -828,6 +896,17 @@
             "type": "boolean"
           },
           "expect_replayed": {
+            "type": "boolean"
+          },
+          "expect_status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "revoked",
+              "unavailable"
+            ]
+          },
+          "expect_required": {
             "type": "boolean"
           },
           "expected_failure_reason": {
@@ -884,6 +963,111 @@
             "then": {
               "required": [
                 "expect_replayed"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "status"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "expect_status",
+                "expect_required"
+              ],
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "expect_status": {
+                        "const": "revoked"
+                      }
+                    },
+                    "required": [
+                      "expect_status"
+                    ]
+                  },
+                  "then": {
+                    "required": [
+                      "expected_failure_reason"
+                    ],
+                    "properties": {
+                      "expected_failure_reason": {
+                        "const": "STATUS_REVOKED"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "expect_status": {
+                        "const": "unavailable"
+                      },
+                      "expect_required": {
+                        "const": true
+                      }
+                    },
+                    "required": [
+                      "expect_status",
+                      "expect_required"
+                    ]
+                  },
+                  "then": {
+                    "required": [
+                      "expected_failure_reason"
+                    ],
+                    "properties": {
+                      "expected_failure_reason": {
+                        "const": "STATUS_UNAVAILABLE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "anyOf": [
+                      {
+                        "properties": {
+                          "expect_status": {
+                            "const": "active"
+                          }
+                        },
+                        "required": [
+                          "expect_status"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "expect_status": {
+                            "const": "unavailable"
+                          },
+                          "expect_required": {
+                            "const": false
+                          }
+                        },
+                        "required": [
+                          "expect_status",
+                          "expect_required"
+                        ]
+                      }
+                    ]
+                  },
+                  "then": {
+                    "not": {
+                      "required": [
+                        "expected_failure_reason"
+                      ]
+                    }
+                  }
+                }
               ]
             }
           }
@@ -984,6 +1168,48 @@
     }
   },
   "allOf": [
+    {
+      "if": {
+        "properties": {
+          "al2_context_checks": {
+            "contains": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "status"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            }
+          }
+        },
+        "required": [
+          "al2_context_checks"
+        ]
+      },
+      "then": {
+        "required": [
+          "sut_inputs"
+        ],
+        "properties": {
+          "sut_inputs": {
+            "contains": {
+              "type": "object",
+              "properties": {
+                "role": {
+                  "const": "status_evidence"
+                }
+              },
+              "required": [
+                "role"
+              ]
+            }
+          }
+        }
+      }
+    },
     {
       "if": {
         "properties": {

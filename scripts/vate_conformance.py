@@ -33,6 +33,7 @@ CORPUS_INDEX_VERSION = "vate-conformance-corpus-2026-07"
 CORPUS_INDEX_FILENAME = "corpus.json"
 SUT_RESULTS_VERSION = "vate-sut-results-2026-07"
 EVIDENCE_VOCABULARY_VERSION = "vate-evidence-vocabulary-2026-07"
+STATUS_CONTEXT_VERSION = "vate-status-context-2026-07"
 SUT_ARTIFACT_MODE_CORPUS = "corpus-fixture-validation"
 SUT_ARTIFACT_MODE_GENERATED = "generated-receipts"
 SUT_ARTIFACT_MODES = {
@@ -47,6 +48,12 @@ MAX_GENERATED_ARTIFACT_BYTES = 8 * 1024 * 1024
 SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 PROFILE_HASH_RE = re.compile(r"^sha-256:[0-9a-f]{64}$")
 CANONICAL_MONEY_VALUE_RE = re.compile(r"^(0|[1-9][0-9]*)(\.[0-9]+)?$")
+RFC3339_TIMESTAMP_RE = re.compile(
+    r"^\d{4}-\d{2}-\d{2}[Tt]"
+    r"(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d"
+    r"(?:\.\d{1,6})?"
+    r"(?:[Zz]|[+-](?:[01]\d|2[0-3]):[0-5]\d)$"
+)
 EVIDENCE_VOCABULARY_PATH = ROOT / "registries" / "evidence-vocabulary.v0.3.json"
 TERMINAL_REASON_CODES = {"FAIL_CLOSED", "POLICY_MATCH"}
 PAIRING_REQUIRED_FIELDS = (
@@ -169,8 +176,469 @@ POLICY_VIOLATION_REASON_CODES = {
 CANONICAL_POLICY_VIOLATION_TOKENS = set(POLICY_VIOLATION_REASON_CODES)
 
 
+def is_string_enum(value: Any, allowed: set[str] | frozenset[str]) -> bool:
+    """Return true only for string members of an enumerated JSON vocabulary."""
+    return isinstance(value, str) and value in allowed
+
+
 def read_json(path: Path) -> Any:
     return strict_json_loads(path.read_text(encoding="utf-8"))
+
+
+def case_check_collection_failures(case: dict[str, Any]) -> list[str]:
+    """Validate every case-level collection that the runner iterates."""
+    failures: list[str] = []
+
+    if "pairing" in case:
+        pairing = case.get("pairing")
+        if not isinstance(pairing, dict):
+            failures.append("pairing: expected object")
+        else:
+            allowed_pairing_fields = {
+                "pair_id",
+                "role",
+                "paired_case_id",
+                "mutation_axis",
+                "stable_fields",
+                "mutated_fields",
+            }
+            unexpected_pairing_fields = sorted(
+                set(pairing) - allowed_pairing_fields
+            )
+            if unexpected_pairing_fields:
+                failures.append(
+                    f"pairing: unsupported fields {unexpected_pairing_fields}"
+                )
+            for field in (
+                "pair_id",
+                "role",
+                "paired_case_id",
+                "mutation_axis",
+            ):
+                value = pairing.get(field)
+                if not isinstance(value, str) or not value:
+                    failures.append(
+                        f"pairing.{field}: expected non-empty string"
+                    )
+            if not is_string_enum(pairing.get("role"), PAIRING_ROLES):
+                failures.append(
+                    f"pairing.role: expected one of {sorted(PAIRING_ROLES)}"
+                )
+            for field in ("stable_fields", "mutated_fields"):
+                value = pairing.get(field)
+                if not isinstance(value, list) or not value:
+                    failures.append(
+                        f"pairing.{field}: expected non-empty array"
+                    )
+                    continue
+                for index, item in enumerate(value):
+                    if not isinstance(item, str) or not item:
+                        failures.append(
+                            f"pairing.{field}[{index}]: expected non-empty string"
+                        )
+                string_items = [
+                    item for item in value if isinstance(item, str)
+                ]
+                if len(string_items) != len(set(string_items)):
+                    failures.append(
+                        f"pairing.{field}: duplicate values are not allowed"
+                    )
+
+    validation_focus = case.get("validation_focus")
+    if "validation_focus" in case:
+        if not isinstance(validation_focus, list):
+            failures.append("validation_focus: expected array")
+        else:
+            for index, item in enumerate(validation_focus):
+                if not isinstance(item, str) or not item:
+                    failures.append(
+                        f"validation_focus[{index}]: expected non-empty string"
+                    )
+
+    collection_fields = (
+        "integrity_checks",
+        "trust_checks",
+        "jose_checks",
+        "policy_snapshot_checks",
+        "artifact_reference_checks",
+        "linkage_checks",
+        "attenuation_checks",
+        "al2_context_checks",
+    )
+    collections: dict[str, list[Any]] = {}
+    for field in collection_fields:
+        if field not in case:
+            collections[field] = []
+            continue
+        value = case.get(field)
+        if not isinstance(value, list):
+            failures.append(f"{field}: expected array")
+            collections[field] = []
+            continue
+        collections[field] = value
+        for index, item in enumerate(value):
+            if not isinstance(item, dict):
+                failures.append(f"{field}[{index}]: expected object")
+
+    def require_string(item: dict[str, Any], label: str, field: str) -> None:
+        value = item.get(field)
+        if not isinstance(value, str) or not value:
+            failures.append(f"{label}.{field}: expected non-empty string")
+
+    def optional_string(item: dict[str, Any], label: str, field: str) -> None:
+        if field in item:
+            require_string(item, label, field)
+
+    def require_bool(item: dict[str, Any], label: str, field: str) -> None:
+        if not isinstance(item.get(field), bool):
+            failures.append(f"{label}.{field}: expected boolean")
+
+    def optional_bool(item: dict[str, Any], label: str, field: str) -> None:
+        if field in item:
+            require_bool(item, label, field)
+
+    for index, item in enumerate(collections["integrity_checks"]):
+        if not isinstance(item, dict):
+            continue
+        label = f"integrity_checks[{index}]"
+        require_string(item, label, "artifact")
+        digest = item.get("expected_digest")
+        if not isinstance(digest, dict):
+            failures.append(f"{label}.expected_digest: expected object")
+        else:
+            unexpected_digest_fields = sorted(
+                set(digest) - {"alg", "value"}
+            )
+            if unexpected_digest_fields:
+                failures.append(
+                    f"{label}.expected_digest: unsupported fields "
+                    f"{unexpected_digest_fields}"
+                )
+            if digest.get("alg") != "sha-256":
+                failures.append(f"{label}.expected_digest.alg: expected sha-256")
+            digest_value = digest.get("value")
+            if not isinstance(digest_value, str) or SHA256_HEX_RE.fullmatch(digest_value) is None:
+                failures.append(
+                    f"{label}.expected_digest.value: expected lowercase SHA-256 hex"
+                )
+        optional_bool(item, label, "expect_match")
+
+    for index, item in enumerate(collections["trust_checks"]):
+        if not isinstance(item, dict):
+            continue
+        label = f"trust_checks[{index}]"
+        for field in ("trust_bundle", "issuer_id", "kid", "evidence_type"):
+            require_string(item, label, field)
+        require_bool(item, label, "expect_trusted")
+        for field in ("alg", "expected_failure_reason"):
+            optional_string(item, label, field)
+        if "checked_at" in item and try_parse_time(item.get("checked_at")) is None:
+            failures.append(f"{label}.checked_at: expected supported RFC3339 timestamp")
+
+    for index, item in enumerate(collections["jose_checks"]):
+        if not isinstance(item, dict):
+            continue
+        label = f"jose_checks[{index}]"
+        for field in ("proof_package", "detached_payload", "trust_bundle"):
+            require_string(item, label, field)
+        require_bool(item, label, "expect_valid")
+        for field in ("expected_typ", "expected_failure_reason"):
+            optional_string(item, label, field)
+        if "checked_at" in item and try_parse_time(item.get("checked_at")) is None:
+            failures.append(f"{label}.checked_at: expected supported RFC3339 timestamp")
+
+    def reference_path_failures(
+        item: dict[str, Any],
+        *,
+        label: str,
+        allowed_artifacts: set[str],
+        required: bool,
+    ) -> None:
+        if "reference_paths" not in item:
+            if required:
+                failures.append(f"{label}.reference_paths: required")
+            return
+        reference_paths = item.get("reference_paths")
+        if not isinstance(reference_paths, list):
+            failures.append(f"{label}.reference_paths: expected array")
+            return
+        for reference_index, reference in enumerate(reference_paths):
+            reference_label = f"{label}.reference_paths[{reference_index}]"
+            if not isinstance(reference, dict):
+                failures.append(f"{reference_label}: expected object")
+                continue
+            artifact = reference.get("artifact")
+            if not is_string_enum(artifact, allowed_artifacts):
+                failures.append(
+                    f"{reference_label}.artifact: expected one of {sorted(allowed_artifacts)}"
+                )
+            require_string(reference, reference_label, "path")
+
+    for index, item in enumerate(collections["policy_snapshot_checks"]):
+        if not isinstance(item, dict):
+            continue
+        label = f"policy_snapshot_checks[{index}]"
+        require_string(item, label, "artifact")
+        optional_bool(item, label, "expect_match")
+        reference_path_failures(
+            item,
+            label=label,
+            allowed_artifacts={"admission_receipt", "a2a_metadata"},
+            required=False,
+        )
+        if "compare_fields" in item:
+            compare_fields = item.get("compare_fields")
+            if not isinstance(compare_fields, list):
+                failures.append(f"{label}.compare_fields: expected array")
+            else:
+                for field_index, field in enumerate(compare_fields):
+                    if not isinstance(field, str) or not field:
+                        failures.append(
+                            f"{label}.compare_fields[{field_index}]: expected non-empty string"
+                        )
+
+    for index, item in enumerate(collections["artifact_reference_checks"]):
+        if not isinstance(item, dict):
+            continue
+        label = f"artifact_reference_checks[{index}]"
+        require_string(item, label, "artifact")
+        optional_bool(item, label, "expect_match")
+        reference_path_failures(
+            item,
+            label=label,
+            allowed_artifacts={
+                "admission_request",
+                "admission_receipt",
+                "post_execution_receipt",
+                "a2a_metadata",
+            },
+            required=True,
+        )
+
+    for index, item in enumerate(collections["linkage_checks"]):
+        for failure in linkage_check_contract_failures(index, item):
+            failures.append(f"linkage_checks: {failure}")
+
+    for index, item in enumerate(collections["attenuation_checks"]):
+        if not isinstance(item, dict):
+            continue
+        label = f"attenuation_checks[{index}]"
+        require_string(item, label, "artifact")
+        require_bool(item, label, "expect_valid")
+        for field in ("source_path", "expected_failure_reason"):
+            optional_string(item, label, field)
+
+    for index, item in enumerate(collections["al2_context_checks"]):
+        if not isinstance(item, dict):
+            continue
+        label = f"al2_context_checks[{index}]"
+        kind = item.get("kind")
+        if not is_string_enum(
+            kind,
+            {"freshness", "binding", "replay", "status"},
+        ):
+            failures.append(
+                f"{label}.kind: expected freshness, binding, replay, or status"
+            )
+        require_string(item, label, "artifact")
+        if kind == "freshness":
+            require_bool(item, label, "expect_fresh")
+        elif kind == "binding":
+            require_bool(item, label, "expect_match")
+        elif kind == "replay":
+            require_bool(item, label, "expect_replayed")
+        elif kind == "status":
+            expect_status = item.get("expect_status")
+            expect_required = item.get("expect_required")
+            if not is_string_enum(
+                expect_status,
+                {"active", "revoked", "unavailable"},
+            ):
+                failures.append(
+                    f"{label}.expect_status: expected active, revoked, or unavailable"
+                )
+            require_bool(item, label, "expect_required")
+            expected_failure_reason = item.get("expected_failure_reason")
+            if expect_status == "revoked":
+                if expected_failure_reason != "STATUS_REVOKED":
+                    failures.append(
+                        f"{label}.expected_failure_reason: expected STATUS_REVOKED"
+                    )
+            elif expect_status == "unavailable" and expect_required is True:
+                if expected_failure_reason != "STATUS_UNAVAILABLE":
+                    failures.append(
+                        f"{label}.expected_failure_reason: expected STATUS_UNAVAILABLE"
+                    )
+            elif is_string_enum(expect_status, {"active", "unavailable"}) and (
+                expect_status == "active" or expect_required is False
+            ):
+                if "expected_failure_reason" in item:
+                    failures.append(
+                        f"{label}.expected_failure_reason: must be absent for "
+                        f"{expect_status} status with expect_required={expect_required}"
+                    )
+        if "max_age_seconds" in item:
+            max_age_seconds = item.get("max_age_seconds")
+            if (
+                isinstance(max_age_seconds, bool)
+                or not isinstance(max_age_seconds, int)
+                or max_age_seconds < 0
+            ):
+                failures.append(
+                    f"{label}.max_age_seconds: expected non-negative integer"
+                )
+        optional_string(item, label, "expected_failure_reason")
+    return failures
+
+
+def case_envelope_failures(case: dict[str, Any]) -> list[str]:
+    """Dependency-free checks for the case shape required before evaluation."""
+    failures: list[str] = []
+    required_fields = (
+        "version",
+        "profile",
+        "case_id",
+        "title",
+        "category",
+        "purpose",
+        "artifacts",
+        "expected",
+    )
+    for field in required_fields:
+        if field not in case:
+            failures.append(f"{field}: required")
+
+    if case.get("version") != "vate-conformance-0.3":
+        failures.append(
+            "version: expected vate-conformance-0.3 "
+            f"actual {case.get('version')}"
+        )
+    if case.get("profile") != PROFILE:
+        failures.append(f"profile: expected {PROFILE} actual {case.get('profile')}")
+    for field in ("case_id", "title", "purpose"):
+        value = case.get(field)
+        if not isinstance(value, str) or not value:
+            failures.append(f"{field}: expected non-empty string")
+
+    category = case.get("category")
+    if not is_string_enum(category, {"positive", "negative", "linkage"}):
+        failures.append(
+            "category: expected one of ['linkage', 'negative', 'positive'] "
+            f"actual {category}"
+        )
+    artifacts = case.get("artifacts")
+    if not isinstance(artifacts, dict):
+        failures.append("artifacts: expected object")
+    else:
+        for field in (
+            "a2a_metadata",
+            "admission_request",
+            "admission_receipt",
+            "policy_snapshot",
+            "post_execution_receipt",
+            "base_artifact",
+        ):
+            if field in artifacts and (
+                not isinstance(artifacts.get(field), str)
+                or not artifacts.get(field)
+            ):
+                failures.append(
+                    f"artifacts.{field}: expected non-empty file-reference string"
+                )
+        if "mutation" in artifacts and not isinstance(
+            artifacts.get("mutation"), dict
+        ):
+            failures.append("artifacts.mutation: expected object")
+
+    expected = case.get("expected")
+    if not isinstance(expected, dict):
+        failures.append("expected: expected object")
+        return failures
+    should_execute = expected.get("should_execute")
+    if not isinstance(should_execute, bool):
+        failures.append("expected.should_execute: expected boolean")
+
+    reason_codes = expected.get("reason_codes")
+    if not isinstance(reason_codes, list):
+        failures.append("expected.reason_codes: expected array")
+    else:
+        for index, reason_code in enumerate(reason_codes):
+            if not isinstance(reason_code, str) or not reason_code:
+                failures.append(
+                    f"expected.reason_codes[{index}]: expected non-empty string"
+                )
+
+    checks = expected.get("checks")
+    if not isinstance(checks, list):
+        failures.append("expected.checks: expected array")
+    else:
+        for index, check in enumerate(checks):
+            label = f"expected.checks[{index}]"
+            if not isinstance(check, dict):
+                failures.append(f"{label}: expected object")
+                continue
+            name = check.get("name")
+            if not isinstance(name, str) or not name:
+                failures.append(f"{label}.name: expected non-empty string")
+            expected_value = check.get("expected")
+            if not is_string_enum(
+                expected_value,
+                {"pass", "fail", "present", "absent"},
+            ):
+                failures.append(
+                    f"{label}.expected: expected pass, fail, present, or absent"
+                )
+
+    if is_string_enum(category, {"positive", "negative"}):
+        decision = expected.get("admission_decision")
+        if not is_string_enum(decision, {"allow", "attenuate", "deny"}):
+            failures.append(
+                "expected.admission_decision: expected allow, attenuate, or deny"
+            )
+    elif category == "linkage":
+        outcome = expected.get("post_execution_outcome")
+        if not is_string_enum(
+            outcome,
+            {"success", "partial_success", "failed", "cancelled"},
+        ):
+            failures.append(
+                "expected.post_execution_outcome: expected success, partial_success, "
+                "failed, or cancelled"
+            )
+    failures.extend(case_check_collection_failures(case))
+    return failures
+
+
+def load_corpus_case_records(
+    corpus_root: Path,
+) -> tuple[list[tuple[Path, dict[str, Any]]], list[str]]:
+    """Load corpus cases without allowing one bad case to escape as a traceback."""
+    records: list[tuple[Path, dict[str, Any]]] = []
+    failures: list[str] = []
+    for case_path in sorted((corpus_root / "cases").glob("*.json")):
+        label = display_path(case_path.resolve())
+        try:
+            case = read_json(case_path)
+        except (OSError, UnicodeDecodeError, ValueError) as exc:
+            failures.append(
+                f"corpus case {label}: invalid strict JSON input "
+                f"({type(exc).__name__}: {exc})"
+            )
+            continue
+        if not isinstance(case, dict):
+            failures.append(
+                f"corpus case {label}: expected object, actual {type(case).__name__}"
+            )
+            continue
+        envelope_failures = case_envelope_failures(case)
+        if envelope_failures:
+            failures.extend(
+                f"corpus case {label}: {failure}"
+                for failure in envelope_failures
+            )
+            continue
+        records.append((case_path, case))
+    return records, failures
 
 
 def write_json(path: Path, data: dict[str, Any]) -> None:
@@ -198,14 +666,13 @@ def pairing_string_array_failures(case_id: str, pairing: dict[str, Any], field: 
 
 
 def corpus_pairing_failures(corpus_root: Path) -> list[str]:
-    case_paths = sorted((corpus_root / "cases").glob("*.json"))
+    case_records, case_load_failures = load_corpus_case_records(corpus_root)
     cases_by_id: dict[str, dict[str, Any]] = {}
     pairing_case_ids: list[str] = []
     pair_members: dict[str, set[str]] = {}
-    failures: list[str] = []
+    failures: list[str] = list(case_load_failures)
 
-    for case_path in case_paths:
-        case = read_json(case_path)
+    for case_path, case in case_records:
         case_id = case.get("case_id")
         if not isinstance(case_id, str) or not case_id:
             failures.append(f"{display_path(case_path.resolve())}: missing string case_id")
@@ -235,7 +702,7 @@ def corpus_pairing_failures(corpus_root: Path) -> list[str]:
         if isinstance(role, str) and role not in PAIRING_ROLES:
             failures.append(f"{case_id}.pairing.role: expected one of {sorted(PAIRING_ROLES)}")
         category = case.get("category")
-        if category not in PAIRING_ROLES:
+        if not is_string_enum(category, PAIRING_ROLES):
             failures.append(f"{case_id}.pairing.category: expected positive or negative case category")
         elif isinstance(role, str) and role in PAIRING_ROLES and role != category:
             failures.append(f"{case_id}.pairing.role: expected {category} to match case category")
@@ -307,7 +774,14 @@ def iso_now() -> str:
 
 
 def parse_time(value: str) -> datetime:
-    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if RFC3339_TIMESTAMP_RE.fullmatch(value) is None:
+        raise ValueError("timestamp must use the supported RFC3339 date-time form")
+    normalized = value
+    if normalized[10] == "t":
+        normalized = normalized[:10] + "T" + normalized[11:]
+    if normalized.endswith(("Z", "z")):
+        normalized = normalized[:-1] + "+00:00"
+    return datetime.fromisoformat(normalized)
 
 
 def try_parse_time(value: Any) -> datetime | None:
@@ -378,9 +852,16 @@ def display_path(path: Path) -> str:
         return path.as_posix()
 
 
+def case_artifacts(case: dict[str, Any]) -> dict[str, Any]:
+    artifacts = case.get("artifacts")
+    return artifacts if isinstance(artifacts, dict) else {}
+
+
 def resolve_artifact_path(case: dict[str, Any], key_or_path: str) -> Path:
-    artifacts = case.get("artifacts", {})
+    artifacts = case_artifacts(case)
     rel = artifacts.get(key_or_path, key_or_path)
+    if not isinstance(rel, str) or not rel:
+        raise TypeError("artifact path must be a non-empty string")
     path = Path(rel)
     if path.is_absolute():
         return path
@@ -420,29 +901,100 @@ def case_artifact_sha256(case: dict[str, Any], key_or_path: str) -> str | None:
 
 
 def load_artifact(case: dict[str, Any], key: str) -> dict[str, Any] | None:
-    rel = case.get("artifacts", {}).get(key)
+    rel = case_artifacts(case).get(key)
     if not isinstance(rel, str) or not rel:
         return None
     artifact, _ = read_case_artifact(case, key)
     return artifact
 
 
-def referenced_paths(case: dict[str, Any]) -> list[Path]:
+def referenced_paths(case: dict[str, Any]) -> tuple[list[Path], list[str]]:
     paths: list[Path] = []
-    for key, value in case.get("artifacts", {}).items():
+    failures: list[str] = []
+
+    def add_reference(key_or_path: Any, label: str) -> None:
+        if not isinstance(key_or_path, str) or not key_or_path:
+            failures.append(f"{label}: expected non-empty artifact reference")
+            return
+        try:
+            paths.append(resolve_artifact_path(case, key_or_path))
+        except (TypeError, ValueError):
+            failures.append(f"{label}: artifact path is invalid")
+
+    for key, value in case_artifacts(case).items():
         if isinstance(value, str):
-            paths.append(resolve_artifact_path(case, key))
-    for check in case.get("integrity_checks", []):
-        paths.append(resolve_artifact_path(case, check["artifact"]))
-    for check in case.get("trust_checks", []):
-        paths.append(resolve_artifact_path(case, check["trust_bundle"]))
-    for check in case.get("jose_checks", []):
+            add_reference(key, f"artifacts.{key}")
+    for index, check in enumerate(case.get("integrity_checks", [])):
+        add_reference(
+            check.get("artifact") if isinstance(check, dict) else None,
+            f"integrity_checks[{index}].artifact",
+        )
+    for index, check in enumerate(case.get("trust_checks", [])):
+        add_reference(
+            check.get("trust_bundle") if isinstance(check, dict) else None,
+            f"trust_checks[{index}].trust_bundle",
+        )
+    for index, check in enumerate(case.get("jose_checks", [])):
+        if not isinstance(check, dict):
+            failures.append(f"jose_checks[{index}]: expected object")
+            continue
         for key in ("proof_package", "detached_payload", "trust_bundle"):
             if key in check:
-                paths.append(resolve_artifact_path(case, check[key]))
-    for check in case.get("policy_snapshot_checks", []):
-        paths.append(resolve_artifact_path(case, check["artifact"]))
-    return paths
+                add_reference(check.get(key), f"jose_checks[{index}].{key}")
+    for index, check in enumerate(case.get("policy_snapshot_checks", [])):
+        add_reference(
+            check.get("artifact") if isinstance(check, dict) else None,
+            f"policy_snapshot_checks[{index}].artifact",
+        )
+    return paths, failures
+
+
+def policy_snapshot_reference_contract_failures(
+    case: dict[str, Any],
+) -> list[str]:
+    failures: list[str] = []
+    for check_index, check in enumerate(case.get("policy_snapshot_checks", [])):
+        if not isinstance(check, dict):
+            continue
+        reference_paths = check.get(
+            "reference_paths",
+            [
+                {
+                    "artifact": "admission_receipt",
+                    "path": "policy.policy_snapshot",
+                }
+            ],
+        )
+        if not isinstance(reference_paths, list):
+            continue
+        for reference_index, reference in enumerate(reference_paths):
+            if not isinstance(reference, dict):
+                continue
+            label = (
+                f"policy_snapshot_checks[{check_index}]"
+                f".reference_paths[{reference_index}]"
+            )
+            source_name = reference.get("artifact")
+            source, source_failure = read_case_artifact(case, source_name)
+            if source_failure:
+                failures.append(
+                    f"{label}: {source_name}: {source_failure}"
+                )
+                continue
+            reference_path = reference.get("path")
+            if not isinstance(reference_path, str) or not reference_path:
+                failures.append(f"{label}.path: expected non-empty string")
+                continue
+            try:
+                snapshot_ref = get_path(source, reference_path)
+            except (KeyError, IndexError, TypeError, ValueError):
+                failures.append(f"{label}: reference path missing")
+                continue
+            if not isinstance(snapshot_ref, dict):
+                failures.append(
+                    f"{label}: reference path must resolve to an object"
+                )
+    return failures
 
 
 def corpus_manifest(
@@ -466,9 +1018,13 @@ def corpus_manifest(
 
     for path in corpus_root.rglob("*.json"):
         add_manifest_path(path)
-    for case_path in sorted((corpus_root / "cases").glob("*.json")):
-        case = read_json(case_path)
-        for path in referenced_paths(case):
+    case_records, case_load_failures = load_corpus_case_records(corpus_root)
+    failures.update(case_load_failures)
+    for _, case in case_records:
+        case_paths, reference_failures = referenced_paths(case)
+        failures.update(reference_failures)
+        failures.update(policy_snapshot_reference_contract_failures(case))
+        for path in case_paths:
             add_manifest_path(path)
 
     manifest: list[dict[str, str]] = []
@@ -509,10 +1065,12 @@ def case_index_entry(case_path: Path) -> dict[str, Any]:
         "expected_primary_reason_code": primary_reason_code(expected_reason_codes),
         "expected_reason_codes": expected_reason_codes,
         "validation_focus": case.get("validation_focus", []),
-        "artifacts": case.get("artifacts", {}),
+        "artifacts": case_artifacts(case),
     }
     if "pairing" in case:
         entry["pairing"] = case["pairing"]
+    if "sut_inputs" in case:
+        entry["sut_inputs"] = case["sut_inputs"]
     return entry
 
 
@@ -525,10 +1083,27 @@ def category_counts(cases: list[dict[str, Any]]) -> dict[str, int]:
 
 
 def make_corpus_index(corpus_root: Path) -> dict[str, Any]:
-    case_paths = sorted((corpus_root / "cases").glob("*.json"))
+    cases_dir = corpus_root / "cases"
+    if not cases_dir.is_dir():
+        raise RuntimeError(
+            f"corpus cases directory is missing: {display_path(cases_dir.resolve())}"
+        )
+    case_records, case_load_failures = load_corpus_case_records(corpus_root)
+    if case_load_failures:
+        raise RuntimeError(
+            "invalid corpus case input:\n- " + "\n- ".join(case_load_failures)
+        )
+    if not case_records:
+        raise RuntimeError("no conformance case files found")
+    case_paths = [case_path for case_path, _ in case_records]
     pairing_failures = corpus_pairing_failures(corpus_root)
     if pairing_failures:
         raise RuntimeError("invalid corpus pairing metadata:\n- " + "\n- ".join(pairing_failures))
+    input_contract_failures = corpus_sut_input_contract_failures(corpus_root)
+    if input_contract_failures:
+        raise RuntimeError(
+            "invalid corpus SUT input contract:\n- " + "\n- ".join(input_contract_failures)
+        )
     cases = [case_index_entry(path) for path in case_paths]
     manifest, digest, manifest_failures = corpus_manifest(corpus_root)
     if manifest_failures:
@@ -613,6 +1188,8 @@ def actual_reason_codes(admission_receipt: dict[str, Any] | None) -> list[str]:
 
 def primary_reason_code(reason_codes: list[str]) -> str | None:
     for code in reason_codes:
+        if not isinstance(code, str):
+            continue
         if code not in TERMINAL_REASON_CODES:
             return code
     return None
@@ -620,6 +1197,8 @@ def primary_reason_code(reason_codes: list[str]) -> str | None:
 
 def reason_code_order_failures(codes: list[str], outcome: str, *, label: str) -> list[str]:
     failures: list[str] = []
+    if not all(isinstance(code, str) and code for code in codes):
+        return [f"{label}: reason codes must be non-empty strings"]
     if len(codes) != len(set(codes)):
         failures.append(f"{label}: duplicate reason codes are not allowed")
 
@@ -874,6 +1453,8 @@ def linkage_check_contract_failures(index: int, check: Any) -> list[str]:
 
     failures: list[str] = []
     kind = check.get("kind")
+    if not isinstance(kind, str):
+        return [f"linkage[{index}]: kind must be a string enum"]
     if kind in {"transaction_id", "runtime", "effective_request_hash", "path_match"}:
         required = ("admission_path", "post_execution_path", "expect_match")
     elif kind in {"admission_receipt_id", "admission_decision"}:
@@ -902,7 +1483,11 @@ def linkage_check_contract_failures(index: int, check: Any) -> list[str]:
     expected_reason_code = LINKAGE_REASON_CODES_BY_KIND.get(kind)
     if kind == "policy_violation":
         value = check.get("value")
-        expected_reason_code = POLICY_VIOLATION_REASON_CODES.get(value)
+        expected_reason_code = (
+            POLICY_VIOLATION_REASON_CODES.get(value)
+            if isinstance(value, str)
+            else None
+        )
         if expected_reason_code is None:
             failures.append(f"linkage[{index}] policy_violation: unknown policy violation token {value!r}")
 
@@ -1117,6 +1702,8 @@ def linkage_check_violation(
         return True, "admission or post-execution artifact missing"
 
     kind = check.get("kind")
+    if not isinstance(kind, str):
+        return True, "linkage check kind must be a string enum"
     try:
         if kind in {"transaction_id", "runtime", "effective_request_hash", "path_match"}:
             left = get_path(admission, check["admission_path"])
@@ -1204,24 +1791,56 @@ def bool_for_named_check(
     if name == "evidence.verification.result":
         if admission is None:
             return False
-        return all(item.get("verification", {}).get("result") == "verified" for item in admission.get("evidence", []))
+        evidence = admission.get("evidence")
+        if not isinstance(evidence, list) or not evidence:
+            return False
+        verification_items: list[dict[str, Any]] = []
+        for item in evidence:
+            if not isinstance(item, dict):
+                return False
+            verification = item.get("verification")
+            if not isinstance(verification, dict):
+                return False
+            verification_items.append(verification)
+        return all(
+            verification.get("result") == "verified"
+            for verification in verification_items
+        )
     if name == "evidence.verification.failure_reason":
         if admission is None:
             return False
-        return any(has_path(item, "verification.failure_reason") for item in admission.get("evidence", []))
+        evidence = admission.get("evidence")
+        if not isinstance(evidence, list):
+            return False
+        return any(
+            isinstance(item, dict)
+            and isinstance(item.get("verification"), dict)
+            and "failure_reason" in item["verification"]
+            for item in evidence
+        )
     if name == "admission_receipt.evidence.verification.inferred_resource_authority":
         if admission is None:
             return False
+        evidence = admission.get("evidence")
+        if not isinstance(evidence, list):
+            return False
         return any(
-            has_path(item, "verification.inferred_resource_authority")
-            for item in admission.get("evidence", [])
+            isinstance(item, dict)
+            and isinstance(item.get("verification"), dict)
+            and "inferred_resource_authority" in item["verification"]
+            for item in evidence
         )
     if name == "admission_receipt.evidence.verification.inferred_tool_authority":
         if admission is None:
             return False
+        evidence = admission.get("evidence")
+        if not isinstance(evidence, list):
+            return False
         return any(
-            has_path(item, "verification.inferred_tool_authority")
-            for item in admission.get("evidence", [])
+            isinstance(item, dict)
+            and isinstance(item.get("verification"), dict)
+            and "inferred_tool_authority" in item["verification"]
+            for item in evidence
         )
     if name == "policy.policy_version":
         return admission is not None and has_path(admission, "policy.policy_version")
@@ -1230,12 +1849,25 @@ def bool_for_named_check(
     if name in {"request.audience", "target.audience"}:
         if admission is None:
             return False
-        request = admission.get("request", {})
-        return request.get("audience") == request.get("target_audience")
+        request = admission.get("request")
+        if not isinstance(request, dict):
+            return False
+        audience = request.get("audience")
+        target_audience = request.get("target_audience")
+        return (
+            isinstance(audience, str)
+            and bool(audience)
+            and isinstance(target_audience, str)
+            and bool(target_audience)
+            and audience == target_audience
+        )
     if name == "result.policy_violations":
         if post_execution is None:
             return False
-        return post_execution.get("result", {}).get("policy_violations") == []
+        result = post_execution.get("result")
+        if not isinstance(result, dict):
+            return False
+        return result.get("policy_violations") == []
 
     artifact: dict[str, Any] | None
     dotted = name
@@ -1251,6 +1883,34 @@ def bool_for_named_check(
     else:
         artifact = admission
     return artifact is not None and has_path(artifact, dotted)
+
+
+def directly_dereferenced_artifact_failures(
+    admission: dict[str, Any] | None,
+    post_execution: dict[str, Any] | None,
+) -> list[str]:
+    """Validate only nested artifact nodes the dependency-free runner reads."""
+    failures: list[str] = []
+    if admission is not None:
+        request = admission.get("request")
+        if not isinstance(request, dict):
+            failures.append("admission_receipt.request: expected object")
+        evidence = admission.get("evidence")
+        if not isinstance(evidence, list):
+            failures.append("admission_receipt.evidence: expected array")
+        else:
+            for index, item in enumerate(evidence):
+                label = f"admission_receipt.evidence[{index}]"
+                if not isinstance(item, dict):
+                    failures.append(f"{label}: expected object")
+                    continue
+                if not isinstance(item.get("verification"), dict):
+                    failures.append(f"{label}.verification: expected object")
+    if post_execution is not None and not isinstance(
+        post_execution.get("result"), dict
+    ):
+        failures.append("post_execution_receipt.result: expected object")
+    return failures
 
 
 def evaluate_expected_check(
@@ -1346,7 +2006,7 @@ def evaluate_trust_check(bundle: dict[str, Any], check: dict[str, Any]) -> tuple
 
     issuer = key_matches[0]
     status = issuer.get("status", "active")
-    if status in {"revoked", "disabled", "suspended"}:
+    if is_string_enum(status, {"revoked", "disabled", "suspended"}):
         return False, "TRUST_ANCHOR_REVOKED"
     if status != "active":
         return False, "SCHEMA_INVALID"
@@ -1630,6 +2290,11 @@ def evaluate_policy_snapshot_checks(
             except (KeyError, IndexError, TypeError, ValueError):
                 failures.append(f"policy_snapshot {artifact_name}: reference path missing")
                 continue
+            if not isinstance(snapshot_ref, dict):
+                failures.append(
+                    f"policy_snapshot {artifact_name}: reference path must resolve to an object"
+                )
+                continue
             references.append((artifact_name, snapshot_ref))
 
             digest_matches = snapshot_ref.get("digest") == artifact_digest
@@ -1783,7 +2448,7 @@ def validate_evidence_vocab_object(value: Any, *, label: str) -> list[str]:
             failures.append(f"{label}.protocol_hint must be a non-empty string")
         elif protocol_hint not in CANONICAL_PROTOCOL_HINTS:
             failures.append(f"{label}.protocol_hint is not in the canonical protocol hint registry")
-        elif evidence_type in CANONICAL_EVIDENCE_TYPES:
+        elif is_string_enum(evidence_type, CANONICAL_EVIDENCE_TYPES):
             allowed_hints = ALLOWED_PROTOCOL_HINTS_BY_TYPE.get(evidence_type, frozenset())
             if protocol_hint not in allowed_hints:
                 failures.append(f"{label}.protocol_hint is not allowed for evidence type {evidence_type}")
@@ -1792,7 +2457,24 @@ def validate_evidence_vocab_object(value: Any, *, label: str) -> list[str]:
 
 def evaluate_al2_context_checks(case: dict[str, Any]) -> list[str]:
     failures: list[str] = []
-    for check in case.get("al2_context_checks", []):
+    checks = case.get("al2_context_checks", [])
+    raw_sut_inputs = case.get("sut_inputs")
+    sut_inputs = raw_sut_inputs if isinstance(raw_sut_inputs, list) else []
+    status_artifacts = {
+        check.get("artifact")
+        for check in checks
+        if isinstance(check, dict)
+        and check.get("kind") == "status"
+        and isinstance(check.get("artifact"), str)
+    }
+    status_artifacts.update(
+        item.get("artifact")
+        for item in sut_inputs
+        if isinstance(item, dict)
+        and item.get("role") == "status_evidence"
+        and isinstance(item.get("artifact"), str)
+    )
+    for check in checks:
         artifact_name = check["artifact"]
         artifact, artifact_failure = read_case_artifact(case, artifact_name)
         if artifact_failure:
@@ -1800,27 +2482,254 @@ def evaluate_al2_context_checks(case: dict[str, Any]) -> list[str]:
             continue
         kind = check.get("kind")
         if kind == "freshness":
-            failures.extend(evaluate_context_freshness_check(check, artifact))
+            failures.extend(
+                evaluate_context_freshness_check(
+                    check,
+                    artifact,
+                    require_status_context=artifact_name in status_artifacts,
+                )
+            )
         elif kind == "binding":
             failures.extend(evaluate_context_binding_check(check, artifact))
         elif kind == "replay":
             failures.extend(evaluate_context_replay_check(check, artifact))
+        elif kind == "status":
+            failures.extend(evaluate_context_status_check(check, artifact))
         else:
             failures.append(f"al2_context {check.get('artifact')}: unsupported kind {kind}")
     return failures
 
 
-def evaluate_context_freshness_check(check: dict[str, Any], artifact: dict[str, Any]) -> list[str]:
+def status_context_shape_failures(artifact: Any, label: str) -> list[str]:
+    if not isinstance(artifact, dict):
+        return [f"{label}: expected status context object"]
+
+    failures: list[str] = []
+    allowed_fields = {
+        "version",
+        "source",
+        "required",
+        "availability",
+        "status",
+        "source_issued_at",
+        "checked_at",
+        "max_age_seconds",
+    }
+    for field in sorted(set(artifact) - allowed_fields):
+        failures.append(f"{label}.{field}: unsupported status context field")
+    if artifact.get("version") != STATUS_CONTEXT_VERSION:
+        failures.append(
+            f"{label}.version: expected {STATUS_CONTEXT_VERSION} actual {artifact.get('version')}"
+        )
+    if artifact.get("source") != "status_bundle":
+        failures.append(
+            f"{label}.source: expected status_bundle actual {artifact.get('source')}"
+        )
+    if not isinstance(artifact.get("required"), bool):
+        failures.append(f"{label}.required: expected boolean")
+
+    availability = artifact.get("availability")
+    if not is_string_enum(availability, {"available", "unavailable"}):
+        failures.append(f"{label}.availability: expected available or unavailable")
+    if try_parse_time(artifact.get("checked_at")) is None:
+        failures.append(f"{label}.checked_at: expected valid timestamp")
+
+    has_source_issued_at = "source_issued_at" in artifact
+    if has_source_issued_at and try_parse_time(artifact.get("source_issued_at")) is None:
+        failures.append(f"{label}.source_issued_at: expected valid timestamp when present")
+    has_max_age_seconds = "max_age_seconds" in artifact
+    max_age_seconds = artifact.get("max_age_seconds")
+    if has_max_age_seconds and (
+        isinstance(max_age_seconds, bool)
+        or not isinstance(max_age_seconds, int)
+        or max_age_seconds < 0
+    ):
+        failures.append(f"{label}.max_age_seconds: expected non-negative integer when present")
+
+    if availability == "available":
+        if not is_string_enum(artifact.get("status"), {"active", "revoked"}):
+            failures.append(f"{label}.status: available context requires active or revoked")
+        if not has_source_issued_at:
+            failures.append(f"{label}.source_issued_at: available context requires timestamp")
+        if not has_max_age_seconds:
+            failures.append(f"{label}.max_age_seconds: available context requires integer")
+    elif availability == "unavailable" and "status" in artifact:
+        failures.append(f"{label}.status: unavailable context must not carry a status value")
+
+    return failures
+
+
+def evaluate_context_status_check(check: dict[str, Any], artifact: dict[str, Any]) -> list[str]:
+    failures = status_context_shape_failures(
+        artifact,
+        f"al2_context {check['artifact']}",
+    )
+    if failures:
+        return failures
+    expected_status = check.get("expect_status")
+    expected_required = check.get("expect_required")
+    availability = artifact.get("availability")
+    required = artifact.get("required")
+
+    if not is_string_enum(
+        expected_status,
+        {"active", "revoked", "unavailable"},
+    ):
+        failures.append(
+            f"al2_context {check['artifact']}: status check requires a supported expect_status"
+        )
+    if not isinstance(expected_required, bool):
+        failures.append(
+            f"al2_context {check['artifact']}: status check requires boolean expect_required"
+        )
+    if not is_string_enum(availability, {"available", "unavailable"}):
+        failures.append(
+            f"al2_context {check['artifact']}: availability must be available or unavailable"
+        )
+    if not isinstance(required, bool):
+        failures.append(f"al2_context {check['artifact']}: required must be boolean")
+    if failures:
+        return failures
+
+    if availability == "available":
+        actual_status = artifact.get("status")
+        if not is_string_enum(actual_status, {"active", "revoked"}):
+            failures.append(
+                f"al2_context {check['artifact']}: available status must be active or revoked"
+            )
+    else:
+        actual_status = "unavailable"
+        if "status" in artifact:
+            failures.append(
+                f"al2_context {check['artifact']}: unavailable status must not carry a status value"
+            )
+
+    if actual_status != expected_status:
+        failures.append(
+            f"al2_context {check['artifact']}: expected status={expected_status} actual status={actual_status}"
+        )
+    if required != expected_required:
+        failures.append(
+            f"al2_context {check['artifact']}: expected required={expected_required} actual required={required}"
+        )
+
+    expected_failure = check.get("expected_failure_reason")
+    if actual_status == "revoked":
+        actual_failure = "STATUS_REVOKED"
+    elif actual_status == "unavailable" and required:
+        actual_failure = "STATUS_UNAVAILABLE"
+    else:
+        actual_failure = None
+    if expected_failure is not None and actual_failure != expected_failure:
+        failures.append(
+            f"al2_context {check['artifact']}: expected failure={expected_failure} actual failure={actual_failure}"
+        )
+    if expected_failure is None and actual_failure is not None:
+        failures.append(
+            f"al2_context {check['artifact']}: unexpected derived failure={actual_failure}"
+        )
+    return failures
+
+
+def sut_input_contract_failures(case: dict[str, Any]) -> list[str]:
+    raw_context_checks = case.get("al2_context_checks")
+    status_artifacts = {
+        check.get("artifact")
+        for check in raw_context_checks
+        if isinstance(check, dict)
+        and check.get("kind") == "status"
+        and isinstance(check.get("artifact"), str)
+        and check.get("artifact")
+    } if isinstance(raw_context_checks, list) else set()
+
+    artifacts = case.get("artifacts")
+    if not isinstance(artifacts, dict):
+        if "sut_inputs" in case or status_artifacts:
+            return ["sut_inputs: case artifacts must be an object"]
+        return ["artifacts: expected object"]
+    if "sut_inputs" not in case:
+        if status_artifacts:
+            return ["sut_inputs: required for cases with status context checks"]
+        return []
+    raw_inputs = case["sut_inputs"]
+    if not isinstance(raw_inputs, list) or not raw_inputs:
+        return ["sut_inputs: expected non-empty array"]
+
+    failures: list[str] = []
+    seen: dict[tuple[str, str], int] = {}
+    for index, item in enumerate(raw_inputs):
+        label = f"sut_inputs[{index}]"
+        if not isinstance(item, dict):
+            failures.append(f"{label}: expected object")
+            continue
+        for field in sorted(set(item) - {"artifact", "role", "media_type"}):
+            failures.append(f"{label}.{field}: unsupported SUT input field")
+        artifact_name = item.get("artifact")
+        role = item.get("role")
+        media_type = item.get("media_type")
+        if not isinstance(artifact_name, str) or not artifact_name:
+            failures.append(f"{label}.artifact: expected non-empty string")
+        elif not isinstance(artifacts.get(artifact_name), str):
+            failures.append(f"{label}.artifact: missing string artifact path for {artifact_name}")
+        if not isinstance(role, str) or not role:
+            failures.append(f"{label}.role: expected non-empty string")
+        if not isinstance(media_type, str) or not media_type:
+            failures.append(f"{label}.media_type: expected non-empty string")
+        if isinstance(artifact_name, str) and artifact_name and isinstance(role, str) and role:
+            key = (artifact_name, role)
+            first_index = seen.get(key)
+            if first_index is not None:
+                failures.append(
+                    f"{label}: duplicate logical input artifact={artifact_name} role={role}; "
+                    f"first used at index {first_index}"
+                )
+            else:
+                seen[key] = index
+    for artifact_name in sorted(status_artifacts):
+        if (artifact_name, "status_evidence") not in seen:
+            failures.append(
+                "sut_inputs: status context check requires "
+                f"artifact={artifact_name} role=status_evidence"
+            )
+    return failures
+
+
+def corpus_sut_input_contract_failures(corpus_root: Path) -> list[str]:
+    case_records, case_load_failures = load_corpus_case_records(corpus_root)
+    failures: list[str] = list(case_load_failures)
+    for case_path, case in case_records:
+        case_id = case.get("case_id")
+        label = case_id if isinstance(case_id, str) and case_id else display_path(case_path.resolve())
+        for failure in sut_input_contract_failures(case):
+            failures.append(f"{label}.{failure}")
+    return failures
+
+
+def evaluate_context_freshness_check(
+    check: dict[str, Any],
+    artifact: dict[str, Any],
+    *,
+    require_status_context: bool = False,
+) -> list[str]:
     checked_at = try_parse_time(artifact.get("checked_at"))
     source_issued_at = try_parse_time(artifact.get("source_issued_at"))
     max_age_seconds = artifact.get("max_age_seconds", check.get("max_age_seconds"))
-    failures: list[str] = []
+    is_status_context = require_status_context or artifact.get("version") == STATUS_CONTEXT_VERSION
+    failures: list[str] = (
+        status_context_shape_failures(artifact, f"al2_context {check['artifact']}")
+        if is_status_context
+        else []
+    )
     if not isinstance(check.get("expect_fresh"), bool):
         failures.append(f"al2_context {check['artifact']}: freshness check requires boolean expect_fresh")
     if checked_at is None or source_issued_at is None:
         failures.append(f"al2_context {check['artifact']}: freshness timestamps must be valid")
     if isinstance(max_age_seconds, bool) or not isinstance(max_age_seconds, int) or max_age_seconds < 0:
         failures.append(f"al2_context {check['artifact']}: max_age_seconds must be a non-negative integer")
+    if is_status_context and artifact.get("availability") != "available":
+        failures.append(
+            f"al2_context {check['artifact']}: freshness requires availability=available"
+        )
     if failures:
         return failures
     age_seconds = (checked_at - source_issued_at).total_seconds()
@@ -1828,7 +2737,10 @@ def evaluate_context_freshness_check(check: dict[str, Any], artifact: dict[str, 
     expect_fresh = check["expect_fresh"]
     if fresh != expect_fresh:
         failures.append(f"al2_context {check['artifact']}: expected fresh={expect_fresh} actual fresh={fresh}")
-    actual_failure = artifact.get("failure_reason") if not fresh else None
+    if not fresh and is_status_context:
+        actual_failure = "STATUS_STALE"
+    else:
+        actual_failure = artifact.get("failure_reason") if not fresh else None
     expected_failure = check.get("expected_failure_reason")
     if expected_failure and actual_failure != expected_failure:
         failures.append(
@@ -1869,12 +2781,12 @@ def evaluate_context_replay_check(check: dict[str, Any], artifact: dict[str, Any
         failures.append(f"al2_context {check['artifact']}: replay check requires boolean expect_replayed")
     if not isinstance(replay_key, str) or not replay_key or not isinstance(nonce, str) or not nonce:
         failures.append(f"al2_context {check['artifact']}: replay_key and nonce must be non-empty strings")
-    if state not in {"unused", "consumed", "replayed"}:
+    if not is_string_enum(state, {"unused", "consumed", "replayed"}):
         failures.append(f"al2_context {check['artifact']}: replay state must be unused, consumed, or replayed")
     if failures:
         return failures
     expect_replayed = check["expect_replayed"]
-    replayed = state in {"consumed", "replayed"}
+    replayed = is_string_enum(state, {"consumed", "replayed"})
     if replayed != expect_replayed:
         failures.append(f"al2_context {check['artifact']}: expected replayed={expect_replayed} actual replayed={replayed}")
     actual_failure = artifact.get("failure_reason") if replayed else None
@@ -1905,6 +2817,9 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
     jose_results, jose_failures = evaluate_jose_checks(case)
 
     failures: list[str] = []
+    failures.extend(
+        directly_dereferenced_artifact_failures(admission, post_execution)
+    )
     if actual != expected:
         failures.append(f"outcome: expected {expected} actual {actual}")
     if actual_execute != expected_execute:
@@ -1935,6 +2850,7 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
     failures.extend(evaluate_attenuation_checks(case, admission))
     failures.extend(evaluate_evidence_vocabulary_checks(admission_request, admission))
     failures.extend(evaluate_al2_context_checks(case))
+    failures.extend(sut_input_contract_failures(case))
 
     return {
         "case_id": case["case_id"],
@@ -1954,9 +2870,22 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
 
 def run_corpus(corpus_root: Path) -> dict[str, Any]:
     case_paths = sorted((corpus_root / "cases").glob("*.json"))
-    cases = [evaluate_case(path) for path in case_paths]
+    _, case_load_failures = load_corpus_case_records(corpus_root)
+    input_contract_failures = corpus_sut_input_contract_failures(corpus_root)
+    cases = (
+        []
+        if case_load_failures or input_contract_failures
+        else [evaluate_case(path) for path in case_paths]
+    )
     manifest, digest, manifest_failures = corpus_manifest(corpus_root)
-    fatal_errors = corpus_pairing_failures(corpus_root) + manifest_failures
+    fatal_errors = list(
+        dict.fromkeys(
+            case_load_failures
+            + corpus_pairing_failures(corpus_root)
+            + input_contract_failures
+            + manifest_failures
+        )
+    )
     failed = sum(1 for item in cases if not item["pass"])
     report = {
         "version": CONFORMANCE_REPORT_VERSION,
@@ -1985,8 +2914,8 @@ def run_corpus(corpus_root: Path) -> dict[str, Any]:
 
 def load_case_expectations(corpus_root: Path) -> list[dict[str, Any]]:
     expectations: list[dict[str, Any]] = []
-    for case_path in sorted((corpus_root / "cases").glob("*.json")):
-        case = read_json(case_path)
+    case_records, _ = load_corpus_case_records(corpus_root)
+    for _, case in case_records:
         expected_reason_codes = [str(code) for code in case["expected"]["reason_codes"]]
         expectations.append(
             {
@@ -2011,7 +2940,42 @@ def load_case_expectations(corpus_root: Path) -> list[dict[str, Any]]:
 
 
 def required_sut_artifacts(case: dict[str, Any]) -> dict[str, Any]:
-    artifacts = case.get("artifacts", {})
+    artifacts = case_artifacts(case)
+    input_artifacts: list[dict[str, str | None]] = []
+    if "sut_inputs" in case:
+        raw_explicit_inputs = case["sut_inputs"]
+        explicit_inputs = raw_explicit_inputs if isinstance(raw_explicit_inputs, list) else []
+        for item in explicit_inputs:
+            if not isinstance(item, dict):
+                continue
+            artifact_name = item.get("artifact")
+            role = item.get("role")
+            media_type = item.get("media_type")
+            if (
+                isinstance(artifact_name, str)
+                and artifact_name
+                and isinstance(role, str)
+                and role
+                and isinstance(media_type, str)
+                and media_type
+            ):
+                input_artifacts.append(
+                    {
+                        "case_artifact": artifact_name,
+                        "role": role,
+                        "expected_uri": artifacts.get(artifact_name),
+                        "expected_media_type": media_type,
+                        "expected_digest": case_artifact_sha256(case, artifact_name),
+                    }
+                )
+
+        return {
+            "input_artifacts": input_artifacts,
+            "receipt_artifacts": [],
+            "verification_context": [],
+            "proof_artifacts": [],
+        }
+
     receipt_artifacts: list[dict[str, str]] = []
     for artifact_name in ("admission_receipt", "post_execution_receipt"):
         if isinstance(artifacts, dict) and artifact_name in artifacts:
@@ -2059,6 +3023,7 @@ def required_sut_artifacts(case: dict[str, Any]) -> dict[str, Any]:
                 )
 
     return {
+        "input_artifacts": input_artifacts,
         "receipt_artifacts": receipt_artifacts,
         "verification_context": context_artifacts,
         "proof_artifacts": proof_artifacts,
@@ -2123,7 +3088,7 @@ def evidence_bindings(artifact: dict[str, Any], source_artifact: str, path: str,
 
 def context_evidence_type(context_artifact: dict[str, Any], check_kind: Any) -> str | None:
     source = context_artifact.get("source")
-    if source in {"runtime_attestation", "status_bundle"}:
+    if is_string_enum(source, {"runtime_attestation", "status_bundle"}):
         return source
     if check_kind == "binding" and context_artifact.get("binding") == "runtime":
         return "runtime_attestation"
@@ -2139,7 +3104,7 @@ def append_binding_once(bindings: list[dict[str, Any]], binding: dict[str, Any] 
 
 def required_context_bindings(case: dict[str, Any], check: dict[str, Any]) -> list[dict[str, Any]]:
     bindings: list[dict[str, Any]] = []
-    artifacts = case.get("artifacts", {})
+    artifacts = case_artifacts(case)
 
     admission_receipt = load_artifact(case, "admission_receipt")
     admission_request = load_artifact(case, "admission_request")
@@ -2232,14 +3197,18 @@ def sut_verification_context_failures(value: Any, label: str) -> list[str]:
     if not isinstance(raw_bindings, list) or not raw_bindings:
         failures.append(f"{label}.context_bindings: expected non-empty array")
     else:
-        seen_binding_keys: dict[tuple[Any, Any, Any, Any], int] = {}
+        seen_binding_keys: dict[
+            tuple[str, str, str | None, str | None], int
+        ] = {}
         for index, binding in enumerate(raw_bindings):
             binding_label = f"{label}.context_bindings[{index}]"
-            shape_failures = context_binding_shape_failures(binding, binding_label)
+            key, shape_failures = validated_context_binding_key(
+                binding,
+                binding_label,
+            )
             failures.extend(shape_failures)
-            if shape_failures or not isinstance(binding, dict):
+            if key is None:
                 continue
-            key = context_binding_key(binding)
             first_index = seen_binding_keys.get(key)
             if first_index is not None:
                 failures.append(
@@ -2253,9 +3222,21 @@ def sut_verification_context_failures(value: Any, label: str) -> list[str]:
 
 
 def context_binding_shape_failures(value: Any, label: str) -> list[str]:
+    _, failures = validated_context_binding_key(value, label)
+    return failures
+
+
+def validated_context_binding_key(
+    value: Any,
+    label: str,
+) -> tuple[
+    tuple[str, str, str | None, str | None] | None,
+    list[str],
+]:
+    """Validate a context binding and return only a hash-safe logical key."""
     failures: list[str] = []
     if not isinstance(value, dict):
-        return [f"{label}: expected object"]
+        return None, [f"{label}: expected object"]
     role = value.get("role")
     if not isinstance(role, str) or role not in {
         "admission_receipt",
@@ -2269,30 +3250,50 @@ def context_binding_shape_failures(value: Any, label: str) -> list[str]:
     if not isinstance(source_artifact, str) or not source_artifact:
         failures.append(f"{label}.source_artifact: expected non-empty string")
 
-    if isinstance(role, str) and role in {"admission_receipt", "admission_request", "evidence"}:
-        failures.extend(digest_descriptor_failures(value.get("digest"), f"{label}.digest"))
-    if isinstance(role, str) and role in {"transaction_id", "runtime", "evidence"}:
-        path = value.get("path")
+    requires_digest = isinstance(role, str) and role in {
+        "admission_receipt",
+        "admission_request",
+        "evidence",
+    }
+    if "digest" in value or requires_digest:
+        failures.extend(
+            digest_descriptor_failures(value.get("digest"), f"{label}.digest")
+        )
+
+    requires_path = isinstance(role, str) and role in {
+        "transaction_id",
+        "runtime",
+        "evidence",
+    }
+    path = value.get("path") if "path" in value else None
+    if "path" in value or requires_path:
         if not isinstance(path, str) or not path:
             failures.append(f"{label}.path: expected non-empty string")
-    if isinstance(role, str) and role in {"transaction_id", "runtime"}:
-        bound_value = value.get("value")
+
+    requires_value = isinstance(role, str) and role in {
+        "transaction_id",
+        "runtime",
+    }
+    bound_value = value.get("value") if "value" in value else None
+    if "value" in value or requires_value:
         if not isinstance(bound_value, str) or not bound_value:
             failures.append(f"{label}.value: expected non-empty string")
-    if role == "evidence":
-        evidence_type = value.get("evidence_type")
-        if not isinstance(evidence_type, str) or not evidence_type:
-            failures.append(f"{label}.evidence_type: expected non-empty string")
-    return failures
 
-
-def context_binding_key(binding: dict[str, Any]) -> tuple[Any, Any, Any, Any]:
-    return (
-        binding.get("role"),
-        binding.get("source_artifact"),
-        binding.get("path"),
-        binding.get("evidence_type"),
+    requires_evidence_type = role == "evidence"
+    evidence_type = (
+        value.get("evidence_type") if "evidence_type" in value else None
     )
+    if "evidence_type" in value or requires_evidence_type:
+        if not isinstance(evidence_type, str) or not evidence_type:
+            failures.append(
+                f"{label}.evidence_type: expected non-empty string"
+            )
+
+    if failures:
+        return None, failures
+    assert isinstance(role, str)
+    assert isinstance(source_artifact, str)
+    return (role, source_artifact, path, evidence_type), []
 
 
 def context_binding_match_failures(
@@ -2305,21 +3306,30 @@ def context_binding_match_failures(
     if not isinstance(actual_bindings, list):
         return [f"{label}: expected context binding array"]
 
-    actual_by_key: dict[tuple[Any, Any, Any, Any], dict[str, Any]] = {}
-    duplicate_keys: set[tuple[Any, Any, Any, Any]] = set()
-    for binding in actual_bindings:
-        if not isinstance(binding, dict):
-            continue
-        key = context_binding_key(binding)
-        if any(item is not None and not isinstance(item, str) for item in key):
+    actual_by_key: dict[
+        tuple[str, str, str | None, str | None], dict[str, Any]
+    ] = {}
+    duplicate_keys: set[tuple[str, str, str | None, str | None]] = set()
+    for index, binding in enumerate(actual_bindings):
+        key, _ = validated_context_binding_key(
+            binding,
+            f"{label}[{index}]",
+        )
+        if key is None or not isinstance(binding, dict):
             continue
         if key in actual_by_key:
             duplicate_keys.add(key)
         else:
             actual_by_key[key] = binding
     failures: list[str] = []
-    for expected in expected_bindings:
-        key = context_binding_key(expected)
+    for index, expected in enumerate(expected_bindings):
+        key, key_failures = validated_context_binding_key(
+            expected,
+            f"{label}.expected[{index}]",
+        )
+        if key is None:
+            failures.extend(key_failures)
+            continue
         if key in duplicate_keys:
             continue
         actual = actual_by_key.get(key)
@@ -2349,6 +3359,26 @@ def sut_proof_artifact_failures(value: Any, label: str) -> list[str]:
     case_artifact = value.get("case_artifact")
     if not isinstance(case_artifact, str) or not case_artifact:
         failures.append(f"{label}.case_artifact: expected non-empty string")
+    return failures
+
+
+def sut_input_artifact_failures(value: Any, label: str) -> list[str]:
+    failures = sut_artifact_ref_failures(value, label, require_media_type=True)
+    if not isinstance(value, dict):
+        return failures
+    allowed_fields = {"case_artifact", "role", "uri", "media_type", "digest"}
+    for field in sorted(set(value) - allowed_fields):
+        failures.append(f"{label}.{field}: unsupported input artifact field")
+    digest = value.get("digest")
+    if isinstance(digest, dict):
+        for field in sorted(set(digest) - {"alg", "value"}):
+            failures.append(f"{label}.digest.{field}: unsupported input digest field")
+    case_artifact = value.get("case_artifact")
+    role = value.get("role")
+    if not isinstance(case_artifact, str) or not case_artifact:
+        failures.append(f"{label}.case_artifact: expected non-empty string")
+    if not isinstance(role, str) or not role:
+        failures.append(f"{label}.role: expected non-empty string")
     return failures
 
 
@@ -2385,6 +3415,12 @@ def artifact_entries_by_logical_key(
 
 def sut_result_artifact_failures(result: dict[str, Any], requirements: dict[str, Any]) -> list[str]:
     failures: list[str] = []
+    required_inputs = [
+        item for item in requirements.get("input_artifacts", [])
+        if isinstance(item, dict)
+        and isinstance(item.get("case_artifact"), str)
+        and isinstance(item.get("role"), str)
+    ]
     required_receipts = [
         receipt for receipt in requirements.get("receipt_artifacts", [])
         if isinstance(receipt, dict) and isinstance(receipt.get("name"), str)
@@ -2397,12 +3433,100 @@ def sut_result_artifact_failures(result: dict[str, Any], requirements: dict[str,
         proof for proof in requirements.get("proof_artifacts", [])
         if isinstance(proof, dict)
     ]
-    if not required_receipts and not required_contexts and not required_proofs:
+    artifacts = result.get("artifacts")
+    if (
+        not required_inputs
+        and isinstance(artifacts, dict)
+        and "input_artifacts" in artifacts
+    ):
+        failures.append(
+            "artifacts.input_artifacts: not allowed when the case does not declare authoritative sut_inputs"
+        )
+    if not required_inputs and not required_receipts and not required_contexts and not required_proofs:
         return failures
 
-    artifacts = result.get("artifacts")
     if not isinstance(artifacts, dict):
         return ["artifacts: expected object with required artifact references"]
+
+    if required_inputs:
+        for key in sorted(set(artifacts) - {"input_artifacts"}):
+            failures.append(
+                f"artifacts.{key}: not allowed when the case declares authoritative sut_inputs"
+            )
+
+        raw_inputs = artifacts.get("input_artifacts")
+        if not isinstance(raw_inputs, list) or not raw_inputs:
+            failures.append("artifacts.input_artifacts: required non-empty array for this case")
+            raw_inputs = []
+        elif not all(isinstance(item, dict) for item in raw_inputs):
+            failures.append("artifacts.input_artifacts: expected array of objects")
+            raw_inputs = [item for item in raw_inputs if isinstance(item, dict)]
+
+        actual_by_key: dict[tuple[str, str], dict[str, Any]] = {}
+        duplicate_keys: set[tuple[str, str]] = set()
+        for index, item in enumerate(raw_inputs):
+            label = f"artifacts.input_artifacts[{index}]"
+            failures.extend(sut_input_artifact_failures(item, label))
+            if not isinstance(item, dict):
+                continue
+            case_artifact = item.get("case_artifact")
+            role = item.get("role")
+            if not isinstance(case_artifact, str) or not case_artifact:
+                continue
+            if not isinstance(role, str) or not role:
+                continue
+            key = (case_artifact, role)
+            if key in actual_by_key:
+                duplicate_keys.add(key)
+                failures.append(
+                    f"{label}: duplicate logical input artifact key "
+                    f"case_artifact={case_artifact} role={role}"
+                )
+            else:
+                actual_by_key[key] = item
+
+        for expected_input in required_inputs:
+            key = (expected_input["case_artifact"], expected_input["role"])
+            if key in duplicate_keys:
+                continue
+            actual_input = actual_by_key.get(key)
+            if actual_input is None:
+                failures.append(
+                    "artifacts.input_artifacts: "
+                    f"missing case_artifact={key[0]} role={key[1]}"
+                )
+                continue
+            failures.extend(
+                sut_artifact_digest_match_failures(
+                    actual_input,
+                    f"artifacts.input_artifacts case_artifact={key[0]} role={key[1]}",
+                    expected_input.get("expected_digest"),
+                )
+            )
+            expected_uri = expected_input.get("expected_uri")
+            if actual_input.get("uri") != expected_uri:
+                failures.append(
+                    "artifacts.input_artifacts: "
+                    f"uri mismatch for case_artifact={key[0]} role={key[1]}; "
+                    f"expected {expected_uri} actual {actual_input.get('uri')}"
+                )
+            expected_media_type = expected_input.get("expected_media_type")
+            if actual_input.get("media_type") != expected_media_type:
+                failures.append(
+                    "artifacts.input_artifacts: "
+                    f"media_type mismatch for case_artifact={key[0]} role={key[1]}; "
+                    f"expected {expected_media_type} actual {actual_input.get('media_type')}"
+                )
+
+        expected_keys = {
+            (expected_input["case_artifact"], expected_input["role"])
+            for expected_input in required_inputs
+        }
+        for case_artifact, role in sorted(set(actual_by_key) - expected_keys):
+            failures.append(
+                "artifacts.input_artifacts: "
+                f"unexpected case_artifact={case_artifact} role={role}"
+            )
 
     for required_receipt in required_receipts:
         artifact_name = required_receipt["name"]
@@ -2787,7 +3911,10 @@ def generated_decision_shape_failures(value: Any, label: str) -> list[str]:
         failures.append(f"{label}.reason_withheld: expected boolean when present")
     if visibility == "disclosed" and reason_withheld is True:
         failures.append(f"{label}.reason_withheld: disclosed reasons cannot be withheld")
-    if reason_withheld is True and visibility not in {"opaque", "withheld"}:
+    if reason_withheld is True and not is_string_enum(
+        visibility,
+        {"opaque", "withheld"},
+    ):
         failures.append(f"{label}.reason_visibility: true reason_withheld requires opaque or withheld")
     failures.extend(
         non_empty_string_field_failures(value, "human_readable_summary", label, required=False)
@@ -2956,11 +4083,11 @@ def generated_sut_artifact_failures(
         return ["generated_artifacts: expected object for generated-receipts mode"]
 
     case = expected["case"]
-    requirements = expected["required_artifacts"]
+    artifact_map = case_artifacts(case)
     required_receipt_names = {
-        item.get("name")
-        for item in requirements.get("receipt_artifacts", [])
-        if isinstance(item, dict) and item.get("name") in GENERATED_ARTIFACT_NAMES
+        name
+        for name in GENERATED_ARTIFACT_NAMES
+        if isinstance(artifact_map.get(name), str)
     }
     unknown_names = set(generated) - GENERATED_ARTIFACT_NAMES
     for name in sorted(unknown_names):
@@ -3104,12 +4231,211 @@ def generated_sut_artifact_failures(
     return failures
 
 
+def sut_result_envelope_failures(sut_results: dict[str, Any]) -> list[str]:
+    failures: list[str] = []
+    if try_parse_time(sut_results.get("generated_at")) is None:
+        failures.append("sut_results.generated_at: expected valid RFC3339 date-time")
+
+    if "results" not in sut_results or not isinstance(sut_results.get("results"), list):
+        failures.append("sut_results.results: expected array")
+
+    implementation = sut_results.get("implementation")
+    if not isinstance(implementation, dict):
+        failures.append("sut_results.implementation: expected object")
+        return failures
+    for field in ("name", "type", "version", "language"):
+        value = implementation.get(field)
+        if not isinstance(value, str) or not value:
+            failures.append(
+                f"sut_results.implementation.{field}: expected non-empty string"
+            )
+    return failures
+
+
+def normalize_sut_results(
+    sut_results: dict[str, Any],
+    canonical_case_ids: list[str],
+) -> dict[str, Any]:
+    """Normalize one supplied SUT result without evaluating corpus expectations."""
+    structural_failures: list[str] = []
+    default_mode = sut_results.get("artifact_mode", SUT_ARTIFACT_MODE_CORPUS)
+    default_mode_failure: str | None = None
+    if not isinstance(default_mode, str) or default_mode not in SUT_ARTIFACT_MODES:
+        default_mode_failure = (
+            "sut_results.artifact_mode: expected one of "
+            f"{sorted(SUT_ARTIFACT_MODES)} actual {default_mode}"
+        )
+        default_mode = SUT_ARTIFACT_MODE_CORPUS
+
+    raw_results = sut_results.get("results")
+    if not isinstance(raw_results, list):
+        structural_failures.append("sut_results.results: expected array")
+        raw_results = []
+
+    results_by_case: dict[str, dict[str, Any]] = {}
+    result_indexes_by_case: dict[str, int] = {}
+    duplicate_case_ids: set[str] = set()
+    for index, result in enumerate(raw_results):
+        if not isinstance(result, dict):
+            structural_failures.append(
+                f"sut_results.results[{index}]: expected object"
+            )
+            continue
+        case_id = result.get("case_id")
+        if not isinstance(case_id, str) or not case_id:
+            structural_failures.append(
+                f"sut_results.results[{index}]: expected non-empty string case_id"
+            )
+            continue
+        if case_id in results_by_case:
+            duplicate_case_ids.add(case_id)
+        results_by_case[case_id] = result
+        result_indexes_by_case[case_id] = index
+    for case_id in sorted(duplicate_case_ids):
+        structural_failures.append(
+            f"sut_results.results: duplicate case_id {case_id}"
+        )
+
+    canonical_case_id_set = set(canonical_case_ids)
+    for case_id in sorted(set(results_by_case) - canonical_case_id_set):
+        structural_failures.append(
+            f"sut_results.results: unknown case_id {case_id}"
+        )
+
+    normalized_cases: list[dict[str, Any]] = []
+    artifact_mode_counts = {
+        mode: 0 for mode in sorted(SUT_ARTIFACT_MODES)
+    }
+    skipped_count = 0
+    for case_id in canonical_case_ids:
+        result = results_by_case.get(case_id)
+        artifact_mode = default_mode
+        artifact_mode_failures: list[str] = []
+        field_failures: list[str] = []
+        if result is None:
+            actual_outcome = "missing"
+            actual_should_execute_value = None
+            actual_reason_codes: list[str] = []
+            status = "missing"
+            state_failure = "sut result missing"
+            field_failures.append(state_failure)
+        else:
+            raw_artifact_mode = result.get("artifact_mode", default_mode)
+            if (
+                not isinstance(raw_artifact_mode, str)
+                or raw_artifact_mode not in SUT_ARTIFACT_MODES
+            ):
+                artifact_mode_failures.append(
+                    "artifact_mode: expected one of "
+                    f"{sorted(SUT_ARTIFACT_MODES)} actual {raw_artifact_mode}"
+                )
+            else:
+                artifact_mode = raw_artifact_mode
+            if (
+                default_mode == SUT_ARTIFACT_MODE_GENERATED
+                and artifact_mode != SUT_ARTIFACT_MODE_GENERATED
+            ):
+                artifact_mode_failures.append(
+                    "artifact_mode: a generated-receipts default cannot be "
+                    "downgraded per case"
+                )
+            field_failures.extend(artifact_mode_failures)
+
+            raw_outcome = result.get("outcome")
+            if isinstance(raw_outcome, str) and raw_outcome:
+                actual_outcome = raw_outcome
+            else:
+                actual_outcome = "missing"
+                field_failures.append("outcome: expected non-empty string")
+
+            raw_should_execute = result.get("should_execute")
+            if isinstance(raw_should_execute, bool):
+                actual_should_execute_value = raw_should_execute
+            else:
+                actual_should_execute_value = None
+                field_failures.append("should_execute: expected boolean")
+
+            raw_reason_codes = result.get("reason_codes", [])
+            if not isinstance(raw_reason_codes, list):
+                actual_reason_codes = []
+                field_failures.append("reason_codes: expected array")
+            else:
+                actual_reason_codes = [
+                    code
+                    for code in raw_reason_codes
+                    if isinstance(code, str) and code
+                ]
+                if len(actual_reason_codes) != len(raw_reason_codes):
+                    field_failures.append(
+                        "reason_codes: expected non-empty string entries"
+                    )
+
+            status = result.get("status")
+            state_failure = None
+            if status == "skipped":
+                state_failure = "sut result skipped"
+                skipped_count += 1
+            elif status != "completed":
+                state_failure = (
+                    "sut result status: expected completed actual "
+                    f"{status}"
+                )
+            if state_failure is not None:
+                field_failures.append(state_failure)
+
+        artifact_mode_counts[artifact_mode] += 1
+        normalized_cases.append(
+            {
+                "case_id": case_id,
+                "result": result,
+                "result_index": result_indexes_by_case.get(case_id),
+                "status": status,
+                "state_failure": state_failure,
+                "artifact_mode": artifact_mode,
+                "artifact_mode_failures": artifact_mode_failures,
+                "actual_outcome": actual_outcome,
+                "actual_should_execute": actual_should_execute_value,
+                "actual_reason_codes": actual_reason_codes,
+                "actual_primary_reason_code": primary_reason_code(
+                    actual_reason_codes
+                ),
+                "field_failures": field_failures,
+            }
+        )
+
+    return {
+        "default_artifact_mode": default_mode,
+        "default_artifact_mode_failure": default_mode_failure,
+        "structural_failures": structural_failures,
+        "cases": normalized_cases,
+        "cases_by_id": {
+            case["case_id"]: case for case in normalized_cases
+        },
+        "artifact_mode_counts": artifact_mode_counts,
+        "skipped_count": skipped_count,
+    }
+
+
 def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, Any]:
+    case_paths = sorted((corpus_root / "cases").glob("*.json"))
+    _, case_load_failures = load_corpus_case_records(corpus_root)
     pairing_failures = corpus_pairing_failures(corpus_root)
+    input_contract_failures = corpus_sut_input_contract_failures(corpus_root)
     expectations = load_case_expectations(corpus_root)
     manifest, digest, manifest_failures = corpus_manifest(corpus_root)
 
-    fatal_errors: list[str] = list(pairing_failures) + manifest_failures
+    fatal_errors: list[str] = list(
+        dict.fromkeys(
+            case_load_failures
+            + list(pairing_failures)
+            + input_contract_failures
+            + manifest_failures
+        )
+    )
+    if not case_paths:
+        fatal_errors.append("no conformance case files found")
+    elif not expectations:
+        fatal_errors.append("no valid conformance cases loaded")
     try:
         sut_results = read_json(sut_results_path)
     except (OSError, UnicodeDecodeError, ValueError) as exc:
@@ -3125,14 +4451,7 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
         fatal_errors.append(f"sut_results.version: expected {SUT_RESULTS_VERSION} actual {sut_results.get('version')}")
     if sut_results.get("profile") != PROFILE:
         fatal_errors.append(f"sut_results.profile: expected {PROFILE} actual {sut_results.get('profile')}")
-
-    default_artifact_mode = sut_results.get("artifact_mode", SUT_ARTIFACT_MODE_CORPUS)
-    if not isinstance(default_artifact_mode, str) or default_artifact_mode not in SUT_ARTIFACT_MODES:
-        fatal_errors.append(
-            "sut_results.artifact_mode: expected one of "
-            f"{sorted(SUT_ARTIFACT_MODES)} actual {default_artifact_mode}"
-        )
-        default_artifact_mode = SUT_ARTIFACT_MODE_CORPUS
+    fatal_errors.extend(sut_result_envelope_failures(sut_results))
 
     sut_corpus = sut_results.get("corpus", {})
     if not isinstance(sut_corpus, dict):
@@ -3143,94 +4462,61 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
     if sut_corpus.get("digest") != digest:
         fatal_errors.append("sut_results.corpus.digest: does not match current corpus digest")
 
-    sut_implementation = sut_results.get("implementation", {})
+    sut_implementation = sut_results.get("implementation")
     if not isinstance(sut_implementation, dict):
-        fatal_errors.append("sut_results.implementation: expected object")
         sut_implementation = {}
 
-    raw_results = sut_results.get("results", [])
-    if not isinstance(raw_results, list):
-        fatal_errors.append("sut_results.results: expected array")
-        raw_results = []
-
-    result_by_case: dict[str, dict[str, Any]] = {}
-    duplicate_cases: set[str] = set()
-    for index, result in enumerate(raw_results):
-        if not isinstance(result, dict):
-            fatal_errors.append(f"sut_results.results[{index}]: expected object")
-            continue
-        case_id = result.get("case_id")
-        if not isinstance(case_id, str):
-            fatal_errors.append(f"sut_results.results[{index}]: result missing string case_id")
-            continue
-        if case_id in result_by_case:
-            duplicate_cases.add(case_id)
-        result_by_case[case_id] = result
-    for case_id in sorted(duplicate_cases):
-        fatal_errors.append(f"sut_results.results: duplicate case_id {case_id}")
-
-    expected_case_ids = {case["case_id"] for case in expectations}
-    for case_id in sorted(set(result_by_case) - expected_case_ids):
-        fatal_errors.append(f"sut_results.results: unknown case_id {case_id}")
+    normalized_sut_results = normalize_sut_results(
+        sut_results,
+        [expected["case_id"] for expected in expectations],
+    )
+    default_artifact_mode = normalized_sut_results[
+        "default_artifact_mode"
+    ]
+    default_mode_failure = normalized_sut_results[
+        "default_artifact_mode_failure"
+    ]
+    if default_mode_failure is not None:
+        fatal_errors.append(default_mode_failure)
+    fatal_errors.extend(normalized_sut_results["structural_failures"])
 
     cases: list[dict[str, Any]] = []
     for expected in expectations:
-        result = result_by_case.get(expected["case_id"])
-        failures: list[str] = []
-        artifact_mode = default_artifact_mode
-        if result is None:
-            actual_outcome = "missing"
-            actual_should_execute_value = None
-            actual_reason_codes: list[str] = []
-            failures.append("sut result missing")
-        else:
-            artifact_mode = result.get("artifact_mode", default_artifact_mode)
-            if not isinstance(artifact_mode, str) or artifact_mode not in SUT_ARTIFACT_MODES:
-                failures.append(
-                    "artifact_mode: expected one of "
-                    f"{sorted(SUT_ARTIFACT_MODES)} actual {artifact_mode}"
-                )
-                artifact_mode = default_artifact_mode
+        normalized_result = normalized_sut_results["cases_by_id"][
+            expected["case_id"]
+        ]
+        result = normalized_result["result"]
+        failures = list(normalized_result["field_failures"])
+        artifact_mode = normalized_result["artifact_mode"]
+        actual_outcome = normalized_result["actual_outcome"]
+        actual_should_execute_value = normalized_result[
+            "actual_should_execute"
+        ]
+        actual_reason_codes = normalized_result["actual_reason_codes"]
+        actual_primary_reason_code = normalized_result[
+            "actual_primary_reason_code"
+        ]
+        if result is not None:
             if (
-                default_artifact_mode == SUT_ARTIFACT_MODE_GENERATED
-                and artifact_mode != SUT_ARTIFACT_MODE_GENERATED
+                isinstance(actual_should_execute_value, bool)
+                and actual_should_execute_value
+                != expected["expected_should_execute"]
             ):
                 failures.append(
-                    "artifact_mode: a generated-receipts default cannot be downgraded per case"
+                    "should_execute: "
+                    f"expected {expected['expected_should_execute']} actual "
+                    f"{actual_should_execute_value}"
                 )
-            actual_outcome = str(result.get("outcome", "missing"))
-            raw_should_execute = result.get("should_execute")
-            if isinstance(raw_should_execute, bool):
-                actual_should_execute_value = raw_should_execute
-                if actual_should_execute_value != expected["expected_should_execute"]:
-                    failures.append(
-                        "should_execute: "
-                        f"expected {expected['expected_should_execute']} actual {actual_should_execute_value}"
-                    )
-            else:
-                actual_should_execute_value = None
-                failures.append("should_execute: expected boolean")
-            raw_reason_codes = result.get("reason_codes", [])
-            if not isinstance(raw_reason_codes, list):
-                actual_reason_codes = []
-                failures.append("reason_codes: expected array")
-            else:
-                actual_reason_codes = [str(code) for code in raw_reason_codes]
-            status = result.get("status")
-            if status == "skipped":
-                failures.append("sut result skipped")
-            elif status != "completed":
-                failures.append(f"sut result status: expected completed actual {status}")
 
             if actual_outcome != expected["expected_outcome"]:
                 failures.append(f"outcome: expected {expected['expected_outcome']} actual {actual_outcome}")
             if actual_reason_codes != expected["expected_reason_codes"]:
                 failures.append(f"reason_codes: expected {expected['expected_reason_codes']} actual {actual_reason_codes}")
-            if primary_reason_code(actual_reason_codes) != expected["expected_primary_reason_code"]:
+            if actual_primary_reason_code != expected["expected_primary_reason_code"]:
                 failures.append(
                     "primary_reason_code: "
                     f"expected {expected['expected_primary_reason_code']} "
-                    f"actual {primary_reason_code(actual_reason_codes)}"
+                    f"actual {actual_primary_reason_code}"
                 )
             failures.extend(
                 reason_code_order_failures(
@@ -3291,7 +4577,7 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
                 "expected_should_execute": expected["expected_should_execute"],
                 "actual_should_execute": actual_should_execute_value,
                 "expected_primary_reason_code": expected["expected_primary_reason_code"],
-                "actual_primary_reason_code": primary_reason_code(actual_reason_codes),
+                "actual_primary_reason_code": actual_primary_reason_code,
                 "expected_reason_codes": expected["expected_reason_codes"],
                 "actual_reason_codes": actual_reason_codes,
                 "pass": not failures,
@@ -3300,11 +4586,10 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
         )
 
     failed = sum(1 for case in cases if not case["pass"])
-    skipped = sum(1 for result in result_by_case.values() if result.get("status") == "skipped")
-    artifact_mode_counts = {
-        mode: sum(1 for case in cases if case.get("artifact_mode") == mode)
-        for mode in sorted(SUT_ARTIFACT_MODES)
-    }
+    skipped = normalized_sut_results["skipped_count"]
+    artifact_mode_counts = effective_sut_artifact_mode_counts(
+        normalized_sut_results
+    )
     report = {
         "version": CONFORMANCE_REPORT_VERSION,
         "profile": PROFILE,
@@ -3360,74 +4645,59 @@ def add_bundle_check(
 
 def add_generated_artifact_bundle_checks(
     checks: list[dict[str, Any]],
-    sut_results: dict[str, Any],
+    normalized_sut_results: dict[str, Any],
     sut_results_path: Path,
     corpus_root: Path,
 ) -> None:
-    default_mode = sut_results.get("artifact_mode", SUT_ARTIFACT_MODE_CORPUS)
-    if not isinstance(default_mode, str) or default_mode not in SUT_ARTIFACT_MODES:
+    default_mode_failure = normalized_sut_results[
+        "default_artifact_mode_failure"
+    ]
+    if default_mode_failure is not None:
         add_bundle_check(
             checks,
             "sut_results.artifact_mode",
             False,
             expected=sorted(SUT_ARTIFACT_MODES),
-            actual=default_mode,
+            actual=default_mode_failure,
         )
-        default_mode = SUT_ARTIFACT_MODE_CORPUS
 
     expectations = {
         expected["case_id"]: expected
         for expected in load_case_expectations(corpus_root)
     }
-    results = sut_results.get("results")
-    if not isinstance(results, list):
-        add_bundle_check(
-            checks,
-            "sut_results.results.shape",
-            False,
-            expected="array",
-            actual=type(results).__name__,
-        )
-        return
-
-    for index, result in enumerate(results):
-        if not isinstance(result, dict):
+    for normalized_result in normalized_sut_results["cases"]:
+        result = normalized_result["result"]
+        if result is None:
             continue
-        mode = result.get("artifact_mode", default_mode)
-        if not isinstance(mode, str) or mode not in SUT_ARTIFACT_MODES:
+        case_id = normalized_result["case_id"]
+        result_index = normalized_result["result_index"]
+        mode = normalized_result["artifact_mode"]
+        artifact_mode_failures = normalized_result[
+            "artifact_mode_failures"
+        ]
+        if artifact_mode_failures:
             add_bundle_check(
                 checks,
-                f"sut_results.artifact_mode.result_{index}",
+                f"sut_results.artifact_mode.result_{result_index}",
                 False,
-                expected=sorted(SUT_ARTIFACT_MODES),
-                actual=mode,
-            )
-            continue
-        if default_mode == SUT_ARTIFACT_MODE_GENERATED and mode != SUT_ARTIFACT_MODE_GENERATED:
-            add_bundle_check(
-                checks,
-                f"sut_results.artifact_mode.result_{index}",
-                False,
-                expected=SUT_ARTIFACT_MODE_GENERATED,
-                actual=mode,
-                details="a generated-receipts default cannot be downgraded per case",
+                expected="valid effective artifact mode",
+                actual=artifact_mode_failures,
             )
             continue
         if mode != SUT_ARTIFACT_MODE_GENERATED:
             if "generated_artifacts" in result:
                 add_bundle_check(
                     checks,
-                    f"sut_results.generated_artifacts.result_{index}",
+                    f"sut_results.generated_artifacts.result_{result_index}",
                     False,
                     details="generated_artifacts requires artifact_mode generated-receipts",
                 )
             continue
-        case_id = result.get("case_id")
-        expected = expectations.get(case_id) if isinstance(case_id, str) else None
+        expected = expectations.get(case_id)
         if expected is None:
             add_bundle_check(
                 checks,
-                f"sut_results.generated_artifacts.result_{index}",
+                f"sut_results.generated_artifacts.result_{result_index}",
                 False,
                 details=f"generated-receipts result has unknown case_id {case_id!r}",
             )
@@ -3446,34 +4716,668 @@ def add_generated_artifact_bundle_checks(
 
 
 def effective_sut_artifact_mode_counts(
-    sut_results: dict[str, Any],
-    corpus_root: Path,
+    normalized_sut_results: dict[str, Any],
 ) -> dict[str, int]:
-    default_mode = sut_results.get("artifact_mode", SUT_ARTIFACT_MODE_CORPUS)
-    if not isinstance(default_mode, str) or default_mode not in SUT_ARTIFACT_MODES:
-        default_mode = SUT_ARTIFACT_MODE_CORPUS
-    raw_results = sut_results.get("results")
-    results_by_case = {
-        result.get("case_id"): result
-        for result in raw_results
-        if isinstance(result, dict) and isinstance(result.get("case_id"), str)
-    } if isinstance(raw_results, list) else {}
-    counts = {mode: 0 for mode in sorted(SUT_ARTIFACT_MODES)}
-    for expected in load_case_expectations(corpus_root):
-        result = results_by_case.get(expected["case_id"])
-        mode = result.get("artifact_mode", default_mode) if isinstance(result, dict) else default_mode
-        if not isinstance(mode, str) or mode not in SUT_ARTIFACT_MODES:
-            mode = default_mode
-        counts[mode] += 1
-    return counts
+    return dict(normalized_sut_results["artifact_mode_counts"])
+
+
+def sut_result_report_projection_failures(
+    normalized_sut_results: dict[str, Any],
+    conformance_cases: Any,
+) -> list[str]:
+    if not isinstance(conformance_cases, list):
+        return ["conformance_report.cases: expected array"]
+
+    report_cases_by_id: dict[str, dict[str, Any]] = {}
+    for case in conformance_cases:
+        if not isinstance(case, dict):
+            continue
+        case_id = case.get("case_id")
+        if isinstance(case_id, str) and case_id not in report_cases_by_id:
+            report_cases_by_id[case_id] = case
+
+    failures: list[str] = []
+    state_failure_prefix = "sut result status: expected completed actual "
+    for normalized_result in normalized_sut_results["cases"]:
+        case_id = normalized_result["case_id"]
+        report_case = report_cases_by_id.get(case_id)
+        if report_case is None:
+            failures.append(f"{case_id}: conformance report case missing")
+            continue
+
+        expected_projection = {
+            "actual_outcome": normalized_result["actual_outcome"],
+            "actual_should_execute": normalized_result[
+                "actual_should_execute"
+            ],
+            "actual_reason_codes": normalized_result[
+                "actual_reason_codes"
+            ],
+            "actual_primary_reason_code": normalized_result[
+                "actual_primary_reason_code"
+            ],
+            "artifact_mode": normalized_result["artifact_mode"],
+        }
+        actual_projection = {
+            field: report_case.get(field) for field in expected_projection
+        }
+        if actual_projection != expected_projection:
+            failures.append(
+                f"{case_id}: expected actual projection {expected_projection} "
+                f"actual {actual_projection}"
+            )
+
+        recorded_failures = report_case.get("failures")
+        recorded_failure_strings = (
+            recorded_failures
+            if isinstance(recorded_failures, list)
+            and all(isinstance(item, str) for item in recorded_failures)
+            else []
+        )
+        recorded_state_failures = [
+            item
+            for item in recorded_failure_strings
+            if item in {"sut result missing", "sut result skipped"}
+            or item.startswith(state_failure_prefix)
+        ]
+        expected_state_failure = normalized_result["state_failure"]
+        expected_state_failures = (
+            [expected_state_failure]
+            if isinstance(expected_state_failure, str)
+            else []
+        )
+        if recorded_state_failures != expected_state_failures:
+            failures.append(
+                f"{case_id}: expected state failures "
+                f"{expected_state_failures} actual {recorded_state_failures}"
+            )
+        if expected_state_failures and report_case.get("pass") is not False:
+            failures.append(
+                f"{case_id}: non-completed SUT state requires pass=false"
+            )
+    return failures
+
+
+def non_empty_string_failure(value: Any, label: str) -> list[str]:
+    if isinstance(value, str) and value:
+        return []
+    return [f"{label}: expected non-empty string"]
+
+
+def non_negative_integer_failure(value: Any, label: str) -> list[str]:
+    if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+        return []
+    return [f"{label}: expected non-negative integer"]
+
+
+def digest_contract_failures(value: Any, label: str) -> list[str]:
+    if not isinstance(value, dict):
+        return [f"{label}: expected digest object"]
+    failures: list[str] = []
+    if value.get("alg") != "sha-256":
+        failures.append(f"{label}.alg: expected sha-256")
+    digest_value = value.get("value")
+    if (
+        not isinstance(digest_value, str)
+        or SHA256_HEX_RE.fullmatch(digest_value) is None
+    ):
+        failures.append(
+            f"{label}.value: expected lowercase SHA-256 hex"
+        )
+    return failures
+
+
+def string_array_contract_failures(value: Any, label: str) -> list[str]:
+    if not isinstance(value, list):
+        return [f"{label}: expected array"]
+    failures: list[str] = []
+    for index, item in enumerate(value):
+        if not isinstance(item, str) or not item:
+            failures.append(f"{label}[{index}]: expected non-empty string")
+    return failures
+
+
+def artifact_mode_counts_contract_failures(
+    value: Any,
+    label: str,
+) -> list[str]:
+    if not isinstance(value, dict):
+        return [f"{label}: expected object"]
+    failures: list[str] = []
+    expected_fields = set(SUT_ARTIFACT_MODES)
+    if set(value) != expected_fields:
+        failures.append(
+            f"{label}: expected exactly {sorted(expected_fields)}"
+        )
+    for field in sorted(expected_fields):
+        failures.extend(
+            non_negative_integer_failure(value.get(field), f"{label}.{field}")
+        )
+    return failures
+
+
+def conformance_case_contract_failures(value: Any, label: str) -> list[str]:
+    if not isinstance(value, dict):
+        return [f"{label}: expected object"]
+    failures: list[str] = []
+    required_fields = {
+        "case_id",
+        "category",
+        "expected_outcome",
+        "actual_outcome",
+        "expected_should_execute",
+        "actual_should_execute",
+        "expected_primary_reason_code",
+        "actual_primary_reason_code",
+        "expected_reason_codes",
+        "actual_reason_codes",
+        "pass",
+        "failures",
+    }
+    for field in sorted(required_fields - set(value)):
+        failures.append(f"{label}.{field}: required")
+    for field in ("case_id", "category", "expected_outcome", "actual_outcome"):
+        failures.extend(non_empty_string_failure(value.get(field), f"{label}.{field}"))
+    artifact_mode = value.get("artifact_mode")
+    if "artifact_mode" in value and not is_string_enum(
+        artifact_mode,
+        SUT_ARTIFACT_MODES,
+    ):
+        failures.append(
+            f"{label}.artifact_mode: expected one of {sorted(SUT_ARTIFACT_MODES)}"
+        )
+    if not isinstance(value.get("expected_should_execute"), bool):
+        failures.append(f"{label}.expected_should_execute: expected boolean")
+    actual_should_execute = value.get("actual_should_execute")
+    if actual_should_execute is not None and not isinstance(
+        actual_should_execute, bool
+    ):
+        failures.append(
+            f"{label}.actual_should_execute: expected boolean or null"
+        )
+    for field in (
+        "expected_primary_reason_code",
+        "actual_primary_reason_code",
+    ):
+        reason_code = value.get(field)
+        if reason_code is not None and (
+            not isinstance(reason_code, str) or not reason_code
+        ):
+            failures.append(f"{label}.{field}: expected non-empty string or null")
+    failures.extend(
+        string_array_contract_failures(
+            value.get("expected_reason_codes"),
+            f"{label}.expected_reason_codes",
+        )
+    )
+    failures.extend(
+        string_array_contract_failures(
+            value.get("actual_reason_codes"),
+            f"{label}.actual_reason_codes",
+        )
+    )
+    if not isinstance(value.get("pass"), bool):
+        failures.append(f"{label}.pass: expected boolean")
+    if "failures" in value:
+        failures.extend(
+            string_array_contract_failures(
+                value.get("failures"), f"{label}.failures"
+            )
+        )
+    return failures
+
+
+def conformance_case_consistency_failures(value: Any, label: str) -> list[str]:
+    """Validate one report case without re-running raw SUT semantics."""
+    if not isinstance(value, dict):
+        return []
+
+    failures: list[str] = []
+    expected_reason_codes = value.get("expected_reason_codes")
+    actual_reason_codes = value.get("actual_reason_codes")
+    expected_reasons_valid = (
+        isinstance(expected_reason_codes, list)
+        and all(
+            isinstance(code, str) and code
+            for code in expected_reason_codes
+        )
+    )
+    actual_reasons_valid = (
+        isinstance(actual_reason_codes, list)
+        and all(
+            isinstance(code, str) and code
+            for code in actual_reason_codes
+        )
+    )
+    if expected_reasons_valid:
+        derived_expected_primary = primary_reason_code(expected_reason_codes)
+        if value.get("expected_primary_reason_code") != derived_expected_primary:
+            failures.append(
+                f"{label}.expected_primary_reason_code: expected derived value "
+                f"{derived_expected_primary!r}"
+            )
+    if actual_reasons_valid:
+        derived_actual_primary = primary_reason_code(actual_reason_codes)
+        if value.get("actual_primary_reason_code") != derived_actual_primary:
+            failures.append(
+                f"{label}.actual_primary_reason_code: expected derived value "
+                f"{derived_actual_primary!r}"
+            )
+
+    passed = value.get("pass")
+    recorded_failures = value.get("failures")
+    if passed is True:
+        for expected_field, actual_field in (
+            ("expected_outcome", "actual_outcome"),
+            ("expected_should_execute", "actual_should_execute"),
+            (
+                "expected_primary_reason_code",
+                "actual_primary_reason_code",
+            ),
+            ("expected_reason_codes", "actual_reason_codes"),
+        ):
+            if value.get(expected_field) != value.get(actual_field):
+                failures.append(
+                    f"{label}.{actual_field}: pass=true requires equality with "
+                    f"{expected_field}"
+                )
+        if recorded_failures != []:
+            failures.append(f"{label}.failures: pass=true requires an empty array")
+    elif passed is False:
+        if not isinstance(recorded_failures, list) or not recorded_failures:
+            failures.append(
+                f"{label}.failures: pass=false requires at least one failure"
+            )
+    return failures
+
+
+def conformance_cases_consistency_failures(cases: Any) -> list[str]:
+    if not isinstance(cases, list):
+        return []
+    failures: list[str] = []
+    for index, case in enumerate(cases):
+        failures.extend(
+            conformance_case_consistency_failures(case, f"cases[{index}]")
+        )
+    return failures
+
+
+def implementation_case_contract_failures(value: Any, label: str) -> list[str]:
+    if not isinstance(value, dict):
+        return [f"{label}: expected object"]
+    failures: list[str] = []
+    required_fields = {
+        "case_id",
+        "expected_outcome",
+        "actual_outcome",
+        "expected_should_execute",
+        "actual_should_execute",
+        "expected_primary_reason_code",
+        "actual_primary_reason_code",
+        "pass",
+    }
+    for field in sorted(required_fields - set(value)):
+        failures.append(f"{label}.{field}: required")
+    for field in ("case_id", "expected_outcome", "actual_outcome"):
+        failures.extend(non_empty_string_failure(value.get(field), f"{label}.{field}"))
+    artifact_mode = value.get("artifact_mode")
+    if "artifact_mode" in value and not is_string_enum(
+        artifact_mode,
+        SUT_ARTIFACT_MODES,
+    ):
+        failures.append(
+            f"{label}.artifact_mode: expected one of {sorted(SUT_ARTIFACT_MODES)}"
+        )
+    if not isinstance(value.get("expected_should_execute"), bool):
+        failures.append(f"{label}.expected_should_execute: expected boolean")
+    actual_should_execute = value.get("actual_should_execute")
+    if actual_should_execute is not None and not isinstance(
+        actual_should_execute, bool
+    ):
+        failures.append(
+            f"{label}.actual_should_execute: expected boolean or null"
+        )
+    for field in (
+        "expected_primary_reason_code",
+        "actual_primary_reason_code",
+    ):
+        reason_code = value.get(field)
+        if reason_code is not None and (
+            not isinstance(reason_code, str) or not reason_code
+        ):
+            failures.append(f"{label}.{field}: expected non-empty string or null")
+    if not isinstance(value.get("pass"), bool):
+        failures.append(f"{label}.pass: expected boolean")
+    return failures
+
+
+def report_corpus_contract_failures(
+    value: Any,
+    label: str,
+    *,
+    implementation: bool,
+) -> list[str]:
+    if not isinstance(value, dict):
+        return [f"{label}: expected object"]
+    failures: list[str] = []
+    for field in ("name", "root"):
+        failures.extend(non_empty_string_failure(value.get(field), f"{label}.{field}"))
+    failures.extend(
+        non_negative_integer_failure(
+            value.get("artifact_count"), f"{label}.artifact_count"
+        )
+    )
+    failures.extend(digest_contract_failures(value.get("digest"), f"{label}.digest"))
+    if not implementation:
+        return failures
+    failures.extend(
+        non_negative_integer_failure(
+            value.get("case_count"), f"{label}.case_count"
+        )
+    )
+    manifest = value.get("manifest")
+    if not isinstance(manifest, list):
+        failures.append(f"{label}.manifest: expected array")
+        return failures
+    for index, item in enumerate(manifest):
+        item_label = f"{label}.manifest[{index}]"
+        if not isinstance(item, dict):
+            failures.append(f"{item_label}: expected object")
+            continue
+        failures.extend(
+            non_empty_string_failure(item.get("path"), f"{item_label}.path")
+        )
+        sha256 = item.get("sha256")
+        if not isinstance(sha256, str) or SHA256_HEX_RE.fullmatch(sha256) is None:
+            failures.append(f"{item_label}.sha256: expected lowercase SHA-256 hex")
+    return failures
+
+
+def conformance_report_contract_failures(report: dict[str, Any]) -> list[str]:
+    failures: list[str] = []
+    if report.get("version") != CONFORMANCE_REPORT_VERSION:
+        failures.append(
+            f"version: expected {CONFORMANCE_REPORT_VERSION}"
+        )
+    if report.get("profile") != PROFILE:
+        failures.append(f"profile: expected {PROFILE}")
+    if try_parse_time(report.get("checked_at")) is None:
+        failures.append("checked_at: expected supported RFC3339 timestamp")
+    cases = report.get("cases")
+    if not isinstance(cases, list):
+        failures.append("cases: expected array")
+    else:
+        for index, case in enumerate(cases):
+            failures.extend(
+                conformance_case_contract_failures(case, f"cases[{index}]")
+            )
+    failures.extend(conformance_summary_failures(report.get("summary"), cases))
+    failures.extend(
+        report_corpus_contract_failures(
+            report.get("corpus"), "corpus", implementation=False
+        )
+    )
+    if "fatal_errors" in report:
+        failures.extend(
+            string_array_contract_failures(
+                report.get("fatal_errors"), "fatal_errors"
+            )
+        )
+    if "sut_results" in report:
+        sut_results = report.get("sut_results")
+        if not isinstance(sut_results, dict):
+            failures.append("sut_results: expected object")
+        else:
+            failures.extend(
+                non_empty_string_failure(sut_results.get("path"), "sut_results.path")
+            )
+            failures.extend(
+                digest_contract_failures(
+                    sut_results.get("digest"), "sut_results.digest"
+                )
+            )
+            if sut_results.get("digest_basis") != "json-sorted-no-whitespace":
+                failures.append(
+                    "sut_results.digest_basis: expected json-sorted-no-whitespace"
+                )
+            if not is_string_enum(
+                sut_results.get("artifact_mode"),
+                SUT_ARTIFACT_MODES,
+            ):
+                failures.append(
+                    "sut_results.artifact_mode: expected supported artifact mode"
+                )
+            failures.extend(
+                artifact_mode_counts_contract_failures(
+                    sut_results.get("artifact_mode_counts"),
+                    "sut_results.artifact_mode_counts",
+                )
+            )
+            if not isinstance(sut_results.get("implementation"), dict):
+                failures.append("sut_results.implementation: expected object")
+    return failures
+
+
+def implementation_report_contract_failures(report: dict[str, Any]) -> list[str]:
+    failures: list[str] = []
+    if report.get("version") != IMPLEMENTATION_REPORT_VERSION:
+        failures.append(
+            f"version: expected {IMPLEMENTATION_REPORT_VERSION}"
+        )
+    if report.get("profile") != PROFILE:
+        failures.append(f"profile: expected {PROFILE}")
+    if try_parse_time(report.get("generated_at")) is None:
+        failures.append("generated_at: expected supported RFC3339 timestamp")
+    if not is_string_enum(
+        report.get("status"),
+        {"pass", "fail", "partial", "not_applicable"},
+    ):
+        failures.append("status: expected pass, fail, partial, or not_applicable")
+    implementation = report.get("implementation")
+    if not isinstance(implementation, dict):
+        failures.append("implementation: expected object")
+    else:
+        for field in ("name", "type", "version", "language"):
+            failures.extend(
+                non_empty_string_failure(
+                    implementation.get(field), f"implementation.{field}"
+                )
+            )
+        for field in ("source", "commit", "environment"):
+            if field in implementation:
+                failures.extend(
+                    non_empty_string_failure(
+                        implementation.get(field), f"implementation.{field}"
+                    )
+                )
+    failures.extend(
+        report_corpus_contract_failures(
+            report.get("corpus"), "corpus", implementation=True
+        )
+    )
+    conformance_report = report.get("conformance_report")
+    if not isinstance(conformance_report, dict):
+        failures.append("conformance_report: expected object")
+    else:
+        failures.extend(
+            non_empty_string_failure(
+                conformance_report.get("uri"), "conformance_report.uri"
+            )
+        )
+        if (
+            conformance_report.get("media_type")
+            != "application/vate-conformance-report+json"
+        ):
+            failures.append(
+                "conformance_report.media_type: expected "
+                "application/vate-conformance-report+json"
+            )
+        failures.extend(
+            digest_contract_failures(
+                conformance_report.get("digest"), "conformance_report.digest"
+            )
+        )
+        if not is_string_enum(
+            conformance_report.get("digest_basis"),
+            {"json-sorted-no-whitespace", "exact-bytes"},
+        ):
+            failures.append(
+                "conformance_report.digest_basis: expected supported digest basis"
+            )
+    case_results = report.get("case_results")
+    if not isinstance(case_results, list):
+        failures.append("case_results: expected array")
+    else:
+        for index, case in enumerate(case_results):
+            failures.extend(
+                implementation_case_contract_failures(
+                    case, f"case_results[{index}]"
+                )
+            )
+    failures.extend(
+        conformance_summary_failures(report.get("summary"), case_results)
+    )
+    if "artifact_mode_counts" in report:
+        failures.extend(
+            artifact_mode_counts_contract_failures(
+                report.get("artifact_mode_counts"), "artifact_mode_counts"
+            )
+        )
+    if "limitations" in report:
+        failures.extend(
+            string_array_contract_failures(
+                report.get("limitations"), "limitations"
+            )
+        )
+    return failures
+
+
+def case_collection_failures(
+    value: Any,
+    *,
+    label: str,
+    require_pass: bool,
+) -> tuple[list[str], list[str]]:
+    if not isinstance(value, list):
+        return [], [f"{label}: expected array"]
+    case_ids: list[str] = []
+    failures: list[str] = []
+    seen: set[str] = set()
+    for index, item in enumerate(value):
+        item_label = f"{label}[{index}]"
+        if not isinstance(item, dict):
+            failures.append(f"{item_label}: expected object")
+            continue
+        case_id = item.get("case_id")
+        if not isinstance(case_id, str) or not case_id:
+            failures.append(f"{item_label}.case_id: expected non-empty string")
+        else:
+            if case_id in seen:
+                failures.append(f"{item_label}.case_id: duplicate case_id {case_id}")
+            seen.add(case_id)
+            case_ids.append(case_id)
+        if require_pass and not isinstance(item.get("pass"), bool):
+            failures.append(f"{item_label}.pass: expected boolean")
+    return case_ids, failures
+
+
+def conformance_summary_failures(
+    summary: Any,
+    cases: Any,
+) -> list[str]:
+    if not isinstance(summary, dict):
+        return ["summary: expected object"]
+    if not isinstance(cases, list):
+        return ["cases: expected array before summary arithmetic"]
+    failures: list[str] = []
+    values: dict[str, int] = {}
+    for field in ("total", "passed", "failed", "skipped"):
+        value = summary.get(field)
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            failures.append(f"summary.{field}: expected non-negative integer")
+        else:
+            values[field] = value
+    if len(values) != 4:
+        return failures
+
+    passed = sum(
+        1 for case in cases if isinstance(case, dict) and case.get("pass") is True
+    )
+    failed = sum(
+        1 for case in cases if isinstance(case, dict) and case.get("pass") is False
+    )
+    if values["total"] != len(cases):
+        failures.append(
+            f"summary.total: expected {len(cases)} from cases actual {values['total']}"
+        )
+    if values["passed"] != passed:
+        failures.append(
+            f"summary.passed: expected {passed} from cases actual {values['passed']}"
+        )
+    if values["failed"] != failed:
+        failures.append(
+            f"summary.failed: expected {failed} from cases actual {values['failed']}"
+        )
+    if values["passed"] + values["failed"] != values["total"]:
+        failures.append("summary: passed + failed must equal total")
+    if values["skipped"] > values["failed"]:
+        failures.append("summary.skipped: cannot exceed failed cases")
+    return failures
+
+
+def conformance_case_expectation_failures(
+    cases: Any,
+    corpus_root: Path,
+) -> list[str]:
+    if not isinstance(cases, list):
+        return ["conformance_report.cases: expected array"]
+    expected_by_id = {
+        expected["case_id"]: expected
+        for expected in load_case_expectations(corpus_root)
+    }
+    fields = (
+        "category",
+        "expected_outcome",
+        "expected_should_execute",
+        "expected_primary_reason_code",
+        "expected_reason_codes",
+    )
+    failures: list[str] = []
+    for index, case in enumerate(cases):
+        if not isinstance(case, dict):
+            continue
+        case_id = case.get("case_id")
+        if not isinstance(case_id, str) or not case_id:
+            continue
+        expected = expected_by_id.get(case_id)
+        if expected is None:
+            continue
+        for field in fields:
+            if case.get(field) != expected.get(field):
+                failures.append(
+                    f"conformance_report.cases[{index}].{field}: does not match "
+                    f"canonical case {case_id}"
+                )
+    return failures
 
 
 def summary_status(summary: Any) -> str:
     if not isinstance(summary, dict):
         return "fail"
-    if summary.get("failed"):
+    total = summary.get("total")
+    passed = summary.get("passed")
+    failed = summary.get("failed")
+    skipped = summary.get("skipped")
+    if any(
+        isinstance(value, bool) or not isinstance(value, int) or value < 0
+        for value in (total, passed, failed, skipped)
+    ):
         return "fail"
-    if summary.get("skipped"):
+    if total <= 0 or passed + failed != total or skipped > failed:
+        return "fail"
+    if failed:
+        return "fail"
+    if skipped:
         return "partial"
     return "pass"
 
@@ -3570,6 +5474,40 @@ def verify_report_bundle(
         if sut_results_path
         else None
     )
+    cases_dir = corpus_root / "cases"
+    case_records, case_load_failures = load_corpus_case_records(corpus_root)
+    canonical_case_ids = [case.get("case_id") for _, case in case_records]
+    canonical_case_ids = [
+        case_id for case_id in canonical_case_ids if isinstance(case_id, str)
+    ]
+    add_bundle_check(
+        checks,
+        "corpus.cases.directory",
+        cases_dir.is_dir(),
+        expected="readable cases directory",
+        actual=(display_path(cases_dir.resolve()) if cases_dir.is_dir() else "missing"),
+    )
+    add_bundle_check(
+        checks,
+        "corpus.cases.envelope",
+        not case_load_failures,
+        expected="all case files are valid case objects",
+        actual=case_load_failures,
+    )
+    add_bundle_check(
+        checks,
+        "corpus.cases.non_empty",
+        bool(canonical_case_ids),
+        expected="at least one valid conformance case",
+        actual=len(canonical_case_ids),
+    )
+    add_bundle_check(
+        checks,
+        "corpus.cases.unique",
+        len(canonical_case_ids) == len(set(canonical_case_ids)),
+        expected="unique canonical case_id values",
+        actual=canonical_case_ids,
+    )
     manifest, corpus_digest, manifest_failures = corpus_manifest(corpus_root)
     for index, failure in enumerate(manifest_failures):
         add_bundle_check(
@@ -3579,6 +5517,14 @@ def verify_report_bundle(
             expected="readable regular file",
             actual=failure,
         )
+    for index, failure in enumerate(corpus_sut_input_contract_failures(corpus_root)):
+        add_bundle_check(
+            checks,
+            f"corpus.sut_inputs[{index}]",
+            False,
+            expected="valid authoritative SUT input contract",
+            actual=failure,
+        )
 
     conformance_report = json_object_or_empty(raw_conformance_report, checks, "conformance_report")
     implementation_report = json_object_or_empty(raw_implementation_report, checks, "implementation_report")
@@ -3586,6 +5532,31 @@ def verify_report_bundle(
         json_object_or_empty(raw_sut_results, checks, "sut_results")
         if sut_results_path
         else None
+    )
+    normalized_sut_results = (
+        normalize_sut_results(sut_results, canonical_case_ids)
+        if sut_results_path and isinstance(sut_results, dict)
+        else None
+    )
+    conformance_envelope_failures = conformance_report_contract_failures(
+        conformance_report
+    )
+    add_bundle_check(
+        checks,
+        "conformance_report.envelope",
+        not conformance_envelope_failures,
+        expected="dependency-free conformance report contract",
+        actual=conformance_envelope_failures,
+    )
+    implementation_envelope_failures = implementation_report_contract_failures(
+        implementation_report
+    )
+    add_bundle_check(
+        checks,
+        "implementation_report.envelope",
+        not implementation_envelope_failures,
+        expected="dependency-free implementation report contract",
+        actual=implementation_envelope_failures,
     )
 
     add_bundle_check(
@@ -3617,7 +5588,54 @@ def verify_report_bundle(
         actual=implementation_report.get("profile"),
     )
 
-    corpus_index = read_json(corpus_root / CORPUS_INDEX_FILENAME)
+    raw_corpus_index = read_bundle_json_or_empty(
+        corpus_root / CORPUS_INDEX_FILENAME,
+        checks,
+        "corpus_index",
+    )
+    if isinstance(raw_corpus_index, dict):
+        corpus_index = raw_corpus_index
+    else:
+        add_bundle_check(
+            checks,
+            "corpus_index.shape",
+            False,
+            expected="object",
+            actual=type(raw_corpus_index).__name__,
+        )
+        corpus_index = {}
+    expected_corpus_index_identity = {
+        "version": CORPUS_INDEX_VERSION,
+        "profile": PROFILE,
+        "name": corpus_root.name,
+        "root": display_path(corpus_root.resolve()),
+        "case_schema": display_path(
+            (corpus_root / "conformance-case.schema.json").resolve()
+        ),
+        "digest_basis": {
+            "alg": "sha-256",
+            "canonicalization": (
+                "JSON objects are sorted by key with insignificant whitespace "
+                "removed before hashing."
+            ),
+            "manifest_excludes": [
+                display_path(
+                    (corpus_root / CORPUS_INDEX_FILENAME).resolve()
+                )
+            ],
+        },
+    }
+    actual_corpus_index_identity = {
+        field: corpus_index.get(field)
+        for field in expected_corpus_index_identity
+    }
+    add_bundle_check(
+        checks,
+        "corpus_index.identity",
+        actual_corpus_index_identity == expected_corpus_index_identity,
+        expected=expected_corpus_index_identity,
+        actual=actual_corpus_index_identity,
+    )
     add_bundle_check(
         checks,
         "corpus_index.digest",
@@ -3632,6 +5650,137 @@ def verify_report_bundle(
         details="committed corpus.json manifest matches the recomputed corpus manifest",
     )
 
+    corpus_index_case_ids, corpus_index_case_failures = case_collection_failures(
+        corpus_index.get("cases"),
+        label="corpus_index.cases",
+        require_pass=False,
+    )
+    add_bundle_check(
+        checks,
+        "corpus_index.cases.shape",
+        not corpus_index_case_failures,
+        expected="case objects with unique non-empty case_id values",
+        actual=corpus_index_case_failures,
+    )
+    add_bundle_check(
+        checks,
+        "corpus_index.cases.coverage",
+        not corpus_index_case_failures
+        and bool(canonical_case_ids)
+        and sorted(corpus_index_case_ids) == sorted(canonical_case_ids),
+        expected=sorted(canonical_case_ids),
+        actual=sorted(corpus_index_case_ids),
+    )
+    expected_index_cases = [
+        case_index_entry(case_path) for case_path, _ in case_records
+    ]
+    add_bundle_check(
+        checks,
+        "corpus_index.cases.entries",
+        corpus_index.get("cases") == expected_index_cases,
+        details="corpus index case entries match the loaded canonical case files",
+    )
+    corpus_index_summary = corpus_index.get("summary")
+    expected_category_counts = category_counts(
+        [case for _, case in case_records]
+    )
+    add_bundle_check(
+        checks,
+        "corpus_index.summary.case_count",
+        isinstance(corpus_index_summary, dict)
+        and corpus_index_summary.get("case_count") == len(canonical_case_ids),
+        expected=len(canonical_case_ids),
+        actual=(
+            corpus_index_summary.get("case_count")
+            if isinstance(corpus_index_summary, dict)
+            else None
+        ),
+    )
+    add_bundle_check(
+        checks,
+        "corpus_index.summary.category_counts",
+        isinstance(corpus_index_summary, dict)
+        and corpus_index_summary.get("category_counts") == expected_category_counts,
+        expected=expected_category_counts,
+        actual=(
+            corpus_index_summary.get("category_counts")
+            if isinstance(corpus_index_summary, dict)
+            else None
+        ),
+    )
+    corpus_index_artifact_count = (
+        corpus_index_summary.get("artifact_count")
+        if isinstance(corpus_index_summary, dict)
+        else None
+    )
+    add_bundle_check(
+        checks,
+        "corpus_index.summary.artifact_count",
+        isinstance(corpus_index_artifact_count, int)
+        and not isinstance(corpus_index_artifact_count, bool)
+        and corpus_index_artifact_count == len(manifest),
+        expected=len(manifest),
+        actual=corpus_index_artifact_count,
+    )
+
+    conformance_cases = conformance_report.get("cases")
+    conformance_case_ids, conformance_case_failures = case_collection_failures(
+        conformance_cases,
+        label="conformance_report.cases",
+        require_pass=True,
+    )
+    add_bundle_check(
+        checks,
+        "conformance_report.cases.shape",
+        not conformance_case_failures,
+        expected="case result objects with unique case_id and boolean pass",
+        actual=conformance_case_failures,
+    )
+    add_bundle_check(
+        checks,
+        "conformance_report.cases.coverage",
+        not conformance_case_failures
+        and bool(canonical_case_ids)
+        and sorted(conformance_case_ids) == sorted(canonical_case_ids),
+        expected=sorted(canonical_case_ids),
+        actual=sorted(conformance_case_ids),
+    )
+    expectation_failures = conformance_case_expectation_failures(
+        conformance_cases,
+        corpus_root,
+    )
+    add_bundle_check(
+        checks,
+        "conformance_report.cases.expectations",
+        not expectation_failures,
+        expected="canonical expected case projection",
+        actual=expectation_failures,
+    )
+    conformance_consistency_failures = (
+        conformance_cases_consistency_failures(conformance_cases)
+    )
+    add_bundle_check(
+        checks,
+        "conformance_report.cases.internal_consistency",
+        not conformance_consistency_failures,
+        expected=(
+            "pass cases have matching expected/actual projections and no failures; "
+            "failed cases carry at least one failure"
+        ),
+        actual=conformance_consistency_failures,
+    )
+    conformance_arithmetic_failures = conformance_summary_failures(
+        conformance_report.get("summary"),
+        conformance_cases,
+    )
+    add_bundle_check(
+        checks,
+        "conformance_report.summary.arithmetic",
+        not conformance_arithmetic_failures,
+        expected="summary counts derived from cases",
+        actual=conformance_arithmetic_failures,
+    )
+
     conformance_corpus = conformance_report.get("corpus", {})
     add_bundle_check(
         checks,
@@ -3639,6 +5788,20 @@ def verify_report_bundle(
         isinstance(conformance_corpus, dict) and conformance_corpus.get("digest") == corpus_digest,
         expected=corpus_digest,
         actual=conformance_corpus.get("digest") if isinstance(conformance_corpus, dict) else None,
+    )
+    conformance_artifact_count = (
+        conformance_corpus.get("artifact_count")
+        if isinstance(conformance_corpus, dict)
+        else None
+    )
+    add_bundle_check(
+        checks,
+        "conformance_report.corpus.artifact_count",
+        isinstance(conformance_artifact_count, int)
+        and not isinstance(conformance_artifact_count, bool)
+        and conformance_artifact_count == len(manifest),
+        expected=len(manifest),
+        actual=conformance_artifact_count,
     )
 
     implementation_corpus = implementation_report.get("corpus", {})
@@ -3654,6 +5817,55 @@ def verify_report_bundle(
         "implementation_report.corpus.manifest",
         isinstance(implementation_corpus, dict) and implementation_corpus.get("manifest") == manifest,
         details="implementation report manifest matches the recomputed corpus manifest",
+    )
+    add_bundle_check(
+        checks,
+        "implementation_report.corpus.case_count",
+        isinstance(implementation_corpus, dict)
+        and implementation_corpus.get("case_count") == len(canonical_case_ids),
+        expected=len(canonical_case_ids),
+        actual=(
+            implementation_corpus.get("case_count")
+            if isinstance(implementation_corpus, dict)
+            else None
+        ),
+    )
+    implementation_artifact_count = (
+        implementation_corpus.get("artifact_count")
+        if isinstance(implementation_corpus, dict)
+        else None
+    )
+    add_bundle_check(
+        checks,
+        "implementation_report.corpus.artifact_count",
+        isinstance(implementation_artifact_count, int)
+        and not isinstance(implementation_artifact_count, bool)
+        and implementation_artifact_count == len(manifest),
+        expected=len(manifest),
+        actual=implementation_artifact_count,
+    )
+
+    implementation_cases = implementation_report.get("case_results")
+    implementation_case_ids, implementation_case_failures = case_collection_failures(
+        implementation_cases,
+        label="implementation_report.case_results",
+        require_pass=True,
+    )
+    add_bundle_check(
+        checks,
+        "implementation_report.case_results.shape",
+        not implementation_case_failures,
+        expected="case result objects with unique case_id and boolean pass",
+        actual=implementation_case_failures,
+    )
+    add_bundle_check(
+        checks,
+        "implementation_report.case_results.coverage",
+        not implementation_case_failures
+        and bool(canonical_case_ids)
+        and sorted(implementation_case_ids) == sorted(canonical_case_ids),
+        expected=sorted(canonical_case_ids),
+        actual=sorted(implementation_case_ids),
     )
 
     conformance_digest = digest_descriptor(raw_conformance_report)
@@ -3727,14 +5939,40 @@ def verify_report_bundle(
         sut_digest = digest_descriptor(sut_results)
         sut_corpus = sut_results.get("corpus", {}) if isinstance(sut_results, dict) else {}
         submitted_default_mode = (
-            sut_results.get("artifact_mode", SUT_ARTIFACT_MODE_CORPUS)
-            if isinstance(sut_results, dict)
+            normalized_sut_results["default_artifact_mode"]
+            if isinstance(normalized_sut_results, dict)
             else None
         )
         submitted_mode_counts = (
-            effective_sut_artifact_mode_counts(sut_results, corpus_root)
-            if isinstance(sut_results, dict)
+            effective_sut_artifact_mode_counts(normalized_sut_results)
+            if isinstance(normalized_sut_results, dict)
             else None
+        )
+        sut_envelope_failures = (
+            sut_result_envelope_failures(sut_results)
+            if isinstance(sut_results, dict)
+            else ["sut_results: expected object"]
+        )
+        add_bundle_check(
+            checks,
+            "sut_results.envelope",
+            not sut_envelope_failures,
+            expected="valid SUT result envelope",
+            actual=sut_envelope_failures,
+        )
+        sut_structure_failures = (
+            normalized_sut_results["structural_failures"]
+            if isinstance(normalized_sut_results, dict)
+            else ["sut_results: expected object"]
+        )
+        add_bundle_check(
+            checks,
+            "sut_results.results.structure",
+            not sut_structure_failures,
+            expected=(
+                "result objects with unique non-empty canonical case_id values"
+            ),
+            actual=sut_structure_failures,
         )
         add_bundle_check(
             checks,
@@ -3801,13 +6039,49 @@ def verify_report_bundle(
                 else None
             ),
         )
-        if isinstance(sut_results, dict):
+        projection_failures = (
+            sut_result_report_projection_failures(
+                normalized_sut_results,
+                conformance_cases,
+            )
+            if isinstance(normalized_sut_results, dict)
+            else ["sut_results: expected normalized result set"]
+        )
+        add_bundle_check(
+            checks,
+            "conformance_report.cases.sut_actual_projection",
+            not sut_structure_failures and not projection_failures,
+            expected=(
+                "actual projection and non-completed state failures derived "
+                "from the supplied SUT result"
+            ),
+            actual=(sut_structure_failures + projection_failures),
+        )
+        if isinstance(normalized_sut_results, dict):
             add_generated_artifact_bundle_checks(
                 checks,
-                sut_results,
+                normalized_sut_results,
                 sut_results_path,
                 corpus_root,
             )
+        expected_skipped = (
+            normalized_sut_results["skipped_count"]
+            if isinstance(normalized_sut_results, dict)
+            else 0
+        )
+        conformance_summary = conformance_report.get("summary")
+        add_bundle_check(
+            checks,
+            "conformance_report.summary.skipped",
+            isinstance(conformance_summary, dict)
+            and conformance_summary.get("skipped") == expected_skipped,
+            expected=expected_skipped,
+            actual=(
+                conformance_summary.get("skipped")
+                if isinstance(conformance_summary, dict)
+                else None
+            ),
+        )
     else:
         add_bundle_check(
             checks,
@@ -3815,6 +6089,19 @@ def verify_report_bundle(
             conformance_sut is None,
             expected="no SUT result file is required for a reference run bundle",
             actual="SUT result file missing" if conformance_sut is not None else "not applicable",
+        )
+        conformance_summary = conformance_report.get("summary")
+        add_bundle_check(
+            checks,
+            "conformance_report.summary.skipped",
+            isinstance(conformance_summary, dict)
+            and conformance_summary.get("skipped") == 0,
+            expected=0,
+            actual=(
+                conformance_summary.get("skipped")
+                if isinstance(conformance_summary, dict)
+                else None
+            ),
         )
 
     failed = sum(1 for check in checks if not check["pass"])
@@ -4057,7 +6344,12 @@ def main() -> int:
             return 1
         return 0
     if args.command == "index":
-        write_json(Path(args.out), make_corpus_index(Path(args.corpus_root)))
+        try:
+            index = make_corpus_index(Path(args.corpus_root))
+        except (OSError, UnicodeDecodeError, ValueError, RuntimeError) as exc:
+            print(f"corpus index generation failed: {exc}", file=sys.stderr)
+            return 1
+        write_json(Path(args.out), index)
         return 0
     if args.command == "compare":
         report = compare_sut_results(Path(args.corpus_root), Path(args.sut_results))

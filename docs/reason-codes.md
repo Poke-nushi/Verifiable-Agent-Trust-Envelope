@@ -90,6 +90,7 @@ digest-bound commitment to that hidden material.
 - `PERMIT_REVOKED` - current status revoked the permit
 - `STATUS_REVOKED` - current status revoked, suspended, or quarantined required evidence
 - `STATUS_STALE` - status evidence was too old for the profile policy
+- `STATUS_UNAVAILABLE` - a profile-required status source was unavailable at admission time
 - `REPLAY_DETECTED` - an admission request or receipt nonce was reused when one-time use was required
 
 ### Policy And Execution

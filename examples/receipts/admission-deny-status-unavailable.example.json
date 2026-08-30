@@ -1,0 +1,50 @@
+{
+  "version": "vate-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "receipt_type": "admission",
+  "receipt_id": "admrec-20260701-status-unavailable-001",
+  "issued_at": "2026-07-01T00:09:08Z",
+  "expires_at": "2026-07-01T00:19:08Z",
+  "verifier": {
+    "id": "did:web:verifier.example"
+  },
+  "request": {
+    "request_id": "areq-20260701-status-unavailable-001",
+    "transaction_id": "txn-20260701-status-unavailable-001",
+    "action": "calendar.event.create",
+    "input_hash": "sha-256:7f8340348335a28141b51be7419aaa2c5b64a65d5c55574989b24050587abebc"
+  },
+  "subject": {
+    "principal": "did:web:user.example",
+    "actor": "did:web:agent.example",
+    "runtime": "spiffe://agent.example/workload/calendar-agent"
+  },
+  "evidence": [
+    {
+      "type": "status_bundle",
+      "uri": "https://status.example/bundles/status-unavailable-001",
+      "digest": {
+        "alg": "sha-256",
+        "value": "90358a518fc4cf3ec98912007e41fb701901710bac03eb373979981314fc90ac"
+      },
+      "verification": {
+        "result": "unavailable",
+        "checked_at": "2026-07-01T00:09:05Z",
+        "method": "status-check",
+        "failure_reason": "The profile-required status source was unavailable at admission time."
+      }
+    }
+  ],
+  "policy": {
+    "policy_id": "al2-calendar-write",
+    "policy_version": "2026-07-01.1",
+    "policy_ref": "https://verifier.example/policies/al2-calendar-write/2026-07-01.1"
+  },
+  "decision": {
+    "outcome": "deny",
+    "reason_codes": [
+      "STATUS_UNAVAILABLE",
+      "FAIL_CLOSED"
+    ]
+  }
+}
