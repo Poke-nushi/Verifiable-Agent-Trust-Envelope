@@ -15,8 +15,8 @@ resulting receipt to later outcome evidence.
 [![DOI](https://zenodo.org/badge/1214949350.svg)](https://doi.org/10.5281/zenodo.19839768)
 
 <picture>
-  <source media="(max-width: 600px)" srcset="docs/figures/where-trust-envelope-fits-readme-mobile.png" width="900" height="1200">
-  <img src="docs/figures/where-trust-envelope-fits-readme.png" width="1600" height="900" alt="One request and evidence references flow into local VATE admission and an allow, attenuate, or deny receipt; an implementation-owned handoff gate reaches a target or stops, and later outcome evidence links back to the admission receipt.">
+  <source media="(max-width: 600px)" srcset="docs/figures/where-trust-envelope-fits-readme-mobile.png">
+  <img src="docs/figures/where-trust-envelope-fits-readme.png" alt="One request and evidence references flow into local VATE admission and an allow, attenuate, or deny receipt; an implementation-owned handoff gate reaches a target or stops, and later outcome evidence links back to the admission receipt.">
 </picture>
 
 [Open the accessible HTML diagram](docs/figures/where-trust-envelope-fits.html).
