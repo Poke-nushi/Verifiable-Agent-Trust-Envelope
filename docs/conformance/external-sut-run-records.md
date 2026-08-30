@@ -23,13 +23,161 @@ evidence for that exact pinned snapshot.
 
 A later 72-case `main` snapshot recorded corpus digest
 `0eb1969ea3763e0fec123de5ea0dacb225eb48a28d76866bbec56dc61d16cf8f`.
-The 75-case snapshot introduced by the RCL carry-plus-projection change records
-corpus digest
+The Pulse record below was evaluated against the 75-case snapshot at VATE
+commit `5a37f87de0190da44e619b1800261637e83dd7ed`. That snapshot records 212
+manifest artifacts and corpus digest
 `988aae7d03dd5bb743e8e03e6ab1120ce8735a4837ac818ffd9d665de0c1e370`.
-The AlgoVoi records validate neither subsequent snapshot nor any future corpus
-bytes. Reviewers should resolve the current digest from
+
+The 76-case `main` snapshot at commit
+`094146757709be01912abf9308781057c81067ad` records 216 manifest artifacts and
+corpus digest
+`195aad6651911be243b5ccbc87fa93d5ca9e46b3ccde1b14cb4688b2089473d7`.
+The records below validate only their named snapshot and no later or future
+corpus bytes. Reviewers should resolve the current digest from
 `conformance/al2-vate-v0.3/corpus.json`; a submission for a different digest
 requires its own comparison record.
+
+## Pulse Three-Case Bounded External SUT Run
+
+This is a solicited, candidate-executed external SUT record for three selected
+AP2 human-not-present cases. The Pulse maintainer supplied the mapping and
+projection source, generated fresh Pulse inputs, executed the frozen native
+Pulse verifier, preserved its raw reports, and published the resulting VATE
+comparison bundle. VATE supplied the fixed input contract and later performed
+a focused intake confirmation. This is not organic adoption or a full-corpus
+Pulse implementation.
+
+Source discussion:
+
+- accepted reciprocal scope and fixed pins:
+  `https://github.com/shibutatsu/pulse-ap2-x402-conformance/issues/18#issuecomment-5448061291`
+- corrected candidate delivery:
+  `https://github.com/shibutatsu/pulse-ap2-x402-conformance/issues/18#issuecomment-5466231021`
+- VATE focused confirmation:
+  `https://github.com/shibutatsu/pulse-ap2-x402-conformance/issues/18#issuecomment-5468193500`
+
+External artifact location:
+
+- corrected evidence directory:
+  `https://github.com/shibutatsu/pulse-ap2-x402-conformance/tree/3bb52c400535f28ee3f5d2e0a2bdb01e9c45c407/evidence/vate-pulse-bounded-2026-08-30`
+- evidence correction PR:
+  `https://github.com/shibutatsu/pulse-ap2-x402-conformance/pull/55`
+- evidence merge commit:
+  `3bb52c400535f28ee3f5d2e0a2bdb01e9c45c407`
+
+Fixed revisions:
+
+- VATE source and corpus:
+  `5a37f87de0190da44e619b1800261637e83dd7ed`
+- corrected VATE starter and validator:
+  `04e2cfaaca1843b67d88d558ccbf4e69d4f14179`
+- candidate-owned mapper and worksheet:
+  `1ee413652f11e720a0da7ffb318e91d87a447d4c`
+- frozen Pulse verifier:
+  `e06a6cbfe3ddb965c8fc70f50838f5014ec2038e`
+- frozen Pulse entry point: `src/verifier.ts#verifyConformanceCase`
+
+Implementation identifier reported by the submitted SUT result:
+
+- name: `Pulse AP2-x402 external VATE attempt`
+- type: `external-verifier-projection`
+- version: `vate-pulse-mapper/0.2`
+- language: `Python standard library`
+- source: `https://github.com/shibutatsu/pulse-ap2-x402-conformance.git`
+- candidate commit: `1ee413652f11e720a0da7ffb318e91d87a447d4c`
+
+Candidate execution record:
+
+- evidence class: `candidate-executed`
+- attempt status: `completed`
+- mapper command: `python3 -I -S -B mapper.py`
+- recorded runtime: Python `3.14.4`
+- recorded runtime raw SHA-256:
+  `02a8df1726463faedb3adef289b3d1bdeabb7785c837fd8c174023aeeeb4d312`
+- mapper commit export: two tracked regular files, 135652 total bytes, inventory
+  SHA-256
+  `502815fd598e123ed603329936653840aaee038c80f4819b50f1fa6beb145631`
+- the candidate record declares no external packages, runtime network access,
+  or writes to the fresh commit export;
+- the run contract includes four randomized sensitivity dimensions for each
+  selected case: amount, merchant, evaluation time, and replay nonce.
+
+Selected results:
+
+| VATE case | Frozen Pulse observation | Relation to VATE |
+|---|---|---|
+| `allow-ap2-hnp-preauthorized-mandate` | `allow`; `EVIDENCE_VERIFIED`, `POLICY_MATCH` | match |
+| `attenuate-ap2-hnp-amount-overrun` | `deny`; `AP2_X402_AMOUNT_MISMATCH` | explicit mismatch: VATE expects `attenuate` |
+| `deny-ap2-hnp-stale-mandate` | `deny`; `PERMIT_EXPIRED`, `FAIL_CLOSED` | match |
+
+Key submitted artifacts:
+
+| File | Raw file SHA-256 | `json-sorted-no-whitespace` SHA-256 |
+|---|---|---|
+| `starter-manifest.json` | `af8a13ff90a48f442b4306d44e4944b854bea019215adfccf0b11805d6c1d266` | `34a8ea2210e7d74bd363bf4e3f668adb07d3c691d8a253cc1bef5d7d6a468c37` |
+| `mapping-source/mapper.py` | `85c87df9a5e4d33c6d68078212a7f94f3271c22b8a69d5c20f526b3879073efb` | n/a |
+| `mapping-worksheet.json` | `270ae12d7dd4e3ef0149a26ef234c53aee4d40a74e93f74c49c93e5f813cd91c` | `5476e0064ad295561e3948f1c6ad718dfc2583c6c93db82ced97e6f22fbdcb1d` |
+| `raw-pulse-output.json` | `12d024b44ff5ddbe3aa3ebf0d116a762fdb1376dc4950399b7380515628d8e96` | `5777a10c3849e6b608a71345f149998d9880949a0455f972df8da51fa640d32f` |
+| `pulse-sut-result.json` | `71739b6e4bbf9e30075bfb1e15415cc9e23f37923188bba87b9ab967f59c61e9` | `edfd466c3bd6de3e6819109dcafc03348107ce4c7697bd520c9042117e09d00c` |
+| `vate-compare-report.json` | `013ce2e58849f88606244edb5825ea892ccae1eddf2afcd8fc7e99e0cf719006` | `92e7d9db4de1d0bf0b30aa94ee71eeec11ea70e2d38c5a36f64750e11dbf349e` |
+| `vate-implementation-report.json` | `2754ca5a6754042aef6e927c119ddf1ab853f0a93129982d4c740c2c71a132d1` | `a0c30a9b3ecf61d389ad12cd1caffd6c13c170cc307aab477ccdfd28873da49c` |
+| `vate-bundle-verification.json` | `d5701305f1af32133a301f9f42710bbeeed5fb5f3f90370b334e47fa9aba84ed` | `1aa323f4514808a44dcc3eb990934d8632655a6694374878d326ecfbb9fecfab` |
+
+The third column uses the `json-sorted-no-whitespace` basis used by the fixed
+VATE runner for report and bundle-integrity descriptors. Raw SHA-256 values
+identify the fetched file bytes at the evidence merge commit.
+
+VATE focused confirmation on 2026-08-30:
+
+- the candidate delta from the original delivery commit `ce125db` to the
+  corrected commit `1ee4136` changed only `mapping-worksheet.json`;
+- `mapper.py` remained byte-identical;
+- the five corrected worksheet leaves now identify the direct VATE source,
+  source pointer, dependency, transform, and `vate-derived` provenance;
+- all 15 evidence references named by the corrected run record matched their
+  raw SHA-256 values;
+- fixed VATE reference run: `75 passed / 0 failed`;
+- `compare`: `2 passed / 73 failed / 72 skipped / 75 total`, exit `1`;
+- implementation report status: `fail`;
+- `verify-bundle`: `27 passed / 0 failed`, exit `0`.
+
+Result interpretation:
+
+- exactly three selected cases were executed; the other 72 entries are
+  explicit `skipped` / `out-of-scope` records;
+- the fixed runner counts every skipped entry as a comparison failure, so the
+  `73 failed` summary means one executed semantic mismatch plus 72 unexecuted
+  cases, not 73 failed Pulse executions;
+- the amount-overrun result is retained as a real design difference: VATE
+  records `attenuate`, while frozen Pulse reports a deny/non-attenuate result;
+- the `27/27` bundle result establishes the recorded local digest chain. It
+  does not convert the semantic mismatch into a pass.
+
+Runtime and replay boundary:
+
+- the corrected candidate evidence records Python `3.14.4` and its runtime
+  digest;
+- the VATE maintainer host used for the focused confirmation exposed Python
+  `3.14.3`, so that pass did not claim byte-identical reproduction of the
+  candidate runtime;
+- the mapper is unchanged from the earlier intake, where its map and projection
+  outputs and the frozen Pulse reports were reproduced under a separately
+  recorded reviewer runtime, including all 12 sensitivity probes;
+- this disclosed runtime difference limits the replay claim but does not change
+  the candidate-owned execution record or the observed three-case results.
+
+Claim boundary:
+
+- this is one solicited, bounded external SUT run against one fixed 75-case
+  VATE snapshot;
+- it records two matching selected decisions and one explicit semantic
+  mismatch;
+- it does not validate the current 76-case corpus or the other 72 cases in the
+  fixed snapshot;
+- it is not a Pulse security audit, organic adoption, endorsement,
+  certification, production approval, passing full-corpus result, or general
+  compatibility claim;
+- it does not complete Pulse Issue #18.
 
 ## AlgoVoi Three-Case External Adapter Run
 
