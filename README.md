@@ -75,6 +75,7 @@ a human-in-the-loop workflow product.
 - `v0.3.0 archived May 10, 2026 AL2 verifier admission hardening snapshot`
 - `v0.3.1 archived May 14, 2026 credibility and reviewability patch`
 - `v0.3.2 archived July 6, 2026 external review portability and reproducibility patch`
+- `v0.4.0 release candidate on main; not yet tagged or archived`
 - `not production-ready`
 - `not an official A2A extension, endorsement, certification, SDK, middleware package, or general compatibility proof`
 - `not an A2A core proposal or universal trust layer`
@@ -86,10 +87,15 @@ Current repository state:
 - **Repository type**: protocol discussion draft
 - **Document maturity**: early draft
 - **Primary language**: English
-- **Roadmap refresh date**: 2026-07-27
+- **Roadmap refresh date**: 2026-08-31
 - **Primary battlefield**: `AL2` external digital write
 - **Current archived snapshot with version DOI**: `v0.3.2` external review
   portability and reproducibility patch
+- **Active main-branch artifact line**: `2026-09`, under v0.4.0 release-candidate
+  review; the AL2 profile identifier remains
+  `VATE-AL2-Verifier-Admission-v0.3`
+- **Active main-branch corpus**: 76 cases / 216 manifest artifacts ·
+  `sha-256:b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130`
 - **Implemented artifacts**: v0.3 schemas and examples; a runnable AL2 fixture
   corpus with negative cases; SUT comparison and implementation-reporting
   formats; a dependency-free verifier core and A2A-shaped adapter demo;
@@ -235,7 +241,7 @@ If you are new to the repository, follow:
 9. [docs/receipt-model-v0.3.md](docs/receipt-model-v0.3.md)
 10. [docs/receipt-audit-walkthrough-v0.3.1.md](docs/receipt-audit-walkthrough-v0.3.1.md)
 11. [docs/a2a-maintainer-brief-v0.3.md](docs/a2a-maintainer-brief-v0.3.md)
-12. [docs/profiles/vate-al2-admission-interop-profile-2026-07.md](docs/profiles/vate-al2-admission-interop-profile-2026-07.md)
+12. [docs/profiles/vate-al2-admission-interop-profile-2026-09.md](docs/profiles/vate-al2-admission-interop-profile-2026-09.md)
 13. [conformance/al2-vate-v0.3/README.md](conformance/al2-vate-v0.3/README.md)
 14. [docs/conformance/external-sut-quickstart.md](docs/conformance/external-sut-quickstart.md)
 15. [docs/conformance/implementation-reporting.md](docs/conformance/implementation-reporting.md)
@@ -276,7 +282,7 @@ The most useful feedback is:
   Baseline profile for the current reference battlefield
 - [docs/profiles/vate-al2-verifier-admission-profile-v0.3.md](docs/profiles/vate-al2-verifier-admission-profile-v0.3.md)
   Narrow v0.3 profile for verifier-side AL2 admission decisions
-- [docs/profiles/vate-al2-admission-interop-profile-2026-07.md](docs/profiles/vate-al2-admission-interop-profile-2026-07.md)
+- [docs/profiles/vate-al2-admission-interop-profile-2026-09.md](docs/profiles/vate-al2-admission-interop-profile-2026-09.md)
   Narrow conformance-facing AL2 admission interop profile
 - [docs/profiles/vate-proof-profile-jose-jcs-v0.2.md](docs/profiles/vate-proof-profile-jose-jcs-v0.2.md)
   Review boundary for future JOSE/JCS production proof verification
@@ -303,6 +309,10 @@ The most useful feedback is:
   Archived notes for the v0.3.1 credibility and reviewability patch
 - [docs/release-notes/v0.3.2.md](docs/release-notes/v0.3.2.md)
   Release notes for the v0.3.2 external review portability and reproducibility patch
+- [docs/release-notes/v0.4.0.md](docs/release-notes/v0.4.0.md)
+  Release-candidate notes for the active 2026-09 artifact line
+- [docs/release-gate-v0.4.0.md](docs/release-gate-v0.4.0.md)
+  Local verification gate for the v0.4.0 release candidate
 - [docs/a2a-issue-update-2026-05.md](docs/a2a-issue-update-2026-05.md)
   Short A2A-adjacent issue update draft after the runnable v0.2 artifacts
 - [docs/a2a-metadata-binding-v0.3.md](docs/a2a-metadata-binding-v0.3.md)
@@ -327,7 +337,7 @@ The most useful feedback is:
 - [docs/conformance/digest-basis.md](docs/conformance/digest-basis.md)
   Digest-basis terminology for corpus, SUT results, evidence objects, receipts, and report bundles
 - [docs/conformance/artifact-versioning.md](docs/conformance/artifact-versioning.md)
-  Date-stamped conformance artifact versioning rules for the July 2026 target line
+  Active 2026-09 artifact line and historical 2026-07 validation boundary
 - [docs/conformance/sut-adapter-contract.md](docs/conformance/sut-adapter-contract.md)
   SUT result contract and comparison command for external implementations
 - [docs/conformance/external-implementation-call.md](docs/conformance/external-implementation-call.md)
@@ -337,7 +347,7 @@ The most useful feedback is:
   Short path for external SUT authors to produce, compare, and bundle-check implementation reports
 - [docs/conformance/external-sut-run-records.md](docs/conformance/external-sut-run-records.md)
   Pinned records of externally supplied SUT run artifacts used for review
-- [docs/profiles/vate-jose-proof-profile-notes-2026-07.md](docs/profiles/vate-jose-proof-profile-notes-2026-07.md)
+- [docs/profiles/vate-jose-proof-profile-notes-2026-09.md](docs/profiles/vate-jose-proof-profile-notes-2026-09.md)
   Production JOSE proof profile notes and current detached fixture boundary
 - [conformance/al2-vate-v0.3/README.md](conformance/al2-vate-v0.3/README.md)
   Runnable conformance corpus for v0.3 admission and receipt semantics

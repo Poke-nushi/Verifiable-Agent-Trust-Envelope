@@ -1,5 +1,5 @@
 {
-  "version": "vate-implementation-report-2026-07",
+  "version": "vate-implementation-report-2026-09",
   "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "generated_at": "2026-07-01T00:00:00Z",
   "status": "pass",
@@ -41,7 +41,7 @@
     "digest_basis": "json-sorted-no-whitespace"
   },
   "publication": {
-    "uri": "https://example.invalid/vate/reports/vate-implementation-report-2026-07-example.json",
+    "uri": "https://example.invalid/vate/reports/vate-implementation-report-2026-09-example.json",
     "controlled_origin": "https://example.invalid",
     "published_at": "2026-07-01T00:05:00Z",
     "immutability": "versioned_url"
@@ -49,7 +49,7 @@
   "proofs": [
     {
       "format": "detached_jws",
-      "uri": "https://example.invalid/vate/reports/vate-implementation-report-2026-07-example.json.jws",
+      "uri": "https://example.invalid/vate/reports/vate-implementation-report-2026-09-example.json.jws",
       "key_ref": "did:web:example.invalid#report-signing-key",
       "covered_artifact": "implementation_report"
     }

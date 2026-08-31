@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:vate:schema:jose-proof-fixture:2026-07",
+  "$id": "urn:vate:schema:jose-proof-fixture:2026-09",
   "title": "VATE JOSE Proof Fixture",
   "description": "Dependency-free fixture shape for byte-level detached JWS proof checks.",
   "type": "object",
@@ -20,7 +20,7 @@
   "properties": {
     "version": {
       "type": "string",
-      "const": "vate-jose-proof-fixture-2026-07"
+      "const": "vate-jose-proof-fixture-2026-09"
     },
     "proof_type": {
       "type": "string",

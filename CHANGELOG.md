@@ -2,6 +2,25 @@
 
 This file records dated public changes to the discussion draft.
 
+## 2026-08-31
+
+- Prepared the v0.4.0 release candidate without tagging, publishing, or
+  changing the archived v0.3.2 review anchor.
+- Advanced the active machine-readable conformance artifact line to `2026-09`
+  while retaining the `VATE-AL2-Verifier-Admission-v0.3` profile identifier.
+- Kept historical `2026-07` implementation evidence tied to its exact tag,
+  commit, schemas, and corpus digest instead of relabeling it as current.
+- Split repository sanity checking into an archive-safe static lane and an
+  explicit full-history lane that reloads the historical VATE source commit
+  pinned by the Pulse starter and runs 33 starter-validator negative probes;
+  frozen Pulse verifier replay remains a separate `--pulse-repo` gate.
+- Added a CI check that runs `scripts/check_repo.py` from a `.git`-free Git
+  source archive.
+- Refreshed approved transitive JavaScript dependencies in the lockfile only.
+- Kept the discussion-draft claim boundary: one implementation run against one
+  corpus snapshot, not production readiness, certification, endorsement, or
+  general compatibility.
+
 ## 2026-08-14
 
 - Added the source-pinned RCL-005, RCL-006, and RCL-008 carry-plus-projection

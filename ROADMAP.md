@@ -9,13 +9,18 @@ For public wording rules, see
 
 ## Current Direction
 
-### `post-v0.3.2-additional-implementation-evidence`
+### `v0.4.0-release-candidate`
 
-The `v0.3.2` patch records the initial three-case external adapter-run bundle
-and the portability fixes that bundle surfaced. The run ledger now also records
-a deeper eight-case slice from the same AlgoVoi implementation line. The
-priority now is evidence from a distinct implementation line and
-reproducibility across implementers.
+The v0.4.0 release candidate advances the active machine-readable artifact line
+to `2026-09` while keeping the semantic profile identifier
+`VATE-AL2-Verifier-Admission-v0.3`. It incorporates the external-SUT input,
+generated-receipt, status-evidence, and report-integrity work accumulated after
+v0.3.2. The archived v0.3.2 snapshot remains the public review anchor until an
+actual release and archive are published.
+
+The priority remains evidence from independently maintained implementation
+lines and reproducibility across implementers. The current contract migration
+must not be used to relabel historical `2026-07` results as current evidence.
 
 The next work should not broaden VATE beyond the
 `VATE-AL2-Verifier-Admission-v0.3` boundary. The priority is to move from
@@ -28,8 +33,11 @@ The current public review surface is:
   <https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.3.1>
 - archived `v0.3.1` version DOI:
   `10.5281/zenodo.20173995`
-- `v0.3.2` release notes draft:
+- archived `v0.3.2` release notes:
   [docs/release-notes/v0.3.2.md](docs/release-notes/v0.3.2.md)
+- `v0.4.0` release-candidate notes and local gate:
+  [docs/release-notes/v0.4.0.md](docs/release-notes/v0.4.0.md) and
+  [docs/release-gate-v0.4.0.md](docs/release-gate-v0.4.0.md)
 - archived `v0.3.0` discussion-draft release:
   <https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.3.0>
 - public claim boundary:
@@ -71,9 +79,8 @@ Near-term public work should happen in this order:
    `verify-bundle` report for each submitted corpus snapshot.
 6. Use those results to identify unclear corpus cases, reason-code friction,
    missing artifact bindings, or publication metadata gaps.
-7. Reserve `v0.4.0` for a real profile-surface expansion, such as a new
-   adjacent-protocol profile, a proof-profile decision, or a materially changed
-   conformance contract.
+7. Complete the v0.4.0 gate for the materially changed conformance contract,
+   then make a separate release and archive decision.
 
 Immediate out of scope:
 

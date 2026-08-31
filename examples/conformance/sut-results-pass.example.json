@@ -3,7 +3,7 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "195aad6651911be243b5ccbc87fa93d5ca9e46b3ccde1b14cb4688b2089473d7"
+      "value": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.3"
   },
@@ -38,7 +38,7 @@
             "case_artifact": "jose_proof",
             "digest": {
               "alg": "sha-256",
-              "value": "1f8278484961f780805748ba7f5cb8233a42e62e34b6c0c233ac84531762ea8f"
+            "value": "f756de408702ccc6607184c052639213c4e0a1a0ca8a8bd023448077a1c48939"
             },
             "kind": "jose_proof_package",
             "media_type": "application/vate-jose-proof-fixture+json",
@@ -58,7 +58,7 @@
             "case_artifact": "trust_bundle",
             "digest": {
               "alg": "sha-256",
-              "value": "52eb6aa22275b514446904bac885723303d20ef264d2fdffcf900b1414c6c6bf"
+            "value": "6c09dd56f29ec7b8d9714e7f17cbe2e2b5b20027bb83d9d4266bbfeee7be3de6"
             },
             "kind": "jose_trust_bundle",
             "media_type": "application/vate-trust-bundle+json",
@@ -308,7 +308,7 @@
             "case_artifact": "jose_proof",
             "digest": {
               "alg": "sha-256",
-              "value": "25d61756d37ee5a651747742b0141b127c870a7cb3d2771d53fdb951db0f156c"
+            "value": "32c97a5c2450e609958ad6245be40cab4fcc7ba5b4c4ef257fbe159dcbac027d"
             },
             "kind": "jose_proof_package",
             "media_type": "application/vate-jose-proof-fixture+json",
@@ -318,7 +318,7 @@
             "case_artifact": "detached_payload",
             "digest": {
               "alg": "sha-256",
-              "value": "6f1dbae1c2dd871de2d6b7f25418469adcfdf6430fb492014c0f023b13173c20"
+              "value": "a868c14bb0ec779efe15ba671162b1eb5947d9e98d885e14ab4d0c1ef166a62f"
             },
             "kind": "jose_detached_payload",
             "media_type": "application/json",
@@ -328,7 +328,7 @@
             "case_artifact": "trust_bundle",
             "digest": {
               "alg": "sha-256",
-              "value": "48094e17ffa90464a626edc01ed1eef37e48acfa95659d26460f1ff1926b7e9c"
+              "value": "25432ad1ea1d7ce53aa1ea5bc3a1e22d7acdd8c9d3238d89fc326b34ecbf36b0"
             },
             "kind": "jose_trust_bundle",
             "media_type": "application/vate-trust-bundle+json",
@@ -488,7 +488,7 @@
             "case_artifact": "status_context",
             "digest": {
               "alg": "sha-256",
-              "value": "2e7c403c583e4942c52ecc9cf6b684120948b550f1eb4038f48bcf8a8a9f1d58"
+            "value": "7524e02c2b810780b7f15268a9c570f224a37e064a092cff1ee572441ee8759b"
             },
             "media_type": "application/json",
             "role": "status_evidence",
@@ -660,7 +660,7 @@
             "case_artifact": "status_context",
             "digest": {
               "alg": "sha-256",
-              "value": "f497ea698c75b6ee07c67c1a22b361f139a98e68b417a04859351b57277524d1"
+            "value": "e202af6ed091cabddf8615857ef81e1a1dfb70a3abdfb7b215c92af7caba67a2"
             },
             "media_type": "application/json",
             "role": "status_evidence",
@@ -1336,7 +1336,7 @@
             "case_artifact": "jose_proof",
             "digest": {
               "alg": "sha-256",
-              "value": "28b612a8dc66e287535bc2b88e6d73a8b77ebe4a5389b377cb8df9c8e4651995"
+            "value": "634ffa9edfc4cad077c9e6bf0b25689aa63d81c18dfd28356d74cb1176db1a86"
             },
             "kind": "jose_proof_package",
             "media_type": "application/vate-jose-proof-fixture+json",
@@ -1346,7 +1346,7 @@
             "case_artifact": "detached_payload",
             "digest": {
               "alg": "sha-256",
-              "value": "6f1dbae1c2dd871de2d6b7f25418469adcfdf6430fb492014c0f023b13173c20"
+              "value": "a868c14bb0ec779efe15ba671162b1eb5947d9e98d885e14ab4d0c1ef166a62f"
             },
             "kind": "jose_detached_payload",
             "media_type": "application/json",
@@ -1356,7 +1356,7 @@
             "case_artifact": "trust_bundle",
             "digest": {
               "alg": "sha-256",
-              "value": "48094e17ffa90464a626edc01ed1eef37e48acfa95659d26460f1ff1926b7e9c"
+              "value": "25432ad1ea1d7ce53aa1ea5bc3a1e22d7acdd8c9d3238d89fc326b34ecbf36b0"
             },
             "kind": "jose_trust_bundle",
             "media_type": "application/vate-trust-bundle+json",
@@ -1398,7 +1398,7 @@
             "case_artifact": "jose_proof",
             "digest": {
               "alg": "sha-256",
-              "value": "867b873a4ecd5275a24257392b591a5e6008692707f091fec4b520ba8ca4c3f6"
+            "value": "794b32654427542a577717e6d19f09d8eb7301cdb9e8a17db0516168c23c102b"
             },
             "kind": "jose_proof_package",
             "media_type": "application/vate-jose-proof-fixture+json",
@@ -1408,7 +1408,7 @@
             "case_artifact": "detached_payload",
             "digest": {
               "alg": "sha-256",
-              "value": "6f1dbae1c2dd871de2d6b7f25418469adcfdf6430fb492014c0f023b13173c20"
+              "value": "a868c14bb0ec779efe15ba671162b1eb5947d9e98d885e14ab4d0c1ef166a62f"
             },
             "kind": "jose_detached_payload",
             "media_type": "application/json",
@@ -1418,7 +1418,7 @@
             "case_artifact": "trust_bundle",
             "digest": {
               "alg": "sha-256",
-              "value": "48094e17ffa90464a626edc01ed1eef37e48acfa95659d26460f1ff1926b7e9c"
+              "value": "25432ad1ea1d7ce53aa1ea5bc3a1e22d7acdd8c9d3238d89fc326b34ecbf36b0"
             },
             "kind": "jose_trust_bundle",
             "media_type": "application/vate-trust-bundle+json",
@@ -1460,7 +1460,7 @@
             "case_artifact": "jose_proof",
             "digest": {
               "alg": "sha-256",
-              "value": "d5744746e782a1b37ca344b93592c2bfd6dc6cdf892c003ca782f39b670d6b3a"
+            "value": "958905f1246b13971aece5a69385478201ce1e2182d6c3fa3962232665caca3d"
             },
             "kind": "jose_proof_package",
             "media_type": "application/vate-jose-proof-fixture+json",
@@ -1470,7 +1470,7 @@
             "case_artifact": "detached_payload",
             "digest": {
               "alg": "sha-256",
-              "value": "6f1dbae1c2dd871de2d6b7f25418469adcfdf6430fb492014c0f023b13173c20"
+              "value": "a868c14bb0ec779efe15ba671162b1eb5947d9e98d885e14ab4d0c1ef166a62f"
             },
             "kind": "jose_detached_payload",
             "media_type": "application/json",
@@ -1480,7 +1480,7 @@
             "case_artifact": "trust_bundle",
             "digest": {
               "alg": "sha-256",
-              "value": "48094e17ffa90464a626edc01ed1eef37e48acfa95659d26460f1ff1926b7e9c"
+              "value": "25432ad1ea1d7ce53aa1ea5bc3a1e22d7acdd8c9d3238d89fc326b34ecbf36b0"
             },
             "kind": "jose_trust_bundle",
             "media_type": "application/vate-trust-bundle+json",
@@ -1534,7 +1534,7 @@
             "case_artifact": "jose_proof",
             "digest": {
               "alg": "sha-256",
-              "value": "d11c5f76b3892698fa8942ec0da1f31dab10a01cf1d063e493cdc16142173c2e"
+            "value": "31bbca27962b8d814230efd778e9e6cfe1d52ab4d870883f384c10f26bf9fe6d"
             },
             "kind": "jose_proof_package",
             "media_type": "application/vate-jose-proof-fixture+json",
@@ -1544,7 +1544,7 @@
             "case_artifact": "detached_payload",
             "digest": {
               "alg": "sha-256",
-              "value": "6f1dbae1c2dd871de2d6b7f25418469adcfdf6430fb492014c0f023b13173c20"
+              "value": "a868c14bb0ec779efe15ba671162b1eb5947d9e98d885e14ab4d0c1ef166a62f"
             },
             "kind": "jose_detached_payload",
             "media_type": "application/json",
@@ -1554,7 +1554,7 @@
             "case_artifact": "trust_bundle",
             "digest": {
               "alg": "sha-256",
-              "value": "48094e17ffa90464a626edc01ed1eef37e48acfa95659d26460f1ff1926b7e9c"
+              "value": "25432ad1ea1d7ce53aa1ea5bc3a1e22d7acdd8c9d3238d89fc326b34ecbf36b0"
             },
             "kind": "jose_trust_bundle",
             "media_type": "application/vate-trust-bundle+json",
@@ -1608,7 +1608,7 @@
             "case_artifact": "jose_proof",
             "digest": {
               "alg": "sha-256",
-              "value": "23fdcf8176bbb99ce58e6312163132bd5eff816547e8f955c96e2e287305755f"
+            "value": "215ac4455e62c9cf90adc09f878609ea27af7bbb5a4ab1c9afff1397d42fa0b3"
             },
             "kind": "jose_proof_package",
             "media_type": "application/vate-jose-proof-fixture+json",
@@ -1618,7 +1618,7 @@
             "case_artifact": "detached_payload",
             "digest": {
               "alg": "sha-256",
-              "value": "6f1dbae1c2dd871de2d6b7f25418469adcfdf6430fb492014c0f023b13173c20"
+              "value": "a868c14bb0ec779efe15ba671162b1eb5947d9e98d885e14ab4d0c1ef166a62f"
             },
             "kind": "jose_detached_payload",
             "media_type": "application/json",
@@ -1628,7 +1628,7 @@
             "case_artifact": "trust_bundle",
             "digest": {
               "alg": "sha-256",
-              "value": "48094e17ffa90464a626edc01ed1eef37e48acfa95659d26460f1ff1926b7e9c"
+              "value": "25432ad1ea1d7ce53aa1ea5bc3a1e22d7acdd8c9d3238d89fc326b34ecbf36b0"
             },
             "kind": "jose_trust_bundle",
             "media_type": "application/vate-trust-bundle+json",
@@ -2388,7 +2388,7 @@
             "case_artifact": "status_context",
             "digest": {
               "alg": "sha-256",
-              "value": "ec6af62717e6f5b08570b9ead1e7facd0bebffb03064f35b13885362ca52d866"
+            "value": "576325e89dc500b9542c019c04aad9567de2563644f9b6f0dbdec3c96361171d"
             },
             "media_type": "application/json",
             "role": "status_evidence",
@@ -2422,7 +2422,7 @@
             "case_artifact": "status_context",
             "digest": {
               "alg": "sha-256",
-              "value": "a92c9b87b4d751c325ec6ec35aae8d9d04ecfb076b48b3c52c05f0a4bb5f577c"
+            "value": "8278227c8d3dd691f4dd793c73b86723c0bf7e4978fc40109f74b9e2d8d12139"
             },
             "media_type": "application/json",
             "role": "status_evidence",
@@ -2456,7 +2456,7 @@
             "case_artifact": "status_context",
             "digest": {
               "alg": "sha-256",
-              "value": "a83f8645b96fcaf6e1a4843a0098ec35963e4b05edc75593a2776dca12a55c90"
+            "value": "5045e9bcf3711e2de9431d50befb03662c0c868988dcccd616d2392375a545b2"
             },
             "media_type": "application/json",
             "role": "status_evidence",
@@ -2490,7 +2490,7 @@
             "case_artifact": "status_context",
             "digest": {
               "alg": "sha-256",
-              "value": "9862f157f67306fe563bc0df55fe29037b4ae404fdd30c332f0afb8ef1a48dc2"
+            "value": "15431f2f5cf1258c84a366c0cb52c99181cab9455f323168a8178c52680abc9c"
             },
             "media_type": "application/json",
             "role": "status_evidence",
@@ -3312,5 +3312,5 @@
       "status": "completed"
     }
   ],
-  "version": "vate-sut-results-2026-07"
+  "version": "vate-sut-results-2026-09"
 }

@@ -9,6 +9,7 @@ scripts/check_repo_strict.py when jsonschema is available locally.
 
 from __future__ import annotations
 
+import argparse
 import base64
 import hashlib
 import importlib.util
@@ -34,7 +35,7 @@ VATE_CORE = ROOT / "reference" / "vate-verifier-core" / "vate_verifier_core.py"
 A2A_ADAPTER = ROOT / "reference" / "a2a-metadata-adapter-demo" / "a2a_metadata_adapter_demo.py"
 EVIDENCE_VOCABULARY = ROOT / "registries" / "evidence-vocabulary.v0.3.json"
 ARTIFACT_VERSIONING_DOC = ROOT / "docs" / "conformance" / "artifact-versioning.md"
-JOSE_PROFILE_NOTES_DOC = ROOT / "docs" / "profiles" / "vate-jose-proof-profile-notes-2026-07.md"
+JOSE_PROFILE_NOTES_DOC = ROOT / "docs" / "profiles" / "vate-jose-proof-profile-notes-2026-09.md"
 NAMESPACE_MIGRATION_DOC = ROOT / "docs" / "namespace-migration.md"
 EXTENSION_FIELDS_DOC = ROOT / "docs" / "extension-fields.md"
 A2A_METADATA_BINDING_DOC = ROOT / "docs" / "a2a-metadata-binding-v0.3.md"
@@ -88,7 +89,6 @@ EXAMPLE_PAIRS = [
     ("examples/report-bundle-verification.example.json", "schemas/report-bundle-verification.schema.json"),
     ("examples/conformance/sut-results-pass.example.json", "schemas/sut-result.schema.json"),
     ("examples/external-sut-template/starter-sut-result.template.json", "schemas/sut-result.schema.json"),
-    ("examples/external-sut-pulse-starter/pulse-sut-result.template.json", "schemas/sut-result.schema.json"),
     ("conformance/al2-vate-v0.3/corpus.json", "schemas/conformance-corpus.schema.json"),
     ("examples/policies/merchant-purchase-al2-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),
     ("examples/policies/al2-repo-merge-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),
@@ -271,6 +271,41 @@ def check(root_schema: dict, schema: dict, value, path: str = "root") -> list[st
 
 def run(cmd: list[str], *, cwd: Path = ROOT) -> None:
     subprocess.run(cmd, cwd=cwd, check=True)
+
+
+def historical_pulse_source_is_available() -> bool:
+    if not (ROOT / ".git").exists():
+        return False
+    try:
+        result = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(ROOT),
+                "cat-file",
+                "-e",
+                "5a37f87de0190da44e619b1800261637e83dd7ed^{commit}",
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+    except FileNotFoundError:
+        return False
+    return result.returncode == 0
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--require-full-history",
+        action="store_true",
+        help=(
+            "fail unless the historical VATE source commit pinned by the Pulse "
+            "starter can be reloaded"
+        ),
+    )
+    return parser.parse_args()
 
 
 def run_expect_failure(cmd: list[str], *, cwd: Path = ROOT) -> subprocess.CompletedProcess:
@@ -1784,12 +1819,13 @@ def check_artifact_versioning_docs() -> None:
     text = ARTIFACT_VERSIONING_DOC.read_text(encoding="utf-8")
     normalized_text = " ".join(text.split()).lower()
     required_phrases = [
-        "july 2026 target interop artifact line",
-        "corpus snapshot",
+        "active conformance artifact line on `main` is **`2026-09`**",
+        "historical `2026-07` validation lane",
+        "exact recorded tag or commit",
         "manifest digest",
         "not the publication date",
         "not a production-readiness claim",
-        "do not rename",
+        "intentionally reject a `2026-07` result",
     ]
     missing = [phrase for phrase in required_phrases if phrase not in normalized_text]
     if missing:
@@ -2838,7 +2874,7 @@ def check_status_input_contract_coverage() -> None:
         raise RuntimeError("unavailable status context must reject a carried status value")
 
     optional_unavailable_context = {
-        "version": "vate-status-context-2026-07",
+        "version": "vate-status-context-2026-09",
         "source": "status_bundle",
         "required": False,
         "availability": "unavailable",
@@ -6519,6 +6555,7 @@ def check_rcl_projection_package() -> None:
 
 
 def main() -> int:
+    args = parse_args()
     validate_examples()
     check_evidence_vocabulary_registry()
     check_artifact_versioning_docs()
@@ -6555,7 +6592,28 @@ def main() -> int:
     run([sys.executable, "-m", "py_compile", str(HTTP_DEMO)])
     run([sys.executable, "-m", "py_compile", str(VATE_CONFORMANCE)])
     run([sys.executable, "-m", "py_compile", str(PULSE_EXTERNAL_SUT_STARTER_CHECK)])
-    run([sys.executable, str(PULSE_EXTERNAL_SUT_STARTER_CHECK), "--self-test"])
+    run([sys.executable, str(PULSE_EXTERNAL_SUT_STARTER_CHECK), "--archive-safe"])
+    if historical_pulse_source_is_available():
+        run([sys.executable, str(PULSE_EXTERNAL_SUT_STARTER_CHECK), "--self-test"])
+        print(
+            "Pulse starter full-history gate: ok "
+            "(historical VATE source commit reloaded; 33 validator negative probes passed; "
+            "frozen Pulse verifier replay not run without --pulse-repo)"
+        )
+    elif args.require_full_history:
+        print(
+            "Pulse starter full-history gate required, but historical VATE source commit "
+            "5a37f87de0190da44e619b1800261637e83dd7ed is unavailable; "
+            "frozen Pulse verifier replay was not attempted",
+            file=sys.stderr,
+        )
+        return 2
+    else:
+        print(
+            "Pulse starter full-history gate: not run "
+            "(historical VATE source commit unavailable in this source archive; "
+            "frozen Pulse verifier replay also not run)"
+        )
     run([sys.executable, "-m", "py_compile", str(VATE_CORE)])
     run([sys.executable, "-m", "py_compile", str(A2A_ADAPTER)])
 

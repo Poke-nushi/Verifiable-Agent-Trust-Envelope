@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:vate:schema:report-bundle-verification:2026-07",
+  "$id": "urn:vate:schema:report-bundle-verification:2026-09",
   "title": "VATE Report Bundle Verification",
   "description": "Machine-readable verification result for a VATE corpus, SUT result, conformance report, and implementation report bundle.",
   "type": "object",
@@ -16,7 +16,7 @@
   "properties": {
     "version": {
       "type": "string",
-      "const": "vate-report-bundle-verification-2026-07"
+      "const": "vate-report-bundle-verification-2026-09"
     },
     "profile": {
       "type": "string",

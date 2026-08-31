@@ -2,7 +2,9 @@
 
 ## Status
 
-This is a small interoperability note for the `VATE AL2 Admission Interop Profile 2026-07`.
+This is a semantic interoperability crosswalk for
+`VATE-AL2-Verifier-Admission-v0.3`. It is independent of the active
+machine-readable artifact line and does not relabel historical result bytes.
 
 It does not claim that VATE replaces AP2, UCP, A2A, PSP rails, wallet flows, merchant checkout systems, or banking systems.
 It shows how an AP2 / UCP-style commerce flow can be consumed as VATE evidence at the verifier-side admission boundary.

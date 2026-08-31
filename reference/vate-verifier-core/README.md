@@ -1,6 +1,6 @@
 # VATE Verifier Core
 
-This directory contains a dependency-free reference verifier core for the `VATE AL2 Admission Interop Profile 2026-07`.
+This directory contains a dependency-free reference verifier core for the active `VATE AL2 Admission Interop Profile 2026-09`.
 
 It is intentionally small and not production-ready.
 The purpose is to make admission behavior testable before binding it to A2A, MCP, HTTP, or another transport.

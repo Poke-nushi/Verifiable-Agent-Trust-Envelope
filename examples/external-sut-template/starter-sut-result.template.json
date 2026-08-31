@@ -1,5 +1,5 @@
 {
-  "version": "vate-sut-results-2026-07",
+  "version": "vate-sut-results-2026-09",
   "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "generated_at": "2026-07-07T00:00:00Z",
   "artifact_mode": "corpus-fixture-validation",
@@ -15,7 +15,7 @@
     "profile": "VATE-AL2-Verifier-Admission-v0.3",
     "digest": {
       "alg": "sha-256",
-      "value": "195aad6651911be243b5ccbc87fa93d5ca9e46b3ccde1b14cb4688b2089473d7"
+      "value": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130"
     }
   },
   "results": [

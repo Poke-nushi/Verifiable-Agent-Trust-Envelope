@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:vate:schema:trust-bundle:2026-07",
+  "$id": "urn:vate:schema:trust-bundle:2026-09",
   "title": "VATE Test Trust Bundle",
   "description": "Minimal trust-anchor bundle for VATE AL2 conformance fixtures.",
   "type": "object",
@@ -12,7 +12,7 @@
   "properties": {
     "version": {
       "type": "string",
-      "const": "vate-trust-bundle-2026-07"
+      "const": "vate-trust-bundle-2026-09"
     },
     "trust_bundle_id": {
       "type": "string",

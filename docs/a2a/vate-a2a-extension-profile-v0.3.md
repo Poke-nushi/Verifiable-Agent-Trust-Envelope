@@ -242,7 +242,7 @@ If a deployment uses JOSE/JCS proof packaging, treat that as future production
 proof work, not as a claim made by this v0.3 metadata profile. For the
 non-normative production-proof review boundary carried forward for v0.3, see
 [VATE JOSE/JCS Proof Profile v0.2](../profiles/vate-proof-profile-jose-jcs-v0.2.md)
-and [VATE JOSE Proof Profile Notes 2026-07](../profiles/vate-jose-proof-profile-notes-2026-07.md).
+and [VATE JOSE Proof Profile Notes 2026-09](../profiles/vate-jose-proof-profile-notes-2026-09.md).
 No normative v0.3 production JOSE/JCS proof profile exists yet. The current AL2
 corpus still uses dependency-free byte-level proof fixtures only.
 

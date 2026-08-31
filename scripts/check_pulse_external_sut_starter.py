@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Fail-closed checks for the bounded VATE-to-Pulse external SUT starter.
 
-The checker reads VATE source bytes from the fixed Git object rather than from
-the current checkout.  With --pulse-repo it also verifies that the frozen Pulse
+The full-history checker reads VATE source bytes from the fixed Git object
+rather than from the current checkout.  ``--archive-safe`` instead verifies the
+committed 12-path starter closure against byte-identical files in a source
+archive without claiming that the historical Git object was replayed.  With
+--pulse-repo it also verifies that the frozen Pulse
 checkout and reviewed verifier surface are byte-identical to the recorded pin.
 With --run-bundle it validates completed, partial, or blocked Pulse-side
 records using a closed, starter-specific contract and bundle-local raw-byte
@@ -1085,6 +1088,85 @@ def load_source_snapshot(source_repo: Path) -> SourceSnapshot:
         case_paths.add(case_path)
     require(set(SELECTED_CASE_IDS).issubset(cases_by_id), "fixed corpus is missing a selected case")
     return SourceSnapshot(corpus, blobs, manifest_hashes, cases_by_id)
+
+
+def load_archive_source_snapshot(
+    source_root: Path,
+    manifest: dict[str, Any],
+) -> SourceSnapshot:
+    """Load only the fixed starter closure from a ``.git``-free source tree.
+
+    This lane proves that the committed starter manifest still binds the same
+    12 source files.  It deliberately does not reconstruct or claim a replay of
+    the historical 212-entry corpus manifest; that remains the responsibility
+    of :func:`load_source_snapshot` in a full-history checkout.
+    """
+
+    raw_cases = expect_array(manifest.get("cases"), "archive-safe starter cases")
+    require(len(raw_cases) == 3, "archive-safe starter manifest must contain exactly three cases")
+    blobs: dict[str, bytes] = {}
+    manifest_hashes: dict[str, str] = {}
+    cases_by_id: dict[str, dict[str, Any]] = {}
+
+    for case_index, raw_case in enumerate(raw_cases):
+        starter_case = expect_object(raw_case, f"archive-safe starter cases[{case_index}]")
+        case_id = expect_nonempty_string(
+            starter_case.get("case_id"),
+            f"archive-safe starter cases[{case_index}].case_id",
+        )
+        require(
+            case_id == SELECTED_CASE_IDS[case_index],
+            f"archive-safe starter case order/identity mismatch at index {case_index}",
+        )
+        inputs = expect_array(
+            starter_case.get("inputs"),
+            f"archive-safe starter case {case_id}.inputs",
+        )
+        require(
+            len(inputs) == 4,
+            f"archive-safe starter case {case_id} must contain four closure inputs",
+        )
+        case_path: str | None = None
+        for input_index, raw_input in enumerate(inputs):
+            entry = expect_object(
+                raw_input,
+                f"archive-safe starter case {case_id}.inputs[{input_index}]",
+            )
+            path = validate_safe_repo_path(
+                entry.get("path"),
+                f"archive-safe starter case {case_id}.inputs[{input_index}].path",
+            )
+            require(path not in manifest_hashes, f"archive-safe starter closure has duplicate path: {path}")
+            expected_digest = validate_sha256(
+                entry.get("raw_sha256"),
+                f"archive-safe starter case {case_id}.inputs[{input_index}].raw_sha256",
+            )
+            raw = read_regular_nonempty(source_root / path)
+            require(
+                sha256_bytes(raw) == expected_digest,
+                f"archive-safe current-tree raw SHA-256 mismatch: {path}",
+            )
+            blobs[path] = raw
+            manifest_hashes[path] = expected_digest
+            if entry.get("role") == "case" and entry.get("artifact_key") == "case":
+                case_path = path
+
+        require(case_path is not None, f"archive-safe starter case {case_id} lacks its case document")
+        case_document = expect_object(
+            parse_strict_json(blobs[case_path], f"archive-safe:{case_path}"),
+            f"archive-safe case {case_id}",
+        )
+        require(case_document.get("case_id") == case_id, f"archive-safe case identity mismatch: {case_id}")
+        cases_by_id[case_id] = {
+            "case_id": case_id,
+            "path": case_path,
+        }
+
+    require(
+        len(blobs) == 12 and len(manifest_hashes) == 12,
+        "archive-safe starter closure must contain 12 unique files",
+    )
+    return SourceSnapshot({}, blobs, manifest_hashes, cases_by_id)
 
 
 def validate_manifest(manifest: dict[str, Any], source: SourceSnapshot) -> dict[str, dict[str, Any]]:
@@ -4832,6 +4914,8 @@ def validate_all(
     source_repo: Path,
     pulse_repo: Path | None,
     strict_json_paths: list[Path],
+    *,
+    archive_safe: bool = False,
 ) -> tuple[dict[str, Any], SourceSnapshot, dict[str, dict[str, Any]]]:
     raw_files = validate_kit_file_set()
     manifest = expect_object(parse_strict_json(raw_files["manifest.json"], str(MANIFEST_PATH)), "starter manifest")
@@ -4839,7 +4923,11 @@ def validate_all(
     result = expect_object(parse_strict_json(raw_files["pulse-sut-result.template.json"], str(RESULT_TEMPLATE_PATH)), "result template")
     for label, value in (("starter manifest", manifest), ("mapping worksheet", worksheet), ("result template", result)):
         scan_json_for_credentials(value, label)
-    source = load_source_snapshot(source_repo)
+    source = (
+        load_archive_source_snapshot(source_repo, manifest)
+        if archive_safe
+        else load_source_snapshot(source_repo)
+    )
     selected_by_id = validate_manifest(manifest, source)
     validate_worksheet(worksheet, selected_by_id, source=source)
     validate_result_template(result, selected_by_id)
@@ -7476,6 +7564,14 @@ def parse_args() -> argparse.Namespace:
         help="Git repository containing the fixed VATE commit (default: this checkout)",
     )
     parser.add_argument(
+        "--archive-safe",
+        action="store_true",
+        help=(
+            "verify the committed 12-path starter closure from current source-tree bytes "
+            "without claiming that the historical Git object was replayed"
+        ),
+    )
+    parser.add_argument(
         "--pulse-repo",
         type=Path,
         help="optional Pulse checkout; HEAD and reviewed bytes must equal the frozen pin",
@@ -7522,10 +7618,15 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     try:
+        require(
+            not (args.archive_safe and args.self_test),
+            "--archive-safe cannot be combined with the history-dependent --self-test lane",
+        )
         manifest, source, selected = validate_all(
             args.source_repo.resolve(),
             args.pulse_repo.resolve() if args.pulse_repo else None,
             args.strict_json,
+            archive_safe=args.archive_safe,
         )
         if args.run_bundle is not None:
             validate_run_bundle(
@@ -7553,12 +7654,17 @@ def main() -> int:
     except CheckFailure as exc:
         raise SystemExit(f"Pulse external SUT starter validation failed: {exc}") from exc
     pulse_status = "verified" if args.pulse_repo else "not supplied (manifest pin/hash set checked)"
+    source_status = (
+        "archive-safe current-tree 12-path closure verified; historical Git-object replay not run"
+        if args.archive_safe
+        else "historical Git-object closure verified"
+    )
     run_suffix = "; run bundle contract: ok" if args.run_bundle else ""
     suffix = "; fail-closed self-tests: ok" if args.self_test else ""
     print(
         "Pulse external SUT starter validation: ok "
         f"(VATE {VATE_COMMIT}; corpus 75 cases/212 artifacts; selected closure 3 cases/12 paths; "
-        f"Pulse checkout {pulse_status}){run_suffix}{suffix}"
+        f"source lane {source_status}; Pulse checkout {pulse_status}){run_suffix}{suffix}"
     )
     return 0
 

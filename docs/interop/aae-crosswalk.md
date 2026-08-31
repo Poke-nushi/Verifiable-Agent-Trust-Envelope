@@ -2,7 +2,9 @@
 
 ## Status
 
-This is a small interoperability note for the `VATE AL2 Admission Interop Profile 2026-07`.
+This is a semantic interoperability crosswalk for
+`VATE-AL2-Verifier-Admission-v0.3`. It is independent of the active
+machine-readable artifact line and does not relabel historical result bytes.
 
 It does not claim that VATE replaces Agent Authorization Envelope (AAE), W3C Verifiable Credentials, DID, JOSE, JWS, or any AAE verification algorithm.
 It shows how an AAE-style authorization artifact can be consumed as VATE evidence at the verifier-side admission boundary.

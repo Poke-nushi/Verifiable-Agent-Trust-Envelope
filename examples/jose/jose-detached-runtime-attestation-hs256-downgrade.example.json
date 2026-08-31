@@ -1,5 +1,5 @@
 {
-  "version": "vate-jose-proof-fixture-2026-07",
+  "version": "vate-jose-proof-fixture-2026-09",
   "proof_type": "detached_jws",
   "payload_canonicalization": "json-sorted-no-whitespace",
   "evidence_type": "runtime_attestation",
@@ -10,14 +10,14 @@
     "typ": "vate-evidence+jws"
   },
   "protected_b64u": "eyJhbGciOiJIUzI1NiIsImtpZCI6ImRpZDp3ZWI6YWdlbnQuZXhhbXBsZSNydW50aW1lLWtleS0xIiwidHlwIjoidmF0ZS1ldmlkZW5jZStqd3MifQ",
-  "detached_payload_b64u": "eyJhcnRpZmFjdF9kaWdlc3QiOnsiYWxnIjoic2hhLTI1NiIsInZhbHVlIjoiYmFzZTY0dXJsLXJ1bnRpbWUtYXR0ZXN0YXRpb24tZGlnZXN0In0sImF1ZGllbmNlIjoiaHR0cHM6Ly92ZXJpZmllci5leGFtcGxlL2EyYSIsImV2aWRlbmNlX3R5cGUiOiJydW50aW1lX2F0dGVzdGF0aW9uIiwiZXhwaXJlc19hdCI6IjIwMjYtMDctMDFUMDA6MjA6MDBaIiwiaXNzdWVkX2F0IjoiMjAyNi0wNy0wMVQwMDoxNTowMFoiLCJpc3N1ZXIiOiJkaWQ6d2ViOmFnZW50LmV4YW1wbGUiLCJub25jZSI6Im5vbmNlLWpvc2UtZGV0YWNoZWQtMDAxIiwicHJvZmlsZSI6IlZBVEUtQUwyLVZlcmlmaWVyLUFkbWlzc2lvbi12MC4zIiwic3ViamVjdCI6eyJhY3RvciI6ImRpZDp3ZWI6YWdlbnQuZXhhbXBsZSIsInJ1bnRpbWUiOiJzcGlmZmU6Ly9hZ2VudC5leGFtcGxlL3dvcmtsb2FkL2Nhc2UtYWdlbnQifSwidmVyc2lvbiI6InZhdGUtam9zZS1wcm9vZi1maXh0dXJlLTIwMjYtMDcifQ",
+  "detached_payload_b64u": "eyJhcnRpZmFjdF9kaWdlc3QiOnsiYWxnIjoic2hhLTI1NiIsInZhbHVlIjoiYmFzZTY0dXJsLXJ1bnRpbWUtYXR0ZXN0YXRpb24tZGlnZXN0In0sImF1ZGllbmNlIjoiaHR0cHM6Ly92ZXJpZmllci5leGFtcGxlL2EyYSIsImV2aWRlbmNlX3R5cGUiOiJydW50aW1lX2F0dGVzdGF0aW9uIiwiZXhwaXJlc19hdCI6IjIwMjYtMDctMDFUMDA6MjA6MDBaIiwiaXNzdWVkX2F0IjoiMjAyNi0wNy0wMVQwMDoxNTowMFoiLCJpc3N1ZXIiOiJkaWQ6d2ViOmFnZW50LmV4YW1wbGUiLCJub25jZSI6Im5vbmNlLWpvc2UtZGV0YWNoZWQtMDAxIiwicHJvZmlsZSI6IlZBVEUtQUwyLVZlcmlmaWVyLUFkbWlzc2lvbi12MC4zIiwic3ViamVjdCI6eyJhY3RvciI6ImRpZDp3ZWI6YWdlbnQuZXhhbXBsZSIsInJ1bnRpbWUiOiJzcGlmZmU6Ly9hZ2VudC5leGFtcGxlL3dvcmtsb2FkL2Nhc2UtYWdlbnQifSwidmVyc2lvbiI6InZhdGUtam9zZS1wcm9vZi1maXh0dXJlLTIwMjYtMDkifQ",
   "detached_payload_sha256": {
     "alg": "sha-256",
-    "value": "f5f83af24cb900c3665579f02ffbcdb9c2e4af7a36f46f50b248aade9e4551ca"
+    "value": "6312b66b7b1771dc478f474f74fae0f5a9194a80d63271b26cfe24fc6e60dcd3"
   },
   "signature_b64u": "Zml4dHVyZS1zaWduYXR1cmUtaHMyNTYtaW52YWxpZA",
   "signing_input_sha256": {
     "alg": "sha-256",
-    "value": "5f09d2503ffca55908e3c4e56ce628b015a400efe2c6e981bb9de1228f8de083"
+    "value": "a7f4d9042e37d6472ffeb5357a10bfc177914746fb84ec82d855106dde084b3f"
   }
 }

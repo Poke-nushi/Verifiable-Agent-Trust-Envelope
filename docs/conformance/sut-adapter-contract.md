@@ -30,14 +30,14 @@ This keeps the conformance surface language-neutral while preserving exact expec
 ## SUT Result Shape
 
 A SUT result file records one implementation run against one corpus snapshot.
-The `2026-07` suffix in the current `version` value identifies the target
+The `2026-09` suffix in the current `version` value identifies the active
 interop artifact line, not the date the SUT result was generated. The exact
 corpus snapshot is identified by `corpus.digest`. See
 `docs/conformance/artifact-versioning.md`.
 
 Required top-level fields:
 
-- `version` - currently `vate-sut-results-2026-07`
+- `version` - currently `vate-sut-results-2026-09`
 - `profile` - currently `VATE-AL2-Verifier-Admission-v0.3`
 - `generated_at` - a valid RFC3339 date-time. The current runner accepts zero
   through six fractional-second digits and rejects higher precision rather than
@@ -48,6 +48,11 @@ Required top-level fields:
   `language` fields
 - `corpus.digest`
 - `results`
+
+Historical `vate-sut-results-2026-07` artifacts must be validated with their
+recorded v0.3.2 tag or commit and schema. The current schema intentionally
+rejects them rather than treating an old result as evidence against the active
+contract.
 
 Each result entry represents one corpus case:
 

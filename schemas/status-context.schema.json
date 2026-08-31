@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:vate:schema:status-context:2026-07",
+  "$id": "urn:vate:schema:status-context:2026-09",
   "title": "VATE Status Evaluation Context",
   "description": "Fixture input describing whether a required status source was available and the status observed at verifier evaluation time. This is an evaluation input, not an admission receipt or a production status-list format.",
   "type": "object",
@@ -14,7 +14,7 @@
   "properties": {
     "version": {
       "type": "string",
-      "const": "vate-status-context-2026-07"
+      "const": "vate-status-context-2026-09"
     },
     "source": {
       "type": "string",
