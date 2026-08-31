@@ -2,7 +2,7 @@
 
 ## Status
 
-This note describes the minimal trust-bundle checks used by the `VATE AL2 Admission Interop Profile 2026-07` conformance corpus.
+This note describes the minimal trust-bundle checks used by the active `VATE AL2 Admission Interop Profile 2026-09` conformance corpus.
 
 It does not define production JOSE, PKI, DID resolution, certificate path building, or key rotation protocols.
 Those remain deployment choices.

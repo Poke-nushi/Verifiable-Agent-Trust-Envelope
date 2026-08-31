@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:vate:schema:conformance-corpus:2026-07",
+  "$id": "urn:vate:schema:conformance-corpus:2026-09",
   "title": "VATE Conformance Corpus Index",
   "description": "Language-neutral index for one VATE conformance corpus snapshot.",
   "type": "object",
@@ -18,7 +18,7 @@
   "properties": {
     "version": {
       "type": "string",
-      "const": "vate-conformance-corpus-2026-07"
+      "const": "vate-conformance-corpus-2026-09"
     },
     "profile": {
       "type": "string",

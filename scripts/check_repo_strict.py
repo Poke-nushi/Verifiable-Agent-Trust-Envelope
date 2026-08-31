@@ -95,7 +95,6 @@ EXAMPLE_PAIRS = [
     ("examples/report-bundle-verification.example.json", "schemas/report-bundle-verification.schema.json"),
     ("examples/conformance/sut-results-pass.example.json", "schemas/sut-result.schema.json"),
     ("examples/external-sut-template/starter-sut-result.template.json", "schemas/sut-result.schema.json"),
-    ("examples/external-sut-pulse-starter/pulse-sut-result.template.json", "schemas/sut-result.schema.json"),
     ("conformance/al2-vate-v0.3/corpus.json", "schemas/conformance-corpus.schema.json"),
     ("examples/policies/merchant-purchase-al2-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),
     ("examples/policies/al2-repo-merge-policy-snapshot.example.json", "schemas/policy-snapshot.schema.json"),
@@ -429,7 +428,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
         (
             "conformance report without corpus",
             {
-                "version": "vate-conformance-report-2026-07",
+                "version": "vate-conformance-report-2026-09",
                 "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "checked_at": "2026-07-01T00:00:00Z",
                 "summary": empty_summary,
@@ -440,7 +439,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
         (
             "passing conformance case with recorded failure",
             {
-                "version": "vate-conformance-report-2026-07",
+                "version": "vate-conformance-report-2026-09",
                 "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "checked_at": "2026-07-01T00:00:00Z",
                 "summary": {
@@ -462,7 +461,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
         (
             "failed conformance case without failure detail",
             {
-                "version": "vate-conformance-report-2026-07",
+                "version": "vate-conformance-report-2026-09",
                 "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "checked_at": "2026-07-01T00:00:00Z",
                 "summary": {
@@ -485,7 +484,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
         (
             "SUT conformance report case without effective artifact mode",
             {
-                "version": "vate-conformance-report-2026-07",
+                "version": "vate-conformance-report-2026-09",
                 "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "checked_at": "2026-07-01T00:00:00Z",
                 "summary": {"total": 1, "passed": 1, "failed": 0, "skipped": 0},
@@ -527,7 +526,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
         (
             "SUT corpus digest is not lowercase sha-256 hex",
             {
-                "version": "vate-sut-results-2026-07",
+                "version": "vate-sut-results-2026-09",
                 "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "generated_at": "2026-07-01T00:00:00Z",
                 "implementation": {"name": "x", "type": "x", "version": "x", "language": "x"},
@@ -934,7 +933,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
         (
             "implementation report without corpus manifest",
             {
-                "version": "vate-implementation-report-2026-07",
+                "version": "vate-implementation-report-2026-09",
                 "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "generated_at": "2026-07-01T00:00:00Z",
                 "status": "pass",
@@ -959,7 +958,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
         (
             "implementation report case result without should_execute projection",
             {
-                "version": "vate-implementation-report-2026-07",
+                "version": "vate-implementation-report-2026-09",
                 "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "generated_at": "2026-07-01T00:00:00Z",
                 "status": "pass",
@@ -993,7 +992,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
         (
             "implementation report mode counts without per-case artifact mode",
             {
-                "version": "vate-implementation-report-2026-07",
+                "version": "vate-implementation-report-2026-09",
                 "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "generated_at": "2026-07-01T00:00:00Z",
                 "status": "pass",
@@ -1035,7 +1034,7 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
         (
             "report bundle verification without status",
             {
-                "version": "vate-report-bundle-verification-2026-07",
+                "version": "vate-report-bundle-verification-2026-09",
                 "profile": "VATE-AL2-Verifier-Admission-v0.3",
                 "checked_at": "2026-07-01T00:00:00Z",
                 "summary": {"total": 0, "passed": 0, "failed": 0},
@@ -1115,6 +1114,21 @@ def main() -> int:
         sut_result_schema,
         format_checker=format_checker,
     )
+    historical_sut_result = load_json(
+        ROOT / "examples/external-sut-pulse-starter/pulse-sut-result.template.json"
+    )
+    historical_sut_errors = list(
+        sut_result_validator.iter_errors(historical_sut_result)
+    )
+    if not any(
+        list(error.path) == ["version"]
+        and error.validator == "const"
+        and error.validator_value == "vate-sut-results-2026-09"
+        for error in historical_sut_errors
+    ):
+        raise SystemExit(
+            "historical 2026-07 Pulse SUT result unexpectedly passed the current 2026-09 schema"
+        )
     sut_result_with_allowed_extensions = json.loads(
         json.dumps(
             load_json(
@@ -1378,7 +1392,7 @@ def main() -> int:
         format_checker=format_checker,
     )
     optional_unavailable_status = {
-        "version": "vate-status-context-2026-07",
+        "version": "vate-status-context-2026-09",
         "source": "status_bundle",
         "required": False,
         "availability": "unavailable",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:vate:schema:evidence-vocabulary:2026-07",
+  "$id": "urn:vate:schema:evidence-vocabulary:2026-09",
   "title": "VATE Evidence Vocabulary Registry",
   "description": "Machine-readable evidence type and protocol hint registry for the VATE AL2 verifier admission conformance profile.",
   "type": "object",
@@ -17,7 +17,7 @@
     },
     "version": {
       "type": "string",
-      "const": "vate-evidence-vocabulary-2026-07"
+      "const": "vate-evidence-vocabulary-2026-09"
     },
     "profile": {
       "type": "string",

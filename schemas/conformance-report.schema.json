@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:vate:schema:conformance-report:2026-07",
+  "$id": "urn:vate:schema:conformance-report:2026-09",
   "title": "VATE Conformance Report",
   "description": "Machine-readable report emitted by the VATE AL2 conformance runner.",
   "type": "object",
@@ -15,7 +15,7 @@
   "properties": {
     "version": {
       "type": "string",
-      "const": "vate-conformance-report-2026-07"
+      "const": "vate-conformance-report-2026-09"
     },
     "profile": {
       "type": "string",

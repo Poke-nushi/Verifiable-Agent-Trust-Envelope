@@ -1,6 +1,6 @@
 {
   "$schema": "../schemas/evidence-vocabulary.schema.json",
-  "version": "vate-evidence-vocabulary-2026-07",
+  "version": "vate-evidence-vocabulary-2026-09",
   "profile": "VATE-AL2-Verifier-Admission-v0.3",
   "evidence_types": [
     {

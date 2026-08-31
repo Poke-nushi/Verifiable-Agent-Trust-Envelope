@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:vate:schema:sut-result:2026-07",
+  "$id": "urn:vate:schema:sut-result:2026-09",
   "title": "VATE SUT Result Set",
   "description": "Machine-readable results emitted by a system under test for one VATE conformance corpus snapshot.",
   "type": "object",
@@ -15,7 +15,7 @@
   "properties": {
     "version": {
       "type": "string",
-      "const": "vate-sut-results-2026-07"
+      "const": "vate-sut-results-2026-09"
     },
     "profile": {
       "type": "string",

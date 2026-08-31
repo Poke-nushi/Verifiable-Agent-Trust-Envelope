@@ -2,7 +2,7 @@
 
 ## Status
 
-This registry is the canonical reason-code vocabulary for the `VATE AL2 Admission Interop Profile 2026-07`.
+This registry is the canonical reason-code vocabulary for the active `VATE AL2 Admission Interop Profile 2026-09`.
 
 Reason codes are stable machine-readable tokens.
 Human-readable explanations belong in receipts, reports, or logs, not in the code value.

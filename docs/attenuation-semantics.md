@@ -2,7 +2,7 @@
 
 ## Status
 
-This note fixes the machine-readable attenuation surface for the `VATE AL2 Admission Interop Profile 2026-07`.
+This note fixes the machine-readable attenuation surface for the active `VATE AL2 Admission Interop Profile 2026-09`.
 
 Attenuation is an admission decision.
 It is not a human note such as "restricted".

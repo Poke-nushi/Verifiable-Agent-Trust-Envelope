@@ -1,6 +1,6 @@
 {
-  "version": "vate-trust-bundle-2026-07",
-  "trust_bundle_id": "vate-test-bundle-2026-07",
+  "version": "vate-trust-bundle-2026-09",
+  "trust_bundle_id": "vate-test-bundle-2026-09",
   "issuers": [
     {
       "issuer_id": "did:web:verifier.example",

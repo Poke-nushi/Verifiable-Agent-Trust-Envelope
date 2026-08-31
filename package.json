@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "ts:check": "tsc -b packages/vate-core-ts packages/vate-a2a-ts",
-    "ts:test": "vitest run"
+    "ts:test": "vitest run --dir packages"
   },
   "devDependencies": {
     "typescript": "6.0.3",

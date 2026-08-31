@@ -1,5 +1,5 @@
 {
-  "version": "vate-jose-proof-fixture-2026-07",
+  "version": "vate-jose-proof-fixture-2026-09",
   "proof_type": "detached_jws",
   "payload_canonicalization": "json-sorted-no-whitespace",
   "evidence_type": "signed_agent_card",

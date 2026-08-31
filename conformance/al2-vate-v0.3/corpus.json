@@ -1981,7 +1981,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "195aad6651911be243b5ccbc87fa93d5ca9e46b3ccde1b14cb4688b2089473d7"
+    "value": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -2362,27 +2362,27 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/fixtures/status-boundary-context.json",
-      "sha256": "2e7c403c583e4942c52ecc9cf6b684120948b550f1eb4038f48bcf8a8a9f1d58"
+      "sha256": "7524e02c2b810780b7f15268a9c570f224a37e064a092cff1ee572441ee8759b"
     },
     {
       "path": "conformance/al2-vate-v0.3/fixtures/status-fresh-context.json",
-      "sha256": "f497ea698c75b6ee07c67c1a22b361f139a98e68b417a04859351b57277524d1"
+      "sha256": "e202af6ed091cabddf8615857ef81e1a1dfb70a3abdfb7b215c92af7caba67a2"
     },
     {
       "path": "conformance/al2-vate-v0.3/fixtures/status-revoked-context.json",
-      "sha256": "ec6af62717e6f5b08570b9ead1e7facd0bebffb03064f35b13885362ca52d866"
+      "sha256": "576325e89dc500b9542c019c04aad9567de2563644f9b6f0dbdec3c96361171d"
     },
     {
       "path": "conformance/al2-vate-v0.3/fixtures/status-stale-context.json",
-      "sha256": "a92c9b87b4d751c325ec6ec35aae8d9d04ecfb076b48b3c52c05f0a4bb5f577c"
+      "sha256": "8278227c8d3dd691f4dd793c73b86723c0bf7e4978fc40109f74b9e2d8d12139"
     },
     {
       "path": "conformance/al2-vate-v0.3/fixtures/status-stale-just-over-boundary-context.json",
-      "sha256": "a83f8645b96fcaf6e1a4843a0098ec35963e4b05edc75593a2776dca12a55c90"
+      "sha256": "5045e9bcf3711e2de9431d50befb03662c0c868988dcccd616d2392375a545b2"
     },
     {
       "path": "conformance/al2-vate-v0.3/fixtures/status-unavailable-context.json",
-      "sha256": "9862f157f67306fe563bc0df55fe29037b4ae404fdd30c332f0afb8ef1a48dc2"
+      "sha256": "15431f2f5cf1258c84a366c0cb52c99181cab9455f323168a8178c52680abc9c"
     },
     {
       "path": "examples/a2a/agent-card-v1-vate-extension.example.json",
@@ -2522,35 +2522,35 @@
     },
     {
       "path": "examples/jose/detached-runtime-attestation-payload.json",
-      "sha256": "6f1dbae1c2dd871de2d6b7f25418469adcfdf6430fb492014c0f023b13173c20"
+      "sha256": "a868c14bb0ec779efe15ba671162b1eb5947d9e98d885e14ab4d0c1ef166a62f"
     },
     {
       "path": "examples/jose/jose-detached-a2a-agent-card.example.json",
-      "sha256": "1f8278484961f780805748ba7f5cb8233a42e62e34b6c0c233ac84531762ea8f"
+      "sha256": "f756de408702ccc6607184c052639213c4e0a1a0ca8a8bd023448077a1c48939"
     },
     {
       "path": "examples/jose/jose-detached-runtime-attestation-alg-none.example.json",
-      "sha256": "28b612a8dc66e287535bc2b88e6d73a8b77ebe4a5389b377cb8df9c8e4651995"
+      "sha256": "634ffa9edfc4cad077c9e6bf0b25689aa63d81c18dfd28356d74cb1176db1a86"
     },
     {
       "path": "examples/jose/jose-detached-runtime-attestation-crit-unsupported.example.json",
-      "sha256": "867b873a4ecd5275a24257392b591a5e6008692707f091fec4b520ba8ca4c3f6"
+      "sha256": "794b32654427542a577717e6d19f09d8eb7301cdb9e8a17db0516168c23c102b"
     },
     {
       "path": "examples/jose/jose-detached-runtime-attestation-es384-not-allowed.example.json",
-      "sha256": "d5744746e782a1b37ca344b93592c2bfd6dc6cdf892c003ca782f39b670d6b3a"
+      "sha256": "958905f1246b13971aece5a69385478201ce1e2182d6c3fa3962232665caca3d"
     },
     {
       "path": "examples/jose/jose-detached-runtime-attestation-hs256-downgrade.example.json",
-      "sha256": "d11c5f76b3892698fa8942ec0da1f31dab10a01cf1d063e493cdc16142173c2e"
+      "sha256": "31bbca27962b8d814230efd778e9e6cfe1d52ab4d870883f384c10f26bf9fe6d"
     },
     {
       "path": "examples/jose/jose-detached-runtime-attestation-payload-digest-mismatch.example.json",
-      "sha256": "23fdcf8176bbb99ce58e6312163132bd5eff816547e8f955c96e2e287305755f"
+      "sha256": "215ac4455e62c9cf90adc09f878609ea27af7bbb5a4ab1c9afff1397d42fa0b3"
     },
     {
       "path": "examples/jose/jose-detached-runtime-attestation-valid.example.json",
-      "sha256": "25d61756d37ee5a651747742b0141b127c870a7cb3d2771d53fdb951db0f156c"
+      "sha256": "32c97a5c2450e609958ad6245be40cab4fcc7ba5b4c4ef257fbe159dcbac027d"
     },
     {
       "path": "examples/policies/al2-repo-merge-policy-snapshot.example.json",
@@ -2850,15 +2850,15 @@
     },
     {
       "path": "examples/trust-bundle-agent-card.example.json",
-      "sha256": "52eb6aa22275b514446904bac885723303d20ef264d2fdffcf900b1414c6c6bf"
+      "sha256": "6c09dd56f29ec7b8d9714e7f17cbe2e2b5b20027bb83d9d4266bbfeee7be3de6"
     },
     {
       "path": "examples/trust-bundle-ambiguous.example.json",
-      "sha256": "a7fa6a2d307c78128e98113cd0e4961fa0132a6d1c4a8b0a6a17c4b17268b38f"
+      "sha256": "951ac22501f44526b36e6d63cfd41bd3e82e1b882aeb62d633ca503e0034ad8e"
     },
     {
       "path": "examples/trust-bundle.example.json",
-      "sha256": "48094e17ffa90464a626edc01ed1eef37e48acfa95659d26460f1ff1926b7e9c"
+      "sha256": "25432ad1ea1d7ce53aa1ea5bc3a1e22d7acdd8c9d3238d89fc326b34ecbf36b0"
     }
   ],
   "name": "al2-vate-v0.3",
@@ -2877,5 +2877,5 @@
       "positive": 19
     }
   },
-  "version": "vate-conformance-corpus-2026-07"
+  "version": "vate-conformance-corpus-2026-09"
 }

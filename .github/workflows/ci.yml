@@ -66,8 +66,14 @@ jobs:
 
       - name: Run repository sanity checks
         run: |
-          python scripts/check_repo.py
+          python scripts/check_repo.py --require-full-history
           python scripts/check_repo_strict.py
+
+      - name: Run source-archive sanity check
+        run: |
+          archive_dir="$(mktemp -d)"
+          git archive HEAD | tar -x -C "$archive_dir"
+          python "$archive_dir/scripts/check_repo.py"
 
       - name: Set up Node.js
         uses: actions/setup-node@v7.0.0
@@ -82,6 +88,7 @@ jobs:
         run: |
           npm run ts:check
           npm run ts:test
+          npm audit --audit-level=moderate
 
       - name: Check whitespace
         env:

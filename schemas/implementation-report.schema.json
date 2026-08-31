@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:vate:schema:implementation-report:2026-07",
+  "$id": "urn:vate:schema:implementation-report:2026-09",
   "title": "VATE Implementation Report",
   "description": "Machine-readable report describing one implementation run against one VATE conformance corpus snapshot.",
   "type": "object",
@@ -18,7 +18,7 @@
   "properties": {
     "version": {
       "type": "string",
-      "const": "vate-implementation-report-2026-07"
+      "const": "vate-implementation-report-2026-09"
     },
     "profile": {
       "type": "string",

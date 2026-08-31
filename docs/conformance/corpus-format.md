@@ -9,11 +9,14 @@ It lets non-Python implementations discover cases, resolve artifacts, and publis
 
 ## Artifact Versioning
 
-The `2026-07` strings in conformance report versions, schema IDs, fixture
-versions, and deterministic fixture timestamps identify the July 2026 target
-interop artifact line. They are not publication dates. Exact corpus snapshots
-are identified by the `corpus.json` manifest digest and the digest fields in
-generated reports.
+The active conformance report versions, schema IDs, and fixture versions use
+the `2026-09` artifact line. Deterministic fixture timestamps may still use
+July 2026 scenario dates; those timestamps are test inputs, not artifact-line
+identifiers or publication dates. Exact corpus snapshots are identified by the
+`corpus.json` manifest digest and the digest fields in generated reports.
+
+Historical `2026-07` reports remain tied to the exact v0.3.2 tag or recorded
+commit and its schemas. They are not accepted as current `2026-09` artifacts.
 
 See `docs/conformance/artifact-versioning.md` for the rule on when to keep or
 change date-stamped conformance artifact identifiers.
