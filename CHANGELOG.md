@@ -2,6 +2,22 @@
 
 This file records dated public changes to the discussion draft.
 
+## 2026-09-01
+
+- Published `v0.4.0` as the current GitHub discussion-draft pre-release review
+  anchor while retaining the `VATE-AL2-Verifier-Admission-v0.3` semantic
+  profile.
+- Published the active `2026-09` machine-readable artifact line with its
+  76-case / 216-artifact corpus and fixed corpus digest.
+- Preserved historical `2026-07` evidence and the archived `v0.3.2` version DOI
+  without relabeling either as current `2026-09` evidence.
+- Recorded the completed archive-safe and full-history technical gates and the
+  approved transitive dependency maintenance.
+- Left the exact `v0.4.0` Zenodo version DOI pending; no unissued DOI is stated
+  or inferred.
+- Maintained the discussion-draft boundary: not production-ready, certified,
+  endorsed, or production-approved.
+
 ## 2026-08-31
 
 - Prepared the v0.4.0 release candidate without tagging, publishing, or

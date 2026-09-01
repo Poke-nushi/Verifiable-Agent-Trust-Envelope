@@ -1,23 +1,24 @@
-# VATE v0.4.0 Release Candidate Gate
+# VATE v0.4.0 Completed Technical Release Gate
 
 ## Status
 
-This is the local technical gate for the v0.4.0 release candidate. Passing it
-prepares a reviewable candidate; it does not create a GitHub release, tag,
-Zenodo record, certification, endorsement, or production approval.
+This records the local technical gate completed before the `v0.4.0` GitHub
+discussion-draft pre-release. Passing this gate did not itself create a GitHub
+tag, release, Zenodo record, certification, endorsement, or production
+approval.
 
-## Fixed Candidate Boundary
+## Fixed Release Boundary
 
-- repository release candidate: `v0.4.0`
+- repository release: GitHub discussion-draft pre-release `v0.4.0`
 - semantic profile: `VATE-AL2-Verifier-Admission-v0.3`
 - active conformance artifact line: `2026-09`
 - corpus: 76 cases / 216 artifacts
 - corpus digest:
   `sha-256:b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130`
-- archived public review anchor: `v0.3.2` until an actual release and archive
-  are published
+- Zenodo archive and exact `v0.4.0` version DOI: pending
+- latest historical Zenodo archive with an exact version DOI: `v0.3.2`
 
-## Required Repository Checks
+## Completed Repository Checks
 
 ```bash
 python3 -m py_compile \
@@ -29,13 +30,13 @@ python3 scripts/check_repo.py --require-full-history
 .venv/bin/python scripts/check_repo_strict.py
 ```
 
-The full-history check MUST reload the historical VATE source commit pinned by
-the Pulse starter and pass all 33 starter-validator negative probes. It does
-not replay the frozen Pulse verifier; that is a separate explicit gate which
-requires supplying a Pulse checkout with `--pulse-repo` to
-`scripts/check_pulse_external_sut_starter.py`.
+These commands completed successfully. The full-history check reloaded the
+historical VATE source commit pinned by the Pulse starter and passed all 33
+starter-validator negative probes. It did not replay the frozen Pulse verifier;
+that remains a separate explicit gate which requires supplying a Pulse checkout
+with `--pulse-repo` to `scripts/check_pulse_external_sut_starter.py`.
 
-## Required Conformance Checks
+## Completed Conformance Checks
 
 ```bash
 python3 scripts/vate_conformance.py run \
@@ -58,22 +59,22 @@ python3 scripts/vate_conformance.py verify-bundle \
   --report /tmp/vate-v0.4.0-bundle.json
 ```
 
-Generated reports MUST use the `2026-09` versions and the fixed candidate
-corpus digest.
+The generated reports used the `2026-09` versions and the fixed release corpus
+digest.
 
-## Historical And Archive Checks
+## Completed Historical And Archive Checks
 
-- A v0.3.2-generated `2026-07` SUT result MUST fail current
-  `schemas/sut-result.schema.json` validation.
-- The same historical artifact remains checkable in its exact v0.3.2 source
+- A v0.3.2-generated `2026-07` SUT result failed current
+  `schemas/sut-result.schema.json` validation as intended.
+- The same historical artifact remained checkable in its exact v0.3.2 source
   snapshot.
-- A source archive produced without `.git` MUST pass
+- A source archive produced without `.git` passed
   `python3 scripts/check_repo.py`.
-- That archive run MUST explicitly report the history-dependent Pulse starter
-  gate as not run; it must not report a false full-history pass or a frozen
-  Pulse verifier replay.
+- That archive run explicitly reported the history-dependent Pulse starter gate
+  as not run and did not report a false full-history pass or frozen Pulse
+  verifier replay.
 
-## JavaScript Checks
+## Completed JavaScript Checks
 
 ```bash
 npm ci
@@ -82,19 +83,20 @@ npm run ts:test
 npm audit --audit-level=moderate
 ```
 
-The lockfile may contain only the approved transitive maintenance updates. No
-new direct dependency is part of this candidate.
+The lockfile contained only the approved transitive maintenance updates. No new
+direct dependency is part of this pre-release.
 
-## Final Review
+## Completed Final Review
 
 - `git diff --check` passes.
-- tracked changes are limited to the release-candidate scope.
+- tracked changes are limited to the v0.4.0 release scope.
 - schema, runner, examples, corpus index, and docs agree on `2026-09`.
 - historical `2026-07` evidence and archived release notes are unchanged.
-- the README archived anchor and citation/DOI data remain v0.3.2 before release.
+- README and citation metadata identify the v0.4.0 GitHub pre-release while
+  leaving its exact Zenodo version DOI pending.
 - claim language remains one implementation run against one corpus snapshot,
   not production readiness, certification, endorsement, or general
   compatibility.
 
-The candidate remains unpublished until a separate owner decision authorizes
-commit, push, tag, release, and any Zenodo update.
+This completed gate record does not state that a Zenodo archive or exact
+`v0.4.0` version DOI exists. Those remain a separate publication step.
