@@ -15,8 +15,9 @@ approval.
 - corpus: 76 cases / 216 artifacts
 - corpus digest:
   `sha-256:b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130`
-- Zenodo archive and exact `v0.4.0` version DOI: pending
-- latest historical Zenodo archive with an exact version DOI: `v0.3.2`
+- Zenodo archive and exact `v0.4.0` version DOI at gate time: pending
+- latest historical Zenodo archive with an exact version DOI at gate time:
+  `v0.3.2`
 
 ## Completed Repository Checks
 
@@ -92,11 +93,25 @@ direct dependency is part of this pre-release.
 - tracked changes are limited to the v0.4.0 release scope.
 - schema, runner, examples, corpus index, and docs agree on `2026-09`.
 - historical `2026-07` evidence and archived release notes are unchanged.
-- README and citation metadata identify the v0.4.0 GitHub pre-release while
-  leaving its exact Zenodo version DOI pending.
+- README and citation metadata identify the v0.4.0 GitHub pre-release without
+  asserting an unissued Zenodo DOI at gate time.
 - claim language remains one implementation run against one corpus snapshot,
   not production readiness, certification, endorsement, or general
   compatibility.
 
-This completed gate record does not state that a Zenodo archive or exact
-`v0.4.0` version DOI exists. Those remain a separate publication step.
+The statements above record the pre-publication gate as it was executed.
+
+## Publication Follow-Up
+
+Publication occurred separately after the technical gate completed:
+
+- GitHub tag and discussion-draft pre-release `v0.4.0` resolve to
+  `cc072ef86f54791213a3e603a65b2f24f64b1b6d`.
+- Zenodo record `22218860` was published on September 1, 2026 with exact version
+  DOI `10.5281/zenodo.22218860`.
+- The downloaded Zenodo ZIP matched all 503 tracked files from the tag, and its
+  MD5 matched the value published by Zenodo.
+
+These publication records do not change the discussion-draft claim boundary or
+imply production readiness, certification, endorsement, production approval,
+or general compatibility.

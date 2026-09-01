@@ -13,8 +13,11 @@ This file records dated public changes to the discussion draft.
   without relabeling either as current `2026-09` evidence.
 - Recorded the completed archive-safe and full-history technical gates and the
   approved transitive dependency maintenance.
-- Left the exact `v0.4.0` Zenodo version DOI pending; no unissued DOI is stated
-  or inferred.
+- Archived the exact `v0.4.0` source snapshot on Zenodo as record `22218860`
+  with version DOI
+  [10.5281/zenodo.22218860](https://doi.org/10.5281/zenodo.22218860).
+- Verified the Zenodo source ZIP against the `v0.4.0` tag: all 503 tracked
+  entries and the downloaded archive MD5 matched the published record.
 - Maintained the discussion-draft boundary: not production-ready, certified,
   endorsed, or production-approved.
 

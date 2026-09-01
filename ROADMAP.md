@@ -16,8 +16,9 @@ review anchor. It advances the active machine-readable artifact line to
 `2026-09` while keeping the semantic profile identifier
 `VATE-AL2-Verifier-Admission-v0.3`. It incorporates the external-SUT input,
 generated-receipt, status-evidence, and report-integrity work accumulated after
-v0.3.2. Its Zenodo archive and exact version DOI are pending; v0.3.2 remains a
-historical archived snapshot with its own exact DOI.
+v0.3.2. The exact `v0.4.0` source snapshot is archived on Zenodo with version
+DOI `10.5281/zenodo.22218860`; v0.3.2 remains a historical archived snapshot
+with its own exact DOI.
 
 The priority remains evidence from independently maintained implementation
 lines and reproducibility across implementers. The current contract migration
@@ -32,6 +33,8 @@ The current public review surface is:
 
 - `v0.4.0` GitHub discussion-draft pre-release:
   <https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.4.0>
+- archived `v0.4.0` version DOI:
+  `10.5281/zenodo.22218860`
 - `v0.4.0` pre-release notes and completed technical gate:
   [docs/release-notes/v0.4.0.md](docs/release-notes/v0.4.0.md) and
   [docs/release-gate-v0.4.0.md](docs/release-gate-v0.4.0.md)
@@ -67,25 +70,22 @@ The current public review surface is:
 
 Near-term public work should happen in this order:
 
-1. Archive the exact `v0.4.0` source snapshot on Zenodo. After Zenodo issues
-   the exact version DOI, add that issued DOI to the citation metadata without
-   guessing or deriving it from the concept DOI.
-2. Keep the lightweight
+1. Keep the lightweight
    [one-hour external SUT or corpus review request](docs/conformance/external-sut-ask-1-hour.md)
    visible for reviewers who are not ready to produce a full adapter.
-3. Use the recorded three-case starter bundle, the deeper eight-case bundle,
+2. Use the recorded three-case starter bundle, the deeper eight-case bundle,
    and the external SUT starter template as the reference path for additional
    reviewers. Treat the two bundles as slices from the same AlgoVoi
    implementation line, not two independent SUTs.
-4. Collect a SUT result from another independently maintained implementation
+3. Collect a SUT result from another independently maintained implementation
    line, distinct from both the repository reference runner and the recorded
    AlgoVoi line, against the current `2026-09` artifact contract and its exact
    76-case corpus snapshot.
-5. Ask implementers to publish generated artifacts or a controlled artifact
+4. Ask implementers to publish generated artifacts or a controlled artifact
    bundle, not only a hand-written result summary.
-6. Generate or collect a conformance report, implementation report, and local
+5. Generate or collect a conformance report, implementation report, and local
    `verify-bundle` report for each submitted corpus snapshot.
-7. Use those results to identify unclear corpus cases, reason-code friction,
+6. Use those results to identify unclear corpus cases, reason-code friction,
    missing artifact bindings, or publication metadata gaps.
 
 Immediate out of scope:
