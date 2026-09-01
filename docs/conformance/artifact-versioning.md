@@ -11,7 +11,7 @@ The active conformance artifact line on `main` is **`2026-09`**.
 
 Four identifiers remain deliberately separate:
 
-- repository release candidate: `v0.4.0`
+- repository release: GitHub discussion-draft pre-release `v0.4.0`
 - AL2 profile: `VATE-AL2-Verifier-Admission-v0.3`
 - active machine-readable artifact line: `2026-09`
 - exact corpus snapshot: the manifest digest in

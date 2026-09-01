@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 title: "Verifiable Agent Trust Envelope"
-message: "This citation metadata describes the archived v0.3.2 discussion-draft pre-release snapshot. Takao Sato is the author; Poke-nushi is the same author's public maintainer alias and also appears in archived artifacts and historical repository records. For unarchived main-branch changes after v0.3.2, cite the repository URL and exact commit SHA in addition to the latest applicable archived version DOI."
+message: "This citation metadata describes the v0.4.0 GitHub discussion-draft pre-release dated September 1, 2026. Its exact Zenodo version DOI is pending; until it is issued, cite the v0.4.0 GitHub tag URL and the all-version concept DOI. Takao Sato is the author; Poke-nushi is the same author's public maintainer alias and also appears in archived artifacts and historical repository records."
 type: software
 authors:
   - given-names: "Takao"
@@ -9,25 +9,9 @@ authors:
 repository-code: "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope"
 url: "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope"
 license: Apache-2.0
-version: "v0.3.2"
-date-released: 2026-07-06
-doi: 10.5281/zenodo.21226254
+version: "v0.4.0"
+date-released: 2026-09-01
 identifiers:
-  - type: doi
-    value: 10.5281/zenodo.21226254
-    description: "Zenodo archive of the July 6, 2026 v0.3.2 external review portability and reproducibility discussion-draft patch"
-  - type: doi
-    value: 10.5281/zenodo.20173995
-    description: "Zenodo archive of the May 14, 2026 v0.3.1 credibility and reviewability discussion-draft patch"
-  - type: doi
-    value: 10.5281/zenodo.20107413
-    description: "Zenodo archive of the May 10, 2026 v0.3.0 discussion-draft pre-release snapshot"
   - type: doi
     value: 10.5281/zenodo.19839768
     description: "Zenodo all-version concept DOI"
-  - type: doi
-    value: 10.5281/zenodo.20043166
-    description: "Zenodo archive of the May 5, 2026 v0.2.0 review snapshot"
-  - type: doi
-    value: 10.5281/zenodo.19839769
-    description: "Zenodo archive of the earlier v0.1.0 discussion draft"

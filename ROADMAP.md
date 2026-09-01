@@ -9,14 +9,15 @@ For public wording rules, see
 
 ## Current Direction
 
-### `v0.4.0-release-candidate`
+### Post-`v0.4.0`: Independent Implementation Evidence
 
-The v0.4.0 release candidate advances the active machine-readable artifact line
-to `2026-09` while keeping the semantic profile identifier
+The `v0.4.0` GitHub discussion-draft pre-release is the current GitHub public
+review anchor. It advances the active machine-readable artifact line to
+`2026-09` while keeping the semantic profile identifier
 `VATE-AL2-Verifier-Admission-v0.3`. It incorporates the external-SUT input,
 generated-receipt, status-evidence, and report-integrity work accumulated after
-v0.3.2. The archived v0.3.2 snapshot remains the public review anchor until an
-actual release and archive are published.
+v0.3.2. Its Zenodo archive and exact version DOI are pending; v0.3.2 remains a
+historical archived snapshot with its own exact DOI.
 
 The priority remains evidence from independently maintained implementation
 lines and reproducibility across implementers. The current contract migration
@@ -29,15 +30,18 @@ reviewer can inspect, reproduce, and tie back to one corpus snapshot.
 
 The current public review surface is:
 
+- `v0.4.0` GitHub discussion-draft pre-release:
+  <https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.4.0>
+- `v0.4.0` pre-release notes and completed technical gate:
+  [docs/release-notes/v0.4.0.md](docs/release-notes/v0.4.0.md) and
+  [docs/release-gate-v0.4.0.md](docs/release-gate-v0.4.0.md)
+- archived `v0.3.2` release notes and version DOI:
+  [docs/release-notes/v0.3.2.md](docs/release-notes/v0.3.2.md) and
+  `10.5281/zenodo.21226254`
 - archived `v0.3.1` discussion-draft patch:
   <https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.3.1>
 - archived `v0.3.1` version DOI:
   `10.5281/zenodo.20173995`
-- archived `v0.3.2` release notes:
-  [docs/release-notes/v0.3.2.md](docs/release-notes/v0.3.2.md)
-- `v0.4.0` release-candidate notes and local gate:
-  [docs/release-notes/v0.4.0.md](docs/release-notes/v0.4.0.md) and
-  [docs/release-gate-v0.4.0.md](docs/release-gate-v0.4.0.md)
 - archived `v0.3.0` discussion-draft release:
   <https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.3.0>
 - public claim boundary:
@@ -63,24 +67,26 @@ The current public review surface is:
 
 Near-term public work should happen in this order:
 
-1. Keep the lightweight
+1. Archive the exact `v0.4.0` source snapshot on Zenodo. After Zenodo issues
+   the exact version DOI, add that issued DOI to the citation metadata without
+   guessing or deriving it from the concept DOI.
+2. Keep the lightweight
    [one-hour external SUT or corpus review request](docs/conformance/external-sut-ask-1-hour.md)
    visible for reviewers who are not ready to produce a full adapter.
-2. Use the recorded three-case starter bundle, the deeper eight-case bundle,
+3. Use the recorded three-case starter bundle, the deeper eight-case bundle,
    and the external SUT starter template as the reference path for additional
    reviewers. Treat the two bundles as slices from the same AlgoVoi
    implementation line, not two independent SUTs.
-3. Collect a SUT result from another independently maintained implementation
+4. Collect a SUT result from another independently maintained implementation
    line, distinct from both the repository reference runner and the recorded
-   AlgoVoi line, against the `v0.3` corpus snapshot.
-4. Ask implementers to publish generated artifacts or a controlled artifact
+   AlgoVoi line, against the current `2026-09` artifact contract and its exact
+   76-case corpus snapshot.
+5. Ask implementers to publish generated artifacts or a controlled artifact
    bundle, not only a hand-written result summary.
-5. Generate or collect a conformance report, implementation report, and local
+6. Generate or collect a conformance report, implementation report, and local
    `verify-bundle` report for each submitted corpus snapshot.
-6. Use those results to identify unclear corpus cases, reason-code friction,
+7. Use those results to identify unclear corpus cases, reason-code friction,
    missing artifact bindings, or publication metadata gaps.
-7. Complete the v0.4.0 gate for the materially changed conformance contract,
-   then make a separate release and archive decision.
 
 Immediate out of scope:
 
@@ -168,9 +174,9 @@ The `v0.3.0` package includes:
 - documentation for fixture canonicalization limits, namespace migration,
   extension-field handling, and the `2026-07` conformance artifact line.
 
-## External Review Target
+## Post-`v0.4.0` External Review Target
 
-The current post-`v0.3.2` target is to move from author-run artifacts toward
+The current post-`v0.4.0` target is to move from author-run artifacts toward
 independent implementation evidence. The priority is not a broader protocol
 surface.
 
