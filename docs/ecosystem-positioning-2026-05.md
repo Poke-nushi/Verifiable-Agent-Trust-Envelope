@@ -64,4 +64,4 @@ The following public updates make this boundary more important:
 
 The immediate implementation priority is not to define a broad commerce profile.
 
-This repository therefore includes small conformance fixtures that show VATE consuming AP2-style Human Not Present payment authority as evidence, enforcing limits and freshness, detecting replay, and linking post-execution receipts.
+This repository therefore includes small conformance fixtures that show VATE consuming VATE-authored, normalized AP2-style Human Not Present payment-authority projections as evidence, enforcing limits and freshness, failing closed on a supplied VATE-local consumed replay-state input, and linking post-execution receipts. These fixtures are not AP2 wire/schema conformance tests and do not validate durable or atomic consume-once behavior.

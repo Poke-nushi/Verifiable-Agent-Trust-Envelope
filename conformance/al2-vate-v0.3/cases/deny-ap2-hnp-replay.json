@@ -18,8 +18,29 @@
   "artifacts": {
     "admission_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-replay.example.json",
     "admission_request": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-replay.example.json",
-    "ap2_mandate": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-replay.example.json"
+    "ap2_mandate": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-replay.example.json",
+    "replay_context": "conformance/al2-vate-v0.3/fixtures/ap2-hnp-payment-authority-consumed-context.json"
   },
+  "sut_inputs": [
+    {
+      "artifact": "ap2_mandate",
+      "role": "normalized_payment_authority",
+      "media_type": "application/json"
+    },
+    {
+      "artifact": "replay_context",
+      "role": "replay_state",
+      "media_type": "application/json"
+    }
+  ],
+  "al2_context_checks": [
+    {
+      "kind": "replay",
+      "artifact": "replay_context",
+      "expect_replayed": true,
+      "expected_failure_reason": "REPLAY_DETECTED"
+    }
+  ],
   "case_id": "deny-ap2-hnp-replay",
   "category": "negative",
   "expected": {
@@ -48,15 +69,24 @@
         "alg": "sha-256",
         "value": "b4b683cb51fd8fe60fed329d0ad8efbbeb24943a0bc801f5e6e69e6f143d6f64"
       }
+    },
+    {
+      "artifact": "replay_context",
+      "expect_match": true,
+      "expected_digest": {
+        "alg": "sha-256",
+        "value": "23f58212a795806635767236c76d0d08c34f948f41cd77c1f274402aad976543"
+      }
     }
   ],
   "profile": "VATE-AL2-Verifier-Admission-v0.3",
-  "purpose": "A VATE verifier should fail closed when a one-time AP2 Human Not Present mandate nonce has already been consumed.",
-  "title": "Deny a replayed AP2 Human Not Present mandate",
+  "purpose": "A VATE verifier should fail closed when supplied VATE-local replay state reports that the consume key for a normalized AP2-style payment-authority artifact has already been consumed.",
+  "title": "Deny a consumed AP2-style payment-authority input",
   "validation_focus": [
-    "AP2 Human Not Present",
-    "one-time use",
-    "replay detection"
+    "AP2-style Human Not Present evidence",
+    "VATE-local replay state",
+    "stable consume-key basis",
+    "fail closed"
   ],
   "version": "vate-conformance-0.3"
 }

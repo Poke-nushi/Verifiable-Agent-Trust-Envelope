@@ -1,0 +1,16 @@
+{
+  "checked_at": "2026-05-07T10:00:06Z",
+  "consume_key_basis": {
+    "artifact": "ap2_mandate",
+    "canonicalization": "json-sorted-no-whitespace-vate-v0.3-fixture",
+    "digest": {
+      "alg": "sha-256",
+      "value": "b4b683cb51fd8fe60fed329d0ad8efbbeb24943a0bc801f5e6e69e6f143d6f64"
+    }
+  },
+  "failure_reason": "REPLAY_DETECTED",
+  "first_seen_at": "2026-05-07T09:59:40Z",
+  "nonce": "observation-ap2hnp-replay-20260507-002",
+  "replay_key": "vate-fixture-json-sha256:b4b683cb51fd8fe60fed329d0ad8efbbeb24943a0bc801f5e6e69e6f143d6f64",
+  "state": "consumed"
+}

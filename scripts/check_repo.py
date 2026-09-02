@@ -5764,6 +5764,90 @@ def check_replay_boundary_coverage() -> None:
         raise RuntimeError("replay context checks must reject unknown replay states")
 
 
+def check_ap2_hnp_replay_context_coverage() -> None:
+    case_path = (
+        ROOT
+        / "conformance"
+        / "al2-vate-v0.3"
+        / "cases"
+        / "deny-ap2-hnp-replay.json"
+    )
+    case = json.loads(case_path.read_text(encoding="utf-8"))
+    expected_inputs = [
+        {
+            "artifact": "ap2_mandate",
+            "role": "normalized_payment_authority",
+            "media_type": "application/json",
+        },
+        {
+            "artifact": "replay_context",
+            "role": "replay_state",
+            "media_type": "application/json",
+        },
+    ]
+    if case.get("sut_inputs") != expected_inputs:
+        raise RuntimeError(
+            "deny-ap2-hnp-replay must expose only the normalized authority and "
+            "VATE-local replay state as authoritative SUT inputs"
+        )
+
+    mandate_path = ROOT / case["artifacts"]["ap2_mandate"]
+    replay_context_path = ROOT / case["artifacts"]["replay_context"]
+    mandate = json.loads(mandate_path.read_text(encoding="utf-8"))
+    replay_context = json.loads(replay_context_path.read_text(encoding="utf-8"))
+    mandate_digest = hashlib.sha256(canonical_json_bytes(mandate)).hexdigest()
+    expected_replay_key = f"vate-fixture-json-sha256:{mandate_digest}"
+    if replay_context.get("replay_key") != expected_replay_key:
+        raise RuntimeError(
+            "deny-ap2-hnp-replay replay_key must bind the normalized payment-authority "
+            "artifact under the VATE v0.3 fixture JSON digest basis"
+        )
+    consume_key_basis = replay_context.get("consume_key_basis")
+    expected_basis = {
+        "artifact": "ap2_mandate",
+        "canonicalization": "json-sorted-no-whitespace-vate-v0.3-fixture",
+        "digest": {"alg": "sha-256", "value": mandate_digest},
+    }
+    if consume_key_basis != expected_basis:
+        raise RuntimeError(
+            "deny-ap2-hnp-replay must state the normalized payment-authority "
+            "consume-key digest basis explicitly"
+        )
+    nonce = replay_context.get("nonce")
+    source_nonce = mandate.get("constraints", {}).get("replay_nonce")
+    if (
+        not isinstance(nonce, str)
+        or not nonce
+        or nonce in {expected_replay_key, source_nonce}
+    ):
+        raise RuntimeError(
+            "deny-ap2-hnp-replay observation nonce must remain distinct from both "
+            "the stable consume key and the AP2-style projection nonce"
+        )
+    if replay_context.get("state") != "consumed":
+        raise RuntimeError(
+            "deny-ap2-hnp-replay must exercise an explicitly consumed VATE-local replay state"
+        )
+
+    conformance = load_vate_conformance_module()
+    unused_context = dict(replay_context)
+    unused_context["state"] = "unused"
+    unused_context["failure_reason"] = None
+    failures = conformance.evaluate_context_replay_check(
+        {
+            "kind": "replay",
+            "artifact": "replay_context",
+            "expect_replayed": True,
+            "expected_failure_reason": "REPLAY_DETECTED",
+        },
+        unused_context,
+    )
+    if not failures:
+        raise RuntimeError(
+            "deny-ap2-hnp-replay must fail when its replay state is mutated to unused"
+        )
+
+
 def check_p1_5_fixture_coverage() -> None:
     required_cases = {
         "deny-status-stale-just-over-boundary": ["STATUS_STALE", "FAIL_CLOSED"],
@@ -6574,6 +6658,7 @@ def main() -> int:
     check_bundle_report_contract_fail_closed()
     check_external_sut_template_partial_contract()
     check_replay_boundary_coverage()
+    check_ap2_hnp_replay_context_coverage()
     check_p1_5_fixture_coverage()
     check_p2_public_artifact_boundary()
     check_rcl_projection_package()
