@@ -30,6 +30,16 @@ because the SUT input contract, generated-receipt mode, status evidence
 bindings, report formats, and bundle checks are materially different from the
 archived v0.3.2 contract.
 
+The tagged `v0.4.0` snapshot remains fixed at 76 cases, 216 manifest artifacts,
+and corpus digest
+`sha-256:b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130`.
+The current `main` snapshot contains 76 cases, 217 manifest artifacts, and
+corpus digest
+`sha-256:02da4ca9257547872ecbcce9728b8bb256afd2f77676d5daef89fd6c831b2bb0`.
+The added artifact supplies VATE-local replay state for the AP2-style replay
+case. This fixture hardening preserves the `2026-09` exchange contract and does
+not relabel the tagged snapshot or claim AP2-native consume-once validation.
+
 ## Historical `2026-07` Validation Lane
 
 The `2026-07` line remains the historical contract for the archived v0.3.2

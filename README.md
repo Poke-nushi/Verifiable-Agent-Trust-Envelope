@@ -99,8 +99,8 @@ Current repository state:
 - **Active main-branch artifact line**: `2026-09`, under v0.4.0 review; the AL2
   profile identifier remains
   `VATE-AL2-Verifier-Admission-v0.3`
-- **Active main-branch corpus**: 76 cases / 216 manifest artifacts ·
-  `sha-256:b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130`
+- **Active main-branch corpus**: 76 cases / 217 manifest artifacts ·
+  `sha-256:02da4ca9257547872ecbcce9728b8bb256afd2f77676d5daef89fd6c831b2bb0`
 - **Implemented artifacts**: v0.3 schemas and examples; a runnable AL2 fixture
   corpus with negative cases; SUT comparison and implementation-reporting
   formats; a dependency-free verifier core and A2A-shaped adapter demo;

@@ -1,6 +1,6 @@
 {
   "decision": {
-    "human_readable_summary": "The verifier denied execution because the one-time Human Not Present mandate was replayed.",
+    "human_readable_summary": "The verifier denied execution because supplied VATE-local replay state marked the normalized Human Not Present payment-authority consume key as consumed.",
     "outcome": "deny",
     "reason_codes": [
       "REPLAY_DETECTED",
@@ -18,8 +18,8 @@
       "uri": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-replay.example.json",
       "verification": {
         "checked_at": "2026-05-07T10:00:06Z",
-        "failure_reason": "The AP2 mandate replay nonce was already consumed.",
-        "method": "ap2-human-not-present-mandate-verification",
+        "failure_reason": "The supplied VATE-local replay state reports the normalized payment-authority consume key as already consumed.",
+        "method": "vate-local-replay-state-evaluation",
         "result": "failed"
       }
     }

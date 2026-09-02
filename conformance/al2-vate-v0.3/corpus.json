@@ -547,7 +547,8 @@
       "artifacts": {
         "admission_receipt": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-replay.example.json",
         "admission_request": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-replay.example.json",
-        "ap2_mandate": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-replay.example.json"
+        "ap2_mandate": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-replay.example.json",
+        "replay_context": "conformance/al2-vate-v0.3/fixtures/ap2-hnp-payment-authority-consumed-context.json"
       },
       "case_id": "deny-ap2-hnp-replay",
       "category": "negative",
@@ -559,11 +560,24 @@
       ],
       "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.3/cases/deny-ap2-hnp-replay.json",
-      "title": "Deny a replayed AP2 Human Not Present mandate",
+      "sut_inputs": [
+        {
+          "artifact": "ap2_mandate",
+          "media_type": "application/json",
+          "role": "normalized_payment_authority"
+        },
+        {
+          "artifact": "replay_context",
+          "media_type": "application/json",
+          "role": "replay_state"
+        }
+      ],
+      "title": "Deny a consumed AP2-style payment-authority input",
       "validation_focus": [
-        "AP2 Human Not Present",
-        "one-time use",
-        "replay detection"
+        "AP2-style Human Not Present evidence",
+        "VATE-local replay state",
+        "stable consume-key basis",
+        "fail closed"
       ]
     },
     {
@@ -1981,7 +1995,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130"
+    "value": "02da4ca9257547872ecbcce9728b8bb256afd2f77676d5daef89fd6c831b2bb0"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -2074,7 +2088,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-ap2-hnp-replay.json",
-      "sha256": "21ab5b9feb2abf416f06b71a3e9569f48854815b5fcfb3f517a363ec72babf41"
+      "sha256": "cbf8ebfcf0525d5b55b516a23eec90451ff9ccc84b1f768099350d456e8d2a55"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-ap2-hnp-stale-mandate.json",
@@ -2309,6 +2323,10 @@
       "sha256": "4164151383605d9d68230d81cc9ae1dd31eb5cfb3fb1348289abf71ee64773ea"
     },
     {
+      "path": "conformance/al2-vate-v0.3/fixtures/ap2-hnp-payment-authority-consumed-context.json",
+      "sha256": "80f91cac83a1d7a61efb9ad0f5791c1a1860c29b64fd7e868628ce9bd10064a9"
+    },
+    {
       "path": "conformance/al2-vate-v0.3/fixtures/attenuation-approval-string.json",
       "sha256": "73b95c887a9a77cca3fd5461ce70d9d3a73b431b6e7105b12b91ada3f8756938"
     },
@@ -2426,7 +2444,7 @@
     },
     {
       "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-replay.example.json",
-      "sha256": "cc6b04954436a3b15502476a377e109b1065c066d4cc370bbd5760475e6a1036"
+      "sha256": "5c9896b9bbb372128b449cd5992ab0f529993759d2a66345f88b9486ccd633ef"
     },
     {
       "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-stale.example.json",
@@ -2442,7 +2460,7 @@
     },
     {
       "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-replay.example.json",
-      "sha256": "fcb76c70a382acdfe94fa65eb767a6c47011454bfda0d33b4124e18ade5e94ac"
+      "sha256": "d4eeed0fe7d551a8dfac8884cada2c5d77743a953c23e06238966f156a70d796"
     },
     {
       "path": "examples/interop/ap2-human-not-present-to-vate/vate-admission-request-ap2-hnp-stale.example.json",
@@ -2869,7 +2887,7 @@
     "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.3 --out conformance/al2-vate-v0.3/corpus.json"
   },
   "summary": {
-    "artifact_count": 216,
+    "artifact_count": 217,
     "case_count": 76,
     "category_counts": {
       "linkage": 14,

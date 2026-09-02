@@ -3,11 +3,11 @@
   "corpus": {
     "digest": {
       "alg": "sha-256",
-      "value": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130"
+      "value": "02da4ca9257547872ecbcce9728b8bb256afd2f77676d5daef89fd6c831b2bb0"
     },
     "profile": "VATE-AL2-Verifier-Admission-v0.3"
   },
-  "generated_at": "2026-07-01T00:30:00Z",
+  "generated_at": "2026-09-02T00:00:00Z",
   "implementation": {
     "commit": "example-commit",
     "language": "Example JSON fixture",
@@ -981,14 +981,28 @@
     },
     {
       "artifacts": {
-        "admission_receipt": {
-          "digest": {
-            "alg": "sha-256",
-            "value": "cc6b04954436a3b15502476a377e109b1065c066d4cc370bbd5760475e6a1036"
+        "input_artifacts": [
+          {
+            "case_artifact": "ap2_mandate",
+            "digest": {
+              "alg": "sha-256",
+              "value": "e39a66fa10d723442b888f1019eb741015d7976f5bdcb98c9d8951e738c3b197"
+            },
+            "media_type": "application/json",
+            "role": "normalized_payment_authority",
+            "uri": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-replay.example.json"
           },
-          "media_type": "application/vate-admission-receipt+json",
-          "uri": "examples/interop/ap2-human-not-present-to-vate/vate-admission-receipt-ap2-hnp-replay.example.json"
-        }
+          {
+            "case_artifact": "replay_context",
+            "digest": {
+              "alg": "sha-256",
+              "value": "80f91cac83a1d7a61efb9ad0f5791c1a1860c29b64fd7e868628ce9bd10064a9"
+            },
+            "media_type": "application/json",
+            "role": "replay_state",
+            "uri": "conformance/al2-vate-v0.3/fixtures/ap2-hnp-payment-authority-consumed-context.json"
+          }
+        ]
       },
       "case_id": "deny-ap2-hnp-replay",
       "checks": [

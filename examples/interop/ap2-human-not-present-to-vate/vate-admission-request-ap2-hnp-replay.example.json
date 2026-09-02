@@ -25,7 +25,7 @@
         "alg": "sha-256",
         "value": "b4b683cb51fd8fe60fed329d0ad8efbbeb24943a0bc801f5e6e69e6f143d6f64"
       },
-      "media_type": "application/ap2-mandate+json",
+      "media_type": "application/json",
       "protocol_hint": "ap2_human_not_present",
       "type": "payment_mandate",
       "uri": "examples/interop/ap2-human-not-present-to-vate/ap2-hnp-mandate-replay.example.json"
