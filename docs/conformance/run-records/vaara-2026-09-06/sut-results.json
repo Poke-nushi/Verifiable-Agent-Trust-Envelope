@@ -1,0 +1,62 @@
+{
+  "version": "vate-sut-results-2026-09",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "generated_at": "2026-09-06T08:17:25.645600+00:00",
+  "artifact_mode": "corpus-fixture-validation",
+  "implementation": {
+    "name": "Vaara",
+    "type": "reviewer-native-run-vate-side-projection",
+    "version": "1.80.0",
+    "language": "Python",
+    "source": "https://github.com/vaaraio/vaara",
+    "commit": "4459c4614d5a978de6d311bc7735085f33c3938a",
+    "candidate_execution_report": "https://github.com/vaaraio/vaara/discussions/502#discussioncomment-18307758",
+    "reviewer_execution_record": "replay.json",
+    "formatted_by": "VATE maintainer",
+    "provenance_status": "VATE-maintainer replay of unchanged candidate scripts; values parsed from saved reviewer stdout"
+  },
+  "corpus": {
+    "profile": "VATE-AL2-Verifier-Admission-v0.3",
+    "digest": {
+      "alg": "sha-256",
+      "value": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130"
+    }
+  },
+  "results": [
+    {
+      "case_id": "deny-status-stale-just-over-boundary",
+      "status": "completed",
+      "outcome": "deny",
+      "should_execute": false,
+      "reason_codes": [
+        "revocation_stale"
+      ],
+      "artifacts": {
+        "input_artifacts": [
+          {
+            "case_artifact": "status_context",
+            "role": "status_evidence",
+            "uri": "conformance/al2-vate-v0.3/fixtures/status-stale-just-over-boundary-context.json",
+            "media_type": "application/json",
+            "digest": {
+              "alg": "sha-256",
+              "value": "5045e9bcf3711e2de9431d50befb03662c0c868988dcccd616d2392375a545b2"
+            }
+          }
+        ]
+      },
+      "limitations": [
+        "One partial evaluation at Vaara 4459c46; the earlier a8b0705 run observed registry freshness without evaluating admission.",
+        "The native admission verdict is projected using the candidate's stated mapping. The native reason is retained without adding VATE reason codes or unperformed named checks.",
+        "source_issued_at determines registry as_of, grant iat and the fixed credential clock; checked_at sets revocation_now; max_age_seconds sets the freshness bound and test grant lifetime. The split clocks isolate registry freshness from credential TTL.",
+        "The HS256 test key, matching tool/tenant/arguments and supplied known binding digest are non-VATE scaffolding. Grant timing fields are derived from the VATE input. No VATE receipt or named VATE check was evaluated.",
+        "required is unmapped; availability and artifact status:active are not evaluated. The relation between the status-source subject/authority and the credential issuer/key remains unresolved.",
+        "TTL, registry and real-clock Gateway controls are auxiliary observations, not additional VATE corpus case executions. The Gateway controls do not reproduce the exact 300/301-second boundary or execute an upstream tool.",
+        "Reviewer runtime: CPython 3.12.14/macOS arm64. Candidate-reported runtime: CPython 3.12.13/Linux aarch64; exact candidate optional-dependency versions and full original stdout/stderr are unavailable."
+      ]
+    }
+  ],
+  "limitations": [
+    "Only one partial corpus case is submitted; the remaining 75 cases were not executed. Read README.md, replay.json and this SUT result with the generated implementation report, which omits the custom provenance and detailed limitations."
+  ]
+}

@@ -1,0 +1,1170 @@
+{
+  "captured_at_utc": "2026-09-06T06:39:50.829752+00:00",
+  "pin": "4459c4614d5a978de6d311bc7735085f33c3938a",
+  "archive_url": "https://api.github.com/repos/vaaraio/vaara/tarball/4459c4614d5a978de6d311bc7735085f33c3938a",
+  "archive_resolved_url": "https://codeload.github.com/vaaraio/vaara/legacy.tar.gz/4459c4614d5a978de6d311bc7735085f33c3938a",
+  "archive_bytes": 19140659,
+  "archive_sha256": "e08822b376ff69e78d4c9ef4370670cae3fc06312face6640d59f0f6c7f60b34",
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 34020,
+      "sha256": "d8a6cc31abc16b6748c7a21f21611f5a1ec33f67d22ca23d7da1c19b95496bee"
+    },
+    {
+      "path": "README.md",
+      "bytes": 23896,
+      "sha256": "bb5b07a9c4f03f939e3cc8a72237a1c30e9aea3609e129219b777a98ceead724"
+    },
+    {
+      "path": "pyproject.toml",
+      "bytes": 5786,
+      "sha256": "a635a7bd808d095e814208ad3c5e49ad15f6cf03d3eb0ad2f6abef2e11868db1"
+    },
+    {
+      "path": "scripts/vate-al2/README.md",
+      "bytes": 3007,
+      "sha256": "b24558b97d2eff6d228fef3bcd8a5359323b91b1ee2742e15d08ce8c61db748e"
+    },
+    {
+      "path": "scripts/vate-al2/_common.py",
+      "bytes": 5356,
+      "sha256": "8dda83469bc9a37bd3bf605f82bf5c8a5133633e1620caacef47dfe3514359c2"
+    },
+    {
+      "path": "scripts/vate-al2/freshness_admission.py",
+      "bytes": 11541,
+      "sha256": "343c9fef6b714a9b1c9716d4a62388612ed97e0269f4f655a27124fe483fcb20"
+    },
+    {
+      "path": "scripts/vate-al2/ttl_bridge.py",
+      "bytes": 4531,
+      "sha256": "e9c4e9c3216be74b5f2d7779bd243d509b7cc1bf9f84262f1ef98d58b54d6c10"
+    },
+    {
+      "path": "src/vaara/__init__.py",
+      "bytes": 848,
+      "sha256": "a381b0d2b1c203d814467ecbb44f11f7ca31290b5fd2e1598f1b01ca99d98cc8"
+    },
+    {
+      "path": "src/vaara/_decision_vocabulary.py",
+      "bytes": 1802,
+      "sha256": "d8118bf3afbe99df9d45872cb3950e1eff53f893542fbb7b950d559575e1d894"
+    },
+    {
+      "path": "src/vaara/_disposition.py",
+      "bytes": 3329,
+      "sha256": "d72c76437d624c9bc9a68c1305aad8e003a04b238ccb07ac6421449e8de07399"
+    },
+    {
+      "path": "src/vaara/_sanitize.py",
+      "bytes": 4398,
+      "sha256": "7869ddc1807bad775e0a3b1a95bcc1c235d9a744ab3e15ca44f3e0a259ca4464"
+    },
+    {
+      "path": "src/vaara/adversarial_classifier.py",
+      "bytes": 15077,
+      "sha256": "4712fbf128a185f0ffc54f8b680069c9f5aa977fa0a3eecaad0afd9a82abedfc"
+    },
+    {
+      "path": "src/vaara/approvals.py",
+      "bytes": 3560,
+      "sha256": "dcade46477a08d8df7bc9fe2e9f6a8be695760ac92e552b38e1d305b4821da18"
+    },
+    {
+      "path": "src/vaara/assets/favicon.svg",
+      "bytes": 312,
+      "sha256": "c0780f4011bb9147a21c69f1e750778c6e20eed7923b05119192a7e91e161b49"
+    },
+    {
+      "path": "src/vaara/assets/vaara-wordmark-dark.png",
+      "bytes": 57394,
+      "sha256": "e67f60355eb9cd86205134f9d5aae49396633b2f45e4a96c17717f0910ff1eaa"
+    },
+    {
+      "path": "src/vaara/assets/vaara-wordmark-light.png",
+      "bytes": 56414,
+      "sha256": "b9b86eceb0141064e06d0f8391076f4f0fb3661b9a45c5f009edf04d831fc892"
+    },
+    {
+      "path": "src/vaara/attestation/__init__.py",
+      "bytes": 7365,
+      "sha256": "6a454c339660e4ebe6f908570a459931c82fb7294599260353055da41f5344df"
+    },
+    {
+      "path": "src/vaara/attestation/_attest_canonical.py",
+      "bytes": 3905,
+      "sha256": "e95b0ae04207b4ee3bc1b6b7ec6ed2dc3865d3901fa64c825df6b72bb33dd5f0"
+    },
+    {
+      "path": "src/vaara/attestation/_attest_emit.py",
+      "bytes": 6338,
+      "sha256": "55530d47d7655a6739603f0414510ec47f3b308037fec55652851058d0278abb"
+    },
+    {
+      "path": "src/vaara/attestation/_attest_signing.py",
+      "bytes": 3049,
+      "sha256": "c9e00dc40af426c9e23490a1d89f39128f5491047a131e97599031fd8e83df67"
+    },
+    {
+      "path": "src/vaara/attestation/_attest_types.py",
+      "bytes": 9936,
+      "sha256": "9bbbac96608a9f9b4dba9db214aacb90c2e68e4534da3ebfa14162dc5689e94e"
+    },
+    {
+      "path": "src/vaara/attestation/_attest_verifier.py",
+      "bytes": 6121,
+      "sha256": "70c7b04987e2cf61cc4ebbca71cbcf535784cd78262e7b08643ba06469bfbce5"
+    },
+    {
+      "path": "src/vaara/attestation/_attestation_result.py",
+      "bytes": 13979,
+      "sha256": "3e1c8b3cb27372fd39efea4b544e2d89cecf38b22e7d8fa0bc79d924c328412c"
+    },
+    {
+      "path": "src/vaara/attestation/_attribute_attestation.py",
+      "bytes": 17840,
+      "sha256": "0321580ecf0a7b54508e431106dc0df1c06090b8b05d9ec3d4f9ea0eb6d112d0"
+    },
+    {
+      "path": "src/vaara/attestation/_attribute_attestation_zk.py",
+      "bytes": 35017,
+      "sha256": "4d2213128d1fc114f4a7e49411048f1781ae92589568db3cf0913fa78db9985b"
+    },
+    {
+      "path": "src/vaara/attestation/_audit_summary.py",
+      "bytes": 4575,
+      "sha256": "748264edd41735dea0247e0085050ea307788fbd2cd19e923e415ef3bee5c602"
+    },
+    {
+      "path": "src/vaara/attestation/_bundle.py",
+      "bytes": 15033,
+      "sha256": "66aad776ed43a7bf56f349f848df1773bd7868e4005d6783961bfc3047220d4e"
+    },
+    {
+      "path": "src/vaara/attestation/_bundle_io.py",
+      "bytes": 13834,
+      "sha256": "f2c6a9ee5efe5ac93c34eea00f50eb27871c4ed19b070f740673d06a69a24239"
+    },
+    {
+      "path": "src/vaara/attestation/_bundle_set.py",
+      "bytes": 6314,
+      "sha256": "26cf1a5e172282bacc8ca5248c56787606b3a5176a6bd4cbfa21eb2a7146e832"
+    },
+    {
+      "path": "src/vaara/attestation/_conformance_statement.py",
+      "bytes": 31733,
+      "sha256": "f7bd2e54bc50df3912ad15bbb8f249e5f65249bcae996ee53f6b1355a9d6df69"
+    },
+    {
+      "path": "src/vaara/attestation/_data_locality.py",
+      "bytes": 6990,
+      "sha256": "11eed71791fc8fc1b52ce081b495fc2d3fe9b8aada6ba3f86fc44f9e9c39a1e4"
+    },
+    {
+      "path": "src/vaara/attestation/_decision_binding.py",
+      "bytes": 3353,
+      "sha256": "3a5c861ed6344e87fb438500b30d2fca3bb83865b8081ac7175299e0b9254944"
+    },
+    {
+      "path": "src/vaara/attestation/_decision_conformance.py",
+      "bytes": 14146,
+      "sha256": "4f0702904f0dc938751ce48f13789cfe051f8df8475fc22951b8deb7711ca10f"
+    },
+    {
+      "path": "src/vaara/attestation/_decision_emit.py",
+      "bytes": 8250,
+      "sha256": "5eed81ecc65db4b2c5d73a25f4652cf7574fbb04bd09bb2edd46c607b76cfd0d"
+    },
+    {
+      "path": "src/vaara/attestation/_decision_proof_verify.py",
+      "bytes": 3979,
+      "sha256": "b19c20c9569526a6f68e4e27af15097f9a8a3a5b19db38dd8769d9b44cd05682"
+    },
+    {
+      "path": "src/vaara/attestation/_decision_types.py",
+      "bytes": 10632,
+      "sha256": "25f75bdcac133a9d4be7919d6c69ec1a7819bfc14a3ec7a27f337509408a1fe8"
+    },
+    {
+      "path": "src/vaara/attestation/_decision_verifier.py",
+      "bytes": 13294,
+      "sha256": "cde8781edb7e24d9a0c36ade7382edacffb8078a603e8de7e3cc4c17faa47ac8"
+    },
+    {
+      "path": "src/vaara/attestation/_declarative.py",
+      "bytes": 10105,
+      "sha256": "2bc7be64e9f68389c7aa89ee0c26dc6515eb69b5a6b86485a860ffc2907ec32d"
+    },
+    {
+      "path": "src/vaara/attestation/_enforcement.py",
+      "bytes": 16078,
+      "sha256": "83458214a1c56564e007b0266022779e12c8c8a9e123b73ffb33aa72111c2079"
+    },
+    {
+      "path": "src/vaara/attestation/_enforcement_set.py",
+      "bytes": 6691,
+      "sha256": "89f4e66ce5450a23fb6fb56c1295a7c48d2b216e29dd5ad38e629d2ed173ebed"
+    },
+    {
+      "path": "src/vaara/attestation/_handoff.py",
+      "bytes": 28827,
+      "sha256": "ce44a18a8e8d1ff20da239ae31787ff58c0aa8a99ec9918a05e96207cfcb3534"
+    },
+    {
+      "path": "src/vaara/attestation/_handoff_set.py",
+      "bytes": 6506,
+      "sha256": "69605d3a77ebf1176f08d561235949c28e4f390404db749bcf55c61fb048fd24"
+    },
+    {
+      "path": "src/vaara/attestation/_inference_chain_verify.py",
+      "bytes": 11709,
+      "sha256": "30a759c6bfd75992707666dde6d407f0cdfd4aae5004a00c454eb7f01fd595f3"
+    },
+    {
+      "path": "src/vaara/attestation/_inference_crosscheck.py",
+      "bytes": 28637,
+      "sha256": "80da84b80c2fd9d6224ba96a4bf92ac49081d2e124629e5dc21fb257df5189a5"
+    },
+    {
+      "path": "src/vaara/attestation/_inference_determinism.py",
+      "bytes": 4269,
+      "sha256": "99dd85e4dccef4c20bab13e9b1cceaf342bd95415425218e5ba0e808344bfee2"
+    },
+    {
+      "path": "src/vaara/attestation/_inference_emit.py",
+      "bytes": 14796,
+      "sha256": "d5592e7b17c3f1d2d9fba633b21758e407c313a8f78eb80508fd308861aa4227"
+    },
+    {
+      "path": "src/vaara/attestation/_inference_session.py",
+      "bytes": 10652,
+      "sha256": "f059eff3ed69b1f8efbe51af60f51ac13d7f0c894ef1f5ab5b7934395dd81d98"
+    },
+    {
+      "path": "src/vaara/attestation/_inference_types.py",
+      "bytes": 14105,
+      "sha256": "9b36e4b7740accffec6d44d6832cf021ff7dcfa035566e11997a2a2cf17c26dc"
+    },
+    {
+      "path": "src/vaara/attestation/_inference_verify.py",
+      "bytes": 8556,
+      "sha256": "28b7ac71877b67f7456db545791301d69e09a9f045542767eecd72d1c9b99fd6"
+    },
+    {
+      "path": "src/vaara/attestation/_ingest_emit.py",
+      "bytes": 9841,
+      "sha256": "8cf5d9e9e475696af018ec548c389651c1bc9123ad2a7f1ff118f630b6ba660c"
+    },
+    {
+      "path": "src/vaara/attestation/_key_history.py",
+      "bytes": 11547,
+      "sha256": "4eb3470b091bf7142785ba3d0b616c32c693f31a2b5598cf3e48b2e6e464461d"
+    },
+    {
+      "path": "src/vaara/attestation/_normalize.py",
+      "bytes": 19374,
+      "sha256": "03cd01813604fc543de6d1bb83db18eada3d43ac43bdf4892f66a921bcdb9e8d"
+    },
+    {
+      "path": "src/vaara/attestation/_receipt_cbom.py",
+      "bytes": 6734,
+      "sha256": "98b34f1f45cb1c5911659a576abfccaa5aad3276c82ace7155969c2752864d13"
+    },
+    {
+      "path": "src/vaara/attestation/_receipt_conformance.py",
+      "bytes": 11778,
+      "sha256": "4735790d6245d6645c447887c45a369875c9c66a28686a6c072e9ecc69c2c62e"
+    },
+    {
+      "path": "src/vaara/attestation/_receipt_cose.py",
+      "bytes": 7704,
+      "sha256": "147e87ad8e3e1566709295fb417bc86ab6261e04a80903dc4399d8a60aede4b8"
+    },
+    {
+      "path": "src/vaara/attestation/_receipt_emit.py",
+      "bytes": 5945,
+      "sha256": "6fe9035f60f3c56384a4be0f395c72683311fe58060bebb9b7fdc720049fdfc0"
+    },
+    {
+      "path": "src/vaara/attestation/_receipt_existence.py",
+      "bytes": 9378,
+      "sha256": "d4a10828063adb0b36d44dfacc8f32b727733a2f33b9858a8366d77910623197"
+    },
+    {
+      "path": "src/vaara/attestation/_receipt_identity.py",
+      "bytes": 6495,
+      "sha256": "2d8200b112846d70c493806db9060af3604eb322f4740236e93f26c3074e6de5"
+    },
+    {
+      "path": "src/vaara/attestation/_receipt_identity_live.py",
+      "bytes": 12675,
+      "sha256": "3b4353dd352ebac53ec7738de4f48b96b9b3192f9758108a97fe5118543134e2"
+    },
+    {
+      "path": "src/vaara/attestation/_receipt_pq.py",
+      "bytes": 11537,
+      "sha256": "9104de06691ff24b87d79135fae970de94cd17fa23ae7f4e31367400d8e25a0b"
+    },
+    {
+      "path": "src/vaara/attestation/_receipt_retention.py",
+      "bytes": 8705,
+      "sha256": "2c0b82d22482f668be236b784b3fcde2cb2e04f3c104c8f7f6b7e74b6e3cdbb5"
+    },
+    {
+      "path": "src/vaara/attestation/_receipt_types.py",
+      "bytes": 22569,
+      "sha256": "ed5a6c81930a89310cd380afa77bd32120ca88876ffd0c6c22fcd02f25c1b6d3"
+    },
+    {
+      "path": "src/vaara/attestation/_receipt_vc.py",
+      "bytes": 5448,
+      "sha256": "648494370658797dc7eaa684491923254001e449c0ba0d1542a58a4cff079680"
+    },
+    {
+      "path": "src/vaara/attestation/_receipt_verifier.py",
+      "bytes": 3567,
+      "sha256": "75aebf8900ef338ab6a0ea4de65461633a7713eb02f5fa0bd7701215a9e5de2a"
+    },
+    {
+      "path": "src/vaara/attestation/_record_set_conformance.py",
+      "bytes": 7480,
+      "sha256": "bd365ffb3f02e9e2ea5a2d2083150cff48ad69c31e0de052269448850986e5b7"
+    },
+    {
+      "path": "src/vaara/attestation/_record_set_findings.py",
+      "bytes": 5216,
+      "sha256": "df9b4bba21568dde462cbc7be4c3a529cb38b3315561caaa0684de8c881f6cca"
+    },
+    {
+      "path": "src/vaara/attestation/_revocation.py",
+      "bytes": 20614,
+      "sha256": "b07be1e66acaa55a6eac1821b2c4c367222e58d0fbd08ae2dcaeae20c0b72aa4"
+    },
+    {
+      "path": "src/vaara/attestation/_tpm.py",
+      "bytes": 19531,
+      "sha256": "fcc202f5814285adbfb791fa447a46ef8d46b178da4bfeee4e260c97f0073069"
+    },
+    {
+      "path": "src/vaara/attestation/_tpm_binding.py",
+      "bytes": 22668,
+      "sha256": "9235501302dad3fa1c34c19a017c8a3e63dbddf3be2e1db22257a0d7e6c4a130"
+    },
+    {
+      "path": "src/vaara/attestation/_tpm_bundle.py",
+      "bytes": 5665,
+      "sha256": "35dc897961bd8de763ea449c0ebdf95c2f36fbec63b7f231b775a54f3c5f8a05"
+    },
+    {
+      "path": "src/vaara/attestation/_tpm_chain.py",
+      "bytes": 18004,
+      "sha256": "69c865be446196525cf071e01d2b5f06fc49f1644bd81534732bb62b24d3b792"
+    },
+    {
+      "path": "src/vaara/attestation/_tpm_chain_bundle.py",
+      "bytes": 7052,
+      "sha256": "efeb42b625c60fb26099306e4b07a2a5d9909be8de727eac2223e4cbef811cce"
+    },
+    {
+      "path": "src/vaara/attestation/attribute.py",
+      "bytes": 2443,
+      "sha256": "cd5625aa0155bc570f3b53b4910b3b3762d02bbb537bc774317fccc3eaad17d4"
+    },
+    {
+      "path": "src/vaara/attestation/attribute_zk.py",
+      "bytes": 3819,
+      "sha256": "3b3536fdea9ca130f53386bf8dd5bf57e07793a0f5635063b33bc181db8f204d"
+    },
+    {
+      "path": "src/vaara/attestation/cose_receipt.py",
+      "bytes": 1264,
+      "sha256": "2e6e413a272494b1195b37f7bf22f31711072c5b1f4c0f68ce178ccf5bc07743"
+    },
+    {
+      "path": "src/vaara/attestation/data_locality.py",
+      "bytes": 2122,
+      "sha256": "a801de8eb5849983e613792719b74bb47bb70ee526acfc0a453c8d7270dfc6fa"
+    },
+    {
+      "path": "src/vaara/attestation/decision.py",
+      "bytes": 3153,
+      "sha256": "e159e8ea88ffdca3b15ab39a8b43b95ac580624d9aa6542233b759ded938dbfe"
+    },
+    {
+      "path": "src/vaara/attestation/iap.py",
+      "bytes": 9634,
+      "sha256": "99c3c5e6ccc7f7e7fd9fe75748cad53dc31e9307aba9204738a4494f468fd2a8"
+    },
+    {
+      "path": "src/vaara/attestation/inference.py",
+      "bytes": 3139,
+      "sha256": "85d5b67e87810fc5292f730aeca64de3aa753582dc8e45b305d140b6f3147db1"
+    },
+    {
+      "path": "src/vaara/attestation/overt.py",
+      "bytes": 13588,
+      "sha256": "b5a9b1a4449b854d53f1c9630911f7fce117f2e6f611d0c470191ffebd556216"
+    },
+    {
+      "path": "src/vaara/attestation/profiles/acp_checkout.json",
+      "bytes": 2400,
+      "sha256": "b7dd61be9b841055b54841cfcbae031f685177c5891fd05aff491a56ca81d1d0"
+    },
+    {
+      "path": "src/vaara/attestation/profiles/agent_decision.json",
+      "bytes": 2427,
+      "sha256": "fe1213d094520f12643f6c7f291f1561968faaf074d07e245ab9b5cadfc6af10"
+    },
+    {
+      "path": "src/vaara/attestation/profiles/ap2_payment_receipt.json",
+      "bytes": 1831,
+      "sha256": "fe7d641468f5afac72b1170eca737393048adce3e97bc90161eeed6b7fe7447c"
+    },
+    {
+      "path": "src/vaara/attestation/profiles/attested_agent_payment.json",
+      "bytes": 3572,
+      "sha256": "bd86690627db87dab3957d831faff54fc1369c3cd73057ad9109816030ff0fb8"
+    },
+    {
+      "path": "src/vaara/attestation/profiles/c2pa_manifest.json",
+      "bytes": 953,
+      "sha256": "b38bb1aa52c45febef0e7a9b5148a12b868c02fbc2b356d23811edd936e37802"
+    },
+    {
+      "path": "src/vaara/attestation/profiles/caep_security_event.json",
+      "bytes": 1665,
+      "sha256": "b3158af7b25d7f023e73a81f2cf9ad0670405605d24b82d0f1d0a04d9c6899d8"
+    },
+    {
+      "path": "src/vaara/attestation/profiles/slsa_provenance.json",
+      "bytes": 1017,
+      "sha256": "d7b1dafcbc1a81e064330bb70424338178cd85f8dbb10d7ceccfc9952f429408"
+    },
+    {
+      "path": "src/vaara/attestation/profiles/x402_settlement.json",
+      "bytes": 1938,
+      "sha256": "f643f8cdf63ef794eb4616cb33880c66dd14a0f78201f83ef1b886137c4af6c6"
+    },
+    {
+      "path": "src/vaara/attestation/receipt.py",
+      "bytes": 10349,
+      "sha256": "ccc2146d8399c7e739faa348fa14945acc39514bfb8e84869a44ca187938044c"
+    },
+    {
+      "path": "src/vaara/attestation/rekor_log.py",
+      "bytes": 7408,
+      "sha256": "61eda985f9e50059624f9fe6e8966a39f56f74bdb396986c6be00fede8d77262"
+    },
+    {
+      "path": "src/vaara/attestation/s3p.py",
+      "bytes": 19057,
+      "sha256": "c12074d190d27d2f0fa6328d2a4560dbe42ba2654223b0ca4065c11dfdfb984b"
+    },
+    {
+      "path": "src/vaara/attestation/sep2787.py",
+      "bytes": 1542,
+      "sha256": "e33b05090d8c4a92c168ba1efbb77d185a510734cefa29cea81e558c0c536ccd"
+    },
+    {
+      "path": "src/vaara/attestation/tee.py",
+      "bytes": 14816,
+      "sha256": "cf6ec63ba3a8e50383ed7d28606722fd9818cb19d4a0b53ae0302e89be25e787"
+    },
+    {
+      "path": "src/vaara/attestation/tool_call_attestation.py",
+      "bytes": 3811,
+      "sha256": "70a324faf9eb9b455124f3e0b4877cc4183adec055e86e9337113b510dd44abb"
+    },
+    {
+      "path": "src/vaara/attestation/transparency_log.py",
+      "bytes": 14628,
+      "sha256": "acfcf100dca632aa288d61452e8e6f6cccbf50c05e307136e74cae10f59225be"
+    },
+    {
+      "path": "src/vaara/attestation/zk/__init__.py",
+      "bytes": 449,
+      "sha256": "1577ae43724f8524f04113a8ffd7b1c3654aa32b72e237200c17e5047dba1c94"
+    },
+    {
+      "path": "src/vaara/attestation/zk/_circuit.py",
+      "bytes": 2007,
+      "sha256": "45336a5f3f7edbe04f491ebafe928689b9c65a23fd134d5890bba78c03ec478c"
+    },
+    {
+      "path": "src/vaara/attestation/zk/_commit.py",
+      "bytes": 1601,
+      "sha256": "85c7bf622273e06758fb1455f337a687d85b097d15b1bd399840f2308f3dc2ae"
+    },
+    {
+      "path": "src/vaara/attestation/zk/_group.py",
+      "bytes": 4870,
+      "sha256": "88b1598cd7575c37feec2726519ce0086843a6dabf56b4c68d02372c2abc8ea4"
+    },
+    {
+      "path": "src/vaara/attestation/zk/_params.py",
+      "bytes": 1127,
+      "sha256": "03cd67f252aea090429e35ec494ceaded5308ac01672881a63e4810bc638b91c"
+    },
+    {
+      "path": "src/vaara/attestation/zk/_prove.py",
+      "bytes": 6858,
+      "sha256": "f2fddc1d94916bf236e580c882bae7003cfe96863cfc7da0c969a04a3e685a93"
+    },
+    {
+      "path": "src/vaara/attestation/zk/_verify.py",
+      "bytes": 3643,
+      "sha256": "6f0494f63f9c65d7baddfd0be3cc10848cf6cc35d3b4d72c67989562174902fa"
+    },
+    {
+      "path": "src/vaara/audit/__init__.py",
+      "bytes": 173,
+      "sha256": "02c325b8ddd1be6a820c909e73ac928130d6fb23d261320ed748cd5608528d83"
+    },
+    {
+      "path": "src/vaara/audit/article12_export.py",
+      "bytes": 14179,
+      "sha256": "cd4365e1144489a124586862e985889e901100119c078f5e665fa2238a492898"
+    },
+    {
+      "path": "src/vaara/audit/article12_report.py",
+      "bytes": 29726,
+      "sha256": "bef2b9bebd324d0dcd7e46cac5cc3e99c7b37c5428fefaddec06a0e3755198cb"
+    },
+    {
+      "path": "src/vaara/audit/article50.py",
+      "bytes": 24610,
+      "sha256": "9b36fba04b45fe1ccb8f15b1b9d9b5b3561fdc08f190b53ba39e7bc8114c1e70"
+    },
+    {
+      "path": "src/vaara/audit/delegation.py",
+      "bytes": 8268,
+      "sha256": "117415af427604679c55f397a1905c877272ba0d09ab92357f68be443c8bbb74"
+    },
+    {
+      "path": "src/vaara/audit/eu_trusted_list.py",
+      "bytes": 5670,
+      "sha256": "3326eeb96d3a788f55c359799809535d8f875663c8ad229696d344b4d7dbdf94"
+    },
+    {
+      "path": "src/vaara/audit/export.py",
+      "bytes": 20106,
+      "sha256": "acf88322608d1b8bca88b1753457df1d5bcb18d95889a02dc54b0fcc97f3e11c"
+    },
+    {
+      "path": "src/vaara/audit/hcs27.py",
+      "bytes": 14995,
+      "sha256": "d29321be5412d898896525ecb594b2ed1d19e5739ee03ea6bec0bd8dde8289ea"
+    },
+    {
+      "path": "src/vaara/audit/incident_export.py",
+      "bytes": 9989,
+      "sha256": "4ba1bd6deabb9fc25ebe584e2a2e4a0fa2433b4a51873cc251a00472869e30f3"
+    },
+    {
+      "path": "src/vaara/audit/prov_export.py",
+      "bytes": 12446,
+      "sha256": "016187375dbfe83e24db5bf33188d719ba68ac22e863d19390bf76ac674c9630"
+    },
+    {
+      "path": "src/vaara/audit/receipt_anchor.py",
+      "bytes": 16266,
+      "sha256": "5eb0e514f8c227fa9fbc457b4ba9615490325f77f537b09b7730951aff99addc"
+    },
+    {
+      "path": "src/vaara/audit/receipt_page.py",
+      "bytes": 11339,
+      "sha256": "886fbf2abe880ce4be5f4e6af57fd1391f755878fd1311192725490f0611bf4d"
+    },
+    {
+      "path": "src/vaara/audit/receipts.py",
+      "bytes": 11242,
+      "sha256": "60b2d2835089ebc03b684329aed2ac93548fdb080d9b842e614ee341ff854a47"
+    },
+    {
+      "path": "src/vaara/audit/review_queue.py",
+      "bytes": 17873,
+      "sha256": "c09afa6a13b468c8221c9a94862ff5f6b3416f547b54f0ee73fc6fed834a6415"
+    },
+    {
+      "path": "src/vaara/audit/rotate.py",
+      "bytes": 4006,
+      "sha256": "26642ed75b01fed1dba04b802efdd8bb7f5864523fb5f28f42d050fb833b370e"
+    },
+    {
+      "path": "src/vaara/audit/scitt_anchor.py",
+      "bytes": 3955,
+      "sha256": "ab709af867c503498524392551b2d13cd3a24f8001460ad376f5ebe45f7f9424"
+    },
+    {
+      "path": "src/vaara/audit/shadow_report.py",
+      "bytes": 5211,
+      "sha256": "502f6761e2841b7fa9a4d5b8f46b6bb4490eafb74754e3869be612d0beae5e7a"
+    },
+    {
+      "path": "src/vaara/audit/signer.py",
+      "bytes": 5390,
+      "sha256": "b2007c272dc71583caa1864aef54fecc9b2a00e595caeeb11d6568966c9e7919"
+    },
+    {
+      "path": "src/vaara/audit/sqlite_backend.py",
+      "bytes": 64301,
+      "sha256": "12f2210c76e3de7571033d954ce885fc4b28f6ab9e295efb9564f5fa89fd8ebe"
+    },
+    {
+      "path": "src/vaara/audit/timeanchor.py",
+      "bytes": 22485,
+      "sha256": "a93a49aa9dc2b4532804fbe95c3c558a30a957f6ff960ccdedfcce2d4a6bdb62"
+    },
+    {
+      "path": "src/vaara/audit/trail.py",
+      "bytes": 87583,
+      "sha256": "297627832af97964da928d7712b18b597fa4a5ee31a5c5c1105aa42029f83054"
+    },
+    {
+      "path": "src/vaara/audit/verify.py",
+      "bytes": 20434,
+      "sha256": "a5037054fe8c72cdb9c7360f220c14dc37f97243a1302bb3b9366472c002c73c"
+    },
+    {
+      "path": "src/vaara/audit/write_failure.py",
+      "bytes": 11365,
+      "sha256": "7b57d6a745ecd997928ba9985c2d31603e715110e0874d845cb9ca54ae1cfa79"
+    },
+    {
+      "path": "src/vaara/audit_cli.py",
+      "bytes": 20415,
+      "sha256": "d537e4db44525389b135d0b20cf9b07506ce305f09a7cb608b6fd91857e80146"
+    },
+    {
+      "path": "src/vaara/auth.py",
+      "bytes": 3541,
+      "sha256": "1985f6a473d02cf17421b7dfc34949c296b1fd18ff7d854cb167f4df0c92572f"
+    },
+    {
+      "path": "src/vaara/cli.py",
+      "bytes": 285747,
+      "sha256": "a58b1abb9343605ceaafffb1fb6f2041546b62bfc2c70708b3d4db6c6607e295"
+    },
+    {
+      "path": "src/vaara/compliance/__init__.py",
+      "bytes": 185,
+      "sha256": "03325f30b7c511644660fe5c5fe189cce4197dc7ace2523021d8f12d3b434269"
+    },
+    {
+      "path": "src/vaara/compliance/dashboard.py",
+      "bytes": 11510,
+      "sha256": "26ef248a59b13db83c51394442c9be185860609fbbc53a8bacb30bb4dbcaa627"
+    },
+    {
+      "path": "src/vaara/compliance/engine.py",
+      "bytes": 40648,
+      "sha256": "0e0bbcbbd816e7150f50679ad6e5305dc95d35096b62c2ee56bf27544041997c"
+    },
+    {
+      "path": "src/vaara/compliance/render.py",
+      "bytes": 25105,
+      "sha256": "42c11da26146ea512cbbf1dd655af06a04a3f22b89819256734aa06c5d45956c"
+    },
+    {
+      "path": "src/vaara/credential/__init__.py",
+      "bytes": 3036,
+      "sha256": "a964673359837e20f8434eb457244d56db303fecca8390d2c7eb3cf8e7062fbb"
+    },
+    {
+      "path": "src/vaara/credential/_authorization_receipt.py",
+      "bytes": 12234,
+      "sha256": "10da61a4d8eff30665b6182f6033d2d1f445154f8e64674eee83968fbb4593ac"
+    },
+    {
+      "path": "src/vaara/credential/_contiguity.py",
+      "bytes": 16217,
+      "sha256": "9c7a8aa5f9652e95112e4d6e3c82bcbbf6c3d2808bc9a06685803311248fe1a0"
+    },
+    {
+      "path": "src/vaara/credential/_grant_attenuation.py",
+      "bytes": 6940,
+      "sha256": "20da33783ce0f27a0ad31f48c339b05732078191993693d788ac80b6ce71c646"
+    },
+    {
+      "path": "src/vaara/credential/_grant_capability.py",
+      "bytes": 6621,
+      "sha256": "b9a61c09ea012cd0520b689b69b6e36a3f08faf3d8ef137ce21a02edc252e93d"
+    },
+    {
+      "path": "src/vaara/credential/_grant_emit.py",
+      "bytes": 6974,
+      "sha256": "53abb28f01abc9fde3e0bee688674844f9ae1386e529656ab01937b2605e9b0a"
+    },
+    {
+      "path": "src/vaara/credential/_grant_mandate.py",
+      "bytes": 9646,
+      "sha256": "5f24252f662288bf266a060007d84664c62675cc3ad24a9ca4645c29449b00d6"
+    },
+    {
+      "path": "src/vaara/credential/_grant_parse.py",
+      "bytes": 5050,
+      "sha256": "e15fda15a0b138d429a05b51dc1d142c6b2c1f9f5849b3d7a8d89b8f09b92e59"
+    },
+    {
+      "path": "src/vaara/credential/_grant_types.py",
+      "bytes": 4856,
+      "sha256": "b427c83248f97461a0bf60e4b10c0efee6af15a5cd3cf35979ed94b575389345"
+    },
+    {
+      "path": "src/vaara/credential/_grant_verify.py",
+      "bytes": 5943,
+      "sha256": "01548218d684a44603781a8d492eee13b125e1d5c7929a6fd916c43d77f44fa8"
+    },
+    {
+      "path": "src/vaara/credential/gateway.py",
+      "bytes": 6713,
+      "sha256": "b12eb372c4ac177d1954175f51eac5cc1d2e4e3565db460ae6f529225b3a5b46"
+    },
+    {
+      "path": "src/vaara/dashboard.html",
+      "bytes": 18529,
+      "sha256": "183df44eb1a28e2cd70a3c81713e148044dfc6e540db5f5a88ab530666c790aa"
+    },
+    {
+      "path": "src/vaara/dashboard.py",
+      "bytes": 15261,
+      "sha256": "b16b1defff24867d7cb4df2ac18f5bbb5a791d1cd46eff503ff12968975b1b13"
+    },
+    {
+      "path": "src/vaara/data/adversarial_classifier_v8.joblib",
+      "bytes": 1289428,
+      "sha256": "453ece66c5be905696113635fcc7ff7ba43431cc9cbcb2743987c66a82485a7c"
+    },
+    {
+      "path": "src/vaara/data/adversarial_classifier_v9.joblib",
+      "bytes": 1301089,
+      "sha256": "2566da22bf5229a3982f5b6ac2a1bb6ca36d13177a32bbbffcc251d8e4fb16c1"
+    },
+    {
+      "path": "src/vaara/detect/__init__.py",
+      "bytes": 1078,
+      "sha256": "ab3fc3758ac6f43dd7a7af042719ab9af47602786044228398dd04b57d82df2d"
+    },
+    {
+      "path": "src/vaara/detect/injection.py",
+      "bytes": 4557,
+      "sha256": "e5356b7b68e421364b2d4c6dcb35ce737bb3179f036b6484aa42ad68c9b782d0"
+    },
+    {
+      "path": "src/vaara/detect/pii.py",
+      "bytes": 4036,
+      "sha256": "5e286012f49d97f3c0ccc9c85f3e273b9f891c54e4e4edd100d28a8c29786b1f"
+    },
+    {
+      "path": "src/vaara/embeddings.py",
+      "bytes": 2116,
+      "sha256": "964b34b0ed4386b3f7b9a6bd430c5979b6578d904ec7facb41ccca545a4cb381"
+    },
+    {
+      "path": "src/vaara/govern.py",
+      "bytes": 8508,
+      "sha256": "be20440acaec8394498c726c537538d4be6f2b946d8e91875a2536ce1b0ea6ec"
+    },
+    {
+      "path": "src/vaara/integrations/__init__.py",
+      "bytes": 194,
+      "sha256": "71eb5b8c3490d12d166e71efb8940d5db6f84ac4c28248e259ba7ce4e0ad7242"
+    },
+    {
+      "path": "src/vaara/integrations/_content_safety_articles.py",
+      "bytes": 12804,
+      "sha256": "49f20715eaee031884459b2fcb76c76bea1907197ed0ca5b503e900863ba970a"
+    },
+    {
+      "path": "src/vaara/integrations/_content_safety_base.py",
+      "bytes": 6493,
+      "sha256": "4d55e8ecbaedff149cabfd95e72159a89c497a0e5d3e3f12a7f25f38800857bf"
+    },
+    {
+      "path": "src/vaara/integrations/_egress_guard.py",
+      "bytes": 15153,
+      "sha256": "953bf656eccfe37689edccd1942e63ff967f48dda370c132e2f75f783a504b96"
+    },
+    {
+      "path": "src/vaara/integrations/_http_origin.py",
+      "bytes": 5472,
+      "sha256": "8cfa7bdf2ec1358a5da9524921eb5e6ecba59213e396bd52826cc59bbb8e0b52"
+    },
+    {
+      "path": "src/vaara/integrations/_infer_console_app.py",
+      "bytes": 15773,
+      "sha256": "c76283ba86f4b8fff2fbf06d27eff309607ca7a8907347dde2c15d0328f3d1dd"
+    },
+    {
+      "path": "src/vaara/integrations/_infer_console_recall.py",
+      "bytes": 5293,
+      "sha256": "e295e9097c8f2077656c16f159ccd5e22bd2c972a46be7d440d5b318910fe57e"
+    },
+    {
+      "path": "src/vaara/integrations/_infer_console_view.py",
+      "bytes": 12437,
+      "sha256": "f01d678afeb9ac5ac2cd24824a785623fb3cffa732f27deeff42f8391fad4b71"
+    },
+    {
+      "path": "src/vaara/integrations/_infer_proxy_app.py",
+      "bytes": 15259,
+      "sha256": "ae59eacca19e062ed2e2da2c12e169666e933a2fee8f838bddc433e946cb5cf4"
+    },
+    {
+      "path": "src/vaara/integrations/_infer_proxy_emit.py",
+      "bytes": 5891,
+      "sha256": "0865c348ab8fd5b3b9acbd0d548122199f8d420de767159712f4715f0b486d8e"
+    },
+    {
+      "path": "src/vaara/integrations/_infer_proxy_gate.py",
+      "bytes": 9207,
+      "sha256": "991daf21454d1ab5543031926a92cd346770b645501795d8a1530bfa251b0c08"
+    },
+    {
+      "path": "src/vaara/integrations/_infer_proxy_govern.py",
+      "bytes": 2844,
+      "sha256": "012e5ecafadae498e5102168adcad4fe7f383e935868fada0a46cd21acf0f281"
+    },
+    {
+      "path": "src/vaara/integrations/_infer_proxy_model.py",
+      "bytes": 4887,
+      "sha256": "18e30377e25f98882857758b8ecec9951b390782fa96259df4256c4e00e643c4"
+    },
+    {
+      "path": "src/vaara/integrations/_infer_proxy_shape.py",
+      "bytes": 11126,
+      "sha256": "f3ad8c83b6bdf0fc9bf921ed62e8ef3272e1ba69234f886c453b9357dc94adff"
+    },
+    {
+      "path": "src/vaara/integrations/_infer_proxy_sign.py",
+      "bytes": 3153,
+      "sha256": "64e19122a984fdbf605a2a6dea865800729e33b06c86eba9642cf1f62d04c130"
+    },
+    {
+      "path": "src/vaara/integrations/_llm_proxy_app.py",
+      "bytes": 11280,
+      "sha256": "f5c0737e5ec92cb9b9a30e29f9e8c3dda29bbf0b63565a7321c843f7e261ca1f"
+    },
+    {
+      "path": "src/vaara/integrations/_llm_proxy_shape.py",
+      "bytes": 6453,
+      "sha256": "212848eb257581dfafb3af13fafc53208dc6f524cf510d17dcea41cb34b7a161"
+    },
+    {
+      "path": "src/vaara/integrations/_mcp_attest.py",
+      "bytes": 26141,
+      "sha256": "1cbdf63a5c6e3e48aea0f66216c298dd7b27008c6de3eef327469d58e331fee3"
+    },
+    {
+      "path": "src/vaara/integrations/_mcp_notify.py",
+      "bytes": 8572,
+      "sha256": "a238f56ee7d3191c7f188dd257531d0d48e51db3189f8dc5e8401a3a88c3d6da"
+    },
+    {
+      "path": "src/vaara/integrations/_mcp_overt.py",
+      "bytes": 8686,
+      "sha256": "18319fdb39e02fa81f0cdc7da41dbf3669815f440bbae49445c8652668b11c36"
+    },
+    {
+      "path": "src/vaara/integrations/_mcp_upstream.py",
+      "bytes": 7885,
+      "sha256": "89941642902f21f4c02fba443621b3fe2d3397fed36cf65ab02c92ed432ff9fb"
+    },
+    {
+      "path": "src/vaara/integrations/_mcp_upstream_http.py",
+      "bytes": 20416,
+      "sha256": "057c5f9ab1ea924e549b2d4f1b7952df915c00da6534ed43ca2a16358671487c"
+    },
+    {
+      "path": "src/vaara/integrations/azure_content_safety.py",
+      "bytes": 10893,
+      "sha256": "52c0b02e34d90d8708024c3ea2ecab03f3da1f95a91fc5ab04e9f340e3de3389"
+    },
+    {
+      "path": "src/vaara/integrations/bedrock_guardrails.py",
+      "bytes": 9130,
+      "sha256": "83263941b4c4956050c6ee754faacc05e41a423d0669c33c936e7ae73c464eda"
+    },
+    {
+      "path": "src/vaara/integrations/claude_code_deny.json",
+      "bytes": 7064,
+      "sha256": "0b2f5e63ba3ff7e81f5cab00986d44093520ee302c8a63819c6b85a8c137a05a"
+    },
+    {
+      "path": "src/vaara/integrations/claude_code_hooks.py",
+      "bytes": 23811,
+      "sha256": "17a7b555b34beb4e9892b865a449061056320af6081ab921a5afc39500052e0d"
+    },
+    {
+      "path": "src/vaara/integrations/crewai.py",
+      "bytes": 24640,
+      "sha256": "c92046477d84aac6dc28784775eef79dc7fa6ade358c9f4152d34c225746d856"
+    },
+    {
+      "path": "src/vaara/integrations/discovery.py",
+      "bytes": 14099,
+      "sha256": "accd68753181846d6e8522537202688592b45aeaf2aa10d622332cccb545ddc2"
+    },
+    {
+      "path": "src/vaara/integrations/gcp_model_armor.py",
+      "bytes": 12950,
+      "sha256": "fb6e121ca34e0cf9b4bebbd6565231ffc377432db19f028fa11f2b30de4d3e92"
+    },
+    {
+      "path": "src/vaara/integrations/guardrails_ai.py",
+      "bytes": 6883,
+      "sha256": "a9f8c1dd34c06e37c04e1af1d5470634195eb51f54a58134dfb2ae15e32eea82"
+    },
+    {
+      "path": "src/vaara/integrations/infer_console.py",
+      "bytes": 7536,
+      "sha256": "be65b1b90efc9e746f78be3eb95bf72680c21b9449ac905b00ae64f19edbf6c1"
+    },
+    {
+      "path": "src/vaara/integrations/infer_proxy.py",
+      "bytes": 4872,
+      "sha256": "27f0e9fac41de231368a2be392d6f981185d1ec3fe07308ab151e096051a664f"
+    },
+    {
+      "path": "src/vaara/integrations/init_governance.py",
+      "bytes": 17864,
+      "sha256": "1302a132fc4166530a7f1a155135ead3172ad9935a0d2c02682223a5499187bd"
+    },
+    {
+      "path": "src/vaara/integrations/langchain.py",
+      "bytes": 19358,
+      "sha256": "5fc6a22273efb79fe9f66a7f68ec659b6fe331abdad83de57f6f6a6afd9668a6"
+    },
+    {
+      "path": "src/vaara/integrations/llm_actions.py",
+      "bytes": 1093,
+      "sha256": "396fe6606e8dad7e2b34b6eb91ccb8f6e6c2f2f203fda2d1de3c2a47010186f6"
+    },
+    {
+      "path": "src/vaara/integrations/llm_guard.py",
+      "bytes": 4885,
+      "sha256": "fcec4aa2aaa93a0d314ef3e5567463cd02ff6cf5b61294070ffd4034b96caedb"
+    },
+    {
+      "path": "src/vaara/integrations/llm_proxy.py",
+      "bytes": 7010,
+      "sha256": "4b20cd31e6f895e3af621cb8e8130dd3876900aa8c42610ea86659b2595ce3be"
+    },
+    {
+      "path": "src/vaara/integrations/mcp_proxy.py",
+      "bytes": 113134,
+      "sha256": "392af19137a6b2ed99312924098e83851ec99d7fb118431c7a6a04a3d5083a3e"
+    },
+    {
+      "path": "src/vaara/integrations/mcp_server.py",
+      "bytes": 35798,
+      "sha256": "983587f5ccc60cab45e0aa565461e2c6457ceff9f96b55d194da936d902219a6"
+    },
+    {
+      "path": "src/vaara/integrations/nemo_guardrails.py",
+      "bytes": 7779,
+      "sha256": "fdebba9efc8f3de4a850b55616526fe7e1bded229cd6113570987f5779b46009"
+    },
+    {
+      "path": "src/vaara/integrations/openai_agents.py",
+      "bytes": 12683,
+      "sha256": "4dbb87855c09fe835ac823fcb977fb4ad83e1705d47bf1f5bdc902801cf4de13"
+    },
+    {
+      "path": "src/vaara/integrations/proxy_service.py",
+      "bytes": 8231,
+      "sha256": "60a4f3a131dcccf7a4f4a89ef37b39d583dff790de06bdb533ee7cfe18d9a1f6"
+    },
+    {
+      "path": "src/vaara/integrations/rebuff.py",
+      "bytes": 8158,
+      "sha256": "b342523aed3f5d3127e567afcdef233422c2118e6f587e75cd719dd6b84b808a"
+    },
+    {
+      "path": "src/vaara/integrations/shell_proxy.py",
+      "bytes": 4925,
+      "sha256": "e643a9292b2a575465045778160472e100a3ddbf9d6c596e3304aa14ef6cf075"
+    },
+    {
+      "path": "src/vaara/menu.py",
+      "bytes": 6873,
+      "sha256": "3d30a8691d1c3f1b4af2772983857ae5408da140dbd3bf392a0904f7db838c20"
+    },
+    {
+      "path": "src/vaara/northern_lights.py",
+      "bytes": 24261,
+      "sha256": "06329d46396c11075705fb48ee5f3c0503ed6b8f0b908d36c035558e058b58b3"
+    },
+    {
+      "path": "src/vaara/pipeline.py",
+      "bytes": 51939,
+      "sha256": "ef16b2a1c83d3f5f40f5c1f8cc20dcd93ad1afe7d35c66d8a526448329a7e518"
+    },
+    {
+      "path": "src/vaara/policy/__init__.py",
+      "bytes": 2590,
+      "sha256": "1f4bc52ca1f5816cef415601eb917b3d20bd6c8e8cb4b0757c8c8823c92b997c"
+    },
+    {
+      "path": "src/vaara/policy/controller.py",
+      "bytes": 4559,
+      "sha256": "c083f4897a4a35a85722d12fed4c4b71e391dc99f79fd396eb7662e297c30582"
+    },
+    {
+      "path": "src/vaara/policy/loader.py",
+      "bytes": 10841,
+      "sha256": "a71f8a77b1aebe1a3fbc40f1dd0939d8bb0804fa2170c5e587a6af93aee7f24a"
+    },
+    {
+      "path": "src/vaara/policy/modes.py",
+      "bytes": 5045,
+      "sha256": "3f4083641d5cd8b23b9f05b28a6374daa72f5cea3f89b95bf46a08221cb9300c"
+    },
+    {
+      "path": "src/vaara/policy/registry.py",
+      "bytes": 5630,
+      "sha256": "40017a2b88e3c9b6050bbf76c38d1f98fa298f8903c042e4120f0658228efce5"
+    },
+    {
+      "path": "src/vaara/policy/schema.py",
+      "bytes": 4738,
+      "sha256": "6f086964417b9364f831e8f3771a54a92793ccdbadadc823e857bdb7fb2f3cc8"
+    },
+    {
+      "path": "src/vaara/policy/test_cases.py",
+      "bytes": 5148,
+      "sha256": "0db73308826b8105489010ef2fd0a42bf19d0c029c10069850473190d6668ef2"
+    },
+    {
+      "path": "src/vaara/policy/test_cases_io.py",
+      "bytes": 3260,
+      "sha256": "6c132ca42a0e5cde1ccfc420494f57c25ff851ee530e51ad88719904656f46fb"
+    },
+    {
+      "path": "src/vaara/policy/validate.py",
+      "bytes": 7534,
+      "sha256": "39e7f3da9000ced2bfbe64f24a82729df8e6ab513d8a0af4447616a3f55017dd"
+    },
+    {
+      "path": "src/vaara/py.typed",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "src/vaara/sandbox/__init__.py",
+      "bytes": 167,
+      "sha256": "b233cd98415f2e37f1d08b67472ab9192da848eabb3f77f06820fe058fa2da83"
+    },
+    {
+      "path": "src/vaara/sandbox/trace_gen.py",
+      "bytes": 15431,
+      "sha256": "3558a4ebac0d7303bed5281f59033de0214024df6fa15eb436aa1e20cffcb0d4"
+    },
+    {
+      "path": "src/vaara/scorer/__init__.py",
+      "bytes": 1522,
+      "sha256": "c1a05f5f7703103bb309124dac4fc7e289d63716a04b9bc6a1c7d8506a293e44"
+    },
+    {
+      "path": "src/vaara/scorer/_param_signals.py",
+      "bytes": 3803,
+      "sha256": "e07c2f3b194291ac594372892f4f6b34885f37a72b38ad6a08cf56e220b038cd"
+    },
+    {
+      "path": "src/vaara/scorer/action_gate.py",
+      "bytes": 11512,
+      "sha256": "74c0f6e379894fc5027d3de802881ec540de53d710d3faf8e33340eb2b336f0a"
+    },
+    {
+      "path": "src/vaara/scorer/adaptive.py",
+      "bytes": 60712,
+      "sha256": "18ce96d021494fe91b80ba67111d56c34ad727764dce9b573bb999d0c4388fbc"
+    },
+    {
+      "path": "src/vaara/scorer/composite.py",
+      "bytes": 3865,
+      "sha256": "09f20b5a7e830424374db54c3cb6383963382d3a2270757211ac4831a87ab5cd"
+    },
+    {
+      "path": "src/vaara/scorer/composition.py",
+      "bytes": 4058,
+      "sha256": "2b5202c0590182e740c5896c0db4348a9a460a4735e55f5bc368654ec4b8a2ed"
+    },
+    {
+      "path": "src/vaara/scorer/mc_dropout_gate.py",
+      "bytes": 12842,
+      "sha256": "e9c6244766bedf48c005e6de794c68050aeb94b4fed24f284c5981cad0718508"
+    },
+    {
+      "path": "src/vaara/scorer/stacked_gate.py",
+      "bytes": 5255,
+      "sha256": "f4f9d6754634cef7213a22d7dd695c37e8423004ea9ff4dde3988ab1671a6c56"
+    },
+    {
+      "path": "src/vaara/scorer/trained_gate.py",
+      "bytes": 4369,
+      "sha256": "e58fcb4dad3a3e8f9a3c410fe3915ffca0e9c6c1f41c8cab074a53cdca5a27db"
+    },
+    {
+      "path": "src/vaara/server/__init__.py",
+      "bytes": 750,
+      "sha256": "10677601de8fd0bcc45ad3c6cb8b4904fc9096ab877597260424b119188a880e"
+    },
+    {
+      "path": "src/vaara/server/anchor.py",
+      "bytes": 7020,
+      "sha256": "bde3f70efe8575fb715cff817218fccf2250deb236781fabc00a85e17f3d4dec"
+    },
+    {
+      "path": "src/vaara/server/app.py",
+      "bytes": 2772,
+      "sha256": "0305ff73b708b976faa1e7e5ac7df4b157b62bb85898c0ab1cced1226f80b46a"
+    },
+    {
+      "path": "src/vaara/server/routes.py",
+      "bytes": 15285,
+      "sha256": "bdae39561543e986448fdb2c8d74790f9dda0797ccf879573504aeca4316a58b"
+    },
+    {
+      "path": "src/vaara/server/schemas.py",
+      "bytes": 6662,
+      "sha256": "663578d8a4f179370b2b90b1d07cfbac4360d10eaf68dd754d7f1c56458805a9"
+    },
+    {
+      "path": "src/vaara/server/state.py",
+      "bytes": 4706,
+      "sha256": "0d3ae06cc8056222f47eeeb21ded962a86e519cfeb8e7485142bebf994451e20"
+    },
+    {
+      "path": "src/vaara/server/x402.py",
+      "bytes": 7443,
+      "sha256": "aee9f5edaa4a600a490e823053414d21c758d0721d95f6b44f1837cc8354c46a"
+    },
+    {
+      "path": "src/vaara/settlement/__init__.py",
+      "bytes": 730,
+      "sha256": "30375ab98710e488d5670b51b851b5e81d8f2e4fd41d68787edb16e9fb69faaa"
+    },
+    {
+      "path": "src/vaara/settlement/release.py",
+      "bytes": 22117,
+      "sha256": "1035d8875d2a38e3dc5e8debab199205e47186c940de056d9df1d713b45c5381"
+    },
+    {
+      "path": "src/vaara/taxonomy/__init__.py",
+      "bytes": 187,
+      "sha256": "7903927dee6597b7ab0cd1d6f4f6e0ff61658d45daa9e8f9c7fbd03cf1582de4"
+    },
+    {
+      "path": "src/vaara/taxonomy/actions.py",
+      "bytes": 22066,
+      "sha256": "12bd524d68f6bf531a31bdb70e6db7a4e11bc65b3ed2fa8d998d482c517cc90d"
+    }
+  ],
+  "fixture": {
+    "pin": "cc072ef86f54791213a3e603a65b2f24f64b1b6d",
+    "path": "conformance/al2-vate-v0.3/fixtures/status-stale-just-over-boundary-context.json",
+    "sha256": "5045e9bcf3711e2de9431d50befb03662c0c868988dcccd616d2392375a545b2"
+  }
+}
