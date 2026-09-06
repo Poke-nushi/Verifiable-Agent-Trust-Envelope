@@ -7,9 +7,9 @@ VATE's maintainer replayed the two unchanged scripts on 6 September 2026:
 all 3 TTL assertions and 13 freshness/admission assertions passed, and the
 10 native verdicts and 3 registry controls matched the Vaara maintainer's report.
 
-This is a solicited, candidate-reported native evaluation with VATE-maintainer
-replay and VATE-side result formatting. It covers one partial VATE case;
-the comparison retains reason-code differences and unevaluated checks. It
+This record presents native results reproduced by the VATE maintainer using
+Vaara's two unchanged scripts. The solicited evaluation covers one partial VATE
+case; the comparison retains reason-code differences and unevaluated checks. It
 does not establish full-corpus conformance, organic adoption, endorsement or
 production approval.
 

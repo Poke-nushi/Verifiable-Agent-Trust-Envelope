@@ -51,8 +51,9 @@ VATE `cc072ef86f54791213a3e603a65b2f24f64b1b6d` and corpus digest
 The native `ok=False` verdict maps to `deny` / `should_execute: false`;
 `revocation_stale` and unresolved mappings remain intact. The comparison fails on reason-code
 and named-check differences; the remaining 75 cases were not executed.
-This is solicited candidate evidence with VATE-maintainer replay, not a
-full-corpus or adoption claim.
+The native results were reproduced by the VATE maintainer using Vaara's two
+unchanged scripts. This solicited, partial evaluation does not establish
+full-corpus conformance or adoption.
 
 ## Pulse Three-Case Bounded External SUT Run
 
