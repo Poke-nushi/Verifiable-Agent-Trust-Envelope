@@ -1,0 +1,208 @@
+{
+  "status": "native_results_reproduced",
+  "verified_at": "2026-09-06T18:07:57.374135+00:00",
+  "case_id": "deny-audience-mismatch",
+  "packet_id": "vate-bolyra-x402-audience-2026-09-06-v1",
+  "pins": {
+    "vate": "cc072ef86f54791213a3e603a65b2f24f64b1b6d",
+    "bolyra": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+    "x402": "992f78e37178dc4d249eeb0e2dc0720120282dd1"
+  },
+  "corpus_digest": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130",
+  "candidate_report": {
+    "url": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/57#issuecomment-5561003269",
+    "author": "saneGuy",
+    "created_at": "2026-09-06T17:44:05Z",
+    "updated_at": "2026-09-06T17:44:05Z",
+    "body_file": "candidate-report.md",
+    "body_sha256": "4392022346b22844622f1b2e833e3b4a58c843d584f5401cf2e2d6dc3b05870b"
+  },
+  "evidence_class": "VATE-maintainer native replay of candidate-provided scripts",
+  "candidate_runtime": {
+    "node": "24.13.0",
+    "platform": "macOS arm64",
+    "tsx": "4.23.13",
+    "circomlibjs": "0.1.7",
+    "esbuild": null
+  },
+  "reviewer_runtime": {
+    "node": "24.19.0",
+    "platform": "macOS arm64",
+    "@bolyra/sdk": "0.6.1",
+    "@bolyra/receipts": "0.10.0",
+    "circomlibjs": "0.1.7",
+    "tsx": "4.23.13",
+    "esbuild": "0.28.2"
+  },
+  "runtime_limitation": "The reviewer used a different Node patch version. Candidate esbuild version was not supplied. The reported results, not the exact candidate environment, were reproduced.",
+  "dependency_installation": {
+    "bolyra": "npm ci from the pinned integrations/mpp-payments/package-lock.json",
+    "harness": "npm ci from the included package-lock.json",
+    "lifecycle_scripts_enabled": false
+  },
+  "source_manifest": "source-manifest.json",
+  "source_files_unchanged_before_and_after": 17,
+  "candidate_scripts_unchanged": true,
+  "script_hashes": {
+    "runner.mjs": "ba822cfe53a6405d4d4b360c4eb25a9f1cafcdaad1bd682e325c63f6e5effc14",
+    "wrapper.mjs": "629c9e4c1159f34532ee569ba17f90e807c121c13bedfb28b45fa43ac9162e97",
+    "construct-requests.mjs": "c9b7cd395397909f01cef92ef0c3fd9819b635bf11276c25cd574fd10ab5ef61"
+  },
+  "input_packet_sha256": "ba121f67bcda09dbe454b48dc17eb4f0e7a98f6e794dbb31cdd353614cebbdd2",
+  "issued_mandate_sha256": "23c921b16c2481160e13fb77f81397572beb5ee29e9c03a8f7d7e68b50e08f4d",
+  "issued_presentation_matches_candidate_byte_for_byte": true,
+  "presentation_reused_unchanged_across_inputs": true,
+  "harness_execution": {
+    "id": "harness",
+    "argv": [
+      "node",
+      "--import",
+      "tsx",
+      "runner.mjs"
+    ],
+    "started_at": "2026-09-06T18:07:51.337018+00:00",
+    "elapsed_seconds": 3.577,
+    "exit_code": 0,
+    "timed_out": false,
+    "stdin": null,
+    "stdout": "harness.stdout.txt",
+    "stderr": "harness.stderr.txt",
+    "stdout_sha256": "d64e452daa6ca54dc7ae1399de94a162f52339c4a8f1920c754a224d88bea41f",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_bytes": 0
+  },
+  "wrapper_captures": [
+    {
+      "id": "P",
+      "argv": [
+        "tsx",
+        "wrapper.mjs"
+      ],
+      "started_at": "2026-09-06T18:07:54.915210+00:00",
+      "elapsed_seconds": 0.824,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdin": "request-P.json",
+      "stdout": "wrapper-P.stdout.txt",
+      "stderr": "wrapper-P.stderr.txt",
+      "stdout_sha256": "5495da633a69a0c5591afc2f9186fdfb1ef799335c7058a89b46f17a005675f9",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    },
+    {
+      "id": "N1",
+      "argv": [
+        "tsx",
+        "wrapper.mjs"
+      ],
+      "started_at": "2026-09-06T18:07:55.739941+00:00",
+      "elapsed_seconds": 0.817,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdin": "request-N1.json",
+      "stdout": "wrapper-N1.stdout.txt",
+      "stderr": "wrapper-N1.stderr.txt",
+      "stdout_sha256": "4779d31cf8e077d0533b45ca28197294b593f956e54ad1c578bff315d8f111ea",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    },
+    {
+      "id": "N2",
+      "argv": [
+        "tsx",
+        "wrapper.mjs"
+      ],
+      "started_at": "2026-09-06T18:07:56.557388+00:00",
+      "elapsed_seconds": 0.816,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdin": "request-N2.json",
+      "stdout": "wrapper-N2.stdout.txt",
+      "stderr": "wrapper-N2.stderr.txt",
+      "stdout_sha256": "b57fe6778009ea99bfe3484163b5fc616c98018eca41d3062cdaf6bc571b7694",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0
+    }
+  ],
+  "wrapper_capture_scope": "Three additional direct calls to the unchanged wrapper, using the same issued presentation after the successful harness run, capture stdin/stdout/stderr and exit status. They are not additional VATE corpus cases.",
+  "native_report": {
+    "path": "native-report.json",
+    "sha256": "1adf05f9ac67937006aabf3cf8d00ecf22505b5b8094eda1298661218e5ec58a"
+  },
+  "comparisons": [
+    {
+      "id": "P",
+      "request_matches_packet": true,
+      "native_matches_candidate_exactly": true,
+      "host_matches_candidate_summary": true,
+      "wrapper_stdout_matches_candidate_exactly": true,
+      "native": {
+        "verdict": "allow",
+        "kind": "classical"
+      },
+      "host": {
+        "decision": "allow"
+      }
+    },
+    {
+      "id": "N1",
+      "request_matches_packet": true,
+      "native_matches_candidate_exactly": true,
+      "host_matches_candidate_summary": true,
+      "wrapper_stdout_matches_candidate_exactly": true,
+      "native": {
+        "verdict": "deny",
+        "code": "request_mismatch",
+        "message": "request project_key does not match the signed binding",
+        "detail": {
+          "field": "project_key",
+          "request": "https://unexpected.example/a2a",
+          "binding": "https://agent.example/a2a"
+        },
+        "kind": "classical"
+      },
+      "host": {
+        "decision": "deny",
+        "code": "request_mismatch"
+      }
+    },
+    {
+      "id": "N2",
+      "request_matches_packet": true,
+      "native_matches_candidate_exactly": true,
+      "host_matches_candidate_summary": true,
+      "wrapper_stdout_matches_candidate_exactly": true,
+      "native": {
+        "verdict": "deny",
+        "code": "request_mismatch",
+        "message": "granted capability \"mpp:financial:medium\" is not covered by the signed binding",
+        "detail": {
+          "field": "granted_capabilities",
+          "capability": "mpp:financial:medium"
+        },
+        "kind": "classical"
+      },
+      "host": {
+        "decision": "deny",
+        "code": "request_mismatch"
+      }
+    }
+  ],
+  "path_rendering": "Machine-specific executable and directory prefixes are normalized in this metadata. Saved stdout, stderr, inputs and candidate scripts are byte-unmodified, apart from a final LF added when extracting public script code blocks.",
+  "execution_environment": {
+    "short_temporary_directory": true,
+    "outbound_ip_network_denied": true
+  },
+  "initial_setup_attempt": {
+    "classification": "reviewer environment failure",
+    "native_results": "The three direct native verdicts and issued presentation matched.",
+    "host_results": "All three returned deny/failureClass=nonzero_exit.",
+    "observed_error": "tsx CLI listen EINVAL for a Unix pipe under a long temporary directory path.",
+    "resolution": "A short temporary directory resolved the host startup failure; source, candidate scripts, inputs, dependency versions and network policy were unchanged.",
+    "included_in_vate_comparison": false
+  },
+  "application_decision_receipt_issued": false,
+  "application_retention_path_exercised": false,
+  "nonce_consumption_reported_by_allow": false,
+  "scope": "One partial VATE N1 audience-mismatch case with P and N2 auxiliary controls. No payment routing, settlement or post-execution linkage was exercised."
+}

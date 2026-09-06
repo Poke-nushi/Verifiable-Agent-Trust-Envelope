@@ -1,0 +1,1 @@
+{"verdict":"allow","kind":"classical"}

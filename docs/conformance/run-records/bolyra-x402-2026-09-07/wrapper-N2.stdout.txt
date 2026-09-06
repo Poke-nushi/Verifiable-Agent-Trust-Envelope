@@ -1,0 +1,1 @@
+{"verdict":"deny","code":"request_mismatch","message":"granted capability \"mpp:financial:medium\" is not covered by the signed binding","detail":{"field":"granted_capabilities","capability":"mpp:financial:medium"},"kind":"classical"}

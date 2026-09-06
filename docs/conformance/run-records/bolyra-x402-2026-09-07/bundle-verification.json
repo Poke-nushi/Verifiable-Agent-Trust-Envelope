@@ -1,0 +1,1024 @@
+{
+  "artifacts": {
+    "conformance_report": {
+      "digest": {
+        "alg": "sha-256",
+        "value": "5f824df331a1df3272724e6b0f5dca97d8238e8fa1d2cbe90b55bf13bc872f65"
+      },
+      "digest_basis": "json-sorted-no-whitespace",
+      "path": "docs/conformance/run-records/bolyra-x402-2026-09-07/compare-report.json"
+    },
+    "corpus": {
+      "artifact_count": 216,
+      "digest": {
+        "alg": "sha-256",
+        "value": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130"
+      },
+      "root": "conformance/al2-vate-v0.3"
+    },
+    "implementation_report": {
+      "digest": {
+        "alg": "sha-256",
+        "value": "b7ca178651cb3ead5e95acfc1a6eecb86c8ef4b173f743a3f92bf5a113daf47f"
+      },
+      "digest_basis": "json-sorted-no-whitespace",
+      "path": "docs/conformance/run-records/bolyra-x402-2026-09-07/implementation-report.json"
+    },
+    "sut_results": {
+      "digest": {
+        "alg": "sha-256",
+        "value": "e92515b51d1b27517c5b4c6f30bedcfddd2244e3e426d259edfcdda5aebfa395"
+      },
+      "digest_basis": "json-sorted-no-whitespace",
+      "path": "docs/conformance/run-records/bolyra-x402-2026-09-07/sut-results.json"
+    }
+  },
+  "checked_at": "2026-09-06T18:47:23Z",
+  "checks": [
+    {
+      "actual": "conformance/al2-vate-v0.3/cases",
+      "expected": "readable cases directory",
+      "name": "corpus.cases.directory",
+      "pass": true
+    },
+    {
+      "actual": [],
+      "expected": "all case files are valid case objects",
+      "name": "corpus.cases.envelope",
+      "pass": true
+    },
+    {
+      "actual": 76,
+      "expected": "at least one valid conformance case",
+      "name": "corpus.cases.non_empty",
+      "pass": true
+    },
+    {
+      "actual": [
+        "allow-a2a-signed-agent-card-evidence",
+        "allow-ap2-hnp-preauthorized-mandate",
+        "allow-jose-detached-runtime-attestation",
+        "allow-mcp-oauth-token-authority-bound",
+        "allow-mcp-oauth-transport-bound",
+        "allow-mcp-tool-class-aligned",
+        "allow-replay-state-unused",
+        "allow-resource-indicator-aligned",
+        "allow-status-fresh-at-boundary",
+        "allow-valid-admission",
+        "allow-valid-basic-external-write",
+        "allow-valid-with-policy-snapshot",
+        "allow-valid-with-status-fresh",
+        "attenuate-ap2-hnp-amount-overrun",
+        "attenuate-max-amount",
+        "attenuate-requires-new-permit",
+        "attenuate-target-scope",
+        "deny-alg-not-allowed",
+        "deny-ambiguous-trust-anchor",
+        "deny-ap2-hnp-replay",
+        "deny-ap2-hnp-stale-mandate",
+        "deny-attenuation-approval-string",
+        "deny-attenuation-legacy-effective-constraints",
+        "deny-attenuation-malformed-money",
+        "deny-attenuation-max-amount-type-edge",
+        "deny-attenuation-negative-amount",
+        "deny-attenuation-unsafe-path",
+        "deny-audience-mismatch",
+        "deny-digest-mismatch-before-policy",
+        "deny-digest-mismatch",
+        "deny-empty-evidence-refs",
+        "deny-evidence-type-not-allowed",
+        "deny-expired-permit",
+        "deny-jose-alg-none",
+        "deny-jose-crit-unsupported",
+        "deny-jose-es384-not-allowed",
+        "deny-jose-hs256-downgrade",
+        "deny-jose-payload-digest-mismatch",
+        "deny-kid-mismatch",
+        "deny-mcp-oauth-overscope",
+        "deny-mcp-oauth-upstream-denied",
+        "deny-mcp-tool-class-mismatch",
+        "deny-not-yet-valid-permit",
+        "deny-policy-snapshot-mismatch",
+        "deny-replay-detected",
+        "deny-replay-state-replayed",
+        "deny-resource-indicator-drift",
+        "deny-runtime-mismatch",
+        "deny-runtime-proof-stale",
+        "deny-signature-tampered",
+        "deny-status-revoked",
+        "deny-status-stale-fail-closed",
+        "deny-status-stale-just-over-boundary",
+        "deny-status-unavailable-fail-closed",
+        "deny-token-passthrough-as-authority",
+        "deny-trust-anchor-expired",
+        "deny-trust-anchor-not-yet-valid",
+        "deny-trust-anchor-revoked",
+        "deny-unknown-trust-anchor",
+        "interop-ap2-ucp-commerce-evidence",
+        "interop-oap-decision-evidence",
+        "post-execution-admission-digest-mismatch",
+        "post-execution-after-admission-expiry",
+        "post-execution-after-deny",
+        "post-execution-allow-effective-constraints-exceeded",
+        "post-execution-ap2-hnp-linkage-success",
+        "post-execution-effective-constraints-aggregate-exceeded",
+        "post-execution-effective-constraints-exceeded",
+        "post-execution-finish-after-admission-expiry",
+        "post-execution-linkage-mismatch",
+        "post-execution-linkage-success",
+        "post-execution-runtime-mismatch",
+        "post-execution-transaction-mismatch",
+        "rcl-005-authorization-params-mismatch",
+        "rcl-006-occurrence-action-linkage-mismatch",
+        "rcl-008-full-pipeline-acceptance-control"
+      ],
+      "expected": "unique canonical case_id values",
+      "name": "corpus.cases.unique",
+      "pass": true
+    },
+    {
+      "name": "conformance_report.shape",
+      "pass": true
+    },
+    {
+      "name": "implementation_report.shape",
+      "pass": true
+    },
+    {
+      "name": "sut_results.shape",
+      "pass": true
+    },
+    {
+      "actual": [],
+      "expected": "dependency-free conformance report contract",
+      "name": "conformance_report.envelope",
+      "pass": true
+    },
+    {
+      "actual": [],
+      "expected": "dependency-free implementation report contract",
+      "name": "implementation_report.envelope",
+      "pass": true
+    },
+    {
+      "actual": "vate-conformance-report-2026-09",
+      "expected": "vate-conformance-report-2026-09",
+      "name": "conformance_report.version",
+      "pass": true
+    },
+    {
+      "actual": "VATE-AL2-Verifier-Admission-v0.3",
+      "expected": "VATE-AL2-Verifier-Admission-v0.3",
+      "name": "conformance_report.profile",
+      "pass": true
+    },
+    {
+      "actual": "vate-implementation-report-2026-09",
+      "expected": "vate-implementation-report-2026-09",
+      "name": "implementation_report.version",
+      "pass": true
+    },
+    {
+      "actual": "VATE-AL2-Verifier-Admission-v0.3",
+      "expected": "VATE-AL2-Verifier-Admission-v0.3",
+      "name": "implementation_report.profile",
+      "pass": true
+    },
+    {
+      "actual": {
+        "case_schema": "conformance/al2-vate-v0.3/conformance-case.schema.json",
+        "digest_basis": {
+          "alg": "sha-256",
+          "canonicalization": "JSON objects are sorted by key with insignificant whitespace removed before hashing.",
+          "manifest_excludes": [
+            "conformance/al2-vate-v0.3/corpus.json"
+          ]
+        },
+        "name": "al2-vate-v0.3",
+        "profile": "VATE-AL2-Verifier-Admission-v0.3",
+        "root": "conformance/al2-vate-v0.3",
+        "version": "vate-conformance-corpus-2026-09"
+      },
+      "expected": {
+        "case_schema": "conformance/al2-vate-v0.3/conformance-case.schema.json",
+        "digest_basis": {
+          "alg": "sha-256",
+          "canonicalization": "JSON objects are sorted by key with insignificant whitespace removed before hashing.",
+          "manifest_excludes": [
+            "conformance/al2-vate-v0.3/corpus.json"
+          ]
+        },
+        "name": "al2-vate-v0.3",
+        "profile": "VATE-AL2-Verifier-Admission-v0.3",
+        "root": "conformance/al2-vate-v0.3",
+        "version": "vate-conformance-corpus-2026-09"
+      },
+      "name": "corpus_index.identity",
+      "pass": true
+    },
+    {
+      "actual": {
+        "alg": "sha-256",
+        "value": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130"
+      },
+      "expected": {
+        "alg": "sha-256",
+        "value": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130"
+      },
+      "name": "corpus_index.digest",
+      "pass": true
+    },
+    {
+      "details": "committed corpus.json manifest matches the recomputed corpus manifest",
+      "name": "corpus_index.manifest",
+      "pass": true
+    },
+    {
+      "actual": [],
+      "expected": "case objects with unique non-empty case_id values",
+      "name": "corpus_index.cases.shape",
+      "pass": true
+    },
+    {
+      "actual": [
+        "allow-a2a-signed-agent-card-evidence",
+        "allow-ap2-hnp-preauthorized-mandate",
+        "allow-jose-detached-runtime-attestation",
+        "allow-mcp-oauth-token-authority-bound",
+        "allow-mcp-oauth-transport-bound",
+        "allow-mcp-tool-class-aligned",
+        "allow-replay-state-unused",
+        "allow-resource-indicator-aligned",
+        "allow-status-fresh-at-boundary",
+        "allow-valid-admission",
+        "allow-valid-basic-external-write",
+        "allow-valid-with-policy-snapshot",
+        "allow-valid-with-status-fresh",
+        "attenuate-ap2-hnp-amount-overrun",
+        "attenuate-max-amount",
+        "attenuate-requires-new-permit",
+        "attenuate-target-scope",
+        "deny-alg-not-allowed",
+        "deny-ambiguous-trust-anchor",
+        "deny-ap2-hnp-replay",
+        "deny-ap2-hnp-stale-mandate",
+        "deny-attenuation-approval-string",
+        "deny-attenuation-legacy-effective-constraints",
+        "deny-attenuation-malformed-money",
+        "deny-attenuation-max-amount-type-edge",
+        "deny-attenuation-negative-amount",
+        "deny-attenuation-unsafe-path",
+        "deny-audience-mismatch",
+        "deny-digest-mismatch",
+        "deny-digest-mismatch-before-policy",
+        "deny-empty-evidence-refs",
+        "deny-evidence-type-not-allowed",
+        "deny-expired-permit",
+        "deny-jose-alg-none",
+        "deny-jose-crit-unsupported",
+        "deny-jose-es384-not-allowed",
+        "deny-jose-hs256-downgrade",
+        "deny-jose-payload-digest-mismatch",
+        "deny-kid-mismatch",
+        "deny-mcp-oauth-overscope",
+        "deny-mcp-oauth-upstream-denied",
+        "deny-mcp-tool-class-mismatch",
+        "deny-not-yet-valid-permit",
+        "deny-policy-snapshot-mismatch",
+        "deny-replay-detected",
+        "deny-replay-state-replayed",
+        "deny-resource-indicator-drift",
+        "deny-runtime-mismatch",
+        "deny-runtime-proof-stale",
+        "deny-signature-tampered",
+        "deny-status-revoked",
+        "deny-status-stale-fail-closed",
+        "deny-status-stale-just-over-boundary",
+        "deny-status-unavailable-fail-closed",
+        "deny-token-passthrough-as-authority",
+        "deny-trust-anchor-expired",
+        "deny-trust-anchor-not-yet-valid",
+        "deny-trust-anchor-revoked",
+        "deny-unknown-trust-anchor",
+        "interop-ap2-ucp-commerce-evidence",
+        "interop-oap-decision-evidence",
+        "post-execution-admission-digest-mismatch",
+        "post-execution-after-admission-expiry",
+        "post-execution-after-deny",
+        "post-execution-allow-effective-constraints-exceeded",
+        "post-execution-ap2-hnp-linkage-success",
+        "post-execution-effective-constraints-aggregate-exceeded",
+        "post-execution-effective-constraints-exceeded",
+        "post-execution-finish-after-admission-expiry",
+        "post-execution-linkage-mismatch",
+        "post-execution-linkage-success",
+        "post-execution-runtime-mismatch",
+        "post-execution-transaction-mismatch",
+        "rcl-005-authorization-params-mismatch",
+        "rcl-006-occurrence-action-linkage-mismatch",
+        "rcl-008-full-pipeline-acceptance-control"
+      ],
+      "expected": [
+        "allow-a2a-signed-agent-card-evidence",
+        "allow-ap2-hnp-preauthorized-mandate",
+        "allow-jose-detached-runtime-attestation",
+        "allow-mcp-oauth-token-authority-bound",
+        "allow-mcp-oauth-transport-bound",
+        "allow-mcp-tool-class-aligned",
+        "allow-replay-state-unused",
+        "allow-resource-indicator-aligned",
+        "allow-status-fresh-at-boundary",
+        "allow-valid-admission",
+        "allow-valid-basic-external-write",
+        "allow-valid-with-policy-snapshot",
+        "allow-valid-with-status-fresh",
+        "attenuate-ap2-hnp-amount-overrun",
+        "attenuate-max-amount",
+        "attenuate-requires-new-permit",
+        "attenuate-target-scope",
+        "deny-alg-not-allowed",
+        "deny-ambiguous-trust-anchor",
+        "deny-ap2-hnp-replay",
+        "deny-ap2-hnp-stale-mandate",
+        "deny-attenuation-approval-string",
+        "deny-attenuation-legacy-effective-constraints",
+        "deny-attenuation-malformed-money",
+        "deny-attenuation-max-amount-type-edge",
+        "deny-attenuation-negative-amount",
+        "deny-attenuation-unsafe-path",
+        "deny-audience-mismatch",
+        "deny-digest-mismatch",
+        "deny-digest-mismatch-before-policy",
+        "deny-empty-evidence-refs",
+        "deny-evidence-type-not-allowed",
+        "deny-expired-permit",
+        "deny-jose-alg-none",
+        "deny-jose-crit-unsupported",
+        "deny-jose-es384-not-allowed",
+        "deny-jose-hs256-downgrade",
+        "deny-jose-payload-digest-mismatch",
+        "deny-kid-mismatch",
+        "deny-mcp-oauth-overscope",
+        "deny-mcp-oauth-upstream-denied",
+        "deny-mcp-tool-class-mismatch",
+        "deny-not-yet-valid-permit",
+        "deny-policy-snapshot-mismatch",
+        "deny-replay-detected",
+        "deny-replay-state-replayed",
+        "deny-resource-indicator-drift",
+        "deny-runtime-mismatch",
+        "deny-runtime-proof-stale",
+        "deny-signature-tampered",
+        "deny-status-revoked",
+        "deny-status-stale-fail-closed",
+        "deny-status-stale-just-over-boundary",
+        "deny-status-unavailable-fail-closed",
+        "deny-token-passthrough-as-authority",
+        "deny-trust-anchor-expired",
+        "deny-trust-anchor-not-yet-valid",
+        "deny-trust-anchor-revoked",
+        "deny-unknown-trust-anchor",
+        "interop-ap2-ucp-commerce-evidence",
+        "interop-oap-decision-evidence",
+        "post-execution-admission-digest-mismatch",
+        "post-execution-after-admission-expiry",
+        "post-execution-after-deny",
+        "post-execution-allow-effective-constraints-exceeded",
+        "post-execution-ap2-hnp-linkage-success",
+        "post-execution-effective-constraints-aggregate-exceeded",
+        "post-execution-effective-constraints-exceeded",
+        "post-execution-finish-after-admission-expiry",
+        "post-execution-linkage-mismatch",
+        "post-execution-linkage-success",
+        "post-execution-runtime-mismatch",
+        "post-execution-transaction-mismatch",
+        "rcl-005-authorization-params-mismatch",
+        "rcl-006-occurrence-action-linkage-mismatch",
+        "rcl-008-full-pipeline-acceptance-control"
+      ],
+      "name": "corpus_index.cases.coverage",
+      "pass": true
+    },
+    {
+      "details": "corpus index case entries match the loaded canonical case files",
+      "name": "corpus_index.cases.entries",
+      "pass": true
+    },
+    {
+      "actual": 76,
+      "expected": 76,
+      "name": "corpus_index.summary.case_count",
+      "pass": true
+    },
+    {
+      "actual": {
+        "linkage": 14,
+        "negative": 43,
+        "positive": 19
+      },
+      "expected": {
+        "linkage": 14,
+        "negative": 43,
+        "positive": 19
+      },
+      "name": "corpus_index.summary.category_counts",
+      "pass": true
+    },
+    {
+      "actual": 216,
+      "expected": 216,
+      "name": "corpus_index.summary.artifact_count",
+      "pass": true
+    },
+    {
+      "actual": [],
+      "expected": "case result objects with unique case_id and boolean pass",
+      "name": "conformance_report.cases.shape",
+      "pass": true
+    },
+    {
+      "actual": [
+        "allow-a2a-signed-agent-card-evidence",
+        "allow-ap2-hnp-preauthorized-mandate",
+        "allow-jose-detached-runtime-attestation",
+        "allow-mcp-oauth-token-authority-bound",
+        "allow-mcp-oauth-transport-bound",
+        "allow-mcp-tool-class-aligned",
+        "allow-replay-state-unused",
+        "allow-resource-indicator-aligned",
+        "allow-status-fresh-at-boundary",
+        "allow-valid-admission",
+        "allow-valid-basic-external-write",
+        "allow-valid-with-policy-snapshot",
+        "allow-valid-with-status-fresh",
+        "attenuate-ap2-hnp-amount-overrun",
+        "attenuate-max-amount",
+        "attenuate-requires-new-permit",
+        "attenuate-target-scope",
+        "deny-alg-not-allowed",
+        "deny-ambiguous-trust-anchor",
+        "deny-ap2-hnp-replay",
+        "deny-ap2-hnp-stale-mandate",
+        "deny-attenuation-approval-string",
+        "deny-attenuation-legacy-effective-constraints",
+        "deny-attenuation-malformed-money",
+        "deny-attenuation-max-amount-type-edge",
+        "deny-attenuation-negative-amount",
+        "deny-attenuation-unsafe-path",
+        "deny-audience-mismatch",
+        "deny-digest-mismatch",
+        "deny-digest-mismatch-before-policy",
+        "deny-empty-evidence-refs",
+        "deny-evidence-type-not-allowed",
+        "deny-expired-permit",
+        "deny-jose-alg-none",
+        "deny-jose-crit-unsupported",
+        "deny-jose-es384-not-allowed",
+        "deny-jose-hs256-downgrade",
+        "deny-jose-payload-digest-mismatch",
+        "deny-kid-mismatch",
+        "deny-mcp-oauth-overscope",
+        "deny-mcp-oauth-upstream-denied",
+        "deny-mcp-tool-class-mismatch",
+        "deny-not-yet-valid-permit",
+        "deny-policy-snapshot-mismatch",
+        "deny-replay-detected",
+        "deny-replay-state-replayed",
+        "deny-resource-indicator-drift",
+        "deny-runtime-mismatch",
+        "deny-runtime-proof-stale",
+        "deny-signature-tampered",
+        "deny-status-revoked",
+        "deny-status-stale-fail-closed",
+        "deny-status-stale-just-over-boundary",
+        "deny-status-unavailable-fail-closed",
+        "deny-token-passthrough-as-authority",
+        "deny-trust-anchor-expired",
+        "deny-trust-anchor-not-yet-valid",
+        "deny-trust-anchor-revoked",
+        "deny-unknown-trust-anchor",
+        "interop-ap2-ucp-commerce-evidence",
+        "interop-oap-decision-evidence",
+        "post-execution-admission-digest-mismatch",
+        "post-execution-after-admission-expiry",
+        "post-execution-after-deny",
+        "post-execution-allow-effective-constraints-exceeded",
+        "post-execution-ap2-hnp-linkage-success",
+        "post-execution-effective-constraints-aggregate-exceeded",
+        "post-execution-effective-constraints-exceeded",
+        "post-execution-finish-after-admission-expiry",
+        "post-execution-linkage-mismatch",
+        "post-execution-linkage-success",
+        "post-execution-runtime-mismatch",
+        "post-execution-transaction-mismatch",
+        "rcl-005-authorization-params-mismatch",
+        "rcl-006-occurrence-action-linkage-mismatch",
+        "rcl-008-full-pipeline-acceptance-control"
+      ],
+      "expected": [
+        "allow-a2a-signed-agent-card-evidence",
+        "allow-ap2-hnp-preauthorized-mandate",
+        "allow-jose-detached-runtime-attestation",
+        "allow-mcp-oauth-token-authority-bound",
+        "allow-mcp-oauth-transport-bound",
+        "allow-mcp-tool-class-aligned",
+        "allow-replay-state-unused",
+        "allow-resource-indicator-aligned",
+        "allow-status-fresh-at-boundary",
+        "allow-valid-admission",
+        "allow-valid-basic-external-write",
+        "allow-valid-with-policy-snapshot",
+        "allow-valid-with-status-fresh",
+        "attenuate-ap2-hnp-amount-overrun",
+        "attenuate-max-amount",
+        "attenuate-requires-new-permit",
+        "attenuate-target-scope",
+        "deny-alg-not-allowed",
+        "deny-ambiguous-trust-anchor",
+        "deny-ap2-hnp-replay",
+        "deny-ap2-hnp-stale-mandate",
+        "deny-attenuation-approval-string",
+        "deny-attenuation-legacy-effective-constraints",
+        "deny-attenuation-malformed-money",
+        "deny-attenuation-max-amount-type-edge",
+        "deny-attenuation-negative-amount",
+        "deny-attenuation-unsafe-path",
+        "deny-audience-mismatch",
+        "deny-digest-mismatch",
+        "deny-digest-mismatch-before-policy",
+        "deny-empty-evidence-refs",
+        "deny-evidence-type-not-allowed",
+        "deny-expired-permit",
+        "deny-jose-alg-none",
+        "deny-jose-crit-unsupported",
+        "deny-jose-es384-not-allowed",
+        "deny-jose-hs256-downgrade",
+        "deny-jose-payload-digest-mismatch",
+        "deny-kid-mismatch",
+        "deny-mcp-oauth-overscope",
+        "deny-mcp-oauth-upstream-denied",
+        "deny-mcp-tool-class-mismatch",
+        "deny-not-yet-valid-permit",
+        "deny-policy-snapshot-mismatch",
+        "deny-replay-detected",
+        "deny-replay-state-replayed",
+        "deny-resource-indicator-drift",
+        "deny-runtime-mismatch",
+        "deny-runtime-proof-stale",
+        "deny-signature-tampered",
+        "deny-status-revoked",
+        "deny-status-stale-fail-closed",
+        "deny-status-stale-just-over-boundary",
+        "deny-status-unavailable-fail-closed",
+        "deny-token-passthrough-as-authority",
+        "deny-trust-anchor-expired",
+        "deny-trust-anchor-not-yet-valid",
+        "deny-trust-anchor-revoked",
+        "deny-unknown-trust-anchor",
+        "interop-ap2-ucp-commerce-evidence",
+        "interop-oap-decision-evidence",
+        "post-execution-admission-digest-mismatch",
+        "post-execution-after-admission-expiry",
+        "post-execution-after-deny",
+        "post-execution-allow-effective-constraints-exceeded",
+        "post-execution-ap2-hnp-linkage-success",
+        "post-execution-effective-constraints-aggregate-exceeded",
+        "post-execution-effective-constraints-exceeded",
+        "post-execution-finish-after-admission-expiry",
+        "post-execution-linkage-mismatch",
+        "post-execution-linkage-success",
+        "post-execution-runtime-mismatch",
+        "post-execution-transaction-mismatch",
+        "rcl-005-authorization-params-mismatch",
+        "rcl-006-occurrence-action-linkage-mismatch",
+        "rcl-008-full-pipeline-acceptance-control"
+      ],
+      "name": "conformance_report.cases.coverage",
+      "pass": true
+    },
+    {
+      "actual": [],
+      "expected": "canonical expected case projection",
+      "name": "conformance_report.cases.expectations",
+      "pass": true
+    },
+    {
+      "actual": [],
+      "expected": "pass cases have matching expected/actual projections and no failures; failed cases carry at least one failure",
+      "name": "conformance_report.cases.internal_consistency",
+      "pass": true
+    },
+    {
+      "actual": [],
+      "expected": "summary counts derived from cases",
+      "name": "conformance_report.summary.arithmetic",
+      "pass": true
+    },
+    {
+      "actual": {
+        "alg": "sha-256",
+        "value": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130"
+      },
+      "expected": {
+        "alg": "sha-256",
+        "value": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130"
+      },
+      "name": "conformance_report.corpus.digest",
+      "pass": true
+    },
+    {
+      "actual": 216,
+      "expected": 216,
+      "name": "conformance_report.corpus.artifact_count",
+      "pass": true
+    },
+    {
+      "actual": {
+        "alg": "sha-256",
+        "value": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130"
+      },
+      "expected": {
+        "alg": "sha-256",
+        "value": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130"
+      },
+      "name": "implementation_report.corpus.digest",
+      "pass": true
+    },
+    {
+      "details": "implementation report manifest matches the recomputed corpus manifest",
+      "name": "implementation_report.corpus.manifest",
+      "pass": true
+    },
+    {
+      "actual": 76,
+      "expected": 76,
+      "name": "implementation_report.corpus.case_count",
+      "pass": true
+    },
+    {
+      "actual": 216,
+      "expected": 216,
+      "name": "implementation_report.corpus.artifact_count",
+      "pass": true
+    },
+    {
+      "actual": [],
+      "expected": "case result objects with unique case_id and boolean pass",
+      "name": "implementation_report.case_results.shape",
+      "pass": true
+    },
+    {
+      "actual": [
+        "allow-a2a-signed-agent-card-evidence",
+        "allow-ap2-hnp-preauthorized-mandate",
+        "allow-jose-detached-runtime-attestation",
+        "allow-mcp-oauth-token-authority-bound",
+        "allow-mcp-oauth-transport-bound",
+        "allow-mcp-tool-class-aligned",
+        "allow-replay-state-unused",
+        "allow-resource-indicator-aligned",
+        "allow-status-fresh-at-boundary",
+        "allow-valid-admission",
+        "allow-valid-basic-external-write",
+        "allow-valid-with-policy-snapshot",
+        "allow-valid-with-status-fresh",
+        "attenuate-ap2-hnp-amount-overrun",
+        "attenuate-max-amount",
+        "attenuate-requires-new-permit",
+        "attenuate-target-scope",
+        "deny-alg-not-allowed",
+        "deny-ambiguous-trust-anchor",
+        "deny-ap2-hnp-replay",
+        "deny-ap2-hnp-stale-mandate",
+        "deny-attenuation-approval-string",
+        "deny-attenuation-legacy-effective-constraints",
+        "deny-attenuation-malformed-money",
+        "deny-attenuation-max-amount-type-edge",
+        "deny-attenuation-negative-amount",
+        "deny-attenuation-unsafe-path",
+        "deny-audience-mismatch",
+        "deny-digest-mismatch",
+        "deny-digest-mismatch-before-policy",
+        "deny-empty-evidence-refs",
+        "deny-evidence-type-not-allowed",
+        "deny-expired-permit",
+        "deny-jose-alg-none",
+        "deny-jose-crit-unsupported",
+        "deny-jose-es384-not-allowed",
+        "deny-jose-hs256-downgrade",
+        "deny-jose-payload-digest-mismatch",
+        "deny-kid-mismatch",
+        "deny-mcp-oauth-overscope",
+        "deny-mcp-oauth-upstream-denied",
+        "deny-mcp-tool-class-mismatch",
+        "deny-not-yet-valid-permit",
+        "deny-policy-snapshot-mismatch",
+        "deny-replay-detected",
+        "deny-replay-state-replayed",
+        "deny-resource-indicator-drift",
+        "deny-runtime-mismatch",
+        "deny-runtime-proof-stale",
+        "deny-signature-tampered",
+        "deny-status-revoked",
+        "deny-status-stale-fail-closed",
+        "deny-status-stale-just-over-boundary",
+        "deny-status-unavailable-fail-closed",
+        "deny-token-passthrough-as-authority",
+        "deny-trust-anchor-expired",
+        "deny-trust-anchor-not-yet-valid",
+        "deny-trust-anchor-revoked",
+        "deny-unknown-trust-anchor",
+        "interop-ap2-ucp-commerce-evidence",
+        "interop-oap-decision-evidence",
+        "post-execution-admission-digest-mismatch",
+        "post-execution-after-admission-expiry",
+        "post-execution-after-deny",
+        "post-execution-allow-effective-constraints-exceeded",
+        "post-execution-ap2-hnp-linkage-success",
+        "post-execution-effective-constraints-aggregate-exceeded",
+        "post-execution-effective-constraints-exceeded",
+        "post-execution-finish-after-admission-expiry",
+        "post-execution-linkage-mismatch",
+        "post-execution-linkage-success",
+        "post-execution-runtime-mismatch",
+        "post-execution-transaction-mismatch",
+        "rcl-005-authorization-params-mismatch",
+        "rcl-006-occurrence-action-linkage-mismatch",
+        "rcl-008-full-pipeline-acceptance-control"
+      ],
+      "expected": [
+        "allow-a2a-signed-agent-card-evidence",
+        "allow-ap2-hnp-preauthorized-mandate",
+        "allow-jose-detached-runtime-attestation",
+        "allow-mcp-oauth-token-authority-bound",
+        "allow-mcp-oauth-transport-bound",
+        "allow-mcp-tool-class-aligned",
+        "allow-replay-state-unused",
+        "allow-resource-indicator-aligned",
+        "allow-status-fresh-at-boundary",
+        "allow-valid-admission",
+        "allow-valid-basic-external-write",
+        "allow-valid-with-policy-snapshot",
+        "allow-valid-with-status-fresh",
+        "attenuate-ap2-hnp-amount-overrun",
+        "attenuate-max-amount",
+        "attenuate-requires-new-permit",
+        "attenuate-target-scope",
+        "deny-alg-not-allowed",
+        "deny-ambiguous-trust-anchor",
+        "deny-ap2-hnp-replay",
+        "deny-ap2-hnp-stale-mandate",
+        "deny-attenuation-approval-string",
+        "deny-attenuation-legacy-effective-constraints",
+        "deny-attenuation-malformed-money",
+        "deny-attenuation-max-amount-type-edge",
+        "deny-attenuation-negative-amount",
+        "deny-attenuation-unsafe-path",
+        "deny-audience-mismatch",
+        "deny-digest-mismatch",
+        "deny-digest-mismatch-before-policy",
+        "deny-empty-evidence-refs",
+        "deny-evidence-type-not-allowed",
+        "deny-expired-permit",
+        "deny-jose-alg-none",
+        "deny-jose-crit-unsupported",
+        "deny-jose-es384-not-allowed",
+        "deny-jose-hs256-downgrade",
+        "deny-jose-payload-digest-mismatch",
+        "deny-kid-mismatch",
+        "deny-mcp-oauth-overscope",
+        "deny-mcp-oauth-upstream-denied",
+        "deny-mcp-tool-class-mismatch",
+        "deny-not-yet-valid-permit",
+        "deny-policy-snapshot-mismatch",
+        "deny-replay-detected",
+        "deny-replay-state-replayed",
+        "deny-resource-indicator-drift",
+        "deny-runtime-mismatch",
+        "deny-runtime-proof-stale",
+        "deny-signature-tampered",
+        "deny-status-revoked",
+        "deny-status-stale-fail-closed",
+        "deny-status-stale-just-over-boundary",
+        "deny-status-unavailable-fail-closed",
+        "deny-token-passthrough-as-authority",
+        "deny-trust-anchor-expired",
+        "deny-trust-anchor-not-yet-valid",
+        "deny-trust-anchor-revoked",
+        "deny-unknown-trust-anchor",
+        "interop-ap2-ucp-commerce-evidence",
+        "interop-oap-decision-evidence",
+        "post-execution-admission-digest-mismatch",
+        "post-execution-after-admission-expiry",
+        "post-execution-after-deny",
+        "post-execution-allow-effective-constraints-exceeded",
+        "post-execution-ap2-hnp-linkage-success",
+        "post-execution-effective-constraints-aggregate-exceeded",
+        "post-execution-effective-constraints-exceeded",
+        "post-execution-finish-after-admission-expiry",
+        "post-execution-linkage-mismatch",
+        "post-execution-linkage-success",
+        "post-execution-runtime-mismatch",
+        "post-execution-transaction-mismatch",
+        "rcl-005-authorization-params-mismatch",
+        "rcl-006-occurrence-action-linkage-mismatch",
+        "rcl-008-full-pipeline-acceptance-control"
+      ],
+      "name": "implementation_report.case_results.coverage",
+      "pass": true
+    },
+    {
+      "actual": {
+        "alg": "sha-256",
+        "value": "5f824df331a1df3272724e6b0f5dca97d8238e8fa1d2cbe90b55bf13bc872f65"
+      },
+      "expected": {
+        "alg": "sha-256",
+        "value": "5f824df331a1df3272724e6b0f5dca97d8238e8fa1d2cbe90b55bf13bc872f65"
+      },
+      "name": "implementation_report.conformance_report.digest",
+      "pass": true
+    },
+    {
+      "actual": "json-sorted-no-whitespace",
+      "expected": "json-sorted-no-whitespace",
+      "name": "implementation_report.conformance_report.digest_basis",
+      "pass": true
+    },
+    {
+      "actual": {
+        "failed": 76,
+        "passed": 0,
+        "skipped": 0,
+        "total": 76
+      },
+      "expected": {
+        "failed": 76,
+        "passed": 0,
+        "skipped": 0,
+        "total": 76
+      },
+      "name": "implementation_report.summary",
+      "pass": true
+    },
+    {
+      "actual": "fail",
+      "expected": "fail",
+      "name": "implementation_report.status",
+      "pass": true
+    },
+    {
+      "details": "implementation case_results are the conformance report case projection",
+      "name": "implementation_report.case_results",
+      "pass": true
+    },
+    {
+      "actual": {
+        "corpus-fixture-validation": 76,
+        "generated-receipts": 0
+      },
+      "expected": {
+        "corpus-fixture-validation": 76,
+        "generated-receipts": 0
+      },
+      "name": "conformance_report.sut_results.artifact_mode_counts",
+      "pass": true
+    },
+    {
+      "actual": {
+        "corpus-fixture-validation": 76,
+        "generated-receipts": 0
+      },
+      "expected": {
+        "corpus-fixture-validation": 76,
+        "generated-receipts": 0
+      },
+      "name": "implementation_report.artifact_mode_counts",
+      "pass": true
+    },
+    {
+      "actual": [],
+      "expected": "valid SUT result envelope",
+      "name": "sut_results.envelope",
+      "pass": true
+    },
+    {
+      "actual": [],
+      "expected": "result objects with unique non-empty canonical case_id values",
+      "name": "sut_results.results.structure",
+      "pass": true
+    },
+    {
+      "actual": "vate-sut-results-2026-09",
+      "expected": "vate-sut-results-2026-09",
+      "name": "sut_results.version",
+      "pass": true
+    },
+    {
+      "actual": "VATE-AL2-Verifier-Admission-v0.3",
+      "expected": "VATE-AL2-Verifier-Admission-v0.3",
+      "name": "sut_results.profile",
+      "pass": true
+    },
+    {
+      "actual": {
+        "alg": "sha-256",
+        "value": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130"
+      },
+      "expected": {
+        "alg": "sha-256",
+        "value": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130"
+      },
+      "name": "sut_results.corpus.digest",
+      "pass": true
+    },
+    {
+      "actual": {
+        "alg": "sha-256",
+        "value": "e92515b51d1b27517c5b4c6f30bedcfddd2244e3e426d259edfcdda5aebfa395"
+      },
+      "expected": {
+        "alg": "sha-256",
+        "value": "e92515b51d1b27517c5b4c6f30bedcfddd2244e3e426d259edfcdda5aebfa395"
+      },
+      "name": "conformance_report.sut_results.digest",
+      "pass": true
+    },
+    {
+      "actual": "json-sorted-no-whitespace",
+      "expected": "json-sorted-no-whitespace",
+      "name": "conformance_report.sut_results.digest_basis",
+      "pass": true
+    },
+    {
+      "actual": {
+        "candidate_execution_report": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/57#issuecomment-5561003269",
+        "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+        "formatted_by": "VATE maintainer",
+        "host_commit": "992f78e37178dc4d249eeb0e2dc0720120282dd1",
+        "host_source": "https://github.com/saneGuy/x402",
+        "language": "TypeScript",
+        "name": "Bolyra verifyClassical via x402 runEvcVerifier",
+        "provenance_status": "VATE-maintainer replay of unchanged candidate scripts; values parsed from saved reviewer stdout",
+        "reviewer_execution_record": "replay.json",
+        "source": "https://github.com/bolyra/bolyra",
+        "type": "reviewer-native-run-vate-side-projection",
+        "version": "@bolyra/mpp 0.4.0; x402 source 992f78e"
+      },
+      "expected": {
+        "candidate_execution_report": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/57#issuecomment-5561003269",
+        "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+        "formatted_by": "VATE maintainer",
+        "host_commit": "992f78e37178dc4d249eeb0e2dc0720120282dd1",
+        "host_source": "https://github.com/saneGuy/x402",
+        "language": "TypeScript",
+        "name": "Bolyra verifyClassical via x402 runEvcVerifier",
+        "provenance_status": "VATE-maintainer replay of unchanged candidate scripts; values parsed from saved reviewer stdout",
+        "reviewer_execution_record": "replay.json",
+        "source": "https://github.com/bolyra/bolyra",
+        "type": "reviewer-native-run-vate-side-projection",
+        "version": "@bolyra/mpp 0.4.0; x402 source 992f78e"
+      },
+      "name": "conformance_report.sut_results.implementation",
+      "pass": true
+    },
+    {
+      "actual": "corpus-fixture-validation",
+      "expected": "corpus-fixture-validation",
+      "name": "conformance_report.sut_results.artifact_mode",
+      "pass": true
+    },
+    {
+      "actual": {
+        "corpus-fixture-validation": 76,
+        "generated-receipts": 0
+      },
+      "expected": {
+        "corpus-fixture-validation": 76,
+        "generated-receipts": 0
+      },
+      "name": "conformance_report.sut_results.submitted_artifact_mode_counts",
+      "pass": true
+    },
+    {
+      "actual": [],
+      "expected": "actual projection and non-completed state failures derived from the supplied SUT result",
+      "name": "conformance_report.cases.sut_actual_projection",
+      "pass": true
+    },
+    {
+      "actual": 0,
+      "expected": 0,
+      "name": "conformance_report.summary.skipped",
+      "pass": true
+    }
+  ],
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "status": "pass",
+  "summary": {
+    "failed": 0,
+    "passed": 54,
+    "total": 54
+  },
+  "version": "vate-report-bundle-verification-2026-09"
+}

@@ -1,0 +1,89 @@
+{
+  "version": "vate-sut-results-2026-09",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "generated_at": "2026-09-06T18:07:57.374135+00:00",
+  "artifact_mode": "corpus-fixture-validation",
+  "implementation": {
+    "name": "Bolyra verifyClassical via x402 runEvcVerifier",
+    "type": "reviewer-native-run-vate-side-projection",
+    "version": "@bolyra/mpp 0.4.0; x402 source 992f78e",
+    "language": "TypeScript",
+    "source": "https://github.com/bolyra/bolyra",
+    "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+    "host_source": "https://github.com/saneGuy/x402",
+    "host_commit": "992f78e37178dc4d249eeb0e2dc0720120282dd1",
+    "candidate_execution_report": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/57#issuecomment-5561003269",
+    "reviewer_execution_record": "replay.json",
+    "formatted_by": "VATE maintainer",
+    "provenance_status": "VATE-maintainer replay of unchanged candidate scripts; values parsed from saved reviewer stdout"
+  },
+  "corpus": {
+    "profile": "VATE-AL2-Verifier-Admission-v0.3",
+    "digest": {
+      "alg": "sha-256",
+      "value": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130"
+    }
+  },
+  "results": [
+    {
+      "case_id": "deny-audience-mismatch",
+      "status": "completed",
+      "outcome": "deny",
+      "should_execute": false,
+      "reason_codes": [
+        "request_mismatch"
+      ],
+      "artifacts": {},
+      "native_evidence": {
+        "report": {
+          "uri": "native-report.json",
+          "media_type": "application/json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "1adf05f9ac67937006aabf3cf8d00ecf22505b5b8094eda1298661218e5ec58a"
+          }
+        },
+        "request": {
+          "uri": "request-N1.json",
+          "media_type": "application/json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "c83c0c62c2c255cbcb801daf6f34853f11e8f740f412e35b36c829cd314a470c"
+          }
+        },
+        "verdict": {
+          "uri": "wrapper-N1.stdout.txt",
+          "media_type": "application/json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "4779d31cf8e077d0533b45ca28197294b593f956e54ad1c578bff315d8f111ea"
+          }
+        },
+        "input_packet": {
+          "uri": "input-packet.json",
+          "media_type": "application/json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "ba121f67bcda09dbe454b48dc17eb4f0e7a98f6e794dbb31cdd353614cebbdd2"
+          }
+        },
+        "report_selector": "/runs/1",
+        "native_failed_field": "project_key",
+        "artifact_role": "Captured test inputs and outputs; not application receipts or evaluated VATE receipt fixtures"
+      },
+      "limitations": [
+        "N1 is one partial audience-mismatch evaluation. P and N2 are auxiliary controls, not additional VATE corpus cases.",
+        "Fixed base /target/audience maps to signed project_key; mutated base /audience maps to request.project_key. This does not equate VATE audience with x402 payee semantics.",
+        "The native request_mismatch reason is retained. No VATE reason code or named check is synthesized.",
+        "The legacy case expects an admission-receipt fixture reference. That fixture was not evaluated and no application decision receipt was issued, so no receipt reference is submitted.",
+        "Agent, model, program, capability tier, fixed clock, nonce and disposable operator key are native scaffolding. Other VATE request fields, payment routing, settlement and post-execution linkage are not evaluated.",
+        "The command host retains decision and code. Detail, message and kind remain in captured native output; no application retention path was used.",
+        "Reviewer Node 24.19.0 differs from candidate Node 24.13.0. Both use macOS arm64 and tsx 4.23.13; Bolyra dependencies follow the same committed lockfile. Candidate esbuild version was not supplied."
+      ]
+    }
+  ],
+  "limitations": [
+    "Only one partial corpus case is submitted. The other 75 cases were not executed. Interpret whole-corpus failure counts with that distinction.",
+    "The generated implementation report omits custom native evidence and detailed limitations; read it with this SUT result and replay.json."
+  ]
+}
