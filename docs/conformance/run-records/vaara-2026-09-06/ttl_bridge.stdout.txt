@@ -1,0 +1,49 @@
+# VATE AL2: deny-status-stale-just-over-boundary, TTL bridge
+
+## Consumed input
+status-stale-just-over-boundary-context.json
+  path   ../../vate-evidence/status-stale-just-over-boundary-context.json
+  sha256 5045e9bcf3711e2de9431d50befb03662c0c868988dcccd616d2392375a545b2 (verified)
+
+## Environment
+  vaara     1.80.0
+  python    3.12.14 (cpython)
+  platform  Darwin arm64
+
+## Non-VATE scaffolding held constant
+  alg HS256 with a published test key
+  argsCommitment recomputed from the runtime arguments
+  tool 'read_file' and tenant 't1' matching the grant scope
+  binding digest supplied to the verifier as known
+  no capabilities block, so the exact-args commitment path is taken
+
+## Bridge, as proposed in the ask
+  source_issued_at 2026-07-01T00:00:00Z  -> asserted.iat      epoch 1782864000
+  checked_at       2026-07-01T00:05:01Z  -> now               epoch 1782864301
+  max_age_seconds  300                  -> expSeconds
+  elapsed          301s against a 300s bound, over by 1s
+
+## Raw output
+  clock_skew_seconds=0                       -> GrantVerdict(ok=False, reason='expired')
+  clock_skew_seconds=30 (shipped default)    -> GrantVerdict(ok=True, reason='ok')
+  control: checked_at minus 1s, skew=0       -> GrantVerdict(ok=True, reason='ok')
+
+## Reading
+  The predicted verdict reproduces: at zero skew the grant is expired,
+  and the boundary sits exactly where the source reading put it.
+
+  Read the second line too. clock_skew_seconds defaults to 30, so a
+  one-second margin sits inside the default tolerance and the shipped
+  default admits. A case built to catch a verifier with no freshness
+  check cannot distinguish it from one that has a check plus any
+  ordinary clock tolerance, unless zero skew is part of what the case
+  fixes or the margin clears the tolerances implementations ship.
+
+  This script calls verify_grant directly, so it says nothing about
+  what CredentialGateway does with the parameter. freshness_admission.py
+  runs that case against the class.
+
+## Assertions
+  [pass] skew=0 denies as expired
+  [pass] skew=30 admits
+  [pass] control admits

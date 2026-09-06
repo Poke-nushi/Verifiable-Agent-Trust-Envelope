@@ -37,6 +37,23 @@ corpus bytes. Reviewers should resolve the current digest from
 `conformance/al2-vate-v0.3/corpus.json`; a submission for a different digest
 requires its own comparison record.
 
+## Vaara One-Case Partial External SUT Run
+
+Vaara's maintainer supplied saved native scripts and admission results at
+`4459c4614d5a978de6d311bc7735085f33c3938a`. VATE's maintainer replayed both
+scripts against the fixed `v0.4.0` input: all 3 TTL and 13 freshness/admission
+assertions passed, matching the reported native verdicts and registry controls.
+
+The [one-case record and evidence bundle](run-records/vaara-2026-09-06/README.md)
+cover a partial evaluation of `deny-status-stale-just-over-boundary` against
+VATE `cc072ef86f54791213a3e603a65b2f24f64b1b6d` and corpus digest
+`b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130`.
+The native `ok=False` verdict maps to `deny` / `should_execute: false`;
+`revocation_stale` and unresolved mappings remain intact. The comparison fails on reason-code
+and named-check differences; the remaining 75 cases were not executed.
+This is solicited candidate evidence with VATE-maintainer replay, not a
+full-corpus or adoption claim.
+
 ## Pulse Three-Case Bounded External SUT Run
 
 This is a solicited, candidate-executed external SUT record for three selected

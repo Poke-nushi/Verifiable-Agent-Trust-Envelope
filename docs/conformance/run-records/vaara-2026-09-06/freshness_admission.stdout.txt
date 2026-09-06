@@ -1,0 +1,89 @@
+# VATE AL2: deny-status-stale-just-over-boundary, freshness and admission
+
+## Consumed input
+status-stale-just-over-boundary-context.json
+  path   ../../vate-evidence/status-stale-just-over-boundary-context.json
+  sha256 5045e9bcf3711e2de9431d50befb03662c0c868988dcccd616d2392375a545b2 (verified)
+
+## Environment
+  vaara     1.80.0
+  python    3.12.14 (cpython)
+  platform  Darwin arm64
+
+## Non-VATE scaffolding held constant
+  alg HS256 with a published test key
+  argsCommitment recomputed from the runtime arguments
+  tool 'read_file' and tenant 't1' matching the grant scope
+  binding digest supplied to the verifier as known
+  no capabilities block, so the exact-args commitment path is taken
+
+## The registry verdict at a fixed clock
+  RevocationRegistry(entries=(), as_of='2026-07-01T00:00:00Z')
+
+  .status(now='2026-07-01T00:05:01Z', max_staleness_seconds=300)
+    revoked             False
+    freshness           'stale'
+    registry_as_of      '2026-07-01T00:00:00Z'
+    establishes_current False
+
+  boundary controls:
+    300s, exactly at the bound   -> 'fresh'
+    301s, one over (the case)    -> 'stale'
+    no as_of at all              -> 'unknown'
+
+## Freshness carried into an admission decision
+  This is the step the 2 September run did not evaluate. The deny and
+  should_execute rows reported that day were a proposed mapping from
+  establishes_current, not the output of a decision step. Here it is
+  actually evaluated.
+
+  verify_grant, fixed clock:
+    bound 300s, registry 301s old (the case)         -> ok=False, reason='revocation_stale'
+    bound 300s, registry exactly at the bound        -> ok=True, reason='ok'
+    no bound stated (the shipped default)            -> ok=True, reason='ok'
+
+## The same verdicts through the shipped enforcement path
+  CredentialGateway, with a real attestation and grant written to disk
+  by AttestPairEmitter, as the proxy writes them. The gateway takes no
+  now, so these run on the real clock and the one-second boundary above
+  cannot be pinned here. What they show is that the bound and the skew
+  reach verify_grant through the class itself.
+
+    registry from 2020, no bound stated              -> ok=True, reason='ok'
+    registry from 2020, bound 300s                   -> ok=False, reason='revocation_stale'
+    grant 1s old past a 1s lifetime, skew 0          -> ok=False, reason='expired'
+    the same grant, skew 30 (the default)            -> ok=True, reason='ok'
+
+## Reading, in the terms the ask used
+  admission_decision deny   evaluated, verify_grant reason
+                            'revocation_stale'
+  should_execute     false  evaluated, GrantVerdict.ok is False
+  reason_codes              ordered by the verifier, not by me:
+                            revoked is answered before staleness, so a
+                            visible revocation is never downgraded to
+                            revocation_stale by a stale registry
+
+  Unchanged from 2 September. These stay written out as mismatches,
+  because a table cell would overstate each one:
+    required     unmapped. Vaara has no per-call notion of status
+                 evidence being required. Absent registry is
+                 revocation=None, which skips the check silently.
+    availability analogue only, through freshness 'unknown'.
+    status       'active' maps to revoked False only if credential
+                 revocation and status-source liveness are one
+                 predicate. I do not think they are.
+
+## Assertions
+  [pass] case is stale
+  [pass] case does not establish current
+  [pass] case is not revoked
+  [pass] at the bound is fresh
+  [pass] one over is stale
+  [pass] no as_of is unknown
+  [pass] admission denies with revocation_stale
+  [pass] admission at the bound admits
+  [pass] no bound stated admits
+  [pass] gateway without a bound admits an old registry
+  [pass] gateway with a bound refuses it as revocation_stale
+  [pass] gateway forwards skew 0, expired grant refused
+  [pass] gateway forwards skew 30, the same grant admitted

@@ -1,0 +1,313 @@
+{
+  "evidence_class": "reviewer-replay-of-candidate-scripts",
+  "candidate_report": {
+    "candidate_report_url": "https://github.com/vaaraio/vaara/discussions/502#discussioncomment-18307758",
+    "candidate_report_body_sha256": "40afce4ad92b48c515a8bd565b4589179c9ffa861b927f9b09be1c6874102b04",
+    "native_verdict_rows_compared": 10,
+    "native_verdict_rows_matched": 10,
+    "registry_control_rows_compared": 3,
+    "registry_control_rows_matched": 3,
+    "comparison_basis": "Parsed ok/reason pairs in script order and registry boundary freshness values; environment and explanatory text are excluded.",
+    "native_verdict_pairs": [
+      [
+        false,
+        "expired"
+      ],
+      [
+        true,
+        "ok"
+      ],
+      [
+        true,
+        "ok"
+      ],
+      [
+        false,
+        "revocation_stale"
+      ],
+      [
+        true,
+        "ok"
+      ],
+      [
+        true,
+        "ok"
+      ],
+      [
+        true,
+        "ok"
+      ],
+      [
+        false,
+        "revocation_stale"
+      ],
+      [
+        false,
+        "expired"
+      ],
+      [
+        true,
+        "ok"
+      ]
+    ],
+    "registry_control_values": [
+      "fresh",
+      "stale",
+      "unknown"
+    ]
+  },
+  "candidate_commit": "4459c4614d5a978de6d311bc7735085f33c3938a",
+  "candidate_version": "1.80.0",
+  "vate_commit": "cc072ef86f54791213a3e603a65b2f24f64b1b6d",
+  "corpus_digest": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130",
+  "case_id": "deny-status-stale-just-over-boundary",
+  "fixture_path": "conformance/al2-vate-v0.3/fixtures/status-stale-just-over-boundary-context.json",
+  "fixture_sha256": "5045e9bcf3711e2de9431d50befb03662c0c868988dcccd616d2392375a545b2",
+  "projection_generated_at": "2026-09-06T08:17:25.645600+00:00",
+  "source_files_verified_before_and_after": 231,
+  "candidate_scripts_modified": false,
+  "reviewer_environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "system": "Darwin",
+    "machine": "arm64",
+    "vaara_version": "1.80.0",
+    "versions": {
+      "rfc8785": "0.1.4",
+      "cryptography": "50.0.1",
+      "cffi": "2.1.1",
+      "pycparser": "3.0"
+    },
+    "cbor2_available": false
+  },
+  "module_origin_verification": {
+    "vaara": "fixed source src/vaara/__init__.py",
+    "verify_grant": "fixed source src/vaara/credential/_grant_verify.py",
+    "rfc8785": "isolated reviewer dependency directory; exact installed version 0.1.4"
+  },
+  "runtime_matches_candidate_exactly": false,
+  "candidate_reported_environment": "CPython 3.12.13 / Linux aarch64; optional dependency versions not supplied",
+  "rfc8785_wheel": {
+    "version": "0.1.4",
+    "wheel_filename": "rfc8785-0.1.4-py3-none-any.whl",
+    "wheel_sha256": "520d690b448ecf0703691c76e1a34a24ddcd4fc5bc41d589cb7c58ec651bcd48",
+    "pypi_metadata_url": "https://pypi.org/pypi/rfc8785/0.1.4/json",
+    "wheel_url": "https://files.pythonhosted.org/packages/4d/78/119878110660b2ad709888c8a1614fce7e2fab39080ab960656dc8605bf6/rfc8785-0.1.4-py3-none-any.whl"
+  },
+  "source_files": [
+    {
+      "path": "scripts/vate-al2/README.md",
+      "bytes": 3007,
+      "sha256": "b24558b97d2eff6d228fef3bcd8a5359323b91b1ee2742e15d08ce8c61db748e"
+    },
+    {
+      "path": "scripts/vate-al2/_common.py",
+      "bytes": 5356,
+      "sha256": "8dda83469bc9a37bd3bf605f82bf5c8a5133633e1620caacef47dfe3514359c2"
+    },
+    {
+      "path": "scripts/vate-al2/freshness_admission.py",
+      "bytes": 11541,
+      "sha256": "343c9fef6b714a9b1c9716d4a62388612ed97e0269f4f655a27124fe483fcb20"
+    },
+    {
+      "path": "scripts/vate-al2/ttl_bridge.py",
+      "bytes": 4531,
+      "sha256": "e9c4e9c3216be74b5f2d7779bd243d509b7cc1bf9f84262f1ef98d58b54d6c10"
+    },
+    {
+      "path": "src/vaara/attestation/_attest_canonical.py",
+      "bytes": 3905,
+      "sha256": "e95b0ae04207b4ee3bc1b6b7ec6ed2dc3865d3901fa64c825df6b72bb33dd5f0"
+    },
+    {
+      "path": "src/vaara/attestation/_revocation.py",
+      "bytes": 20614,
+      "sha256": "b07be1e66acaa55a6eac1821b2c4c367222e58d0fbd08ae2dcaeae20c0b72aa4"
+    },
+    {
+      "path": "src/vaara/credential/_grant_verify.py",
+      "bytes": 5943,
+      "sha256": "01548218d684a44603781a8d492eee13b125e1d5c7929a6fd916c43d77f44fa8"
+    },
+    {
+      "path": "src/vaara/integrations/_mcp_attest.py",
+      "bytes": 26141,
+      "sha256": "1cbdf63a5c6e3e48aea0f66216c298dd7b27008c6de3eef327469d58e331fee3"
+    }
+  ],
+  "commands_path_basis": "Portable commands from the Vaara checkout; PYTHONPATH prepends the isolated rfc8785 directory and the fixed Vaara src directory. Machine-specific executable, source and temporary-directory prefixes are omitted from this metadata. Stdout/stderr files are unchanged.",
+  "environment_options": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONNOUSERSITE": "1",
+    "PYTHONUTF8": "1",
+    "TMPDIR": "temporary directory owned by this replay"
+  },
+  "runs": [
+    {
+      "script": "scripts/vate-al2/ttl_bridge.py",
+      "script_sha256": "e9c4e9c3216be74b5f2d7779bd243d509b7cc1bf9f84262f1ef98d58b54d6c10",
+      "started_at_utc": "2026-09-06T08:11:51.313833+00:00",
+      "duration_seconds": 0.139095,
+      "exit_code": 0,
+      "assertions": [
+        {
+          "status": "pass",
+          "label": "skew=0 denies as expired"
+        },
+        {
+          "status": "pass",
+          "label": "skew=30 admits"
+        },
+        {
+          "status": "pass",
+          "label": "control admits"
+        }
+      ],
+      "passed_assertions": 3,
+      "failed_assertions": 0,
+      "native_verdicts": [
+        {
+          "label": "clock_skew_seconds=0",
+          "ok": false,
+          "reason": "expired"
+        },
+        {
+          "label": "clock_skew_seconds=30 (shipped default)",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "label": "control: checked_at minus 1s, skew=0",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "stdout": "ttl_bridge.stdout.txt",
+      "stdout_sha256": "99c91054cde3d47a3d860151631c5b2dce18af9fd63a31f094e7e88c30e67f84",
+      "stderr": "ttl_bridge.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_command": [
+        "python3",
+        "-B",
+        "scripts/vate-al2/ttl_bridge.py",
+        "../../vate-evidence/status-stale-just-over-boundary-context.json"
+      ]
+    },
+    {
+      "script": "scripts/vate-al2/freshness_admission.py",
+      "script_sha256": "343c9fef6b714a9b1c9716d4a62388612ed97e0269f4f655a27124fe483fcb20",
+      "started_at_utc": "2026-09-06T08:11:51.453231+00:00",
+      "duration_seconds": 2.211704,
+      "exit_code": 0,
+      "assertions": [
+        {
+          "status": "pass",
+          "label": "case is stale"
+        },
+        {
+          "status": "pass",
+          "label": "case does not establish current"
+        },
+        {
+          "status": "pass",
+          "label": "case is not revoked"
+        },
+        {
+          "status": "pass",
+          "label": "at the bound is fresh"
+        },
+        {
+          "status": "pass",
+          "label": "one over is stale"
+        },
+        {
+          "status": "pass",
+          "label": "no as_of is unknown"
+        },
+        {
+          "status": "pass",
+          "label": "admission denies with revocation_stale"
+        },
+        {
+          "status": "pass",
+          "label": "admission at the bound admits"
+        },
+        {
+          "status": "pass",
+          "label": "no bound stated admits"
+        },
+        {
+          "status": "pass",
+          "label": "gateway without a bound admits an old registry"
+        },
+        {
+          "status": "pass",
+          "label": "gateway with a bound refuses it as revocation_stale"
+        },
+        {
+          "status": "pass",
+          "label": "gateway forwards skew 0, expired grant refused"
+        },
+        {
+          "status": "pass",
+          "label": "gateway forwards skew 30, the same grant admitted"
+        }
+      ],
+      "passed_assertions": 13,
+      "failed_assertions": 0,
+      "native_verdicts": [
+        {
+          "label": "bound 300s, registry 301s old (the case)",
+          "ok": false,
+          "reason": "revocation_stale"
+        },
+        {
+          "label": "bound 300s, registry exactly at the bound",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "label": "no bound stated (the shipped default)",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "label": "registry from 2020, no bound stated",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "label": "registry from 2020, bound 300s",
+          "ok": false,
+          "reason": "revocation_stale"
+        },
+        {
+          "label": "grant 1s old past a 1s lifetime, skew 0",
+          "ok": false,
+          "reason": "expired"
+        },
+        {
+          "label": "the same grant, skew 30 (the default)",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "stdout": "freshness_admission.stdout.txt",
+      "stdout_sha256": "71cbf2b5891e67109a2ae4e0ef9bd0d5a42715ed4f20c71fa7f164158bab34ee",
+      "stderr": "freshness_admission.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_command": [
+        "python3",
+        "-B",
+        "scripts/vate-al2/freshness_admission.py",
+        "../../vate-evidence/status-stale-just-over-boundary-context.json"
+      ]
+    }
+  ],
+  "source_manifest": {
+    "uri": "source-manifest.json",
+    "sha256": "113176f5233056a71b09842a3694ff2bcf8334e3ef5ab2cb874e069a113db04d",
+    "files": 231
+  }
+}
