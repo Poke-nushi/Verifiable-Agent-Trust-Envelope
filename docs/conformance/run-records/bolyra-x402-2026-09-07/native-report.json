@@ -1,0 +1,77 @@
+{
+  "packet_id": "vate-bolyra-x402-audience-2026-09-06-v1",
+  "runs": [
+    {
+      "id": "P",
+      "request": {
+        "agent_name": "vate-boundary-probe",
+        "project_key": "https://agent.example/a2a",
+        "program": "x402",
+        "model": "vate-boundary-probe-v1",
+        "granted_capabilities": [
+          "mpp:financial:small"
+        ]
+      },
+      "native": {
+        "verdict": "allow",
+        "kind": "classical"
+      },
+      "host": {
+        "decision": "allow"
+      }
+    },
+    {
+      "id": "N1",
+      "request": {
+        "agent_name": "vate-boundary-probe",
+        "project_key": "https://unexpected.example/a2a",
+        "program": "x402",
+        "model": "vate-boundary-probe-v1",
+        "granted_capabilities": [
+          "mpp:financial:small"
+        ]
+      },
+      "native": {
+        "verdict": "deny",
+        "code": "request_mismatch",
+        "message": "request project_key does not match the signed binding",
+        "detail": {
+          "field": "project_key",
+          "request": "https://unexpected.example/a2a",
+          "binding": "https://agent.example/a2a"
+        },
+        "kind": "classical"
+      },
+      "host": {
+        "decision": "deny",
+        "code": "request_mismatch"
+      }
+    },
+    {
+      "id": "N2",
+      "request": {
+        "agent_name": "vate-boundary-probe",
+        "project_key": "https://agent.example/a2a",
+        "program": "x402",
+        "model": "vate-boundary-probe-v1",
+        "granted_capabilities": [
+          "mpp:financial:medium"
+        ]
+      },
+      "native": {
+        "verdict": "deny",
+        "code": "request_mismatch",
+        "message": "granted capability \"mpp:financial:medium\" is not covered by the signed binding",
+        "detail": {
+          "field": "granted_capabilities",
+          "capability": "mpp:financial:medium"
+        },
+        "kind": "classical"
+      },
+      "host": {
+        "decision": "deny",
+        "code": "request_mismatch"
+      }
+    }
+  ]
+}

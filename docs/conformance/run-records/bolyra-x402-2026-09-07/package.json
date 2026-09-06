@@ -1,0 +1,9 @@
+{
+  "name": "vate-x402-reviewer-replay",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "tsx": "4.23.13"
+  }
+}

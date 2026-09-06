@@ -1,0 +1,157 @@
+{
+  "files": [
+    {
+      "repository": "bolyra/bolyra",
+      "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+      "repository_path": "LICENSE",
+      "local_path": "bolyra-pin/LICENSE",
+      "sha256": "1fafa343ae8ccbccd3672c1e004531212a141cb13e935aa2305b132b16c11792",
+      "github_blob_sha": "349ebd509761145dcf3bf246b2984f22934ff0e2",
+      "bytes": 11316
+    },
+    {
+      "repository": "bolyra/bolyra",
+      "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+      "repository_path": "integrations/mpp-payments/package-lock.json",
+      "local_path": "bolyra-pin/integrations/mpp-payments/package-lock.json",
+      "sha256": "683e6581d01aacb1d49b5c1e533e95983cf5f8eeb1ee3b133389e2493b99b2fc",
+      "github_blob_sha": "c7b81eae1fea10a5bcf7e4c4c5ad10dfc704a697",
+      "bytes": 236356
+    },
+    {
+      "repository": "bolyra/bolyra",
+      "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+      "repository_path": "integrations/mpp-payments/package.json",
+      "local_path": "bolyra-pin/integrations/mpp-payments/package.json",
+      "sha256": "0308883932b9f30b6126db812d857cb9e56bdfa2601425126fc7b16a852fe4f6",
+      "github_blob_sha": "5a3bc7c5f91894938eb6174736d11342f3329aa1",
+      "bytes": 1516
+    },
+    {
+      "repository": "bolyra/bolyra",
+      "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+      "repository_path": "integrations/mpp-payments/src/bundle.ts",
+      "local_path": "bolyra-pin/integrations/mpp-payments/src/bundle.ts",
+      "sha256": "97b2f23ad55fa964efb6b3c1ab73e607b96b61cfc292b0474cc3b8414e3461dd",
+      "github_blob_sha": "b1b2d614b96a78cdf207e0fbd71dcd570551ac75",
+      "bytes": 9166
+    },
+    {
+      "repository": "bolyra/bolyra",
+      "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+      "repository_path": "integrations/mpp-payments/src/classical.ts",
+      "local_path": "bolyra-pin/integrations/mpp-payments/src/classical.ts",
+      "sha256": "82bc213f767d586f3e21768d07b0ec8efd0bce844ad6a4a376aa5e2f7e146c53",
+      "github_blob_sha": "8ebaefd6f8ae959e32c16144a53a4e66e272c283",
+      "bytes": 12017
+    },
+    {
+      "repository": "bolyra/bolyra",
+      "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+      "repository_path": "integrations/mpp-payments/src/demo/cli.ts",
+      "local_path": "bolyra-pin/integrations/mpp-payments/src/demo/cli.ts",
+      "sha256": "388d0f049c9c0d0efaab40afb243e74b79d88e74e0a49b623214ad15b324f7e7",
+      "github_blob_sha": "9f6a0344ddc0e5c35620801fecb3da577346e77f",
+      "bytes": 11919
+    },
+    {
+      "repository": "bolyra/bolyra",
+      "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+      "repository_path": "integrations/mpp-payments/src/deny.ts",
+      "local_path": "bolyra-pin/integrations/mpp-payments/src/deny.ts",
+      "sha256": "a00724b9b7353cf615f9f80348159fab1d51d71c946a7fe1d3b66084171dc971",
+      "github_blob_sha": "937508e4f69ed6de1addf76bdbff4e5a65156b1f",
+      "bytes": 2903
+    },
+    {
+      "repository": "bolyra/bolyra",
+      "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+      "repository_path": "integrations/mpp-payments/src/evc.ts",
+      "local_path": "bolyra-pin/integrations/mpp-payments/src/evc.ts",
+      "sha256": "aba23fc0267055398bffb7ee724bd1d4186f2e29d1bf13e47eab98a39edb928a",
+      "github_blob_sha": "7471ed8e07a541e931850320b768b50c06da8297",
+      "bytes": 9625
+    },
+    {
+      "repository": "bolyra/bolyra",
+      "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+      "repository_path": "integrations/mpp-payments/src/gate.ts",
+      "local_path": "bolyra-pin/integrations/mpp-payments/src/gate.ts",
+      "sha256": "8a3937b89edcb785f44191499cbce292bd9e9e46e4061a62463f50ecfd0580f0",
+      "github_blob_sha": "6dd9026f60f4fef2d4623f953bd0c9cd6f2c8f34",
+      "bytes": 18311
+    },
+    {
+      "repository": "bolyra/bolyra",
+      "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+      "repository_path": "integrations/mpp-payments/src/index.ts",
+      "local_path": "bolyra-pin/integrations/mpp-payments/src/index.ts",
+      "sha256": "c9718b93226b08451cc3b6515ac7d0f039e9df8b30974c831a3ec456ce5f8187",
+      "github_blob_sha": "337d7f7a0da9542f84d415eee70df4ce9b678b03",
+      "bytes": 1888
+    },
+    {
+      "repository": "bolyra/bolyra",
+      "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+      "repository_path": "integrations/mpp-payments/src/issue.ts",
+      "local_path": "bolyra-pin/integrations/mpp-payments/src/issue.ts",
+      "sha256": "c6b50d57cc62e8938975a1192a2d9456379840fadce35f0ca65437a13793d077",
+      "github_blob_sha": "92b34a3df5b6f05c30c16ab942b9643d9d07eed8",
+      "bytes": 14318
+    },
+    {
+      "repository": "bolyra/bolyra",
+      "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+      "repository_path": "integrations/mpp-payments/src/nonces.ts",
+      "local_path": "bolyra-pin/integrations/mpp-payments/src/nonces.ts",
+      "sha256": "90316f22806354a98560ebf7fbdf93d2d85fb44d68bb6f5e5a542ec551e9cc1d",
+      "github_blob_sha": "312bbcb798bc17d66b845b1b8f1b4c562d48d9e7",
+      "bytes": 1465
+    },
+    {
+      "repository": "bolyra/bolyra",
+      "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+      "repository_path": "integrations/mpp-payments/src/receipts.ts",
+      "local_path": "bolyra-pin/integrations/mpp-payments/src/receipts.ts",
+      "sha256": "da69740604dddac51aa59b6c95ebfee509a73c07bd51fa4903fd8a974eb5b23c",
+      "github_blob_sha": "46dd7bb1fe1d339d5a4ef407154cd03fbb0ebcd6",
+      "bytes": 9452
+    },
+    {
+      "repository": "bolyra/bolyra",
+      "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+      "repository_path": "integrations/mpp-payments/src/tiers.ts",
+      "local_path": "bolyra-pin/integrations/mpp-payments/src/tiers.ts",
+      "sha256": "9ee1a8d5cb15fbc2e9824fdaa5e77b815da40e772490ad10be0fb00ae02e7b71",
+      "github_blob_sha": "6f688ad1fa09f0835c5ac5f59d05bd2ef89c8f1d",
+      "bytes": 4511
+    },
+    {
+      "repository": "bolyra/bolyra",
+      "commit": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+      "repository_path": "integrations/mpp-payments/src/types.ts",
+      "local_path": "bolyra-pin/integrations/mpp-payments/src/types.ts",
+      "sha256": "2fa0afc0445dc74f1f4e9aef0ea99e082642db117f79f876dd308ae4523655bf",
+      "github_blob_sha": "760072f5fc8a6f916c96b806d9574eca8bf7fa45",
+      "bytes": 9430
+    },
+    {
+      "repository": "saneGuy/x402",
+      "commit": "992f78e37178dc4d249eeb0e2dc0720120282dd1",
+      "repository_path": "typescript/packages/extensions/src/authorization-evidence/evcHost.ts",
+      "local_path": "evc/evcHost.ts",
+      "sha256": "d991d3bb19686b6fa1c069ca48e4b7f070d610acf0ecd9e25ec06b445e92db08",
+      "github_blob_sha": "dd87377479d6271f8ff050a45e1541d1e00eda0d",
+      "bytes": 9035
+    },
+    {
+      "repository": "saneGuy/x402",
+      "commit": "992f78e37178dc4d249eeb0e2dc0720120282dd1",
+      "repository_path": "typescript/packages/extensions/src/authorization-evidence/types.ts",
+      "local_path": "evc/types.ts",
+      "sha256": "d8212485a2ff40ca4a1c37308c2d4bdb8c269cc8f9f2b0f0c5ad9ac6aca457db",
+      "github_blob_sha": "72ec76c9ac96011a0682ebf54afdd564ce02ed6b",
+      "bytes": 6307
+    }
+  ]
+}

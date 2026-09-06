@@ -1,0 +1,92 @@
+{
+  "packet_id": "vate-bolyra-x402-audience-2026-09-06-v1",
+  "pins": {
+    "vate": "cc072ef86f54791213a3e603a65b2f24f64b1b6d",
+    "bolyra": "511ccbba1a3c929f5803b233fdfd21e0b82bb913",
+    "x402": "992f78e37178dc4d249eeb0e2dc0720120282dd1"
+  },
+  "vate_case_id": "deny-audience-mismatch",
+  "vate_corpus_digest": "b2a281e372b2e1d6b49be219c715fa69c0b2be237d29a6e1f0dda9c0659b6130",
+  "sources": [
+    {
+      "packet_path": "vate/case.json",
+      "repository_path": "conformance/al2-vate-v0.3/cases/deny-audience-mismatch.json",
+      "sha256": "51c8e27971b4d228c0910aa909e5aa59351081608e1bd95633d8c22d20315213",
+      "url": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/blob/cc072ef86f54791213a3e603a65b2f24f64b1b6d/conformance/al2-vate-v0.3/cases/deny-audience-mismatch.json"
+    },
+    {
+      "packet_path": "vate/base-request.json",
+      "repository_path": "examples/admission-request.example.json",
+      "sha256": "979cd16837993c08574c848d7d63302c8aa57fbc7793fc92d31bb733995cf8ae",
+      "url": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/blob/cc072ef86f54791213a3e603a65b2f24f64b1b6d/examples/admission-request.example.json"
+    }
+  ],
+  "issuance": {
+    "operator_private_key_hex": "1111111111111111111111111111111111111111111111111111111111111111",
+    "key_use": "Public disposable test fixture; never configure this key for a real service.",
+    "options": {
+      "agentName": "vate-boundary-probe",
+      "audience": "https://agent.example/a2a",
+      "model": "vate-boundary-probe-v1",
+      "program": "x402",
+      "tier": "small",
+      "expiry": 1788656400,
+      "nonce": "vate-audience-probe-2026-09-06-v1",
+      "encoding": "base64url"
+    }
+  },
+  "evc_common": {
+    "version": 1,
+    "now_unix": 1788652800
+  },
+  "request_contexts": [
+    {
+      "id": "P",
+      "role": "matching auxiliary control",
+      "request": {
+        "agent_name": "vate-boundary-probe",
+        "project_key": "https://agent.example/a2a",
+        "program": "x402",
+        "model": "vate-boundary-probe-v1",
+        "granted_capabilities": [
+          "mpp:financial:small"
+        ]
+      }
+    },
+    {
+      "id": "N1",
+      "role": "partial VATE audience-mismatch case",
+      "request": {
+        "agent_name": "vate-boundary-probe",
+        "project_key": "https://unexpected.example/a2a",
+        "program": "x402",
+        "model": "vate-boundary-probe-v1",
+        "granted_capabilities": [
+          "mpp:financial:small"
+        ]
+      }
+    },
+    {
+      "id": "N2",
+      "role": "uncovered-capability auxiliary control",
+      "request": {
+        "agent_name": "vate-boundary-probe",
+        "project_key": "https://agent.example/a2a",
+        "program": "x402",
+        "model": "vate-boundary-probe-v1",
+        "granted_capabilities": [
+          "mpp:financial:medium"
+        ]
+      }
+    }
+  ],
+  "host_options": {
+    "timeoutMs": 10000,
+    "maxStdoutBytes": 1048576
+  },
+  "construction": {
+    "presentation": "Call the pinned issueMandate once with issuance.options and Buffer.from(issuance.operator_private_key_hex, \"hex\"). Reuse the returned presentation string unchanged for all three requests.",
+    "trusted_operators": "Use only the operatorPublicKey returned by that issuance.",
+    "verifier_request": "For each context construct { ...evc_common, bundle: issued.presentation, request: context.request }. The packet object itself is not an EVC request."
+  }
+}

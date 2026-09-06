@@ -1,0 +1,1 @@
+{"verdict":"deny","code":"request_mismatch","message":"request project_key does not match the signed binding","detail":{"field":"project_key","request":"https://unexpected.example/a2a","binding":"https://agent.example/a2a"},"kind":"classical"}

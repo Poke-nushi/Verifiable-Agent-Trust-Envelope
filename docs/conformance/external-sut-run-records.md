@@ -37,6 +37,28 @@ corpus bytes. Reviewers should resolve the current digest from
 `conformance/al2-vate-v0.3/corpus.json`; a submission for a different digest
 requires its own comparison record.
 
+## Bolyra / x402 One-Case Partial External SUT Run
+
+`saneGuy` supplied a three-input execution of Bolyra's native `verifyClassical`
+through the x402 `runEvcVerifier` command host. VATE's maintainer replayed the
+unchanged candidate runner and wrapper: all three native verdicts and host
+decisions reproduced, and the issued presentation matched byte-for-byte.
+
+The [record and evidence bundle](run-records/bolyra-x402-2026-09-07/README.md)
+cover one partial `deny-audience-mismatch` case at VATE `v0.4.0`
+(`cc072ef86f54791213a3e603a65b2f24f64b1b6d`), with matching and
+uncovered-capability auxiliary controls. The sources are Bolyra `511ccbba` and
+the `saneGuy/x402` command host at `992f78e`, identified by full pins in the
+record.
+
+The refusal agrees with VATE; the native `request_mismatch` reason, three
+unreported named checks and missing legacy receipt-fixture reference remain in
+the comparison. Native output distinguishes the failed fields, while the host
+returns the common decision/code pair. This probe exercised no application
+retention path. It is one solicited experiment across verifier and host, not two
+independent implementation lines or evidence of full-corpus conformance or
+adoption.
+
 ## Vaara One-Case Partial External SUT Run
 
 Vaara's maintainer supplied saved native scripts and admission results at
