@@ -2,6 +2,19 @@
 
 This file records dated public changes to the discussion draft.
 
+## 2026-09-09 — v0.4.1
+
+- Corrected `deny-ap2-hnp-replay` to bind normalized payment-authority and
+  VATE-local consumed-state artifacts as authoritative SUT inputs.
+- Retained the `VATE-AL2-Verifier-Admission-v0.3` profile and `2026-09`
+  artifact line with a 76-case / 217-artifact corpus; see the
+  [release notes](docs/release-notes/v0.4.1.md) for the fixed digest.
+- Included the Vaara and Bolyra / x402 partial native-execution records at
+  their original `v0.4.0` pins, preserving their unresolved comparisons.
+- Added external SUT coverage and EVC / ACS / ACLE-MCP responsibility guides.
+- Updated Vitest to `4.1.11` and refreshed its lockfile.
+- Recorded the v0.4.1 technical release gate and tag-time citation metadata.
+
 ## 2026-09-01
 
 - Published `v0.4.0` as the current GitHub discussion-draft pre-release review
