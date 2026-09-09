@@ -14,6 +14,11 @@ This file records dated public changes to the discussion draft.
 - Added external SUT coverage and EVC / ACS / ACLE-MCP responsibility guides.
 - Updated Vitest to `4.1.11` and refreshed its lockfile.
 - Recorded the v0.4.1 technical release gate and tag-time citation metadata.
+- Archived the exact `v0.4.1` source snapshot on Zenodo as record `22680789`
+  with version DOI
+  [10.5281/zenodo.22680789](https://doi.org/10.5281/zenodo.22680789).
+- Verified all 551 archived file paths and contents against the tag; the
+  downloaded ZIP checksum matched the published record.
 
 ## 2026-09-01
 

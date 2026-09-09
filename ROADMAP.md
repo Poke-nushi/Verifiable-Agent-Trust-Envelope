@@ -21,7 +21,7 @@ original evaluation pins.
 The `v0.4.0` release introduced the external-SUT input, generated-receipt,
 status-evidence, and report-integrity contract accumulated after v0.3.2. Its
 exact source remains archived at DOI `10.5281/zenodo.22218860`; the `v0.4.1`
-version DOI is pending at tag time. Historical records keep their own exact
+version DOI is `10.5281/zenodo.22680789`. Historical records keep their own exact
 source and DOI.
 
 The priority remains evidence from independently maintained implementation
