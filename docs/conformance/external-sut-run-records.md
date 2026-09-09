@@ -14,6 +14,9 @@ Each record identifies the external artifact location, the reviewed revision or
 digest, the corpus snapshot, the local comparison result, and the boundary under
 which the result was used.
 
+For a comparison of native execution, reached predicates, submitted checks, and
+unevaluated scope, see [External SUT Coverage](external-sut-coverage.md).
+
 ## Snapshot Applicability
 
 The two AlgoVoi records below were evaluated against corpus digest
