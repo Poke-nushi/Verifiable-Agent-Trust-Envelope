@@ -14,7 +14,7 @@ separate from these technical checks.
   `sha-256:02da4ca9257547872ecbcce9728b8bb256afd2f77676d5daef89fd6c831b2bb0`
 - Change class: existing fixture-input correction, implementation records,
   informative documentation, and development-dependency maintenance
-- Exact Zenodo version DOI: pending at tag time
+- Exact Zenodo version DOI: `10.5281/zenodo.22680789`
 - Zenodo series: `10.5281/zenodo.19839768`
 
 `v0.4.1` retains the profile and artifact line from `v0.4.0`. It fixes the
@@ -79,11 +79,25 @@ source files.
 
 ## Publication Verification
 
-The GitHub pre-release must target the checked source tree. After Zenodo
-publishes the corresponding new version in the existing series, its version,
-date, DOI, series, and file checksum must be read back. The downloaded archive
-must match the tag's tracked file paths and bytes before adding the issued
-version DOI to current citation metadata.
+The [GitHub pre-release](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.4.1)
+and [Zenodo record](https://zenodo.org/records/22680789) were published on
+September 9, 2026 UTC. The public record's version, date, title, author,
+Apache-2.0 license, exact DOI, and existing concept DOI were read back.
+The series contains one `v0.4.1` record.
+
+- Tag commit: `92fc7b59f78f655d22c34fe345e3c837b4360b88`
+- Source tree: `6e6cd461196736592f7280af3cfa174775cdaf83`
+- Archive: `Poke-nushi/Verifiable-Agent-Trust-Envelope-v0.4.1.zip`
+- Size: 2,042,436 bytes
+- Published and downloaded MD5: `0a191d5d6302eb40f2218fd2124e2282`
+- Downloaded SHA-256: `722cf32ad13ebe16848bb692595bf4b80be8bcd530a27efe7218b02e1fc6889f`
+
+All 551 archived file paths and contents match the tag's tracked public files.
+The Zenodo ZIP also matches the downloaded GitHub tag ZIP byte for byte.
+
+The version DOI was issued after the tag was published. The tag and saved ZIP
+retain their tag-time citation text; the subsequent citation update on `main`
+records the issued DOI without moving the tag or replacing the archive.
 
 Historical run records keep their original tags, digests, and results. A
 passing technical gate does not imply production readiness, certification,

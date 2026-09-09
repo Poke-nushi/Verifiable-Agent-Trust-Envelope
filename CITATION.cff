@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 title: "Verifiable Agent Trust Envelope"
-message: "This citation metadata describes the v0.4.1 GitHub discussion-draft pre-release. Its Zenodo version DOI is pending at tag time; cite the GitHub tag for this snapshot and the concept DOI for the release series. Takao Sato is the author; Poke-nushi is the same author's public maintainer alias and also appears in archived artifacts and historical repository records."
+message: "Cite the v0.4.1 discussion-draft pre-release with its exact Zenodo version DOI, 10.5281/zenodo.22680789. The concept DOI identifies the release series. Takao Sato is the author; Poke-nushi is the same author's public maintainer alias and also appears in archived artifacts and historical repository records."
 type: software
 authors:
   - given-names: "Takao"
@@ -11,6 +11,7 @@ url: "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope"
 license: Apache-2.0
 version: "v0.4.1"
 date-released: 2026-09-09
+doi: 10.5281/zenodo.22680789
 identifiers:
   - type: doi
     value: 10.5281/zenodo.19839768

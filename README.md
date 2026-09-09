@@ -54,8 +54,9 @@ request hashes so later evidence can be checked against the narrowed basis.
 ## Status and Scope
 
 VATE is a public Apache-2.0 protocol discussion draft. The current public
-review snapshot is the `v0.4.1` GitHub discussion-draft pre-release. Its exact
-Zenodo version DOI is pending at tag time; the archived `v0.4.0` remains
+review snapshot is the `v0.4.1` discussion-draft pre-release, archived at
+[`10.5281/zenodo.22680789`](https://doi.org/10.5281/zenodo.22680789).
+The archived `v0.4.0` remains
 available at [`10.5281/zenodo.22218860`](https://doi.org/10.5281/zenodo.22218860).
 `v0.4.1` keeps
 the `VATE-AL2-Verifier-Admission-v0.3` semantic profile and uses the active
@@ -95,9 +96,8 @@ Current repository state:
 - **Roadmap refresh date**: 2026-09-01
 - **Primary battlefield**: `AL2` external digital write
 - **Current GitHub review snapshot**: `v0.4.1` discussion-draft pre-release;
-  exact Zenodo version DOI pending at tag time
-- **Latest Zenodo archive at tag time**: `v0.4.0` · exact DOI
-  `10.5281/zenodo.22218860`
+  exact Zenodo version DOI `10.5281/zenodo.22680789`
+- **Latest Zenodo archive**: `v0.4.1` · September 9, 2026
 - **Active main-branch artifact line**: `2026-09`, retained in v0.4.1; the AL2
   profile identifier remains
   `VATE-AL2-Verifier-Admission-v0.3`
@@ -508,10 +508,11 @@ The maintainer is responsible for the final structure, scope decisions, and publ
 
 ## How to Cite
 
-For the September 9, 2026 `v0.4.1` maintenance pre-release, cite the
-[GitHub tag](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.4.1).
-Its exact Zenodo version DOI is pending at tag time. The
-[concept DOI](https://doi.org/10.5281/zenodo.19839768) identifies all versions.
+For the September 9, 2026 `v0.4.1` maintenance pre-release, cite:
+
+- GitHub tag: [v0.4.1](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.4.1)
+- Exact version DOI: [10.5281/zenodo.22680789](https://doi.org/10.5281/zenodo.22680789)
+- All-version concept DOI: [10.5281/zenodo.19839768](https://doi.org/10.5281/zenodo.19839768)
 
 If you reference the September 1, 2026 `v0.4.0` GitHub discussion-draft
 pre-release, cite:
