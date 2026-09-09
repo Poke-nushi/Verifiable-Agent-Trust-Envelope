@@ -54,14 +54,15 @@ request hashes so later evidence can be checked against the narrowed basis.
 ## Status and Scope
 
 VATE is a public Apache-2.0 protocol discussion draft. The current public
-review anchor is `v0.4.0`, published as a GitHub discussion-draft pre-release
-and archived on Zenodo with exact version DOI
-[`10.5281/zenodo.22218860`](https://doi.org/10.5281/zenodo.22218860). It keeps
+review snapshot is the `v0.4.1` GitHub discussion-draft pre-release. Its exact
+Zenodo version DOI is pending at tag time; the archived `v0.4.0` remains
+available at [`10.5281/zenodo.22218860`](https://doi.org/10.5281/zenodo.22218860).
+`v0.4.1` keeps
 the `VATE-AL2-Verifier-Admission-v0.3` semantic profile and uses the active
 `2026-09` machine-readable artifact line.
 
-**Current public status:** discussion draft · GitHub and Zenodo `v0.4.0` review
-anchor · not production-ready · no production approval implied.
+**Current public status:** discussion draft · `v0.4.1` maintenance pre-release
+· not production-ready · no production approval implied.
 
 VATE composes with A2A, MCP, OAuth, OpenID, VC, SPIFFE, AP2, x402, and payment
 mandates. Those systems retain their own validation and execution semantics;
@@ -79,6 +80,7 @@ a human-in-the-loop workflow product.
 - `v0.3.1 archived May 14, 2026 credibility and reviewability patch`
 - `v0.3.2 archived July 6, 2026 external review portability and reproducibility patch`
 - `v0.4.0 GitHub discussion-draft pre-release and September 1, 2026 Zenodo archive`
+- `v0.4.1 AP2 replay-input and implementation-record maintenance pre-release`
 - `not production-ready`
 - `not an official A2A extension, endorsement, certification, SDK, middleware package, or general compatibility proof`
 - `not an A2A core proposal or universal trust layer`
@@ -92,11 +94,11 @@ Current repository state:
 - **Primary language**: English
 - **Roadmap refresh date**: 2026-09-01
 - **Primary battlefield**: `AL2` external digital write
-- **Current GitHub and Zenodo review anchor**: `v0.4.0` discussion-draft
-  pre-release · exact DOI `10.5281/zenodo.22218860`
-- **Previous Zenodo archived snapshot**: `v0.3.2` external review
-  portability and reproducibility patch
-- **Active main-branch artifact line**: `2026-09`, under v0.4.0 review; the AL2
+- **Current GitHub review snapshot**: `v0.4.1` discussion-draft pre-release;
+  exact Zenodo version DOI pending at tag time
+- **Latest Zenodo archive at tag time**: `v0.4.0` · exact DOI
+  `10.5281/zenodo.22218860`
+- **Active main-branch artifact line**: `2026-09`, retained in v0.4.1; the AL2
   profile identifier remains
   `VATE-AL2-Verifier-Admission-v0.3`
 - **Active main-branch corpus**: 76 cases / 217 manifest artifacts ·
@@ -121,8 +123,8 @@ compatibility claim.
 
 ## Reviewer Entry Points
 
-If you are reviewing the `v0.4.0` GitHub pre-release, the archived `v0.3.2`
-snapshot, or later main-branch work, start here:
+If you are reviewing the `v0.4.1` GitHub pre-release, a historical snapshot,
+or later main-branch work, start here:
 
 - [Public claim boundary](docs/public-claim-boundary.md) - what this repository
   can and cannot claim publicly
@@ -322,6 +324,10 @@ The most useful feedback is:
   GitHub discussion-draft pre-release notes for the active 2026-09 artifact line
 - [docs/release-gate-v0.4.0.md](docs/release-gate-v0.4.0.md)
   Completed local technical gate recorded before the v0.4.0 pre-release
+- [docs/release-notes/v0.4.1.md](docs/release-notes/v0.4.1.md)
+  Maintenance pre-release notes and fixed historical execution boundaries
+- [docs/release-gate-v0.4.1.md](docs/release-gate-v0.4.1.md)
+  Technical gate for the v0.4.1 maintenance pre-release
 - [docs/a2a-issue-update-2026-05.md](docs/a2a-issue-update-2026-05.md)
   Short A2A-adjacent issue update draft after the runnable v0.2 artifacts
 - [docs/a2a-metadata-binding-v0.3.md](docs/a2a-metadata-binding-v0.3.md)
@@ -502,6 +508,11 @@ The maintainer is responsible for the final structure, scope decisions, and publ
 
 ## How to Cite
 
+For the September 9, 2026 `v0.4.1` maintenance pre-release, cite the
+[GitHub tag](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.4.1).
+Its exact Zenodo version DOI is pending at tag time. The
+[concept DOI](https://doi.org/10.5281/zenodo.19839768) identifies all versions.
+
 If you reference the September 1, 2026 `v0.4.0` GitHub discussion-draft
 pre-release, cite:
 
@@ -515,7 +526,7 @@ and reproducibility patch, cite:
 - Version DOI: [10.5281/zenodo.21226254](https://doi.org/10.5281/zenodo.21226254)
 - All-version concept DOI: [10.5281/zenodo.19839768](https://doi.org/10.5281/zenodo.19839768)
 
-If you reference later untagged main-branch changes after `v0.4.0`, cite the
+If you reference later untagged main-branch changes after `v0.4.1`, cite the
 repository URL and exact commit SHA in addition to the latest applicable tag or
 archived version DOI.
 

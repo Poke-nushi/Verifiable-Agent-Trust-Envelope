@@ -9,16 +9,20 @@ For public wording rules, see
 
 ## Current Direction
 
-### Post-`v0.4.0`: Independent Implementation Evidence
+### Post-`v0.4.1`: Independent Implementation Evidence
 
-The `v0.4.0` GitHub discussion-draft pre-release is the current GitHub public
-review anchor. It advances the active machine-readable artifact line to
-`2026-09` while keeping the semantic profile identifier
-`VATE-AL2-Verifier-Admission-v0.3`. It incorporates the external-SUT input,
-generated-receipt, status-evidence, and report-integrity work accumulated after
-v0.3.2. The exact `v0.4.0` source snapshot is archived on Zenodo with version
-DOI `10.5281/zenodo.22218860`; v0.3.2 remains a historical archived snapshot
-with its own exact DOI.
+The `v0.4.1` maintenance discussion-draft pre-release is the current GitHub
+review snapshot. It retains the `2026-09` machine-readable artifact line
+introduced in `v0.4.0` and the semantic profile
+`VATE-AL2-Verifier-Admission-v0.3`. The maintenance release corrects the AP2
+replay case's inputs and collects partial implementation records at their
+original evaluation pins.
+
+The `v0.4.0` release introduced the external-SUT input, generated-receipt,
+status-evidence, and report-integrity contract accumulated after v0.3.2. Its
+exact source remains archived at DOI `10.5281/zenodo.22218860`; the `v0.4.1`
+version DOI is pending at tag time. Historical records keep their own exact
+source and DOI.
 
 The priority remains evidence from independently maintained implementation
 lines and reproducibility across implementers. The current contract migration
@@ -31,11 +35,14 @@ reviewer can inspect, reproduce, and tie back to one corpus snapshot.
 
 The current public review surface is:
 
-- `v0.4.0` GitHub discussion-draft pre-release:
-  <https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.4.0>
+- `v0.4.1` GitHub maintenance discussion-draft pre-release:
+  <https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.4.1>
+- `v0.4.1` pre-release notes and technical gate:
+  [docs/release-notes/v0.4.1.md](docs/release-notes/v0.4.1.md) and
+  [docs/release-gate-v0.4.1.md](docs/release-gate-v0.4.1.md)
 - archived `v0.4.0` version DOI:
   `10.5281/zenodo.22218860`
-- `v0.4.0` pre-release notes and completed technical gate:
+- historical `v0.4.0` pre-release notes and completed technical gate:
   [docs/release-notes/v0.4.0.md](docs/release-notes/v0.4.0.md) and
   [docs/release-gate-v0.4.0.md](docs/release-gate-v0.4.0.md)
 - archived `v0.3.2` release notes and version DOI:
@@ -174,9 +181,9 @@ The `v0.3.0` package includes:
 - documentation for fixture canonicalization limits, namespace migration,
   extension-field handling, and the `2026-07` conformance artifact line.
 
-## Post-`v0.4.0` External Review Target
+## Post-`v0.4.1` External Review Target
 
-The current post-`v0.4.0` target is to move from author-run artifacts toward
+The current post-`v0.4.1` target is to move from author-run artifacts toward
 independent implementation evidence. The priority is not a broader protocol
 surface.
 
