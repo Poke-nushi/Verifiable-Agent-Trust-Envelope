@@ -134,6 +134,10 @@ snapshot, or later main-branch work, start here:
   report links
 - [External SUT run records](docs/conformance/external-sut-run-records.md) -
   pinned externally supplied run artifacts used for review
+- [External SUT coverage](docs/conformance/external-sut-coverage.md) -
+  native execution, reached predicates, submitted checks, and unevaluated cases
+- [EVC, ACS, and ACLE-MCP responsibility boundaries](docs/interop/adjacent-verifier-boundaries.md) -
+  admission, host enforcement, attenuation, replay, and outcome evidence
 - [Pulse three-case bounded external SUT result](docs/conformance/external-sut-run-records.md#pulse-three-case-bounded-external-sut-run) -
   candidate-owned mapping through a frozen Pulse verifier, with two matching
   decisions and one preserved attenuation-versus-deny difference
