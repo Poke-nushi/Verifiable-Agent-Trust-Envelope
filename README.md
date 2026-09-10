@@ -10,7 +10,8 @@ resulting receipt to later outcome evidence.
 [Official website](https://vate.rognalia.com/) ·
 [v0.3 in 5 minutes](docs/v0.3-in-5-minutes.md) ·
 [60-second demo](#try-it-in-60-seconds) ·
-[AL2 verifier admission profile](docs/profiles/vate-al2-verifier-admission-profile-v0.3.md)
+[AL2 verifier admission profile](docs/profiles/vate-al2-verifier-admission-profile-v0.3.md) ·
+[Technical report](#technical-report)
 
 [![DOI](https://zenodo.org/badge/1214949350.svg)](https://doi.org/10.5281/zenodo.19839768)
 
@@ -97,7 +98,7 @@ Current repository state:
 - **Primary battlefield**: `AL2` external digital write
 - **Current GitHub review snapshot**: `v0.4.1` discussion-draft pre-release;
   exact Zenodo version DOI `10.5281/zenodo.22680789`
-- **Latest Zenodo archive**: `v0.4.1` · September 9, 2026
+- **Latest software archive**: `v0.4.1` · September 9, 2026
 - **Active main-branch artifact line**: `2026-09`, retained in v0.4.1; the AL2
   profile identifier remains
   `VATE-AL2-Verifier-Admission-v0.3`
@@ -120,6 +121,25 @@ snapshot. They do not imply endorsement, production approval, or a general
 compatibility claim.
 
 </details>
+
+## Technical Report
+
+[VATE: Verifier-Side Admission and Evidence Linkage for AI Agent Actions](https://doi.org/10.5281/zenodo.22685689)
+by Takao Sato, published 10 September 2026, explains the admission and receipt
+model and examines four external implementation case studies. Its fixed VATE
+`v0.4.0` evaluation snapshot contains 76 cases / 216 artifacts; historical
+comparisons retain their original pins.
+
+- [Read the PDF](https://zenodo.org/records/22685689/files/vate-technical-report.pdf?download=1)
+- [Source package](https://zenodo.org/records/22685689/files/vate-technical-report-source.zip?download=1) —
+  manuscript and PDF build script
+- [Supplement S1](https://zenodo.org/records/22685689/files/vate-technical-report-supplement-s1.zip?download=1) —
+  two saved repository self-test reports, checksums, and reproduction commands
+- [All files and metadata](https://zenodo.org/records/22685689) —
+  includes the evidence manifest and publication-file checksums
+
+The report text and original tables are licensed under CC BY 4.0. The build
+script and Supplement S1 retain Apache-2.0.
 
 ## Reviewer Entry Points
 
@@ -508,6 +528,13 @@ The maintainer is responsible for the final structure, scope decisions, and publ
 
 ## How to Cite
 
+### Technical Report
+
+Sato, T. (2026). *VATE: Verifier-Side Admission and Evidence Linkage for AI Agent
+Actions*. Zenodo. [https://doi.org/10.5281/zenodo.22685689](https://doi.org/10.5281/zenodo.22685689).
+
+### Software Snapshots
+
 For the September 9, 2026 `v0.4.1` maintenance pre-release, cite:
 
 - GitHub tag: [v0.4.1](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.4.1)
@@ -546,7 +573,7 @@ If you reference the archived May 5, 2026 `v0.2.0` snapshot, cite:
 - Version DOI: [10.5281/zenodo.20043166](https://doi.org/10.5281/zenodo.20043166)
 
 - Earlier `v0.1.0` DOI: [10.5281/zenodo.19839769](https://doi.org/10.5281/zenodo.19839769)
-- Machine-readable metadata: [CITATION.cff](CITATION.cff)
+- Machine-readable software citation metadata: [CITATION.cff](CITATION.cff)
 
 ## License
 
