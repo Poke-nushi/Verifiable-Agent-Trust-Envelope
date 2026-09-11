@@ -15,18 +15,18 @@ vendored into the VATE corpus.
 
 | Field | Pinned value |
 |---|---|
-| Repository | [`astrogilda/aee-conformance`](https://github.com/astrogilda/aee-conformance) |
-| Review discussion | [AEE issue #3](https://github.com/astrogilda/aee-conformance/issues/3) |
-| Merged contribution | [AEE PR #4](https://github.com/astrogilda/aee-conformance/pull/4) |
-| Merged PR head / GitHub merge SHA | [`2aa5a23d0e0cf93921a59510a755ccfe1e103a47`](https://github.com/astrogilda/aee-conformance/commit/2aa5a23d0e0cf93921a59510a755ccfe1e103a47) |
+| Repository | [`astrogilda/agent-evidence-vectors`](https://github.com/astrogilda/agent-evidence-vectors) |
+| Review discussion | [AEE issue #3](https://github.com/astrogilda/agent-evidence-vectors/issues/3) |
+| Merged contribution | [AEE PR #4](https://github.com/astrogilda/agent-evidence-vectors/pull/4) |
+| Merged PR head / GitHub merge SHA | [`2aa5a23d0e0cf93921a59510a755ccfe1e103a47`](https://github.com/astrogilda/agent-evidence-vectors/commit/2aa5a23d0e0cf93921a59510a755ccfe1e103a47) |
 | AEE suite | revision 26, 258 vectors |
 | AEE corpus digest at the merged PR head | `8d4d08dedd7b5fe8b99c2b9a7d42fa407e6ca20f6cda6da337c0efc838a9d6ab` |
 | License | Apache-2.0 |
 
 The AEE-side provenance and interpretation are recorded in its pinned
-[`vectors/CHANGES.md`](https://github.com/astrogilda/aee-conformance/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/CHANGES.md)
+[`vectors/CHANGES.md`](https://github.com/astrogilda/agent-evidence-vectors/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/CHANGES.md)
 and machine-readable
-[`vectors/MANIFEST.json`](https://github.com/astrogilda/aee-conformance/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/MANIFEST.json).
+[`vectors/MANIFEST.json`](https://github.com/astrogilda/agent-evidence-vectors/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/MANIFEST.json).
 
 ## Follow-up Correction
 
@@ -36,15 +36,15 @@ rewriting suiteRevision 26:
 
 | Field | Pinned value |
 |---|---|
-| Correction commit | [`297636c25472b207c56e90ab13b5a15cc40d6f25`](https://github.com/astrogilda/aee-conformance/commit/297636c25472b207c56e90ab13b5a15cc40d6f25) |
+| Correction commit | [`297636c25472b207c56e90ab13b5a15cc40d6f25`](https://github.com/astrogilda/agent-evidence-vectors/commit/297636c25472b207c56e90ab13b5a15cc40d6f25) |
 | AEE suite at correction | suiteRevision 27, 258 vectors; corpus digest `12d27820ede985ac2cd43b5b4e6a6569ebd74a032f2748017022cb2735d282e9` |
-| Maintainer explanation | [PR #4 follow-up](https://github.com/astrogilda/aee-conformance/pull/4#issuecomment-5447244673) |
-| VATE owner confirmation | [verification comment](https://github.com/astrogilda/aee-conformance/pull/4#issuecomment-5447525943) |
+| Maintainer explanation | [PR #4 follow-up](https://github.com/astrogilda/agent-evidence-vectors/pull/4#issuecomment-5447244673) |
+| VATE owner confirmation | [verification comment](https://github.com/astrogilda/agent-evidence-vectors/pull/4#issuecomment-5447525943) |
 
 At that commit, the committed
-[`vate-1d`](https://github.com/astrogilda/aee-conformance/blob/297636c25472b207c56e90ab13b5a15cc40d6f25/vectors/accept/vate-1d-admission-receipt-as-sole-subject.json)
+[`vate-1d`](https://github.com/astrogilda/agent-evidence-vectors/blob/297636c25472b207c56e90ab13b5a15cc40d6f25/vectors/accept/vate-1d-admission-receipt-as-sole-subject.json)
 and
-[`vate-1a`](https://github.com/astrogilda/aee-conformance/blob/297636c25472b207c56e90ab13b5a15cc40d6f25/vectors/reject/vate-1a-admission-receipt-substituted-splice.json)
+[`vate-1a`](https://github.com/astrogilda/agent-evidence-vectors/blob/297636c25472b207c56e90ab13b5a15cc40d6f25/vectors/reject/vate-1a-admission-receipt-substituted-splice.json)
 statements each have 38 scalar leaves and differ only at
 `subject[0].digest.sha256`. The reject generator reads the committed `vate-1d`
 accept vector and mutates that path instead of rebuilding a parallel parent
@@ -92,14 +92,14 @@ but this AEE record is not a review of the 75-case corpus as a whole.
 
 ### Admission Receipt Linkage
 
-- [`vate-1a-admission-receipt-substituted-splice`](https://github.com/astrogilda/aee-conformance/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/reject/vate-1a-admission-receipt-substituted-splice.json)
+- [`vate-1a-admission-receipt-substituted-splice`](https://github.com/astrogilda/agent-evidence-vectors/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/reject/vate-1a-admission-receipt-substituted-splice.json)
   - `invalid`; manifest code `run-binding-mismatch`; also carries
     `sealed-record-absent`
-- [`vate-1b-carried-admission-digest-unread`](https://github.com/astrogilda/aee-conformance/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/accept/vate-1b-carried-admission-digest-unread.json)
+- [`vate-1b-carried-admission-digest-unread`](https://github.com/astrogilda/agent-evidence-vectors/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/accept/vate-1b-carried-admission-digest-unread.json)
   - `valid` / `pass`
-- [`vate-1c-two-subjects-artifact-and-admission`](https://github.com/astrogilda/aee-conformance/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/reject/vate-1c-two-subjects-artifact-and-admission.json)
+- [`vate-1c-two-subjects-artifact-and-admission`](https://github.com/astrogilda/agent-evidence-vectors/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/reject/vate-1c-two-subjects-artifact-and-admission.json)
   - `invalid`; manifest code `subject-cardinality`
-- [`vate-1d-admission-receipt-as-sole-subject`](https://github.com/astrogilda/aee-conformance/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/accept/vate-1d-admission-receipt-as-sole-subject.json)
+- [`vate-1d-admission-receipt-as-sole-subject`](https://github.com/astrogilda/agent-evidence-vectors/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/accept/vate-1d-admission-receipt-as-sole-subject.json)
   - `valid` / `pass`
 
 AEE binds its sole subject against record splicing and rejects a second
@@ -116,7 +116,7 @@ correction is recorded separately above.
 
 ### Aggregate Effective Constraints
 
-- [`vate-2a-aggregate-overrun-unread`](https://github.com/astrogilda/aee-conformance/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/accept/vate-2a-aggregate-overrun-unread.json)
+- [`vate-2a-aggregate-overrun-unread`](https://github.com/astrogilda/agent-evidence-vectors/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/accept/vate-2a-aggregate-overrun-unread.json)
   - `valid` / `pass`
 
 The vector carries two amounts that each remain below the carried maximum but
@@ -125,12 +125,12 @@ or aggregate those producer-defined quantities.
 
 ### Runtime Identity Across Admission And Observation
 
-- [`vate-3a-substrate-substituted-splice`](https://github.com/astrogilda/aee-conformance/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/reject/vate-3a-substrate-substituted-splice.json)
+- [`vate-3a-substrate-substituted-splice`](https://github.com/astrogilda/agent-evidence-vectors/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/reject/vate-3a-substrate-substituted-splice.json)
   - `invalid`; manifest code `run-binding-mismatch`; also carries
     `sealed-record-absent`
-- [`vate-3b-admitted-vs-observed-runtime-unread`](https://github.com/astrogilda/aee-conformance/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/accept/vate-3b-admitted-vs-observed-runtime-unread.json)
+- [`vate-3b-admitted-vs-observed-runtime-unread`](https://github.com/astrogilda/agent-evidence-vectors/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/accept/vate-3b-admitted-vs-observed-runtime-unread.json)
   - `valid` / `pass`
-- [`vate-3c-substrate-substituted-and-resigned`](https://github.com/astrogilda/aee-conformance/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/accept/vate-3c-substrate-substituted-and-resigned.json)
+- [`vate-3c-substrate-substituted-and-resigned`](https://github.com/astrogilda/agent-evidence-vectors/blob/2aa5a23d0e0cf93921a59510a755ccfe1e103a47/vectors/accept/vate-3c-substrate-substituted-and-resigned.json)
   - `valid` / `pass`
 
 AEE rejects a substrate substitution that breaks its run binding, while a run
