@@ -13,6 +13,12 @@ export function digestDescriptorForBytes(bytes: Uint8Array): DigestDescriptor {
   };
 }
 
+/**
+ * Hash an object under stableJsonBytes's limited Python fixture input contract.
+ * Numbers must be known Python integers in JavaScript's safe range; fractional
+ * numbers, unsafe integers, and negative zero throw TypeError. Parsed 1.0/1e0
+ * cannot be distinguished from 1. See docs/conformance/digest-basis.md.
+ */
 export function digestDescriptorForJson(value: JsonValue): DigestDescriptor {
   return digestDescriptorForBytes(stableJsonBytes(value));
 }
