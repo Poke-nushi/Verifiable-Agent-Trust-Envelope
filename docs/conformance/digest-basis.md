@@ -34,7 +34,7 @@ object keys and no insignificant whitespace before applying SHA-256. In
 implementation terms, the current Python runner uses:
 
 ```text
-json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+json.dumps(value, allow_nan=False, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
 ```
 
 This basis is intentionally limited. It keeps the current fixture corpus and
@@ -45,6 +45,39 @@ payload handling, or a general signed-JSON profile.
 
 Do not relabel this current basis as RFC 8785 / JCS unless the runner, fixtures,
 schemas, examples, and comparison rules have been updated to use that profile.
+
+### TypeScript Object Helper Input Contract
+
+The package-private TypeScript `stableJsonString`, `stableJsonBytes`, and
+`digestDescriptorForJson` helpers reproduce this Python basis for strings,
+booleans, null, arrays, and plain objects whose numeric values are known to be
+Python integers within JavaScript's safe integer range
+(`-9007199254740991` through `9007199254740991`). They escape non-ASCII strings
+with lowercase `\u` sequences, sort keys by Unicode code point, and preserve
+integer-like keys and literal `__proto__` members. They do not normalize Unicode.
+
+These helpers reject fractional numbers, negative zero, non-finite numbers,
+and integers outside the safe range. This is a TypeScript helper limitation;
+it does not change the Python fixture basis or prohibit floating-point values
+in the conformance runner.
+
+Do not use these object helpers to recompute the digest of arbitrary parsed
+JSON. JavaScript loses numeric representation information: `JSON.parse("1.0")`
+and `JSON.parse("1e0")` both produce `1`, while Python parses those tokens as
+floats and serializes them as `1.0`. The helper cannot detect that loss from the
+resulting JavaScript value. Even a safe integer value requires a source contract
+that excludes floating-point tokens and prior numeric rounding.
+
+For an object outside that contract, retain the original input and compute its
+fixture bytes with the Python runner before hashing those bytes. Hashing the raw
+source file instead is valid only when the artifact or profile calls for a raw
+artifact digest; it is not a substitute for the fixture/object JSON digest.
+
+The TypeScript correction aligns its supported strings and object keys with the
+existing Python basis. Digests previously produced by the TypeScript helper for
+non-ASCII text, integer-like keys, or dropped `__proto__` members must be
+recomputed from the source object. Published corpus and historical report-bundle
+digests retain their existing basis and bytes.
 
 ## Embedded Evidence-Object Digest
 

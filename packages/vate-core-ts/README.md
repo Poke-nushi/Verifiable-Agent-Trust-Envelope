@@ -19,6 +19,14 @@ The package currently covers:
 - schema-shaped SUT result entries for `schemas/sut-result.schema.json`;
 - distinct `corpus-fixture-validation` and `generated-receipts` evidence fields;
 
+`stableJsonString`, `stableJsonBytes`, and `digestDescriptorForJson` use the
+[limited Python fixture input contract](../../docs/conformance/digest-basis.md#typescript-object-helper-input-contract).
+Numeric values must be known Python integers within JavaScript's safe integer
+range; fractional numbers, unsafe integers, and negative zero are rejected.
+Parsing `1.0` or `1e0` into a JavaScript value loses information needed for this
+basis, so arbitrary source JSON must retain its original input for computation
+with the Python runner.
+
 The helper deliberately does not:
 
 - fetch remote artifact URIs;
