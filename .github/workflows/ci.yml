@@ -13,6 +13,41 @@ permissions:
   contents: read
 
 jobs:
+  execution-evidence:
+    name: Execution evidence (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.10", "3.12", "3.14"]
+        include:
+          - os: macos-15
+            python: "3.14"
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install Python validation dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      - name: Run execution evidence tests
+        run: python -B -m unittest discover -s reference/execution-evidence-demo -p 'test_*.py' -v
+
+      - name: Run execution evidence CLI from a source archive
+        run: |
+          archive_dir="$(mktemp -d)"
+          git archive HEAD | tar -x -C "$archive_dir"
+          python -B "$archive_dir/reference/execution-evidence-demo/run_demo.py" --output-name ci
+
   validate:
     name: Repository checks
     runs-on: ubuntu-latest

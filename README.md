@@ -31,6 +31,17 @@ python3 reference/quickstart-demo/run_demo.py
 No dependencies. The demo narrates three committed v0.3 corpus cases: `allow`,
 `attenuate`, and a fail-closed `deny`.
 
+To trace an admitted operation through a separate local provider process,
+actual output files, and response-loss reconciliation, run the
+[Execution Evidence Demo](reference/execution-evidence-demo/README.md):
+
+```bash
+python3 reference/execution-evidence-demo/run_demo.py --output-name first-run
+```
+
+Its ten scenarios retain the original and effective inputs, provider evidence,
+and receipts for inspection with the included evidence verifier.
+
 ## What VATE Records
 
 - **One admission basis**: action, target, any requested constraints, actor, principal,
@@ -392,6 +403,8 @@ The most useful feedback is:
   Publication and integrity guidance for SUT, conformance, and implementation reports
 - [reference/vate-verifier-core/README.md](reference/vate-verifier-core/README.md)
   Dependency-free verifier core for AL2 admission fixtures
+- [reference/execution-evidence-demo/README.md](reference/execution-evidence-demo/README.md)
+  Local file execution, exact provider inputs, generated evidence, and response-loss reconciliation
 - [reference/a2a-metadata-adapter-demo/README.md](reference/a2a-metadata-adapter-demo/README.md)
   Dependency-free A2A-shaped metadata adapter demo
 - [packages/vate-core-ts/README.md](packages/vate-core-ts/README.md)

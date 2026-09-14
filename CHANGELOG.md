@@ -2,6 +2,15 @@
 
 This file records dated public changes to the discussion draft.
 
+## Unreleased
+
+- Add the Execution Evidence Demo: a local file-set operation linking admission,
+  the exact provider input, observed files, and generated receipts.
+- Include ten scenarios covering permission narrowing, refused handoffs,
+  response loss and read-only reconciliation, and missing or altered evidence.
+- Add regression tests and CI coverage for the demo's local execution and
+  evidence contracts. The existing VATE core, schemas, and corpus are unchanged.
+
 ## 2026-09-09 — v0.4.1
 
 - Corrected `deny-ap2-hnp-replay` to bind normalized payment-authority and
