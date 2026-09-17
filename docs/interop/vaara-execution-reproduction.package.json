@@ -1,0 +1,19 @@
+{
+  "format": "vate-execution-reproduction-download-1",
+  "archive": "vate-reproduction-local-draft-01.zip",
+  "url": "https://vate.rognalia.com/downloads/vaara-vate/2026-09-16/vate-reproduction-local-draft-01.zip",
+  "size_bytes": 22842060,
+  "sha256": "5f1fe2d4bf656cc02c25c04757180fc3d6111296e157abfc61f5b3e7715d3f7e",
+  "manifest_sha256": "d603a1638ee3160a20dc0cda3b84664ae1de937fd5705b0a35dca1ee2ac82279",
+  "source_pins": {
+    "vate": "a15b9f5e64413f7a1312ec8e9e7731e8ebdb1f60",
+    "vaara": "cfb5495c0c8d08fb34a99501c670f4ed225e7870",
+    "rfc8785": "0.1.4"
+  },
+  "licenses": {
+    "vaara": "AGPL-3.0-or-later",
+    "vate": "Apache-2.0",
+    "rfc8785": "Apache-2.0"
+  },
+  "scope": "same-owner local stdio execution and disclosed-evidence reproduction; not external-SUT conformance or production approval"
+}
