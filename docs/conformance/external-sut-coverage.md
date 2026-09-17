@@ -5,6 +5,11 @@ their native output establishes, and what remains unresolved in VATE comparison.
 Use it to choose a case to reproduce or extend; follow the linked run records for
 the exact inputs, source revisions, artifacts, and replay instructions.
 
+A later [Vaara → VATE execution reproduction](../interop/vaara-execution-reproduction.md)
+connects a pinned stdio proxy, credential gateway, local file handler and VATE
+records. That maintainer-operated experiment has its own pins and observation
+boundary; it is separate from the external-SUT comparisons below.
+
 The table covers the three candidate-executed native-verifier records available
 on 2026-09-10. The [run register](external-sut-run-records.md) also contains two
 AlgoVoi adapter-result slices from one implementation line. Those slices have

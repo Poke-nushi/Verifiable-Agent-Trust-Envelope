@@ -42,6 +42,11 @@ python3 reference/execution-evidence-demo/run_demo.py --output-name first-run
 Its ten scenarios retain the original and effective inputs, provider evidence,
 and receipts for inspection with the included evidence verifier.
 
+For a pinned Vaara stdio proxy and credential-gateway path, use the
+[Vaara → VATE reproduction package](docs/interop/vaara-execution-reproduction.md).
+It checks four disclosed evidence cases and can create a new local file-operation
+capture, including changed arguments and response loss.
+
 ## What VATE Records
 
 - **One admission basis**: action, target, any requested constraints, actor, principal,
