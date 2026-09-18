@@ -1785,7 +1785,9 @@ class ExecutionDemoTest(unittest.TestCase):
         case = self.clone("response-loss")
         original = read_json(case / "inputs/original-operation.json")
         permit = read_json(case / "admission-2/permit.json")
-        permit["issued_at"] = read_json(case / "admission-1/permit.json")["issued_at"]
+        original_permit = read_json(case / "admission-1/permit.json")
+        # Backdate the whole window so the chronology probe retains a valid lifetime.
+        permit.update(issued_at=original_permit["issued_at"], expires_at=original_permit["expires_at"])
         auth = evaluate(original, permit, read_json(case / "policy.json"), resource=original["target"]["resource"],
                         permit_uri="local:admission-2/permit.json",
                         evaluated_at=read_json(case / "provider/native-result.json")["finished_at"])
