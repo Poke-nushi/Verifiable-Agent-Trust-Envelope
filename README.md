@@ -181,6 +181,9 @@ or later main-branch work, start here:
   decisions and one preserved attenuation-versus-deny difference
 - [AEE-native boundary review](docs/interop/aee-native-boundary-review.md) -
   eight executable AEE-native vectors prompted by three pinned VATE cases
+- [HandoffProbe reconciliation review](docs/interop/handoffprobe-reconciliation-review.md) -
+  package verification and a HandoffProbe-native original-attempt recovery
+  experiment prompted by the fixed Vaara → VATE package
 - [External implementation call](docs/conformance/external-implementation-call.md) -
   the request for result files, generated artifacts, and implementation reports
 - [External SUT quickstart](docs/conformance/external-sut-quickstart.md) - how a
@@ -422,6 +425,8 @@ The most useful feedback is:
   Agent Authorization Envelope evidence crosswalk for VATE admission receipts
 - [docs/interop/aee-native-boundary-review.md](docs/interop/aee-native-boundary-review.md)
   Source-pinned AEE-native boundary vectors prompted by three VATE cases
+- [docs/interop/handoffprobe-reconciliation-review.md](docs/interop/handoffprobe-reconciliation-review.md)
+  HandoffProbe's package check, property comparison and synthetic reconciliation fixture
 - [docs/interop/ap2-ucp-commerce-crosswalk.md](docs/interop/ap2-ucp-commerce-crosswalk.md)
   AP2 / UCP commerce evidence crosswalk for VATE admission receipts
 - [docs/interop/ap2-human-not-present-evidence.md](docs/interop/ap2-human-not-present-evidence.md)
