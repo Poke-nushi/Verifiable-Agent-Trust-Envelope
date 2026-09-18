@@ -9,7 +9,7 @@ For public wording rules, see
 
 ## Current Direction
 
-### Post-`v0.4.1`: Independent Implementation Evidence
+### Post-`v0.4.1`: Execution Evidence And Recipient Review
 
 The `v0.4.1` maintenance discussion-draft pre-release is the current GitHub
 review snapshot. It retains the `2026-09` machine-readable artifact line
@@ -24,14 +24,42 @@ exact source remains archived at DOI `10.5281/zenodo.22218860`; the `v0.4.1`
 version DOI is `10.5281/zenodo.22680789`. Historical records keep their own exact
 source and DOI.
 
-The priority remains evidence from independently maintained implementation
-lines and reproducibility across implementers. The current contract migration
-must not be used to relabel historical `2026-07` results as current evidence.
+The current work connects a relying party's admission decision to the request
+actually delivered, the resulting evidence, and a recipient's assessment of
+that evidence. The next question is whether a recipient can make that assessment
+from the supplied artifacts and documentation, and maintain it when the source
+format or evidence semantics change.
 
-The next work should not broaden VATE beyond the
-`VATE-AL2-Verifier-Admission-v0.3` boundary. The priority is to move from
-author-run repository checks toward independent implementation evidence that a
-reviewer can inspect, reproduce, and tie back to one corpus snapshot.
+Independent implementation evidence remains a parallel priority. Each corpus
+comparison retains its own snapshot; historical `2026-07` results are not
+relabeled as current `2026-09` evidence.
+
+### Available Execution And Review Evidence
+
+The following work is available on `main` after the `v0.4.1` archive:
+
+- [Execution Evidence Demo](reference/execution-evidence-demo/README.md): ten
+  local scenarios link admission, exact provider input, observed files and
+  generated receipts, including response loss and read-only reconciliation.
+- [Vaara → VATE reproduction package](docs/interop/vaara-execution-reproduction.md):
+  a fixed package for checking disclosed evidence and creating a new local run
+  through a pinned stdio proxy, credential gateway and file handler.
+- [HandoffProbe reconciliation review](docs/interop/handoffprobe-reconciliation-review.md):
+  an external package check and property comparison that led to a
+  HandoffProbe-native synthetic original-attempt reconciliation fixture.
+
+The VATE demo and Vaara path use one operator, local processes and unsigned
+VATE records. HandoffProbe's result is an external technical review, not an
+additional VATE corpus comparison; its tests are reported by its author. These
+records keep their distinct observation boundaries and do not establish
+independent issuer authenticity, production readiness or A2A transport support.
+
+The main-branch conformance corpus remains 76 cases / 217 manifest artifacts.
+The demonstration scenarios are separate from that corpus. See
+[external SUT coverage](docs/conformance/external-sut-coverage.md) for the
+partial native-implementation records and their historical evaluation pins.
+
+### Release And Review References
 
 The current public review surface is:
 
@@ -75,25 +103,38 @@ The current public review surface is:
 - independent implementation / external SUT review intake:
   [issue #2](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2)
 
-Near-term public work should happen in this order:
+### Next Technical Work
 
-1. Keep the lightweight
-   [one-hour external SUT or corpus review request](docs/conformance/external-sut-ask-1-hour.md)
-   visible for reviewers who are not ready to produce a full adapter.
-2. Use the recorded three-case starter bundle, the deeper eight-case bundle,
-   and the external SUT starter template as the reference path for additional
-   reviewers. Treat the two bundles as slices from the same AlgoVoi
-   implementation line, not two independent SUTs.
-3. Collect a SUT result from another independently maintained implementation
-   line, distinct from both the repository reference runner and the recorded
-   AlgoVoi line, against the current `2026-09` artifact contract and its exact
-   76-case corpus snapshot.
-4. Ask implementers to publish generated artifacts or a controlled artifact
-   bundle, not only a hand-written result summary.
-5. Generate or collect a conformance report, implementation report, and local
-   `verify-bundle` report for each submitted corpus snapshot.
-6. Use those results to identify unclear corpus cases, reason-code friction,
-   missing artifact bindings, or publication metadata gaps.
+1. Take the existing non-payment operation through initial receipt of its
+   evidence, a bounded source change, and a second recipient assessment. Fix the
+   disclosed artifacts, trusted parties, questions and expected decisions
+   before the trial.
+2. Exercise a format-only change and a change in evidence meaning separately.
+   Preserve the original packages and identify synthetic changes as such.
+   Record the recipient's decisions, unresolved evidence, additional questions
+   and required adapter or documentation changes.
+3. Compare VATE records with the native originals plus an explicit mapping and
+   the transformations needed to use them. Include preparation and maintenance
+   on both sides, as well as incorrect conclusions and justified unresolved
+   outcomes. A completed trial should identify the useful distinctions, costs
+   and remaining technical gaps.
+4. Map the resulting evidence requirements to the
+   [existing A2A extension draft](docs/a2a/vate-a2a-extension-profile-v0.3.md).
+   Distinguish what local execution demonstrates from the transport and
+   receiver behavior still to be exercised in an A2A exchange.
+5. Extend independently maintained implementation evidence through the
+   [external SUT review path](docs/conformance/external-sut-quickstart.md).
+   Keep partial comparisons, generated artifacts and external technical reviews
+   identifiable by their source, execution conditions and corpus snapshot
+   where applicable.
+
+For the execution-and-recipient path, generation and continued use by another
+operator, human review effort, and behavior across restarts or concurrent
+execution remain open.
+The [one-hour corpus review](docs/conformance/external-sut-ask-1-hour.md) and
+the reproduction package provide separate entry points for contributors.
+
+### Current Scope
 
 Immediate out of scope:
 
@@ -108,8 +149,9 @@ Immediate out of scope:
 - dependency additions, package publication, or production proof verification
   without an explicit separate review decision.
 
-The test for the next public patch is simple: it should make independent
-implementation review easier without changing the public claim boundary.
+The current work retains the `VATE-AL2-Verifier-Admission-v0.3` semantic profile
+and the [public claim boundary](docs/public-claim-boundary.md). Observations from
+the trials will inform any later profile or contract changes.
 
 ## Completed `v0.3.1` Credibility And Reviewability Patch
 
@@ -181,11 +223,12 @@ The `v0.3.0` package includes:
 - documentation for fixture canonicalization limits, namespace migration,
   extension-field handling, and the `2026-07` conformance artifact line.
 
-## Post-`v0.4.1` External Review Target
+## Independent Implementation Evidence
 
-The current post-`v0.4.1` target is to move from author-run artifacts toward
-independent implementation evidence. The priority is not a broader protocol
-surface.
+The [coverage guide](docs/conformance/external-sut-coverage.md) distinguishes
+native execution, reached predicates and unresolved VATE comparisons for Pulse,
+Vaara and Bolyra / x402. These partial records remain tied to their original
+inputs and corpus snapshots.
 
 The recorded AlgoVoi evidence in
 [docs/conformance/external-sut-run-records.md](docs/conformance/external-sut-run-records.md)

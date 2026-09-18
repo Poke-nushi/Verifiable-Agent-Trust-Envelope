@@ -94,15 +94,36 @@ Changes are evaluated in roughly this order:
 
 ## Near-Term Priorities
 
-1. stabilize the data model
-2. clarify verification flows
-3. separate profiles more cleanly
-4. refine status and attenuation semantics
-5. establish the foundation for conformance tests
+The [roadmap](ROADMAP.md) connects admission, executed requests, outcome
+evidence and recipient review. Useful contributions include:
+
+1. reproduce the published execution paths and report an unclear or
+   inconsistent evidence relationship;
+2. test whether a recipient can distinguish an observed outcome, an unresolved
+   attempt and missing evidence from the supplied artifacts;
+3. identify what must change in an adapter or mapping when a source format or
+   its evidence semantics changes;
+4. contribute partial external SUT results with the evaluated inputs, native
+   output, generated artifacts and remaining unsupported cases identified;
+5. clarify how the existing A2A metadata profile can carry the required
+   references while leaving evidence assessment with the recipient.
+
+For a local execution review, start with the
+[Execution Evidence Demo](reference/execution-evidence-demo/README.md) or the
+[Vaara reproduction package](docs/interop/vaara-execution-reproduction.md).
+For a corpus or SUT review, use the
+[one-hour review request](docs/conformance/external-sut-ask-1-hour.md).
+Share a reproducible result or question in
+[issue #2](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2),
+identifying which path and source version you used. An execution-evidence
+review can use its native records without a VATE SUT result file.
 
 ## Related Documents
 
 - `README.md`
+- `ROADMAP.md`
+- `docs/known-gaps.md`
+- `docs/conformance/external-sut-quickstart.md`
 - `docs/verifiable-agent-trust-envelope-spec-v0.1.md`
 - `docs/standards-and-ecosystem-landscape-2026-04.md`
 - `schemas/*.schema.json`

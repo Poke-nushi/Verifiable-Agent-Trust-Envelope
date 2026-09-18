@@ -4,12 +4,24 @@ This file records dated public changes to the discussion draft.
 
 ## Unreleased
 
+- Link the published technical report with its fixed v0.4.0 evaluation snapshot.
+- Align TypeScript fixture JSON encoding with the Python byte basis for the
+  supported input values.
+- Update the AEE interop record's links to the renamed external vector suite.
 - Add the Execution Evidence Demo: a local file-set operation linking admission,
   the exact provider input, observed files, and generated receipts.
 - Include ten scenarios covering permission narrowing, refused handoffs,
   response loss and read-only reconciliation, and missing or altered evidence.
 - Add regression tests and CI coverage for the demo's local execution and
   evidence contracts. The existing VATE core, schemas, and corpus are unchanged.
+- Publish the fixed Vaara → VATE reproduction guide and package identity, with
+  separate saved-evidence checks and new local execution instructions.
+- Record HandoffProbe's package check, property comparison and synthetic
+  reconciliation fixture, with acknowledgement and fixed source references.
+- Keep the chronology regression test's permit timestamps within one validity
+  window so clock rollover does not mask the intended assertion.
+- Refresh the roadmap, contributor guidance, FAQ, known gaps and A2A review
+  entry points for the published execution evidence and recipient-review work.
 
 ## 2026-09-09 — v0.4.1
 

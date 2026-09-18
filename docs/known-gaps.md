@@ -120,9 +120,14 @@ language-neutral corpus index:
 
 Those corpora make the draft easier to inspect and replay, but they are not yet a multi-implementation conformance suite.
 
+The [external SUT coverage guide](conformance/external-sut-coverage.md) and
+[run register](conformance/external-sut-run-records.md) record partial results
+from independently maintained implementations. They distinguish native
+execution, submitted results and unresolved comparisons at each historical pin.
+
 Remaining work includes:
 
-- independent implementation reports
+- broader independent implementation reports, including generated receipts
 - transport-bound SUT adapters beyond the generic result comparison contract
 - production signature verification fixtures
 - cross-implementation report comparison
@@ -163,6 +168,15 @@ field, and `require_new_permit` fixtures use `should_execute: false`. Production
 profiles still need a sharper execution gate model so "admitted with
 attenuation" is never misread as unconditional execution approval.
 
+The [Execution Evidence Demo](../reference/execution-evidence-demo/README.md)
+now exercises a local gate, exact provider input, observed file output and
+receipt linkage. It retains an unknown caller outcome after response loss and
+can reconcile the original attempt by a read-only query. The
+[Vaara reproduction package](interop/vaara-execution-reproduction.md) connects
+the same local operation to a pinned stdio proxy and credential gateway.
+These same-operator paths leave independent issuer verification, durable
+recovery and concurrent execution open.
+
 Remaining work includes:
 
 - deciding whether future profiles keep `require_new_permit` as an `attenuate`
@@ -173,7 +187,7 @@ Remaining work includes:
   `supersedes` properties in status and standalone attenuation-effect schemas
   do not define or validate that re-admission lineage
 - extending execution-gate checks beyond fixture-level admission receipts into
-  adapter behavior and post-execution receipt validation
+  independently operated adapters and profile-level post-execution validation
 - adding more fixtures where an admission decision exists but execution must not
   proceed
 - adding more transport-bound fixtures only where they expose a distinct
@@ -194,6 +208,10 @@ Remaining work includes:
 - policy snapshot digest mismatch after an otherwise matching effective request
 - side-effect checks beyond simple amount limits
 - independent implementation reports that exercise the linkage checks
+
+The [HandoffProbe reconciliation review](interop/handoffprobe-reconciliation-review.md)
+records an external comparison and synthetic original-attempt reconciliation
+experiment. It informs this boundary but is not a VATE corpus linkage result.
 
 The external SUT contract now separates digest-matched corpus artifact
 references from receipt bytes submitted as SUT output. `generated-receipts`
@@ -268,9 +286,9 @@ Remaining work includes:
   type/hint combinations
 
 AgentKit, AgentBook, World ID, and similar adjacent protocol evidence remain
-future interop work. The current v0.3.1 direction is to avoid protocol-specific
-evidence vocabulary expansion and keep adjacent artifacts under generic evidence
-types plus `protocol_hint` until a later profile has a concrete validation need.
+future interop work. The current direction keeps adjacent artifacts under
+generic evidence types plus `protocol_hint` until a profile has a concrete
+validation need for a protocol-specific vocabulary expansion.
 
 ### 16. Report Integrity Needs External Proof Implementation
 
@@ -287,13 +305,3 @@ Remaining work includes:
   Sigstore bundles
 - publishing real implementation reports under implementer-controlled origins
 - deciding whether future profiles require a specific proof format
-
-## Practical Reading Of These Gaps
-
-These gaps do **not** mean the current repo is empty.
-They mean the repo should be read as:
-
-- a serious problem framing
-- a concrete object-model proposal
-- a verifier-oriented AL2 draft wedge
-- an invitation for sharper profile and interoperability work
