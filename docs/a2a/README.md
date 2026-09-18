@@ -33,7 +33,26 @@ objects.
 3. [A2A v1.0 Extension Sketch](../a2a-v1-extension-sketch-2026-05.md)
 4. [A2A Maintainer Brief](../a2a-maintainer-brief-v0.3.md)
 5. [Receipt Audit Walkthrough v0.3.1](../receipt-audit-walkthrough-v0.3.1.md)
-6. [A2A Issue Update Draft](../a2a-issue-update-2026-05.md)
+6. [Historical May 2026 Issue Update Draft](../a2a-issue-update-2026-05.md)
+
+## Execution Evidence For Review
+
+- [Execution Evidence Demo](../../reference/execution-evidence-demo/README.md):
+  local admission, provider input, observed files, and response-loss recovery.
+- [Vaara → VATE reproduction package](../interop/vaara-execution-reproduction.md):
+  a fixed stdio proxy and credential-gateway experiment with saved-evidence
+  checks and a new-run path.
+- [HandoffProbe reconciliation review](../interop/handoffprobe-reconciliation-review.md):
+  an external property comparison and synthetic experiment concerning evidence
+  for the original action and attempt.
+
+Use these records to assess which artifact references an A2A receiver needs
+and what it can conclude from them. The local stdio and synthetic experiments
+do not exercise A2A transport. Carrying the references through an A2A exchange
+and testing the receiver's evidence assessment remain further work for the
+existing metadata-only profile.
+
+## Examples And Review Aids
 
 Related examples:
 

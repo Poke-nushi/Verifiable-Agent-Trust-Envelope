@@ -112,10 +112,10 @@ The intended fit is narrower: this draft provides the portable trust envelope th
 
 ## Is This Draft Still Too Broad?
 
-That is a fair concern, and the current answer should be:
+The concrete implementation and review scope is:
 
 - the core claim is narrow
-- the durable battlefield is still `AL2` external digital write
+- the target is `AL2` external digital writes
 - `v0.3` keeps the most concrete new work in a narrow AL2 verifier admission
   profile and hardens empty `evidence_refs` handling
 - broader deployment shapes should move into profiles, extensions, or later drafts where possible
@@ -135,7 +135,9 @@ The preserved v0.1 core discussion draft centers on:
 The repository also includes payload schemas, examples, verifier guidance, negative tests, and educational reference demos.
 The current v0.3 additions provide a concrete AL2 verifier admission profile,
 reference-only A2A metadata binding, separate admission and post-execution
-receipt schemas, and a 63-case machine-readable conformance corpus.
+receipt schemas, and a 76-case machine-readable conformance corpus. The current
+count and artifact manifest are recorded in
+[corpus.json](conformance/al2-vate-v0.3/corpus.json).
 
 ## What Is Still Future Work?
 
@@ -184,14 +186,27 @@ The point is to avoid reusing one globally stable alias across every relying par
 
 No.
 
-This draft currently models receipt semantics with `issuer_role`.
+The preserved v0.1 AER model describes receipt issuer roles with `issuer_role`.
 Examples include:
 
 - `runtime` - the actor runtime signs what it claims it executed
 - `verifier` - the relying party signs what it accepted or observed
 - `broker` - an intermediary signs a policy or settlement-side record
 
-The educational demo currently uses `issuer_role: runtime`.
+The `reference/minimal-al2-demo/` example uses `issuer_role: runtime`.
+The newer execution evidence demo produces unsigned local VATE records; their
+linkage checks do not authenticate an issuer.
+
+## Where Can I Inspect Execution Evidence?
+
+The [Execution Evidence Demo](reference/execution-evidence-demo/README.md)
+traces a local file operation through admission, provider input, output files
+and receipts, including response loss and reconciliation.
+
+The [Vaara → VATE reproduction package](docs/interop/vaara-execution-reproduction.md)
+adds a pinned stdio proxy and credential-gateway path. It supports checking
+saved evidence and creating a new local run. Both paths describe the evidence
+available to the recipient and the limits of a same-operator local experiment.
 
 ## Is The Reference Demo Production Ready?
 

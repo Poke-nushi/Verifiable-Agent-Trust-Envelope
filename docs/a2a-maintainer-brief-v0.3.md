@@ -167,6 +167,13 @@ or make signed Agent Cards sufficient authority for risky external writes.
 
 ## Current Review Aids
 
+The [execution evidence review aids](a2a/README.md#execution-evidence-for-review)
+connect the profile discussion to a local file-operation demo, the pinned Vaara
+reproduction package, and HandoffProbe's original-attempt reconciliation
+experiment. They expose concrete admission, input and outcome relationships
+for review. Transport-bound carriage and receiver behavior in an A2A exchange
+remain untested by those experiments.
+
 The current AL2 v0.3 conformance surface is the corpus under
 `conformance/al2-vate-v0.3/`. Its current case count is recorded in
 `conformance/al2-vate-v0.3/corpus.json` as `summary.case_count`.
@@ -216,6 +223,3 @@ That should still avoid pulling full verifier policy, payment, identity, or rece
 The main question is:
 
 > Can this metadata-only, by-reference admission / receipt binding be reviewed through A2A-style extension metadata, or should it remain entirely as an adjacent VATE profile outside A2A governance?
-
-The proposal is intentionally modest.
-It tries to preserve A2A's boundary while giving implementers a concrete way to carry verifier-side admission evidence across A2A task flows.
