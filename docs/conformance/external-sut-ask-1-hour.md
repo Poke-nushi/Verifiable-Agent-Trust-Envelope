@@ -66,6 +66,14 @@ later integrity denial remains non-overridable and occurs before the upstream
 call, report both the matching terminal result and the ordering limitation;
 `partial` is an acceptable review classification.
 
+For `allow-valid-admission`, read `expected.checks` together with
+`al2_context_checks` and the
+[AL2 context binding requirements](sut-adapter-contract.md#al2-context-bindings).
+The three named checks alone are not a complete SUT result: the case also
+requires the admission receipt reference and runtime context bindings. The
+[three-case result template](../../examples/external-sut-template/starter-sut-result.template.json)
+shows the combined shape.
+
 ## Scope
 
 - Target corpus: `conformance/al2-vate-v0.3`

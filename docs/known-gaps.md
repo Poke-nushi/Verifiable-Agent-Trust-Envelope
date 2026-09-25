@@ -272,10 +272,11 @@ Remaining work includes:
   including concurrency and restart behavior; the AP2-style replay fixture
   currently evaluates only a supplied VATE-local replay-state input whose
   consume key is based on a normalized payment-authority fixture digest
-- more explicit evaluation-order fixtures showing that malformed proof, replay,
-  and digest mismatch fail closed before policy or attenuation can allow
-  execution; the current evaluation-order coverage includes
-  `deny-runtime-proof-stale` and `deny-digest-mismatch-before-policy`
+- explicit runtime evidence for any claim about internal evaluation order;
+  `deny-runtime-proof-stale` and `deny-digest-mismatch-before-policy` cover
+  fail-closed fixture expectations, while `compare` checks submitted terminal
+  results and required artifact bindings. It does not observe the SUT's gate
+  sequence. See the [validation focus boundary](conformance/corpus-format.md#validation-focus-boundary)
 - more production-signature algorithm-confusion fixtures; the current
   byte-level JOSE coverage includes `deny-jose-alg-none`,
   `deny-jose-hs256-downgrade`, and `deny-jose-es384-not-allowed`

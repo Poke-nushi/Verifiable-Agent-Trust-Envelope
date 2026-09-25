@@ -341,7 +341,8 @@
         "admission receipt shape",
         "allow decision",
         "evidence verification results",
-        "policy versioning"
+        "policy versioning",
+        "runtime context bindings"
       ]
     },
     {
@@ -778,11 +779,11 @@
       ],
       "expected_should_execute": false,
       "path": "conformance/al2-vate-v0.3/cases/deny-digest-mismatch-before-policy.json",
-      "title": "Deny a digest mismatch before policy admission",
+      "title": "Deny execution on a digest mismatch",
       "validation_focus": [
         "digest-bound reference",
-        "evaluation order",
-        "fail closed before policy allow",
+        "terminal integrity denial",
+        "non-overridable denial before execution",
         "execution gate"
       ]
     },
@@ -1995,7 +1996,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "02da4ca9257547872ecbcce9728b8bb256afd2f77676d5daef89fd6c831b2bb0"
+    "value": "9f16ca68c32e57ee79a0c4080310fe90b63f337bbe827cad6b1017acc2b1a14e"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -2048,7 +2049,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-valid-admission.json",
-      "sha256": "3a02a09f7144b18e5996041aa6887880865c0d7140be0586df4a8e20d7805cf0"
+      "sha256": "697d171bb7111fd538c46700cec687c92cc9db8641383b6d9328cce7c3c017b6"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/allow-valid-basic-external-write.json",
@@ -2124,7 +2125,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-digest-mismatch-before-policy.json",
-      "sha256": "23ba27aac2bdcc15897b49456c92778e8409b639bc2c40b4b5baf0e263a6ce78"
+      "sha256": "8919e5e04c13002e0b13e7e65fac86e8de3956ce8f0148b95b8e552ab26e1dbc"
     },
     {
       "path": "conformance/al2-vate-v0.3/cases/deny-digest-mismatch.json",

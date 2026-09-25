@@ -5891,8 +5891,6 @@ def check_p1_5_fixture_coverage() -> None:
     integrity_checks = digest_case.get("integrity_checks", [])
     if not integrity_checks or integrity_checks[0].get("expect_match") is not False:
         raise RuntimeError("deny-digest-mismatch-before-policy must include a failing digest check")
-    if "evaluation order" not in digest_case.get("validation_focus", []):
-        raise RuntimeError("deny-digest-mismatch-before-policy must declare evaluation-order focus")
 
     jose_case = json.loads((case_dir / "deny-jose-es384-not-allowed.json").read_text(encoding="utf-8"))
     jose_checks = jose_case.get("jose_checks", [])
