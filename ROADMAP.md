@@ -47,12 +47,18 @@ The following work is available on `main` after the `v0.4.1` archive:
 - [HandoffProbe reconciliation review](docs/interop/handoffprobe-reconciliation-review.md):
   an external package check and property comparison that led to a
   HandoffProbe-native synthetic original-attempt reconciliation fixture.
+- [A2A evidence-review reproduction](docs/a2a/evidence-reproduction.md): three
+  fixed historical disclosures exchanged through loopback `SendMessage` and
+  `GetTask`, with recipient assessments and saved-run verification.
 
 The VATE demo and Vaara path use one operator, local processes and unsigned
 VATE records. HandoffProbe's result is an external technical review, not an
-additional VATE corpus comparison; its tests are reported by its author. These
-records keep their distinct observation boundaries and do not establish
-independent issuer authenticity, production readiness or A2A transport support.
+additional VATE corpus comparison; its tests are reported by its author. The
+A2A package uses one process and an explicit local evidence-review contract;
+it checks 131 fetched files and keeps review-Task completion separate from the
+original operation's outcome.
+Independent issuer authenticity, cross-implementation A2A exchanges and
+production readiness remain unestablished.
 
 The main-branch conformance corpus remains 76 cases / 217 manifest artifacts.
 The demonstration scenarios are separate from that corpus. See
@@ -118,10 +124,12 @@ The current public review surface is:
    on both sides, as well as incorrect conclusions and justified unresolved
    outcomes. A completed trial should identify the useful distinctions, costs
    and remaining technical gaps.
-4. Map the resulting evidence requirements to the
+4. Use the [A2A evidence-review reproduction](docs/a2a/evidence-reproduction.md)
+   to test another recipient or evidence source against the
    [existing A2A extension draft](docs/a2a/vate-a2a-extension-profile-v0.3.md).
-   Distinguish what local execution demonstrates from the transport and
-   receiver behavior still to be exercised in an A2A exchange.
+   Record the required mapping, retrieval policy and interpretation changes.
+   Keep the fixed loopback result distinct from independent implementation or
+   operator evidence.
 5. Extend independently maintained implementation evidence through the
    [external SUT review path](docs/conformance/external-sut-quickstart.md).
    Keep partial comparisons, generated artifacts and external technical reviews

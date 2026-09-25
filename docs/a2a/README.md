@@ -45,12 +45,16 @@ objects.
 - [HandoffProbe reconciliation review](../interop/handoffprobe-reconciliation-review.md):
   an external property comparison and synthetic experiment concerning evidence
   for the original action and attempt.
+- [A2A evidence-review reproduction](evidence-reproduction.md): a fixed package
+  that exchanges three historical disclosures over loopback `SendMessage` and
+  `GetTask`, evaluates 131 fetched files and checks the saved review Tasks.
 
 Use these records to assess which artifact references an A2A receiver needs
-and what it can conclude from them. The local stdio and synthetic experiments
-do not exercise A2A transport. Carrying the references through an A2A exchange
-and testing the receiver's evidence assessment remain further work for the
-existing metadata-only profile.
+and what it can conclude from them. The A2A reproduction separates completion
+of the evidence-review Task from the original operation's effect, including an
+unknown outcome. It uses the existing metadata profile and an explicit local
+review contract in one process. Exchanges across independent implementations
+and operators remain further work.
 
 ## Examples And Review Aids
 

@@ -1,0 +1,20 @@
+{
+  "format": "vate-a2a-evidence-reproduction-download-1",
+  "archive": "vate-a2a-evidence-starter-06.zip",
+  "url": "https://vate.rognalia.com/downloads/a2a-evidence/2026-09-22/vate-a2a-evidence-starter-06.zip",
+  "size_bytes": 234820,
+  "sha256": "ec9b2286a18f5500f10a10281dfe6e2620b9aa31b5045ce0748bb89c8308fd31",
+  "manifest_sha256": "f6861bba26872c6abb7a6d9242ee309a8a5e8b723a2cf5e4828ea7d600d6fb57",
+  "source_pins": {
+    "vate": "2348fe12870acc0d6821a47e3b10f49655d5aadb",
+    "a2a_proto": "afda8316c64951a2ecb2a0d3d10867405d2b4095",
+    "vaara_historical_fixture_source": "cfb5495c0c8d08fb34a99501c670f4ed225e7870"
+  },
+  "licenses": {
+    "vate_and_synthetic_fixtures": "Apache-2.0",
+    "a2a_proto": "Apache-2.0",
+    "installed_dependencies": "See bundled THIRD-PARTY-NOTICES.md",
+    "vaara_source": "Not included"
+  },
+  "scope": "same-owner, one-process loopback A2A review of fixed historical disclosures under an explicit local contract; not external-SUT conformance, general A2A compatibility or production approval"
+}
