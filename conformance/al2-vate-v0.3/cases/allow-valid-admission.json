@@ -4,7 +4,7 @@
   "case_id": "allow-valid-admission",
   "title": "Allow a valid AL2 admission receipt",
   "category": "positive",
-  "purpose": "A verifier should accept an admission receipt when identity, runtime, audience, evidence, and local policy checks pass without attenuation.",
+  "purpose": "A verifier should accept an admission receipt when identity, runtime, audience, evidence, and local policy checks pass without attenuation. For corpus comparison, expected.checks is supplemented by al2_context_checks and the artifact/context binding requirements in docs/conformance/sut-adapter-contract.md#al2-context-bindings.",
   "artifacts": {
     "admission_receipt": "examples/receipts/admission-allow.example.json",
     "runtime_context": "conformance/al2-vate-v0.3/fixtures/runtime-binding-match-context.json"
@@ -42,6 +42,7 @@
     "admission receipt shape",
     "allow decision",
     "evidence verification results",
-    "policy versioning"
+    "policy versioning",
+    "runtime context bindings"
   ]
 }

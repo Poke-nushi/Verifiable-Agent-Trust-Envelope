@@ -142,9 +142,12 @@ it through an `expected` value or a profile-specific check and the selected
 command actually evaluates it. `run` and `compare` do not automatically prove
 the same implementation behavior.
 
-For example, `deny-digest-mismatch-before-policy` declares `evaluation order`
-as a review focus. In the reference path, `run` independently checks that the
-committed `base_artifact` has the configured failing digest relation and that
+For example, `deny-digest-mismatch-before-policy` focuses on a terminal integrity
+denial that policy or attenuation cannot override to permit execution. Its
+case ID is retained for result-file continuity; the ID does not establish an
+observed sequence of internal checks. In the reference path, `run` independently
+checks that the committed `base_artifact` has the configured failing digest
+relation and that
 the committed admission receipt matches the expected terminal outcome,
 execution gate, ordered reason codes, and named checks. It does not prove that
 a runtime verifier produced that receipt because of the mismatch.
@@ -186,8 +189,11 @@ A non-reference implementation can run the corpus without importing Python code:
    aliased sibling field into the SUT input record.
 7. If the verifier emits receipts, record those separate files under
    `results[].generated_artifacts` and opt into `generated-receipts` mode.
-8. Write a report matching `schemas/conformance-report.schema.json`.
-9. Optionally publish an implementation report matching `schemas/implementation-report.schema.json`.
+8. Write a SUT result file matching `schemas/sut-result.schema.json`.
+9. Pass that file to `compare --sut-results` to generate a comparison report
+   matching `schemas/conformance-report.schema.json`.
+10. Optionally use `compare --implementation-report` to generate an
+    implementation report matching `schemas/implementation-report.schema.json`.
 
 Implementations MAY use the reference runner as a comparison oracle, but the corpus index is the portable contract.
 

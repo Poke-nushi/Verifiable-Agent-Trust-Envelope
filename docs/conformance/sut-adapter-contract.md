@@ -148,6 +148,8 @@ Receipt artifact references require:
 - `digest.alg` set to `sha-256`
 - `digest.value` as lowercase SHA-256 hex
 
+### AL2 Context Bindings
+
 When the corpus case includes `al2_context_checks`, the result entry must
 include `artifacts.verification_context[]` entries with:
 
@@ -203,6 +205,17 @@ For example, `deny-runtime-proof-stale` requires five bindings: the admission
 receipt digest, its transaction id, the admission request digest, the embedded
 `runtime_attestation` evidence in the receipt, and the corresponding
 `runtime_attestation` evidence reference in the request.
+
+For `allow-valid-admission`, the three entries in `expected.checks` are only
+the named-check projection. The case also declares a runtime `binding` check
+in `al2_context_checks`. Its result requires the admission receipt reference
+and a `verification_context[]` entry for `runtime_context`, with four
+`context_bindings`: the admission receipt digest, its transaction id, its
+runtime value, and its embedded `runtime_attestation` evidence digest. The
+[three-case result template](../../examples/external-sut-template/starter-sut-result.template.json)
+shows these fields together. Matching these fields and bindings does not prove
+that the SUT performed every identity, audience, evidence, or policy check
+described by the case's admission scenario.
 
 The selected evidence object must be identified by the case or profile. Do not
 use ordinary language-runtime JSON serialization as an implicit canonicalization
