@@ -120,6 +120,13 @@ language-neutral corpus index:
 
 Those corpora make the draft easier to inspect and replay, but they are not yet a multi-implementation conformance suite.
 
+The [A2A evidence-review reproduction](a2a/evidence-reproduction.md) exercises
+`SendMessage`, `GetTask`, fetched-artifact assessment and saved-run verification
+for three historical disclosures under an explicit local contract. This
+same-owner, one-process exchange is separate from the conformance corpora.
+Independent A2A implementations, operators and SDK integrations remain untested
+by that package.
+
 The [external SUT coverage guide](conformance/external-sut-coverage.md) and
 [run register](conformance/external-sut-run-records.md) record partial results
 from independently maintained implementations. They distinguish native
@@ -176,6 +183,12 @@ can reconcile the original attempt by a read-only query. The
 the same local operation to a pinned stdio proxy and credential gateway.
 These same-operator paths leave independent issuer verification, durable
 recovery and concurrent execution open.
+
+The [A2A evidence-review package](a2a/evidence-reproduction.md) carries fixed
+historical evidence to a recipient without repeating the original operation.
+Its R52 review Task can complete while the original effect remains unknown.
+Retrieving the known review Task again does not reconcile that effect; a
+provider query and initial-`SendMessage` loss recovery remain outside this example.
 
 Remaining work includes:
 
