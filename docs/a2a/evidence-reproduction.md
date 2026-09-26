@@ -132,6 +132,14 @@ It is a community-profile reproduction aid, not an official A2A SDK integration,
 an external-SUT conformance result, general A2A compatibility proof or production
 approval. Cross-implementation and independently operated exchanges remain open.
 
+## External Reproduction Report
+
+[HandoffProbe's maintainer reported reproducing this fixed package](../interop/handoffprobe-a2a-reproduction.md),
+including all three assessments and the R52 distinction between review-Task
+completion and the original operation's unknown effect. The record links the
+contributor's environment, commands and results, and states what the VATE
+maintainer checked.
+
 ## Sources And Feedback
 
 `PROVENANCE.md` records VATE source at

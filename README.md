@@ -184,6 +184,9 @@ or later main-branch work, start here:
 - [HandoffProbe reconciliation review](docs/interop/handoffprobe-reconciliation-review.md) -
   package verification and a HandoffProbe-native original-attempt recovery
   experiment prompted by the fixed Vaara → VATE package
+- [HandoffProbe A2A reproduction report](docs/interop/handoffprobe-a2a-reproduction.md) -
+  contributor-reported execution of the fixed evidence-review package,
+  preserving the distinction between review-Task completion and operation outcome
 - [External implementation call](docs/conformance/external-implementation-call.md) -
   the request for result files, generated artifacts, and implementation reports
 - [External SUT quickstart](docs/conformance/external-sut-quickstart.md) - how a
@@ -427,6 +430,8 @@ The most useful feedback is:
   Source-pinned AEE-native boundary vectors prompted by three VATE cases
 - [docs/interop/handoffprobe-reconciliation-review.md](docs/interop/handoffprobe-reconciliation-review.md)
   HandoffProbe's package check, property comparison and synthetic reconciliation fixture
+- [docs/interop/handoffprobe-a2a-reproduction.md](docs/interop/handoffprobe-a2a-reproduction.md)
+  HandoffProbe's reported reproduction of the fixed A2A evidence-review package
 - [docs/interop/ap2-ucp-commerce-crosswalk.md](docs/interop/ap2-ucp-commerce-crosswalk.md)
   AP2 / UCP commerce evidence crosswalk for VATE admission receipts
 - [docs/interop/ap2-human-not-present-evidence.md](docs/interop/ap2-human-not-present-evidence.md)

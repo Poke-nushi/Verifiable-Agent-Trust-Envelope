@@ -50,11 +50,14 @@ The following work is available on `main` after the `v0.4.1` archive:
 - [A2A evidence-review reproduction](docs/a2a/evidence-reproduction.md): three
   fixed historical disclosures exchanged through loopback `SendMessage` and
   `GetTask`, with recipient assessments and saved-run verification.
+- [HandoffProbe A2A reproduction report](docs/interop/handoffprobe-a2a-reproduction.md):
+  an external contributor reports running the fixed package and reproducing
+  the distinction between review-Task completion and original operation outcome.
 
 The VATE demo and Vaara path use one operator, local processes and unsigned
-VATE records. HandoffProbe's result is an external technical review, not an
-additional VATE corpus comparison; its tests are reported by its author. The
-A2A package uses one process and an explicit local evidence-review contract;
+VATE records. HandoffProbe's reconciliation experiment and later A2A package
+reproduction are contributor-reported results, separate from VATE corpus
+comparisons. The A2A package uses one process and an explicit local evidence-review contract;
 it checks 131 fetched files and keeps review-Task completion separate from the
 original operation's outcome.
 Independent issuer authenticity, cross-implementation A2A exchanges and
