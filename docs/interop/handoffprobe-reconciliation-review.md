@@ -81,3 +81,9 @@ Thanks to [Heaviside479](https://github.com/Heaviside479) for checking the fixed
 reproduction package, comparing the three VATE properties against
 HandoffProbe's existing evidence, and publishing the original-attempt
 reconciliation fixture and its results.
+
+## Related Reproduction
+
+The later [HandoffProbe A2A reproduction report](handoffprobe-a2a-reproduction.md)
+records the contributor's run of the fixed evidence-review package. It is a
+separate result from the original-attempt reconciliation experiment above.

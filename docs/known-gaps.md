@@ -124,8 +124,9 @@ The [A2A evidence-review reproduction](a2a/evidence-reproduction.md) exercises
 `SendMessage`, `GetTask`, fetched-artifact assessment and saved-run verification
 for three historical disclosures under an explicit local contract. This
 same-owner, one-process exchange is separate from the conformance corpora.
-Independent A2A implementations, operators and SDK integrations remain untested
-by that package.
+[HandoffProbe reports reproducing that fixed exchange](interop/handoffprobe-a2a-reproduction.md).
+Exchanges between independent A2A implementations or independently operated
+participants, and SDK integrations, remain untested by that package.
 
 The [external SUT coverage guide](conformance/external-sut-coverage.md) and
 [run register](conformance/external-sut-run-records.md) record partial results
