@@ -187,6 +187,9 @@ or later main-branch work, start here:
 - [HandoffProbe A2A reproduction report](docs/interop/handoffprobe-a2a-reproduction.md) -
   contributor-reported execution of the fixed evidence-review package,
   preserving the distinction between review-Task completion and operation outcome
+- [NENRIN mapping and verifier review](docs/interop/nenrin-mapping-verifier-review.md) -
+  mapping conditions and two upstream result-consistency fixes confirmed in
+  `nenrin-verify@0.2.3`
 - [External implementation call](docs/conformance/external-implementation-call.md) -
   the request for result files, generated artifacts, and implementation reports
 - [External SUT quickstart](docs/conformance/external-sut-quickstart.md) - how a
