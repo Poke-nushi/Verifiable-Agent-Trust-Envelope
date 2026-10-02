@@ -4,6 +4,10 @@ This file records dated public changes to the discussion draft.
 
 ## Unreleased
 
+- Record the NENRIN mapping review and two upstream verifier fixes, with fixed
+  source references and confirmation against the published `0.2.3` package.
+- Update the locked `fast-uri` dependency from `3.1.6` to `3.1.8` for upstream
+  security fixes.
 - Link the published technical report with its fixed v0.4.0 evaluation snapshot.
 - Align TypeScript fixture JSON encoding with the Python byte basis for the
   supported input values.
