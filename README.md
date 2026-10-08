@@ -8,6 +8,7 @@ and digest-addressed evidence references into local admission, then links the
 resulting receipt to later outcome evidence.
 
 [Official website](https://vate.rognalia.com/) ·
+[Overview video (1:38)](https://vate.rognalia.com/#overview) ·
 [v0.3 in 5 minutes](docs/v0.3-in-5-minutes.md) ·
 [60-second demo](#try-it-in-60-seconds) ·
 [AL2 verifier admission profile](docs/profiles/vate-al2-verifier-admission-profile-v0.3.md) ·
@@ -167,6 +168,9 @@ or later main-branch work, start here:
 - [One-hour external SUT or corpus review request](docs/conformance/external-sut-ask-1-hour.md) -
   the smallest useful path for unclear cases, reason codes, artifact binding,
   or draft SUT results
+- [Experimental WebMCP review tools](https://vate.rognalia.com/webmcp/) -
+  review routes and checks of selected starter result fields for browser agents
+  visiting the VATE home page in compatible browsers, before repository `compare`
 - [Independent implementation review issue](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2) -
   public intake for external SUT questions, partial results, and implementation
   report links
