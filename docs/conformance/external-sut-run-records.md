@@ -62,6 +62,13 @@ retention path. It is one solicited experiment across verifier and host, not two
 independent implementation lines or evidence of full-corpus conformance or
 adoption.
 
+[EVC draft-02 §12.6](https://datatracker.ietf.org/doc/html/draft-kondoju-evc-02#section-12.6),
+dated 8 September 2026, cites the
+[fixed reproduction record at `571def8`](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/tree/571def8f4cd83c7d46df9887fab8629108465a12/docs/conformance/run-records/bolyra-x402-2026-09-07)
+in its implementation-status section. The individual Internet-Draft preserves
+the record's one-partial-case/two-control scope and its full-corpus conformance,
+adoption and endorsement limitations.
+
 ## Vaara One-Case Partial External SUT Run
 
 Vaara's maintainer supplied saved native scripts and admission results at
