@@ -384,7 +384,15 @@ class VateVerifier:
 
         receipt_decision = admission_receipt.get("decision", {}).get("outcome")
         post_decision = admission.get("decision")
-        if receipt_decision not in EXECUTABLE_ADMISSION_DECISIONS or post_decision == "deny":
+        requires_new_permit = (
+            receipt_decision == "attenuate"
+            and admission_receipt.get("attenuation", {}).get("require_new_permit") is True
+        )
+        if (
+            receipt_decision not in EXECUTABLE_ADMISSION_DECISIONS
+            or post_decision == "deny"
+            or requires_new_permit
+        ):
             failures.append("POST_EXEC_ADMISSION_DENIED")
         elif post_decision != receipt_decision:
             failures.append("POST_EXEC_LINKAGE_MISMATCH")
@@ -947,8 +955,21 @@ def run_self_test() -> None:
             "policy_violations": []
         },
     }
+    assert admission_receipt["attenuation"]["require_new_permit"] is False
     linkage = verifier.validate_post_execution_linkage(admission_receipt, post_execution)
     assert linkage["outcome"] == "success"
+
+    new_permit_receipt = copy.deepcopy(admission_receipt)
+    new_permit_receipt["attenuation"]["mode"] = "require_new_permit"
+    new_permit_receipt["attenuation"]["require_new_permit"] = True
+    new_permit_receipt["decision"]["reason_codes"].append("NEW_PERMIT_REQUIRED")
+    new_permit_post_execution = copy.deepcopy(post_execution)
+    new_permit_post_execution["admission"]["digest"]["value"] = digest_value(new_permit_receipt)
+    linkage = verifier.validate_post_execution_linkage(new_permit_receipt, new_permit_post_execution)
+    assert linkage == {
+        "outcome": "failed",
+        "reason_codes": ["POST_EXEC_ADMISSION_DENIED"],
+    }
 
     allow_post_execution = copy.deepcopy(post_execution)
     allow_post_execution["admission"] = {
@@ -962,6 +983,10 @@ def run_self_test() -> None:
     allow_post_execution["execution"]["transaction_id"] = allowed_receipt["request"]["transaction_id"]
     allow_post_execution["execution"]["effective_request_hash"] = allowed_receipt["request"]["input_hash"]
     allow_post_execution["execution"]["runtime"] = allowed_receipt["subject"]["runtime"]
+    allow_post_execution["result"]["side_effects"][0]["amount"]["value"] = "10.00"
+    linkage = verifier.validate_post_execution_linkage(allowed_receipt, allow_post_execution)
+    assert linkage["outcome"] == "success"
+
     allow_post_execution["result"]["side_effects"][0]["amount"]["value"] = "12.00"
     linkage = verifier.validate_post_execution_linkage(allowed_receipt, allow_post_execution)
     assert linkage["outcome"] == "failed"
