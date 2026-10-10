@@ -781,6 +781,9 @@ def parse_time(value: str) -> datetime:
         normalized = normalized[:10] + "T" + normalized[11:]
     if normalized.endswith(("Z", "z")):
         normalized = normalized[:-1] + "+00:00"
+    # Python 3.10 accepts only 3 or 6 fractional digits. Pad the parser input
+    # without changing the instant or the receipt's original timestamp text.
+    normalized = re.sub(r"\.(\d{1,6})", lambda part: "." + part.group(1).ljust(6, "0"), normalized)
     return datetime.fromisoformat(normalized)
 
 

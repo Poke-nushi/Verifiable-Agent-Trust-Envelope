@@ -1,0 +1,219 @@
+{
+  "scope": "local reuse of existing receipt checks; no original action or external SUT executed",
+  "all_expected_assessments_observed": true,
+  "examples": [
+    {
+      "example": "R17",
+      "synthetic": false,
+      "expected_local_assessment": "matched",
+      "assessment": {
+        "record_linkage": "matched",
+        "assessment_scope": "receipt relationships and reference-core constraints only",
+        "source_files": {
+          "reference/vate-verifier-core/vate_verifier_core.py": "ead16bebda908187485cf095f71538b23102ec32ea94c6efca0d7e0a44849e84",
+          "scripts/vate_conformance.py": "570b1b71b86e85add1fad6f8bcd0a544ca7cad71dca78a3bfca5b00698762764",
+          "schemas/admission-receipt.schema.json": "fc5fc085a741ce1e23e6435c9402f3838eaa701dd363ba84610a8989ad8af7fb",
+          "schemas/post-execution-receipt.schema.json": "3451185169de5deb210a9f3319dd6217fbe6bf6bb0b8b835c9b7e5a874467892",
+          "registries/evidence-vocabulary.v0.3.json": "df3c49399ea7082a32eb397e951a88b44630bc26624be08041a8040488776814"
+        },
+        "digest_basis": "VATE v0.3 fixture json-sorted-no-whitespace",
+        "inputs": {
+          "admission": {
+            "supplied": true,
+            "raw_file_sha256": "67294bb6e95be96d58d1a8492490f061188ed2ecdaa1a6b6f83734aaf98a1ab2"
+          },
+          "post": {
+            "supplied": true,
+            "raw_file_sha256": "21a8bd39a976a21b97564855bf7b6bb0c2f51a6873928e4100cbfbbcbc73c8be"
+          }
+        },
+        "input_issues": [],
+        "linkage_checks_run": [
+          "receipt_id_and_admission_object_digest",
+          "admission_decision_and_fresh_permit_requirement",
+          "transaction_runtime_and_effective_request_hash_fields",
+          "execution_times_within_admission_window",
+          "reference_reported_constraint_and_policy_validation"
+        ],
+        "core_result": {
+          "outcome": "success",
+          "reason_codes": [
+            "ADMISSION_RECEIPT_LINKED",
+            "ADMISSION_DIGEST_MATCH",
+            "ADMISSION_DECISION_EXECUTABLE",
+            "TRANSACTION_MATCH",
+            "RUNTIME_MATCH",
+            "ADMISSION_WINDOW_VALID",
+            "EFFECTIVE_REQUEST_HASH_MATCH",
+            "EFFECTIVE_CONSTRAINTS_OBSERVED",
+            "NO_POLICY_VIOLATIONS"
+          ]
+        },
+        "side_effect_check_failures": [],
+        "not_checked": [
+          "signatures_and_issuer_authority",
+          "request_hash_preimages",
+          "constraints_other_than_reported_max_amount_tool_allowlist_and_policy_violations",
+          "completeness_of_reported_side_effects",
+          "actual_or_independently_observed_execution",
+          "current_permission_to_execute",
+          "reported_amounts_without_max_amount_constraint"
+        ]
+      }
+    },
+    {
+      "example": "R86",
+      "synthetic": false,
+      "expected_local_assessment": "matched",
+      "assessment": {
+        "record_linkage": "matched",
+        "assessment_scope": "receipt relationships and reference-core constraints only",
+        "source_files": {
+          "reference/vate-verifier-core/vate_verifier_core.py": "ead16bebda908187485cf095f71538b23102ec32ea94c6efca0d7e0a44849e84",
+          "scripts/vate_conformance.py": "570b1b71b86e85add1fad6f8bcd0a544ca7cad71dca78a3bfca5b00698762764",
+          "schemas/admission-receipt.schema.json": "fc5fc085a741ce1e23e6435c9402f3838eaa701dd363ba84610a8989ad8af7fb",
+          "schemas/post-execution-receipt.schema.json": "3451185169de5deb210a9f3319dd6217fbe6bf6bb0b8b835c9b7e5a874467892",
+          "registries/evidence-vocabulary.v0.3.json": "df3c49399ea7082a32eb397e951a88b44630bc26624be08041a8040488776814"
+        },
+        "digest_basis": "VATE v0.3 fixture json-sorted-no-whitespace",
+        "inputs": {
+          "admission": {
+            "supplied": true,
+            "raw_file_sha256": "398069838305cab957c8777aff0965552be3767fcd6a0accb713ae911c9de740"
+          },
+          "post": {
+            "supplied": true,
+            "raw_file_sha256": "414991563136b305bb693fd1c09e7e38ee39f50af7da718b30b060a74a05210f"
+          }
+        },
+        "input_issues": [],
+        "linkage_checks_run": [
+          "receipt_id_and_admission_object_digest",
+          "admission_decision_and_fresh_permit_requirement",
+          "transaction_runtime_and_effective_request_hash_fields",
+          "execution_times_within_admission_window",
+          "reference_reported_constraint_and_policy_validation"
+        ],
+        "core_result": {
+          "outcome": "success",
+          "reason_codes": [
+            "ADMISSION_RECEIPT_LINKED",
+            "ADMISSION_DIGEST_MATCH",
+            "ADMISSION_DECISION_EXECUTABLE",
+            "TRANSACTION_MATCH",
+            "RUNTIME_MATCH",
+            "ADMISSION_WINDOW_VALID",
+            "EFFECTIVE_REQUEST_HASH_MATCH",
+            "EFFECTIVE_CONSTRAINTS_OBSERVED",
+            "NO_POLICY_VIOLATIONS"
+          ]
+        },
+        "side_effect_check_failures": [],
+        "not_checked": [
+          "signatures_and_issuer_authority",
+          "request_hash_preimages",
+          "constraints_other_than_reported_max_amount_tool_allowlist_and_policy_violations",
+          "completeness_of_reported_side_effects",
+          "actual_or_independently_observed_execution",
+          "current_permission_to_execute",
+          "reported_amounts_without_max_amount_constraint"
+        ]
+      }
+    },
+    {
+      "example": "R52",
+      "synthetic": false,
+      "expected_local_assessment": "not_assessed",
+      "assessment": {
+        "record_linkage": "not_assessed",
+        "assessment_scope": "receipt relationships and reference-core constraints only",
+        "source_files": {
+          "reference/vate-verifier-core/vate_verifier_core.py": "ead16bebda908187485cf095f71538b23102ec32ea94c6efca0d7e0a44849e84",
+          "scripts/vate_conformance.py": "570b1b71b86e85add1fad6f8bcd0a544ca7cad71dca78a3bfca5b00698762764",
+          "schemas/admission-receipt.schema.json": "fc5fc085a741ce1e23e6435c9402f3838eaa701dd363ba84610a8989ad8af7fb",
+          "schemas/post-execution-receipt.schema.json": "3451185169de5deb210a9f3319dd6217fbe6bf6bb0b8b835c9b7e5a874467892",
+          "registries/evidence-vocabulary.v0.3.json": "df3c49399ea7082a32eb397e951a88b44630bc26624be08041a8040488776814"
+        },
+        "digest_basis": "VATE v0.3 fixture json-sorted-no-whitespace",
+        "inputs": {
+          "admission": {
+            "supplied": true,
+            "raw_file_sha256": "927357b398cfca486f81e83ad834791daa45108c46614c7a3c3260ed8ccaa8c2"
+          },
+          "post": {
+            "supplied": false,
+            "raw_file_sha256": null
+          }
+        },
+        "input_issues": [
+          {
+            "input": "post",
+            "kind": "not_supplied"
+          }
+        ],
+        "linkage_checks_run": [],
+        "core_result": null,
+        "side_effect_check_failures": [],
+        "not_checked": [
+          "signatures_and_issuer_authority",
+          "request_hash_preimages",
+          "constraints_other_than_reported_max_amount_tool_allowlist_and_policy_violations",
+          "completeness_of_reported_side_effects",
+          "actual_or_independently_observed_execution",
+          "current_permission_to_execute"
+        ]
+      }
+    },
+    {
+      "example": "synthetic_runtime_mismatch",
+      "synthetic": true,
+      "expected_local_assessment": "mismatch",
+      "assessment": {
+        "record_linkage": "mismatch",
+        "assessment_scope": "receipt relationships and reference-core constraints only",
+        "source_files": {
+          "reference/vate-verifier-core/vate_verifier_core.py": "ead16bebda908187485cf095f71538b23102ec32ea94c6efca0d7e0a44849e84",
+          "scripts/vate_conformance.py": "570b1b71b86e85add1fad6f8bcd0a544ca7cad71dca78a3bfca5b00698762764",
+          "schemas/admission-receipt.schema.json": "fc5fc085a741ce1e23e6435c9402f3838eaa701dd363ba84610a8989ad8af7fb",
+          "schemas/post-execution-receipt.schema.json": "3451185169de5deb210a9f3319dd6217fbe6bf6bb0b8b835c9b7e5a874467892",
+          "registries/evidence-vocabulary.v0.3.json": "df3c49399ea7082a32eb397e951a88b44630bc26624be08041a8040488776814"
+        },
+        "digest_basis": "VATE v0.3 fixture json-sorted-no-whitespace",
+        "inputs": {
+          "admission": {
+            "supplied": true,
+            "raw_file_sha256": "67294bb6e95be96d58d1a8492490f061188ed2ecdaa1a6b6f83734aaf98a1ab2"
+          },
+          "post": {
+            "supplied": true,
+            "raw_file_sha256": "4251ad446b49db39cc35ecec7af4cc161dc4748b08c6065d5a44235950561ca0"
+          }
+        },
+        "input_issues": [],
+        "linkage_checks_run": [
+          "receipt_id_and_admission_object_digest",
+          "admission_decision_and_fresh_permit_requirement",
+          "transaction_runtime_and_effective_request_hash_fields",
+          "execution_times_within_admission_window",
+          "reference_reported_constraint_and_policy_validation"
+        ],
+        "core_result": {
+          "outcome": "failed",
+          "reason_codes": [
+            "POST_EXEC_RUNTIME_MISMATCH"
+          ]
+        },
+        "side_effect_check_failures": [],
+        "not_checked": [
+          "signatures_and_issuer_authority",
+          "request_hash_preimages",
+          "constraints_other_than_reported_max_amount_tool_allowlist_and_policy_violations",
+          "completeness_of_reported_side_effects",
+          "actual_or_independently_observed_execution",
+          "current_permission_to_execute",
+          "reported_amounts_without_max_amount_constraint"
+        ]
+      }
+    }
+  ]
+}
