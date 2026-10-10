@@ -21,7 +21,7 @@ import subprocess
 import sys
 import tempfile
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path, PureWindowsPath
 from typing import Any
 from urllib.request import urlopen
@@ -2576,6 +2576,12 @@ def check_transport_bound_fixture_coverage() -> None:
 
 def check_status_freshness_boundary_coverage() -> None:
     conformance = load_vate_conformance_module()
+    for fraction in ("1", "12", "123", "1234", "12345", "123456"):
+        expected = datetime(2026, 7, 1, 0, 0, 0, int(fraction.ljust(6, "0")), tzinfo=timezone.utc)
+        for clock, zone in (("00:00:00", "Z"), ("00:00:00", "z"), ("01:00:00", "+01:00")):
+            timestamp = f"2026-07-01t{clock}.{fraction}{zone}"
+            if conformance.try_parse_time(timestamp) != expected:
+                raise RuntimeError(f"RFC3339 fractional-second value changed or was rejected: {timestamp}")
     for accepted in (
         "2026-07-01T00:00:00Z",
         "2026-07-01T00:00:00.1z",

@@ -41,6 +41,10 @@ The following work is available on `main` after the `v0.4.1` archive:
 - [Execution Evidence Demo](reference/execution-evidence-demo/README.md): ten
   local scenarios link admission, exact provider input, observed files and
   generated receipts, including response loss and read-only reconciliation.
+- [Receipt Linkage Example](reference/receipt-linkage-example/README.md): reuse
+  existing core, runner and schema checks on two stored receipts, with explicit
+  matching, mismatch and unassessed results. This checks receipt relationships;
+  independent execution evidence and external reuse remain separate questions.
 - [Vaara → VATE reproduction package](docs/interop/vaara-execution-reproduction.md):
   a fixed package for checking disclosed evidence and creating a new local run
   through a pinned stdio proxy, credential gateway and file handler.

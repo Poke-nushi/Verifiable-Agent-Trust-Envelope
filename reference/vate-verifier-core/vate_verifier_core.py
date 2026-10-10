@@ -22,6 +22,14 @@ VERSION = "vate-0.3"
 EXECUTABLE_ADMISSION_DECISIONS = {"allow", "attenuate"}
 SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 PROFILE_HASH_RE = re.compile(r"^sha-256:[0-9a-f]{64}$")
+# Match the reference runner's supported timestamp form without truncating
+# sub-microsecond values through datetime.fromisoformat.
+RFC3339_TIMESTAMP_RE = re.compile(
+    r"^\d{4}-\d{2}-\d{2}[Tt]"
+    r"(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d"
+    r"(?:\.\d{1,6})?"
+    r"(?:[Zz]|[+-](?:[01]\d|2[0-3]):[0-5]\d)$"
+)
 MAX_AMOUNT_TEXT_LENGTH = 64
 MAX_AMOUNT_INTEGER_DIGITS = 18
 MAX_AMOUNT_FRACTIONAL_DIGITS = 8
@@ -76,11 +84,19 @@ ALLOWED_PROTOCOL_HINTS_BY_TYPE.update(
 
 
 def parse_time(value: str) -> datetime:
-    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if RFC3339_TIMESTAMP_RE.fullmatch(value) is None:
+        raise ValueError("timestamp must use the supported RFC3339 date-time form")
+    normalized = value[:10] + "T" + value[11:]
+    if normalized.endswith(("Z", "z")):
+        normalized = normalized[:-1] + "+00:00"
+    # Python 3.10 accepts only 3 or 6 fractional digits. Pad the parser input
+    # without changing the instant or the receipt's original timestamp text.
+    normalized = re.sub(r"\.(\d{1,6})", lambda part: "." + part.group(1).ljust(6, "0"), normalized)
+    return datetime.fromisoformat(normalized)
 
 
 def iso(value: datetime) -> str:
-    return value.astimezone(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def utc_now() -> datetime:
@@ -652,7 +668,13 @@ class VateVerifier:
     ) -> dict[str, Any]:
         request_obj = request if isinstance(request, dict) else {}
         request_id = safe_string(request_obj.get("request_id"), "schema-invalid")
-        expires_at = request_obj.get("expires_at") if safe_parse_time(request_obj.get("expires_at")) else iso(now)
+        issued_at = iso(now)
+        request_expires_at = safe_parse_time(request_obj.get("expires_at"))
+        expires_at = request_obj.get("expires_at") if request_expires_at is not None else issued_at
+        if outcome == "deny" and request_expires_at is not None and request_expires_at < now:
+            # Record the denial at judgment time without issuing an inverted window.
+            # The denied request remains non-executable and is not modified.
+            expires_at = issued_at
         input_hash = request_obj.get("input_hash")
         if not is_profile_hash(input_hash):
             input_hash = safe_canonical_hash(request)
@@ -671,7 +693,7 @@ class VateVerifier:
                     "digest": {"alg": "sha-256", "value": safe_digest_value(request_obj)},
                     "verification": {
                         "result": "failed",
-                        "checked_at": iso(now),
+                        "checked_at": issued_at,
                         "method": "vate-verifier-core",
                         "failure_reason": evidence_refs_failure_reason(request_obj, raw_evidence_refs),
                     },
@@ -686,7 +708,7 @@ class VateVerifier:
                     "digest": evidence["digest"],
                     "verification": {
                         "result": "verified" if outcome != "deny" else "failed",
-                        "checked_at": iso(now),
+                        "checked_at": issued_at,
                         "method": "vate-verifier-core",
                     },
                 }
@@ -698,7 +720,7 @@ class VateVerifier:
             "profile": PROFILE,
             "receipt_type": "admission",
             "receipt_id": "admrec-" + request_id,
-            "issued_at": iso(now),
+            "issued_at": issued_at,
             "expires_at": expires_at,
             "verifier": {
                 "id": self.verifier_id,
@@ -958,6 +980,74 @@ def run_self_test() -> None:
     assert admission_receipt["attenuation"]["require_new_permit"] is False
     linkage = verifier.validate_post_execution_linkage(admission_receipt, post_execution)
     assert linkage["outcome"] == "success"
+
+    assert iso(now) == "2026-07-01T00:01:00Z"
+    assert iso(parse_time("2026-07-01T01:01:00.000001+01:00")) == "2026-07-01T00:01:00.000001Z"
+    precise_now = parse_time("2026-07-01T00:01:00.800000Z")
+    precise_request = sample_request()
+    precise_request.update(request_id="areq-core-self-test-precise-clock", issued_at="2026-07-01T00:01:00.700000Z")
+    precise_original = copy.deepcopy(precise_request)
+    precise = verifier.admit(precise_request, now=precise_now)
+    assert precise["decision"] == "attenuate"
+    precise_receipt = precise["admission_receipt"]
+    assert precise_receipt["issued_at"] == "2026-07-01T00:01:00.800000Z"
+    assert all(e["verification"]["checked_at"] == precise_receipt["issued_at"] for e in precise_receipt["evidence"])
+    assert precise_request == precise_original
+    precise_post = copy.deepcopy(post_execution)
+    precise_post["admission"].update(receipt_id=precise_receipt["receipt_id"],
+                                      digest={"alg": "sha-256", "value": digest_value(precise_receipt)})
+    precise_post["execution"]["effective_request_hash"] = precise_receipt["attenuation"]["effective_request_hash"]
+    for started_at, expected in (("2026-07-01T00:01:00.799999Z", "failed"),
+                                 (precise_receipt["issued_at"], "success")):
+        precise_post["execution"]["started_at"] = started_at
+        result = verifier.validate_post_execution_linkage(precise_receipt, precise_post)
+        assert result["outcome"] == expected
+        if expected == "failed":
+            assert result["reason_codes"] == ["POST_EXEC_ADMISSION_EXPIRED"]
+
+    expired_now = parse_time("2026-07-01T00:20:00.000001Z")
+    expired_request = sample_request()
+    expired_request["request_id"] = "areq-core-self-test-expired-window"
+    expired_original = copy.deepcopy(expired_request)
+    expired = verifier.admit(expired_request, now=expired_now)
+    assert expired["decision"] == "deny"
+    assert expired["reason_codes"] == ["PERMIT_EXPIRED", "FAIL_CLOSED"]
+    expired_receipt = expired["admission_receipt"]
+    assert expired_receipt["issued_at"] == expired_receipt["expires_at"] == "2026-07-01T00:20:00.000001Z"
+    assert expired_request == expired_original
+    expired_post = copy.deepcopy(post_execution)
+    expired_post["admission"].update(receipt_id=expired_receipt["receipt_id"],
+                                      decision="deny", digest={"alg": "sha-256", "value": digest_value(expired_receipt)})
+    expired_post["execution"].update(effective_request_hash=expired_receipt["request"]["input_hash"],
+                                      started_at=expired_receipt["issued_at"], finished_at=expired_receipt["expires_at"])
+    expired_post["result"]["side_effects"] = []
+    assert verifier.validate_post_execution_linkage(expired_receipt, expired_post) == {
+        "outcome": "failed", "reason_codes": ["POST_EXEC_ADMISSION_DENIED"]}
+
+    for spelling in ("2026-07-01T00:02:00Z", "2026-07-01t00:02:00z",
+                     "2026-07-01T01:02:00+01:00"):
+        equivalent_time = copy.deepcopy(post_execution)
+        equivalent_time["execution"]["started_at"] = spelling
+        assert verifier.validate_post_execution_linkage(admission_receipt, equivalent_time)["outcome"] == "success"
+    for timestamp in ("2026-07-01T00:02:00.0000001Z", "2026-07-01T00:02:00",
+                      "2026-07-01 00:02:00Z", "2026-07-01T00:02:00Z\n"):
+        assert safe_parse_time(timestamp) is None
+    for start, finish in (
+        (admission_receipt["expires_at"].replace("Z", ".0000001Z"),
+         admission_receipt["expires_at"].replace("Z", ".0000002Z")),
+        ("2026-07-01T00:02:00.0000009Z", "2026-07-01T00:02:00.0000001Z"),
+        ("2026-07-01T00:02:00.000009Z", "2026-07-01T00:02:00.000001Z"),
+    ):
+        time_failure = copy.deepcopy(post_execution)
+        time_failure["execution"].update(started_at=start, finished_at=finish)
+        assert "POST_EXEC_ADMISSION_EXPIRED" in verifier.validate_post_execution_linkage(
+            admission_receipt, time_failure)["reason_codes"]
+    assert safe_parse_time("2026-07-01T00:02:00.000001Z").microsecond == 1
+    for fraction in ("1", "12", "123", "1234", "12345", "123456"):
+        expected_microsecond = int(fraction.ljust(6, "0"))
+        for clock, zone in (("00:02:00", "Z"), ("00:02:00", "z"), ("01:02:00", "+01:00")):
+            parsed = parse_time(f"2026-07-01t{clock}.{fraction}{zone}")
+            assert parsed == datetime(2026, 7, 1, 0, 2, 0, expected_microsecond, tzinfo=timezone.utc)
 
     new_permit_receipt = copy.deepcopy(admission_receipt)
     new_permit_receipt["attenuation"]["mode"] = "require_new_permit"

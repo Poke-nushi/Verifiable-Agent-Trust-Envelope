@@ -48,6 +48,12 @@ For a pinned Vaara stdio proxy and credential-gateway path, use the
 It checks four disclosed evidence cases and can create a new local file-operation
 capture, including changed arguments and response loss.
 
+To check two stored VATE receipts without running an operation, use the
+[Receipt Linkage Example](reference/receipt-linkage-example/README.md). It
+reuses the existing core and runner checks and distinguishes matching receipts,
+mismatches, and inputs that cannot be assessed. Its result concerns the receipt
+relationship, not proof of actual execution.
+
 ## What VATE Records
 
 - **One admission basis**: action, target, any requested constraints, actor, principal,
@@ -423,6 +429,8 @@ The most useful feedback is:
   Dependency-free verifier core for AL2 admission fixtures
 - [reference/execution-evidence-demo/README.md](reference/execution-evidence-demo/README.md)
   Local file execution, exact provider inputs, generated evidence, and response-loss reconciliation
+- [reference/receipt-linkage-example/README.md](reference/receipt-linkage-example/README.md)
+  Inspect a stored admission/post-execution pair with existing receipt checks
 - [reference/a2a-metadata-adapter-demo/README.md](reference/a2a-metadata-adapter-demo/README.md)
   Dependency-free A2A-shaped metadata adapter demo
 - [packages/vate-core-ts/README.md](packages/vate-core-ts/README.md)

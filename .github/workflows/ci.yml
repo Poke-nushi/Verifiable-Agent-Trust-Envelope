@@ -42,11 +42,21 @@ jobs:
       - name: Run execution evidence tests
         run: python -B -m unittest discover -s reference/execution-evidence-demo -p 'test_*.py' -v
 
+      - name: Run receipt linkage tests
+        run: python -B -m unittest discover -s reference/receipt-linkage-example -p 'test_*.py' -v
+
       - name: Run execution evidence CLI from a source archive
         run: |
           archive_dir="$(mktemp -d)"
           git archive HEAD | tar -x -C "$archive_dir"
           python -B "$archive_dir/reference/execution-evidence-demo/run_demo.py" --output-name ci
+
+      - name: Run receipt linkage example from a source archive
+        run: |
+          archive_dir="$(mktemp -d)"
+          git archive HEAD | tar -x -C "$archive_dir"
+          python -B "$archive_dir/reference/receipt-linkage-example/run_examples.py"
+          python -B -m unittest discover -s "$archive_dir/reference/receipt-linkage-example" -p 'test_*.py' -v
 
   validate:
     name: Repository checks

@@ -1,0 +1,70 @@
+{
+  "source_archive": "https://vate.rognalia.com/downloads/a2a-evidence/2026-09-22/vate-a2a-evidence-starter-06.zip",
+  "source_archive_sha256": "ec9b2286a18f5500f10a10281dfe6e2620b9aa31b5045ce0748bb89c8308fd31",
+  "source_archive_bytes": 234820,
+  "scope": "Five unchanged receipt originals and one explicitly synthetic post; no original operation rerun.",
+  "inputs": [
+    {
+      "case": "R17",
+      "role": "admission",
+      "path": "inputs/R17/admission.json",
+      "source_member": "vate-a2a-evidence-starter-06/fixtures/cases/R17/statements/admission-1/receipt.json",
+      "raw_file_sha256": "67294bb6e95be96d58d1a8492490f061188ed2ecdaa1a6b6f83734aaf98a1ab2",
+      "bytes": 1690,
+      "synthetic": false
+    },
+    {
+      "case": "R17",
+      "role": "post",
+      "path": "inputs/R17/post.json",
+      "source_member": "vate-a2a-evidence-starter-06/fixtures/cases/R17/statements/adapter/post-execution-receipt.json",
+      "raw_file_sha256": "21a8bd39a976a21b97564855bf7b6bb0c2f51a6873928e4100cbfbbcbc73c8be",
+      "bytes": 2037,
+      "synthetic": false
+    },
+    {
+      "case": "R52",
+      "role": "admission",
+      "path": "inputs/R52/admission.json",
+      "source_member": "vate-a2a-evidence-starter-06/fixtures/cases/R52/statements/admission-1/receipt.json",
+      "raw_file_sha256": "927357b398cfca486f81e83ad834791daa45108c46614c7a3c3260ed8ccaa8c2",
+      "bytes": 1690,
+      "synthetic": false
+    },
+    {
+      "case": "R52",
+      "role": "post",
+      "not_in_archive": true,
+      "checked_member": "vate-a2a-evidence-starter-06/fixtures/cases/R52/statements/adapter/post-execution-receipt.json"
+    },
+    {
+      "case": "R86",
+      "role": "admission",
+      "path": "inputs/R86/admission.json",
+      "source_member": "vate-a2a-evidence-starter-06/fixtures/cases/R86/statements/admission-1/receipt.json",
+      "raw_file_sha256": "398069838305cab957c8777aff0965552be3767fcd6a0accb713ae911c9de740",
+      "bytes": 1690,
+      "synthetic": false
+    },
+    {
+      "case": "R86",
+      "role": "post",
+      "path": "inputs/R86/post.json",
+      "source_member": "vate-a2a-evidence-starter-06/fixtures/cases/R86/statements/adapter/post-execution-receipt.json",
+      "raw_file_sha256": "414991563136b305bb693fd1c09e7e38ee39f50af7da718b30b060a74a05210f",
+      "bytes": 2037,
+      "synthetic": false
+    },
+    {
+      "case": "synthetic_runtime_mismatch",
+      "role": "post",
+      "path": "inputs/synthetic-runtime-mismatch.json",
+      "derived_from": "inputs/R17/post.json",
+      "changed_field": "execution.runtime",
+      "old_value": "urn:vate:demo:file-provider",
+      "new_value": "urn:vate:demo:different-runtime",
+      "raw_file_sha256": "4251ad446b49db39cc35ecec7af4cc161dc4748b08c6065d5a44235950561ca0",
+      "synthetic": true
+    }
+  ]
+}
