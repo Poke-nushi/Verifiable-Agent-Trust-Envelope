@@ -57,11 +57,19 @@ The following work is available on `main` after the `v0.4.1` archive:
 - [HandoffProbe A2A reproduction report](docs/interop/handoffprobe-a2a-reproduction.md):
   an external contributor reports running the fixed package and reproducing
   the distinction between review-Task completion and original operation outcome.
+- [Mission A2A reproduction report](docs/interop/mission-a2a-reproduction.md):
+  another contributor reports running starter-06, distinguishing live recovery
+  observations from saved-run verification.
+- [Receipt Protocol store reuse](docs/interop/receipt-protocol-store-reuse.md):
+  an external developer connects a storage POC to the existing VATE checker.
+  The maintainer reproduced the fixed R17 handoff and a mismatch control;
+  a mutable-buffer limitation remains at that storage source pin.
 
 The VATE demo and Vaara path use one operator, local processes and unsigned
-VATE records. HandoffProbe's reconciliation experiment and later A2A package
-reproduction are contributor-reported results, separate from VATE corpus
-comparisons. The A2A package uses one process and an explicit local evidence-review contract;
+VATE records. HandoffProbe's reconciliation experiment and the HandoffProbe and
+Mission A2A package reproductions are contributor-reported results, separate
+from VATE corpus comparisons. Receipt Protocol reuses the VATE checker rather
+than implementing its own VATE verifier. The A2A package uses one process and an explicit local evidence-review contract;
 it checks 131 fetched files and keeps review-Task completion separate from the
 original operation's outcome.
 Independent issuer authenticity, cross-implementation A2A exchanges and
@@ -118,19 +126,18 @@ The current public review surface is:
 
 ### Next Technical Work
 
-1. Take the existing non-payment operation through initial receipt of its
-   evidence, a bounded source change, and a second recipient assessment. Fix the
-   disclosed artifacts, trusted parties, questions and expected decisions
-   before the trial.
-2. Exercise a format-only change and a change in evidence meaning separately.
-   Preserve the original packages and identify synthetic changes as such.
-   Record the recipient's decisions, unresolved evidence, additional questions
-   and required adapter or documentation changes.
-3. Compare VATE records with the native originals plus an explicit mapping and
-   the transformations needed to use them. Include preparation and maintenance
-   on both sides, as well as incorrect conclusions and justified unresolved
-   outcomes. A completed trial should identify the useful distinctions, costs
-   and remaining technical gaps.
+1. For a source with a different native receipt format, first establish what
+   its records mean, which originals are needed and what the recipient must
+   decide. Once these are available, select one integration use case and fix
+   the evidence, trust assumptions and expected decisions before the trial.
+2. In that use case, identify reusable checks and the additional retrieval,
+   mapping and documentation needed. When evaluating a source change, separate
+   format changes from changes in evidence meaning. Preserve the originals,
+   identify synthetic changes and record decisions that remain unresolved.
+3. Compare VATE records with native originals plus an explicit mapping when
+   this addresses an unresolved integration question. Account for preparation,
+   maintenance, incorrect conclusions and justified unresolved outcomes. Reuse
+   completed comparisons unless the inputs, assumptions or questions change.
 4. Use the [A2A evidence-review reproduction](docs/a2a/evidence-reproduction.md)
    to test another recipient or evidence source against the
    [existing A2A extension draft](docs/a2a/vate-a2a-extension-profile-v0.3.md).
@@ -142,6 +149,14 @@ The current public review surface is:
    Keep partial comparisons, generated artifacts and external technical reviews
    identifiable by their source, execution conditions and corpus snapshot
    where applicable.
+
+The recorded storage-to-checker reuse provides a concrete starting point for
+the recipient path. Further work should identify which existing rules are
+reused, what retrieval or native-format mapping is added, who owns trust and
+effect assessment, and what changes when a source or checker version changes.
+The [connection conditions](docs/interop/receipt-protocol-store-reuse.md#connection-conditions)
+describe the current storage path; different native receipts require their own
+source evidence and mapping decisions.
 
 For the execution-and-recipient path, generation and continued use by another
 operator, human review effort, and behavior across restarts or concurrent

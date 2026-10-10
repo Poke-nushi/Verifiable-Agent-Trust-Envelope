@@ -132,13 +132,18 @@ It is a community-profile reproduction aid, not an official A2A SDK integration,
 an external-SUT conformance result, general A2A compatibility proof or production
 approval. Cross-implementation and independently operated exchanges remain open.
 
-## External Reproduction Report
+## External Reproduction Reports
 
 [HandoffProbe's maintainer reported reproducing this fixed package](../interop/handoffprobe-a2a-reproduction.md),
 including all three assessments and the R52 distinction between review-Task
 completion and the original operation's unknown effect. The record links the
 contributor's environment, commands and results, and states what the VATE
 maintainer checked.
+
+[Mission also reported reproducing starter-06](../interop/mission-a2a-reproduction.md),
+including the three assessments, live recovery probe and saved-run checks.
+Its report records a separate contributor execution of the same fixed package;
+the scope and maintainer verification are described in that record.
 
 ## Sources And Feedback
 

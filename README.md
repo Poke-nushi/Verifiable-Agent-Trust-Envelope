@@ -117,7 +117,7 @@ Current repository state:
 - **Repository type**: protocol discussion draft
 - **Document maturity**: early draft
 - **Primary language**: English
-- **Roadmap refresh date**: 2026-09-01
+- **Roadmap refresh date**: 2026-10-11
 - **Primary battlefield**: `AL2` external digital write
 - **Current GitHub review snapshot**: `v0.4.1` discussion-draft pre-release;
   exact Zenodo version DOI `10.5281/zenodo.22680789`
@@ -197,6 +197,12 @@ or later main-branch work, start here:
 - [HandoffProbe A2A reproduction report](docs/interop/handoffprobe-a2a-reproduction.md) -
   contributor-reported execution of the fixed evidence-review package,
   preserving the distinction between review-Task completion and operation outcome
+- [Mission A2A reproduction report](docs/interop/mission-a2a-reproduction.md) -
+  contributor-reported execution of starter-06, with live and saved checks
+  identified separately
+- [Receipt Protocol store reuse](docs/interop/receipt-protocol-store-reuse.md) -
+  an external storage POC calling VATE's receipt checker; maintainer-reproduced
+  results, connection conditions and a storage limitation at the tested pin
 - [NENRIN mapping and verifier review](docs/interop/nenrin-mapping-verifier-review.md) -
   mapping conditions and two upstream result-consistency fixes confirmed in
   `nenrin-verify@0.2.3`
@@ -447,6 +453,10 @@ The most useful feedback is:
   HandoffProbe's package check, property comparison and synthetic reconciliation fixture
 - [docs/interop/handoffprobe-a2a-reproduction.md](docs/interop/handoffprobe-a2a-reproduction.md)
   HandoffProbe's reported reproduction of the fixed A2A evidence-review package
+- [docs/interop/mission-a2a-reproduction.md](docs/interop/mission-a2a-reproduction.md)
+  Mission's reported reproduction of starter-06 and its live/saved verification boundary
+- [docs/interop/receipt-protocol-store-reuse.md](docs/interop/receipt-protocol-store-reuse.md)
+  Receipt Protocol's storage-to-checker handoff and connection conditions
 - [docs/interop/ap2-ucp-commerce-crosswalk.md](docs/interop/ap2-ucp-commerce-crosswalk.md)
   AP2 / UCP commerce evidence crosswalk for VATE admission receipts
 - [docs/interop/ap2-human-not-present-evidence.md](docs/interop/ap2-human-not-present-evidence.md)
