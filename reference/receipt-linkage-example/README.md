@@ -134,3 +134,10 @@ For verification of a complete capture, including provider evidence and source
 manifests, use the [Execution Evidence Demo](../execution-evidence-demo/README.md)
 or the fixed starter's recipient. This example exposes the receipt checks for
 reuse; it does not implement a native-format adapter or a production verifier.
+
+## External reuse
+
+[Receipt Protocol's storage POC](../../docs/interop/receipt-protocol-store-reuse.md)
+stores the R17 originals, retrieves them and invokes this checker. The record
+includes the maintainer's reproduction, a mismatch control, connection
+conditions and a mutable-buffer limitation at the tested source pin.
