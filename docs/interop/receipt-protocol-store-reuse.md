@@ -12,7 +12,13 @@ This is a concrete example of an external developer reusing VATE's receipt
 checks after storage and retrieval. The store supplies the originals; the
 recipient runs VATE's checks on their relationship.
 
+A [follow-up recheck](#buffer-copy-fix-recheck) confirmed that the store's
+input/output Buffer-copy fix preserves this result.
+
 ## Sources And Reproduction
+
+These pins reproduce the original run; the
+[recheck](#buffer-copy-fix-recheck) uses the corrected store.
 
 - [Contributor's report](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2#issuecomment-6097856240), following a [request for this round trip](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2#issuecomment-6097450251).
 - [VATE maintainer's reproduction and storage finding](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2#issuecomment-6100439962).
@@ -43,7 +49,7 @@ The round-trip script writes retrieved copies into `tmp-r17/` and invokes
 | Check | Observed result |
 | --- | --- |
 | Unmodified upstream R17 script | Seven assertions passed; exit 0. |
-| Unmodified upstream regression script | Nine assertions passed; exit 0. |
+| Unmodified upstream regression script | Nine regression tests passed; exit 0. |
 | Admission and post-execution originals after retrieval | 1,690 and 2,037 bytes respectively; both exactly equal to their inputs. |
 | Direct and retrieved-input checker runs | Complete JSON results equal; `record_linkage: matched`, `core_result.outcome: success`, exit 0. |
 | VATE's existing synthetic runtime-mismatch pair through the store | `mismatch`, `POST_EXEC_RUNTIME_MISMATCH`, exit 1 as expected. |
@@ -66,7 +72,7 @@ responsibilities; they introduce no new VATE schema or protocol requirement.
 | Maintain the connection | Pin the source and checker dependencies. The POC adds a retrieval/file handoff and assumes the directory layout above; it does not translate a different native receipt format into VATE. |
 | Establish trust and effects | Issuer authority, signatures, request-hash preimages, complete effect evidence and current execution permission remain separate from receipt-pair matching. |
 
-### Storage limitation at the tested pin
+### Storage limitation at the original pin
 
 `storeReceipt()` retains the caller's mutable Buffer, and `getReceiptRaw()`
 returns that same Buffer. The maintainer observed that changing either the
@@ -74,7 +80,40 @@ input Buffer after insertion or a retrieved Buffer changes the stored bytes
 while leaving the lookup digest unchanged. The successful R17 path did not
 mutate those buffers. Copying bytes at insertion and retrieval, with regression
 checks for both paths, was recommended in the linked maintainer response.
-No corrected version is evaluated in this record.
+The corrected version is evaluated below.
+
+## Buffer-Copy Fix Recheck
+
+Following the [contributor's fix report](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/2#issuecomment-6102200721),
+the maintainer tested Receipt Protocol
+[`848eab43988cc2ab122fa12816e75f1e71a902b9`](https://github.com/hhh7666/receipt-protocol/tree/848eab43988cc2ab122fa12816e75f1e71a902b9/reference/store-poc)
+on 11 October 2026 (JST), keeping VATE at `b8bc649` and using the environment
+and directory layout above. `storeReceipt()` now copies incoming bytes, and
+`getReceiptRaw()` returns a separate copy.
+
+The three upstream scripts were run without modification, with network access
+disabled:
+
+```sh
+cd receipt-protocol/reference/store-poc
+node immutability-attack.mjs
+node negative-tests.mjs
+node r17-roundtrip.mjs
+```
+
+| Check at the corrected pin | Observed result |
+| --- | --- |
+| Upstream Buffer-copy regression script | Six assertions passed; exit 0. |
+| Existing upstream regression and R17 scripts | Nine regression tests and seven R17 checks passed respectively; both exited 0. |
+| Additional input/returned-Buffer mutation checks | Stored bytes and their lookup digests remained unchanged after caller-side changes. |
+| R17 originals versus retrieved receipts | Both files remained byte-identical; complete direct/retrieved checker JSON results were equal. |
+| Existing synthetic runtime-mismatch pair through the corrected store | `mismatch`, `POST_EXEC_RUNTIME_MISMATCH`, exit 1 as expected. |
+
+As a regression control, the same new six-assertion script was run against the
+original `35a5afb` store: four assertions failed and it exited 1. This confirms
+that the script detects the earlier Buffer-sharing behavior. The recheck
+addresses that input/read-copy defect and the existing receipt-checking path;
+the scope below remains unchanged.
 
 ## Scope And Acknowledgement
 
