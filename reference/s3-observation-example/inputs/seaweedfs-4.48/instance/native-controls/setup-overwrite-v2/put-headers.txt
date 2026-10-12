@@ -1,0 +1,10 @@
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Content-Length: 0
+ETag: "429d429b3a6c044a5d45cdc69b0304d5"
+Server: SeaweedFS 30GB 4.48
+Vary: Origin
+X-Amz-Request-Id: 18DDCA62E95526B8786E24ED
+X-Amz-Version-Id: 6722359d16a74737e05c83b08e066271
+Date: Mon, 12 Oct 2026 13:12:32 GMT
+

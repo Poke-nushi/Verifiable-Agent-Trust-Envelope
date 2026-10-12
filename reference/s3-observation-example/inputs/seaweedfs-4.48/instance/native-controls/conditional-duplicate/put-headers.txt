@@ -1,0 +1,9 @@
+HTTP/1.1 412 Precondition Failed
+Accept-Ranges: bytes
+Content-Length: 337
+Content-Type: application/xml
+Server: SeaweedFS 30GB 4.48
+Vary: Origin
+X-Amz-Request-Id: 18DDCA62D2E7509045896C97
+Date: Mon, 12 Oct 2026 13:12:32 GMT
+
