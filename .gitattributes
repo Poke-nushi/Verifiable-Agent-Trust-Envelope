@@ -1,3 +1,9 @@
 # Keep digest-addressed corpus and fixture bytes stable across platforms.
 conformance/** text eol=lf
 examples/** text eol=lf
+
+# Preserve captured HTTP bytes, including CRLF and the terminal empty line.
+reference/s3-observation-example/inputs/seaweedfs-4.48/instance/**/*-headers.txt -text whitespace=cr-at-eol,-blank-at-eof
+
+# Keep this source-pinned capture helper byte-identical to its recorded evidence.
+reference/s3-observation-example/sandbox_macos.py whitespace=-blank-at-eof
