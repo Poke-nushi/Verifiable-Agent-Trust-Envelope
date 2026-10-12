@@ -45,6 +45,11 @@ The following work is available on `main` after the `v0.4.1` archive:
   existing core, runner and schema checks on two stored receipts, with explicit
   matching, mismatch and unassessed results. This checks receipt relationships;
   independent execution evidence and external reuse remain separate questions.
+- [S3 Observation Example](reference/s3-observation-example/README.md): connect
+  existing receipt checks to a captured upload and version-specific read-back
+  from local SeaweedFS. Included originals distinguish a matching result,
+  unavailable observations and an observed historical version under explicit
+  local collector/store trust assumptions.
 - [Vaara → VATE reproduction package](docs/interop/vaara-execution-reproduction.md):
   a fixed package for checking disclosed evidence and creating a new local run
   through a pinned stdio proxy, credential gateway and file handler.

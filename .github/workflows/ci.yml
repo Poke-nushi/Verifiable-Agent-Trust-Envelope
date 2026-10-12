@@ -45,6 +45,12 @@ jobs:
       - name: Run receipt linkage tests
         run: python -B -m unittest discover -s reference/receipt-linkage-example -p 'test_*.py' -v
 
+      - name: Replay S3 observations and run offline acceptance checks
+        run: |
+          python -B reference/s3-observation-example/run_examples.py
+          python -B reference/s3-observation-example/test_assessment.py
+          python -B -m unittest discover -s reference/s3-observation-example -p 'test_native_fixture.py' -v
+
       - name: Run execution evidence CLI from a source archive
         run: |
           archive_dir="$(mktemp -d)"
@@ -57,6 +63,14 @@ jobs:
           git archive HEAD | tar -x -C "$archive_dir"
           python -B "$archive_dir/reference/receipt-linkage-example/run_examples.py"
           python -B -m unittest discover -s "$archive_dir/reference/receipt-linkage-example" -p 'test_*.py' -v
+
+      - name: Replay S3 observations from a source archive
+        run: |
+          archive_dir="$(mktemp -d)"
+          git archive HEAD | tar -x -C "$archive_dir"
+          python -B "$archive_dir/reference/s3-observation-example/run_examples.py"
+          python -B "$archive_dir/reference/s3-observation-example/test_assessment.py"
+          python -B -m unittest discover -s "$archive_dir/reference/s3-observation-example" -p 'test_native_fixture.py' -v
 
   validate:
     name: Repository checks
