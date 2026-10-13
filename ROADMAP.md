@@ -131,6 +131,13 @@ The current public review surface is:
 
 ### Next Technical Work
 
+The [Recipient Assessment API](reference/recipient-assessment/README.md) provides
+a versioned entry point for the existing receipt and S3 evaluators. Next, use it
+in a receiving application and exercise an update while retaining original
+inputs, evaluator identities and previous assessments. The local vectors and
+API tests provide a starting point; continued maintenance by another implementer
+remains to be observed.
+
 1. For a source with a different native receipt format, first establish what
    its records mean, which originals are needed and what the recipient must
    decide. Once these are available, select one integration use case and fix

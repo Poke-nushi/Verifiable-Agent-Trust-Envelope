@@ -59,6 +59,11 @@ use the [S3 Observation Example](reference/s3-observation-example/README.md).
 It replays local SeaweedFS captures and checks the admitted request, recorded
 upload, returned version and observed result under explicit local trust assumptions.
 
+To call either assessment from another application, use the
+[Recipient Assessment API](reference/recipient-assessment/README.md). Its Python
+and JSON CLI entry points preserve native results and identify the API contract
+and evaluator sources for integration and update checks.
+
 ## What VATE Records
 
 - **One admission basis**: action, target, any requested constraints, actor, principal,
@@ -444,6 +449,8 @@ The most useful feedback is:
   Inspect a stored admission/post-execution pair with existing receipt checks
 - [reference/s3-observation-example/README.md](reference/s3-observation-example/README.md)
   Connect admission and execution receipts to a captured upload and version-specific read-back
+- [reference/recipient-assessment/README.md](reference/recipient-assessment/README.md)
+  Call receipt and S3 assessments through a versioned local Python API or JSON CLI
 - [reference/a2a-metadata-adapter-demo/README.md](reference/a2a-metadata-adapter-demo/README.md)
   Dependency-free A2A-shaped metadata adapter demo
 - [packages/vate-core-ts/README.md](packages/vate-core-ts/README.md)

@@ -34,6 +34,11 @@ files without modifying them, fetching their URIs, or executing the operation.
 Keep this directory inside the repository tree; a source archive works without
 Git or the original development directory.
 
+For calls from another application, use the
+[Recipient Assessment API](../recipient-assessment/README.md). It returns this
+example's complete native result with a versioned calling contract and source
+identity, while isolating its imports from the calling process.
+
 ## Interpret the result
 
 | `record_linkage` | Meaning | CLI exit code |
