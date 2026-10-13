@@ -51,6 +51,11 @@ jobs:
           python -B reference/s3-observation-example/test_assessment.py
           python -B -m unittest discover -s reference/s3-observation-example -p 'test_native_fixture.py' -v
 
+      - name: Check the recipient assessment API and input vectors
+        run: |
+          python -B reference/recipient-assessment/run_vectors.py
+          python -B -m unittest discover -s reference/recipient-assessment -p 'test_*.py' -v
+
       - name: Run execution evidence CLI from a source archive
         run: |
           archive_dir="$(mktemp -d)"
@@ -71,6 +76,13 @@ jobs:
           python -B "$archive_dir/reference/s3-observation-example/run_examples.py"
           python -B "$archive_dir/reference/s3-observation-example/test_assessment.py"
           python -B -m unittest discover -s "$archive_dir/reference/s3-observation-example" -p 'test_native_fixture.py' -v
+
+      - name: Check the recipient API from a source archive
+        run: |
+          archive_dir="$(mktemp -d)"
+          git archive HEAD | tar -x -C "$archive_dir"
+          python -B "$archive_dir/reference/recipient-assessment/run_vectors.py"
+          python -B -m unittest discover -s "$archive_dir/reference/recipient-assessment" -p 'test_*.py' -v
 
   validate:
     name: Repository checks

@@ -27,6 +27,12 @@ From the repository root, use Python 3.10 or later on Linux or macOS and the
 repository's existing `jsonschema` dependency (`requirements-dev.txt`). No
 SeaweedFS binary, service, credentials or network connection is needed for replay.
 
+For other bundles with 1–6 fractional-second digits in their timestamps, use
+Python 3.11 or later. On Python 3.10, the fixed S3 evaluator accepts whole seconds
+or exactly 3 or 6 fractional digits; other lengths can leave an assessment
+`insufficient`. Select a compatible interpreter without rewriting received
+receipts or capture artifacts.
+
 ```bash
 python3 reference/s3-observation-example/run_examples.py
 ```
@@ -59,6 +65,11 @@ bucket and source hashes. A bundle cannot establish its own trust merely by
 carrying consistent hashes. `receipt_check` preserves the existing checker's
 reason codes and `not_checked` list; see [CONTRACT.md](CONTRACT.md) for the added
 assessment fields and decision rules.
+
+For calls from another application, the
+[Recipient Assessment API](../recipient-assessment/README.md) provides a
+versioned Python and JSON CLI entry point. It preserves this complete assessment
+and the existing source-pin and receiver-policy requirements.
 
 ## Inspect and test
 
