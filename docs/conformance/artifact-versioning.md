@@ -11,7 +11,7 @@ The active conformance artifact line on `main` is **`2026-09`**.
 
 Four identifiers remain deliberately separate:
 
-- repository release: GitHub discussion-draft pre-release `v0.4.1`
+- repository release: GitHub discussion-draft pre-release `v0.5.0`
 - AL2 profile: `VATE-AL2-Verifier-Admission-v0.3`
 - active machine-readable artifact line: `2026-09`
 - exact corpus snapshot: the manifest digest in
@@ -40,7 +40,7 @@ The added artifact supplies VATE-local replay state for the AP2-style replay
 case. This fixture hardening preserves the `2026-09` exchange contract and does
 not relabel the tagged snapshot or claim AP2-native consume-once validation.
 
-The current `main` snapshot contains 76 cases, 217 manifest artifacts, and
+The `v0.5.0` snapshot contains 76 cases, 217 manifest artifacts, and
 corpus digest
 `sha-256:9f16ca68c32e57ee79a0c4080310fe90b63f337bbe827cad6b1017acc2b1a14e`.
 It clarifies the terminal-denial comparison boundary and the allow case's
