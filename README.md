@@ -101,8 +101,9 @@ request hashes so later evidence can be checked against the narrowed basis.
 
 VATE is a public Apache-2.0 protocol discussion draft. The current public
 review snapshot is the [`v0.5.0` discussion-draft pre-release](docs/release-notes/v0.5.0.md),
-covering execution evidence and recipient review. Its exact Zenodo version DOI
-is pending at tag time. The archived `v0.4.1` remains available at
+covering execution evidence and recipient review. The archived snapshot is
+available at [`10.5281/zenodo.23378498`](https://doi.org/10.5281/zenodo.23378498).
+The archived `v0.4.1` remains available at
 [`10.5281/zenodo.22680789`](https://doi.org/10.5281/zenodo.22680789).
 `v0.5.0` keeps
 the `VATE-AL2-Verifier-Admission-v0.3` semantic profile and uses the active
@@ -142,9 +143,9 @@ Current repository state:
 - **Primary language**: English
 - **Roadmap refresh date**: 2026-10-15
 - **Primary battlefield**: `AL2` external digital write
-- **Current GitHub review snapshot**: `v0.5.0` discussion-draft pre-release;
-  exact Zenodo version DOI pending at tag time
-- **Latest verified Zenodo software archive at tag time**: `v0.4.1` · September 9, 2026
+- **Current GitHub review snapshot**: `v0.5.0` discussion-draft pre-release
+- **Latest verified Zenodo software archive**: `v0.5.0` · October 14, 2026 ·
+  [10.5281/zenodo.23378498](https://doi.org/10.5281/zenodo.23378498)
 - **Active main-branch artifact line**: `2026-09`, retained in v0.5.0; the AL2
   profile identifier remains
   `VATE-AL2-Verifier-Admission-v0.3`
@@ -632,12 +633,14 @@ Actions*. Zenodo. [https://doi.org/10.5281/zenodo.22685689](https://doi.org/10.5
 
 ### Software Snapshots
 
-For the `v0.5.0` discussion-draft pre-release, cite the
-[GitHub tag](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.5.0)
-and its exact source commit. Its Zenodo version DOI is pending at tag time.
-The [concept DOI](https://doi.org/10.5281/zenodo.19839768) identifies the software
-release series, not the exact v0.5.0 files. The release page and current citation
-metadata can record the issued version DOI after the archive is verified.
+For the October 14, 2026 `v0.5.0` discussion-draft pre-release, cite:
+
+- GitHub tag: [v0.5.0](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.5.0)
+- Exact version DOI: [10.5281/zenodo.23378498](https://doi.org/10.5281/zenodo.23378498)
+- All-version concept DOI: [10.5281/zenodo.19839768](https://doi.org/10.5281/zenodo.19839768)
+
+The exact version DOI identifies the archived v0.5.0 files. The concept DOI
+identifies the software release series.
 
 For the September 9, 2026 `v0.4.1` maintenance pre-release, cite:
 

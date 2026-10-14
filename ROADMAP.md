@@ -17,7 +17,8 @@ external reuse/reproduction records. It retains the `2026-09` machine-readable
 artifact line and `VATE-AL2-Verifier-Admission-v0.3` semantic profile.
 The added signature contract is an experimental implementation aid.
 
-The exact v0.5.0 Zenodo version DOI is pending at tag time. Historical `v0.4.1`
+The v0.5.0 source snapshot is archived at
+[10.5281/zenodo.23378498](https://doi.org/10.5281/zenodo.23378498). Historical `v0.4.1`
 and `v0.4.0` remain archived at `10.5281/zenodo.22680789` and
 `10.5281/zenodo.22218860`, respectively. Historical records keep their original
 source and DOI.
@@ -98,6 +99,8 @@ The current public review surface is:
 
 - `v0.5.0` GitHub discussion-draft pre-release:
   <https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.5.0>
+- `v0.5.0` exact version DOI:
+  <https://doi.org/10.5281/zenodo.23378498>
 - `v0.5.0` notes and technical gate:
   [docs/release-notes/v0.5.0.md](docs/release-notes/v0.5.0.md) and
   [docs/release-gate-v0.5.0.md](docs/release-gate-v0.5.0.md)
