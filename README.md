@@ -7,9 +7,13 @@ agent action was allowed, narrowed, or denied. It carries a declared input hash
 and digest-addressed evidence references into local admission, then links the
 resulting receipt to later outcome evidence.
 
+The current [v0.5.0 release](docs/release-notes/v0.5.0.md) uses the **AL2 verifier
+admission profile v0.3**. The profile defines the admission rules and receipt
+model introduced below; its version is separate from the repository release.
+
 [Official website](https://vate.rognalia.com/) ·
 [Overview video (1:38)](https://vate.rognalia.com/#overview) ·
-[v0.3 in 5 minutes](docs/v0.3-in-5-minutes.md) ·
+[VATE in 5 minutes](docs/v0.3-in-5-minutes.md) ·
 [60-second demo](#try-it-in-60-seconds) ·
 [AL2 verifier admission profile](docs/profiles/vate-al2-verifier-admission-profile-v0.3.md) ·
 [Technical report](#technical-report)
@@ -29,8 +33,8 @@ resulting receipt to later outcome evidence.
 python3 reference/quickstart-demo/run_demo.py
 ```
 
-No dependencies. The demo narrates three committed v0.3 corpus cases: `allow`,
-`attenuate`, and a fail-closed `deny`.
+No dependencies. The demo narrates three committed cases from the AL2
+admission profile: `allow`, `attenuate`, and a fail-closed `deny`.
 
 To trace an admitted operation through a separate local provider process,
 actual output files, and response-loss reconciliation, run the
@@ -329,7 +333,7 @@ See the [direct comparison note](docs/close-adjacent-work-2026-04.md).
 
 ## Read This In 5 Minutes
 
-Start with the [v0.3 in 5 minutes](docs/v0.3-in-5-minutes.md) overview.
+Start with the [VATE in 5 minutes](docs/v0.3-in-5-minutes.md) overview.
 
 ### Further Reading
 
@@ -400,7 +404,7 @@ The most useful feedback is:
 - [docs/attenuation-semantics.md](docs/attenuation-semantics.md)
   Machine-readable attenuation semantics for AL2 conformance
 - [docs/v0.3-in-5-minutes.md](docs/v0.3-in-5-minutes.md)
-  Short entry point for the v0.3 draft
+  Introduction to the AL2 admission profile used in the current release
 - [docs/a2a/README.md](docs/a2a/README.md)
   A2A-shaped metadata review package entry point
 - [docs/a2a/vate-a2a-extension-profile-v0.3.md](docs/a2a/vate-a2a-extension-profile-v0.3.md)
