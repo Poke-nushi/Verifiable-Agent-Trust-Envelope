@@ -147,13 +147,16 @@ inputs, evaluator identities and previous assessments. The local vectors and
 API tests provide a starting point; continued maintenance by another implementer
 remains to be observed.
 
-Two follow-on investigations address additional recipient requirements:
+Two paths address additional recipient requirements:
 
-- **Signatures and issuer authority:** connect one existing external signature
-  verifier to the assessment path. Keep verification of the signed bytes,
-  authority to issue a record for the action under review, and receipt linkage
-  as separate results. Specify the trust inputs needed for that authority
-  decision; a valid signature alone does not establish it.
+- **Signatures and issuer authority:** the experimental
+  [recipient signature example](reference/recipient-signature-authority/README.md)
+  connects OpenSSL P-256 / SHA-256 verification and receiver-selected
+  record-issuing grants to the existing receipt assessment. Signed bytes,
+  authority under that policy and receipt linkage remain separate results.
+  Next, exercise independently selected issuer/key/scope mappings with another
+  receiver. The public test-key controls do not establish real issuer identity
+  or authority at the original operation.
 - **Missing required records:** investigate an optional check against a set of
   required operations or attempts fixed by the recipient before assessment.
   Distinguish missing artifacts for a listed attempt from an attempt omitted
@@ -161,10 +164,10 @@ Two follow-on investigations address additional recipient requirements:
   remain explicit; this check would not establish that all real-world activity
   has been recorded.
 
-These are prospective additions. The current API preserves existing evaluator
-results and reports unsupported requirements; it implements neither of these
-additional checks. See [known gaps](docs/known-gaps.md) for the remaining proof
-and evidence boundaries.
+The signature example wraps the current API without changing its unsupported
+requirements. The missing-record review set remains prospective.
+See [known gaps](docs/known-gaps.md) for the remaining proof and evidence
+boundaries.
 
 The NENRIN S3 example supplies one fixed cross-format comparison with preserved
 native results. Reuse its inputs, checks and documented mapping when evaluating
