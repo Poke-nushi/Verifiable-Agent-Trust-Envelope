@@ -50,6 +50,7 @@ jobs:
           python -B reference/s3-observation-example/run_examples.py
           python -B reference/s3-observation-example/test_assessment.py
           python -B -m unittest discover -s reference/s3-observation-example -p 'test_native_fixture.py' -v
+          python -B -m unittest discover -s reference/s3-observation-example -p 'test_assess_cli.py' -v
 
       - name: Check the recipient assessment API and input vectors
         run: |
@@ -84,6 +85,7 @@ jobs:
           python -B "$archive_dir/reference/s3-observation-example/run_examples.py"
           python -B "$archive_dir/reference/s3-observation-example/test_assessment.py"
           python -B -m unittest discover -s "$archive_dir/reference/s3-observation-example" -p 'test_native_fixture.py' -v
+          python -B -m unittest discover -s "$archive_dir/reference/s3-observation-example" -p 'test_assess_cli.py' -v
 
       - name: Check the recipient API from a source archive
         run: |
