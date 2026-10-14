@@ -233,6 +233,15 @@ JSON CLI. It preserves each evaluator's complete result, unsupported
 requirements and source identity. Application reuse and version-update trials
 remain needed beyond the local vectors and tests.
 
+The separate [Recipient Signature and Issuer Authority
+Example](../reference/recipient-signature-authority/README.md) verifies detached
+P-256 / SHA-256 signatures through OpenSSL and evaluates receiver-selected
+record-issuing grants while preserving the API result. Its public test keys and
+retrospective signatures do not establish real issuer identity, authority at
+the original operation, actual write order or a mapping between protocol
+identities. General JOSE/PKI, certificate/revocation handling and independent
+issuer/key selection remain outside that experimental contract.
+
 These assessments can identify missing inputs required by their fixed
 contracts. They do not establish a complete set of operations or attempts
 against which to detect omitted records. The

@@ -70,6 +70,12 @@ To call the receipt-linkage or S3 observation assessment from another applicatio
 and JSON CLI entry points preserve native results and identify the API contract
 and evaluator sources for integration and update checks.
 
+To inspect detached signatures and receiver-selected record-issuing authority
+alongside that assessment, use the
+[Recipient Signature and Issuer Authority Example](reference/recipient-signature-authority/README.md).
+It keeps signature, authority and receipt-linkage results separate under an
+experimental P-256 / SHA-256 contract with public test keys.
+
 ## What VATE Records
 
 - **One admission basis**: action, target, any requested constraints, actor, principal,
@@ -468,6 +474,8 @@ The most useful feedback is:
   Compare NENRIN records with the VATE S3 capture while retaining both native assessments
 - [reference/recipient-assessment/README.md](reference/recipient-assessment/README.md)
   Call receipt and S3 assessments through a versioned local Python API or JSON CLI
+- [reference/recipient-signature-authority/README.md](reference/recipient-signature-authority/README.md)
+  Inspect detached signatures and receiver-selected record authority alongside receipt linkage
 - [reference/a2a-metadata-adapter-demo/README.md](reference/a2a-metadata-adapter-demo/README.md)
   Dependency-free A2A-shaped metadata adapter demo
 - [packages/vate-core-ts/README.md](packages/vate-core-ts/README.md)

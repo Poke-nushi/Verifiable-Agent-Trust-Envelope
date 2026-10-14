@@ -118,6 +118,12 @@ and [S3 contract](../s3-observation-example/CONTRACT.md#outputs-and-precedence).
 These reference assessments do not authenticate signatures or issuers, prove
 complete independent execution evidence, or grant permission to execute.
 
+The separate [Recipient Signature and Issuer Authority
+Example](../recipient-signature-authority/README.md) calls this API and adds
+experimental P-256 / SHA-256 signature and receiver-policy checks alongside its
+unchanged result. It does not change this API's capabilities or unsupported
+requirements.
+
 ## Reproduce and update
 
 Run the original-input vectors and the API tests:
