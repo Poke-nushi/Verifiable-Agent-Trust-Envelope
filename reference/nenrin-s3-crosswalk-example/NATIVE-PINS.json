@@ -1,0 +1,206 @@
+{
+  "npm": {
+    "files": {
+      "nenrin_verify.mjs": {
+        "byte_length": 80295,
+        "sha256": "5c64fa053ce96c12f572b09191e3fa56c4c4fde2b93efbce3745cb4cc8e3d2f9"
+      },
+      "package.json": {
+        "byte_length": 2319,
+        "sha256": "e9ac4886d7ec66c76d3cac0b4ec88d648fa6650abcbb7ecf697432ecbbc45859"
+      }
+    },
+    "name": "nenrin-verify",
+    "version": "0.5.1"
+  },
+  "pypi": {
+    "files": {
+      "nenrin_verify/__init__.py": {
+        "byte_length": 4468,
+        "sha256": "a40ccc470facb50592d1e1dfdb1c1cea0054f9c95a0307cc39a6d0c9cb1adf88"
+      },
+      "nenrin_verify/_js.py": {
+        "byte_length": 22162,
+        "sha256": "5eddc1158bcf948520bfd262be1afe0ca717b68af7dfa0efe90d8d2f890b90b6"
+      },
+      "nenrin_verify/_repo/agreement-v0/agreement_verify.py": {
+        "byte_length": 67868,
+        "sha256": "92d744c829c585d45e3e0f704bbdc81542b1c6a3cfae362765fb0785b2949053"
+      },
+      "nenrin_verify/_repo/agreement-v0/key_succession.py": {
+        "byte_length": 7446,
+        "sha256": "0d0209b318f654d0995ac6ca40f5194064cd6e8b49459d1bbbcfdb957b61452d"
+      },
+      "nenrin_verify/_repo/musubi-v0/admission_verify_v0.py": {
+        "byte_length": 22465,
+        "sha256": "aa889e542ff40e257f62b7a6ac50ddb9d2bf52d655b206d9e7c8b2468c9d0a6a"
+      },
+      "nenrin_verify/_repo/musubi-v0/anchor_compose.py": {
+        "byte_length": 39817,
+        "sha256": "a661f673c05dbe6e05ffc0ca4bf4b859f5fa6b0f198ba3a5f199ffa90ae4b1f0"
+      },
+      "nenrin_verify/_repo/musubi-v0/bond_v0.py": {
+        "byte_length": 17332,
+        "sha256": "e15c4355f762f08bf7ea070613e4572e2f72d7786bd44866d961ca59a25c181c"
+      },
+      "nenrin_verify/_repo/musubi-v0/clause_eval_v0.py": {
+        "byte_length": 16839,
+        "sha256": "fee48c3a66c28fe14ecbb8e2aea03a062fbe7be22810d3ca94332b36f660bed0"
+      },
+      "nenrin_verify/_repo/musubi-v0/contract_v0.py": {
+        "byte_length": 69023,
+        "sha256": "da6729c62c976761aa95742736f86d28b5e895f7601002cad39123941d5aa9a1"
+      },
+      "nenrin_verify/_repo/musubi-v0/convergence_v0.py": {
+        "byte_length": 37240,
+        "sha256": "65a267380fa623f59767a8d20a13d11d84a3db18ab1204c0f7779db2e31c0da5"
+      },
+      "nenrin_verify/_repo/musubi-v0/correction_bundle_v0.py": {
+        "byte_length": 13819,
+        "sha256": "2ca27cb37a5bb1e698d49950411208659000eeddf545c46d6a8e77470f419808"
+      },
+      "nenrin_verify/_repo/musubi-v0/correction_v0.py": {
+        "byte_length": 15599,
+        "sha256": "4ab0c29319628eca71f747ec29a9544a85bfbbcc9a8ed8c8954e971de0cb3e44"
+      },
+      "nenrin_verify/_repo/musubi-v0/corroboration_v0.py": {
+        "byte_length": 39799,
+        "sha256": "62ae1d6c27a9222863f81f6669ad706c99388091a1fc0a34ec56db63c60f2587"
+      },
+      "nenrin_verify/_repo/musubi-v0/fixtures/babyblueviper1_approver_v2/_ed25519.py": {
+        "byte_length": 2348,
+        "sha256": "1223e077ba894370d40723cc2e73b7be0693cfcc9f9efb29a5c5790bc5fc7015"
+      },
+      "nenrin_verify/_repo/musubi-v0/fixtures/babyblueviper1_approver_v2/verify_approval_v2.py": {
+        "byte_length": 4894,
+        "sha256": "31e863c39256a7045ba39f8569654630adf1de69a96713a38dea76382fab8d0d"
+      },
+      "nenrin_verify/_repo/musubi-v0/independence_v0.py": {
+        "byte_length": 36841,
+        "sha256": "50964883c27896de4723c323b57c244736a8e4e9e776f04f91c5d83499e8bf3a"
+      },
+      "nenrin_verify/_repo/musubi-v0/offer_v0.py": {
+        "byte_length": 15265,
+        "sha256": "7ee79eb6ee3796af9cc542a9d24da1fb3390a43c5bcc7ca9ceb250b0624c77f6"
+      },
+      "nenrin_verify/_repo/musubi-v0/settle_v1.py": {
+        "byte_length": 23232,
+        "sha256": "0e51350331c8931c639d4acb95cdf9d07deff2e4c4e231f6df254cd1ee4412ba"
+      },
+      "nenrin_verify/_repo/musubi-v0/settle_v1_1.py": {
+        "byte_length": 30911,
+        "sha256": "a2391a5db199bcdaafed31ff0a3c8a93d1cd6794f4f55bfc42a82a478d7ad558"
+      },
+      "nenrin_verify/_repo/musubi-v0/settle_v1_10.py": {
+        "byte_length": 28271,
+        "sha256": "34beeebaa139705955fa39012c8a70081bec9e20fbe7fd49c51718cafe754023"
+      },
+      "nenrin_verify/_repo/musubi-v0/settle_v1_11.py": {
+        "byte_length": 23681,
+        "sha256": "fb03687cbacd2713d28256450a5b5e4f7fdb9bacd4e13d44b67de649e404d743"
+      },
+      "nenrin_verify/_repo/musubi-v0/settle_v1_12.py": {
+        "byte_length": 18898,
+        "sha256": "40a8fbb82a8e76806f0b095fbc70a12f133a12289bc9e8d538c906d49b9eb1e1"
+      },
+      "nenrin_verify/_repo/musubi-v0/settle_v1_2.py": {
+        "byte_length": 20870,
+        "sha256": "6c674fd54a1a5c89a300d88f638dd61dd0b4a75d16174756560e33d1f4ee5cbf"
+      },
+      "nenrin_verify/_repo/musubi-v0/settle_v1_3.py": {
+        "byte_length": 19704,
+        "sha256": "17119bbc7802647fed09bafee650107f0cf905451e621e048a5ee150c2dca787"
+      },
+      "nenrin_verify/_repo/musubi-v0/settle_v1_4.py": {
+        "byte_length": 35502,
+        "sha256": "ef3779d05fc98e4000d6f75d81a9346f1033506543953e3049745087b75ddac5"
+      },
+      "nenrin_verify/_repo/musubi-v0/settle_v1_5.py": {
+        "byte_length": 20833,
+        "sha256": "f9b313566713cdc412afb072c0e1ed0d5acf29059aa7ded9d83e24ae2a62e0f6"
+      },
+      "nenrin_verify/_repo/musubi-v0/settle_v1_6.py": {
+        "byte_length": 31759,
+        "sha256": "6752a748ed7b6e3bb1447f1bd52fb83802b076bd46bccafd03c41cc8abb4ad8d"
+      },
+      "nenrin_verify/_repo/musubi-v0/settle_v1_7.py": {
+        "byte_length": 32721,
+        "sha256": "878a3a3697775d3a1567d3271e90d21c4fed34dd7954dbb87efc64dead24c41d"
+      },
+      "nenrin_verify/_repo/musubi-v0/settle_v1_8.py": {
+        "byte_length": 29322,
+        "sha256": "fe61f67c1593c776abe06be3f036853529e0f8099cf75d8eff3095f9914e1ba0"
+      },
+      "nenrin_verify/_repo/musubi-v0/settle_v1_9.py": {
+        "byte_length": 14964,
+        "sha256": "7a84302be1ec38a1800d9280dbd2f123e2210355049096740b9657bd523f4aae"
+      },
+      "nenrin_verify/_repo/musubi-v0/spine_verify.py": {
+        "byte_length": 39934,
+        "sha256": "ad2076d49be6763ec708f4c1db1a607043fc6cb8a9116346b75cabfddd71359a"
+      },
+      "nenrin_verify/_repo/musubi-v0/terms_v0.py": {
+        "byte_length": 40216,
+        "sha256": "6532d5c6160a3974673f4b70d744e7aa5f19176a34e12a81f75f4abe0a2aad21"
+      },
+      "nenrin_verify/_repo/recovery-v0/recovery_verify.py": {
+        "byte_length": 34169,
+        "sha256": "e9bc9c11dd7d9aefaab3bff525909866ab0cab58d20dcd6e90932bfa5be2de3a"
+      },
+      "nenrin_verify/_url.py": {
+        "byte_length": 6547,
+        "sha256": "bcffb33d534994debb2adb66b22cd20e8f2b84e49c19d10f70f53309c2dd18e8"
+      },
+      "nenrin_verify/a2a_recorder.py": {
+        "byte_length": 33057,
+        "sha256": "9d28778805017f5437d3195df074a95c9d582d8c4c985246ec481b0ca12266ed"
+      },
+      "nenrin_verify/agreement_verify.py": {
+        "byte_length": 67999,
+        "sha256": "fff2f7ac0d8df3d6f51a4b6a4e7776674e7b3ed12a34c4938dbd447365be2ad5"
+      },
+      "nenrin_verify/cli.py": {
+        "byte_length": 5287,
+        "sha256": "0f3fb0d2e2dbb2bcebe18a10b7e20a9f47e435d6351ad762c92585760ab414de"
+      },
+      "nenrin_verify/key_succession.py": {
+        "byte_length": 7568,
+        "sha256": "fd3601681733cc3a5a9b30a2a459f5c6e49ada7167055775283493084c48178a"
+      },
+      "nenrin_verify/musubi.py": {
+        "byte_length": 9786,
+        "sha256": "81d76e470f19e1ec8508705ebf21d7ce3bfc39eab67dc5fd6b2d9ac3335ed3b0"
+      },
+      "nenrin_verify/policy.py": {
+        "byte_length": 14447,
+        "sha256": "e016945a3b1eec6a211ffc01fca909690fabbf4ab7e2a63e5f47516ea0203a75"
+      },
+      "nenrin_verify/provenance.py": {
+        "byte_length": 55217,
+        "sha256": "9bcf6dfd0c534124c955b507eecc32ba14dbac2e59ce47a257cc2c54d473bb8b"
+      },
+      "nenrin_verify/trace.py": {
+        "byte_length": 15204,
+        "sha256": "70e83ad71ffae7d17537febcc374a0ec3645fb4bef9ca6b6013dc68deda3cac1"
+      },
+      "nenrin_verify/trace_pin.py": {
+        "byte_length": 7365,
+        "sha256": "74939f970e9f3fc9975043c02e67c16764998bb5d3ab2a08f917d7fc2aa3ec16"
+      },
+      "nenrin_verify/tsugi.py": {
+        "byte_length": 50315,
+        "sha256": "45e2994b8c8b832311ba9b592824c2cdfb998003a4cc5a3c322ec994bd29fe97"
+      },
+      "nenrin_verify/tsunagi.py": {
+        "byte_length": 9528,
+        "sha256": "90780030e8e213f8206a6aa8c1af757648a4e0629a2b802909ce2cca659192ba"
+      }
+    },
+    "name": "nenrin-verify",
+    "version": "0.5.3"
+  },
+  "schema": "nenrin-vate-native-distribution-source-pins-v1",
+  "scope": "NENRIN distribution source identity; interpreter, OS and cryptography dependencies are recorded by new local replay, not attested by these pins.",
+  "source_commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+  "verifier_version": "0.1.6"
+}

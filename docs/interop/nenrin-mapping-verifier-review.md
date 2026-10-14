@@ -5,6 +5,11 @@ verifier admission and execution evidence. Two result-consistency issues
 reported by the VATE maintainer were also fixed upstream and confirmed in the
 published `nenrin-verify@0.2.3` package.
 
+For the later three-case connection using `nenrin-verify` npm `0.5.1` and
+PyPI `0.5.3`, see the [NENRIN–VATE S3 Crosswalk Example](../../reference/nenrin-s3-crosswalk-example/README.md).
+It retains its own source pins, inputs and complete results, separate from the
+mapping and verifier-fix record below.
+
 ## Mapping Record
 
 The [corrected NENRIN mapping note](https://github.com/ogasurfproject-jpg/horizon-shield/blob/9454f58240bb2133ae3a99d59f44000e7f32cedf/workers/hs-ledger/nenrin/task-execution-bind-v0/VATE_MAPPING_v0.md)

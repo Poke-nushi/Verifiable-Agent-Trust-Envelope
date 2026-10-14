@@ -1,0 +1,34 @@
+{
+  "nenrin": {
+    "bundles_and_manifest": "exact upstream bytes",
+    "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+    "contribution": "workers/hs-ledger/nenrin/vate-s3-v0/",
+    "generator": "https://github.com/ogasurfproject-jpg/horizon-shield/blob/bfde94be9d8089b7c683bc31b9c39c3879b07ab2/workers/hs-ledger/nenrin/vate-s3-v0/gen.mjs",
+    "license": {
+      "byte_length": 1107,
+      "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+      "git_blob": "c22a9ee4895c1f0867952bd0af248fe5bd478e88",
+      "path": "LICENSE",
+      "repo": "https://github.com/ogasurfproject-jpg/horizon-shield",
+      "sha256": "fb64e419d1d94dfa6afc2927c35bbe577627701cd9fae4ca139483d5e2bec72d"
+    },
+    "repository": "https://github.com/ogasurfproject-jpg/horizon-shield"
+  },
+  "publication": {
+    "contributor": "ogasurfproject-jpg / The HORIZONs Co., Ltd.",
+    "discussion": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/issues/84",
+    "sources": "SOURCES.json"
+  },
+  "saved_records": {
+    "metadata": "New publication schemas retain relevant historical timestamps, cases, package/source pins, exits and raw input/output fingerprints. They are not the original invocation manifests and do not claim a new execution at comparison time.",
+    "nenrin": "Complete stdout/stderr from the VATE maintainer reproduction; each is byte-identical to the fixed upstream saved output.",
+    "vate": "Complete stdout/stderr from the fixed-source VATE offline replay."
+  },
+  "schema": "nenrin-vate-crosswalk-provenance-v1",
+  "vate": {
+    "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+    "license": "Apache-2.0",
+    "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+    "source_pins": "VATE-PINS.json"
+  }
+}

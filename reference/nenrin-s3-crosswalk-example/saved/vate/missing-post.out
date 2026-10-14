@@ -1,0 +1,69 @@
+{
+  "contract": "vate-local-s3-observation-v1",
+  "record_linkage": "not_assessed",
+  "request_binding": "matched",
+  "target_observation": "matched",
+  "attempt_binding": "response_linked",
+  "post_observation_binding": "not_assessed",
+  "source_trust": "accepted_local_assumption",
+  "version_scope": "specified_version",
+  "assessment": "insufficient",
+  "diagnostics": [
+    {
+      "kind": "missing_or_invalid",
+      "code": "RECEIPT_NOT_ASSESSED",
+      "detail": [
+        {
+          "input": "post",
+          "kind": "not_supplied"
+        }
+      ]
+    },
+    {
+      "kind": "missing_or_invalid",
+      "code": "POST_OBSERVATION_NOT_ASSESSED",
+      "detail": "post not supplied"
+    }
+  ],
+  "receipt_check": {
+    "record_linkage": "not_assessed",
+    "assessment_scope": "receipt relationships and reference-core constraints only",
+    "source_files": {
+      "reference/vate-verifier-core/vate_verifier_core.py": "ead16bebda908187485cf095f71538b23102ec32ea94c6efca0d7e0a44849e84",
+      "scripts/vate_conformance.py": "570b1b71b86e85add1fad6f8bcd0a544ca7cad71dca78a3bfca5b00698762764",
+      "schemas/admission-receipt.schema.json": "fc5fc085a741ce1e23e6435c9402f3838eaa701dd363ba84610a8989ad8af7fb",
+      "schemas/post-execution-receipt.schema.json": "3451185169de5deb210a9f3319dd6217fbe6bf6bb0b8b835c9b7e5a874467892",
+      "registries/evidence-vocabulary.v0.3.json": "df3c49399ea7082a32eb397e951a88b44630bc26624be08041a8040488776814"
+    },
+    "digest_basis": "VATE v0.3 fixture json-sorted-no-whitespace",
+    "inputs": {
+      "admission": {
+        "supplied": true,
+        "raw_file_sha256": "cdfab8a13e33d473166a6e37e11ac4408d4e074d522737113b5ad60f0eb8963e"
+      },
+      "post": {
+        "supplied": false,
+        "raw_file_sha256": null
+      }
+    },
+    "input_issues": [
+      {
+        "input": "post",
+        "kind": "not_supplied"
+      }
+    ],
+    "linkage_checks_run": [],
+    "core_result": null,
+    "side_effect_check_failures": [],
+    "not_checked": [
+      "signatures_and_issuer_authority",
+      "request_hash_preimages",
+      "constraints_other_than_reported_max_amount_tool_allowlist_and_policy_violations",
+      "completeness_of_reported_side_effects",
+      "actual_or_independently_observed_execution",
+      "current_permission_to_execute"
+    ]
+  },
+  "retry_authorized": false,
+  "scope": "unsigned local collector/store assumptions; no current permission or independent causality proof"
+}

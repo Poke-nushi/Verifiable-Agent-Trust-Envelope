@@ -1,0 +1,177 @@
+{
+  "evidence_mode": "saved",
+  "native_signature_mode": "published CLI default require_signatures=true; outputs retained unchanged",
+  "record_scope": "Selected execution metadata and complete output bytes from the VATE maintainer offline reproduction; this publication record does not contain the original host environment or invocation record.",
+  "runs": [
+    {
+      "case": "match",
+      "engine": "npm",
+      "exit_code": 0,
+      "historical_execution": {
+        "finished_at": "2026-10-13T20:58:34.912980+00:00",
+        "started_at": "2026-10-13T20:58:34.867985+00:00"
+      },
+      "input": {
+        "byte_length": 2826,
+        "path": "third_party/nenrin/records/match/nenrin-bundle.json",
+        "sha256": "8cc480c66682a0393f03d8101d3afc65399963579fc6f72d30416bbdc37eadfe"
+      },
+      "package": {
+        "name": "nenrin-verify",
+        "version": "0.5.1"
+      },
+      "stderr": {
+        "byte_length": 0,
+        "path": "saved/nenrin/npm-match.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "byte_length": 7546,
+        "path": "saved/nenrin/npm-match.out",
+        "sha256": "609009ef1a7e0c3e5f833496f4afa71ddaa9a572174141dff98e0d53c536ba55"
+      }
+    },
+    {
+      "case": "match",
+      "engine": "pypi",
+      "exit_code": 0,
+      "historical_execution": {
+        "finished_at": "2026-10-13T20:58:35.441983+00:00",
+        "started_at": "2026-10-13T20:58:34.914013+00:00"
+      },
+      "input": {
+        "byte_length": 2826,
+        "path": "third_party/nenrin/records/match/nenrin-bundle.json",
+        "sha256": "8cc480c66682a0393f03d8101d3afc65399963579fc6f72d30416bbdc37eadfe"
+      },
+      "package": {
+        "name": "nenrin-verify",
+        "version": "0.5.3"
+      },
+      "stderr": {
+        "byte_length": 0,
+        "path": "saved/nenrin/pypi-match.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "byte_length": 7546,
+        "path": "saved/nenrin/pypi-match.out",
+        "sha256": "609009ef1a7e0c3e5f833496f4afa71ddaa9a572174141dff98e0d53c536ba55"
+      }
+    },
+    {
+      "case": "target_mismatch",
+      "engine": "npm",
+      "exit_code": 1,
+      "historical_execution": {
+        "finished_at": "2026-10-13T20:58:35.489294+00:00",
+        "started_at": "2026-10-13T20:58:35.443275+00:00"
+      },
+      "input": {
+        "byte_length": 2832,
+        "path": "third_party/nenrin/records/target_mismatch/nenrin-bundle.json",
+        "sha256": "c54228f0e43b3ec7d2bc5a83f7c38ddb3b8c990da8e11888a9aa1df6d432a52e"
+      },
+      "package": {
+        "name": "nenrin-verify",
+        "version": "0.5.1"
+      },
+      "stderr": {
+        "byte_length": 0,
+        "path": "saved/nenrin/npm-target_mismatch.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "byte_length": 6603,
+        "path": "saved/nenrin/npm-target_mismatch.out",
+        "sha256": "5f2ecffd45107d373db9fe980375804d2c72cb5707a91283af16438ce3e85abd"
+      }
+    },
+    {
+      "case": "target_mismatch",
+      "engine": "pypi",
+      "exit_code": 1,
+      "historical_execution": {
+        "finished_at": "2026-10-13T20:58:35.591612+00:00",
+        "started_at": "2026-10-13T20:58:35.490439+00:00"
+      },
+      "input": {
+        "byte_length": 2832,
+        "path": "third_party/nenrin/records/target_mismatch/nenrin-bundle.json",
+        "sha256": "c54228f0e43b3ec7d2bc5a83f7c38ddb3b8c990da8e11888a9aa1df6d432a52e"
+      },
+      "package": {
+        "name": "nenrin-verify",
+        "version": "0.5.3"
+      },
+      "stderr": {
+        "byte_length": 0,
+        "path": "saved/nenrin/pypi-target_mismatch.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "byte_length": 6603,
+        "path": "saved/nenrin/pypi-target_mismatch.out",
+        "sha256": "5f2ecffd45107d373db9fe980375804d2c72cb5707a91283af16438ce3e85abd"
+      }
+    },
+    {
+      "case": "missing_receipt",
+      "engine": "npm",
+      "exit_code": 1,
+      "historical_execution": {
+        "finished_at": "2026-10-13T20:58:35.634043+00:00",
+        "started_at": "2026-10-13T20:58:35.593635+00:00"
+      },
+      "input": {
+        "byte_length": 1208,
+        "path": "third_party/nenrin/records/missing_receipt/nenrin-bundle.json",
+        "sha256": "25157161133671c10ffa4cd116bb19c3bf1bc185a4742f885f962ce00c5fe45b"
+      },
+      "package": {
+        "name": "nenrin-verify",
+        "version": "0.5.1"
+      },
+      "stderr": {
+        "byte_length": 0,
+        "path": "saved/nenrin/npm-missing_receipt.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "byte_length": 5572,
+        "path": "saved/nenrin/npm-missing_receipt.out",
+        "sha256": "720843c8668a5fd0991ad555a482ed3593eadcdc0df90e02f489b5545d81f35a"
+      }
+    },
+    {
+      "case": "missing_receipt",
+      "engine": "pypi",
+      "exit_code": 1,
+      "historical_execution": {
+        "finished_at": "2026-10-13T20:58:35.728516+00:00",
+        "started_at": "2026-10-13T20:58:35.635065+00:00"
+      },
+      "input": {
+        "byte_length": 1208,
+        "path": "third_party/nenrin/records/missing_receipt/nenrin-bundle.json",
+        "sha256": "25157161133671c10ffa4cd116bb19c3bf1bc185a4742f885f962ce00c5fe45b"
+      },
+      "package": {
+        "name": "nenrin-verify",
+        "version": "0.5.3"
+      },
+      "stderr": {
+        "byte_length": 0,
+        "path": "saved/nenrin/pypi-missing_receipt.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "byte_length": 5572,
+        "path": "saved/nenrin/pypi-missing_receipt.out",
+        "sha256": "720843c8668a5fd0991ad555a482ed3593eadcdc0df90e02f489b5545d81f35a"
+      }
+    }
+  ],
+  "schema": "nenrin-vate-saved-nenrin-reports-v1",
+  "source_commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2"
+}

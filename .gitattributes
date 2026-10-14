@@ -7,3 +7,9 @@ reference/s3-observation-example/inputs/seaweedfs-4.48/instance/**/*-headers.txt
 
 # Keep this source-pinned capture helper byte-identical to its recorded evidence.
 reference/s3-observation-example/sandbox_macos.py whitespace=-blank-at-eof
+
+# Preserve raw bytes in the NENRIN crosswalk's redistributed and saved records.
+reference/nenrin-s3-crosswalk-example/** text eol=lf
+reference/nenrin-s3-crosswalk-example/third_party/** -text
+reference/nenrin-s3-crosswalk-example/saved/** -text
+reference/nenrin-s3-crosswalk-example/saved/vate/cases/**/*-headers.txt whitespace=cr-at-eol,-blank-at-eof

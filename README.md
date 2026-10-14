@@ -59,7 +59,13 @@ use the [S3 Observation Example](reference/s3-observation-example/README.md).
 It replays local SeaweedFS captures and checks the admitted request, recorded
 upload, returned version and observed result under explicit local trust assumptions.
 
-To call either assessment from another application, use the
+To compare NENRIN grant and receipt records with that captured operation, use the
+[NENRIN–VATE S3 Crosswalk Example](reference/nenrin-s3-crosswalk-example/README.md).
+Its three fixed cases check the relationships between the records while retaining
+each verifier's own result. Saved-report comparison and fresh checker runs are
+separate commands.
+
+To call the receipt-linkage or S3 observation assessment from another application, use the
 [Recipient Assessment API](reference/recipient-assessment/README.md). Its Python
 and JSON CLI entry points preserve native results and identify the API contract
 and evaluator sources for integration and update checks.
@@ -216,6 +222,9 @@ or later main-branch work, start here:
 - [NENRIN mapping and verifier review](docs/interop/nenrin-mapping-verifier-review.md) -
   mapping conditions and two upstream result-consistency fixes confirmed in
   `nenrin-verify@0.2.3`
+- [NENRIN–VATE S3 Crosswalk Example](reference/nenrin-s3-crosswalk-example/README.md) -
+  three fixed cases connecting contributor-supplied NENRIN records to the VATE
+  S3 capture, with complete native results and reproducible relationship checks
 - [External implementation call](docs/conformance/external-implementation-call.md) -
   the request for result files, generated artifacts, and implementation reports
 - [External SUT quickstart](docs/conformance/external-sut-quickstart.md) - how a
@@ -449,6 +458,8 @@ The most useful feedback is:
   Inspect a stored admission/post-execution pair with existing receipt checks
 - [reference/s3-observation-example/README.md](reference/s3-observation-example/README.md)
   Connect admission and execution receipts to a captured upload and version-specific read-back
+- [reference/nenrin-s3-crosswalk-example/README.md](reference/nenrin-s3-crosswalk-example/README.md)
+  Compare NENRIN records with the VATE S3 capture while retaining both native assessments
 - [reference/recipient-assessment/README.md](reference/recipient-assessment/README.md)
   Call receipt and S3 assessments through a versioned local Python API or JSON CLI
 - [reference/a2a-metadata-adapter-demo/README.md](reference/a2a-metadata-adapter-demo/README.md)
