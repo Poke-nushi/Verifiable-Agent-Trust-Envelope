@@ -15,7 +15,8 @@ steps from the technical checks below.
 - Change class: added reference interfaces and examples, bounded correctness
   fixes, reproduction/reuse records and development-dependency maintenance
 - Existing Zenodo concept DOI: `10.5281/zenodo.19839768`
-- Exact v0.5.0 Zenodo version DOI: pending at tag time
+- Exact v0.5.0 Zenodo version DOI:
+  [10.5281/zenodo.23378498](https://doi.org/10.5281/zenodo.23378498)
 
 The [release notes](release-notes/v0.5.0.md) identify the included paths and
 their evidence boundaries. This release does not rename the semantic profile
@@ -85,8 +86,36 @@ unavailable; that check passed in the full-history checkout above.
 
 These checks did not make a new S3 capture or rerun the NENRIN or Pulse native
 verifiers. Saved native reports and historical external run records keep their
-original provenance. GitHub CI results for the final release source are
-verified separately before publication.
+original provenance.
+
+## Publication Verification
+
+The [GitHub pre-release](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.5.0)
+was published on October 14, 2026 UTC (October 15 JST) from source commit
+`253aaa13f232823c982122fde5abb4e4b8d410b8` and annotated tag object
+`d6babdda408958e2c047e10faae2ef4b3dec3cc5`.
+[PR CI](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/actions/runs/38638120491)
+and [main CI](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/actions/runs/38639338641)
+each passed all five jobs. The case-sensitive S3 CLI check passed in all three
+Ubuntu Python lanes, in both checkout and source-archive runs.
+
+The [Zenodo record](https://zenodo.org/records/23378498) has version `v0.5.0`
+and belongs to the existing concept DOI `10.5281/zenodo.19839768`. At publication
+verification, the series contained eight versions and exactly one v0.5.0;
+the previous seven versions retained their identifiers and file checksums.
+The separate technical-report record was unchanged.
+
+The downloaded GitHub and Zenodo ZIPs were byte-identical (2,547,108 bytes):
+
+- SHA-256: `e1bfb3321e0be535bc5637419557059920972a9867847b0de95c80be57484a45`
+- Zenodo MD5: `b1fce1f534842d6d54676516aeded110`
+
+All 836 source file paths and bytes matched the reviewed Git tree
+`7b7217ccfc7d658e7840d3d2323b579140de74e5`. The ZIP did not include Unix file-mode
+metadata; this comparison establishes path and content equality.
+
+The issued DOI was added to current citation metadata only after these checks.
+The tag and its archived files retain their original tag-time citation text.
 
 ## Archive and DOI Sequence
 
