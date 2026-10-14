@@ -74,8 +74,10 @@ The following work is available on `main` after the `v0.4.1` archive:
   observations from saved-run verification.
 - [Receipt Protocol store reuse](docs/interop/receipt-protocol-store-reuse.md):
   an external developer connects a storage POC to the existing VATE checker.
-  The maintainer reproduced the fixed R17 handoff and a mismatch control;
-  a mutable-buffer limitation remains at that storage source pin.
+  The maintainer reproduced the fixed R17 handoff and a mismatch control, then
+  [rechecked the Buffer-copy fix](docs/interop/receipt-protocol-store-reuse.md#buffer-copy-fix-recheck).
+  The corrected store preserved the receipt bytes and checker results; the
+  original pin's mutable-buffer finding remains in the record.
 
 The VATE demo and Vaara path use one operator, local processes and unsigned
 VATE records. HandoffProbe's reconciliation experiment and the HandoffProbe and
@@ -144,6 +146,25 @@ in a receiving application and exercise an update while retaining original
 inputs, evaluator identities and previous assessments. The local vectors and
 API tests provide a starting point; continued maintenance by another implementer
 remains to be observed.
+
+Two follow-on investigations address additional recipient requirements:
+
+- **Signatures and issuer authority:** connect one existing external signature
+  verifier to the assessment path. Keep verification of the signed bytes,
+  authority to issue a record for the action under review, and receipt linkage
+  as separate results. Specify the trust inputs needed for that authority
+  decision; a valid signature alone does not establish it.
+- **Missing required records:** investigate an optional check against a set of
+  required operations or attempts fixed by the recipient before assessment.
+  Distinguish missing artifacts for a listed attempt from an attempt omitted
+  from the supplied records. The set's source and collection coverage must
+  remain explicit; this check would not establish that all real-world activity
+  has been recorded.
+
+These are prospective additions. The current API preserves existing evaluator
+results and reports unsupported requirements; it implements neither of these
+additional checks. See [known gaps](docs/known-gaps.md) for the remaining proof
+and evidence boundaries.
 
 The NENRIN S3 example supplies one fixed cross-format comparison with preserved
 native results. Reuse its inputs, checks and documented mapping when evaluating

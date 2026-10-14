@@ -133,7 +133,7 @@ Current repository state:
 - **Repository type**: protocol discussion draft
 - **Document maturity**: early draft
 - **Primary language**: English
-- **Roadmap refresh date**: 2026-10-11
+- **Roadmap refresh date**: 2026-10-14
 - **Primary battlefield**: `AL2` external digital write
 - **Current GitHub review snapshot**: `v0.4.1` discussion-draft pre-release;
   exact Zenodo version DOI `10.5281/zenodo.22680789`
@@ -218,7 +218,9 @@ or later main-branch work, start here:
   identified separately
 - [Receipt Protocol store reuse](docs/interop/receipt-protocol-store-reuse.md) -
   an external storage POC calling VATE's receipt checker; maintainer-reproduced
-  results, connection conditions and a storage limitation at the tested pin
+  results, connection conditions and a
+  [Buffer-copy fix recheck](docs/interop/receipt-protocol-store-reuse.md#buffer-copy-fix-recheck)
+  alongside the original storage finding
 - [NENRIN mapping and verifier review](docs/interop/nenrin-mapping-verifier-review.md) -
   mapping conditions and two upstream result-consistency fixes confirmed in
   `nenrin-verify@0.2.3`
@@ -319,7 +321,11 @@ See the [direct comparison note](docs/close-adjacent-work-2026-04.md).
 
 ## Read This In 5 Minutes
 
-If you are new to the repository, follow:
+Start with the [v0.3 in 5 minutes](docs/v0.3-in-5-minutes.md) overview.
+
+### Further Reading
+
+For a deeper technical review, the following references expand on the overview:
 
 1. this `README.md`
 2. [docs/public-claim-boundary.md](docs/public-claim-boundary.md)
