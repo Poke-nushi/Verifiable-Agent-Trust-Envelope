@@ -1,0 +1,944 @@
+{
+  "artifacts": {
+    "LICENSE": {
+      "byte_length": 10254,
+      "origin": {
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "LICENSE",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope"
+      },
+      "role": "license",
+      "sha256": "a7f02d0ab1cc53abde08c95ab75725d673aa5af2d3184cfa07907d34c1f7a318"
+    },
+    "NATIVE-PINS.json": {
+      "byte_length": 8742,
+      "origin": {
+        "kind": "published distributions used for the saved reproduction"
+      },
+      "role": "native_distribution_source_pins",
+      "sha256": "a654e19519102346e5f374db24c6c99e888b2ee059937b35ae2636142c42f1ee"
+    },
+    "VATE-PINS.json": {
+      "byte_length": 9206,
+      "origin": {
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "scope": "36 fixed source, input and policy files"
+      },
+      "role": "vate_source_pins",
+      "sha256": "57b40ffb1f302f2bc2fb05b5b448677867fa3bf56491af234bb4095a7acef2c8"
+    },
+    "saved/nenrin/REPORTS.json": {
+      "byte_length": 6091,
+      "origin": {
+        "kind": "publication transfer record",
+        "original_execution": "2026-10-13 UTC"
+      },
+      "role": "saved_report_metadata",
+      "sha256": "84f98ef779c2f7f07e7bbd0d928e6521bf3b165612e37e1d8470eee699293e88"
+    },
+    "saved/nenrin/npm-match.err": {
+      "byte_length": 0,
+      "origin": {
+        "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+        "origin_kind": "maintainer offline reproduction; bytes also equal the fixed upstream saved output",
+        "path": "workers/hs-ledger/nenrin/vate-s3-v0/runs/npm-match.err",
+        "repository": "https://github.com/ogasurfproject-jpg/horizon-shield"
+      },
+      "role": "saved_native_report",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "saved/nenrin/npm-match.out": {
+      "byte_length": 7546,
+      "origin": {
+        "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+        "origin_kind": "maintainer offline reproduction; bytes also equal the fixed upstream saved output",
+        "path": "workers/hs-ledger/nenrin/vate-s3-v0/runs/npm-match.out",
+        "repository": "https://github.com/ogasurfproject-jpg/horizon-shield"
+      },
+      "role": "saved_native_report",
+      "sha256": "609009ef1a7e0c3e5f833496f4afa71ddaa9a572174141dff98e0d53c536ba55"
+    },
+    "saved/nenrin/npm-missing_receipt.err": {
+      "byte_length": 0,
+      "origin": {
+        "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+        "origin_kind": "maintainer offline reproduction; bytes also equal the fixed upstream saved output",
+        "path": "workers/hs-ledger/nenrin/vate-s3-v0/runs/npm-missing_receipt.err",
+        "repository": "https://github.com/ogasurfproject-jpg/horizon-shield"
+      },
+      "role": "saved_native_report",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "saved/nenrin/npm-missing_receipt.out": {
+      "byte_length": 5572,
+      "origin": {
+        "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+        "origin_kind": "maintainer offline reproduction; bytes also equal the fixed upstream saved output",
+        "path": "workers/hs-ledger/nenrin/vate-s3-v0/runs/npm-missing_receipt.out",
+        "repository": "https://github.com/ogasurfproject-jpg/horizon-shield"
+      },
+      "role": "saved_native_report",
+      "sha256": "720843c8668a5fd0991ad555a482ed3593eadcdc0df90e02f489b5545d81f35a"
+    },
+    "saved/nenrin/npm-target_mismatch.err": {
+      "byte_length": 0,
+      "origin": {
+        "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+        "origin_kind": "maintainer offline reproduction; bytes also equal the fixed upstream saved output",
+        "path": "workers/hs-ledger/nenrin/vate-s3-v0/runs/npm-target_mismatch.err",
+        "repository": "https://github.com/ogasurfproject-jpg/horizon-shield"
+      },
+      "role": "saved_native_report",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "saved/nenrin/npm-target_mismatch.out": {
+      "byte_length": 6603,
+      "origin": {
+        "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+        "origin_kind": "maintainer offline reproduction; bytes also equal the fixed upstream saved output",
+        "path": "workers/hs-ledger/nenrin/vate-s3-v0/runs/npm-target_mismatch.out",
+        "repository": "https://github.com/ogasurfproject-jpg/horizon-shield"
+      },
+      "role": "saved_native_report",
+      "sha256": "5f2ecffd45107d373db9fe980375804d2c72cb5707a91283af16438ce3e85abd"
+    },
+    "saved/nenrin/pypi-match.err": {
+      "byte_length": 0,
+      "origin": {
+        "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+        "origin_kind": "maintainer offline reproduction; bytes also equal the fixed upstream saved output",
+        "path": "workers/hs-ledger/nenrin/vate-s3-v0/runs/pypi-match.err",
+        "repository": "https://github.com/ogasurfproject-jpg/horizon-shield"
+      },
+      "role": "saved_native_report",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "saved/nenrin/pypi-match.out": {
+      "byte_length": 7546,
+      "origin": {
+        "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+        "origin_kind": "maintainer offline reproduction; bytes also equal the fixed upstream saved output",
+        "path": "workers/hs-ledger/nenrin/vate-s3-v0/runs/pypi-match.out",
+        "repository": "https://github.com/ogasurfproject-jpg/horizon-shield"
+      },
+      "role": "saved_native_report",
+      "sha256": "609009ef1a7e0c3e5f833496f4afa71ddaa9a572174141dff98e0d53c536ba55"
+    },
+    "saved/nenrin/pypi-missing_receipt.err": {
+      "byte_length": 0,
+      "origin": {
+        "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+        "origin_kind": "maintainer offline reproduction; bytes also equal the fixed upstream saved output",
+        "path": "workers/hs-ledger/nenrin/vate-s3-v0/runs/pypi-missing_receipt.err",
+        "repository": "https://github.com/ogasurfproject-jpg/horizon-shield"
+      },
+      "role": "saved_native_report",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "saved/nenrin/pypi-missing_receipt.out": {
+      "byte_length": 5572,
+      "origin": {
+        "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+        "origin_kind": "maintainer offline reproduction; bytes also equal the fixed upstream saved output",
+        "path": "workers/hs-ledger/nenrin/vate-s3-v0/runs/pypi-missing_receipt.out",
+        "repository": "https://github.com/ogasurfproject-jpg/horizon-shield"
+      },
+      "role": "saved_native_report",
+      "sha256": "720843c8668a5fd0991ad555a482ed3593eadcdc0df90e02f489b5545d81f35a"
+    },
+    "saved/nenrin/pypi-target_mismatch.err": {
+      "byte_length": 0,
+      "origin": {
+        "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+        "origin_kind": "maintainer offline reproduction; bytes also equal the fixed upstream saved output",
+        "path": "workers/hs-ledger/nenrin/vate-s3-v0/runs/pypi-target_mismatch.err",
+        "repository": "https://github.com/ogasurfproject-jpg/horizon-shield"
+      },
+      "role": "saved_native_report",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "saved/nenrin/pypi-target_mismatch.out": {
+      "byte_length": 6603,
+      "origin": {
+        "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+        "origin_kind": "maintainer offline reproduction; bytes also equal the fixed upstream saved output",
+        "path": "workers/hs-ledger/nenrin/vate-s3-v0/runs/pypi-target_mismatch.out",
+        "repository": "https://github.com/ogasurfproject-jpg/horizon-shield"
+      },
+      "role": "saved_native_report",
+      "sha256": "5f2ecffd45107d373db9fe980375804d2c72cb5707a91283af16438ce3e85abd"
+    },
+    "saved/vate/REPORTS.json": {
+      "byte_length": 10930,
+      "origin": {
+        "kind": "publication transfer record",
+        "source_commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc"
+      },
+      "role": "saved_report_metadata",
+      "sha256": "f264b28ff456ec561cd03892f3c471c1047423e0d0d479640d3889c9d39b05a0"
+    },
+    "saved/vate/cases/matching/admission-decision.json": {
+      "byte_length": 1425,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/admission-decision.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "78813aabcd1e6b5d436d41bc351b22112df7b89389378370884379213292f861"
+    },
+    "saved/vate/cases/matching/admission-request.json": {
+      "byte_length": 1082,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/admission-request.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "9dced0af22ee3c8a461e73ebbf76cf564f17f6da2b89eabbdb0d81fd78400e08"
+    },
+    "saved/vate/cases/matching/admission.json": {
+      "byte_length": 1660,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/admission.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "cdfab8a13e33d473166a6e37e11ac4408d4e074d522737113b5ad60f0eb8963e"
+    },
+    "saved/vate/cases/matching/attempt.json": {
+      "byte_length": 785,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/attempt.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "2684017e54c7a7d54d6f290c83df226a6fc5e6b9f5270105f7393f12910c08c1"
+    },
+    "saved/vate/cases/matching/effective-request.json": {
+      "byte_length": 365,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/effective-request.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "2e4dce64ddc0f6b44386144ed675006e43f5e18d9214ee45de49da5d991ba98c"
+    },
+    "saved/vate/cases/matching/get-body.bin": {
+      "byte_length": 47,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/get-body.bin",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "6a639f0771bfe86b9e4dd4c0ea0b020d360308a55f34d8b0064d9f2d1d3c150c"
+    },
+    "saved/vate/cases/matching/get-headers.txt": {
+      "byte_length": 507,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/get-headers.txt",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "6b1b7a99e8669e35b11d2918b55e4cb595d35ea10ed2879c7ddb5881a27d2b33"
+    },
+    "saved/vate/cases/matching/get-request.json": {
+      "byte_length": 433,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/get-request.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "e20f02cf8de0bbdcaf0b02d090311fe841034a751aa2c621036f3e15813ec276"
+    },
+    "saved/vate/cases/matching/get-transport.json": {
+      "byte_length": 807,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/get-transport.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "f08e274f626c8139008092930e416861e827ba1cab1f9ec7937878e7370f7291"
+    },
+    "saved/vate/cases/matching/manifest.json": {
+      "byte_length": 2451,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/manifest.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "455e30f846585d003c3f40a83fa5d7fa24b12bebef20ff1d374517e0b642a9fa"
+    },
+    "saved/vate/cases/matching/permit.json": {
+      "byte_length": 282,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/permit.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "a1b80d6c5aa68c46381ed6a5a5e6e5f3ed96e2fa599a65bf9edb431b91689a52"
+    },
+    "saved/vate/cases/matching/post.json": {
+      "byte_length": 1551,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/post.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "d7cc150c297d5d57e8e8dc8299eaf63329b16b24d4b4617beb4db87a04578c5a"
+    },
+    "saved/vate/cases/matching/put-body.bin": {
+      "byte_length": 47,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-body.bin",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "6a639f0771bfe86b9e4dd4c0ea0b020d360308a55f34d8b0064d9f2d1d3c150c"
+    },
+    "saved/vate/cases/matching/put-headers.txt": {
+      "byte_length": 278,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-headers.txt",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "fe2ed471202335df659ab466f1dfab5d420666fb450413359c3c63f344dbc554"
+    },
+    "saved/vate/cases/matching/put-request.json": {
+      "byte_length": 709,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-request.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "b22bd05ea42b9177365e484dee35e380dc56c148c3f0208263e595c64a45aad9"
+    },
+    "saved/vate/cases/matching/put-response-body.bin": {
+      "byte_length": 0,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-response-body.bin",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "saved/vate/cases/matching/put-transport.json": {
+      "byte_length": 954,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-transport.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "5c9152c0333efeb2f7e1298be5f132c99793066e2043333fa7d538a7e46b634e"
+    },
+    "saved/vate/cases/matching/sources.json": {
+      "byte_length": 1727,
+      "origin": {
+        "case": "matching",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/sources.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "unchanged capture"
+      },
+      "role": "vate_case_input",
+      "sha256": "74758ffcb2c255c27b7666b05b8a6488fccbe7514f65a4213e0415b1dfeda26d"
+    },
+    "saved/vate/cases/missing-post/admission-decision.json": {
+      "byte_length": 1425,
+      "origin": {
+        "case": "missing-post",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/admission-decision.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "post removed and manifest regenerated"
+      },
+      "role": "vate_case_input",
+      "sha256": "78813aabcd1e6b5d436d41bc351b22112df7b89389378370884379213292f861"
+    },
+    "saved/vate/cases/missing-post/admission-request.json": {
+      "byte_length": 1082,
+      "origin": {
+        "case": "missing-post",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/admission-request.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "post removed and manifest regenerated"
+      },
+      "role": "vate_case_input",
+      "sha256": "9dced0af22ee3c8a461e73ebbf76cf564f17f6da2b89eabbdb0d81fd78400e08"
+    },
+    "saved/vate/cases/missing-post/admission.json": {
+      "byte_length": 1660,
+      "origin": {
+        "case": "missing-post",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/admission.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "post removed and manifest regenerated"
+      },
+      "role": "vate_case_input",
+      "sha256": "cdfab8a13e33d473166a6e37e11ac4408d4e074d522737113b5ad60f0eb8963e"
+    },
+    "saved/vate/cases/missing-post/attempt.json": {
+      "byte_length": 785,
+      "origin": {
+        "case": "missing-post",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/attempt.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "post removed and manifest regenerated"
+      },
+      "role": "vate_case_input",
+      "sha256": "2684017e54c7a7d54d6f290c83df226a6fc5e6b9f5270105f7393f12910c08c1"
+    },
+    "saved/vate/cases/missing-post/effective-request.json": {
+      "byte_length": 365,
+      "origin": {
+        "case": "missing-post",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/effective-request.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "post removed and manifest regenerated"
+      },
+      "role": "vate_case_input",
+      "sha256": "2e4dce64ddc0f6b44386144ed675006e43f5e18d9214ee45de49da5d991ba98c"
+    },
+    "saved/vate/cases/missing-post/get-body.bin": {
+      "byte_length": 47,
+      "origin": {
+        "case": "missing-post",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/get-body.bin",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "post removed and manifest regenerated"
+      },
+      "role": "vate_case_input",
+      "sha256": "6a639f0771bfe86b9e4dd4c0ea0b020d360308a55f34d8b0064d9f2d1d3c150c"
+    },
+    "saved/vate/cases/missing-post/get-headers.txt": {
+      "byte_length": 507,
+      "origin": {
+        "case": "missing-post",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/get-headers.txt",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "post removed and manifest regenerated"
+      },
+      "role": "vate_case_input",
+      "sha256": "6b1b7a99e8669e35b11d2918b55e4cb595d35ea10ed2879c7ddb5881a27d2b33"
+    },
+    "saved/vate/cases/missing-post/get-request.json": {
+      "byte_length": 433,
+      "origin": {
+        "case": "missing-post",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/get-request.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "post removed and manifest regenerated"
+      },
+      "role": "vate_case_input",
+      "sha256": "e20f02cf8de0bbdcaf0b02d090311fe841034a751aa2c621036f3e15813ec276"
+    },
+    "saved/vate/cases/missing-post/get-transport.json": {
+      "byte_length": 807,
+      "origin": {
+        "case": "missing-post",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/get-transport.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "post removed and manifest regenerated"
+      },
+      "role": "vate_case_input",
+      "sha256": "f08e274f626c8139008092930e416861e827ba1cab1f9ec7937878e7370f7291"
+    },
+    "saved/vate/cases/missing-post/manifest.json": {
+      "byte_length": 2316,
+      "origin": {
+        "case": "missing-post",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/manifest.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "post removed and manifest regenerated"
+      },
+      "role": "vate_case_input",
+      "sha256": "25e9426ecb758c1b2033c280507c08bdcce444547fed41fc6652c38b778b53c6"
+    },
+    "saved/vate/cases/missing-post/permit.json": {
+      "byte_length": 282,
+      "origin": {
+        "case": "missing-post",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/permit.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "post removed and manifest regenerated"
+      },
+      "role": "vate_case_input",
+      "sha256": "a1b80d6c5aa68c46381ed6a5a5e6e5f3ed96e2fa599a65bf9edb431b91689a52"
+    },
+    "saved/vate/cases/missing-post/put-body.bin": {
+      "byte_length": 47,
+      "origin": {
+        "case": "missing-post",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-body.bin",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "post removed and manifest regenerated"
+      },
+      "role": "vate_case_input",
+      "sha256": "6a639f0771bfe86b9e4dd4c0ea0b020d360308a55f34d8b0064d9f2d1d3c150c"
+    },
+    "saved/vate/cases/missing-post/put-headers.txt": {
+      "byte_length": 278,
+      "origin": {
+        "case": "missing-post",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-headers.txt",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "post removed and manifest regenerated"
+      },
+      "role": "vate_case_input",
+      "sha256": "fe2ed471202335df659ab466f1dfab5d420666fb450413359c3c63f344dbc554"
+    },
+    "saved/vate/cases/missing-post/put-request.json": {
+      "byte_length": 709,
+      "origin": {
+        "case": "missing-post",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-request.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "post removed and manifest regenerated"
+      },
+      "role": "vate_case_input",
+      "sha256": "b22bd05ea42b9177365e484dee35e380dc56c148c3f0208263e595c64a45aad9"
+    },
+    "saved/vate/cases/missing-post/put-response-body.bin": {
+      "byte_length": 0,
+      "origin": {
+        "case": "missing-post",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-response-body.bin",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "post removed and manifest regenerated"
+      },
+      "role": "vate_case_input",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "saved/vate/cases/missing-post/put-transport.json": {
+      "byte_length": 954,
+      "origin": {
+        "case": "missing-post",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-transport.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "post removed and manifest regenerated"
+      },
+      "role": "vate_case_input",
+      "sha256": "5c9152c0333efeb2f7e1298be5f132c99793066e2043333fa7d538a7e46b634e"
+    },
+    "saved/vate/cases/missing-post/sources.json": {
+      "byte_length": 1727,
+      "origin": {
+        "case": "missing-post",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/sources.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "post removed and manifest regenerated"
+      },
+      "role": "vate_case_input",
+      "sha256": "74758ffcb2c255c27b7666b05b8a6488fccbe7514f65a4213e0415b1dfeda26d"
+    },
+    "saved/vate/cases/target-mismatch/admission-decision.json": {
+      "byte_length": 1425,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/admission-decision.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "78813aabcd1e6b5d436d41bc351b22112df7b89389378370884379213292f861"
+    },
+    "saved/vate/cases/target-mismatch/admission-request.json": {
+      "byte_length": 1082,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/admission-request.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "9dced0af22ee3c8a461e73ebbf76cf564f17f6da2b89eabbdb0d81fd78400e08"
+    },
+    "saved/vate/cases/target-mismatch/admission.json": {
+      "byte_length": 1660,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/admission.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "cdfab8a13e33d473166a6e37e11ac4408d4e074d522737113b5ad60f0eb8963e"
+    },
+    "saved/vate/cases/target-mismatch/attempt.json": {
+      "byte_length": 785,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/attempt.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "2684017e54c7a7d54d6f290c83df226a6fc5e6b9f5270105f7393f12910c08c1"
+    },
+    "saved/vate/cases/target-mismatch/effective-request.json": {
+      "byte_length": 365,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/effective-request.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "2e4dce64ddc0f6b44386144ed675006e43f5e18d9214ee45de49da5d991ba98c"
+    },
+    "saved/vate/cases/target-mismatch/get-body.bin": {
+      "byte_length": 47,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/get-body.bin",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "6a639f0771bfe86b9e4dd4c0ea0b020d360308a55f34d8b0064d9f2d1d3c150c"
+    },
+    "saved/vate/cases/target-mismatch/get-headers.txt": {
+      "byte_length": 507,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/get-headers.txt",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "6b1b7a99e8669e35b11d2918b55e4cb595d35ea10ed2879c7ddb5881a27d2b33"
+    },
+    "saved/vate/cases/target-mismatch/get-request.json": {
+      "byte_length": 432,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/get-request.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "12bca0675f5d9c1b874858e3305056b371d06c22dfe904ebf6299da415645589"
+    },
+    "saved/vate/cases/target-mismatch/get-transport.json": {
+      "byte_length": 807,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/get-transport.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "5cce7bf7be93542277fdedd3c24dbdc61b67ae3ce0df078b6e78ca1db8fcbd3f"
+    },
+    "saved/vate/cases/target-mismatch/manifest.json": {
+      "byte_length": 2451,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/manifest.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "8654d4b1c43cc416af0ca60440616b3200b44d589bb1177e548815b27d1c7472"
+    },
+    "saved/vate/cases/target-mismatch/permit.json": {
+      "byte_length": 282,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/permit.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "a1b80d6c5aa68c46381ed6a5a5e6e5f3ed96e2fa599a65bf9edb431b91689a52"
+    },
+    "saved/vate/cases/target-mismatch/post.json": {
+      "byte_length": 1551,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/post.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "d7cc150c297d5d57e8e8dc8299eaf63329b16b24d4b4617beb4db87a04578c5a"
+    },
+    "saved/vate/cases/target-mismatch/put-body.bin": {
+      "byte_length": 47,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-body.bin",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "6a639f0771bfe86b9e4dd4c0ea0b020d360308a55f34d8b0064d9f2d1d3c150c"
+    },
+    "saved/vate/cases/target-mismatch/put-headers.txt": {
+      "byte_length": 278,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-headers.txt",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "fe2ed471202335df659ab466f1dfab5d420666fb450413359c3c63f344dbc554"
+    },
+    "saved/vate/cases/target-mismatch/put-request.json": {
+      "byte_length": 709,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-request.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "b22bd05ea42b9177365e484dee35e380dc56c148c3f0208263e595c64a45aad9"
+    },
+    "saved/vate/cases/target-mismatch/put-response-body.bin": {
+      "byte_length": 0,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-response-body.bin",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "saved/vate/cases/target-mismatch/put-transport.json": {
+      "byte_length": 954,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-transport.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "5c9152c0333efeb2f7e1298be5f132c99793066e2043333fa7d538a7e46b634e"
+    },
+    "saved/vate/cases/target-mismatch/sources.json": {
+      "byte_length": 1727,
+      "origin": {
+        "case": "target-mismatch",
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/sources.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+        "transformation": "GET key other.txt plus request reference/manifest"
+      },
+      "role": "vate_case_input",
+      "sha256": "74758ffcb2c255c27b7666b05b8a6488fccbe7514f65a4213e0415b1dfeda26d"
+    },
+    "saved/vate/matching.err": {
+      "byte_length": 0,
+      "origin": {
+        "case": "matching",
+        "kind": "VATE maintainer offline reproduction",
+        "source_commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc"
+      },
+      "role": "saved_vate_stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "saved/vate/matching.out": {
+      "byte_length": 2827,
+      "origin": {
+        "case": "matching",
+        "kind": "VATE maintainer offline reproduction",
+        "source_commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc"
+      },
+      "role": "saved_vate_report",
+      "sha256": "34f1ae03738fac6a4d038d7939de8d3de4da8ccdf72f9981da2a36fd8082f64b"
+    },
+    "saved/vate/missing-post.err": {
+      "byte_length": 0,
+      "origin": {
+        "case": "missing-post",
+        "kind": "VATE maintainer offline reproduction",
+        "source_commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc"
+      },
+      "role": "saved_vate_stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "saved/vate/missing-post.out": {
+      "byte_length": 2451,
+      "origin": {
+        "case": "missing-post",
+        "kind": "VATE maintainer offline reproduction",
+        "source_commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc"
+      },
+      "role": "saved_vate_report",
+      "sha256": "087c696aacddbe4e4be0d9b7158fef034070f6da8b34b2294907a9cbafd92d63"
+    },
+    "saved/vate/receiver-policy.json": {
+      "byte_length": 2019,
+      "origin": {
+        "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+        "path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/receiver-policy.json",
+        "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope"
+      },
+      "role": "receiver_policy",
+      "sha256": "e828cb109fed1b02f27f188eddcbfe3763655ff25f9f65e9d8e43bdc4c2db5a4"
+    },
+    "saved/vate/target-mismatch.err": {
+      "byte_length": 0,
+      "origin": {
+        "case": "target-mismatch",
+        "kind": "VATE maintainer offline reproduction",
+        "source_commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc"
+      },
+      "role": "saved_vate_stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "saved/vate/target-mismatch.out": {
+      "byte_length": 3173,
+      "origin": {
+        "case": "target-mismatch",
+        "kind": "VATE maintainer offline reproduction",
+        "source_commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc"
+      },
+      "role": "saved_vate_report",
+      "sha256": "4ee1274a46d3e5a19edde6d91873922cb513764d72833800b637d95fda2213c2"
+    },
+    "third_party/nenrin/LICENSE": {
+      "byte_length": 1107,
+      "origin": {
+        "byte_length": 1107,
+        "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+        "git_blob": "c22a9ee4895c1f0867952bd0af248fe5bd478e88",
+        "path": "LICENSE",
+        "repo": "https://github.com/ogasurfproject-jpg/horizon-shield",
+        "sha256": "fb64e419d1d94dfa6afc2927c35bbe577627701cd9fae4ca139483d5e2bec72d"
+      },
+      "role": "license",
+      "sha256": "fb64e419d1d94dfa6afc2927c35bbe577627701cd9fae4ca139483d5e2bec72d"
+    },
+    "third_party/nenrin/MANIFEST.json": {
+      "byte_length": 20734,
+      "origin": {
+        "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+        "path": "workers/hs-ledger/nenrin/vate-s3-v0/MANIFEST.json",
+        "repository": "https://github.com/ogasurfproject-jpg/horizon-shield"
+      },
+      "role": "nenrin_submission",
+      "sha256": "c2689c92050bec2285466282eeccff3549e9d72e8869e6b4906c017775664ea7"
+    },
+    "third_party/nenrin/records/match/nenrin-bundle.json": {
+      "byte_length": 2826,
+      "origin": {
+        "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+        "path": "workers/hs-ledger/nenrin/vate-s3-v0/records/match/nenrin-bundle.json",
+        "repository": "https://github.com/ogasurfproject-jpg/horizon-shield"
+      },
+      "role": "nenrin_submission",
+      "sha256": "8cc480c66682a0393f03d8101d3afc65399963579fc6f72d30416bbdc37eadfe"
+    },
+    "third_party/nenrin/records/missing_receipt/nenrin-bundle.json": {
+      "byte_length": 1208,
+      "origin": {
+        "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+        "path": "workers/hs-ledger/nenrin/vate-s3-v0/records/missing_receipt/nenrin-bundle.json",
+        "repository": "https://github.com/ogasurfproject-jpg/horizon-shield"
+      },
+      "role": "nenrin_submission",
+      "sha256": "25157161133671c10ffa4cd116bb19c3bf1bc185a4742f885f962ce00c5fe45b"
+    },
+    "third_party/nenrin/records/target_mismatch/nenrin-bundle.json": {
+      "byte_length": 2832,
+      "origin": {
+        "commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+        "path": "workers/hs-ledger/nenrin/vate-s3-v0/records/target_mismatch/nenrin-bundle.json",
+        "repository": "https://github.com/ogasurfproject-jpg/horizon-shield"
+      },
+      "role": "nenrin_submission",
+      "sha256": "c54228f0e43b3ec7d2bc5a83f7c38ddb3b8c990da8e11888a9aa1df6d432a52e"
+    }
+  },
+  "nenrin_commit": "bfde94be9d8089b7c683bc31b9c39c3879b07ab2",
+  "schema": "nenrin-vate-public-sources-v1",
+  "vate_commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc"
+}

@@ -56,6 +56,14 @@ jobs:
           python -B reference/recipient-assessment/run_vectors.py
           python -B -m unittest discover -s reference/recipient-assessment -p 'test_*.py' -v
 
+      - name: Check NENRIN saved records and replay the pinned VATE cases
+        run: |
+          output_dir="$(mktemp -d)"
+          python -B reference/nenrin-s3-crosswalk-example/compare_records.py --output "$output_dir/saved.json"
+          python -B reference/nenrin-s3-crosswalk-example/replay_vate.py --output "$output_dir/vate"
+          python -B reference/nenrin-s3-crosswalk-example/compare_records.py --vate-run "$output_dir/vate" --output "$output_dir/replayed.json"
+          python -B -m unittest discover -s reference/nenrin-s3-crosswalk-example/tests -p 'test_*.py' -v
+
       - name: Run execution evidence CLI from a source archive
         run: |
           archive_dir="$(mktemp -d)"
@@ -83,6 +91,17 @@ jobs:
           git archive HEAD | tar -x -C "$archive_dir"
           python -B "$archive_dir/reference/recipient-assessment/run_vectors.py"
           python -B -m unittest discover -s "$archive_dir/reference/recipient-assessment" -p 'test_*.py' -v
+
+      - name: Check the NENRIN crosswalk from a source archive
+        run: |
+          archive_dir="$(mktemp -d)"
+          output_dir="$(mktemp -d)"
+          git archive HEAD | tar -x -C "$archive_dir"
+          cd "$output_dir"
+          python -B "$archive_dir/reference/nenrin-s3-crosswalk-example/compare_records.py" --output "$output_dir/saved.json"
+          python -B "$archive_dir/reference/nenrin-s3-crosswalk-example/replay_vate.py" --output "$output_dir/vate"
+          python -B "$archive_dir/reference/nenrin-s3-crosswalk-example/compare_records.py" --vate-run "$output_dir/vate" --output "$output_dir/replayed.json"
+          python -B -m unittest discover -s "$archive_dir/reference/nenrin-s3-crosswalk-example/tests" -p 'test_*.py' -v
 
   validate:
     name: Repository checks

@@ -1,0 +1,205 @@
+{
+  "commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc",
+  "files": {
+    "reference/receipt-linkage-example/SOURCE-PINS.json": {
+      "byte_length": 596,
+      "role": "source",
+      "sha256": "c2de4b4ffbd08a950dbab82edb4030b520690b71c9b6962db9f71a9d93779545"
+    },
+    "reference/receipt-linkage-example/recipient_example.py": {
+      "byte_length": 16874,
+      "role": "source",
+      "sha256": "261b1d439945e3e33c1c48a970dd431d55966b505403f237bbad8ef3d6e7128c"
+    },
+    "reference/s3-observation-example/SEAWEEDFS-PIN.json": {
+      "byte_length": 525,
+      "role": "source",
+      "sha256": "816b2c85f129d06afbf66249ba5943e33a67200af65ee7877e92fea30b4f24c9"
+    },
+    "reference/s3-observation-example/assess_observation.py": {
+      "byte_length": 21987,
+      "role": "source",
+      "sha256": "8c46963e62c2fa4eb390b846b6b0208e4c5f3c6eb501e5834a722f08e5058120"
+    },
+    "reference/s3-observation-example/capture_s3.py": {
+      "byte_length": 8569,
+      "role": "source",
+      "sha256": "96386f1ebd734eb163005004536cd553590f6bad79a273d0d2a6fe256f8389c1"
+    },
+    "reference/s3-observation-example/contract.py": {
+      "byte_length": 13180,
+      "role": "source",
+      "sha256": "4049c8b92ef1709f96abffc5ac7adab2461be1f1aee29347838b766a8335a935"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/admission-decision.json": {
+      "byte_length": 1425,
+      "role": "original",
+      "sha256": "78813aabcd1e6b5d436d41bc351b22112df7b89389378370884379213292f861"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/admission-request.json": {
+      "byte_length": 1082,
+      "role": "original",
+      "sha256": "9dced0af22ee3c8a461e73ebbf76cf564f17f6da2b89eabbdb0d81fd78400e08"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/admission.json": {
+      "byte_length": 1660,
+      "role": "original",
+      "sha256": "cdfab8a13e33d473166a6e37e11ac4408d4e074d522737113b5ad60f0eb8963e"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/attempt.json": {
+      "byte_length": 785,
+      "role": "original",
+      "sha256": "2684017e54c7a7d54d6f290c83df226a6fc5e6b9f5270105f7393f12910c08c1"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/effective-request.json": {
+      "byte_length": 365,
+      "role": "original",
+      "sha256": "2e4dce64ddc0f6b44386144ed675006e43f5e18d9214ee45de49da5d991ba98c"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/get-body.bin": {
+      "byte_length": 47,
+      "role": "original",
+      "sha256": "6a639f0771bfe86b9e4dd4c0ea0b020d360308a55f34d8b0064d9f2d1d3c150c"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/get-headers.txt": {
+      "byte_length": 507,
+      "role": "original",
+      "sha256": "6b1b7a99e8669e35b11d2918b55e4cb595d35ea10ed2879c7ddb5881a27d2b33"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/get-request.json": {
+      "byte_length": 433,
+      "role": "original",
+      "sha256": "e20f02cf8de0bbdcaf0b02d090311fe841034a751aa2c621036f3e15813ec276"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/get-transport.json": {
+      "byte_length": 807,
+      "role": "original",
+      "sha256": "f08e274f626c8139008092930e416861e827ba1cab1f9ec7937878e7370f7291"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/manifest.json": {
+      "byte_length": 2451,
+      "role": "original",
+      "sha256": "455e30f846585d003c3f40a83fa5d7fa24b12bebef20ff1d374517e0b642a9fa"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/permit.json": {
+      "byte_length": 282,
+      "role": "original",
+      "sha256": "a1b80d6c5aa68c46381ed6a5a5e6e5f3ed96e2fa599a65bf9edb431b91689a52"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/post.json": {
+      "byte_length": 1551,
+      "role": "original",
+      "sha256": "d7cc150c297d5d57e8e8dc8299eaf63329b16b24d4b4617beb4db87a04578c5a"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-body.bin": {
+      "byte_length": 47,
+      "role": "original",
+      "sha256": "6a639f0771bfe86b9e4dd4c0ea0b020d360308a55f34d8b0064d9f2d1d3c150c"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-headers.txt": {
+      "byte_length": 278,
+      "role": "original",
+      "sha256": "fe2ed471202335df659ab466f1dfab5d420666fb450413359c3c63f344dbc554"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-request.json": {
+      "byte_length": 709,
+      "role": "original",
+      "sha256": "b22bd05ea42b9177365e484dee35e380dc56c148c3f0208263e595c64a45aad9"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-response-body.bin": {
+      "byte_length": 0,
+      "role": "original",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/put-transport.json": {
+      "byte_length": 954,
+      "role": "original",
+      "sha256": "5c9152c0333efeb2f7e1298be5f132c99793066e2043333fa7d538a7e46b634e"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported/sources.json": {
+      "byte_length": 1727,
+      "role": "original",
+      "sha256": "74758ffcb2c255c27b7666b05b8a6488fccbe7514f65a4213e0415b1dfeda26d"
+    },
+    "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/receiver-policy.json": {
+      "byte_length": 2019,
+      "role": "policy",
+      "sha256": "e828cb109fed1b02f27f188eddcbfe3763655ff25f9f65e9d8e43bdc4c2db5a4"
+    },
+    "reference/s3-observation-example/native_fixture.py": {
+      "byte_length": 9885,
+      "role": "source",
+      "sha256": "23f9a93d7c3799db5f2d616fa3a36fccef36106693d30c079ebb8132d48596d2"
+    },
+    "reference/s3-observation-example/run_trial.py": {
+      "byte_length": 9855,
+      "role": "source",
+      "sha256": "44a13ea835ddaaa18f4e9c1a1a68632880977164eb7b046cd093f3ab1408fa2e"
+    },
+    "reference/s3-observation-example/sandbox_macos.py": {
+      "byte_length": 2158,
+      "role": "source",
+      "sha256": "f45a46632cab83fe0b30e65f7b9665e0135ade7c904be3eb9b3a5e5f455ccb4a"
+    },
+    "reference/s3-observation-example/test_assessment.py": {
+      "byte_length": 24934,
+      "role": "reference",
+      "sha256": "cddb051bc120bad3627837e63c5823614cf85f77f3dfc1713705a2dd14d04662"
+    },
+    "reference/vate-verifier-core/vate_verifier_core.py": {
+      "byte_length": 50023,
+      "role": "source",
+      "sha256": "ead16bebda908187485cf095f71538b23102ec32ea94c6efca0d7e0a44849e84"
+    },
+    "registries/evidence-vocabulary.v0.3.json": {
+      "byte_length": 7367,
+      "role": "source",
+      "sha256": "df3c49399ea7082a32eb397e951a88b44630bc26624be08041a8040488776814"
+    },
+    "requirements-dev.txt": {
+      "byte_length": 19,
+      "role": "reference",
+      "sha256": "756cc9e506ae4ee1a6f6c0507088b5cfc0dc8ba350fb2d2d46f1ffa72033adb6"
+    },
+    "schemas/admission-receipt.schema.json": {
+      "byte_length": 17948,
+      "role": "source",
+      "sha256": "fc5fc085a741ce1e23e6435c9402f3838eaa701dd363ba84610a8989ad8af7fb"
+    },
+    "schemas/admission-request.schema.json": {
+      "byte_length": 4586,
+      "role": "source",
+      "sha256": "8b8ce5931df45b17dbe3d85562f031eb69edf19de8317c4c2f49c7c116421ba9"
+    },
+    "schemas/post-execution-receipt.schema.json": {
+      "byte_length": 7080,
+      "role": "source",
+      "sha256": "3451185169de5deb210a9f3319dd6217fbe6bf6bb0b8b835c9b7e5a874467892"
+    },
+    "scripts/vate_conformance.py": {
+      "byte_length": 263169,
+      "role": "source",
+      "sha256": "570b1b71b86e85add1fad6f8bcd0a544ca7cad71dca78a3bfca5b00698762764"
+    }
+  },
+  "policy_path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/receiver-policy.json",
+  "source_paths": [
+    "reference/receipt-linkage-example/SOURCE-PINS.json",
+    "reference/receipt-linkage-example/recipient_example.py",
+    "reference/s3-observation-example/SEAWEEDFS-PIN.json",
+    "reference/s3-observation-example/assess_observation.py",
+    "reference/s3-observation-example/capture_s3.py",
+    "reference/s3-observation-example/contract.py",
+    "reference/s3-observation-example/native_fixture.py",
+    "reference/s3-observation-example/run_trial.py",
+    "reference/s3-observation-example/sandbox_macos.py",
+    "reference/vate-verifier-core/vate_verifier_core.py",
+    "registries/evidence-vocabulary.v0.3.json",
+    "schemas/admission-receipt.schema.json",
+    "schemas/admission-request.schema.json",
+    "schemas/post-execution-receipt.schema.json",
+    "scripts/vate_conformance.py"
+  ],
+  "supported_path": "reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported",
+  "version": "nenrin-vate-s3-fixed-inputs-1"
+}

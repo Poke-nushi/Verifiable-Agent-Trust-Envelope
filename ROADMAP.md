@@ -50,6 +50,13 @@ The following work is available on `main` after the `v0.4.1` archive:
   from local SeaweedFS. Included originals distinguish a matching result,
   unavailable observations and an observed historical version under explicit
   local collector/store trust assumptions.
+- [NENRIN–VATE S3 Crosswalk Example](reference/nenrin-s3-crosswalk-example/README.md):
+  three fixed cases compare contributor-supplied NENRIN grant and receipt
+  records with the VATE S3 capture. Complete native results remain alongside
+  the relationship checks; saved-record comparison and fresh checker runs
+  are separate operations. The signed NENRIN records are a retrospective
+  synthetic reconstruction of the capture, adding no independent observation
+  of the original upload.
 - [Vaara → VATE reproduction package](docs/interop/vaara-execution-reproduction.md):
   a fixed package for checking disclosed evidence and creating a new local run
   through a pinned stdio proxy, credential gateway and file handler.
@@ -137,6 +144,11 @@ in a receiving application and exercise an update while retaining original
 inputs, evaluator identities and previous assessments. The local vectors and
 API tests provide a starting point; continued maintenance by another implementer
 remains to be observed.
+
+The NENRIN S3 example supplies one fixed cross-format comparison with preserved
+native results. Reuse its inputs, checks and documented mapping when evaluating
+another recipient or a source update; distinguish an actual integration from
+replaying the same three cases.
 
 1. For a source with a different native receipt format, first establish what
    its records mean, which originals are needed and what the recipient must

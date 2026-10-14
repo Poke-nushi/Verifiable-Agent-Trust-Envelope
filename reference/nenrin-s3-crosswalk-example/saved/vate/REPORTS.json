@@ -1,0 +1,288 @@
+{
+  "cases": [
+    {
+      "case": "matching",
+      "exit_code": 0,
+      "historical_execution": {
+        "finished_at": "2026-10-13T20:49:25.489644+00:00",
+        "started_at": "2026-10-13T20:49:25.344508+00:00"
+      },
+      "input_directory": "saved/vate/cases/matching",
+      "input_files": {
+        "admission-decision.json": {
+          "byte_length": 1425,
+          "sha256": "78813aabcd1e6b5d436d41bc351b22112df7b89389378370884379213292f861"
+        },
+        "admission-request.json": {
+          "byte_length": 1082,
+          "sha256": "9dced0af22ee3c8a461e73ebbf76cf564f17f6da2b89eabbdb0d81fd78400e08"
+        },
+        "admission.json": {
+          "byte_length": 1660,
+          "sha256": "cdfab8a13e33d473166a6e37e11ac4408d4e074d522737113b5ad60f0eb8963e"
+        },
+        "attempt.json": {
+          "byte_length": 785,
+          "sha256": "2684017e54c7a7d54d6f290c83df226a6fc5e6b9f5270105f7393f12910c08c1"
+        },
+        "effective-request.json": {
+          "byte_length": 365,
+          "sha256": "2e4dce64ddc0f6b44386144ed675006e43f5e18d9214ee45de49da5d991ba98c"
+        },
+        "get-body.bin": {
+          "byte_length": 47,
+          "sha256": "6a639f0771bfe86b9e4dd4c0ea0b020d360308a55f34d8b0064d9f2d1d3c150c"
+        },
+        "get-headers.txt": {
+          "byte_length": 507,
+          "sha256": "6b1b7a99e8669e35b11d2918b55e4cb595d35ea10ed2879c7ddb5881a27d2b33"
+        },
+        "get-request.json": {
+          "byte_length": 433,
+          "sha256": "e20f02cf8de0bbdcaf0b02d090311fe841034a751aa2c621036f3e15813ec276"
+        },
+        "get-transport.json": {
+          "byte_length": 807,
+          "sha256": "f08e274f626c8139008092930e416861e827ba1cab1f9ec7937878e7370f7291"
+        },
+        "manifest.json": {
+          "byte_length": 2451,
+          "sha256": "455e30f846585d003c3f40a83fa5d7fa24b12bebef20ff1d374517e0b642a9fa"
+        },
+        "permit.json": {
+          "byte_length": 282,
+          "sha256": "a1b80d6c5aa68c46381ed6a5a5e6e5f3ed96e2fa599a65bf9edb431b91689a52"
+        },
+        "post.json": {
+          "byte_length": 1551,
+          "sha256": "d7cc150c297d5d57e8e8dc8299eaf63329b16b24d4b4617beb4db87a04578c5a"
+        },
+        "put-body.bin": {
+          "byte_length": 47,
+          "sha256": "6a639f0771bfe86b9e4dd4c0ea0b020d360308a55f34d8b0064d9f2d1d3c150c"
+        },
+        "put-headers.txt": {
+          "byte_length": 278,
+          "sha256": "fe2ed471202335df659ab466f1dfab5d420666fb450413359c3c63f344dbc554"
+        },
+        "put-request.json": {
+          "byte_length": 709,
+          "sha256": "b22bd05ea42b9177365e484dee35e380dc56c148c3f0208263e595c64a45aad9"
+        },
+        "put-response-body.bin": {
+          "byte_length": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "put-transport.json": {
+          "byte_length": 954,
+          "sha256": "5c9152c0333efeb2f7e1298be5f132c99793066e2043333fa7d538a7e46b634e"
+        },
+        "sources.json": {
+          "byte_length": 1727,
+          "sha256": "74758ffcb2c255c27b7666b05b8a6488fccbe7514f65a4213e0415b1dfeda26d"
+        }
+      },
+      "stderr": {
+        "byte_length": 0,
+        "path": "saved/vate/matching.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "byte_length": 2827,
+        "path": "saved/vate/matching.out",
+        "sha256": "34f1ae03738fac6a4d038d7939de8d3de4da8ccdf72f9981da2a36fd8082f64b"
+      }
+    },
+    {
+      "case": "missing-post",
+      "exit_code": 2,
+      "historical_execution": {
+        "finished_at": "2026-10-13T20:49:25.770884+00:00",
+        "started_at": "2026-10-13T20:49:25.636276+00:00"
+      },
+      "input_directory": "saved/vate/cases/missing-post",
+      "input_files": {
+        "admission-decision.json": {
+          "byte_length": 1425,
+          "sha256": "78813aabcd1e6b5d436d41bc351b22112df7b89389378370884379213292f861"
+        },
+        "admission-request.json": {
+          "byte_length": 1082,
+          "sha256": "9dced0af22ee3c8a461e73ebbf76cf564f17f6da2b89eabbdb0d81fd78400e08"
+        },
+        "admission.json": {
+          "byte_length": 1660,
+          "sha256": "cdfab8a13e33d473166a6e37e11ac4408d4e074d522737113b5ad60f0eb8963e"
+        },
+        "attempt.json": {
+          "byte_length": 785,
+          "sha256": "2684017e54c7a7d54d6f290c83df226a6fc5e6b9f5270105f7393f12910c08c1"
+        },
+        "effective-request.json": {
+          "byte_length": 365,
+          "sha256": "2e4dce64ddc0f6b44386144ed675006e43f5e18d9214ee45de49da5d991ba98c"
+        },
+        "get-body.bin": {
+          "byte_length": 47,
+          "sha256": "6a639f0771bfe86b9e4dd4c0ea0b020d360308a55f34d8b0064d9f2d1d3c150c"
+        },
+        "get-headers.txt": {
+          "byte_length": 507,
+          "sha256": "6b1b7a99e8669e35b11d2918b55e4cb595d35ea10ed2879c7ddb5881a27d2b33"
+        },
+        "get-request.json": {
+          "byte_length": 433,
+          "sha256": "e20f02cf8de0bbdcaf0b02d090311fe841034a751aa2c621036f3e15813ec276"
+        },
+        "get-transport.json": {
+          "byte_length": 807,
+          "sha256": "f08e274f626c8139008092930e416861e827ba1cab1f9ec7937878e7370f7291"
+        },
+        "manifest.json": {
+          "byte_length": 2316,
+          "sha256": "25e9426ecb758c1b2033c280507c08bdcce444547fed41fc6652c38b778b53c6"
+        },
+        "permit.json": {
+          "byte_length": 282,
+          "sha256": "a1b80d6c5aa68c46381ed6a5a5e6e5f3ed96e2fa599a65bf9edb431b91689a52"
+        },
+        "put-body.bin": {
+          "byte_length": 47,
+          "sha256": "6a639f0771bfe86b9e4dd4c0ea0b020d360308a55f34d8b0064d9f2d1d3c150c"
+        },
+        "put-headers.txt": {
+          "byte_length": 278,
+          "sha256": "fe2ed471202335df659ab466f1dfab5d420666fb450413359c3c63f344dbc554"
+        },
+        "put-request.json": {
+          "byte_length": 709,
+          "sha256": "b22bd05ea42b9177365e484dee35e380dc56c148c3f0208263e595c64a45aad9"
+        },
+        "put-response-body.bin": {
+          "byte_length": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "put-transport.json": {
+          "byte_length": 954,
+          "sha256": "5c9152c0333efeb2f7e1298be5f132c99793066e2043333fa7d538a7e46b634e"
+        },
+        "sources.json": {
+          "byte_length": 1727,
+          "sha256": "74758ffcb2c255c27b7666b05b8a6488fccbe7514f65a4213e0415b1dfeda26d"
+        }
+      },
+      "stderr": {
+        "byte_length": 0,
+        "path": "saved/vate/missing-post.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "byte_length": 2451,
+        "path": "saved/vate/missing-post.out",
+        "sha256": "087c696aacddbe4e4be0d9b7158fef034070f6da8b34b2294907a9cbafd92d63"
+      }
+    },
+    {
+      "case": "target-mismatch",
+      "exit_code": 1,
+      "historical_execution": {
+        "finished_at": "2026-10-13T20:49:25.632285+00:00",
+        "started_at": "2026-10-13T20:49:25.493635+00:00"
+      },
+      "input_directory": "saved/vate/cases/target-mismatch",
+      "input_files": {
+        "admission-decision.json": {
+          "byte_length": 1425,
+          "sha256": "78813aabcd1e6b5d436d41bc351b22112df7b89389378370884379213292f861"
+        },
+        "admission-request.json": {
+          "byte_length": 1082,
+          "sha256": "9dced0af22ee3c8a461e73ebbf76cf564f17f6da2b89eabbdb0d81fd78400e08"
+        },
+        "admission.json": {
+          "byte_length": 1660,
+          "sha256": "cdfab8a13e33d473166a6e37e11ac4408d4e074d522737113b5ad60f0eb8963e"
+        },
+        "attempt.json": {
+          "byte_length": 785,
+          "sha256": "2684017e54c7a7d54d6f290c83df226a6fc5e6b9f5270105f7393f12910c08c1"
+        },
+        "effective-request.json": {
+          "byte_length": 365,
+          "sha256": "2e4dce64ddc0f6b44386144ed675006e43f5e18d9214ee45de49da5d991ba98c"
+        },
+        "get-body.bin": {
+          "byte_length": 47,
+          "sha256": "6a639f0771bfe86b9e4dd4c0ea0b020d360308a55f34d8b0064d9f2d1d3c150c"
+        },
+        "get-headers.txt": {
+          "byte_length": 507,
+          "sha256": "6b1b7a99e8669e35b11d2918b55e4cb595d35ea10ed2879c7ddb5881a27d2b33"
+        },
+        "get-request.json": {
+          "byte_length": 432,
+          "sha256": "12bca0675f5d9c1b874858e3305056b371d06c22dfe904ebf6299da415645589"
+        },
+        "get-transport.json": {
+          "byte_length": 807,
+          "sha256": "5cce7bf7be93542277fdedd3c24dbdc61b67ae3ce0df078b6e78ca1db8fcbd3f"
+        },
+        "manifest.json": {
+          "byte_length": 2451,
+          "sha256": "8654d4b1c43cc416af0ca60440616b3200b44d589bb1177e548815b27d1c7472"
+        },
+        "permit.json": {
+          "byte_length": 282,
+          "sha256": "a1b80d6c5aa68c46381ed6a5a5e6e5f3ed96e2fa599a65bf9edb431b91689a52"
+        },
+        "post.json": {
+          "byte_length": 1551,
+          "sha256": "d7cc150c297d5d57e8e8dc8299eaf63329b16b24d4b4617beb4db87a04578c5a"
+        },
+        "put-body.bin": {
+          "byte_length": 47,
+          "sha256": "6a639f0771bfe86b9e4dd4c0ea0b020d360308a55f34d8b0064d9f2d1d3c150c"
+        },
+        "put-headers.txt": {
+          "byte_length": 278,
+          "sha256": "fe2ed471202335df659ab466f1dfab5d420666fb450413359c3c63f344dbc554"
+        },
+        "put-request.json": {
+          "byte_length": 709,
+          "sha256": "b22bd05ea42b9177365e484dee35e380dc56c148c3f0208263e595c64a45aad9"
+        },
+        "put-response-body.bin": {
+          "byte_length": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "put-transport.json": {
+          "byte_length": 954,
+          "sha256": "5c9152c0333efeb2f7e1298be5f132c99793066e2043333fa7d538a7e46b634e"
+        },
+        "sources.json": {
+          "byte_length": 1727,
+          "sha256": "74758ffcb2c255c27b7666b05b8a6488fccbe7514f65a4213e0415b1dfeda26d"
+        }
+      },
+      "stderr": {
+        "byte_length": 0,
+        "path": "saved/vate/target-mismatch.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "byte_length": 3173,
+        "path": "saved/vate/target-mismatch.out",
+        "sha256": "4ee1274a46d3e5a19edde6d91873922cb513764d72833800b637d95fda2213c2"
+      }
+    }
+  ],
+  "evidence_mode": "saved",
+  "receiver_policy": {
+    "byte_length": 2019,
+    "path": "saved/vate/receiver-policy.json",
+    "sha256": "e828cb109fed1b02f27f188eddcbfe3763655ff25f9f65e9d8e43bdc4c2db5a4"
+  },
+  "record_scope": "Selected execution metadata and complete output bytes from a VATE maintainer offline replay; publication metadata is distinct from a new local replay record.",
+  "schema": "nenrin-vate-saved-vate-reports-v1",
+  "source_commit": "b3b6d4f9610e159e92d3b41b66e72fc7251758dc"
+}
