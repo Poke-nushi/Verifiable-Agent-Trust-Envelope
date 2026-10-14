@@ -2,32 +2,32 @@
 
 This file records dated public changes to the discussion draft.
 
-## Unreleased
+## 2026-10-15 JST — v0.5.0 (2026-10-14 UTC)
 
-- Update the locked `source-map-js` dependency from `1.2.1` to `1.2.2` for
-  upstream denial-of-service fixes.
-- Record the NENRIN mapping review and two upstream verifier fixes, with fixed
-  source references and confirmation against the published `0.2.3` package.
-- Update the locked `fast-uri` dependency from `3.1.6` to `3.1.8` for upstream
-  security fixes.
-- Link the published technical report with its fixed v0.4.0 evaluation snapshot.
-- Align TypeScript fixture JSON encoding with the Python byte basis for the
-  supported input values.
-- Update the AEE interop record's links to the renamed external vector suite.
-- Add the Execution Evidence Demo: a local file-set operation linking admission,
-  the exact provider input, observed files, and generated receipts.
-- Include ten scenarios covering permission narrowing, refused handoffs,
-  response loss and read-only reconciliation, and missing or altered evidence.
-- Add regression tests and CI coverage for the demo's local execution and
-  evidence contracts. The existing VATE core, schemas, and corpus are unchanged.
-- Publish the fixed Vaara → VATE reproduction guide and package identity, with
-  separate saved-evidence checks and new local execution instructions.
-- Record HandoffProbe's package check, property comparison and synthetic
-  reconciliation fixture, with acknowledgement and fixed source references.
-- Keep the chronology regression test's permit timestamps within one validity
-  window so clock rollover does not mask the intended assertion.
-- Refresh the roadmap, contributor guidance, FAQ, known gaps and A2A review
-  entry points for the published execution evidence and recipient-review work.
+- Added ten local execution-evidence scenarios connecting admission, exact
+  provider input, observed files and linked receipts, including response loss
+  and read-only reconciliation.
+- Added reusable receipt-linkage and S3-observation examples, a versioned local
+  recipient Python API and JSON CLI, and three NENRIN–VATE crosswalk cases
+  preserving complete native reports.
+- Added an experimental detached-signature and receiver-selected issuer-authority
+  example, keeping signature, policy authority and receipt linkage separate.
+- Fixed linkage acceptance when admission requires a new permit, TypeScript
+  fixture JSON byte agreement, and trust-policy placement checks in the
+  recommended S3 CLI entry point.
+- Preserved microsecond precision in the reference core, tightened its supported
+  timestamp forms, and corrected receipt windows for expired-request denials.
+- Added fixed Vaara and A2A reproduction guides and external reuse/review
+  records for HandoffProbe, Mission, Receipt Protocol and NENRIN, retaining
+  their source pins and observed execution scope.
+- Clarified existing corpus case prose without changing case IDs, expected
+  outcomes, reason codes or required artifacts. The 76-case / 217-artifact
+  snapshot has a new digest; the AL2 v0.3 profile and 2026-09 artifact line remain.
+- Updated the locked `fast-uri` and `source-map-js` transitive dependencies for
+  upstream security fixes; expanded Linux/macOS and source-archive CI coverage.
+- Added release notes, a technical gate and tag-time citation metadata.
+  The exact v0.5.0 Zenodo DOI is pending at tag time; historical version DOIs
+  continue to identify their original files.
 
 ## 2026-09-09 — v0.4.1
 

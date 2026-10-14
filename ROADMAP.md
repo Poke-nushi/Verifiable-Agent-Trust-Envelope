@@ -9,19 +9,17 @@ For public wording rules, see
 
 ## Current Direction
 
-### Post-`v0.4.1`: Execution Evidence And Recipient Review
+### v0.5.0: Execution Evidence And Recipient Review
 
-The `v0.4.1` maintenance discussion-draft pre-release is the current GitHub
-review snapshot. It retains the `2026-09` machine-readable artifact line
-introduced in `v0.4.0` and the semantic profile
-`VATE-AL2-Verifier-Admission-v0.3`. The maintenance release corrects the AP2
-replay case's inputs and collects partial implementation records at their
-original evaluation pins.
+The `v0.5.0` discussion-draft pre-release collects execution-evidence examples,
+recipient assessment interfaces, signature and issuer-authority checks, and
+external reuse/reproduction records. It retains the `2026-09` machine-readable
+artifact line and `VATE-AL2-Verifier-Admission-v0.3` semantic profile.
+The added signature contract is an experimental implementation aid.
 
-The `v0.4.0` release introduced the external-SUT input, generated-receipt,
-status-evidence, and report-integrity contract accumulated after v0.3.2. Its
-exact source remains archived at DOI `10.5281/zenodo.22218860`; the `v0.4.1`
-version DOI is `10.5281/zenodo.22680789`. Historical records keep their own exact
+The exact v0.5.0 Zenodo version DOI is pending at tag time. Historical `v0.4.1`
+and `v0.4.0` remain archived at `10.5281/zenodo.22680789` and
+`10.5281/zenodo.22218860`, respectively. Historical records keep their original
 source and DOI.
 
 The current work connects a relying party's admission decision to the request
@@ -36,7 +34,7 @@ relabeled as current `2026-09` evidence.
 
 ### Available Execution And Review Evidence
 
-The following work is available on `main` after the `v0.4.1` archive:
+The v0.5.0 source snapshot includes the following work added after v0.4.1:
 
 - [Execution Evidence Demo](reference/execution-evidence-demo/README.md): ten
   local scenarios link admission, exact provider input, observed files and
@@ -98,7 +96,12 @@ partial native-implementation records and their historical evaluation pins.
 
 The current public review surface is:
 
-- `v0.4.1` GitHub maintenance discussion-draft pre-release:
+- `v0.5.0` GitHub discussion-draft pre-release:
+  <https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.5.0>
+- `v0.5.0` notes and technical gate:
+  [docs/release-notes/v0.5.0.md](docs/release-notes/v0.5.0.md) and
+  [docs/release-gate-v0.5.0.md](docs/release-gate-v0.5.0.md)
+- archived `v0.4.1` GitHub maintenance discussion-draft pre-release:
   <https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.4.1>
 - `v0.4.1` pre-release notes and technical gate:
   [docs/release-notes/v0.4.1.md](docs/release-notes/v0.4.1.md) and
