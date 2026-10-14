@@ -11,6 +11,7 @@ The current repo is strongest on:
 - verifier ordering
 - status and attenuation semantics
 - a narrow AL2 verifier wedge
+- receipt linkage and local observation assessment through a versioned API
 
 It is weaker on:
 
@@ -191,6 +192,13 @@ Its R52 review Task can complete while the original effect remains unknown.
 Retrieving the known review Task again does not reconcile that effect; a
 provider query and initial-`SendMessage` loss recovery remain outside this example.
 
+The [S3 Observation Example](../reference/s3-observation-example/README.md)
+connects receipts to the captured request, upload attempt and version-specific
+read-back from local SeaweedFS. Its offline assessment uses a receiver-selected
+policy accepting the local collector and storage assumptions. Independent
+observation, durable recovery and concurrent execution remain open; replaying
+the capture does not perform a new upload or authorize a retry.
+
 Remaining work includes:
 
 - deciding whether future profiles keep `require_new_permit` as an `attenuate`
@@ -216,6 +224,21 @@ The runner now checks admission receipt id, admission digest, transaction id,
 runtime, decision, expiry, admitted effective request hash, and basic
 attenuated amount boundaries. That is enough for the v0.3 corpus, but not yet
 enough to claim multi-implementation readiness.
+
+The [Receipt Linkage Example](../reference/receipt-linkage-example/README.md)
+applies existing core, runner and schema checks to stored receipt pairs.
+The [Recipient Assessment API](../reference/recipient-assessment/README.md)
+exposes that assessment and the S3 observation assessment through Python and a
+JSON CLI. It preserves each evaluator's complete result, unsupported
+requirements and source identity. Application reuse and version-update trials
+remain needed beyond the local vectors and tests.
+
+These assessments can identify missing inputs required by their fixed
+contracts. They do not establish a complete set of operations or attempts
+against which to detect omitted records. The
+[roadmap](../ROADMAP.md#next-technical-work) proposes a recipient-defined review
+set for that separate check; activity outside the set and the completeness of
+collection remain external questions.
 
 Remaining work includes:
 
@@ -313,6 +336,12 @@ implementation report for both reference runs and external SUT comparisons.
 The v0.3 package also documents extension-field handling and includes a
 corpus-bound byte-level A2A signed Agent Card fixture, but still does not verify
 production cryptographic signatures.
+
+The Recipient Assessment API also reports signature and issuer-authority
+checks as unsupported. Connecting an external verifier still requires a
+profile to identify trusted keys or trust anchors and establish the signer's
+authority for the action being reviewed. Signature validity, issuer authority
+and receipt linkage are distinct judgments.
 
 Remaining work includes:
 

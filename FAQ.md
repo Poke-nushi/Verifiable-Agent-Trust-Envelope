@@ -149,6 +149,10 @@ The current repo does not yet freeze:
 - physical `ABS` profiles
 - full runnable conformance corpora across multiple implementations
 
+For the next steps in recipient-application reuse, signature and issuer-authority
+connections, and missing-record checks, see the
+[public roadmap](ROADMAP.md#next-technical-work).
+
 ## What Does `attenuated` Mean?
 
 `attenuated` means an artifact is not fully revoked, but it is no longer usable under the original scope.
@@ -207,6 +211,21 @@ The [Vaara → VATE reproduction package](docs/interop/vaara-execution-reproduct
 adds a pinned stdio proxy and credential-gateway path. It supports checking
 saved evidence and creating a new local run. Both paths describe the evidence
 available to the recipient and the limits of a same-operator local experiment.
+
+To assess existing records, choose the entry point for your input:
+
+- [Receipt Linkage Example](reference/receipt-linkage-example/README.md): check
+  two stored VATE receipts and distinguish matching relationships, mismatches
+  and inputs that cannot be assessed.
+- [S3 Observation Example](reference/s3-observation-example/README.md): connect
+  receipts to a captured request, upload attempt and version-specific read-back
+  under the receiver's selected local trust assumptions.
+- [Recipient Assessment API](reference/recipient-assessment/README.md): call
+  either assessment from another application through Python or a JSON CLI,
+  retaining the evaluator's full result and source identity.
+
+These assessments inspect supplied records. They do not authenticate issuers
+or authorize a new operation or retry.
 
 ## Is The Reference Demo Production Ready?
 
