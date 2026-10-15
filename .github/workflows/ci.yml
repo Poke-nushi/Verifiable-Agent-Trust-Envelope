@@ -16,7 +16,7 @@ jobs:
   execution-evidence:
     name: Execution evidence (${{ matrix.os }}, Python ${{ matrix.python }})
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 10
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -78,6 +78,12 @@ jobs:
           output_dir="$(mktemp -d)"
           python -B reference/recipient-signature-authority/run_trial.py --openssl "$VATE_TRIAL_OPENSSL" --openssl-sha256 "$VATE_TRIAL_OPENSSL_SHA256" --output "$output_dir/run"
 
+      - name: Check required records and receiver-selected review controls
+        run: |
+          python -B -m unittest discover -s reference/required-records -p 'test_*.py' -v
+          output_dir="$(mktemp -d)"
+          python -B reference/required-records/run_examples.py --openssl "$VATE_TRIAL_OPENSSL" --openssl-sha256 "$VATE_TRIAL_OPENSSL_SHA256" --output "$output_dir/run"
+
       - name: Check NENRIN saved records and replay the pinned VATE cases
         run: |
           output_dir="$(mktemp -d)"
@@ -134,6 +140,15 @@ jobs:
           cd "$output_dir"
           python -B -m unittest discover -s "$archive_dir/reference/recipient-signature-authority" -p 'test_*.py' -v
           python -B "$archive_dir/reference/recipient-signature-authority/run_trial.py" --openssl "$VATE_TRIAL_OPENSSL" --openssl-sha256 "$VATE_TRIAL_OPENSSL_SHA256" --output "$output_dir/run"
+
+      - name: Check required records from a source archive
+        run: |
+          archive_dir="$(mktemp -d)"
+          output_dir="$(mktemp -d)"
+          git archive HEAD | tar -x -C "$archive_dir"
+          cd "$output_dir"
+          python -B -m unittest discover -s "$archive_dir/reference/required-records" -p 'test_*.py' -v
+          python -B "$archive_dir/reference/required-records/run_examples.py" --openssl "$VATE_TRIAL_OPENSSL" --openssl-sha256 "$VATE_TRIAL_OPENSSL_SHA256" --output "$output_dir/run"
 
   validate:
     name: Repository checks

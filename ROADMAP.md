@@ -163,15 +163,16 @@ Two paths address additional recipient requirements:
   Next, exercise independently selected issuer/key/scope mappings with another
   receiver. The public test-key controls do not establish real issuer identity
   or authority at the original operation.
-- **Missing required records:** investigate an optional check against a set of
-  required operations or attempts fixed by the recipient before assessment.
-  Distinguish missing artifacts for a listed attempt from an attempt omitted
-  from the supplied records. The set's source and collection coverage must
-  remain explicit; this check would not establish that all real-world activity
-  has been recorded.
+- **Missing required records:** [Required Record Review](reference/required-records/README.md)
+  checks an explicit receiver-selected set of operations or known attempts.
+  It distinguishes missing, pending and unresolved records, preserves native
+  results and records cutoff, arrival and collection assumptions. Next,
+  exercise independently supplied requirements and collection inventories
+  with another receiving application, including an update that retains its
+  previous report. Activity outside the selected set remains unmeasured.
 
-The signature example wraps the current API without changing its unsupported
-requirements. The missing-record review set remains prospective.
+The signature example and required-record review wrap the current API without
+changing its unsupported requirements or the v0.3 semantic profile.
 See [known gaps](docs/known-gaps.md) for the remaining proof and evidence
 boundaries.
 
