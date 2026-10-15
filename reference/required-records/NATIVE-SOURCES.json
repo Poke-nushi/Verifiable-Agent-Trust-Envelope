@@ -1,0 +1,21 @@
+{
+  "reference/receipt-linkage-example/SOURCE-PINS.json": "c2de4b4ffbd08a950dbab82edb4030b520690b71c9b6962db9f71a9d93779545",
+  "reference/receipt-linkage-example/recipient_example.py": "261b1d439945e3e33c1c48a970dd431d55966b505403f237bbad8ef3d6e7128c",
+  "reference/recipient-assessment/EVALUATOR-SOURCES.json": "97b46ce56abaaf0afc1e1ba77b3d73b48504fb05f35042793eb3aa81eee0a226",
+  "reference/recipient-assessment/_worker.py": "5834df316c2d07c822d1e7f5c3733d61af68e1278c48f0e570199d0954564696",
+  "reference/recipient-assessment/vate_recipient.py": "f04249301cc7861e8854db2b0464f5f1fabaee3eae64969ba082eec11a702c93",
+  "reference/recipient-signature-authority/recipient_trial.py": "ed277beaedc4c30bf2145fc1c64c291967b6e4ba5993f020c07c492a08058b7a",
+  "reference/s3-observation-example/SEAWEEDFS-PIN.json": "816b2c85f129d06afbf66249ba5943e33a67200af65ee7877e92fea30b4f24c9",
+  "reference/s3-observation-example/assess_observation.py": "8c46963e62c2fa4eb390b846b6b0208e4c5f3c6eb501e5834a722f08e5058120",
+  "reference/s3-observation-example/capture_s3.py": "96386f1ebd734eb163005004536cd553590f6bad79a273d0d2a6fe256f8389c1",
+  "reference/s3-observation-example/contract.py": "4049c8b92ef1709f96abffc5ac7adab2461be1f1aee29347838b766a8335a935",
+  "reference/s3-observation-example/native_fixture.py": "23f9a93d7c3799db5f2d616fa3a36fccef36106693d30c079ebb8132d48596d2",
+  "reference/s3-observation-example/run_trial.py": "44a13ea835ddaaa18f4e9c1a1a68632880977164eb7b046cd093f3ab1408fa2e",
+  "reference/s3-observation-example/sandbox_macos.py": "f45a46632cab83fe0b30e65f7b9665e0135ade7c904be3eb9b3a5e5f455ccb4a",
+  "reference/vate-verifier-core/vate_verifier_core.py": "ead16bebda908187485cf095f71538b23102ec32ea94c6efca0d7e0a44849e84",
+  "registries/evidence-vocabulary.v0.3.json": "df3c49399ea7082a32eb397e951a88b44630bc26624be08041a8040488776814",
+  "schemas/admission-receipt.schema.json": "fc5fc085a741ce1e23e6435c9402f3838eaa701dd363ba84610a8989ad8af7fb",
+  "schemas/admission-request.schema.json": "8b8ce5931df45b17dbe3d85562f031eb69edf19de8317c4c2f49c7c116421ba9",
+  "schemas/post-execution-receipt.schema.json": "3451185169de5deb210a9f3319dd6217fbe6bf6bb0b8b835c9b7e5a874467892",
+  "scripts/vate_conformance.py": "570b1b71b86e85add1fad6f8bcd0a544ca7cad71dca78a3bfca5b00698762764"
+}

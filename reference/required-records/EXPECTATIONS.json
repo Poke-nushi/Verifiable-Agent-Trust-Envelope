@@ -1,0 +1,100 @@
+{
+  "operation-B-missing": {
+    "review_set_status": "selected",
+    "coverage": {
+      "A": "present",
+      "B": "missing"
+    },
+    "timeliness": {
+      "A": "on_time",
+      "B": "not_received"
+    },
+    "invocation_errors": false
+  },
+  "arrival-unknown-membership-included": {
+    "review_set_status": "selected",
+    "coverage": {
+      "A": "present"
+    },
+    "timeliness": {
+      "A": "unknown"
+    },
+    "invocation_errors": false
+  },
+  "arrival-and-membership-unknown": {
+    "review_set_status": "selected",
+    "coverage": {
+      "A": "unresolved"
+    },
+    "timeliness": {
+      "A": "unknown"
+    },
+    "invocation_errors": false
+  },
+  "s3-attempt": {
+    "review_set_status": "selected",
+    "coverage": {
+      "A": "present"
+    },
+    "timeliness": {
+      "A": "on_time"
+    },
+    "invocation_errors": false
+  },
+  "s3-late-support": {
+    "review_set_status": "selected",
+    "coverage": {
+      "A": "unresolved"
+    },
+    "timeliness": {
+      "A": "unknown"
+    },
+    "invocation_errors": false
+  },
+  "partial-even-with-matching-record": {
+    "review_set_status": "selected",
+    "coverage": {
+      "A": "unresolved"
+    },
+    "timeliness": {
+      "A": "on_time"
+    },
+    "invocation_errors": false
+  },
+  "signature-and-authority": {
+    "review_set_status": "selected",
+    "coverage": {
+      "A": "present"
+    },
+    "timeliness": {
+      "A": "on_time"
+    },
+    "invocation_errors": false
+  },
+  "signature-early-error": {
+    "review_set_status": "selected",
+    "coverage": {
+      "A": "present"
+    },
+    "timeliness": {
+      "A": "on_time"
+    },
+    "invocation_errors": true
+  },
+  "receiver-waiver-revision": {
+    "review_set_status": "selected",
+    "coverage": {
+      "A": "waived_by_receiver"
+    },
+    "timeliness": {
+      "A": "not_received"
+    },
+    "invocation_errors": false
+  },
+  "semantic-alias-rejected": {
+    "review_set_status": "invalid",
+    "coverage": {},
+    "timeliness": {},
+    "invocation_errors": true
+  }
+}

@@ -80,6 +80,11 @@ alongside that assessment, use the
 It keeps signature, authority and receipt-linkage results separate under an
 experimental P-256 / SHA-256 contract with public test keys.
 
+To find records omitted from a receiver-selected set of operations or known
+attempts, use [Required Record Review](reference/required-records/README.md).
+It distinguishes missing, pending and unresolved records while retaining the
+complete native assessments and the receiver's collection assumptions.
+
 ## What VATE Records
 
 - **One admission basis**: action, target, any requested constraints, actor, principal,
@@ -486,6 +491,8 @@ The most useful feedback is:
   Call receipt and S3 assessments through a versioned local Python API or JSON CLI
 - [reference/recipient-signature-authority/README.md](reference/recipient-signature-authority/README.md)
   Inspect detached signatures and receiver-selected record authority alongside receipt linkage
+- [reference/required-records/README.md](reference/required-records/README.md)
+  Find missing records within a receiver-selected set of operations or known attempts
 - [reference/a2a-metadata-adapter-demo/README.md](reference/a2a-metadata-adapter-demo/README.md)
   Dependency-free A2A-shaped metadata adapter demo
 - [packages/vate-core-ts/README.md](packages/vate-core-ts/README.md)

@@ -242,12 +242,15 @@ the original operation, actual write order or a mapping between protocol
 identities. General JOSE/PKI, certificate/revocation handling and independent
 issuer/key selection remain outside that experimental contract.
 
-These assessments can identify missing inputs required by their fixed
-contracts. They do not establish a complete set of operations or attempts
-against which to detect omitted records. The
-[roadmap](../ROADMAP.md#next-technical-work) proposes a recipient-defined review
-set for that separate check; activity outside the set and the completeness of
-collection remain external questions.
+The separate [Required Record Review](../reference/required-records/README.md)
+detects omitted records against an explicit receiver-selected set of operations
+or known attempts. Its Python API and JSON CLI keep record coverage, arrival
+timing and complete native results separate. Requirements, waivers, cutoff and
+collection scope come from the receiver; hashes bind the selected bytes without
+establishing that these decisions are authoritative. Activity outside the set,
+unknown attempts and completeness of collection remain external questions.
+Independent requirement selection, collection governance and application/update
+trials remain needed beyond the saved and synthetic controls.
 
 Remaining work includes:
 
