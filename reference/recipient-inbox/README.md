@@ -9,8 +9,9 @@ selected evaluator identity and previous history.
 The experimental contract is `vate-recipient-inbox-local-v1`. Use it from a
 trusted local receiving application. The receiver still chooses the required
 set, collection scope, arrival assertions and policy. The current native
-review profiles use VATE receipts with S3 action context; storage in SQLite
-does not expand those profiles or establish complete collection.
+review profiles accept operation-level VATE receipts with S3 or local file-set
+action context, plus S3 attempt requirements. Storage in SQLite does not
+establish complete collection.
 
 ## Run the intake example
 
@@ -45,6 +46,15 @@ choices are synthetic. Test signatures use public test keys and were not made
 at the original operation. No storage service or network request is involved.
 
 ## Use the API or CLI
+
+For [local file-set receipts](../required-records/README.md#choose-what-must-be-present),
+use the same `receipt_pair` delivery kind and an operation-level review set.
+Deliver `admission-1/receipt.json` in the `admission` slot and
+`adapter/post-execution-receipt.json`, when available, in the `post` slot.
+The receiver's arrival time and selected cutoff determine inclusion and
+timeliness; the receipt's execution and issuance times do not replace them.
+File-set attempt requirements and full execution-evidence verification remain
+outside the required-record review.
 
 Create a database without the optional signature check:
 

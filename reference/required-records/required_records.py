@@ -29,6 +29,8 @@ def capture_loaded_source(path, code):
 LOADED_SOURCE_SHA256, LOADED_SOURCE_ERROR = capture_loaded_source(Path(__file__), sys._getframe().f_code)
 CONTRACT = 'vate-required-records-local-v2'
 S3 = 'vate-local-s3-observation-v1'
+FILE_SET = 'vate-demo-file-set-v1'
+OPERATION_ACTIONS = {S3: 's3.put_object', FILE_SET: 'demo.create_file_set'}
 CANON = 'vate-v0.3-fixture-json;ascii-escaped;sorted;compact;no-floats'
 MEMBERS = frozenset(('effective-request.json', 'permit.json', 'admission-request.json',
     'admission-decision.json', 'admission.json', 'attempt.json', 'put-request.json',
@@ -139,9 +141,10 @@ def context_shape(context):
     binding = context['action_binding']
     exact(binding, ('type', 'preimage_profile', 'canonicalization', 'digest'))
     exact(binding['digest'], ('alg', 'value'))
-    need(binding['type'] == 'profile_defined_digest' and binding['preimage_profile'] == S3
+    need(binding['type'] == 'profile_defined_digest' and type(binding['preimage_profile']) is str
+         and binding['preimage_profile'] in OPERATION_ACTIONS
          and binding['canonicalization'] == CANON and binding['digest']['alg'] == 'sha-256'
-         and type(binding['digest']['value']) is str and re.fullmatch('[0-9a-f]{64}', binding['digest']['value']), 'unsupported S3 context')
+         and type(binding['digest']['value']) is str and re.fullmatch('[0-9a-f]{64}', binding['digest']['value']), 'unsupported operation context')
     need(context['effective_request_hash'] == 'sha-256:'+binding['digest']['value'], 'request/binding hash mismatch')
 
 
@@ -176,7 +179,8 @@ def review_shape(review):
         need(row['record_kind'] in ('admission', 'post_execution'), 'unknown record kind')
         if sub['kind'] == 'attempt':
             label(sub.get('attempt_id'))
-            need(row['record_kind'] == 'post_execution' and row['binding_profile'] == 'vate_s3_attempt_context', 'unsupported attempt requirement')
+            need(row['record_kind'] == 'post_execution' and row['binding_profile'] == 'vate_s3_attempt_context'
+                 and sub['native_context']['action_binding']['preimage_profile'] == S3, 'unsupported attempt requirement')
             key = sub['attempt_id']
         else:
             need('attempt_id' not in sub and row['binding_profile'] == 'vate_receipt_operation_context', 'unsupported operation requirement')
@@ -320,13 +324,21 @@ def extract(raw, kind):
     try:
         if kind == 'admission':
             part = doc['request']; runtime = doc['subject']['runtime']
-            need(part['action'] == 's3.put_object', 'unsupported admission action')
             request_hash = part['input_hash']
+            if part['action_binding']['preimage_profile'] == FILE_SET:
+                outcome = doc['decision']['outcome']
+                need(type(outcome) is str and outcome in ('allow', 'deny', 'attenuate'),
+                     'unsupported file-set admission outcome')
+                if outcome == 'attenuate':
+                    request_hash = doc['attenuation']['effective_request_hash']
         else:
             part = doc['execution']; runtime = part['runtime']; request_hash = part['effective_request_hash']
         context = {'transaction_id': part['transaction_id'], 'runtime': runtime,
                    'effective_request_hash': request_hash, 'action_binding': part['action_binding']}
         context_shape(context)
+        if kind == 'admission':
+            need(part['action'] == OPERATION_ACTIONS[context['action_binding']['preimage_profile']],
+                 'unsupported admission action for context')
         return doc, context
     except (KeyError, TypeError) as exc:
         raise Problem('UNSUPPORTED_CONTEXT', str(exc)) from exc

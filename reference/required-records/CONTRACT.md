@@ -94,19 +94,37 @@ deadline must always be a valid time.
 
 `subject.kind` is `operation` or `attempt`. Its native context has exactly
 `transaction_id`, `runtime`, `effective_request_hash` and `action_binding`.
-The binding has type `profile_defined_digest`, preimage profile
-`vate-local-s3-observation-v1`, canonicalization
+The binding has type `profile_defined_digest`, one of the preimage profiles
+below, canonicalization
 `vate-v0.3-fixture-json;ascii-escaped;sorted;compact;no-floats`, and a
 `sha-256` digest with 64 lowercase hex digits. The effective request hash is
 `sha-256:<that same digest value>`. The original must expose this typed context
 under the existing VATE receipt profile; matching a label alone is insufficient.
+
+| Preimage profile | Admission request action | Supported subjects |
+| --- | --- | --- |
+| `vate-local-s3-observation-v1` | `s3.put_object` | Operation and S3 attempt |
+| `vate-demo-file-set-v1` | `demo.create_file_set` | Operation only |
+
+An admission's action must match its preimage profile. Post-execution receipts
+expose the profile in their execution action binding. For file-set admissions,
+select `attenuation.effective_request_hash` when `decision.outcome` is
+`attenuate`, and `request.input_hash` for `allow` or `deny`. The original
+input hash stays original when narrowed. Missing or unrecognized hash-selection
+metadata remains unsupported. S3 admission extraction uses `request.input_hash`.
+The selected hash must match the action binding digest. Unknown profiles and
+canonicalizations remain unsupported. File-set operation requirements use
+`vate_receipt_operation_context` and the unchanged receipt originals; they do
+not accept `vate_s3_attempt_context`. The native receipt assessment remains
+separate from operation-level record presence. The checker does not invoke the
+file-set execution-evidence verifier or validate the complete demo artifact set.
 
 Semantic identity uses namespace, typed context, record kind and explicit
 attempt ID. The checker rejects two operation labels for the same context,
 one label for different contexts, duplicate semantic subjects, and overlapping
 operation/attempt requirements for the same context and record kind.
 
-The supported request names are `receipt_linkage`, `s3_observation_binding`,
+The recognized request names are `receipt_linkage`, `s3_observation_binding`,
 `signatures_and_issuer_authority`, `independent_execution_observation`,
 `operation_population_coverage`, and `current_permission_to_execute`.
 These names do not imply support: the last three remain unsupported.
@@ -154,7 +172,7 @@ unsupported profiles or broken identifiers in the same namespace are unknown.
 An explicit null member is absent. Structural or pin errors are never repaired
 to create a native success.
 
-For an attempt, all 18 original members must be included, readable and pinned.
+For a supported S3 attempt, all 18 original members must be included, readable and pinned.
 The complete native S3 result must report `request_binding: matched`,
 `attempt_binding: response_linked`, `post_observation_binding: matched` and
 `source_trust: accepted_local_assumption`. The attempt ID must match the
