@@ -35,7 +35,7 @@ def replay(output, *, example=comparison.HERE, repository=comparison.REPOSITORY)
     repo = c.Reader(repository, 'repository')
     try:
         pins, _, _ = comparison.verify_public_inputs(public)
-        source_data = comparison.source_bytes(repo, pins)
+        source_data = comparison.repository_source_bytes(repo, pins)
         helper = public.read('helpers/build_cases.py')
     finally:
         public.close()

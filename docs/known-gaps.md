@@ -249,8 +249,14 @@ timing and complete native results separate. Requirements, waivers, cutoff and
 collection scope come from the receiver; hashes bind the selected bytes without
 establishing that these decisions are authoritative. Activity outside the set,
 unknown attempts and completeness of collection remain external questions.
+[Recipient Inbox](../reference/recipient-inbox/README.md) adds local SQLite
+storage, fixed review inputs, late-arrival reassessment and preserved history.
+Its offline controls cover restarts and an evaluator update while retaining old
+originals and reports. It remains a trusted local receiving application, with
+finite collection limits, explicit rejection and diagnostic truncation. It
+provides no remote ingestion service or tamper-resistant audit storage.
 Independent requirement selection, collection governance and application/update
-trials remain needed beyond the saved and synthetic controls.
+trials remain needed beyond these local controls.
 
 Remaining work includes:
 

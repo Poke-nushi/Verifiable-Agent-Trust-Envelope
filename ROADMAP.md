@@ -147,11 +147,14 @@ The current public review surface is:
 ### Next Technical Work
 
 The [Recipient Assessment API](reference/recipient-assessment/README.md) provides
-a versioned entry point for the existing receipt and S3 evaluators. Next, use it
-in a receiving application and exercise an update while retaining original
-inputs, evaluator identities and previous assessments. The local vectors and
-API tests provide a starting point; continued maintenance by another implementer
-remains to be observed.
+a versioned entry point for the existing receipt and S3 evaluators.
+[Recipient Inbox](reference/recipient-inbox/README.md) connects that assessment
+to local raw-byte storage, fixed review inputs, late delivery and retained
+history. Its example covers restarts and exported reassessment; diagnostic
+controls also exercise an evaluator update after an old failure. Next, use
+these paths with another receiving application and independently selected
+collection requirements. Continued maintenance by another implementer remains
+to be observed.
 
 Two paths address additional recipient requirements:
 

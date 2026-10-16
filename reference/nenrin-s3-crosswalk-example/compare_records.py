@@ -19,6 +19,7 @@ NATIVE_SAVED = 'nenrin-vate-saved-nenrin-reports-v1'
 VATE_SAVED = 'nenrin-vate-saved-vate-reports-v1'
 NATIVE_FRESH = 'nenrin-vate-native-replay-v1'
 VATE_FRESH = 'nenrin-vate-vate-replay-v1'
+HISTORICAL_PREFIX = 'reference/historical-runtime/e845a6a8/'
 
 
 def document_reference(reader, path):
@@ -95,6 +96,11 @@ def source_bytes(reader, pins, prefix=''):
     for path, expected in pins['files'].items():
         result[path] = reader.bound({'path': prefix + path, 'sha256': expected['sha256'], 'byte_length': expected['byte_length']}).raw
     return result
+
+
+def repository_source_bytes(reader, pins):
+    """Read the fixed archived files; VATE-PINS still binds their original bytes."""
+    return source_bytes(reader, pins, HISTORICAL_PREFIX)
 
 
 def original_case(sources, pins):
@@ -364,7 +370,7 @@ def build_report(*, vate_run=None, native_run=None, example=HERE, repository=REP
         public = open_reader(example, 'example')
         pins, source_inventory, pins_document = verify_public_inputs(public)
         repo = open_reader(repository, 'repository')
-        source_data = source_bytes(repo, pins)
+        source_data = repository_source_bytes(repo, pins)
         bundles, submission = load_bundles(public)
         nr = open_reader(Path(native_run).resolve(strict=True), 'native_local_run') if native_run else public
         vr = open_reader(Path(vate_run).resolve(strict=True), 'vate_local_run') if vate_run else public

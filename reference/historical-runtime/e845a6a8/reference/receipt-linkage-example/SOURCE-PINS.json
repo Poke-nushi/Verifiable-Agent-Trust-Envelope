@@ -1,0 +1,9 @@
+{
+  "files": {
+    "reference/vate-verifier-core/vate_verifier_core.py": "ead16bebda908187485cf095f71538b23102ec32ea94c6efca0d7e0a44849e84",
+    "scripts/vate_conformance.py": "570b1b71b86e85add1fad6f8bcd0a544ca7cad71dca78a3bfca5b00698762764",
+    "schemas/admission-receipt.schema.json": "fc5fc085a741ce1e23e6435c9402f3838eaa701dd363ba84610a8989ad8af7fb",
+    "schemas/post-execution-receipt.schema.json": "3451185169de5deb210a9f3319dd6217fbe6bf6bb0b8b835c9b7e5a874467892",
+    "registries/evidence-vocabulary.v0.3.json": "df3c49399ea7082a32eb397e951a88b44630bc26624be08041a8040488776814"
+  }
+}

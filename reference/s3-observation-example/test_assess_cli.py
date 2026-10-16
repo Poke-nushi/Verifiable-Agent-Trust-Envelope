@@ -21,9 +21,19 @@ CLI = HERE / 'assess_cli.py'
 LEGACY = HERE / 'assess_observation.py'
 INSTANCE = HERE / 'inputs/seaweedfs-4.48/instance'
 POLICY = INSTANCE / 'receiver-policy.json'
+sys.path.insert(0, str(HERE.parents[1] / 'reference/runtime-support'))
+from synthetic_s3 import synthetic_current_instance
 
 
 class AssessmentCliTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        global INSTANCE, POLICY
+        cls.synthetic = tempfile.TemporaryDirectory(prefix="vate-current-s3-cli-")
+        cls.addClassCleanup(cls.synthetic.cleanup)
+        INSTANCE = synthetic_current_instance(HERE.parents[1], Path(cls.synthetic.name) / "instance")
+        POLICY = INSTANCE / "receiver-policy.json"
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix='vate-s3-cli-')
         self.addCleanup(self.temp.cleanup)

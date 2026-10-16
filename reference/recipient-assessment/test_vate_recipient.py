@@ -26,6 +26,8 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 RECEIPTS = ROOT / "reference/receipt-linkage-example"
 INSTANCE = ROOT / "reference/s3-observation-example/inputs/seaweedfs-4.48/instance"
+sys.path.insert(0, str(ROOT / "reference/runtime-support"))
+from synthetic_s3 import synthetic_current_instance
 
 
 def encoded(value):
@@ -95,11 +97,15 @@ def unknown_check_in_process():
 class RecipientAssessorTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        global INSTANCE
+        cls.synthetic = tempfile.TemporaryDirectory(prefix="vate-current-s3-api-")
+        cls.addClassCleanup(cls.synthetic.cleanup)
+        INSTANCE = synthetic_current_instance(ROOT, Path(cls.synthetic.name) / "instance")
         cls.admission = (RECEIPTS / "inputs/R17/admission.json").read_bytes()
         cls.post = (RECEIPTS / "inputs/R17/post.json").read_bytes()
         cls.policy = (INSTANCE / "receiver-policy.json").read_bytes()
         cls.expected_receipt = json.loads((RECEIPTS / "expected-results.json").read_bytes())["examples"][0]["assessment"]
-        cls.expected_s3 = json.loads((INSTANCE / "ASSESSMENTS.json").read_bytes())["supported"]
+        cls.expected_s3 = json.loads((INSTANCE / "EXPECTED-SYNTHETIC.json").read_bytes())["supported"]
 
     def setUp(self):
         self.assessor = api.RecipientAssessor(expected_api_contract=api.API_CONTRACT)
@@ -533,7 +539,7 @@ class RecipientAssessorTests(unittest.TestCase):
                 self.assertEqual(parsed["native_result"]["assessment"], verdict)
                 results[verdict] = parsed["native_result"]
             self.assertEqual(results["supported_under_local_assumptions"], self.expected_s3)
-            self.assertEqual(results["insufficient"], json.loads((INSTANCE / "ASSESSMENTS.json").read_bytes())["actual-403"])
+            self.assertEqual(results["insufficient"], json.loads((INSTANCE / "EXPECTED-SYNTHETIC.json").read_bytes())["actual-403"])
             native = results["contradictory"]
             self.assertEqual([d["code"] for d in native["diagnostics"]],
                              ["GET_TARGET_MISMATCH", "PUT_GET_VERSION_TARGET_MISMATCH", "POST_OBSERVATION_NOT_ASSESSED"])

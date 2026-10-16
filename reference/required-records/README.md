@@ -12,6 +12,11 @@ receipts with the existing S3 action context, including explicitly identified
 S3 attempts. It is an implementation aid alongside the existing specification;
 it does not change the `VATE-AL2-Verifier-Admission-v0.3` semantic profile.
 
+For persistent intake, late-arrival reassessment and retained history, use
+[Recipient Inbox](../recipient-inbox/README.md). It prepares these same review
+inputs from stored originals without inferring the required set or collection
+closure.
+
 ## Try an omitted operation
 
 Use a trusted checkout or source archive of the **whole repository**, Linux or

@@ -1,3 +1,6 @@
+# Preserve the fixed historical runtime and original vector bytes exactly.
+reference/historical-runtime/e845a6a8/** -text whitespace=-blank-at-eof,cr-at-eol
+
 # Keep digest-addressed corpus and fixture bytes stable across platforms.
 conformance/** text eol=lf
 examples/** text eol=lf

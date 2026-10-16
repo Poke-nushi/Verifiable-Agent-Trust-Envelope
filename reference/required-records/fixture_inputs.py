@@ -9,6 +9,8 @@ HERE = Path(__file__).resolve().parent
 ROOT = next(p for p in HERE.parents if (p/'reference/recipient-assessment/vate_recipient.py').is_file())
 SAVED = ROOT/'reference/s3-observation-example/inputs/seaweedfs-4.48/instance'
 BUNDLE = SAVED/'bundles/supported'
+sys.path.insert(0, str(ROOT/'reference/runtime-support'))
+from synthetic_s3 import synthetic_current_instance
 DUE = '2026-10-20T12:00:00Z'
 CUTOFF = '2026-10-20T13:00:00Z'
 RECEIVED = '2026-10-20T10:00:00Z'
@@ -19,8 +21,10 @@ ATTEMPT = json.loads((BUNDLE/'attempt.json').read_bytes())['attempt_id']
 class Inputs:
     def __init__(self, folder):
         self.folder = Path(folder); self.folder.mkdir(parents=True, exist_ok=True)
+        self.saved = synthetic_current_instance(ROOT, self.folder/'synthetic-current-s3')
+        self.bundle_path = self.saved/'bundles/supported'
         self.serial = 0
-        self.basis = self.store(b'Synthetic receiver selection, arrival times and requirements; archived S3 bytes.\n', 'basis.txt')
+        self.basis = self.store(b'Synthetic receiver selection, arrival times and current-source S3 derivatives; no new storage operation.\n', 'basis.txt')
         self.review = {'document_type':'receiver_review_set_design', 'design_revision':2,
             'review_set_id':'receiver-A-B', 'revision':1, 'namespace':NS, 'collection_scope':'receiver_selected_set_only',
             'population_basis_refs':[self.basis], 'requirements':[]}
@@ -31,7 +35,7 @@ class Inputs:
             'receiver_id':'urn:example:receiver', 'review_set_selected_at':'2026-10-20T09:00:00Z',
             'snapshot_selected_at':'2026-10-20T13:05:00Z', 'assessment_time':'2026-10-20T14:00:00Z',
             'assessment_cutoff':CUTOFF, 'selection_basis_ref':self.basis,
-            'native_policy_refs':{'s3':self.ref(SAVED/'receiver-policy.json'), 'signature':None}}
+            'native_policy_refs':{'s3':self.ref(self.saved/'receiver-policy.json'), 'signature':None}}
         self.admission = (BUNDLE/'admission.json').read_bytes(); self.post = (BUNDLE/'post.json').read_bytes()
         self.context = extract(self.post, 'post_execution')[1]
 
@@ -73,7 +77,8 @@ class Inputs:
                          'post':self.event(self.post if post is None else post)}}
         self.snapshot['entries'].append(entry); return entry
 
-    def bundle(self, name='S3', path=BUNDLE):
+    def bundle(self, name='S3', path=None):
+        path = self.bundle_path if path is None else path
         entry = {'entry_id':name, 'source_namespace':NS, 'native_input_kind':'s3_bundle',
                  'originals':{n:self.event(ref=self.ref(Path(path)/n)) if (Path(path)/n).is_file() else None for n in sorted(MEMBERS)}}
         self.snapshot['entries'].append(entry); return entry

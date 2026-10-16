@@ -21,7 +21,7 @@ import sys
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 ROOT = Path(__file__).resolve().parents[1]
 PROFILE = "VATE-AL2-Verifier-Admission-v0.3"
@@ -1283,14 +1283,19 @@ def decimal_amount_failures(value: Any, *, label: str) -> list[str]:
     return []
 
 
-def attenuation_validation_failures(
+def attenuation_validation_failures(attenuation: Any, *, decision_reason_codes: list[str] | None=None) -> list[str]:
+    """Preserve the existing list API; bounded readers use the iterator."""
+    return list(iter_attenuation_validation_failures(attenuation, decision_reason_codes=decision_reason_codes))
+
+
+def iter_attenuation_validation_failures(
     attenuation: Any,
     *,
     decision_reason_codes: list[str] | None = None,
-) -> list[str]:
-    failures: list[str] = []
+) -> Iterator[str]:
     if not isinstance(attenuation, dict):
-        return ["attenuation must be an object"]
+        yield from ["attenuation must be an object"]
+        return
 
     mode = attenuation.get("mode")
     if not isinstance(mode, str) or mode not in {
@@ -1298,53 +1303,53 @@ def attenuation_validation_failures(
         "require_new_permit",
         "deny_if_not_accepted",
     }:
-        failures.append("mode must be a supported attenuation mode")
+        yield ("mode must be a supported attenuation mode")
 
     original_hash = attenuation.get("original_request_hash")
     effective_hash = attenuation.get("effective_request_hash")
-    failures.extend(profile_hash_failures(original_hash, label="original_request_hash"))
-    failures.extend(profile_hash_failures(effective_hash, label="effective_request_hash"))
+    yield from (profile_hash_failures(original_hash, label="original_request_hash"))
+    yield from (profile_hash_failures(effective_hash, label="effective_request_hash"))
     if is_profile_hash(original_hash) and original_hash == effective_hash:
-        failures.append("effective_request_hash must differ from original_request_hash")
+        yield ("effective_request_hash must differ from original_request_hash")
 
     require_new_permit = attenuation.get("require_new_permit")
     if not isinstance(require_new_permit, bool):
-        failures.append("require_new_permit must be a boolean")
+        yield ("require_new_permit must be a boolean")
     if mode == "require_new_permit" and require_new_permit is not True:
-        failures.append("mode require_new_permit requires require_new_permit true")
+        yield ("mode require_new_permit requires require_new_permit true")
 
     changes = attenuation.get("changes")
     if not isinstance(changes, list) or not changes:
-        failures.append("changes must be a non-empty array")
+        yield ("changes must be a non-empty array")
     else:
         for index, change in enumerate(changes):
             if not isinstance(change, dict):
-                failures.append(f"changes[{index}] must be an object")
+                yield (f"changes[{index}] must be an object")
                 continue
             operation = change.get("op")
             if not isinstance(operation, str) or operation not in {"add", "remove", "replace"}:
-                failures.append(f"changes[{index}].op must be add, remove, or replace")
+                yield (f"changes[{index}].op must be add, remove, or replace")
             for failure in safe_attenuation_path_failures(change.get("path")):
-                failures.append(f"changes[{index}].path: {failure}")
+                yield (f"changes[{index}].path: {failure}")
             reason_code = change.get("reason_code")
             if not isinstance(reason_code, str) or not reason_code:
-                failures.append(f"changes[{index}].reason_code must be a non-empty string")
+                yield (f"changes[{index}].reason_code must be a non-empty string")
             elif decision_reason_codes is not None and reason_code not in decision_reason_codes:
-                failures.append(f"changes[{index}].reason_code must appear in decision.reason_codes")
+                yield (f"changes[{index}].reason_code must appear in decision.reason_codes")
 
     effective_constraints = attenuation.get("effective_constraints")
     if not isinstance(effective_constraints, dict) or not effective_constraints:
-        failures.append("effective_constraints must be a non-empty object")
+        yield ("effective_constraints must be a non-empty object")
     else:
         if "max_amount_usd" in effective_constraints:
-            failures.append("effective_constraints.max_amount_usd is a legacy input alias; use max_amount")
+            yield ("effective_constraints.max_amount_usd is a legacy input alias; use max_amount")
         if "resource" in effective_constraints:
-            failures.append("effective_constraints.resource is a legacy input alias; use target_resource")
+            yield ("effective_constraints.resource is a legacy input alias; use target_resource")
 
         max_amount = effective_constraints.get("max_amount")
         if max_amount is not None:
             if not isinstance(max_amount, dict):
-                failures.append("effective_constraints.max_amount must be an object")
+                yield ("effective_constraints.max_amount must be an object")
             else:
                 currency = max_amount.get("currency")
                 if (
@@ -1352,8 +1357,8 @@ def attenuation_validation_failures(
                     or len(currency) != 3
                     or not all("A" <= char <= "Z" for char in currency)
                 ):
-                    failures.append("effective_constraints.max_amount.currency must be a 3-letter uppercase code")
-                failures.extend(
+                    yield ("effective_constraints.max_amount.currency must be a 3-letter uppercase code")
+                yield from (
                     decimal_amount_failures(
                         max_amount.get("value"),
                         label="effective_constraints.max_amount.value",
@@ -1365,29 +1370,29 @@ def attenuation_validation_failures(
             not isinstance(tool_allowlist, list)
             or not all(isinstance(tool, str) and tool for tool in tool_allowlist)
         ):
-            failures.append("effective_constraints.tool_allowlist must be an array of non-empty strings")
+            yield ("effective_constraints.tool_allowlist must be an array of non-empty strings")
 
         target_resource = effective_constraints.get("target_resource")
         if target_resource is not None and (not isinstance(target_resource, str) or not target_resource):
-            failures.append("effective_constraints.target_resource must be a non-empty string")
+            yield ("effective_constraints.target_resource must be a non-empty string")
 
         approval = effective_constraints.get("approval")
         if approval is not None:
             if not isinstance(approval, dict):
-                failures.append("effective_constraints.approval must be an object")
+                yield ("effective_constraints.approval must be an object")
             else:
                 approval_mode = approval.get("mode")
                 if not isinstance(approval_mode, str) or not approval_mode:
-                    failures.append("effective_constraints.approval.mode must be a non-empty string")
+                    yield ("effective_constraints.approval.mode must be a non-empty string")
                 policy_ref = approval.get("policy_ref")
                 if policy_ref is not None and (not isinstance(policy_ref, str) or not policy_ref):
-                    failures.append("effective_constraints.approval.policy_ref must be a non-empty string")
+                    yield ("effective_constraints.approval.policy_ref must be a non-empty string")
 
         expires_at = effective_constraints.get("expires_at")
         if expires_at is not None and try_parse_time(expires_at) is None:
-            failures.append("effective_constraints.expires_at must be an RFC3339 timestamp")
+            yield ("effective_constraints.expires_at must be an RFC3339 timestamp")
 
-    return failures
+    return
 
 
 def attenuation_failure_reason(failures: list[str]) -> str | None:
@@ -1611,50 +1616,55 @@ def post_execution_linkage_failures(
     return failures
 
 
-def post_execution_side_effect_failures(
+def post_execution_side_effect_failures(admission_receipt: dict[str, Any], post_execution_receipt: dict[str, Any]) -> list[str]:
+    """Preserve the existing list API; bounded readers use the iterator."""
+    return list(iter_post_execution_side_effect_failures(admission_receipt, post_execution_receipt))
+
+
+def iter_post_execution_side_effect_failures(
     admission_receipt: dict[str, Any],
     post_execution_receipt: dict[str, Any],
-) -> list[str]:
-    failures: list[str] = []
+) -> Iterator[str]:
     max_amount = admitted_effective_constraints(admission_receipt).get("max_amount")
     if not isinstance(max_amount, dict):
-        return failures
+        return
     max_currency = max_amount.get("currency")
     max_value = max_amount.get("value")
     max_failures = decimal_amount_failures(max_value, label="admitted max_amount.value")
     if max_failures or not isinstance(max_currency, str):
-        return failures
+        return
     max_decimal = Decimal(str(max_value))
     total_decimal = Decimal("0")
 
     result = post_execution_receipt.get("result")
     if not isinstance(result, dict):
-        return ["post_execution.result must be an object"]
+        yield from ["post_execution.result must be an object"]
+        return
     side_effects = result.get("side_effects", [])
     if not isinstance(side_effects, list):
-        failures.append("side_effects must be an array")
-        return failures
+        yield ("side_effects must be an array")
+        return
     for index, side_effect in enumerate(side_effects):
         if not isinstance(side_effect, dict) or "amount" not in side_effect:
             continue
         amount = side_effect.get("amount")
         if not isinstance(amount, dict):
-            failures.append(f"side_effects[{index}].amount must be an object")
+            yield (f"side_effects[{index}].amount must be an object")
             continue
         currency = amount.get("currency")
         value = amount.get("value")
         if currency != max_currency:
-            failures.append(f"side_effects[{index}].amount currency exceeds admitted currency boundary")
+            yield (f"side_effects[{index}].amount currency exceeds admitted currency boundary")
             continue
         amount_failures = decimal_amount_failures(value, label=f"side_effects[{index}].amount.value")
         if amount_failures:
-            failures.extend(amount_failures)
+            yield from (amount_failures)
             continue
         total_decimal += Decimal(str(value))
         if total_decimal > max_decimal:
-            failures.append("side_effects aggregate amount exceeds admitted max_amount")
+            yield ("side_effects aggregate amount exceeds admitted max_amount")
             break
-    return failures
+    return
 
 
 def admission_executable_for_post_execution(admission_receipt: dict[str, Any]) -> bool:
@@ -2405,17 +2415,21 @@ def evaluate_attenuation_checks(case: dict[str, Any], admission: dict[str, Any] 
     return failures
 
 
-def evaluate_evidence_vocabulary_checks(
+def evaluate_evidence_vocabulary_checks(admission_request: dict[str, Any] | None, admission: dict[str, Any] | None) -> list[str]:
+    """Preserve the existing list API; bounded readers use the iterator."""
+    return list(iter_evaluate_evidence_vocabulary_checks(admission_request, admission))
+
+
+def iter_evaluate_evidence_vocabulary_checks(
     admission_request: dict[str, Any] | None,
     admission: dict[str, Any] | None,
-) -> list[str]:
-    failures: list[str] = []
+) -> Iterator[str]:
     if admission_request is not None:
         evidence_refs = admission_request.get("evidence_refs", [])
         if not isinstance(evidence_refs, list):
-            failures.append("admission_request.evidence_refs: expected array")
+            yield ("admission_request.evidence_refs: expected array")
         for index, evidence_ref in enumerate(evidence_refs if isinstance(evidence_refs, list) else []):
-            failures.extend(
+            yield from (
                 validate_evidence_vocab_object(
                     evidence_ref,
                     label=f"admission_request.evidence_refs[{index}]",
@@ -2424,15 +2438,15 @@ def evaluate_evidence_vocabulary_checks(
     if admission is not None:
         evidence_items = admission.get("evidence", [])
         if not isinstance(evidence_items, list):
-            failures.append("admission_receipt.evidence: expected array")
+            yield ("admission_receipt.evidence: expected array")
         for index, evidence in enumerate(evidence_items if isinstance(evidence_items, list) else []):
-            failures.extend(
+            yield from (
                 validate_evidence_vocab_object(
                     evidence,
                     label=f"admission_receipt.evidence[{index}]",
                 )
             )
-    return failures
+    return
 
 
 def validate_evidence_vocab_object(value: Any, *, label: str) -> list[str]:
@@ -3888,51 +3902,60 @@ def generated_proof_shape_failures(value: Any, label: str) -> list[str]:
 
 
 def generated_decision_shape_failures(value: Any, label: str) -> list[str]:
-    if not isinstance(value, dict):
-        return [f"{label}: expected object"]
+    """Preserve the existing list API; bounded readers use the iterator."""
+    return list(iter_generated_decision_shape_failures(value, label))
 
-    failures: list[str] = []
+
+def iter_generated_decision_shape_failures(value: Any, label: str) -> Iterator[str]:
+    if not isinstance(value, dict):
+        yield from [f"{label}: expected object"]
+        return
+
     outcome = value.get("outcome")
     if not isinstance(outcome, str) or outcome not in {"allow", "attenuate", "deny"}:
-        failures.append(f"{label}.outcome: expected allow, attenuate, or deny")
+        yield (f"{label}.outcome: expected allow, attenuate, or deny")
     reason_codes = value.get("reason_codes")
     if not isinstance(reason_codes, list):
-        failures.append(f"{label}.reason_codes: expected array")
+        yield (f"{label}.reason_codes: expected array")
     else:
         for index, reason_code in enumerate(reason_codes):
             if not isinstance(reason_code, str) or not reason_code:
-                failures.append(f"{label}.reason_codes[{index}]: expected non-empty string")
+                yield (f"{label}.reason_codes[{index}]: expected non-empty string")
 
     visibility = value.get("reason_visibility")
     if "reason_visibility" in value and (
         not isinstance(visibility, str)
         or visibility not in {"disclosed", "opaque", "withheld"}
     ):
-        failures.append(f"{label}.reason_visibility: expected disclosed, opaque, or withheld")
+        yield (f"{label}.reason_visibility: expected disclosed, opaque, or withheld")
     reason_withheld = value.get("reason_withheld")
     if "reason_withheld" in value and not isinstance(reason_withheld, bool):
-        failures.append(f"{label}.reason_withheld: expected boolean when present")
+        yield (f"{label}.reason_withheld: expected boolean when present")
     if visibility == "disclosed" and reason_withheld is True:
-        failures.append(f"{label}.reason_withheld: disclosed reasons cannot be withheld")
+        yield (f"{label}.reason_withheld: disclosed reasons cannot be withheld")
     if reason_withheld is True and not is_string_enum(
         visibility,
         {"opaque", "withheld"},
     ):
-        failures.append(f"{label}.reason_visibility: true reason_withheld requires opaque or withheld")
-    failures.extend(
+        yield (f"{label}.reason_visibility: true reason_withheld requires opaque or withheld")
+    yield from (
         non_empty_string_field_failures(value, "human_readable_summary", label, required=False)
     )
-    return failures
+    return
 
 
 def generated_admission_receipt_shape_failures(receipt: dict[str, Any], label: str) -> list[str]:
-    failures: list[str] = []
+    """Preserve the existing list API; bounded readers use the iterator."""
+    return list(iter_generated_admission_receipt_shape_failures(receipt, label))
+
+
+def iter_generated_admission_receipt_shape_failures(receipt: dict[str, Any], label: str) -> Iterator[str]:
     verifier = receipt.get("verifier")
     if not isinstance(verifier, dict):
-        failures.append(f"{label}.verifier: expected object")
+        yield (f"{label}.verifier: expected object")
     else:
-        failures.extend(non_empty_string_field_failures(verifier, "id", f"{label}.verifier"))
-        failures.extend(
+        yield from (non_empty_string_field_failures(verifier, "id", f"{label}.verifier"))
+        yield from (
             non_empty_string_field_failures(
                 verifier,
                 "key_id",
@@ -3941,26 +3964,26 @@ def generated_admission_receipt_shape_failures(receipt: dict[str, Any], label: s
             )
         )
     decision = receipt.get("decision")
-    failures.extend(generated_decision_shape_failures(decision, f"{label}.decision"))
+    yield from (iter_generated_decision_shape_failures(decision, f"{label}.decision"))
     decision_outcome = decision.get("outcome") if isinstance(decision, dict) else None
     if decision_outcome == "attenuate" and "attenuation" not in receipt:
-        failures.append(f"{label}.attenuation: required when decision.outcome is attenuate")
+        yield (f"{label}.attenuation: required when decision.outcome is attenuate")
     elif decision_outcome != "attenuate" and "attenuation" in receipt:
-        failures.append(f"{label}.attenuation: must be absent unless decision.outcome is attenuate")
+        yield (f"{label}.attenuation: must be absent unless decision.outcome is attenuate")
     if decision_outcome == "attenuate" and "attenuation" in receipt:
         decision_codes = (
             decision.get("reason_codes")
             if isinstance(decision, dict) and isinstance(decision.get("reason_codes"), list)
             else None
         )
-        for failure in attenuation_validation_failures(
+        for failure in iter_attenuation_validation_failures(
             receipt.get("attenuation"),
             decision_reason_codes=decision_codes,
         ):
-            failures.append(f"{label}.attenuation: {failure}")
+            yield (f"{label}.attenuation: {failure}")
     if "proof" in receipt:
-        failures.extend(generated_proof_shape_failures(receipt.get("proof"), f"{label}.proof"))
-    return failures
+        yield from (generated_proof_shape_failures(receipt.get("proof"), f"{label}.proof"))
+    return
 
 
 def generated_post_execution_receipt_shape_failures(

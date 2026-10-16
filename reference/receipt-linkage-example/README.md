@@ -48,8 +48,9 @@ identity, while isolating its imports from the calling process.
 | `not_assessed` | Missing, unreadable, invalid or unsupported input prevented comparison. | 2 |
 
 These are this example's reporting categories, not new VATE decision codes.
-`core_result` retains the core's output, and `side_effect_check_failures` retains
-the runner's amount-check findings. The top-level result reflects both.
+`core_result` retains the core's output, and `side_effect_check_failures` reports
+the runner's amount-check findings within the diagnostic limits below. The
+top-level result reflects both.
 `linkage_checks_run` lists the check groups invoked; `not_checked` lists the remaining
 verification responsibilities.
 
@@ -71,6 +72,25 @@ In CLI output, each input's `file_status` distinguishes `not_specified`, `read`,
 `read` alone does not mean valid JSON. `raw_file_sha256` identifies those bytes.
 Receipt-to-receipt linkage uses the existing VATE JSON object digest, which is
 different from a raw-file digest.
+
+## Diagnostic limits
+
+Each `input_issues` or `side_effect_check_failures` list retains at most
+32 items and 32 KiB of compact ASCII-escaped JSON. Detail text is limited to
+512 Unicode characters, paths to 16 components, and string path components to
+128 characters. These are local reporting limits, not receipt-schema limits.
+
+When needed, `diagnostic_truncation` identifies omitted text or collection
+stopped at the limit. A stopped collection has `total_errors: null`; even
+exactly 32 findings receives the stop marker because the checker does not
+scan ahead to count the remainder. Individual truncated detail/path values
+are marked as well. Inspect that metadata before treating the list as complete.
+
+Invalidity is retained independently of the saved findings: truncation cannot
+turn `not_assessed` or `mismatch` into `matched`. Original hashes and core
+reason codes remain in the result. jsonschema can create a large error message
+before yielding it; these reporting limits do not bound all internal CPU or
+memory use. Caller time and output limits still apply.
 
 ## Input conditions
 

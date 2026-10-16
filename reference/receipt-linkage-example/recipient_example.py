@@ -7,6 +7,7 @@ import hashlib
 import importlib.util
 import json
 import math
+from itertools import chain
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 import sys
@@ -76,6 +77,78 @@ def load_module(name: str, path: Path):
     return module
 
 
+
+# Local diagnostic presentation limits; receipt/schema semantics are unchanged.
+DIAGNOSTIC_LIMITS = {"items": 32, "detail_characters": 512, "path_components": 16,
+                     "path_component_characters": 128, "list_json_bytes": 32768}
+
+
+class DiagnosticBudget:
+    """Collect incrementally; never count omitted errors by exhausting a source."""
+    def __init__(self):
+        self.items = []
+        self.json_bytes = 2  # The list's opening and closing brackets.
+        self.found = False
+        self.text_omitted = False
+        self.collection_stopped = False
+
+    def _text(self, value, limit):
+        if len(value) > limit:
+            self.text_omitted = True
+            return value[:limit]
+        return value
+
+    def add(self, value):
+        self.found = True  # Evidence of invalidity survives a full display budget.
+        if self.collection_stopped:
+            return False
+        if isinstance(value, dict):
+            value = dict(value)
+            if "detail" in value:
+                old = value["detail"]
+                value["detail"] = self._text(old, DIAGNOSTIC_LIMITS["detail_characters"])
+                if old != value["detail"]:
+                    value["detail_truncated"] = True
+            if "path" in value:
+                path = value["path"]
+                kept = [self._text(p, DIAGNOSTIC_LIMITS["path_component_characters"])
+                        if isinstance(p, str) else p
+                        for p in path[:DIAGNOSTIC_LIMITS["path_components"]]]
+                if kept != path:
+                    self.text_omitted = True
+                    value["path_truncated"] = True
+                value["path"] = kept
+        else:
+            value = self._text(value, DIAGNOSTIC_LIMITS["detail_characters"])
+        size = len(json.dumps(value, ensure_ascii=True, separators=(",", ":")).encode("ascii"))
+        next_size = self.json_bytes + bool(self.items) + size
+        if next_size > DIAGNOSTIC_LIMITS["list_json_bytes"]:
+            self.collection_stopped = True
+            return False
+        self.items.append(value)
+        self.json_bytes = next_size
+        if len(self.items) >= DIAGNOSTIC_LIMITS["items"] or self.json_bytes >= DIAGNOSTIC_LIMITS["list_json_bytes"]:
+            self.collection_stopped = True
+        return not self.collection_stopped
+
+    def consume(self, values):
+        if self.collection_stopped:
+            return
+        for value in values:
+            if not self.add(value):
+                break
+
+    def attach(self, result, field):
+        result[field] = self.items
+        if self.text_omitted or self.collection_stopped:
+            result.setdefault("diagnostic_truncation", {})[field] = {
+                "text_omitted": self.text_omitted,
+                "collection_stopped_at_limit": self.collection_stopped,
+                "total_errors": None,
+                "limits": dict(DIAGNOSTIC_LIMITS),
+            }
+
+
 class RecipientExample:
     def __init__(self) -> None:
         if ROOT is None:
@@ -108,31 +181,30 @@ class RecipientExample:
         self.tool_allowlist_validator = Draft202012Validator(tool_schema)
         self.tool_name_validator = Draft202012Validator(tool_schema["items"])
 
-    def reference_input_issues(self, admission: dict, post: dict) -> list[dict]:
+    def reference_input_issues(self, admission: dict, post: dict):
         """Local preconditions for values this example asks the core to interpret."""
-        issues = []
 
         def validate(role, path, value, validator):
             for error in validator.iter_errors(value):
-                issues.append({"input": role, "kind": "semantic_input_invalid",
+                yield ({"input": role, "kind": "semantic_input_invalid",
                                "path": path + list(error.absolute_path), "detail": error.message})
 
         def validate_amount(role, path, amount):
-            validate(role, path, amount, self.amount_validator)
+            yield from validate(role, path, amount, self.amount_validator)
             if not isinstance(amount, dict):
                 return
             for failure in self.runner.decimal_amount_failures(amount.get("value"), label="amount.value"):
-                issues.append({"input": role, "kind": "semantic_input_invalid",
+                yield ({"input": role, "kind": "semantic_input_invalid",
                                "path": path + ["value"], "detail": failure})
             if self.core.safe_decimal_amount(amount.get("value")) is None:
-                issues.append({"input": role, "kind": "unsupported_amount",
+                yield ({"input": role, "kind": "unsupported_amount",
                                "path": path + ["value"],
                                "detail": "amount exceeds reference-core input bounds (64 characters, 18 integer digits, 8 fractional digits)"})
             # Match the existing runner's three-letter currency condition as well
             # as its schema: a regex '$' alone may accept a final newline.
             currency = amount.get("currency")
             if isinstance(currency, str) and (len(currency) != 3 or not all("A" <= c <= "Z" for c in currency)):
-                issues.append({"input": role, "kind": "semantic_input_invalid",
+                yield ({"input": role, "kind": "semantic_input_invalid",
                                "path": path + ["currency"], "detail": "currency must be a 3-letter uppercase code"})
 
         constraints = self.core.admitted_effective_constraints(admission)
@@ -142,39 +214,38 @@ class RecipientExample:
         # constraint or normalize the supplied original at the recipient.
         for legacy, canonical in (("max_amount_usd", "max_amount"), ("resource", "target_resource")):
             if legacy in constraints:
-                issues.append({"input": "admission", "kind": "semantic_input_invalid",
+                yield ({"input": "admission", "kind": "semantic_input_invalid",
                                "path": constraint_path + [legacy],
                                "detail": f"issued AL2 receipt contains legacy constraint {legacy}; expected {canonical}"})
         if isinstance(constraints.get("approval"), str):
-            issues.append({"input": "admission", "kind": "semantic_input_invalid",
+            yield ({"input": "admission", "kind": "semantic_input_invalid",
                            "path": constraint_path + ["approval"],
                            "detail": "issued AL2 receipt contains string-valued approval; expected an approval object"})
         if "max_amount" in constraints:
-            validate_amount("admission", constraint_path + ["max_amount"], constraints["max_amount"])
+            yield from validate_amount("admission", constraint_path + ["max_amount"], constraints["max_amount"])
             for index, effect in enumerate(post["result"]["side_effects"]):
                 if "amount" in effect:
-                    validate_amount("post", ["result", "side_effects", index, "amount"], effect["amount"])
+                    yield from validate_amount("post", ["result", "side_effects", index, "amount"], effect["amount"])
         if "tool_allowlist" in constraints:
-            validate("admission", constraint_path + ["tool_allowlist"],
+            yield from validate("admission", constraint_path + ["tool_allowlist"],
                      constraints["tool_allowlist"], self.tool_allowlist_validator)
             for index, effect in enumerate(post["result"]["side_effects"]):
                 # These aliases and their precedence come from the pinned reference core.
                 aliases = [key for key in ("tool", "tool_id", "name") if key in effect]
                 if aliases:
                     selected = next((key for key in aliases if effect[key]), aliases[0])
-                    validate("post", ["result", "side_effects", index, selected],
+                    yield from validate("post", ["result", "side_effects", index, selected],
                              effect[selected], self.tool_name_validator)
-        return issues
+        return
 
-    def declared_field_issues(self, role: str, receipt: dict) -> list[dict]:
+    def declared_field_issues(self, role: str, receipt: dict):
         """Check known typed fields, leaving extension/annotation objects alone."""
-        issues = []
         hashes = ([["request", "input_hash"], ["attenuation", "original_request_hash"],
                    ["attenuation", "effective_request_hash"]] if role == "admission" else
                   [["execution", "effective_request_hash"], ["result", "output_hash"]])
-        descriptors = ([["request", "action_binding", "digest"],
-                        ["policy", "policy_snapshot", "digest"]]
-                       + [["evidence", i, "digest"] for i in range(len(receipt.get("evidence", [])))]
+        descriptors = (chain([["request", "action_binding", "digest"],
+                          ["policy", "policy_snapshot", "digest"]],
+                         (["evidence", i, "digest"] for i in range(len(receipt.get("evidence", [])))))
                        if role == "admission" else
                        [["admission", "digest"], ["execution", "action_binding", "digest"]])
         times = ([["issued_at"], ["expires_at"]] if role == "admission" else
@@ -193,9 +264,9 @@ class RecipientExample:
                 except (KeyError, IndexError, TypeError):
                     continue  # Required fields and shapes were checked by the schema.
                 if not check(value):
-                    issues.append({"input": role, "kind": "semantic_input_invalid",
+                    yield ({"input": role, "kind": "semantic_input_invalid",
                                    "path": path, "detail": detail})
-        return issues
+        return
 
     def assess(self, admission_raw: bytes | None, post_raw: bytes | None) -> dict:
         """Missing bytes mean not supplied, never that execution did not occur."""
@@ -204,53 +275,63 @@ class RecipientExample:
             "assessment_scope": "receipt relationships and reference-core constraints only",
             "source_files": self.sources["files"],
             "digest_basis": "VATE v0.3 fixture json-sorted-no-whitespace",
-            "inputs": {},
+            "inputs": {role: {"supplied": raw is not None,
+                              "raw_file_sha256": digest(raw) if raw is not None else None}
+                       for role, raw in (("admission", admission_raw), ("post", post_raw))},
             "input_issues": [],
             "linkage_checks_run": [],
             "core_result": None,
             "side_effect_check_failures": [],
             "not_checked": list(NOT_CHECKED),
         }
+        issues = DiagnosticBudget()
         receipts = {}
+
+        def semantic_issues(role, receipt):
+            shape_check = (self.runner.iter_generated_admission_receipt_shape_failures
+                           if role == "admission" else self.runner.generated_post_execution_receipt_shape_failures)
+            yield from shape_check(receipt, role)
+            yield from self.runner.generated_receipt_identity_failures(
+                receipt, role, "admission" if role == "admission" else "post_execution")
+            if role == "admission":
+                yield from self.runner.reason_code_order_failures(
+                    receipt["decision"]["reason_codes"], receipt["decision"]["outcome"], label="admission.decision")
+                yield from self.runner.iter_evaluate_evidence_vocabulary_checks(None, receipt)
+
         for role, raw in (("admission", admission_raw), ("post", post_raw)):
-            result["inputs"][role] = {
-                "supplied": raw is not None,
-                "raw_file_sha256": digest(raw) if raw is not None else None,
-            }
+            if issues.collection_stopped:
+                break  # Both original hashes are already retained above.
             if raw is None:
-                result["input_issues"].append({"input": role, "kind": "not_supplied"})
+                issues.add({"input": role, "kind": "not_supplied"})
                 continue
             try:
                 receipt = parse_receipt(raw)
-                errors = list(self.validators[role].iter_errors(receipt))
+                schema_invalid = False
+                for error in self.validators[role].iter_errors(receipt):
+                    schema_invalid = True
+                    if not issues.add({"input": role, "kind": "schema_invalid",
+                                       "path": list(error.absolute_path), "detail": error.message}):
+                        break
             except (ValueError, UnicodeError, RecursionError) as exc:
-                result["input_issues"].append({"input": role, "kind": "invalid_input", "detail": str(exc)})
+                issues.add({"input": role, "kind": "invalid_input", "detail": str(exc)})
                 continue
-            if errors:
-                result["input_issues"].extend({
-                    "input": role, "kind": "schema_invalid",
-                    "path": list(error.absolute_path), "detail": error.message,
-                } for error in errors)
+            if schema_invalid:
                 continue
-            shape_check = (self.runner.generated_admission_receipt_shape_failures
-                           if role == "admission" else self.runner.generated_post_execution_receipt_shape_failures)
-            semantic_errors = shape_check(receipt, role)
-            semantic_errors += self.runner.generated_receipt_identity_failures(
-                receipt, role, "admission" if role == "admission" else "post_execution")
-            if role == "admission":
-                semantic_errors += self.runner.reason_code_order_failures(
-                    receipt["decision"]["reason_codes"], receipt["decision"]["outcome"], label="admission.decision")
-                semantic_errors += self.runner.evaluate_evidence_vocabulary_checks(None, receipt)
-            if semantic_errors:
-                result["input_issues"].extend({"input": role, "kind": "semantic_input_invalid", "detail": error}
-                                              for error in semantic_errors)
+            semantic_invalid = False
+            for error in semantic_issues(role, receipt):
+                semantic_invalid = True
+                if not issues.add({"input": role, "kind": "semantic_input_invalid", "detail": error}):
+                    break
+            if semantic_invalid:
                 continue
-            result["input_issues"].extend(self.declared_field_issues(role, receipt))
+            issues.consume(self.declared_field_issues(role, receipt))
             receipts[role] = receipt
-        if result["input_issues"]:
+        if issues.found:
+            issues.attach(result, "input_issues")
             return result
-        result["input_issues"] = self.reference_input_issues(receipts["admission"], receipts["post"])
-        if result["input_issues"]:
+        issues.consume(self.reference_input_issues(receipts["admission"], receipts["post"]))
+        if issues.found:
+            issues.attach(result, "input_issues")
             return result
         result["linkage_checks_run"] = [
             "receipt_id_and_admission_object_digest",
@@ -261,15 +342,17 @@ class RecipientExample:
         ]
         result["core_result"] = self.verifier.validate_post_execution_linkage(receipts["admission"], receipts["post"])
         constraints = self.core.admitted_effective_constraints(receipts["admission"])
+        side_effects = DiagnosticBudget()
         if "max_amount" in constraints:
-            result["side_effect_check_failures"] = self.runner.post_execution_side_effect_failures(
-                receipts["admission"], receipts["post"])
+            side_effects.consume(self.runner.iter_post_execution_side_effect_failures(
+                receipts["admission"], receipts["post"]))
+            side_effects.attach(result, "side_effect_check_failures")
             result["linkage_checks_run"].append("runner_reported_amount_validation")
         else:
             result["not_checked"].append("reported_amounts_without_max_amount_constraint")
         if "tool_allowlist" not in constraints:
             result["not_checked"].append("reported_tools_without_tool_allowlist_constraint")
-        matched = result["core_result"]["outcome"] == "success" and not result["side_effect_check_failures"]
+        matched = result["core_result"]["outcome"] == "success" and not side_effects.found
         result["record_linkage"] = "matched" if matched else "mismatch"
         return result
 
@@ -305,7 +388,17 @@ def main() -> int:
         for role, status in file_status.items():
             result["inputs"][role]["file_status"] = status
         unreadable = {issue["input"] for issue in io_issues}
-        result["input_issues"] = [issue for issue in result["input_issues"] if issue["input"] not in unreadable] + io_issues
+        previous = result.get("diagnostic_truncation", {}).get("input_issues")
+        issues = DiagnosticBudget()
+        issues.consume(chain((issue for issue in result["input_issues"] if issue["input"] not in unreadable), io_issues))
+        issues.attach(result, "input_issues")
+        if previous:
+            current = result.setdefault("diagnostic_truncation", {}).get("input_issues", {})
+            result["diagnostic_truncation"]["input_issues"] = {
+                **previous,
+                "text_omitted": previous["text_omitted"] or current.get("text_omitted", False),
+                "collection_stopped_at_limit": previous["collection_stopped_at_limit"] or current.get("collection_stopped_at_limit", False),
+            }
     except (OSError, ValueError) as exc:
         print(json.dumps({"record_linkage": "not_assessed", "tool_error": str(exc)}))
         return 2

@@ -85,6 +85,11 @@ attempts, use [Required Record Review](reference/required-records/README.md).
 It distinguishes missing, pending and unresolved records while retaining the
 complete native assessments and the receiver's collection assumptions.
 
+To preserve those originals across restarts and reassess after late delivery,
+use [Recipient Inbox](reference/recipient-inbox/README.md). It stores raw bytes,
+fixed review inputs and successive reports in SQLite, and exports the accepted
+history for replay with an explicitly selected evaluator.
+
 ## What VATE Records
 
 - **One admission basis**: action, target, any requested constraints, actor, principal,

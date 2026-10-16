@@ -16,7 +16,7 @@ jobs:
   execution-evidence:
     name: Execution evidence (${{ matrix.os }}, Python ${{ matrix.python }})
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 15
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
@@ -48,8 +48,8 @@ jobs:
 
       - name: Replay S3 observations and run offline acceptance checks
         run: |
-          python -B reference/s3-observation-example/run_examples.py
-          python -B reference/s3-observation-example/test_assessment.py
+          python -B reference/s3-observation-example/run_examples.py --runtime historical-e845a6a8
+          python -B reference/s3-observation-example/test_assessment.py --synthetic-current
           python -B -m unittest discover -s reference/s3-observation-example -p 'test_native_fixture.py' -v
           python -B -m unittest discover -s reference/s3-observation-example -p 'test_assess_cli.py' -v
 
@@ -84,6 +84,12 @@ jobs:
           output_dir="$(mktemp -d)"
           python -B reference/required-records/run_examples.py --openssl "$VATE_TRIAL_OPENSSL" --openssl-sha256 "$VATE_TRIAL_OPENSSL_SHA256" --output "$output_dir/run"
 
+      - name: Check durable receipt intake, bounded diagnostics, and historical replay
+        run: |
+          python -B -m unittest discover -s reference/recipient-inbox -p 'test_*.py' -v
+          output_dir="$(mktemp -d)"
+          python -B reference/recipient-inbox/run_trial.py --openssl "$VATE_TRIAL_OPENSSL" --openssl-sha256 "$VATE_TRIAL_OPENSSL_SHA256" --output "$output_dir/run"
+
       - name: Check NENRIN saved records and replay the pinned VATE cases
         run: |
           output_dir="$(mktemp -d)"
@@ -109,8 +115,8 @@ jobs:
         run: |
           archive_dir="$(mktemp -d)"
           git archive HEAD | tar -x -C "$archive_dir"
-          python -B "$archive_dir/reference/s3-observation-example/run_examples.py"
-          python -B "$archive_dir/reference/s3-observation-example/test_assessment.py"
+          python -B "$archive_dir/reference/s3-observation-example/run_examples.py" --runtime historical-e845a6a8
+          python -B "$archive_dir/reference/s3-observation-example/test_assessment.py" --synthetic-current
           python -B -m unittest discover -s "$archive_dir/reference/s3-observation-example" -p 'test_native_fixture.py' -v
           python -B -m unittest discover -s "$archive_dir/reference/s3-observation-example" -p 'test_assess_cli.py' -v
 
@@ -149,6 +155,15 @@ jobs:
           cd "$output_dir"
           python -B -m unittest discover -s "$archive_dir/reference/required-records" -p 'test_*.py' -v
           python -B "$archive_dir/reference/required-records/run_examples.py" --openssl "$VATE_TRIAL_OPENSSL" --openssl-sha256 "$VATE_TRIAL_OPENSSL_SHA256" --output "$output_dir/run"
+
+      - name: Check durable receipt intake from a source archive
+        run: |
+          archive_dir="$(mktemp -d)"
+          output_dir="$(mktemp -d)"
+          git archive HEAD | tar -x -C "$archive_dir"
+          cd "$output_dir"
+          python -B -m unittest discover -s "$archive_dir/reference/recipient-inbox" -p 'test_*.py' -v
+          python -B "$archive_dir/reference/recipient-inbox/run_trial.py" --openssl "$VATE_TRIAL_OPENSSL" --openssl-sha256 "$VATE_TRIAL_OPENSSL_SHA256" --output "$output_dir/run"
 
   validate:
     name: Repository checks
