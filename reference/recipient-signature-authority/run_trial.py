@@ -10,6 +10,22 @@ import sys
 
 import recipient_trial as trial
 from trial_fixtures import Fixtures
+sys.path.insert(0, str(trial.ROOT / "reference/runtime-support"))
+from historical import COMMIT as HISTORICAL_COMMIT, historical_api
+
+
+def check_current_response(current, baseline):
+    """Allow only verified current source identities to differ from the old result."""
+    current, baseline = deepcopy(current), deepcopy(baseline)
+    for field in ("wrapper", "evaluator", "native_result"):
+        observed = current[field].pop("source_files")
+        previous = baseline[field].pop("source_files")
+        if set(observed) != set(previous):
+            raise AssertionError("current source set changed: " + field)
+        if observed != {name: trial.sha((trial.ROOT / name).read_bytes()) for name in observed}:
+            raise AssertionError("current source identity differs: " + field)
+    if trial.encoded(current) != trial.encoded(baseline):
+        raise AssertionError("current response changed beyond verified source identities")
 
 
 def run(output, openssl, expected_sha):
@@ -68,15 +84,26 @@ def run(output, openssl, expected_sha):
                         "post_axes": list(actual), "expectation_matched": True})
     before = json.loads((trial.HERE / "BASELINE.json").read_bytes())
     matching = json.loads((output / "matching/RESULT.json").read_bytes())
-    if trial.encoded(before["receipt_pair"]) != trial.encoded(matching["receipt_assessment"]):
-        raise AssertionError("pre-extension complete v1 response changed")
+    historical, frozen = historical_api(trial.ROOT)
+    replay = historical.RecipientAssessor(expected_api_contract=historical.API_CONTRACT, source_root=frozen).assess_receipts(
+        fixtures.admission, fixtures.post, requested_checks=["receipt_linkage", "signatures_and_issuer_authority"])
+    if trial.encoded(before["receipt_pair"]) != trial.encoded(replay):
+        raise AssertionError("historical complete v1 response changed")
+    replay_raw = trial.encoded(replay) + b"\n"
+    (output / "HISTORICAL-RECEIPT-BASELINE.json").write_bytes(replay_raw)
+    check_current_response(matching["receipt_assessment"], before["receipt_pair"])
     for name, expected in before["protected_files"].items():
-        if trial.sha((trial.ROOT / name).read_bytes()) != expected:
+        if trial.sha((frozen / name).read_bytes()) != expected:
             raise AssertionError("protected source changed: " + name)
     record = {"contract": trial.CONTRACT, "created_at": datetime.now(timezone.utc).isoformat(),
               "runtime": {"python": sys.version, "executable": sys.executable, "platform": platform.platform(),
                           "openssl": assessor.verifier_identity}, "cases": reports,
               "previous_api_response_preserved": True, "protected_files_unchanged": len(before["protected_files"]),
+              "baseline_verification": {
+                  "baseline_source_commit": before["source_commit"],
+                  "historical_runtime_commit": HISTORICAL_COMMIT,
+                  "historical_response": {"path": "HISTORICAL-RECEIPT-BASELINE.json", **trial.identity(replay_raw)},
+                  "current_response_differs_only_in_verified_source_files": True},
               "implementation_files": {name: trial.identity((trial.HERE / name).read_bytes())
                  for name in ("recipient_trial.py", "trial_fixtures.py", "run_trial.py")},
               "synthetic_signatures": True, "new_s3_execution": False}

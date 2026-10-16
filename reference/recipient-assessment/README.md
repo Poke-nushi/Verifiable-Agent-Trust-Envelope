@@ -37,17 +37,19 @@ From the repository root, inspect the receipt pair included in R17:
   --post reference/receipt-linkage-example/inputs/R17/post.json
 ```
 
-Omit a receipt argument when that original is unavailable. For a captured S3
-operation, supply the bundle and a receiver-selected policy file outside it:
+Omit a receipt argument when that original is unavailable. Replay the included
+S3 captures with their explicitly selected historical evaluator:
 
 ```bash
-.venv/bin/python -B reference/recipient-assessment/vate_recipient.py \
-  --api-contract vate-recipient-assessment-api-v1 s3 \
-  --bundle reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported \
-  --receiver-policy reference/s3-observation-example/inputs/seaweedfs-4.48/instance/receiver-policy.json
+.venv/bin/python -B reference/s3-observation-example/run_examples.py \
+  --runtime historical-e845a6a8
 ```
 
-The included policy explicitly accepts the example's unsigned local collector.
+For new S3 inputs, use this API's `s3` subcommand with `--bundle` and
+`--receiver-policy`; keep the policy outside the bundle. The capture, policy
+and current evaluator source hashes must agree. The included policy accepts
+the archived unsigned collector and source snapshot; it does not authorize
+new evaluator bytes. See [historical replay](../historical-runtime/README.md).
 Select policy through the receiving application; consistent bundle hashes alone
 do not establish that trust. The API's detailed input conditions and error codes
 are in [CONTRACT.md](CONTRACT.md).
@@ -126,13 +128,18 @@ requirements.
 
 ## Reproduce and update
 
-Run the original-input vectors and the API tests:
+Run the original-input vectors under the fixed historical runtime, then the
+current API tests:
 
 ```bash
 .venv/bin/python -B reference/recipient-assessment/run_vectors.py
 .venv/bin/python -B -m unittest discover \
   -s reference/recipient-assessment -p 'test_*.py' -v
 ```
+
+The first command verifies the fixed e845a6a8 runtime and reproduces the
+original native results. The tests use current receipt checks and labelled
+synthetic S3 derivatives, retaining their original-input provenance.
 
 The [vector index](vectors.json) points to stored originals and semantic
 expectations so another language can consume the inputs without reproducing

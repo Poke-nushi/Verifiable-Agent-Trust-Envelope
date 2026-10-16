@@ -34,8 +34,12 @@ or exactly 3 or 6 fractional digits; other lengths can leave an assessment
 receipts or capture artifacts.
 
 ```bash
-python3 reference/s3-observation-example/run_examples.py
+python3 reference/s3-observation-example/run_examples.py --runtime historical-e845a6a8
 ```
+
+The command explicitly selects the [fixed historical runtime](../historical-runtime/README.md)
+whose source identity matches the captures and receiver policy. Current assessment
+entry points retain current pins; they do not fall back to this snapshot.
 
 The command exits successfully when all four assessments match their expected
 results. A successful replay includes the two deliberately insufficient cases:
@@ -51,13 +55,16 @@ The last row concerns the named historical version, not the current latest objec
 The 403/404 rows do not establish that the original upload failed or that retrying
 it is permitted. Every assessment returns `retry_authorized: false`.
 
-For a complete assessment of one bundle:
+Save the complete historical assessment of one included bundle:
 
 ```bash
-python3 reference/s3-observation-example/assess_cli.py \
-  --bundle reference/s3-observation-example/inputs/seaweedfs-4.48/instance/bundles/supported \
-  --trust reference/s3-observation-example/inputs/seaweedfs-4.48/instance/receiver-policy.json
+python3 reference/s3-observation-example/run_examples.py \
+  --runtime historical-e845a6a8 --case supported \
+  --output /tmp/vate-s3-supported.json
 ```
+
+For a newly captured current-source bundle, use `assess_cli.py` with `--bundle`
+and an external `--trust` policy whose source hashes match the installed evaluator.
 
 The receiver policy is a separate input, outside each bundle. In this example it
 explicitly accepts the local unsigned collector and store and fixes the endpoint,
@@ -68,14 +75,14 @@ assessment fields and decision rules.
 
 `assess_cli.py` checks the policy's filesystem location, including case and
 Unicode aliases for the same bundle directory, before reading the policy. It
-returns the fixed evaluator's complete JSON and exit codes: 0 for supported,
+returns the installed evaluator's complete JSON and exit codes: 0 for supported,
 1 for contradictory, 2 for insufficient, and 3 for unsupported. Invalid policy
 placement returns `insufficient` with a `receiver_configuration` diagnostic and
 exit 2.
 
 Use this entry point for direct assessments. The original
-`assess_observation.py` remains byte-for-byte fixed for historical reproductions
-and the Recipient Assessment API. Its historical CLI uses a lexical path check
+`assess_observation.py` file remains fixed and is also used by the Recipient
+Assessment API. Its receipt-reader dependencies have their own source identities. Its historical CLI uses a lexical path check
 that can miss filesystem aliases. The new entry point is outside the captured
 source-pin set; `source_trust` describes the fixed evaluator and capture sources,
 not the new CLI's bytes. Location checking does not establish who selected or
@@ -99,12 +106,14 @@ and the existing source-pin and receiver-policy requirements.
 Run the offline acceptance checks:
 
 ```bash
-python3 reference/s3-observation-example/test_assessment.py
+python3 reference/s3-observation-example/test_assessment.py --synthetic-current
 python3 -m unittest discover -s reference/s3-observation-example -p 'test_native_fixture.py' -v
 python3 -m unittest discover -s reference/s3-observation-example -p 'test_assess_cli.py' -v
 ```
 
-These checks replay stored captures and mutate separate copies to test changed
+These current-code checks derive separate synthetic copies with current source
+declarations and record the changed fields in `SYNTHETIC-PROVENANCE.json`.
+They retain the saved originals and test changed
 targets, bodies, versions, attempt references, receipt fields, missing originals,
 unknown contracts and malformed bundles. Synthetic cases are identified in the
 output; they are not additional SeaweedFS measurements. The first command writes its
@@ -147,8 +156,10 @@ sharing it; the included public inputs contain only selected evidence files.
 The recorded capture required forced process termination, so it does not test
 clean shutdown or restart durability.
 
-To assess your new capture, pass its output directory with `--input` to
-`run_examples.py` or with `--run` to `test_assessment.py`.
+To assess your new capture with the current sources, pass its output directory
+with `--input` and select `--runtime current` in `run_examples.py`. For the
+acceptance checks, pass the output directory with `--run` to `test_assessment.py`.
+The `--synthetic-current` option is only for the derived offline test inputs.
 
 ## Scope and reuse
 

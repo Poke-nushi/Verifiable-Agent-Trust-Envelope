@@ -11,7 +11,10 @@ import unittest
 from unittest.mock import patch
 
 import recipient_trial as trial
+import run_trial
 from trial_fixtures import Fixtures
+sys.path.insert(0, str(trial.ROOT / "reference/runtime-support"))
+from historical import historical_api, historical_root
 
 
 class TrialTests(unittest.TestCase):
@@ -55,14 +58,46 @@ class TrialTests(unittest.TestCase):
         self.assertEqual(result["receipt_assessment"]["native_result"]["record_linkage"], "matched")
         self.assertEqual(result["receipt_assessment"]["requested_checks"]["unsupported"], ["signatures_and_issuer_authority"])
         before = json.loads((trial.HERE / "BASELINE.json").read_bytes())["receipt_pair"]
-        self.assertEqual(trial.encoded(result["receipt_assessment"]), trial.encoded(before))
+        historical, frozen = historical_api(trial.ROOT)
+        replay = historical.RecipientAssessor(expected_api_contract=historical.API_CONTRACT, source_root=frozen).assess_receipts(
+            self.fixtures.admission, self.fixtures.post, requested_checks=["receipt_linkage", "signatures_and_issuer_authority"])
+        self.assertEqual(replay, before)
+        current = deepcopy(result["receipt_assessment"])
+        for field in ("wrapper", "evaluator", "native_result"):
+            observed_sources = current[field].pop("source_files")
+            self.assertEqual(set(observed_sources), set(before[field]["source_files"]))
+            self.assertEqual(observed_sources, {name: trial.sha((trial.ROOT / name).read_bytes()) for name in observed_sources})
+            before[field].pop("source_files")
+        self.assertEqual(trial.encoded(current), trial.encoded(before))
         self.assertNotIn("overall", result)
 
     def test_all_protected_sources_unchanged(self):
         before = json.loads((trial.HERE / "BASELINE.json").read_bytes())
         for relative, expected in before["protected_files"].items():
             with self.subTest(path=relative):
-                self.assertEqual(trial.sha((trial.ROOT / relative).read_bytes()), expected)
+                self.assertEqual(trial.sha((historical_root(trial.ROOT) / relative).read_bytes()), expected)
+
+    def test_trial_comparison_refuses_forged_or_partial_current_source_identity(self):
+        current = self.assess()["receipt_assessment"]
+        baseline = json.loads((trial.HERE / "BASELINE.json").read_bytes())["receipt_pair"]
+        run_trial.check_current_response(current, baseline)
+        for field in ("wrapper", "evaluator", "native_result"):
+            for remove in (False, True):
+                changed = deepcopy(current)
+                name = next(iter(changed[field]["source_files"]))
+                if remove:
+                    del changed[field]["source_files"][name]
+                else:
+                    changed[field]["source_files"][name] = "0" * 64
+                with self.subTest(field=field, remove=remove), self.assertRaisesRegex(AssertionError, "current source"):
+                    run_trial.check_current_response(changed, baseline)
+
+    def test_trial_comparison_refuses_semantic_change_even_with_correct_current_sources(self):
+        current = self.assess()["receipt_assessment"]
+        baseline = json.loads((trial.HERE / "BASELINE.json").read_bytes())["receipt_pair"]
+        current["native_result"]["record_linkage"] = "mismatch"
+        with self.assertRaisesRegex(AssertionError, "changed beyond verified source identities"):
+            run_trial.check_current_response(current, baseline)
 
     def test_shipped_policy_matches_generated_fixture_policy(self):
         shipped = (trial.HERE / "receiver-policy.example.json").read_bytes()

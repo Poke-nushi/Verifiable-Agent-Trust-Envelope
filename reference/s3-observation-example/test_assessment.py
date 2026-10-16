@@ -5,6 +5,7 @@ import datetime as dt
 import re
 import shutil
 import tempfile
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
@@ -61,15 +62,24 @@ def short_body(p, size):
     save(p, 'post.json', c.make_post(admission, read(p, 'attempt.json'), read(p, 'put-transport.json'), read(p, 'get-transport.json'), body))
 
 
-def main():
+def _main(synthetic_directory):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--run', type=Path, default=c.HERE / 'inputs/seaweedfs-4.48', help='Capture root containing instance/; defaults to included native inputs')
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--synthetic-current', action='store_true', help='Derive offline current-source fixtures without changing saved captures')
     args = parser.parse_args()
     instance = args.run / 'instance'
+    if args.synthetic_current:
+        if args.run != c.HERE / 'inputs/seaweedfs-4.48':
+            parser.error('--synthetic-current uses only the included saved input set')
+        sys.path.insert(0, str(c.ROOT / 'reference/runtime-support'))
+        from synthetic_s3 import synthetic_current_instance
+        instance = synthetic_current_instance(c.ROOT, synthetic_directory / 'instance')
     policy = read(instance, 'receiver-policy.json')
     output = args.output or Path(tempfile.mkdtemp(prefix='vate-s3-offline-'))
     output.mkdir(parents=True, exist_ok=True)
+    if args.synthetic_current:
+        shutil.copyfile(instance / 'SYNTHETIC-PROVENANCE.json', output / 'SYNTHETIC-PROVENANCE.json')
     records = []
     def case(name, change=None, expected=None, *, base='supported', trust=None, after_seal=None, required_codes=()):
         folder = output / name
@@ -84,7 +94,7 @@ def main():
         expected = expected or {'assessment': 'contradictory'}
         passed = all(result.get(k) == v for k, v in expected.items()) and result['retry_authorized'] is False
         passed = passed and set(required_codes) <= {d['code'] for d in result['diagnostics']}
-        records.append({'case': name, 'basis': 'native-replay' if change is None and after_seal is None else 'synthetic-copy',
+        records.append({'case': name, 'basis': 'synthetic-current-source' if args.synthetic_current else ('native-replay' if change is None and after_seal is None else 'synthetic-copy'),
                         'expected': expected, 'required_codes': list(required_codes), 'passed': passed, 'result': result})
         return folder
     supported = {'assessment': 'supported_under_local_assumptions', 'record_linkage': 'matched'}
@@ -352,8 +362,8 @@ def main():
         records.append({'case': 'R04-dot-key-' + str(len(key)), 'basis': 'offline-validation',
                         'passed': errors == ['dot-segment key outside local profile'] * 2})
     # Actual credential controls and cleanup are evaluated independently of the synthesized copies.
-    controls = read(instance, 'native-checks.json')
-    lifecycle = read(instance, 'LIFECYCLE.json')
+    controls = read(args.run / 'instance', 'native-checks.json')
+    lifecycle = read(args.run / 'instance', 'LIFECYCLE.json')
     expected_denials = {'observer-put-denied': 403, 'observer-delete-denied': 403, 'observer-other-denied': 403, 'conditional-duplicate': 412}
     passed = all(any(c['label'] == k and c['passed'] and c['http_status'] == v for c in controls) for k, v in expected_denials.items())
     passed = passed and lifecycle['cleanup_ok'] and lifecycle['process_stopped'] and lifecycle['credentials_file_removed'] and not lifecycle['credential_marker_residual_paths'] and not any(lifecycle['grpc_sockets'].values())
@@ -362,6 +372,11 @@ def main():
     c.write(output / 'RESULTS.json', result)
     print(c.encode({'all_passed': result['all_passed'], 'count': len(records), 'failed': [r['case'] for r in records if not r['passed']], 'output': str(output)}).decode())
     return 0 if result['all_passed'] else 1
+
+
+def main():
+    with tempfile.TemporaryDirectory(prefix='vate-current-s3-acceptance-') as directory:
+        return _main(Path(directory))
 
 
 if __name__ == '__main__':

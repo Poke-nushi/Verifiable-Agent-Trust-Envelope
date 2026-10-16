@@ -39,8 +39,11 @@ the [NENRIN records](third_party/nenrin/MANIFEST.json), and the saved
 
 Use the repository's existing environment with `jsonschema==4.26.0` from
 [requirements-dev.txt](../../requirements-dev.txt). The replay checks and copies
-the 36 source and input files in [VATE-PINS.json](VATE-PINS.json), prepares the
-three cases, and invokes the fixed VATE assessor in isolated Python processes.
+the 36 source and input files in [VATE-PINS.json](VATE-PINS.json) from the
+[historical snapshot](../historical-runtime/README.md), prepares the three
+cases, and invokes the fixed VATE assessor in isolated Python processes.
+Those files retain the hashes recorded at `b3b6d4f9`; the current evaluator
+is not substituted into this replay.
 It does not install dependencies or fetch sources.
 
 ```bash

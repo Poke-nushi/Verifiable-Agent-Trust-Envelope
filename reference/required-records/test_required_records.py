@@ -205,7 +205,7 @@ class RequiredRecords(unittest.TestCase):
         # Build the relabelled control entirely from the distributed originals.
         # Updating unsigned attempt/request refs alone must not assign the same
         # unchanged post receipt to a second explicitly named attempt.
-        members={name:(BUNDLE/name).read_bytes() for name in MEMBERS}
+        members={name:(self.f.bundle_path/name).read_bytes() for name in MEMBERS}
         def reference(name):
             raw=members[name]
             return {'path':name,'byte_length':len(raw),'digest':{'alg':'sha-256','value':sha(raw)}}
@@ -236,7 +236,7 @@ class RequiredRecords(unittest.TestCase):
     def test_RR44_cancelled_post_operation_present(self):
         self.f.row();e=self.f.bundle();p=json.loads(self.f.post);p['result']['outcome']='cancelled'
         raw=encode(p);e['originals']['post.json']=self.f.event(raw)
-        manifest=json.loads((BUNDLE/'manifest.json').read_bytes())
+        manifest=json.loads((self.f.bundle_path/'manifest.json').read_bytes())
         manifest['artifacts']['post.json']={'digest':{'alg':'sha-256','value':sha(raw)},'byte_length':len(raw)}
         e['originals']['manifest.json']=self.f.event(encode(manifest));r=self.assess()
         self.assertEqual(self.coverage(r),{'A':'present'});self.assertEqual(self.native(r,'s3')['native_result']['post_observation_binding'],'unsupported')
@@ -255,14 +255,14 @@ class RequiredRecords(unittest.TestCase):
                 if invalid is None:post.pop('receipt_id')
                 else:post['receipt_id']=invalid
                 raw=encode(post);e['originals']['post.json']=self.f.event(raw)
-                manifest=json.loads((BUNDLE/'manifest.json').read_bytes())
+                manifest=json.loads((self.f.bundle_path/'manifest.json').read_bytes())
                 manifest['artifacts']['post.json']={'digest':{'alg':'sha-256','value':sha(raw)},'byte_length':len(raw)}
                 e['originals']['manifest.json']=self.f.event(encode(manifest));r=self.assess()
                 self.assertEqual(self.coverage(r),{'A':'unresolved'})
                 self.assertEqual(r['requirements'][0]['candidates'][0]['reason'],'POST_IDENTIFIER_UNAVAILABLE')
 
     def test_historical_observation_is_not_missing(self):
-        self.f.row(attempt=ATTEMPT);self.f.bundle('historical',SAVED/'bundles/historical-v1')
+        self.f.row(attempt=ATTEMPT);self.f.bundle('historical',self.f.saved/'bundles/historical-v1')
         r=self.assess()
         self.assertEqual(self.coverage(r),{'A':'unresolved'})
         self.assertEqual(r['requirements'][0]['candidate_presence'],'bytes_available')
@@ -270,7 +270,7 @@ class RequiredRecords(unittest.TestCase):
         self.assertEqual(self.native(r,'s3')['native_result']['assessment'],'supported_under_local_assumptions')
 
     def test_historical_observation_remains_an_unknown_competitor(self):
-        self.f.row(attempt=ATTEMPT);self.f.bundle('historical',SAVED/'bundles/historical-v1');self.f.bundle('normal')
+        self.f.row(attempt=ATTEMPT);self.f.bundle('historical',self.f.saved/'bundles/historical-v1');self.f.bundle('normal')
         r=self.assess()
         self.assertEqual(self.coverage(r),{'A':'unresolved'})
         self.assertEqual(r['requirements'][0]['unique_candidates'],1)
@@ -283,7 +283,7 @@ class RequiredRecords(unittest.TestCase):
             with self.subTest(identifier=identifier):
                 post=json.loads(self.f.post);post['receipt_id']=identifier;raw=encode(post)
                 e['originals']['post.json']=self.f.event(raw)
-                manifest=json.loads((BUNDLE/'manifest.json').read_bytes())
+                manifest=json.loads((self.f.bundle_path/'manifest.json').read_bytes())
                 manifest['artifacts']['post.json']={'digest':{'alg':'sha-256','value':sha(raw)},'byte_length':len(raw)}
                 e['originals']['manifest.json']=self.f.event(encode(manifest));r=self.assess()
                 self.assertEqual(self.coverage(r),{'A':'unresolved'})
@@ -452,7 +452,7 @@ class RequiredRecords(unittest.TestCase):
     def test_path_escape_and_unknown_fields_rejected(self):
         self.f.row();self.f.basis['path']='../outside';self.assertEqual(self.assess()['review_set_status'],'invalid')
     def test_symlink_not_read(self):
-        e=self.setup_pair();ref=e['originals']['post']['ref'];path=self.f.folder/ref['path'];path.unlink();path.symlink_to(BUNDLE/'post.json')
+        e=self.setup_pair();ref=e['originals']['post']['ref'];path=self.f.folder/ref['path'];path.unlink();path.symlink_to(self.f.bundle_path/'post.json')
         r=self.assess();self.assertEqual(self.coverage(r),{'A':'unresolved'});self.assertTrue(r['invocation_errors'])
     def test_fifo_not_read_or_blocking(self):
         e=self.setup_pair();ref=e['originals']['post']['ref'];path=self.f.folder/ref['path'];path.unlink();os.mkfifo(path)

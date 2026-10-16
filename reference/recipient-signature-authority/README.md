@@ -46,6 +46,13 @@ public test scalars 1, 2 and 3. They are unsuitable for any real identity or
 authority. Signatures are added after the recorded operation and may differ
 between runs; compare the expected findings and retain each run's original bytes.
 
+The archived `BASELINE.json` remains tied to its original source identity.
+The trial and tests reproduce it with the
+[fixed historical runtime](../historical-runtime/README.md) and compare current
+behavior separately, including the current code hashes. `RUN.json` identifies
+the historical replay report and the separate check that the current matching
+response differs only in its verified source identities.
+
 ## Read the three results
 
 The following columns describe the post-execution receipt:

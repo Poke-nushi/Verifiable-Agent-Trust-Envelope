@@ -46,7 +46,7 @@ class RelationshipTests(unittest.TestCase):
             pins, _, _ = compare.verify_public_inputs(reader)
             repo = cw.Reader(REPO, 'repository')
             try:
-                sources = compare.source_bytes(repo, pins)
+                sources = compare.repository_source_bytes(repo, pins)
             finally:
                 repo.close()
             cls.vate_cases, _, _, cls.policy, _, _ = compare.load_vate(reader, pins, compare.original_case(sources, pins), sources)
@@ -465,7 +465,7 @@ class PublicAndVateCustodyTests(unittest.TestCase):
         self.pins, _, _ = compare.verify_public_inputs(self.public)
         repo = cw.Reader(REPO, 'repository')
         try:
-            self.sources = compare.source_bytes(repo, self.pins)
+            self.sources = compare.repository_source_bytes(repo, self.pins)
         finally:
             repo.close()
         self.original = compare.original_case(self.sources, self.pins)
@@ -772,6 +772,26 @@ class PublicAndVateCustodyTests(unittest.TestCase):
         try:
             with self.assertRaisesRegex(cw.InputError, 'binding mismatch'):
                 compare.source_bytes(reader, self.pins)
+        finally:
+            reader.close()
+
+    def test_repository_replay_uses_fixed_archive_and_refuses_its_tampering(self):
+        repository = self.root / 'repository'
+        for path, raw in self.sources.items():
+            compare.write_new(repository / compare.HISTORICAL_PREFIX / path, raw)
+        current = repository / 'reference/s3-observation-example/contract.py'
+        compare.write_new(current, b'changed current source')
+        reader = cw.Reader(repository, 'repository')
+        try:
+            self.assertEqual(compare.repository_source_bytes(reader, self.pins), self.sources)
+        finally:
+            reader.close()
+        archived = repository / compare.HISTORICAL_PREFIX / 'reference/s3-observation-example/contract.py'
+        archived.write_bytes(b'changed historical source')
+        reader = cw.Reader(repository, 'repository')
+        try:
+            with self.assertRaisesRegex(cw.InputError, 'binding mismatch'):
+                compare.repository_source_bytes(reader, self.pins)
         finally:
             reader.close()
 

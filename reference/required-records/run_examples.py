@@ -77,7 +77,7 @@ def generate(destination, openssl, expected_sha256):
     environment={'python':sys.version, 'platform':platform.platform(),
                  'openssl':str(sig.openssl), 'openssl_sha256':sig.binary_sha256,
                  'openssl_version':sig.run(['version']).decode().strip(),
-                 'basis':'Saved S3 originals and synthetic receiver decisions; detached signatures use public test scalars, not real keys.'}
+                 'basis':'Saved receipt bytes, synthetic current-source S3 derivatives and receiver decisions; detached signatures use public test scalars, not real keys.'}
     (destination/'SUMMARY.json').write_bytes(encode({'environment':environment,'examples':summaries})+b'\n')
     return summaries
 

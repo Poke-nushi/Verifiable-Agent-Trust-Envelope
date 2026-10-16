@@ -8,11 +8,14 @@ import json
 from pathlib import Path
 import shutil
 import tempfile
+import sys
 
 from vate_recipient import API_CONTRACT, AssessmentError, RecipientAssessor
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
+sys.path.insert(0, str(ROOT / "reference/runtime-support"))
+from historical import historical_api
 
 
 def encode(value):
@@ -92,11 +95,14 @@ def verify_result(root, vector, result):
         raise AssertionError("unsupported requested checks differ")
 
 
-def run_vectors(root=ROOT, vectors_path=HERE / "vectors.json"):
+def run_vectors(root=None, vectors_path=None):
+    historical, frozen = historical_api(ROOT)
+    root = Path(root) if root is not None else frozen
+    vectors_path = Path(vectors_path) if vectors_path is not None else root / "reference/recipient-assessment/vectors.json"
     document = json.loads(vectors_path.read_bytes())
     if document["vector_contract"] != "vate-recipient-assessment-vectors-v1":
         raise ValueError("unknown vector contract")
-    assessor = RecipientAssessor(expected_api_contract=document["api_contract"], source_root=root)
+    assessor = historical.RecipientAssessor(expected_api_contract=document["api_contract"], source_root=root)
     records = []
     with tempfile.TemporaryDirectory(prefix="vate-recipient-vectors-") as directory:
         for vector in document["vectors"]:
@@ -104,15 +110,15 @@ def run_vectors(root=ROOT, vectors_path=HERE / "vectors.json"):
             try:
                 result = assess_vector(assessor, root, vector, Path(directory))
                 verify_result(root, vector, result)
-            except (AssessmentError, AssertionError, OSError, ValueError, KeyError) as exc:
+            except (historical.AssessmentError, AssertionError, OSError, ValueError, KeyError) as exc:
                 record.update(verification="different_or_unavailable", detail=str(exc))
             records.append(record)
-    return {"api_contract": API_CONTRACT, "scope": "local API vector replay", "vectors": records}
+    return {"api_contract": API_CONTRACT, "scope": "historical API vector replay at e845a6a8", "vectors": records}
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source-root", type=Path, default=ROOT)
+    parser.add_argument("--source-root", type=Path, help="Explicit copy of the fixed historical runtime and vector inputs")
     args = parser.parse_args()
     report = run_vectors(args.source_root)
     print(json.dumps(report, indent=2))
