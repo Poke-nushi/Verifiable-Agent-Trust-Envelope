@@ -8,8 +8,9 @@ collected candidate, and retain the complete receipt, S3 and optional signature
 assessments alongside that finding.
 
 The experimental contract is `vate-required-records-local-v2`. It covers VATE
-receipts with the existing S3 action context, including explicitly identified
-S3 attempts. It is an implementation aid alongside the existing specification;
+receipts with the existing S3 or local file-set action context at operation
+level, and explicitly identified S3 attempts. It is an implementation aid
+alongside the existing specification;
 it does not change the `VATE-AL2-Verifier-Admission-v0.3` semantic profile.
 
 For persistent intake, late-arrival reassessment and retained history, use
@@ -68,6 +69,16 @@ obligation is legitimate, or whether a receipt time is independently proven.
 An operation label and the optional candidate hints do not establish binding:
 the checker compares the original's typed context with the selected subject.
 
+For the [local file-set demo](../execution-evidence-demo/README.md), use
+`subject.kind: operation` and `binding_profile: vate_receipt_operation_context`.
+Keep its `vate-demo-file-set-v1` action binding unchanged and submit the original
+admission and post-execution receipts as a `receipt_pair`. The
+[supported-context table](CONTRACT.md#review-set) gives the exact profile/action
+pairs. File-set attempt requirements and verification of the complete file-set
+execution evidence are outside this checker; use the demo's verifier for that
+evidence. A missing post receipt can coexist with an executed operation when
+its response was lost.
+
 For S3 attempt requirements, supply the complete existing 18-member bundle.
 The additional attempt binding requires the selected native relationships and
 the saved generator's explicit post-ID rule. Keep detached proofs outside that
@@ -80,7 +91,7 @@ observation suffix, also leaves the same explicit attempt `unresolved`.
 
 | `record_coverage` | Meaning within the selected review |
 | --- | --- |
-| `present` | One distinct original binds to this requirement, with no unresolved competitor. |
+| `present` | A required record has one distinct matching original, a closed inventory and no unresolved competitor. |
 | `missing` | No matching or potentially matching candidate remains, the inventory is closed and the cutoff is after the deadline. |
 | `pending` | The same absence conditions hold, but the cutoff has not passed the deadline. |
 | `unresolved` | Binding, uniqueness, inventory, obligation or processing is incomplete. |
