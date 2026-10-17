@@ -53,11 +53,19 @@ The review set is a revision-1 template under the existing
 its next revision to the accepted previous review and report. The receiver
 supplies revision grounds; the inbox does not infer requirements or collection
 closure from whatever records arrived.
+For the same receiver ID, namespace and review-set ID, `revision_basis_ref`
+may be null while no run has been accepted; subsequent revisions require a
+stored basis. The existing [revision rules](../required-records/CONTRACT.md#one-revision)
+also reject a regressing cutoff or removal of a previous requirement ID.
 
 `prepare` selects all registered entries in that namespace and fixes a
-snapshot, review and selection. Later arrivals cannot enter that job.
+snapshot, review and selection. Deliveries registered after `prepare` cannot
+enter that job.
 Records after the cutoff are marked after; unknown arrival times remain
-unknown. A declared arrival after the assessment time is rejected.
+unknown. If any registered arrival is later than `assessment_time`, `prepare`
+fails with `RECEIPT_TIME_IN_FUTURE`; it does not create the job or remove the
+stored slots. Registering a delivery does not check it against a future plan's
+assessment time.
 `closed`, `partial` and `unavailable` retain the reviewer's meanings.
 
 ## Evaluation and history
@@ -80,8 +88,61 @@ operation represented by the records.
 
 The inbox cannot resume an old prepared job under changed source/runtime
 identity. The application either resumes it with the original environment
-or prepares a new job with the new Engine. Old originals and success/error
+or prepares a new job with the new Engine. Changes to the inbox module or
+Python runtime require restarting the receiving process first.
+Old originals and success/error
 reports are not rewritten to claim the new evaluator identity.
+
+## Python API return values
+
+Import `Engine` and `Inbox` from `recipient_inbox` after selecting the module
+directory under the trusted source tree. `Engine(source_root, openssl=None,
+openssl_sha256=None)` selects the evaluator. `Inbox(path, engine, create=True)`
+initializes a new database; use `create=False` to reopen it.
+
+| Call | Returned value |
+| --- | --- |
+| `put(raw_bytes, media_type="application/json")` | The six-field raw reference described under Storage references. |
+| `get(ref)` | The original `bytes`, after checking their hash and length. |
+| `receive(delivery_raw)` | An object with `event_id`, integer `sequence` and boolean `duplicate`. An identical repeated event returns its original sequence. |
+| `prepare(plan_raw)` | A state object with `status: prepared`; pass its `run_id` string to `run`, `status` or `export`. |
+| `run(run_id)` | The state object after evaluation, or the recorded state if that job already ran. |
+| `status(run_id)` | The current state object described below. |
+| `export(run_id, destination)` | An object with `directory`, integer `files`, `run_id` and `status`. `files` counts the exported payload files, excluding `MANIFEST.json`. |
+| `close()` | `None`; closes the database connection. |
+
+Delivery and plan arguments are UTF-8 JSON `bytes`, not Python dictionaries.
+The caller stores each referenced original or basis with `put` before
+submitting metadata that refers to it. These methods can raise exceptions for
+invalid inputs, unavailable files or database failures. A source/runtime
+change detected before evaluation also raises an exception and leaves the job
+`prepared`. Catch errors at the application boundary and close the inbox in
+`finally`.
+
+The state object has these fields:
+
+| Field | Meaning |
+| --- | --- |
+| `contract` | `vate-recipient-inbox-local-v1`. |
+| `run_id` | The prepared job's identifier. |
+| `status` | `prepared`, `completed`, `assessment_error` or `stale_history`. |
+| `revision` | The selected review-set revision. |
+| `previous_id` | The accepted predecessor selected at preparation, or null. |
+| `max_delivery_sequence` | The highest delivery sequence included in the prepared namespace snapshot, or zero. Arrival assertions and the cutoff still govern record inclusion. |
+| `report_ref` | A raw reference to the saved complete report, or null when none was saved. It may be present with `assessment_error` or `stale_history`. |
+| `head` | The history's current accepted run ID, or null. It may differ from this `run_id`. |
+| `errors` | Retained inbox processing errors. Native findings are in the report. |
+
+The CLI prints the corresponding method's returned object as JSON.
+To retrieve a saved complete report, use `export RUN_ID DIRECTORY` and read
+`DIRECTORY/report.json`.
+Command-line argument errors print a usage error and exit 2. After argument
+parsing, handled input or operational errors produce an `error` object and
+exit 64. A `run` command
+also exits 64 when its returned status is not `completed`; other successfully
+handled commands exit 0. `status` can therefore exit 0 while reporting an
+earlier assessment error. The report's coverage and native findings remain
+separate from these command outcomes.
 
 ## Capacity and failures
 
@@ -111,9 +172,11 @@ Process execution retains its time limits, the reviewer's 2 MiB native-result
 limit, and the inbox's 128 MiB report and 1 MiB per-log limits. A log exceeding
 its limit produces an explicit error; complete retention of that oversized
 log is not claimed. Available bounded files are collected independently.
-If the database is writable, ordinary source/startup/execution/collection
-failures become `assessment_error` without advancing the head. A report that
-was never produced cannot be retained.
+If the database is writable, failures recorded during evaluation or output
+collection become `assessment_error` without advancing the head. This also
+includes a saved report with `invocation_errors: true`. Calling `run` again
+returns that recorded state; correct the inputs or configuration and prepare
+a new job. A report that was never produced cannot be retained.
 
 These limits do not bound every temporary allocation inside jsonschema or
 guarantee completion for every input. The receipt checker marks truncated
@@ -128,8 +191,13 @@ manifest. Exported bytes are checked against the stored originals.
 An export contains at most 256 revisions, including the selected run and its
 accepted predecessor chain; a longer chain is rejected.
 The receiving application can reassess the selection using its explicitly
-selected source tree and runtime; elapsed time and temporary evaluator paths
-can differ. Keep both reports.
+selected source tree and runtime. Elapsed time can differ; changing the selected
+source-tree or OpenSSL path can also change native call IDs and their references.
+Keep both reports.
+Map the raw-reference path base `inbox` to the export directory, which contains
+`objects/`, and pass its `selection.json` to the required-record CLI. The
+[reassessment command](README.md#reassess-an-exported-run) writes a separate
+report without changing the selected cutoff, policies or stored history.
 
 SQLite integrity and raw-hash checks do not protect against a party that can
 rewrite the database and recompute its references. A remote service, access
