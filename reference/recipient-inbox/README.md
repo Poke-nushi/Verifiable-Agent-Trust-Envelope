@@ -83,8 +83,42 @@ The CLI exposes the same sequence through `put FILE`, `receive FILE`,
 `prepare FILE`, `run RUN_ID`, `status RUN_ID` and
 `export RUN_ID DIRECTORY`. Each invocation takes `--db` and `--source-root`;
 signature checks also require the selected OpenSSL path and hash.
-See [the input contract](CONTRACT.md) and the example's
+`prepare`, `run` and `status` return a state object. Pass its `run_id` string
+to the next call. `report_ref` identifies the complete report when one was
+saved; it can also be present after an assessment error.
+To read that report through the CLI, export the run and open the exported
+`report.json` when a report was saved.
+See [the API return values](CONTRACT.md#python-api-return-values),
+[the input contract](CONTRACT.md) and the example's
 [delivery/plan construction](scenario_inputs.py) for field definitions.
+
+For an initialized inbox and a plan whose references have already been stored:
+
+```python
+import json
+import sys
+from pathlib import Path
+
+root = Path("/path/to/VATE")
+sys.path.insert(0, str(root / "reference/recipient-inbox"))
+from recipient_inbox import Engine, Inbox
+
+inbox = Inbox("/path/to/receiver.sqlite3", Engine(root), create=False)
+try:
+    prepared = inbox.prepare(Path("/path/to/plan.json").read_bytes())
+    state = inbox.run(prepared["run_id"])
+    print(json.dumps(state))
+    if state["report_ref"] is not None:
+        report = json.loads(inbox.get(state["report_ref"]))
+        print(json.dumps(report))
+finally:
+    inbox.close()
+```
+
+This example omits the optional signature configuration. Select the OpenSSL
+path and hash on `Engine` when the plan requests that check. Read the returned
+state and the report separately; saving a report does not establish that its
+records are present or valid.
 
 ## Read the saved state
 
@@ -92,19 +126,62 @@ See [the input contract](CONTRACT.md) and the example's
 | --- | --- |
 | `prepared` | Fixed inputs are stored; the run has no accepted report yet. |
 | `completed` | The complete report was saved and accepted as the next history revision. |
-| `assessment_error` | Execution or report collection failed; the previous history head is retained. |
+| `assessment_error` | Evaluation or report collection failed; the previous history head is retained. |
 | `stale_history` | A competing run advanced the history first; this report is retained separately. |
 
 `completed` and CLI exit 0 describe report handling. Read the report's coverage,
 timeliness and native assessments to determine whether records are missing,
 invalid or contradictory. They do not grant execution permission. A `run`
-ending in another state exits 64; input and operational errors also exit 64.
+ending in another state exits 64. Handled processing errors after argument
+parsing also exit 64; argument-parsing errors exit 2.
 
-Prepared inputs exclude later arrivals. Resuming a prepared job requires the
-same source and runtime identity. After an update, create a new Engine and
-prepare a new job; original bytes and previous success/error reports remain
-available. The [historical runtime](../historical-runtime/README.md) supports
+`assessment_error` also covers a saved report with `invocation_errors: true`,
+such as a requested check without its policy or verifier configuration.
+Inspect the saved report's `diagnostics` and `native_calls[].result` even if
+the state's `errors` list is empty.
+Calling `run` again returns the recorded state. Correct the inputs or
+configuration and prepare a new job.
+
+Prepared inputs exclude deliveries registered after `prepare`.
+Resuming a prepared job requires the same source and runtime identity.
+After an update, create a new Engine and prepare a new job. When the inbox
+module or Python runtime changes, restart the receiving process first.
+Original bytes and previous success/error reports remain available.
+The [historical runtime](../historical-runtime/README.md) supports
 explicit replay of the archived inputs.
+
+Changing a deadline can change a later report from `late` to `on_time` under
+the new deadline. Compare it with the retained earlier report; the new result
+does not mean the original deadline was met.
+
+## Reassess an exported run
+
+After `export(run_id, "/tmp/vate-inbox-export")`, the new directory contains
+`selection.json`, the available `report.json`, `runs.json`, `MANIFEST.json`
+and `objects/`. The selection's raw references use the path-base name `inbox`.
+Map that name to the export directory when calling Required Record Review:
+
+```bash
+.venv/bin/python -B reference/required-records/required_records.py \
+  --selection /tmp/vate-inbox-export/selection.json \
+  --base "inbox=/tmp/vate-inbox-export" \
+  --source-root "$PWD" \
+  --output /tmp/vate-inbox-reassessment.json
+```
+
+Run this from the explicitly selected VATE source tree with its required
+Python dependencies. For signature checks, also supply `--openssl` and
+`--openssl-sha256` as in the original configuration. The output path must be
+new; keep the exported report alongside the reassessment. The selection keeps
+its original cutoff and receiver policies. To assess later arrivals or a
+changed policy, prepare a new inbox plan instead.
+
+Reassessment records its evaluator source hashes and Python version.
+`usage.elapsed_milliseconds` can differ between runs. The selected source-tree
+and OpenSSL paths also enter native call identities, so changing those paths
+can change call IDs and their references even when the selected files are
+unchanged. Retain both full reports when comparing their coverage, timeliness
+and native results.
 
 ## Limits and collection responsibility
 
