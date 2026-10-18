@@ -151,7 +151,10 @@ a versioned entry point for the existing receipt and S3 evaluators.
 [Recipient Inbox](reference/recipient-inbox/README.md) connects that assessment
 to local raw-byte storage, fixed review inputs, late delivery and retained
 history. Its example covers restarts and exported reassessment; diagnostic
-controls also exercise an evaluator update after an old failure. Next, use
+controls also exercise an evaluator update after an old failure. The
+[package intake example](reference/recipient-inbox/PACKAGE-INTAKE.md) connects
+finite local package reads and registration to collection status, with a
+separately selected requirement inventory. Next, use
 these paths with another receiving application and independently selected
 collection requirements. Continued maintenance by another implementer remains
 to be observed.

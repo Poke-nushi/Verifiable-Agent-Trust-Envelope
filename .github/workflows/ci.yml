@@ -84,11 +84,13 @@ jobs:
           output_dir="$(mktemp -d)"
           python -B reference/required-records/run_examples.py --openssl "$VATE_TRIAL_OPENSSL" --openssl-sha256 "$VATE_TRIAL_OPENSSL_SHA256" --output "$output_dir/run"
 
-      - name: Check durable receipt intake, bounded diagnostics, and historical replay
+      - name: Check durable receipt intake, package collection, and historical replay
         run: |
           python -B -m unittest discover -s reference/recipient-inbox -p 'test_*.py' -v
           output_dir="$(mktemp -d)"
           python -B reference/recipient-inbox/run_trial.py --openssl "$VATE_TRIAL_OPENSSL" --openssl-sha256 "$VATE_TRIAL_OPENSSL_SHA256" --output "$output_dir/run"
+          python -B reference/recipient-inbox/package_example.py --output "$output_dir/package-inputs"
+          python -B reference/recipient-inbox/package_intake.py --source-root "$PWD" --inventory "$output_dir/package-inputs/inventory.json" --membership "$output_dir/package-inputs/membership.json" --package "$output_dir/package-inputs/package" --due-at 2026-10-16T20:03:00Z --output "$output_dir/package-intake"
 
       - name: Check NENRIN saved records and replay the pinned VATE cases
         run: |
@@ -164,6 +166,8 @@ jobs:
           cd "$output_dir"
           python -B -m unittest discover -s "$archive_dir/reference/recipient-inbox" -p 'test_*.py' -v
           python -B "$archive_dir/reference/recipient-inbox/run_trial.py" --openssl "$VATE_TRIAL_OPENSSL" --openssl-sha256 "$VATE_TRIAL_OPENSSL_SHA256" --output "$output_dir/run"
+          python -B "$archive_dir/reference/recipient-inbox/package_example.py" --output "$output_dir/package-inputs"
+          python -B "$archive_dir/reference/recipient-inbox/package_intake.py" --source-root "$archive_dir" --inventory "$output_dir/package-inputs/inventory.json" --membership "$output_dir/package-inputs/membership.json" --package "$output_dir/package-inputs/package" --due-at 2026-10-16T20:03:00Z --output "$output_dir/package-intake"
 
   validate:
     name: Repository checks
