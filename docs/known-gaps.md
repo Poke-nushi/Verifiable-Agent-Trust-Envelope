@@ -255,6 +255,10 @@ Its offline controls cover restarts and an evaluator update while retaining old
 originals and reports. It remains a trusted local receiving application, with
 finite collection limits, explicit rejection and diagnostic truncation. It
 provides no remote ingestion service or tamper-resistant audit storage.
+The [package intake example](../reference/recipient-inbox/PACKAGE-INTAKE.md)
+derives collection status for a selected static local package from reads,
+digest checks and registration. Its generated receiver choices do not establish
+external collection completeness or independent inventory authority.
 Independent requirement selection, collection governance and application/update
 trials remain needed beyond these local controls.
 

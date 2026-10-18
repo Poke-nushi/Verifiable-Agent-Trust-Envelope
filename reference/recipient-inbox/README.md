@@ -13,6 +13,11 @@ review profiles accept operation-level VATE receipts with S3 or local file-set
 action context, plus S3 attempt requirements. Storage in SQLite does not
 establish complete collection.
 
+To derive collection status from actual reads and registration of a selected
+local receipt package, use the [package intake example](PACKAGE-INTAKE.md).
+It preserves collection failures separately from record absence and receipt
+contradictions, and includes a generated A/B/C example with B omitted.
+
 ## Run the intake example
 
 Use Linux or macOS, Python 3.10 or later, and a trusted checkout or source
