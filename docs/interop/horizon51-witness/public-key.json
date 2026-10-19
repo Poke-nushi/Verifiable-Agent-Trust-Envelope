@@ -1,0 +1,8 @@
+{
+  "algorithm": "Ed25519",
+  "public_key_hex": "d6f6ca92ef53665c74700dab244b00c194102897f14999dabc20a28a1dda10a8",
+  "purpose": "musubi.ca2a.witness-ack.v0",
+  "log_id": "nenrin:ca2a-companion:pilot51",
+  "maintainer": "Poke-nushi",
+  "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope"
+}
