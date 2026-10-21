@@ -21,7 +21,7 @@ companion's witnessed lane can carry.
 
 The three criteria commitments contain digests of the requests and criteria
 document, together with the buyer, checker and observed Bitcoin block. They
-are commitments made before execution, not acceptance verdicts. All three
+are commitments intended to be fixed before execution, not acceptance verdicts. All three
 refer to the same criteria document, with SHA-256
 `6d62ca38527015ac9c31612653171b0d05547591b9bfd4be33593e513ab534b9`.
 
@@ -53,11 +53,12 @@ with this manifest; it does not verify a signature or timestamp proof.
 
 ## Witness status
 
-This archive contains the original signed items. No VATE-maintainer witness
-acknowledgement or run result has been issued here.
+The VATE maintainer's [four witness acknowledgements](acknowledgements/README.md)
+are available with their OpenTimestamps digests. They attest receipt and
+publication of these originals; experiment results are separate.
 
-A witness acknowledgement attests receipt and publication of a named item.
-A verified anchor supplies its upper time bound under the
+A verified anchor supplies an upper bound on when the acknowledgement had
+been signed, under the
 [MUSUBI companion profile](https://github.com/ogasurfproject-jpg/horizon-shield/blob/6b4841af9083ddfe6eb9f9cfe253d2c97743f290/workers/hs-ledger/nenrin/musubi-v0/ca2a-companion-v0/COMPANION_v0_1.md).
 The acknowledgement alone does not establish that upper bound or attest that
 the budget or criteria are sensible, that a payment settled, or that the work
