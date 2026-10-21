@@ -5,7 +5,8 @@ The VATE maintainer's dedicated Ed25519 public key for the
 is in [public-key.json](public-key.json).
 
 The [replacement input archive for 22 October 2026](2026-10-22-replacement/README.md)
-contains the budget policy and three criteria commitments to be witnessed.
+contains the budget policy, three criteria commitments, and the maintainer's
+[witness acknowledgements](2026-10-22-replacement/acknowledgements/README.md).
 
 - Acknowledgement type: `musubi.ca2a.witness-ack.v0`.
 - Log ID: `nenrin:ca2a-companion:pilot51`.
@@ -21,5 +22,3 @@ The witness acknowledgement attests receipt and publication of the named
 item. A verified anchor supplies the upper time bound under the profile;
 the acknowledgement alone does not. It does not attest that the budget or
 criteria are sensible, that a payment settled, or that the work succeeded.
-
-No pilot acknowledgement or run result has been issued here.
