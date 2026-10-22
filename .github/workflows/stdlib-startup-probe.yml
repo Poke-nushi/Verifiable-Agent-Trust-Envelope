@@ -1,0 +1,48 @@
+name: Standard library startup diagnosis
+
+on:
+  push:
+    branches: [codex/ci-stdlib-probe]
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    name: Stdlib probe (${{ matrix.os }}, Python ${{ matrix.python }}, repeat ${{ matrix.repetition }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.10", "3.12", "3.14"]
+        repetition: [1, 2]
+        include:
+          - os: macos-15
+            python: "3.14"
+            repetition: 1
+          - os: macos-15
+            python: "3.14"
+            repetition: 2
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PROBE_REPETITION: ${{ matrix.repetition }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+          check-latest: true
+
+      - name: Install Python validation dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      - name: Test standard-library preparation boundaries
+        run: python -B -m unittest discover -s scripts -p test_prepare_ci_stdlib.py -v
+
+      - name: Compare unchanged tests before and after preparation
+        run: python -B scripts/diagnose_ci_stdlib.py
