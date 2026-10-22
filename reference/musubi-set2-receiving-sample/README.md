@@ -34,14 +34,16 @@ packages from source. If a matching wheel is unavailable, preparation stops.
 
 In a VATE checkout or source archive, open a terminal in
 `reference/musubi-set2-receiving-sample/`. If you copied just this sample folder,
-open that folder instead. Use a fresh sibling directory for each runtime or run;
-the sample files remain unchanged.
+open that folder instead. Keep the runtime, VATE source and results in a separate
+working directory outside the checkout. Change `sample_workspace` below if that
+directory already contains an earlier run; runtime and output paths must be new.
 
 ```bash
-sample_root="$PWD"
-vate_root="$sample_root/../vate-source"
-sample_environment="$sample_root/../musubi-runtime"
-sample_output="$sample_root/../musubi-results"
+sample_workspace="$HOME/vate-musubi-example"
+mkdir -p "$sample_workspace"
+vate_root="$sample_workspace/vate-source"
+sample_environment="$sample_workspace/runtime"
+sample_output="$sample_workspace/results"
 ```
 
 If you do not already have the pinned VATE source, obtain it with:
@@ -136,7 +138,7 @@ affected run's `RECOVERY.json` to rebuild its output into a new directory:
 
 ```bash
 recovery_receipt="$sample_output/baseline/RECOVERY.json"
-recovered_output="$sample_root/../musubi-baseline-recovered"
+recovered_output="$sample_workspace/baseline-recovered"
 "$sample_environment/venv/bin/python" -B recover_output.py \
   --vate-root "$vate_root" \
   --database "$sample_output/inbox.sqlite" \
@@ -184,7 +186,7 @@ expected values above, then continue with the intended header reassessment:
   --environment "$sample_environment" \
   --database "$sample_output/inbox.sqlite" \
   --previous "$recovered_output/RESULT.json" \
-  --output "$sample_root/../musubi-continued-extended"
+  --output "$sample_workspace/continued-extended"
 ```
 
 The continuation command checks the prepared Python environment, evaluator
@@ -222,16 +224,16 @@ evaluator and restores originals from an Inbox export.
 "$sample_environment/venv/bin/python" -B verify.py --sample sample
 "$sample_environment/venv/bin/python" -B verify_cli.py \
   --vate-root "$vate_root" --environment "$sample_environment" \
-  --output "$sample_root/../musubi-cli-check"
+  --output "$sample_workspace/cli-check"
 "$sample_environment/venv/bin/python" -B verify_recovery.py \
   --vate-root "$vate_root" --environment "$sample_environment" \
-  --output "$sample_root/../musubi-recovery-check"
+  --output "$sample_workspace/recovery-check"
 "$sample_environment/venv/bin/python" -B verify_continuation.py \
   --vate-root "$vate_root" --environment "$sample_environment" \
-  --output "$sample_root/../musubi-continuation-check"
+  --output "$sample_workspace/continuation-check"
 "$sample_environment/venv/bin/python" -B verify.py --sample sample \
   --vate-root "$vate_root" --environment "$sample_environment" \
-  --output "$sample_root/../musubi-integration-check"
+  --output "$sample_workspace/integration-check"
 ```
 
 The unit suite includes a validly signed record from another request, ambiguous
