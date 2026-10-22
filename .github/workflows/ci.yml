@@ -40,6 +40,9 @@ jobs:
       - name: Install Python validation dependencies
         run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
 
+      - name: Prepare Python standard-library bytecode
+        run: python -B scripts/prepare_ci_stdlib.py
+
       - name: Run execution evidence tests
         run: python -B -m unittest discover -s reference/execution-evidence-demo -p 'test_*.py' -v
 
@@ -126,6 +129,9 @@ jobs:
 
       - name: Install Python validation dependencies
         run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      - name: Prepare Python standard-library bytecode
+        run: python -B scripts/prepare_ci_stdlib.py
 
       - name: Select the runner's existing OpenSSL for the signature example
         shell: bash
@@ -235,6 +241,9 @@ jobs:
 
       - name: Compile Python scripts
         run: python -m py_compile scripts/vate_conformance.py scripts/check_repo.py scripts/check_repo_strict.py
+
+      - name: Test standard-library preparation boundaries
+        run: python -B -m unittest discover -s scripts -p test_prepare_ci_stdlib.py -v
 
       - name: Run quickstart demo
         run: python reference/quickstart-demo/run_demo.py
