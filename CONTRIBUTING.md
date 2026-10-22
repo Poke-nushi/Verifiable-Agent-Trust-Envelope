@@ -118,6 +118,31 @@ Share a reproducible result or question in
 identifying which path and source version you used. An execution-evidence
 review can use its native records without a VATE SUT result file.
 
+## Checking GitHub Actions Workflows
+
+Run the same workflow check used by CI from the repository root:
+
+```bash
+bash scripts/check_workflows.sh
+```
+
+The script runs [actionlint](https://github.com/rhysd/actionlint) 1.7.12 on all
+workflow files. It supports macOS and Linux on arm64 and x86_64, using Bash,
+curl, tar, and shasum. On the first run it downloads the official release
+archive to `${XDG_CACHE_HOME:-$HOME/.cache}/vate/actionlint/1.7.12/`.
+Every run verifies the archive against a SHA-256 checksum pinned in the
+script before extracting and executing it. Later runs use the cached archive.
+If checksum verification fails, remove the named cached archive and retry.
+
+Optional ShellCheck and Pyflakes integrations are disabled so that installed
+tools do not change the check between machines. Workflow syntax, expressions,
+job dependencies, and matrix references are checked by actionlint itself.
+CI runs this command in `Repository checks`, whose result is required by
+`CI complete`. Runtime tests remain separate checks.
+
+When updating actionlint, update the version and all four archive checksums
+in the script from the same official release, and run the check again.
+
 ## Related Documents
 
 - `README.md`

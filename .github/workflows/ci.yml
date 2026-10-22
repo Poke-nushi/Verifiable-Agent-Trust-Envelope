@@ -230,6 +230,9 @@ jobs:
       - name: Install Python validation dependencies
         run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
 
+      - name: Check GitHub Actions workflows
+        run: bash scripts/check_workflows.sh
+
       - name: Compile Python scripts
         run: python -m py_compile scripts/vate_conformance.py scripts/check_repo.py scripts/check_repo_strict.py
 
