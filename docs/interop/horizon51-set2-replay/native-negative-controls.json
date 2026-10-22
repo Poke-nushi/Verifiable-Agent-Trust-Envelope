@@ -1,0 +1,299 @@
+[
+  {
+    "case": "changed-log-signature",
+    "exit_code": 2,
+    "refused": null,
+    "log": {
+      "problem": "signature_invalid",
+      "verified": false
+    },
+    "witnessed_rejected": null,
+    "receipts": null,
+    "payments": null
+  },
+  {
+    "case": "changed-checkpoint-signature",
+    "exit_code": 2,
+    "refused": null,
+    "log": {
+      "problem": "signature_invalid",
+      "verified": false
+    },
+    "witnessed_rejected": null,
+    "receipts": null,
+    "payments": null
+  },
+  {
+    "case": "changed-header",
+    "exit_code": 2,
+    "refused": null,
+    "log": {
+      "problem": "view_rejected",
+      "verified": false
+    },
+    "witnessed_rejected": null,
+    "receipts": null,
+    "payments": null
+  },
+  {
+    "case": "changed-witness-signature",
+    "exit_code": 0,
+    "refused": null,
+    "log": {
+      "anchor_block_time": 1792632805,
+      "anchor_depth": 9,
+      "anchor_height": 972551,
+      "as_of": 1792627866,
+      "head": "746eba10245043374a7845e40877685568f724b268e83de4a9fb9c7bf075f823",
+      "size": 13,
+      "verified": true
+    },
+    "witnessed_rejected": [
+      {
+        "ack_problems": [
+          {
+            "ack": 0,
+            "reason": "signature_invalid",
+            "record": 0
+          }
+        ],
+        "index": 0,
+        "reason": "too_few_witnesses",
+        "witnesses": 1
+      }
+    ],
+    "receipts": [
+      {
+        "ca2a_at_execution": "ok",
+        "ca2a_audit": "ok",
+        "capability": "pay",
+        "disposition": "within_delegation",
+        "outcome": "result",
+        "reasons": [],
+        "request_known": true,
+        "request_sha256": "329a112eec9250ea574c4720db74333302a515808be1b0a4b54793e93f2a6fd6",
+        "responder": "7b1ada68cd366c70a79544b6d719d685fd37e01f26549e08bf388768cc7d0ffe",
+        "seq": 6,
+        "stage": "audited"
+      },
+      {
+        "ca2a_at_execution": "ok",
+        "ca2a_audit": "ok",
+        "capability": "pay",
+        "disposition": "within_delegation",
+        "outcome": "result",
+        "reasons": [],
+        "request_known": true,
+        "request_sha256": "c13a8c64ec5135dab706963c7204c5adb30c12efa8b1d56b9c0900b4fbb32ccc",
+        "responder": "7b1ada68cd366c70a79544b6d719d685fd37e01f26549e08bf388768cc7d0ffe",
+        "seq": 9,
+        "stage": "audited"
+      },
+      {
+        "ca2a_at_execution": "ok",
+        "ca2a_audit": "ok",
+        "capability": "pay",
+        "disposition": "within_delegation",
+        "outcome": "result",
+        "reasons": [],
+        "request_known": true,
+        "request_sha256": "a5650ab747a92d6b164c1753c731a419f197521691fa29af9a7b86a49f6a2a5f",
+        "responder": "7b1ada68cd366c70a79544b6d719d685fd37e01f26549e08bf388768cc7d0ffe",
+        "seq": 12,
+        "stage": "audited"
+      }
+    ],
+    "payments": [
+      {
+        "amount": 7000,
+        "budgets": [
+          {
+            "hop": 0,
+            "limit": 20000,
+            "total": 7000,
+            "unit": "JPY-testnet"
+          }
+        ],
+        "counted": true,
+        "for_task": true,
+        "payee": "7b1ada68cd366c70a79544b6d719d685fd37e01f26549e08bf388768cc7d0ffe",
+        "payer": "4c3b54ac9bf947d723a035261fa1574c9e66d5bdbcee8c9346369b8be484ef58",
+        "rail": "signed-test-transfer",
+        "rail_receipt_sha256": "a88bc8a2ffc2f29c2b64fdfcb6ff90a49c8ec0f061e75d7db3e46b72d9ae5abd",
+        "reasons": [],
+        "request_known": true,
+        "request_sha256": "329a112eec9250ea574c4720db74333302a515808be1b0a4b54793e93f2a6fd6",
+        "seq": 5,
+        "task_known": true,
+        "unit": "JPY-testnet"
+      },
+      {
+        "amount": 7000,
+        "budgets": [
+          {
+            "hop": 0,
+            "limit": 20000,
+            "total": 14000,
+            "unit": "JPY-testnet"
+          }
+        ],
+        "counted": true,
+        "for_task": true,
+        "payee": "7b1ada68cd366c70a79544b6d719d685fd37e01f26549e08bf388768cc7d0ffe",
+        "payer": "4c3b54ac9bf947d723a035261fa1574c9e66d5bdbcee8c9346369b8be484ef58",
+        "rail": "signed-test-transfer",
+        "rail_receipt_sha256": "d46e7dcdc5d05f906fbe5048d4aef1fa490273b13280256132780a66ecc78ee5",
+        "reasons": [],
+        "request_known": true,
+        "request_sha256": "c13a8c64ec5135dab706963c7204c5adb30c12efa8b1d56b9c0900b4fbb32ccc",
+        "seq": 8,
+        "task_known": true,
+        "unit": "JPY-testnet"
+      },
+      {
+        "amount": 7000,
+        "budgets": [
+          {
+            "hop": 0,
+            "limit": 20000,
+            "total": 21000,
+            "unit": "JPY-testnet"
+          }
+        ],
+        "counted": true,
+        "for_task": true,
+        "payee": "7b1ada68cd366c70a79544b6d719d685fd37e01f26549e08bf388768cc7d0ffe",
+        "payer": "4c3b54ac9bf947d723a035261fa1574c9e66d5bdbcee8c9346369b8be484ef58",
+        "rail": "signed-test-transfer",
+        "rail_receipt_sha256": "961caf2a08f014c5688e7bd7cbedf78a0bd1a54fcda9c60d9660c7db4efa9e2b",
+        "reasons": [
+          "budget_exceeded"
+        ],
+        "request_known": true,
+        "request_sha256": "a5650ab747a92d6b164c1753c731a419f197521691fa29af9a7b86a49f6a2a5f",
+        "seq": 11,
+        "task_known": true,
+        "unit": "JPY-testnet"
+      }
+    ]
+  },
+  {
+    "case": "missing-request-C",
+    "exit_code": 0,
+    "refused": null,
+    "log": {
+      "anchor_block_time": 1792632805,
+      "anchor_depth": 9,
+      "anchor_height": 972551,
+      "as_of": 1792627866,
+      "head": "746eba10245043374a7845e40877685568f724b268e83de4a9fb9c7bf075f823",
+      "size": 13,
+      "verified": true
+    },
+    "witnessed_rejected": [],
+    "receipts": [
+      {
+        "ca2a_at_execution": "ok",
+        "ca2a_audit": "ok",
+        "capability": "pay",
+        "disposition": "within_delegation",
+        "outcome": "result",
+        "reasons": [],
+        "request_known": true,
+        "request_sha256": "329a112eec9250ea574c4720db74333302a515808be1b0a4b54793e93f2a6fd6",
+        "responder": "7b1ada68cd366c70a79544b6d719d685fd37e01f26549e08bf388768cc7d0ffe",
+        "seq": 6,
+        "stage": "audited"
+      },
+      {
+        "ca2a_at_execution": "ok",
+        "ca2a_audit": "ok",
+        "capability": "pay",
+        "disposition": "within_delegation",
+        "outcome": "result",
+        "reasons": [],
+        "request_known": true,
+        "request_sha256": "c13a8c64ec5135dab706963c7204c5adb30c12efa8b1d56b9c0900b4fbb32ccc",
+        "responder": "7b1ada68cd366c70a79544b6d719d685fd37e01f26549e08bf388768cc7d0ffe",
+        "seq": 9,
+        "stage": "audited"
+      },
+      {
+        "ca2a_at_execution": "ok",
+        "ca2a_audit": "ok",
+        "capability": "pay",
+        "disposition": "within_delegation",
+        "outcome": "result",
+        "reasons": [],
+        "request_known": false,
+        "request_sha256": "a5650ab747a92d6b164c1753c731a419f197521691fa29af9a7b86a49f6a2a5f",
+        "responder": "7b1ada68cd366c70a79544b6d719d685fd37e01f26549e08bf388768cc7d0ffe",
+        "seq": 12,
+        "stage": "audited"
+      }
+    ],
+    "payments": [
+      {
+        "amount": 7000,
+        "budgets": [
+          {
+            "hop": 0,
+            "limit": 20000,
+            "total": 7000,
+            "unit": "JPY-testnet"
+          }
+        ],
+        "counted": true,
+        "for_task": true,
+        "payee": "7b1ada68cd366c70a79544b6d719d685fd37e01f26549e08bf388768cc7d0ffe",
+        "payer": "4c3b54ac9bf947d723a035261fa1574c9e66d5bdbcee8c9346369b8be484ef58",
+        "rail": "signed-test-transfer",
+        "rail_receipt_sha256": "a88bc8a2ffc2f29c2b64fdfcb6ff90a49c8ec0f061e75d7db3e46b72d9ae5abd",
+        "reasons": [],
+        "request_known": true,
+        "request_sha256": "329a112eec9250ea574c4720db74333302a515808be1b0a4b54793e93f2a6fd6",
+        "seq": 5,
+        "task_known": true,
+        "unit": "JPY-testnet"
+      },
+      {
+        "amount": 7000,
+        "budgets": [
+          {
+            "hop": 0,
+            "limit": 20000,
+            "total": 14000,
+            "unit": "JPY-testnet"
+          }
+        ],
+        "counted": true,
+        "for_task": true,
+        "payee": "7b1ada68cd366c70a79544b6d719d685fd37e01f26549e08bf388768cc7d0ffe",
+        "payer": "4c3b54ac9bf947d723a035261fa1574c9e66d5bdbcee8c9346369b8be484ef58",
+        "rail": "signed-test-transfer",
+        "rail_receipt_sha256": "d46e7dcdc5d05f906fbe5048d4aef1fa490273b13280256132780a66ecc78ee5",
+        "reasons": [],
+        "request_known": true,
+        "request_sha256": "c13a8c64ec5135dab706963c7204c5adb30c12efa8b1d56b9c0900b4fbb32ccc",
+        "seq": 8,
+        "task_known": true,
+        "unit": "JPY-testnet"
+      },
+      {
+        "amount": 7000,
+        "counted": false,
+        "payee": "7b1ada68cd366c70a79544b6d719d685fd37e01f26549e08bf388768cc7d0ffe",
+        "payer": "4c3b54ac9bf947d723a035261fa1574c9e66d5bdbcee8c9346369b8be484ef58",
+        "rail": "signed-test-transfer",
+        "rail_receipt_sha256": "961caf2a08f014c5688e7bd7cbedf78a0bd1a54fcda9c60d9660c7db4efa9e2b",
+        "reasons": [
+          "request_unknown"
+        ],
+        "request_known": false,
+        "request_sha256": "a5650ab747a92d6b164c1753c731a419f197521691fa29af9a7b86a49f6a2a5f",
+        "seq": 11,
+        "unit": "JPY-testnet"
+      }
+    ]
+  }
+]

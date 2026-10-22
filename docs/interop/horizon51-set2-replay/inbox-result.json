@@ -1,0 +1,16 @@
+{
+  "core_reassessment_equal_except_elapsed_time": true,
+  "core_status_both": "selected_empty",
+  "first_report_unchanged_and_in_second_export": true,
+  "first_run": "9f2bd35a-44b8-4bf1-a258-9acbe4f5f57a",
+  "first_snapshot_entries": 74,
+  "foreign_native_calls_in_VATE_core": 0,
+  "formal_evidence_completion": "partial",
+  "inventory_state_both": "partial",
+  "native_from_export_sha256": "18a19f8a1eb62593b857241f34c07b1d96550b93d5c9ea17184b2ac695818fbd",
+  "original_files_restored": 68,
+  "public_files_changed": false,
+  "second_run": "ad3e9ba3-4f4a-4c7f-9521-b24855ecd51a",
+  "second_snapshot_entries": 168,
+  "status": "pass"
+}

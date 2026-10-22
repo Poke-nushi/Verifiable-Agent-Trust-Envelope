@@ -1,0 +1,17 @@
+{
+  "exit_code": 0,
+  "stdout_sha256": "18a19f8a1eb62593b857241f34c07b1d96550b93d5c9ea17184b2ac695818fbd",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "profile_sha256": "00d59ced170b5c2d4d04b6d679c5a5ee1ca9017f7237eb6222091405315c5376",
+  "network_denied_probe": true,
+  "outside_home_content_denied_probe": true,
+  "authored_output_expected": true,
+  "record_kind": "published_execution_summary",
+  "observed_on": "2026-10-22",
+  "platform": "macOS arm64",
+  "python": "3.14.8",
+  "source_commit": "b85029de8d22c5246886f4f50ede03da0f54dfcf",
+  "command_description": "pilot_v0.py --settle bundle.json under network-denied macOS sandbox",
+  "stdout_file": "native-settlement.json",
+  "source_execution_record_sha256": "83f94c0e644c31fb673d623e44d9c451872b4a82264650a34f24c4a847f7790a"
+}

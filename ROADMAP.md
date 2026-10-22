@@ -219,9 +219,20 @@ The [connection conditions](docs/interop/receipt-protocol-store-reuse.md#connect
 describe the current storage path; different native receipts require their own
 source evidence and mapping decisions.
 
+The [MUSUBI set2 receiving sample](reference/musubi-set2-receiving-sample/README.md)
+now provides one fixed integration with a different native format. It selects
+receipt requirements, checks request bindings, preserves native results and
+recovers saved outputs without repeating the evaluation. The
+[Horizon Shield #51 replay record](docs/interop/horizon51-set2-replay/README.md)
+preserves the experiment's sources, local verification and unresolved evidence.
+Next, use the documented contract to receive an independently supplied update
+or to support another receiver; record which selection and mapping work remains.
+
 For the execution-and-recipient path, generation and continued use by another
-operator, human review effort, and behavior across restarts or concurrent
-execution remain open.
+operator and human review effort remain open. The Inbox and MUSUBI sample
+exercise local restart and saved-output recovery cases; process termination,
+power loss, database repair and broader concurrent operation remain outside
+that sample's tested recovery contract.
 The [one-hour corpus review](docs/conformance/external-sut-ask-1-hour.md) and
 the reproduction package provide separate entry points for contributors.
 

@@ -2,6 +2,18 @@
 
 This file records dated public changes to the discussion draft.
 
+## 2026-10-23 — main branch
+
+- Published a fixed MUSUBI set2 receiving sample with request-binding checks,
+  pinned macOS environment preparation, Inbox storage, retained reassessment
+  history and recovery of outputs after an assessment has been saved.
+- Published the October 22 Horizon Shield #51 verification record: saved
+  signature and hash checks, exact native settlement replay, header-view
+  reassessment and VATE receipt/export results.
+- Added Linux / Python 3.11–3.14 CI for sample integrity and portable binding,
+  CLI/SQLite and output-recovery tests. Native replay remains macOS-only;
+  the existing semantic profile, core schemas and corpus are unchanged.
+
 ## 2026-10-15 JST — v0.5.0 (2026-10-14 UTC)
 
 - Added ten local execution-evidence scenarios connecting admission, exact
