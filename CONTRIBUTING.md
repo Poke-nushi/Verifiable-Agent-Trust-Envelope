@@ -143,6 +143,19 @@ CI runs this command in `Repository checks`, whose result is required by
 When updating actionlint, update the version and all four archive checksums
 in the script from the same official release, and run the check again.
 
+## CI Python Startup
+
+The execution-evidence and source-archive jobs prepare standard-library
+bytecode once in their disposable setup-python interpreter. This lets ordinary
+test subprocesses reuse Python's compiled modules when the runner's interpreter
+has no usable bytecode cache. The helper excludes third-party
+packages, test directories, symlinks, and repository code.
+
+The existing `-B` and `PYTHONDONTWRITEBYTECODE` settings still prevent automatic
+bytecode writes by test processes. They permit reading the prepared standard
+library. Isolated workers retain their empty private bytecode prefix.
+Local development does not require running this CI-only helper.
+
 ## Related Documents
 
 - `README.md`
