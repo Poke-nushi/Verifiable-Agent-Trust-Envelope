@@ -100,6 +100,11 @@ both assessments after a header-view change, and recovers outputs from a saved
 run. The [Horizon Shield #51 verification record](docs/interop/horizon51-set2-replay/README.md)
 describes the experiment's signature, hash and replay results. Native replay
 requires macOS; the receiving and recovery tests also run on Linux in CI.
+The [audit and dataset example](reference/musubi-set2-receiving-sample/AUDIT-CONTRACT.md)
+adds the published A/C originals, checks their links to selected execution
+receipts, and retains the earlier assessment. Its
+[verification record](docs/interop/horizon51-set2-audit-receiving/README.md)
+separates byte linkage from actual dataset use and formal acceptance.
 
 ## What VATE Records
 

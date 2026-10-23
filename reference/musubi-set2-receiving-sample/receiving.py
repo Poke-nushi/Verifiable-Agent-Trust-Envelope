@@ -14,6 +14,8 @@ import sys
 
 PROFILE = 'musubi.ca2a.pilot.v0'
 CONTRACT = 'local-musubi-set2-receiving-1'
+AUDIT_PROFILE = 'horizon-estimate-audit-dataset-linkage-1'
+AUDIT_TYPE = 'horizon-shield.estimate-audit.v0'
 MIB = 1024 * 1024
 KINDS = {k: 'musubi.ca2a.' + v + '.v0' for k, v in {
     'execution': 'execution-receipt', 'payment': 'payment-receipt',
@@ -188,6 +190,92 @@ def validate_selection(s, originals):
             need(r['occurrence_id'] is not None and re.fullmatch('[0-9a-f]{64}', r['item_sha256']),
                  'supported record needs selected occurrence and item digest')
     canonical(s['trust'])
+    if 'audit_binding_profile' in s:
+        need(s['audit_binding_profile'] == AUDIT_PROFILE, 'unsupported audit binding profile')
+        by_id = {r['id']: r for r in requirements}
+        for r in requirements:
+            if r['kind'] not in ('audit_original', 'dataset_original'):
+                continue
+            field, kind = (('execution_requirement', 'execution') if r['kind'] == 'audit_original'
+                           else ('audit_requirement', 'audit_original'))
+            need(type(r.get(field)) is str and r[field] in by_id,
+                 'audit linkage requires an explicitly selected prerequisite')
+            parent = by_id[r[field]]
+            need(r['occurrence_id'] is not None and parent['kind'] == kind
+                 and parent['occurrence_id'] == r['occurrence_id'] and parent['required'],
+                 'audit prerequisite must be selected in the same request occurrence')
+
+
+def bind_audit_originals(s, originals, records):
+    """Join raw evidence bytes; never assert audit quality or actual dataset use."""
+    if s.get('audit_binding_profile') != AUDIT_PROFILE:
+        return
+    by_id = {r['id']: r for r in records}
+    # Audit first, dataset second. Selection order cannot choose the dependency order.
+    for kind in ('audit_original', 'dataset_original'):
+        for r in records:
+            if r['kind'] != kind or not r['required'] or len(r['files']) != 1:
+                continue
+            field = 'execution_requirement' if kind == 'audit_original' else 'audit_requirement'
+            parent = by_id[r[field]]
+            r['claim_scope'] = 'published_digest_linkage_only'
+            if parent['binding_status'] != 'bound':
+                r.update(binding_status='unresolved', reason='selected_prerequisite_not_bound')
+                continue
+            raw = originals[r['files'][0]]
+            if kind == 'audit_original':
+                entry = decode(originals[parent['files'][0]])
+                item = entry['item']
+                outcome = item.get('outcome')
+                if (type(outcome) is not dict or outcome.get('kind') != 'result'
+                        or outcome.get('stage') != 'audited'
+                        or type(outcome.get('response_sha256')) is not str
+                        or re.fullmatch('[0-9a-f]{64}', outcome['response_sha256']) is None):
+                    r.update(binding_status='contradictory', reason='execution_does_not_name_audit_result')
+                    continue
+                if sha(raw) != outcome['response_sha256']:
+                    r.update(binding_status='contradictory', reason='audit_response_digest_mismatch')
+                    continue
+                try:
+                    audit = decode(raw)
+                    need(type(audit) is dict, 'audit must be an object')
+                    if audit.get('type') != AUDIT_TYPE:
+                        r.update(binding_status='unsupported', reason='unsupported_audit_type')
+                        continue
+                    lines = audit.get('lines')
+                    need(type(lines) is list and 0 < len(lines) <= 256, 'audit line count bound')
+                    need(all(type(line) is dict and type(line.get('dataset_sha256')) is str
+                             and re.fullmatch('[0-9a-f]{64}', line['dataset_sha256'])
+                             for line in lines), 'audit dataset digest shape')
+                    dataset_digests = sorted({line['dataset_sha256'] for line in lines})
+                except ValueError:
+                    # JSON's bounded integer parser may raise plain ValueError
+                    # (for example, an excessive digit count), not InputError.
+                    r.update(binding_status='contradictory', reason='invalid_audit_shape')
+                    continue
+                if len(dataset_digests) != 1:
+                    r.update(binding_status='unsupported', reason='multiple_dataset_digests_not_supported')
+                    continue
+                r.update(binding_status='bound', reason='audit_bytes_match_selected_execution',
+                         dataset_sha256=dataset_digests[0],
+                         linkage_basis={'execution_requirement': parent['id'],
+                                        'request_sha256': item['request_sha256'],
+                                        'execution_item_sha256': parent['item_sha256'],
+                                        'execution_raw_sha256': parent['raw_sha256'][0],
+                                        'response_sha256': outcome['response_sha256']})
+                if parent['semantic_assessment'] == 'native_result_attached':
+                    r['semantic_assessment'] = 'digest_linkage_checked'
+            else:
+                expected = parent['dataset_sha256']
+                if sha(raw) != expected:
+                    r.update(binding_status='contradictory', reason='audit_dataset_digest_mismatch')
+                    continue
+                r.update(binding_status='bound', reason='dataset_bytes_match_selected_audit',
+                         linkage_basis={'audit_requirement': parent['id'],
+                                        'audit_raw_sha256': parent['raw_sha256'][0],
+                                        'dataset_sha256': expected})
+                if parent['semantic_assessment'] == 'digest_linkage_checked':
+                    r['semantic_assessment'] = 'digest_linkage_checked'
 
 
 def changes(left, right, path='$'):
@@ -235,7 +323,7 @@ def interpret_native(stdout, execution):
         else:
             raise InputError('exit and settlement outcome disagree')
         return native
-    except (InputError, TypeError, AttributeError):
+    except (ValueError, TypeError, AttributeError):
         execution['state'] = 'evaluator_error'
         execution['error'] = 'invalid_native_output_or_exit_contract'
         return None
@@ -301,17 +389,22 @@ def assess(s, originals, bundle, native, execution):
         r['binding_status'] = state
         r['raw_sha256'] = [sha(originals[n]) for n in files]
         records.append(r)
+    bind_audit_originals(s, originals, records)
     complete = (not global_findings and all(c['binding_status'] == 'bound' for c in cases)
                 and execution['state'] == 'evaluated'
                 and all(not r['required'] or (r['binding_status'] == 'bound'
-                        and r['semantic_assessment'] == 'native_result_attached') for r in records))
-    return {'contract': CONTRACT, 'experiment': s['experiment'], 'run': s['run'],
+                        and r['semantic_assessment'] in ('native_result_attached', 'digest_linkage_checked'))
+                        for r in records))
+    result = {'contract': CONTRACT, 'experiment': s['experiment'], 'run': s['run'],
             'question': s['question'], 'assessment_time': s['assessment_time'],
             'global_findings': global_findings, 'cases': cases, 'requirements': records,
             'overall_evidence_state': 'selected_records_bound' if complete else 'partial',
             'native': {'state': execution['state'], 'output': native},
             'core_foreign_semantics': 'not_implemented_selected_empty',
             'arrival_basis': 'local_material_selection_not_external_late_delivery'}
+    if 'audit_binding_profile' in s:
+        result['audit_binding_profile'] = s['audit_binding_profile']
+    return result
 
 
 def load_inbox(vate_root):

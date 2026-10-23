@@ -1,0 +1,274 @@
+{
+  "assessment_time": "2026-10-23T13:34:56.857372Z",
+  "audit_binding_profile": "horizon-estimate-audit-dataset-linkage-1",
+  "bundle": {
+    "path": "workers/hs-ledger/nenrin/musubi-v0/ca2a-companion-v0/pilot51/set2/bundle.json",
+    "sha256": "c4ecb8830a69f4a8e8c31f5c8d4c32460651d1cf63cabf77db08a7a4a62a3668"
+  },
+  "cases": [
+    {
+      "checker": "a58d1420da7d1cfe825544d105c39e2a8e4c3db86a46512cba2000c37251dd65",
+      "criteria_sha256": "6d62ca38527015ac9c31612653171b0d05547591b9bfd4be33593e513ab534b9",
+      "occurrence_id": "hs51-musubi-2-A",
+      "request_sha256": "329a112eec9250ea574c4720db74333302a515808be1b0a4b54793e93f2a6fd6"
+    },
+    {
+      "checker": "a58d1420da7d1cfe825544d105c39e2a8e4c3db86a46512cba2000c37251dd65",
+      "criteria_sha256": "6d62ca38527015ac9c31612653171b0d05547591b9bfd4be33593e513ab534b9",
+      "occurrence_id": "hs51-musubi-2-B",
+      "request_sha256": "c13a8c64ec5135dab706963c7204c5adb30c12efa8b1d56b9c0900b4fbb32ccc"
+    },
+    {
+      "checker": "a58d1420da7d1cfe825544d105c39e2a8e4c3db86a46512cba2000c37251dd65",
+      "criteria_sha256": "6d62ca38527015ac9c31612653171b0d05547591b9bfd4be33593e513ab534b9",
+      "occurrence_id": "hs51-musubi-2-C",
+      "request_sha256": "a5650ab747a92d6b164c1753c731a419f197521691fa29af9a7b86a49f6a2a5f"
+    }
+  ],
+  "contract": "local-musubi-set2-receiving-1",
+  "experiment": "Horizon #51",
+  "log_identity": {
+    "head": "746eba10245043374a7845e40877685568f724b268e83de4a9fb9c7bf075f823",
+    "log_id": "nenrin:ca2a-companion:pilot51"
+  },
+  "namespace": "horizon51-musubi-set2-reusable-local",
+  "profile": "musubi.ca2a.pilot.v0",
+  "question": "Retain A/C audit and dataset originals, check their published digest links to each selected request, and preserve missing formal evidence and the preceding assessment.",
+  "receiver_id": "vate-local-receiver",
+  "reference_output": {
+    "path": "workers/hs-ledger/nenrin/musubi-v0/ca2a-companion-v0/pilot51/set2/settlement.json",
+    "sha256": "565acd9cec6772c0c44bbff3cad1c71ed1c3c106c1448cbe37ae3c641b947d19"
+  },
+  "requirements": [
+    {
+      "files": [
+        "workers/hs-ledger/nenrin/musubi-v0/ca2a-companion-v0/pilot51/set2/log/entries/006_receipt_A.json"
+      ],
+      "id": "hs51-musubi-2-A:execution",
+      "item_sha256": "a8fe39e0671a14040c4520b9154c374e097dd9d040a6472dfa1f4c12ef47698e",
+      "kind": "execution",
+      "occurrence_id": "hs51-musubi-2-A",
+      "required": true
+    },
+    {
+      "files": [
+        "workers/hs-ledger/nenrin/musubi-v0/ca2a-companion-v0/pilot51/set2/log/entries/005_payment_A.json"
+      ],
+      "id": "hs51-musubi-2-A:payment",
+      "item_sha256": "a1647febc1fc5d964c60730059d8e6233a81c75155485ad3a18548921789a455",
+      "kind": "payment",
+      "occurrence_id": "hs51-musubi-2-A",
+      "required": true
+    },
+    {
+      "files": [
+        "workers/hs-ledger/nenrin/musubi-v0/ca2a-companion-v0/pilot51/set2/log/entries/001_criteria_A.json"
+      ],
+      "id": "hs51-musubi-2-A:criteria",
+      "item_sha256": "d5d272d6863f667b3b4dc5f99185e7c9b49416379d8cee5f2e1f939e7de52f49",
+      "kind": "criteria",
+      "occurrence_id": "hs51-musubi-2-A",
+      "required": true
+    },
+    {
+      "files": [],
+      "id": "hs51-musubi-2-A:acceptance",
+      "kind": "acceptance",
+      "occurrence_id": "hs51-musubi-2-A",
+      "required": true
+    },
+    {
+      "execution_requirement": "hs51-musubi-2-A:execution",
+      "files": [
+        "supplementary/audit-A-C.json"
+      ],
+      "id": "hs51-musubi-2-A:audit_original",
+      "kind": "audit_original",
+      "occurrence_id": "hs51-musubi-2-A",
+      "required": true
+    },
+    {
+      "files": [],
+      "id": "hs51-musubi-2-A:rail_original",
+      "kind": "rail_original",
+      "occurrence_id": "hs51-musubi-2-A",
+      "required": true
+    },
+    {
+      "files": [],
+      "id": "hs51-musubi-2-A:raw_response",
+      "kind": "raw_response",
+      "occurrence_id": "hs51-musubi-2-A",
+      "required": true
+    },
+    {
+      "files": [
+        "workers/hs-ledger/nenrin/musubi-v0/ca2a-companion-v0/pilot51/set2/log/entries/009_receipt_B.json"
+      ],
+      "id": "hs51-musubi-2-B:execution",
+      "item_sha256": "66facb13faa3ba4f74cd2f4dc31d95f77cd0ec7a37f0946cfbf91e63b72e9ef4",
+      "kind": "execution",
+      "occurrence_id": "hs51-musubi-2-B",
+      "required": true
+    },
+    {
+      "files": [
+        "workers/hs-ledger/nenrin/musubi-v0/ca2a-companion-v0/pilot51/set2/log/entries/008_payment_B.json"
+      ],
+      "id": "hs51-musubi-2-B:payment",
+      "item_sha256": "fdbd9a2baaf266476164768fb613af9cf099ccf65c52b4832676698238ba2f6c",
+      "kind": "payment",
+      "occurrence_id": "hs51-musubi-2-B",
+      "required": true
+    },
+    {
+      "files": [
+        "workers/hs-ledger/nenrin/musubi-v0/ca2a-companion-v0/pilot51/set2/log/entries/002_criteria_B.json"
+      ],
+      "id": "hs51-musubi-2-B:criteria",
+      "item_sha256": "baebf8aa243dc6ae6687abfdd8487b8d83e69f137bcb92586a20c5c55b7a97df",
+      "kind": "criteria",
+      "occurrence_id": "hs51-musubi-2-B",
+      "required": true
+    },
+    {
+      "files": [],
+      "id": "hs51-musubi-2-B:acceptance",
+      "kind": "acceptance",
+      "occurrence_id": "hs51-musubi-2-B",
+      "required": true
+    },
+    {
+      "execution_requirement": "hs51-musubi-2-B:execution",
+      "files": [],
+      "id": "hs51-musubi-2-B:audit_original",
+      "kind": "audit_original",
+      "occurrence_id": "hs51-musubi-2-B",
+      "required": true
+    },
+    {
+      "files": [],
+      "id": "hs51-musubi-2-B:rail_original",
+      "kind": "rail_original",
+      "occurrence_id": "hs51-musubi-2-B",
+      "required": true
+    },
+    {
+      "files": [],
+      "id": "hs51-musubi-2-B:raw_response",
+      "kind": "raw_response",
+      "occurrence_id": "hs51-musubi-2-B",
+      "required": true
+    },
+    {
+      "files": [
+        "workers/hs-ledger/nenrin/musubi-v0/ca2a-companion-v0/pilot51/set2/log/entries/012_receipt_C.json"
+      ],
+      "id": "hs51-musubi-2-C:execution",
+      "item_sha256": "3408330296e45a9dd93f27e7f4250650599598f4ba6f4e6d07efd41f5e1f10a5",
+      "kind": "execution",
+      "occurrence_id": "hs51-musubi-2-C",
+      "required": true
+    },
+    {
+      "files": [
+        "workers/hs-ledger/nenrin/musubi-v0/ca2a-companion-v0/pilot51/set2/log/entries/011_payment_C.json"
+      ],
+      "id": "hs51-musubi-2-C:payment",
+      "item_sha256": "f3a70a257d296a78cee4f6ba574a99c191ded6a2929bc7c41b067058d04f3ee9",
+      "kind": "payment",
+      "occurrence_id": "hs51-musubi-2-C",
+      "required": true
+    },
+    {
+      "files": [
+        "workers/hs-ledger/nenrin/musubi-v0/ca2a-companion-v0/pilot51/set2/log/entries/003_criteria_C.json"
+      ],
+      "id": "hs51-musubi-2-C:criteria",
+      "item_sha256": "759d8cf2de928b61cfd6e66a06f5528762582658b0dc7e14d04187f48b7d65e3",
+      "kind": "criteria",
+      "occurrence_id": "hs51-musubi-2-C",
+      "required": true
+    },
+    {
+      "files": [],
+      "id": "hs51-musubi-2-C:acceptance",
+      "kind": "acceptance",
+      "occurrence_id": "hs51-musubi-2-C",
+      "required": false
+    },
+    {
+      "execution_requirement": "hs51-musubi-2-C:execution",
+      "files": [
+        "supplementary/audit-A-C.json"
+      ],
+      "id": "hs51-musubi-2-C:audit_original",
+      "kind": "audit_original",
+      "occurrence_id": "hs51-musubi-2-C",
+      "required": true
+    },
+    {
+      "files": [],
+      "id": "hs51-musubi-2-C:rail_original",
+      "kind": "rail_original",
+      "occurrence_id": "hs51-musubi-2-C",
+      "required": true
+    },
+    {
+      "files": [],
+      "id": "hs51-musubi-2-C:raw_response",
+      "kind": "raw_response",
+      "occurrence_id": "hs51-musubi-2-C",
+      "required": true
+    },
+    {
+      "audit_requirement": "hs51-musubi-2-A:audit_original",
+      "files": [
+        "supplementary/souba-db.json"
+      ],
+      "id": "hs51-musubi-2-A:dataset_original",
+      "kind": "dataset_original",
+      "occurrence_id": "hs51-musubi-2-A",
+      "required": true
+    },
+    {
+      "audit_requirement": "hs51-musubi-2-B:audit_original",
+      "files": [],
+      "id": "hs51-musubi-2-B:dataset_original",
+      "kind": "dataset_original",
+      "occurrence_id": "hs51-musubi-2-B",
+      "required": true
+    },
+    {
+      "audit_requirement": "hs51-musubi-2-C:audit_original",
+      "files": [
+        "supplementary/souba-db.json"
+      ],
+      "id": "hs51-musubi-2-C:dataset_original",
+      "kind": "dataset_original",
+      "occurrence_id": "hs51-musubi-2-C",
+      "required": true
+    }
+  ],
+  "run": "MUSUBI set2",
+  "trust": {
+    "log_id": "nenrin:ca2a-companion:pilot51",
+    "lower_bound": {
+      "hash": "00000000000000000000fb68086526bfc292a37a3a1bd02cd115cdd28c7bc49a",
+      "height": 972238
+    },
+    "max_merge_blocks": 6,
+    "max_target_bits": "17200930",
+    "min_depth": 6,
+    "operator": "d73636e0fa521898f36ccc7de11d6277817eb183835536b3c05b3e50f1222f9f",
+    "root_issuers": [
+      "ced79be22d276dfecd1f48722c64f3e5362ffd3b0c3766094ad8187734a0c833"
+    ],
+    "witness_threshold": 2,
+    "witnesses": [
+      "58c98ed44ec96da02907e0ed6a74fa2792d4d3f494925d306fe12a47a280fb99",
+      "d6f6ca92ef53665c74700dab244b00c194102897f14999dabc20a28a1dda10a8"
+    ]
+  },
+  "view_sha256": null
+}

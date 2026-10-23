@@ -4,6 +4,7 @@ import copy
 from pathlib import Path
 import platform
 import shutil
+import sys
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
@@ -138,6 +139,25 @@ class BindingTests(unittest.TestCase):
             execution={'state':'process_completed','exit_code':0}
             self.assertIsNone(interpret_native(raw,execution))
             self.assertEqual('evaluator_error',execution['state'])
+
+    def test_native_integer_parse_limit_retains_unassessed_bindings(self):
+        limit = sys.get_int_max_str_digits()
+        try:
+            sys.set_int_max_str_digits(4300)
+            for prefix in (b'{', encoded(self.native).rstrip()[:-1] + b','):
+                with self.subTest(valid_settlement_prefix=prefix != b'{'):
+                    raw = prefix + b'"ignored":' + b'9' * 5000 + b'}'
+                    execution = {'state': 'process_completed', 'exit_code': 0}
+                    actual = interpret_native(raw, execution)
+                    self.assertIsNone(actual)
+                    self.assertEqual('evaluator_error', execution['state'])
+                    self.assertEqual('invalid_native_output_or_exit_contract', execution['error'])
+                    report = assess(self.selection, self.originals, self.bundle, actual, execution)
+                    self.assertEqual('partial', report['overall_evidence_state'])
+                    self.assertEqual(9, sum(x['binding_status'] == 'bound' for x in report['requirements']))
+                    self.assertTrue(all(x['semantic_assessment'] == 'unassessed' for x in report['requirements']))
+        finally:
+            sys.set_int_max_str_digits(limit)
 
     def test_process_failure_cannot_be_promoted_by_stdout(self):
         execution={'state':'evaluator_error','exit_code':1}

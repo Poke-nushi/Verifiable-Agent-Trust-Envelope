@@ -297,6 +297,60 @@ def main():
         assert db_state(folder/'inbox.sqlite') == before
         cases.append({'case': 'preserve-'+mode, 'status': 'pass', 'exit_code': proc.returncode})
 
+    # Parser failures are recorded, including raw stdout, before output recovery.
+    limit = sys.get_int_max_str_digits()
+    try:
+        sys.set_int_max_str_digits(4300)
+        for mode, prefix, use_audits in (('integer-limit-object', b'{', False),
+                ('integer-limit-settlement', raw.rstrip()[:-1] + b',', True)):
+            folder = output/mode; folder.mkdir()
+            invalid_stdout = prefix + b'"ignored":' + b'9' * 5000 + b'}'
+            def integer_output(*unused):
+                native_calls.append(mode)
+                return {'state': 'process_completed', 'exit_code': 0}, invalid_stdout, b'', {}
+            options = dict(selection=sample/'audit-selection.json', manifest=sample/'audit-manifest.json') if use_audits else {}
+            args = inputs(folder, **options)
+            stream = io.StringIO()
+            with patch.object(offline_native, 'replay', integer_output), \
+                 patch.object(sys, 'argv', cli_args(args)), redirect_stdout(stream):
+                code = r.main()
+            message = r.decode(stream.getvalue().encode())
+            assert code == 64 and message['status'] == 'recorded_evaluator_error', message
+            result = r.decode((args.output/'RESULT.json').read_bytes())
+            assessment = (args.output/'assessment.json').read_bytes()
+            report = r.decode(assessment)
+            assert report['native']['state'] == 'evaluator_error' and report['native']['output'] is None
+            assert report['overall_evidence_state'] == 'partial'
+            assert all(x['semantic_assessment'] == 'unassessed' for x in report['requirements'])
+            assert sum(x['binding_status'] == 'bound' for x in report['requirements']) == (13 if use_audits else 9)
+            ref = result['payload_refs']['native.stdout']
+            assert (args.output/'export'/ref['path']).read_bytes() == invalid_stdout
+            assert ref['digest']['value'] == r.sha(invalid_stdout) and ref['byte_length'] == len(invalid_stdout)
+            state = db_state(args.database)
+            assert len(state['runs']) == 1 and state['runs'][0][1] == 'completed'
+            recovered = safe_recover(args.database, result['recovery'], folder/'recovered')
+            assert recovered['status'] == 'recorded_evaluator_error'
+            assert recovered['inbox']['run_id'] == result['inbox']['run_id']
+            assert (folder/'recovered/assessment.json').read_bytes() == assessment
+            assert (folder/'recovered/materials/evaluation/native.stdout').read_bytes() == invalid_stdout
+            cmd = [sys.executable, '-B', str(root/'recover_output.py'), '--vate-root', str(vate),
+                   '--database', str(args.database), '--receipt', str(args.output/'RESULT.json'),
+                   '--output', str(folder/'cli-recovered')]
+            proc = subprocess.run(cmd, capture_output=True, timeout=60)
+            assert proc.returncode == 64 and not proc.stderr, proc.stderr
+            reply = r.decode(proc.stdout)
+            assert reply['status'] == 'output_recovered' and reply['saved_status'] == 'recorded_evaluator_error'
+            assert reply['native_state'] == 'evaluator_error' and reply['run_id'] == result['inbox']['run_id']
+            assert (folder/'cli-recovered/assessment.json').read_bytes() == assessment
+            assert (folder/'cli-recovered/materials/evaluation/native.stdout').read_bytes() == invalid_stdout
+            assert db_state(args.database) == state
+            cases.append({'case': mode, 'status': 'pass', 'receive_exit_code': code,
+                          'recover_exit_code': proc.returncode, 'stdout_bytes': len(invalid_stdout),
+                          'stdout_sha256': r.sha(invalid_stdout), 'completed_runs': 1,
+                          'recovery_count': 2, 'database_unchanged': True})
+    finally:
+        sys.set_int_max_str_digits(limit)
+
     # Second output failure leaves the existing DB and original receipt usable.
     before = db_state(db)
     with patch.object(Inbox, 'export', side_effect=OSError('second output failure')), \

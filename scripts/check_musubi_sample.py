@@ -22,6 +22,7 @@ import venv
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLE = ROOT / "reference/musubi-set2-receiving-sample"
 RECORD = ROOT / "docs/interop/horizon51-set2-replay"
+AUDIT_RECORD = ROOT / "docs/interop/horizon51-set2-audit-receiving"
 
 
 def sha(raw):
@@ -53,7 +54,8 @@ def check_manifest(root):
 
 
 def check_integrity():
-    counts = {"sample_files": check_manifest(SAMPLE), "record_files": check_manifest(RECORD)}
+    counts = {"sample_files": check_manifest(SAMPLE), "record_files": check_manifest(RECORD),
+              "audit_record_files": check_manifest(AUDIT_RECORD)}
     pin = json.loads((SAMPLE / "vate-source.json").read_bytes())
     for row in pin["files"]:
         raw = (ROOT / row["path"]).read_bytes()
@@ -116,6 +118,16 @@ def run_portable():
             result = json.loads((output / "RESULT.json").read_bytes())
             require(result["status"] == "pass", f"{name} checks failed")
             counts[name] = len(result["cases"])
+        audit_output = root / "audit"
+        subprocess.run([str(python), "-B", str(SAMPLE / "verify_audits.py"), "--portable",
+                        "--environment", str(environment), "--vate-root", str(ROOT),
+                        "--output", str(audit_output)], check=True, env=env, timeout=240)
+        audit = json.loads((audit_output / "VERIFICATION.json").read_bytes())
+        require(audit["status"] == "pass" and audit["real_native_replays"] == 0
+                and audit["replay_mode"] == "saved_output_test_double",
+                "audit checks did not report the expected portable test scope")
+        counts["audit_unit_and_storage"] = "pass"
+        counts["audit_native_replays"] = audit["real_native_replays"]
         return counts
 
 
