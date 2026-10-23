@@ -1,5 +1,8 @@
 # Receiving contract: MUSUBI set2 sample
 
+The opt-in local audit/dataset profile is specified in [AUDIT-CONTRACT.md](AUDIT-CONTRACT.md).
+The contract below describes the unchanged base behavior when that profile is absent.
+
 The adapter receives the fixed Horizon #51 set2 originals, binds them to explicit
 receiver selections, runs a pinned upstream evaluator, and stores the inputs and
 assessments in a VATE Inbox. It adds no normative VATE schema or semantic profile.

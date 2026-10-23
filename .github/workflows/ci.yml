@@ -245,7 +245,7 @@ jobs:
       - name: Check published sample and experiment file integrity
         run: python -B scripts/check_musubi_sample.py --integrity-only
 
-      - name: Check binding, intake and output recovery from a source archive
+      - name: Check binding, audit intake and output recovery from a source archive
         run: |
           archive_dir="$(mktemp -d)"
           git archive HEAD | tar -x -C "$archive_dir"

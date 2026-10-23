@@ -1,0 +1,23 @@
+{
+  "files": [
+    {
+      "path": "supplementary/audit-A-C.json",
+      "bytes": 1532,
+      "sha256": "c2920477d95a8e48f16cc2df49ec58a02cd9b422db491206446e7a5be21937f5",
+      "git_blob": "f3ec8de6918d9e06d596488f8d9565ea1fca8e8f",
+      "retrieved_at": "2026-10-23T12:43:29.227072+00:00",
+      "source_commit": "b85029de8d22c5246886f4f50ede03da0f54dfcf",
+      "url": "https://github.com/ogasurfproject-jpg/horizon-shield/blob/b85029de8d22c5246886f4f50ede03da0f54dfcf/workers/hs-ledger/nenrin/musubi-v0/ca2a-companion-v0/rehearsal/live_smoke/audit.json"
+    },
+    {
+      "path": "supplementary/souba-db.json",
+      "bytes": 117282,
+      "sha256": "7b16600e50ed73b844ff5b2718f04a6dd4d9ace0367982fb8d139db509d023fd",
+      "git_blob": "5fa35481663fce168b305113cc185ba24f058ba2",
+      "retrieved_at": "2026-10-23T12:43:29.770151+00:00",
+      "source_commit": "5b22c203248b0149cd0456f77d32feb887f48ee0",
+      "url": "https://github.com/ogasurfproject-jpg/horizon-shield/blob/5b22c203248b0149cd0456f77d32feb887f48ee0/data/souba-db.json"
+    }
+  ],
+  "basis": "https://github.com/ogasurfproject-jpg/horizon-shield/issues/55#issuecomment-6340981584"
+}

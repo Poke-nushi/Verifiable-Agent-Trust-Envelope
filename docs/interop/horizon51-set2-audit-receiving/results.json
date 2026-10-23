@@ -1,0 +1,97 @@
+{
+  "observation_date": "2026-10-23",
+  "scope": "published_digest_linkage_only",
+  "source_clarification": "https://github.com/ogasurfproject-jpg/horizon-shield/issues/55#issuecomment-6340981584",
+  "horizon_set2_commit": "b85029de8d22c5246886f4f50ede03da0f54dfcf",
+  "dataset_commit": "5b22c203248b0149cd0456f77d32feb887f48ee0",
+  "native_output_sha256": "18a19f8a1eb62593b857241f34c07b1d96550b93d5c9ea17184b2ac695818fbd",
+  "rows": [
+    {
+      "occurrence": "hs51-musubi-2-A",
+      "request_sha256": "329a112eec9250ea574c4720db74333302a515808be1b0a4b54793e93f2a6fd6",
+      "delegation_scope": "within_delegation",
+      "scope_basis": "pinned_upstream_replay",
+      "budget": [
+        {
+          "hop": 0,
+          "limit": 20000,
+          "total": 7000,
+          "unit": "JPY-testnet"
+        }
+      ],
+      "payment_reasons": [],
+      "acceptance": null,
+      "audit_byte_linkage": "bound",
+      "dataset_byte_linkage": "bound",
+      "dataset_sha256": "7b16600e50ed73b844ff5b2718f04a6dd4d9ace0367982fb8d139db509d023fd",
+      "actual_runtime_dataset_use": "not_independently_observed",
+      "matched_audit_sha256": "c2920477d95a8e48f16cc2df49ec58a02cd9b422db491206446e7a5be21937f5",
+      "selected_record_bindings": {
+        "execution": "bound",
+        "payment": "bound",
+        "criteria": "bound"
+      },
+      "receipt_response_sha256": "c2920477d95a8e48f16cc2df49ec58a02cd9b422db491206446e7a5be21937f5"
+    },
+    {
+      "occurrence": "hs51-musubi-2-B",
+      "request_sha256": "c13a8c64ec5135dab706963c7204c5adb30c12efa8b1d56b9c0900b4fbb32ccc",
+      "delegation_scope": "within_delegation",
+      "scope_basis": "pinned_upstream_replay",
+      "budget": [
+        {
+          "hop": 0,
+          "limit": 20000,
+          "total": 14000,
+          "unit": "JPY-testnet"
+        }
+      ],
+      "payment_reasons": [],
+      "acceptance": null,
+      "audit_byte_linkage": "not_received",
+      "dataset_byte_linkage": "not_received",
+      "dataset_sha256": null,
+      "actual_runtime_dataset_use": "not_independently_observed",
+      "matched_audit_sha256": null,
+      "selected_record_bindings": {
+        "execution": "bound",
+        "payment": "bound",
+        "criteria": "bound"
+      },
+      "receipt_response_sha256": "40bc2a46f428b2cc5000e9d5e896adac218ebe3c2b76f78ba29afebf97887aea"
+    },
+    {
+      "occurrence": "hs51-musubi-2-C",
+      "request_sha256": "a5650ab747a92d6b164c1753c731a419f197521691fa29af9a7b86a49f6a2a5f",
+      "delegation_scope": "within_delegation",
+      "scope_basis": "pinned_upstream_replay",
+      "budget": [
+        {
+          "hop": 0,
+          "limit": 20000,
+          "total": 21000,
+          "unit": "JPY-testnet"
+        }
+      ],
+      "payment_reasons": [
+        "budget_exceeded"
+      ],
+      "acceptance": null,
+      "audit_byte_linkage": "bound",
+      "dataset_byte_linkage": "bound",
+      "dataset_sha256": "7b16600e50ed73b844ff5b2718f04a6dd4d9ace0367982fb8d139db509d023fd",
+      "actual_runtime_dataset_use": "not_independently_observed",
+      "matched_audit_sha256": "c2920477d95a8e48f16cc2df49ec58a02cd9b422db491206446e7a5be21937f5",
+      "selected_record_bindings": {
+        "execution": "bound",
+        "payment": "bound",
+        "criteria": "bound"
+      },
+      "receipt_response_sha256": "c2920477d95a8e48f16cc2df49ec58a02cd9b422db491206446e7a5be21937f5"
+    }
+  ],
+  "overall_evidence_state": "partial",
+  "prior_assessment_preserved": true,
+  "native_reimplementation": false,
+  "authored_and_operated_by": "VATE maintainer with coding agent assistance"
+}

@@ -2,6 +2,14 @@
 
 This file records dated public changes to the discussion draft.
 
+## Unreleased
+
+- Add an opt-in MUSUBI set2 audit/dataset receiving example. It checks the
+  published A/C bytes against selected execution receipts, retains both
+  assessments, and preserves missing B evidence and unresolved acceptance.
+- Add the supplementary verification record and portable audit/storage
+  regressions to the existing Linux / Python 3.11–3.14 sample CI job.
+
 ## 2026-10-23 — main branch
 
 - Published a fixed MUSUBI set2 receiving sample with request-binding checks,

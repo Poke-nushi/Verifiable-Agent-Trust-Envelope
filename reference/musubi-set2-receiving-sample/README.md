@@ -6,8 +6,13 @@ calculation. Then change the selected Bitcoin header view and save a second
 assessment linked to the first. Both assessments and their original inputs
 remain available for inspection and export.
 
-The included material comes from [Horizon Shield #51](https://github.com/ogasurfproject-jpg/horizon-shield/issues/51),
-at commit `b85029de8d22c5246886f4f50ede03da0f54dfcf`. This is a fixed-source
+An optional [A/C audit and dataset example](AUDIT-CONTRACT.md) adds the published
+originals, checks their digest links to the selected execution receipts, and
+retains the earlier assessment. Both examples use the preparation below.
+
+The base 68 originals and upstream evaluator come from [Horizon Shield #51](https://github.com/ogasurfproject-jpg/horizon-shield/issues/51),
+at commit `b85029de8d22c5246886f4f50ede03da0f54dfcf`. The two additions have
+per-file commit pins in [audit-sources.json](sample/audit-sources.json). This is a fixed-source
 interoperability example, not a production-ready verifier or a general
 compatibility result. See [the receiving contract](CONTRACT.md) for the exact
 meaning of its states and bindings.
@@ -24,6 +29,12 @@ meaning of its states and bindings.
 - Internet access for environment preparation from PyPI. The replay uses the
   included source and originals; the upstream evaluator runs with networking
   denied.
+
+The tested macOS interpreters use Homebrew under `/opt/homebrew` or Python's
+framework layout under `/Library/Frameworks`. The replay sandbox denies reads
+elsewhere in the home directory outside the prepared runtime and output paths.
+A base interpreter or standard library installed there may therefore be
+inaccessible; that installation layout has not been validated.
 
 `requirements.lock` fixes all 21 package versions and their allowed distribution
 hashes. Preparation installs wheels only into a new virtual environment. It does

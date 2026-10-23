@@ -1,5 +1,9 @@
 # Sample validation record
 
+The results below belong to the published base sample. Validation of the
+audit/dataset extension and subsequent native-output parser correction is
+recorded separately in [AUDIT-VALIDATION.md](AUDIT-VALIDATION.md).
+
 Local verification on 2026-10-23, macOS arm64. VATE source:
 `f044b208bcb8046fd4aa262094b4b77271ba7b27`; Horizon Shield source:
 `b85029de8d22c5246886f4f50ede03da0f54dfcf`.
