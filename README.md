@@ -93,6 +93,14 @@ Its [package intake example](reference/recipient-inbox/PACKAGE-INTAKE.md) derive
 collection status from actual file reads and registration, keeping collection
 failure separate from missing records.
 
+For a worked connection to another protocol's records, use the
+[MUSUBI set2 recipient sample](reference/musubi-set2-receiving-sample/README.md).
+It checks request bindings, replays the pinned settlement calculation, preserves
+both assessments after a header-view change, and recovers outputs from a saved
+run. The [Horizon Shield #51 verification record](docs/interop/horizon51-set2-replay/README.md)
+describes the experiment's signature, hash and replay results. Native replay
+requires macOS; the receiving and recovery tests also run on Linux in CI.
+
 ## What VATE Records
 
 - **One admission basis**: action, target, any requested constraints, actor, principal,
@@ -501,6 +509,10 @@ The most useful feedback is:
   Inspect detached signatures and receiver-selected record authority alongside receipt linkage
 - [reference/required-records/README.md](reference/required-records/README.md)
   Find missing records within a receiver-selected set of operations or known attempts
+- [reference/musubi-set2-receiving-sample/README.md](reference/musubi-set2-receiving-sample/README.md)
+  Receive fixed MUSUBI records, retain native assessments and recover saved outputs
+- [docs/interop/horizon51-set2-replay/README.md](docs/interop/horizon51-set2-replay/README.md)
+  Inspect the October 22 experiment's saved signature, hash and recipient-replay results
 - [reference/a2a-metadata-adapter-demo/README.md](reference/a2a-metadata-adapter-demo/README.md)
   Dependency-free A2A-shaped metadata adapter demo
 - [packages/vate-core-ts/README.md](packages/vate-core-ts/README.md)

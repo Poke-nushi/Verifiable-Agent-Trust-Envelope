@@ -1,0 +1,9 @@
+{
+  "negative_controls": 5,
+  "published_view_checked_against_two_explorers": true,
+  "linked_headers_in_observed_view": 327,
+  "tip": 972564,
+  "checkpoint_depth": 14,
+  "settlement_equal_except_anchor_depth": true,
+  "independent_full_node": false
+}
