@@ -251,6 +251,41 @@ jobs:
           git archive HEAD | tar -x -C "$archive_dir"
           python -B "$archive_dir/scripts/check_musubi_sample.py"
 
+  post-admission-revocation:
+    name: Post-admission revocation (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.11", "3.12", "3.13", "3.14"]
+        include:
+          - os: macos-15
+            python: "3.14"
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+          check-latest: true
+
+      - name: Select existing OpenSSL on macOS
+        if: runner.os == 'macOS'
+        run: echo "$(brew --prefix openssl@3)/bin" >> "$GITHUB_PATH"
+
+      - name: Check the standalone sample from a source archive
+        run: |
+          archive_dir="$(mktemp -d)"
+          trap 'rm -rf "$archive_dir"' EXIT
+          git archive HEAD:reference/post-admission-revocation-sample | tar -x -C "$archive_dir"
+          python -E -s -B scripts/check_post_admission_revocation_sample.py --sample-root "$archive_dir"
+
   validate:
     name: Repository checks
     runs-on: ubuntu-latest
@@ -353,7 +388,7 @@ jobs:
   ci-complete:
     name: CI complete
     if: ${{ always() }}
-    needs: [execution-evidence, execution-evidence-archive, musubi-receiving, validate]
+    needs: [execution-evidence, execution-evidence-archive, musubi-receiving, post-admission-revocation, validate]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
@@ -363,8 +398,10 @@ jobs:
           ARCHIVE_RESULT: ${{ needs.execution-evidence-archive.result }}
           REPOSITORY_RESULT: ${{ needs.validate.result }}
           MUSUBI_RESULT: ${{ needs.musubi-receiving.result }}
+          REVOCATION_RESULT: ${{ needs.post-admission-revocation.result }}
         run: |
           test "$CHECKOUT_RESULT" = success
           test "$ARCHIVE_RESULT" = success
           test "$REPOSITORY_RESULT" = success
           test "$MUSUBI_RESULT" = success
+          test "$REVOCATION_RESULT" = success

@@ -16,3 +16,6 @@ reference/nenrin-s3-crosswalk-example/** text eol=lf
 reference/nenrin-s3-crosswalk-example/third_party/** -text
 reference/nenrin-s3-crosswalk-example/saved/** -text
 reference/nenrin-s3-crosswalk-example/saved/vate/cases/**/*-headers.txt whitespace=cr-at-eol,-blank-at-eof
+
+# Keep the standalone revocation sample consistent with its raw-byte manifest.
+reference/post-admission-revocation-sample/** text eol=lf
