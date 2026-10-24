@@ -9,6 +9,21 @@ For public wording rules, see
 
 ## Current Direction
 
+### v0.6.0: Receiving, Reassessment and Runtime-Key Revocation
+
+The `v0.6.0` source adds receiver-selected required-record checks, persistent
+intake and exported-history reassessment, fixed MUSUBI evidence connections,
+and a standalone post-admission runtime-key revocation sample. The release
+retains the AL2 profile v0.3, artifact line `2026-09` and the v0.5.0 corpus.
+See the [review paths](docs/release-notes/v0.6.0.md) and
+[publication/archive gate](docs/release-gate-v0.6.0.md).
+
+The next technical questions concern independently selected trust and required
+records, connecting execution evidence to a receiving application, and retaining
+earlier judgments when conditions change. Existing file-operation and payment
+examples provide different contexts for those questions. A further example
+should address a concrete integration or maintenance problem.
+
 ### v0.5.0: Execution Evidence And Recipient Review
 
 The `v0.5.0` discussion-draft pre-release collects execution-evidence examples,
@@ -97,6 +112,9 @@ partial native-implementation records and their historical evaluation pins.
 
 The current public review surface is:
 
+- `v0.6.0` source notes and publication/archive gate:
+  [docs/release-notes/v0.6.0.md](docs/release-notes/v0.6.0.md) and
+  [docs/release-gate-v0.6.0.md](docs/release-gate-v0.6.0.md)
 - `v0.5.0` GitHub discussion-draft pre-release:
   <https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.5.0>
 - `v0.5.0` exact version DOI:
