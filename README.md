@@ -7,7 +7,7 @@ agent action was allowed, narrowed, or denied. It carries a declared input hash
 and digest-addressed evidence references into local admission, then links the
 resulting receipt to later outcome evidence.
 
-The current [v0.5.0 release](docs/release-notes/v0.5.0.md) uses the **AL2 verifier
+The [v0.6.0 source](docs/release-notes/v0.6.0.md) uses the **AL2 verifier
 admission profile v0.3**. The profile defines the admission rules and receipt
 model introduced below; its version is separate from the repository release.
 
@@ -35,6 +35,8 @@ python3 reference/quickstart-demo/run_demo.py
 
 No dependencies. The demo narrates three committed cases from the AL2
 admission profile: `allow`, `attenuate`, and a fail-closed `deny`.
+
+## Choose a Reference Path
 
 To trace an admitted operation through a separate local provider process,
 actual output files, and response-loss reconciliation, run the
@@ -138,17 +140,20 @@ request hashes so later evidence can be checked against the narrowed basis.
 
 ## Status and Scope
 
-VATE is a public Apache-2.0 protocol discussion draft. The current public
-review snapshot is the [`v0.5.0` discussion-draft pre-release](docs/release-notes/v0.5.0.md),
-covering execution evidence and recipient review. The archived snapshot is
+VATE is a public Apache-2.0 protocol discussion draft. The
+[`v0.6.0` source](docs/release-notes/v0.6.0.md) collects required-record review,
+persistent receiving and reassessment, fixed external-record examples and a
+post-admission runtime-key revocation sample. Its
+[release gate](docs/release-gate-v0.6.0.md) separates source validation from
+publication and archive verification. The latest verified archive is `v0.5.0`,
 available at [`10.5281/zenodo.23378498`](https://doi.org/10.5281/zenodo.23378498).
 The archived `v0.4.1` remains available at
 [`10.5281/zenodo.22680789`](https://doi.org/10.5281/zenodo.22680789).
-`v0.5.0` keeps
+`v0.6.0` keeps
 the `VATE-AL2-Verifier-Admission-v0.3` semantic profile and uses the active
 `2026-09` machine-readable artifact line.
 
-**Current public status:** discussion draft · `v0.5.0` pre-release
+**Current public status:** discussion draft · `v0.6.0` source
 · not production-ready · no production approval implied.
 
 VATE composes with A2A, MCP, OAuth, OpenID, VC, SPIFFE, AP2, x402, and payment
@@ -169,6 +174,7 @@ a human-in-the-loop workflow product.
 - `v0.4.0 GitHub discussion-draft pre-release and September 1, 2026 Zenodo archive`
 - `v0.4.1 AP2 replay-input and implementation-record maintenance pre-release`
 - `v0.5.0 execution-evidence and recipient-review pre-release`
+- `v0.6.0 receiving, reassessment and runtime-key revocation source`
 - `not production-ready`
 - `not an official A2A extension, endorsement, certification, SDK, middleware package, or general compatibility proof`
 - `not an A2A core proposal or universal trust layer`
@@ -180,12 +186,12 @@ Current repository state:
 - **Repository type**: protocol discussion draft
 - **Document maturity**: early draft
 - **Primary language**: English
-- **Roadmap refresh date**: 2026-10-15
+- **Roadmap refresh date**: 2026-10-25
 - **Primary battlefield**: `AL2` external digital write
-- **Current GitHub review snapshot**: `v0.5.0` discussion-draft pre-release
+- **Current source version**: `v0.6.0`; see the release gate for publication status
 - **Latest verified Zenodo software archive**: `v0.5.0` · October 14, 2026 ·
   [10.5281/zenodo.23378498](https://doi.org/10.5281/zenodo.23378498)
-- **Active main-branch artifact line**: `2026-09`, retained in v0.5.0; the AL2
+- **Active main-branch artifact line**: `2026-09`, retained in v0.6.0; the AL2
   profile identifier remains
   `VATE-AL2-Verifier-Admission-v0.3`
 - **Active main-branch corpus**: 76 cases / 217 manifest artifacts ·
@@ -229,7 +235,7 @@ script and Supplement S1 retain Apache-2.0.
 
 ## Reviewer Entry Points
 
-If you are reviewing the `v0.5.0` GitHub pre-release, a historical snapshot,
+If you are reviewing the `v0.6.0` source, a historical snapshot,
 or later main-branch work, start here:
 
 - [Public claim boundary](docs/public-claim-boundary.md) - what this repository
@@ -680,6 +686,11 @@ Actions*. Zenodo. [https://doi.org/10.5281/zenodo.22685689](https://doi.org/10.5
 
 ### Software Snapshots
 
+For the `v0.6.0` source, cite the exact commit and
+[release tag](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.6.0).
+The release page will link its version DOI after archive verification. The
+`v0.5.0` DOI below does not identify the new source.
+
 For the October 14, 2026 `v0.5.0` discussion-draft pre-release, cite:
 
 - GitHub tag: [v0.5.0](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.5.0)
@@ -708,7 +719,7 @@ and reproducibility patch, cite:
 - Version DOI: [10.5281/zenodo.21226254](https://doi.org/10.5281/zenodo.21226254)
 - All-version concept DOI: [10.5281/zenodo.19839768](https://doi.org/10.5281/zenodo.19839768)
 
-If you reference later untagged main-branch changes after `v0.5.0`, cite the
+If you reference later untagged main-branch changes after the cited release, cite the
 repository URL and exact commit SHA in addition to the latest applicable tag or
 archived version DOI.
 
