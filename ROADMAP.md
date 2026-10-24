@@ -182,6 +182,14 @@ changing its unsupported requirements or the v0.3 semantic profile.
 See [known gaps](docs/known-gaps.md) for the remaining proof and evidence
 boundaries.
 
+The [post-admission runtime-key revocation sample](reference/post-admission-revocation-sample/README.md)
+preserves an earlier `allow` while checking signed status at one local provider's
+acceptance boundary. It exercises acceptance ordering, partial effects and
+saved-state recovery with disposable keys, and supplies an exported-evidence
+reader. Next, evaluate this contract with an independently operated provider or
+recipient and separately selected trust inputs. Remote cancellation, general
+PKI revocation and independent proof of time or complete history remain open.
+
 The NENRIN S3 example supplies one fixed cross-format comparison with preserved
 native results. Reuse its inputs, checks and documented mapping when evaluating
 another recipient or a source update; distinguish an actual integration from

@@ -47,6 +47,15 @@ python3 reference/execution-evidence-demo/run_demo.py --output-name first-run
 Its ten scenarios retain the original and effective inputs, provider evidence,
 and receipts for inspection with the included evidence verifier.
 
+To examine a runtime key revoked after an `allow`, use the
+[Post-Admission Runtime-Key Revocation Sample](reference/post-admission-revocation-sample/README.md).
+It preserves the original admission, checks signed status before local provider
+acceptance, and distinguishes completed effects, refusal and an unresolved
+partial result. The eight scenarios use disposable test keys and a fixed clock.
+Open its README for setup and query/export instructions; the complete
+`reference/post-admission-revocation-sample/` folder can be copied out of a
+checkout or repository source archive and run on its own.
+
 For a pinned Vaara stdio proxy and credential-gateway path, use the
 [Vaara → VATE reproduction package](docs/interop/vaara-execution-reproduction.md).
 It checks four disclosed evidence cases and can create a new local file-operation
@@ -502,6 +511,8 @@ The most useful feedback is:
   Dependency-free verifier core for AL2 admission fixtures
 - [reference/execution-evidence-demo/README.md](reference/execution-evidence-demo/README.md)
   Local file execution, exact provider inputs, generated evidence, and response-loss reconciliation
+- [reference/post-admission-revocation-sample/README.md](reference/post-admission-revocation-sample/README.md)
+  Signed runtime-key status, provider acceptance ordering, and recovery after admission
 - [reference/receipt-linkage-example/README.md](reference/receipt-linkage-example/README.md)
   Inspect a stored admission/post-execution pair with existing receipt checks
 - [reference/s3-observation-example/README.md](reference/s3-observation-example/README.md)

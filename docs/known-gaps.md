@@ -84,6 +84,16 @@ The repo models revocation, suspension, quarantine, and attenuation, but still n
 - fail-open versus fail-closed rules
 - push versus pull versus stapled policy behavior
 
+The [post-admission runtime-key revocation sample](../reference/post-admission-revocation-sample/README.md)
+exercises one local status-authority/provider contract: each submission reads
+signed status, and revocation updates and acceptance are ordered in the same
+SQLite store. It retains the original `allow` and keeps an accepted partial
+effect `unknown` during recovery. Its freshness check applies at `checked_at`,
+after signature verification and acceptance-lock acquisition, not at commit
+completion or the later effect. General certificate revocation, remote
+propagation, cancellation after acceptance and independently established time
+or history completeness remain outside this sample.
+
 ### 6. Capability Registry Is Unresolved
 
 The draft intentionally avoids freezing a universal capability vocabulary.

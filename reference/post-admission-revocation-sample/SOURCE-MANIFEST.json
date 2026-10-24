@@ -1,0 +1,33 @@
+{
+  "files": {
+    "CONTRACT.md": "6e9656972ec02956ec061bb7e60d5c0d029f5078efb92e92bff33944d10455fa",
+    "LICENSE": "a7f02d0ab1cc53abde08c95ab75725d673aa5af2d3184cfa07907d34c1f7a318",
+    "README.md": "0f63fee99a0e18cb903c0c23446186613cceea3cdd1a11262206107691f0ba67",
+    "VALIDATION.md": "3eda6e82aaa554a97cacdeba7c11903da914f50eb548e6958684e35cc27532c1",
+    "check_environment.py": "5717915b1c870492aa1842192250c3d7752c527d13c37ad9030e12b2e5921064",
+    "reference/execution-evidence-demo/admission.py": "40abe60a4ee7e269a579ce22f35186013510ac10c3640642d5cf21cb696117f8",
+    "reference/execution-evidence-demo/demo_contract.py": "f23ab66b0731f14cd6c76dd8c6ea9daa50f66c79a9fd050cad93591bb6d703ae",
+    "reference/minimal-al2-demo/trust_envelope_demo.py": "b0c380b04fe4f357e136456055832009ac41723bca2f47bd8a1ad70f18bdda94",
+    "reference/vate-verifier-core/vate_verifier_core.py": "ead16bebda908187485cf095f71538b23102ec32ea94c6efca0d7e0a44849e84",
+    "sample/contract.py": "6dc9c377bf493f2574074caf4dc4eaba50093b8b300ae73f237ce9d242a825ec",
+    "sample/fixture.py": "d53560fdd503f266b4340c33fb712c1881da322ce0d66e77e70081ce9804a433",
+    "sample/provider.py": "fa443dd6a61eb3f3f79aaaf639719cd30ff58e70fc3bbd7d59a5c60c09358a5d",
+    "sample/read_evidence.py": "ae942b4d3999531f08c0898285772b6d25f75fab0aef5684dc7ee99e75195a07",
+    "sample/run_demo.py": "aae852837e7e1ba0f51b6072122f366740aa6679f4fbd0c5b424418d3068c1f5",
+    "sample/test_revocation.py": "7b6d91106639f18c0a0b6e66bc802991901e2e920b78e28dd135c276ee6092dd",
+    "test_environment.py": "7d2a62112c56a5736e3cf5cf006dc7817e4c6728c0cac4f83730950af8af0984"
+  },
+  "format": "vate-local-sample-files-1",
+  "scope": "raw SHA-256 of the listed distribution files; manifest excludes itself",
+  "upstream": {
+    "commit": "6c9bc7434c3fa2298268ced27afe5cefd0c85ee6",
+    "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+    "unchanged_files": {
+      "LICENSE": "a7f02d0ab1cc53abde08c95ab75725d673aa5af2d3184cfa07907d34c1f7a318",
+      "reference/execution-evidence-demo/admission.py": "40abe60a4ee7e269a579ce22f35186013510ac10c3640642d5cf21cb696117f8",
+      "reference/execution-evidence-demo/demo_contract.py": "f23ab66b0731f14cd6c76dd8c6ea9daa50f66c79a9fd050cad93591bb6d703ae",
+      "reference/minimal-al2-demo/trust_envelope_demo.py": "b0c380b04fe4f357e136456055832009ac41723bca2f47bd8a1ad70f18bdda94",
+      "reference/vate-verifier-core/vate_verifier_core.py": "ead16bebda908187485cf095f71538b23102ec32ea94c6efca0d7e0a44849e84"
+    }
+  }
+}
