@@ -79,9 +79,14 @@ The baseline has 21 requirements (9 bound, 10 missing, 2 optional); the audit
 selection has 24 (13 bound, 10 missing, 1 optional). These totals concern
 different selected sets and are not a percentage-completion comparison.
 
-B's audit and dataset remain missing. The sample does not infer formal
-acceptance, rail originals or an unspecified raw-transport response from this
-audit object. C's formal acceptance remains outside the selected question;
+B's audit and dataset requirements have no selected originals in this fixed
+example. This describes its saved input set, not current upstream availability.
+The [separate B follow-up](ACCEPTANCE-VALIDATION.md#b-audit-follow-up) uses a later
+audit source without rewriting this example's inputs or earlier results.
+An audit digest link does not fill a formal acceptance or rail requirement, or
+the separately named `raw_response` slot. The rail/raw-response kinds have no
+supported binding rules; see [the receiving contract](CONTRACT.md#rail-and-raw-response-requirements).
+C's formal acceptance remains outside the selected question;
 the native `accepted: null` remains visible for all three occurrences.
 The overall evidence state stays `partial`.
 
@@ -100,8 +105,8 @@ output directory outside both the sample and the runtime:
 ```
 
 This starts a fresh two-step example: fixed baseline, then additional originals.
-It does not modify an earlier experiment database or claim the sources arrived
-late from an external sender. Existing installations need no new packages.
+It does not modify an earlier experiment database. Existing installations need
+no new packages.
 Native replay still requires macOS sandbox-exec and has no network access.
 
 The output includes `baseline/`, `audits/`, `inbox.sqlite` and

@@ -25,3 +25,11 @@ the exact packages listed in `requirements.lock`; each installed distribution
 retains its own license and metadata. `evaluator-template.json` lists the selected
 versions, including ca2a-runtime 0.4.0. No dependency version is selected from the
 received originals.
+
+The optional foreign acceptance example uses the caller's separately obtained
+[HS51 acceptance set](https://github.com/babyblueviper1/preaction-governance-conformance/tree/235aaabc45ebe6fa36dd02ca2cd6a44a69297d93/examples/hs51-acceptance-set)
+and [WAR verifier](https://github.com/maximusrufus/work-acceptance-record/blob/6b2f730b81e0818826f274742d883c2b475d5227/verifier/war_verify.py).
+Those records, the verifier source and its TSA-root test vectors are not bundled
+in this sample. The sample's Apache-2.0 license does not grant rights to those
+separate materials. Their exact bytes and the caller-selected roots are retained
+in local run exports for inspection and recovery.

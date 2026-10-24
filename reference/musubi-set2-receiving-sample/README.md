@@ -10,6 +10,11 @@ An optional [A/C audit and dataset example](AUDIT-CONTRACT.md) adds the publishe
 originals, checks their digest links to the selected execution receipts, and
 retains the earlier assessment. Both examples use the preparation below.
 
+The optional [foreign acceptance profile](ACCEPTANCE-CONTRACT.md) verifies
+published A/B work acceptance records against the selected MUSUBI occurrences.
+It records A's signed pass and B's signed fail separately from the native
+settlement and preserves the earlier evidence history.
+
 The base 68 originals and upstream evaluator come from [Horizon Shield #51](https://github.com/ogasurfproject-jpg/horizon-shield/issues/51),
 at commit `b85029de8d22c5246886f4f50ede03da0f54dfcf`. The two additions have
 per-file commit pins in [audit-sources.json](sample/audit-sources.json). This is a fixed-source
@@ -115,9 +120,14 @@ a new output directory.
 | A/B/C execution | `within_delegation` | The upstream calculation accepts these execution constraints. |
 | C payment | `budget_exceeded` | C takes the cumulative amount to 21,000 against a 20,000 budget. |
 | Native acceptance | `null` | No acceptance decision is supplied by these records. |
-| Required-record state | `partial` | Selected acceptance/audit/rail evidence remains missing or unsupported. |
+| Required-record state | `partial` | The selected evidence set is not fully bound; inspect each requirement's binding and semantic assessment. |
 | Extended replay | `anchor_depth: 9 → 14` | The selected header view changes this field; the original assessment is retained. |
 | Inbox core | `selected_empty` | Foreign meaning is assessed by this adapter; the Inbox stores the evidence and history. |
+
+Read the native judgment, each evidence link and the aggregate state separately.
+`partial` can coexist with verified links or a validly signed work failure. It
+does not identify which check is unfinished. The [receiving contract](CONTRACT.md#states)
+distinguishes missing inputs, unsupported kinds and unselected records.
 
 The expected baseline stdout SHA-256 is
 `18a19f8a1eb62593b857241f34c07b1d96550b93d5c9ea17184b2ac695818fbd`.
@@ -134,6 +144,77 @@ contradiction or an upstream refusal into acceptance. The lower-level
 `receiving.py` CLI returns 0 for a stored evaluation or normal refusal, 64 for an
 input/storage/evaluator error, and 2 for invalid command syntax. The example
 wrapper also returns 64 if either expected sample result differs.
+
+## Add foreign acceptance records
+
+Use `run_acceptance_example.py` for a baseline → A/C audit → foreign acceptance
+sequence in one Inbox. It uses the prepared environment above. Supply these
+external files separately:
+
+- The four `hs51-*.json` originals in the
+  [published acceptance set](https://github.com/babyblueviper1/preaction-governance-conformance/tree/235aaabc45ebe6fa36dd02ca2cd6a44a69297d93/examples/hs51-acceptance-set).
+- The exact [WAR verifier source](https://github.com/maximusrufus/work-acceptance-record/blob/6b2f730b81e0818826f274742d883c2b475d5227/verifier/war_verify.py)
+  pinned in [ACCEPTANCE-CONTRACT.md](ACCEPTANCE-CONTRACT.md).
+- A JSON array of the two base64 DER trust roots in the `inputs.tsa_roots_base64`
+  fields of [vector 31](https://github.com/maximusrufus/work-acceptance-record/blob/6b2f730b81e0818826f274742d883c2b475d5227/vectors/31-tsa-freetsa-verified.json)
+  and [vector 32](https://github.com/maximusrufus/work-acceptance-record/blob/6b2f730b81e0818826f274742d883c2b475d5227/vectors/32-tsa-digicert-verified.json).
+  Combine the two arrays into one array. The example checks the roots' raw SHA-256 fingerprints against its
+  fixed receiver selection. Incoming records cannot supply those roots.
+
+Set these paths to the saved files and choose a new output directory:
+
+```bash
+acceptance_originals="$sample_workspace/hs51-acceptance-set"
+acceptance_verifier="$sample_workspace/war_verify.py"
+acceptance_roots="$sample_workspace/tsa-roots.json"
+acceptance_output="$sample_workspace/acceptance-results"
+"$sample_environment/venv/bin/python" -B run_acceptance_example.py \
+  --vate-root "$vate_root" \
+  --environment "$sample_environment" \
+  --acceptance-dir "$acceptance_originals" \
+  --acceptance-verifier "$acceptance_verifier" \
+  --tsa-roots "$acceptance_roots" \
+  --output "$acceptance_output"
+```
+
+Success writes `ACCEPTANCE-EXAMPLE.json`: A's foreign work verdict is `pass`,
+B's is `fail`, and earlier assessments and all 76 originals export unchanged.
+APS records are retained as originals; they do not fill the selected MUSUBI
+requirements. Inspect the third run's `acceptance/assessment.json` as follows:
+
+| Question | Result in this fixed three-stage sequence |
+| --- | --- |
+| Do the selected foreign acceptance records verify and bind to A/B? | Both have `binding_status: bound` and `semantic_assessment: foreign_acceptance_verified`; the signed work verdicts are A `pass`, B `fail`. |
+| Do the A/C audit and dataset bytes match their selected references? | `binding_status: bound` and `semantic_assessment: digest_linkage_checked`; this checks published byte linkage. |
+| Are B's audit and dataset links established? | Both remain `not_received` in this sequence. |
+| What does the native evaluator say? | Native acceptance remains `null`; C's payment still exceeds the cumulative budget. |
+| Is the whole selected evidence set bound? | `partial`: B's two audit/dataset requirements and six A/B/C rail/raw-response requirements have no selected originals. |
+
+The rail/raw-response requirements also lack supported binding rules. Supplying
+files alone would not complete them. See [those requirements](CONTRACT.md#rail-and-raw-response-requirements)
+before changing a selection; setting `required: false` excludes a requirement
+from verification rather than making it an optional check.
+
+The separate [B audit follow-up](ACCEPTANCE-VALIDATION.md#b-audit-follow-up)
+established B's two digest links in a later assessment and retained the previous
+three. It is not an additional stage run by `run_acceptance_example.py`, which
+reproduces the fixed inputs above.
+
+The database is `history/inbox.sqlite`; the third run is under `acceptance/`.
+If its assessment was saved but output writing failed, recover that run with:
+
+```bash
+"$sample_environment/venv/bin/python" -B recover_output.py \
+  --vate-root "$vate_root" \
+  --database "$acceptance_output/history/inbox.sqlite" \
+  --receipt "$acceptance_output/acceptance/RECOVERY.json" \
+  --output "$sample_workspace/acceptance-recovered"
+```
+
+See the recovery section below when the receipt file could not be written.
+Repeated intake reuses unchanged named materials while keeping each assessment
+and acquisition manifest. Storage remains bounded; capacity refusal rolls back
+the new retention batch.
 
 ## Recover saved outputs
 
@@ -239,6 +320,8 @@ evaluator and restores originals from an Inbox export.
 "$sample_environment/venv/bin/python" -B verify_recovery.py \
   --vate-root "$vate_root" --environment "$sample_environment" \
   --output "$sample_workspace/recovery-check"
+"$sample_environment/venv/bin/python" -B verify_capacity.py \
+  --vate-root "$vate_root" --output "$sample_workspace/capacity-check"
 "$sample_environment/venv/bin/python" -B verify_continuation.py \
   --vate-root "$vate_root" --environment "$sample_environment" \
   --output "$sample_workspace/continuation-check"
@@ -262,5 +345,6 @@ The environment checks reject changed source/lock/runtime files, bytecode,
 unexpected symlinks, mismatched VATE source and attempts to replace an existing
 environment. They use temporary copies and do not install packages.
 
-See [VALIDATION.md](VALIDATION.md) for the tested Python versions and results,
+See [VALIDATION.md](VALIDATION.md) for the base sample's tested Python versions,
+[ACCEPTANCE-VALIDATION.md](ACCEPTANCE-VALIDATION.md) for foreign acceptance and retention checks,
 and [THIRD_PARTY.md](THIRD_PARTY.md) for source attribution and licenses.
