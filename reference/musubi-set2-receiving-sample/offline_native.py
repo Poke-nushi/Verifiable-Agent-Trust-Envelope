@@ -36,7 +36,7 @@ def runtime_identity(root, config):
             'lock_sha256': config['lock_sha256']}
 
 
-def replay(source, runtime, config, bundle_raw, output):
+def replay(source, runtime, config, bundle_raw, output, *, acceptance_job=None):
     output.mkdir(parents=True, exist_ok=False)
     need(config['contract'] == 'local-musubi-native-evaluator-1', 'evaluator contract')
     files = verified_files(source, config['source_files'])
@@ -51,6 +51,9 @@ def replay(source, runtime, config, bundle_raw, output):
     evidence = {'runtime-identity.json': encoded(identity),
                 'requirements.lock': read(runtime.parent, 'requirements.lock')}
     evidence.update({'evaluator-source/' + n: raw for n, raw in files.items()})
+    if acceptance_job is not None:
+        from acceptance_adapter import output_evidence
+        evidence.update(output_evidence(acceptance_job, output))
     if sys.platform != 'darwin' or not Path('/usr/bin/sandbox-exec').is_file():
         return {'state': 'evaluator_error', 'error': 'sandbox_unsupported_platform'}, b'', b'', evidence
     # Resolve output because /var and /tmp are symlinks on macOS.
@@ -110,6 +113,42 @@ def replay(source, runtime, config, bundle_raw, output):
             f'sys.argv=[{str(script)!r},"--settle",{str(output / "input.json")!r}]\n'
             f'runpy.run_path({str(script)!r},run_name="__main__")\n')
     rc, timed, stdout, stderr = execute(code, 'settlement')
+    if acceptance_job is not None:
+        # Use the same deny-network/Keychain sandbox and pinned runtime. The
+        # foreign format cannot choose Python code, import paths or trust roots.
+        worker = output/'acceptance-source/acceptance_worker.py'
+        acceptance_code = ('import sys,runpy,resource\n'
+                           'resource.setrlimit(resource.RLIMIT_FSIZE,(4194304,4194304))\n'
+                           'resource.setrlimit(resource.RLIMIT_CPU,(30,30))\n'
+                           f'sys.path.insert(0,{str(worker.parent)!r})\n'
+                           f'sys.argv=[{str(worker)!r},{str(output/"acceptance-input.json")!r}]\n'
+                           f'runpy.run_path({str(worker)!r},run_name="__main__")\n')
+        arc, atimed, aout, aerr = execute(acceptance_code, 'acceptance')
+        evidence['acceptance.stdout'] = aout
+        evidence['acceptance.stderr'] = aerr
+        verified = {'state': 'evaluator_error', 'error': 'acceptance_worker_failed', 'results': {}}
+        if arc == 0 and not atimed:
+            try:
+                parsed = decode(aout)
+                expected_ids = {row['id'] for row in acceptance_job['input']['items']}
+                need(type(parsed) is dict and parsed.get('profile') == acceptance_job['input']['profile']
+                     and parsed.get('state') in ('evaluated', 'evaluator_error') and type(parsed.get('results')) is dict
+                     and set(parsed['results']) == expected_ids, 'acceptance worker output contract')
+                verified = parsed
+            except (ValueError, TypeError):
+                verified['error'] = 'acceptance_worker_output_contract'
+        evidence['acceptance-verification.json'] = encoded(verified)
+        evidence['acceptance-execution.json'] = encoded({'exit_code': arc, 'timeout': atimed,
+            'state': verified['state'], 'input_sha256': sha(evidence['acceptance-input.json']),
+            'stdout_sha256': sha(aout), 'stderr_sha256': sha(aerr),
+            'verifier_sha256': acceptance_job['config']['verifier_sha256'],
+            'source_sha256': {n: sha(raw) for n, raw in acceptance_job['sources'].items()},
+            'profile_sha256': sha(profile.encode()), 'network_denied_probe': True,
+            'outside_home_content_denied_probe': True})
+        for name, raw in acceptance_job['sources'].items():
+            need(read(output/'acceptance-source', name) == raw, 'acceptance source changed during execution')
+        need(read(output, 'acceptance-input.json') == evidence['acceptance-input.json'],
+             'acceptance input changed during execution')
     # Refuse accepting a run if receiver-selected source/runtime drifted.
     runtime_identity(runtime, config)
     for name, raw in files.items():

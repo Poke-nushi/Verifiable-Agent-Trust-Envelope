@@ -229,6 +229,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v7.0.0
@@ -250,6 +252,16 @@ jobs:
           archive_dir="$(mktemp -d)"
           git archive HEAD | tar -x -C "$archive_dir"
           python -B "$archive_dir/scripts/check_musubi_sample.py"
+
+      - name: Check pinned foreign records and receiver bindings from a source archive
+        run: |
+          archive_dir="$(mktemp -d)"
+          trap 'rm -rf "$archive_dir"' EXIT
+          git archive HEAD | tar -x -C "$archive_dir"
+          acceptance_data="$archive_dir/acceptance-test-data"
+          python -B "$archive_dir/scripts/prepare_musubi_acceptance_tests.py" --output "$acceptance_data"
+          python -B "$archive_dir/reference/musubi-set2-receiving-sample/verify_acceptance.py" --evidence-root "$acceptance_data"
+          python -B "$archive_dir/reference/musubi-set2-receiving-sample/verify_acceptance_integration.py" --evidence-root "$acceptance_data"
 
   post-admission-revocation:
     name: Post-admission revocation (${{ matrix.os }}, Python ${{ matrix.python }})

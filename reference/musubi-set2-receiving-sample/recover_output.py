@@ -166,7 +166,7 @@ def main():
                        'saved_status': summary['status'], 'native_state': summary['native_state'],
                        'overall_evidence_state': summary['overall_evidence_state'],
                        'result': str(a.output.absolute() / 'RESULT.json')}).decode(), end='')
-        return 0 if summary['native_state'] in ('evaluated', 'refused') else 64
+        return 0 if summary['status'] == 'recorded' else 64
     except (KeyError, IndexError, TypeError, ValueError, OSError, sqlite3.Error) as exc:
         # Never write to an existing/partially created directory on failure.
         print(encoded({'status': 'output_recovery_error', 'error_type': type(exc).__name__,

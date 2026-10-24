@@ -128,6 +128,13 @@ def run_portable():
                 "audit checks did not report the expected portable test scope")
         counts["audit_unit_and_storage"] = "pass"
         counts["audit_native_replays"] = audit["real_native_replays"]
+        capacity_output = root / "capacity"
+        subprocess.run([str(python), "-B", str(SAMPLE / "verify_capacity.py"),
+                        "--vate-root", str(ROOT), "--output", str(capacity_output)],
+                       check=True, env=env, timeout=240)
+        capacity = json.loads((capacity_output / "CAPACITY-RESULT.json").read_bytes())
+        require(capacity["status"] == "pass", "capacity checks failed")
+        counts["capacity"] = len(capacity["cases"])
         return counts
 
 

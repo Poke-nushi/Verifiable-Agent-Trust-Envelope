@@ -1,7 +1,8 @@
 # Receiving contract: MUSUBI set2 sample
 
 The opt-in local audit/dataset profile is specified in [AUDIT-CONTRACT.md](AUDIT-CONTRACT.md).
-The contract below describes the unchanged base behavior when that profile is absent.
+The foreign acceptance profile is specified in [ACCEPTANCE-CONTRACT.md](ACCEPTANCE-CONTRACT.md).
+The contract below describes the base behavior when those profiles are absent.
 
 The adapter receives the fixed Horizon #51 set2 originals, binds them to explicit
 receiver selections, runs a pinned upstream evaluator, and stores the inputs and
@@ -51,10 +52,30 @@ rather than approximated. This is not a general JCS implementation.
 ## States
 
 Per-record binding is `bound`, `not_received`, `unsupported`, `ambiguous`,
-`contradictory` or `not_selected`. Multiple candidates do not overwrite each
-other. Unknown acceptance/audit/rail formats can be retained as originals while
-their meaning remains unsupported. Unresolved selected requirements yield
-`partial`; a fully bound selected set yields `selected_records_bound`.
+`contradictory` or `not_selected`. The opt-in profiles also use `unresolved`
+when a required prerequisite or verification condition cannot be established.
+
+| State | Meaning |
+| --- | --- |
+| `bound` | The supported identity and prerequisite checks for this record matched. Read `semantic_assessment` for the check performed. |
+| `not_received` | A required record has no candidate in the selected inputs. This does not establish that it does not exist or is owed by another party. |
+| `unsupported` | A supplied candidate uses a kind or format whose binding or verification is not supported. |
+| `ambiguous` | More than one candidate was supplied; none is chosen automatically. |
+| `contradictory` | The candidate failed a supported identity, content or proof check. |
+| `not_selected` | `required: false` excludes this requirement and its candidates from verification. It is not an optional-if-present check. |
+
+The base assessment checks selection first, then candidate count, then supported
+kind. An empty required slot therefore remains `not_received` even if its kind
+would be unsupported when a candidate is supplied. Multiple candidates remain
+`ambiguous`; they do not overwrite each other.
+
+`selected_records_bound` requires a successful native evaluation, matching
+selected requests/log/profile, and every required record to be `bound` with
+the appropriate semantic assessment. Otherwise the aggregate is `partial`.
+These states describe the selected evidence set; they are not a payment,
+work-acceptance or experiment-success verdict. A narrower selection creates a
+different question, not an improvement to the earlier result. Retain the earlier
+selection and assessment when evaluating changed requirements.
 
 Native evaluation is separate. A typed settlement and its exit code must agree.
 Normal upstream rejection is `refused`, with the reason and full output retained.
@@ -67,6 +88,28 @@ arrays, with object rows carrying an integer sequence and request digest.
 `within_delegation`, `budget_exceeded` and `accepted: null` retain their distinct
 upstream meanings. Inbox core uses empty foreign requirements/native calls and
 reports `selected_empty`; the adapter supplies the foreign binding assessment.
+
+## Rail and raw-response requirements
+
+The fixed selections retain required `rail_original` and `raw_response` slots
+for A/B/C, with no candidate files. Neither kind has a supported binding rule
+in this adapter. With a single candidate, each would be `unsupported`, not
+`bound`; receiving those files alone cannot complete the selected evidence set.
+
+The signed payment records contain a `rail.receipt_sha256` reference for
+`signed-test-transfer` / `JPY-testnet`. Verifying that payment record, matching
+a referenced rail original, and establishing a transfer on that rail are
+different questions. The latter two require their own evidence and verification
+contract; they are not prerequisites for an execution → audit → dataset digest
+linkage check.
+
+`raw_response` has no separately defined byte representation or binding rule in
+this sample. An audit can be the application-result bytes named by
+`outcome.response_sha256`; that does not automatically fill the separate
+`raw_response` slot. A transport-response claim would first need to identify
+the representation, such as body versus headers/body, and its request binding.
+These slots record the receiver's selected questions; they do not assign an
+upstream delivery obligation.
 
 ## Replay and history
 
@@ -83,6 +126,23 @@ namespace and source identity. Its assessment, selection and original index must
 belong to that saved run. Valid references from different runs cannot be spliced
 together. Original inputs and previous assessments remain unchanged. Export can
 restore exact originals for replay, with the selected runtime supplied separately.
+
+An unchanged named byte sequence can reuse its prior delivery in the same
+namespace. Reuse requires the original path, exact object reference, delivery
+identity and stored delivery bytes to match. A changed file, another path or
+another namespace is distinct. Each assessment retains its current acquisition
+manifest and material index even when it reuses an original. Prior deliveries
+and assessments are not rewritten.
+
+Retention through run preparation is one database transaction. An entry,
+snapshot, byte or native-call capacity refusal rolls back that batch's new
+objects, deliveries and prepared run. The existing Inbox limits remain in
+force, including 256 entries per namespace. New assessments still consume
+capacity; this is not unlimited storage. A database already filled by a partial
+retention batch from an older sample version is preserved and is not automatically
+compacted.
+Evaluation and output export occur after preparation; their existing recovery
+rules below still apply.
 
 ## Saved output recovery
 
