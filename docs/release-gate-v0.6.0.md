@@ -72,3 +72,30 @@ digest chain. None is production approval or a general compatibility result.
 Investigate an interrupted archive against the existing release and series
 before retrying; do not create a duplicate deposit. The technical report is a
 separate record and is not revised by this software release.
+
+## Publication Verification
+
+Published October 24, 2026 UTC (October 25 JST):
+
+- [Release PR #109](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/pull/109)
+  passed [19 CI jobs](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/actions/runs/40129614143)
+  at `fb3661a2064914de4e3cc598a233ff5a974b5098` before merging.
+- Annotated tag `v0.6.0` points to
+  `b7e4081949b4b8b147bebbcf7ce92791107ac1d2`, whose tree matches the reviewed PR.
+- [Zenodo record 23626404](https://zenodo.org/records/23626404), exact DOI
+  `10.5281/zenodo.23626404`, is the ninth and unique new version in the existing
+  `10.5281/zenodo.19839768` software series.
+- GitHub and Zenodo served the same 4,205,578-byte ZIP:
+  `sha-256:8dd9f4b3cc7da3af9f423d1d98f79297970a46cd1ef1da4c5485cb46b7b5a7b2`;
+  Zenodo's file checksum is `md5:78e22d088664483eef98ba1305edfadd`.
+- All 1,247 paths and file bytes match the tag. ZIP CRC checks pass. The ZIP
+  does not expose Unix-mode metadata; POSIX mode equality is not established
+  by that ZIP check.
+- The record identifies Sato, Takao as creator, Apache-2.0 as license and
+  software as resource type. The release acknowledgements are present; no
+  additional creator or contributor roles were assigned.
+- The eight earlier software versions retain their identifiers and files.
+  The separate technical-report record is unchanged.
+
+Current citation metadata and release-page text are updated after these checks.
+The tag and its original archive retain the tag-time citation text.

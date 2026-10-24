@@ -11,7 +11,7 @@ For public wording rules, see
 
 ### v0.6.0: Receiving, Reassessment and Runtime-Key Revocation
 
-The `v0.6.0` source adds receiver-selected required-record checks, persistent
+The `v0.6.0` discussion-draft pre-release adds receiver-selected required-record checks, persistent
 intake and exported-history reassessment, fixed MUSUBI evidence connections,
 and a standalone post-admission runtime-key revocation sample. The release
 retains the AL2 profile v0.3, artifact line `2026-09` and the v0.5.0 corpus.
@@ -112,7 +112,7 @@ partial native-implementation records and their historical evaluation pins.
 
 The current public review surface is:
 
-- `v0.6.0` source notes and publication/archive gate:
+- `v0.6.0` release notes and publication/archive gate:
   [docs/release-notes/v0.6.0.md](docs/release-notes/v0.6.0.md) and
   [docs/release-gate-v0.6.0.md](docs/release-gate-v0.6.0.md)
 - `v0.5.0` GitHub discussion-draft pre-release:
