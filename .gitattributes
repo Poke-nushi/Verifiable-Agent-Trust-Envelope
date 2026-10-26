@@ -19,3 +19,6 @@ reference/nenrin-s3-crosswalk-example/saved/vate/cases/**/*-headers.txt whitespa
 
 # Keep the standalone revocation sample consistent with its raw-byte manifest.
 reference/post-admission-revocation-sample/** text eol=lf
+
+# Keep the standalone handoff sample consistent with its raw-byte manifest.
+reference/runtime-handoff-sample/** text eol=lf

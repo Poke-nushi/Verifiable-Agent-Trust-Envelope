@@ -208,6 +208,16 @@ reader. Next, evaluate this contract with an independently operated provider or
 recipient and separately selected trust inputs. Remote cancellation, general
 PKI revocation and independent proof of time or complete history remain open.
 
+The [runtime handoff and receipt sample](reference/runtime-handoff-sample/README.md)
+extends the local provider exercise to two runtimes. It preserves unknown
+results, allows the second runtime to proceed only after confirmed nonexecution
+and its own admission, and passes the saved evidence through Recipient Inbox.
+Its file-creation scenarios keep accepted partial effects, actual execution
+times, receipt linkage and earlier assessments distinct. The next integration
+question is how another provider and recipient establish operation identity,
+exclude the old worker, and select trusted evidence under their own controls.
+The local sample does not establish those guarantees across a network.
+
 The NENRIN S3 example supplies one fixed cross-format comparison with preserved
 native results. Reuse its inputs, checks and documented mapping when evaluating
 another recipient or a source update; distinguish an actual integration from

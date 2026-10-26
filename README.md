@@ -58,6 +58,14 @@ Open its README for setup and query/export instructions; the complete
 `reference/post-admission-revocation-sample/` folder can be copied out of a
 checkout or repository source archive and run on its own.
 
+To preserve an unknown result when execution moves to another runtime, use the
+[Runtime Handoff and Receipt Sample](reference/runtime-handoff-sample/README.md).
+It distinguishes confirmed nonexecution from accepted work with zero or partial
+effects, requires the new runtime's own admission, and retains earlier records
+through Recipient Inbox reassessment. Six local file-creation histories exercise
+the provider and receiver together. Copy the complete sample folder to try it
+independently; its README covers environment setup, receipt intake and replay.
+
 For a pinned Vaara stdio proxy and credential-gateway path, use the
 [Vaara → VATE reproduction package](docs/interop/vaara-execution-reproduction.md).
 It checks four disclosed evidence cases and can create a new local file-operation
@@ -520,6 +528,8 @@ The most useful feedback is:
   Local file execution, exact provider inputs, generated evidence, and response-loss reconciliation
 - [reference/post-admission-revocation-sample/README.md](reference/post-admission-revocation-sample/README.md)
   Signed runtime-key status, provider acceptance ordering, and recovery after admission
+- [reference/runtime-handoff-sample/README.md](reference/runtime-handoff-sample/README.md)
+  Unknown-result handoff between two runtimes, receipt intake, and saved-evidence reassessment
 - [reference/receipt-linkage-example/README.md](reference/receipt-linkage-example/README.md)
   Inspect a stored admission/post-execution pair with existing receipt checks
 - [reference/s3-observation-example/README.md](reference/s3-observation-example/README.md)
