@@ -22,3 +22,5 @@ reference/post-admission-revocation-sample/** text eol=lf
 
 # Keep the standalone handoff sample consistent with its raw-byte manifest.
 reference/runtime-handoff-sample/** text eol=lf
+# Preserve the copied capture helper's fixed upstream bytes.
+reference/runtime-handoff-sample/reference/s3-observation-example/sandbox_macos.py whitespace=-blank-at-eof
