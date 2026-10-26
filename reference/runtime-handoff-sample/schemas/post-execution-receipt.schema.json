@@ -1,0 +1,324 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:post-execution-receipt:0.3",
+  "title": "VATE Post-Execution Receipt",
+  "description": "Draft v0.3 post-execution receipt linked to a VATE admission receipt.",
+  "type": "object",
+  "$defs": {
+    "digestDescriptor": {
+      "type": "object",
+      "required": [
+        "alg",
+        "value"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "const": "sha-256"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": true
+    },
+    "profileHash": {
+      "type": "string",
+      "description": "Profile-defined SHA-256 hash string for AL2 request and execution binding fields.",
+      "pattern": "^sha-256:[0-9a-f]{64}$"
+    },
+    "actionBinding": {
+      "type": "object",
+      "description": "Optional profile-defined content-addressed binding for the action preimage. This complements, but does not replace, the admission receipt digest link.",
+      "required": [
+        "type",
+        "digest"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "canonical_request_digest",
+            "profile_defined_digest",
+            "external_reference"
+          ]
+        },
+        "canonicalization": {
+          "type": "string",
+          "minLength": 1
+        },
+        "preimage_profile": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "#/$defs/digestDescriptor"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "canonical_request_digest"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "canonicalization"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "profile_defined_digest"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "preimage_profile"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "external_reference"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "uri"
+            ]
+          }
+        }
+      ],
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "version",
+    "profile",
+    "receipt_type",
+    "receipt_id",
+    "issued_at",
+    "issuer",
+    "admission",
+    "execution",
+    "result"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "vate-0.3"
+    },
+    "profile": {
+      "type": "string",
+      "const": "VATE-AL2-Verifier-Admission-v0.3"
+    },
+    "receipt_type": {
+      "type": "string",
+      "const": "post_execution"
+    },
+    "receipt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "issuer": {
+      "type": "object",
+      "required": [
+        "id",
+        "role"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "runtime",
+            "agent",
+            "verifier",
+            "broker"
+          ]
+        },
+        "key_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "admission": {
+      "type": "object",
+      "required": [
+        "receipt_id",
+        "uri",
+        "digest",
+        "decision"
+      ],
+      "properties": {
+        "receipt_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "#/$defs/digestDescriptor"
+        },
+        "decision": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "attenuate"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "execution": {
+      "type": "object",
+      "required": [
+        "transaction_id",
+        "started_at",
+        "finished_at",
+        "effective_request_hash",
+        "runtime"
+      ],
+      "properties": {
+        "transaction_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "a2a_context_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "a2a_task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "finished_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "effective_request_hash": {
+          "$ref": "#/$defs/profileHash"
+        },
+        "action_binding": {
+          "$ref": "#/$defs/actionBinding"
+        },
+        "runtime": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "result": {
+      "type": "object",
+      "required": [
+        "outcome",
+        "output_hash",
+        "side_effects",
+        "policy_violations"
+      ],
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "success",
+            "partial_success",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "output_hash": {
+          "$ref": "#/$defs/profileHash"
+        },
+        "side_effects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "policy_violations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]*$"
+          }
+        },
+        "error": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "proof": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": [
+            "detached_jws",
+            "jwt",
+            "vc_proof",
+            "external",
+            "none"
+          ]
+        },
+        "alg": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kid": {
+          "type": "string",
+          "minLength": 1
+        },
+        "signature_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

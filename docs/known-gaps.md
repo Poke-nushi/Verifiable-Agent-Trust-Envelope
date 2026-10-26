@@ -94,6 +94,16 @@ completion or the later effect. General certificate revocation, remote
 propagation, cancellation after acceptance and independently established time
 or history completeness remain outside this sample.
 
+The [runtime handoff and receipt sample](../reference/runtime-handoff-sample/README.md)
+adds a second runtime under one trusted local provider. Confirmed nonexecution
+requires excluding the old worker and checking acceptance and effects in that
+provider's consistent state. Accepted work with zero or partial effects stays
+unresolved; receiver reassessment does not authorize another execution.
+Remote worker exclusion, multiple providers, continuation or compensation of
+partial effects, and independent time or journal anchoring remain outside this
+contract. Saved assessments also require their selected source version,
+source location and Python environment for replay.
+
 ### 6. Capability Registry Is Unresolved
 
 The draft intentionally avoids freezing a universal capability vocabulary.

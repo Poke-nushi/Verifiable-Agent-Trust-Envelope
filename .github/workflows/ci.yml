@@ -298,6 +298,50 @@ jobs:
           git archive HEAD:reference/post-admission-revocation-sample | tar -x -C "$archive_dir"
           python -E -s -B scripts/check_post_admission_revocation_sample.py --sample-root "$archive_dir"
 
+  runtime-handoff:
+    name: Runtime handoff and receipt (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.11", "3.12", "3.13", "3.14"]
+        include:
+          - os: macos-15
+            python: "3.14"
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+          check-latest: true
+
+      - name: Install the sample's fixed dependencies
+        run: |
+          python -m pip install --disable-pip-version-check --require-hashes --only-binary=:all: -r reference/runtime-handoff-sample/requirements.lock
+
+      - name: Prepare Python standard-library bytecode
+        run: python -B scripts/prepare_ci_stdlib.py
+
+      - name: Select existing OpenSSL on macOS
+        if: runner.os == 'macOS'
+        run: echo "$(brew --prefix openssl@3)/bin" >> "$GITHUB_PATH"
+
+      - name: Check handoff and receipt from a source archive
+        run: |
+          archive_dir="$(mktemp -d)"
+          trap 'rm -rf "$archive_dir"' EXIT
+          git archive HEAD:reference/runtime-handoff-sample | tar -x -C "$archive_dir"
+          python -E -s -B scripts/check_runtime_handoff_sample.py --sample-root "$archive_dir"
+
   validate:
     name: Repository checks
     runs-on: ubuntu-latest
@@ -326,6 +370,9 @@ jobs:
 
       - name: Test standard-library preparation boundaries
         run: python -B -m unittest discover -s scripts -p test_prepare_ci_stdlib.py -v
+
+      - name: Test handoff CI result checks
+        run: python -E -s -B -m unittest discover -s scripts -p test_check_runtime_handoff_sample.py -v
 
       - name: Run quickstart demo
         run: python reference/quickstart-demo/run_demo.py
@@ -400,7 +447,7 @@ jobs:
   ci-complete:
     name: CI complete
     if: ${{ always() }}
-    needs: [execution-evidence, execution-evidence-archive, musubi-receiving, post-admission-revocation, validate]
+    needs: [execution-evidence, execution-evidence-archive, musubi-receiving, post-admission-revocation, runtime-handoff, validate]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
@@ -411,9 +458,11 @@ jobs:
           REPOSITORY_RESULT: ${{ needs.validate.result }}
           MUSUBI_RESULT: ${{ needs.musubi-receiving.result }}
           REVOCATION_RESULT: ${{ needs.post-admission-revocation.result }}
+          HANDOFF_RESULT: ${{ needs.runtime-handoff.result }}
         run: |
           test "$CHECKOUT_RESULT" = success
           test "$ARCHIVE_RESULT" = success
           test "$REPOSITORY_RESULT" = success
           test "$MUSUBI_RESULT" = success
           test "$REVOCATION_RESULT" = success
+          test "$HANDOFF_RESULT" = success

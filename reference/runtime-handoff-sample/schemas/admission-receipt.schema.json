@@ -1,0 +1,772 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:admission-receipt:0.3",
+  "title": "VATE Admission Receipt",
+  "description": "Draft v0.3 verifier-signed or verifier-issued admission receipt for AL2 external digital actions.",
+  "type": "object",
+  "$defs": {
+    "evidenceType": {
+      "type": "string",
+      "enum": [
+        "admission_receipt",
+        "admission_request",
+        "agent_card",
+        "attenuation_candidate",
+        "delegated_payment_token",
+        "did_document",
+        "http_message_signature",
+        "local_policy",
+        "mission_permit",
+        "oap_decision",
+        "oauth_access_token",
+        "oauth_transaction_token",
+        "oid4vp_presentation",
+        "openid_subject",
+        "payment_authority",
+        "payment_mandate",
+        "payment_required_state",
+        "policy_snapshot",
+        "post_execution_receipt",
+        "runtime_attestation",
+        "runtime_disclosure",
+        "signed_agent_card",
+        "status_bundle",
+        "ucp_checkout_session",
+        "vc_status",
+        "verifiable_credential",
+        "web_bot_auth_signature"
+      ]
+    },
+    "protocolHint": {
+      "type": "string",
+      "enum": [
+        "ap2",
+        "ap2_human_not_present",
+        "mcp-oauth",
+        "oap_aport",
+        "openid-connect",
+        "spiffe",
+        "stripe_spt",
+        "ucp",
+        "x402"
+      ]
+    },
+    "digestDescriptor": {
+      "type": "object",
+      "required": [
+        "alg",
+        "value"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "const": "sha-256"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": true
+    },
+    "profileHash": {
+      "type": "string",
+      "description": "Profile-defined SHA-256 hash string for AL2 request and execution binding fields.",
+      "pattern": "^sha-256:[0-9a-f]{64}$"
+    },
+    "reasonVisibility": {
+      "type": "string",
+      "description": "Whether the verifier can disclose the concrete basis for a reason code in this receipt.",
+      "enum": [
+        "disclosed",
+        "opaque",
+        "withheld"
+      ]
+    },
+    "actionBinding": {
+      "type": "object",
+      "description": "Optional profile-defined content-addressed binding for the action preimage. This identifies the action being admitted; it does not replace the receipt id, transaction id, or post-execution admission linkage.",
+      "required": [
+        "type",
+        "digest"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "canonical_request_digest",
+            "profile_defined_digest",
+            "external_reference"
+          ]
+        },
+        "canonicalization": {
+          "type": "string",
+          "minLength": 1
+        },
+        "preimage_profile": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "#/$defs/digestDescriptor"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "canonical_request_digest"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "canonicalization"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "profile_defined_digest"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "preimage_profile"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "external_reference"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "uri"
+            ]
+          }
+        }
+      ],
+      "additionalProperties": true
+    },
+    "moneyAmount": {
+      "type": "object",
+      "required": [
+        "currency",
+        "value"
+      ],
+      "properties": {
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "value": {
+          "description": "Review artifacts SHOULD emit a canonical decimal string. JSON numbers are accepted only for input compatibility and must be normalized before stable receipt emission.",
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            },
+            {
+              "type": "number",
+              "minimum": 0
+            }
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "approvalConstraint": {
+      "type": "object",
+      "required": [
+        "mode"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policy_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "effectiveConstraints": {
+      "type": "object",
+      "minProperties": 1,
+      "properties": {
+        "max_amount": {
+          "$ref": "#/$defs/moneyAmount"
+        },
+        "tool_allowlist": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "target_resource": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approval": {
+          "$ref": "#/$defs/approvalConstraint"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "max_amount_usd"
+            ]
+          },
+          {
+            "required": [
+              "resource"
+            ]
+          }
+        ]
+      },
+      "additionalProperties": true
+    },
+    "attenuationChange": {
+      "type": "object",
+      "required": [
+        "op",
+        "path",
+        "reason_code"
+      ],
+      "properties": {
+        "op": {
+          "type": "string",
+          "enum": [
+            "add",
+            "remove",
+            "replace"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^/(approval|constraints|runtime|target|tools)(/|$)"
+        },
+        "from": {},
+        "to": {},
+        "reason_code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason_visibility": {
+          "$ref": "#/$defs/reasonVisibility"
+        },
+        "reason_withheld": {
+          "type": "boolean",
+          "description": "Compatibility flag for profiles that need a boolean marker; true requires reason_visibility to be opaque or withheld."
+        },
+        "source_status_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_evidence_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "reason_visibility": {
+                "const": "disclosed"
+              }
+            },
+            "required": [
+              "reason_visibility"
+            ]
+          },
+          "then": {
+            "properties": {
+              "reason_withheld": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "reason_withheld": {
+                "const": true
+              }
+            },
+            "required": [
+              "reason_withheld"
+            ]
+          },
+          "then": {
+            "required": [
+              "reason_visibility"
+            ],
+            "properties": {
+              "reason_visibility": {
+                "enum": [
+                  "opaque",
+                  "withheld"
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "version",
+    "profile",
+    "receipt_type",
+    "receipt_id",
+    "issued_at",
+    "expires_at",
+    "verifier",
+    "request",
+    "subject",
+    "evidence",
+    "policy",
+    "decision"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "vate-0.3"
+    },
+    "profile": {
+      "type": "string",
+      "const": "VATE-AL2-Verifier-Admission-v0.3"
+    },
+    "receipt_type": {
+      "type": "string",
+      "const": "admission"
+    },
+    "receipt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "verifier": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "key_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "request": {
+      "type": "object",
+      "required": [
+        "request_id",
+        "transaction_id",
+        "action",
+        "input_hash"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "transaction_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "a2a_context_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "a2a_task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input_hash": {
+          "$ref": "#/$defs/profileHash"
+        },
+        "action_binding": {
+          "$ref": "#/$defs/actionBinding"
+        },
+        "constraints": {
+          "type": "object",
+          "description": "For allow decisions, the original request constraints are the effective post-execution constraint basis when present.",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "subject": {
+      "type": "object",
+      "required": [
+        "principal",
+        "actor",
+        "runtime"
+      ],
+      "properties": {
+        "principal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "actor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runtime": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "uri",
+          "digest",
+          "verification"
+        ],
+        "properties": {
+          "type": {
+            "$ref": "#/$defs/evidenceType"
+          },
+          "uri": {
+            "type": "string",
+            "minLength": 1
+          },
+          "protocol_hint": {
+            "$ref": "#/$defs/protocolHint",
+            "description": "Optional informative hint for the concrete source protocol. The canonical evidence type should remain generic unless a profile defines a protocol-specific subtype."
+          },
+          "digest": {
+            "$ref": "#/$defs/digestDescriptor"
+          },
+          "verification": {
+            "type": "object",
+            "required": [
+              "result",
+              "checked_at",
+              "method"
+            ],
+            "properties": {
+              "result": {
+                "type": "string",
+                "enum": [
+                  "verified",
+                  "failed",
+                  "unknown",
+                  "stale",
+                  "unavailable"
+                ]
+              },
+              "checked_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "method": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status_result": {
+                "type": "string",
+                "minLength": 1
+              },
+              "failure_reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "policy": {
+      "type": "object",
+      "required": [
+        "policy_id",
+        "policy_version",
+        "policy_ref"
+      ],
+      "properties": {
+        "policy_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policy_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policy_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policy_snapshot": {
+          "type": "object",
+          "description": "Optional digest-bound reference to the concrete policy snapshot used to produce this admission decision.",
+          "required": [
+            "uri",
+            "media_type",
+            "digest"
+          ],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "minLength": 1
+            },
+            "media_type": {
+              "type": "string",
+              "minLength": 1
+            },
+            "digest": {
+              "$ref": "#/$defs/digestDescriptor"
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "decision": {
+      "type": "object",
+      "required": [
+        "outcome",
+        "reason_codes"
+      ],
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "attenuate",
+            "deny"
+          ]
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "reason_visibility": {
+          "$ref": "#/$defs/reasonVisibility"
+        },
+        "reason_withheld": {
+          "type": "boolean",
+          "description": "Compatibility flag for profiles that need a boolean marker; true requires reason_visibility to be opaque or withheld."
+        },
+        "human_readable_summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "reason_visibility": {
+                "const": "disclosed"
+              }
+            },
+            "required": [
+              "reason_visibility"
+            ]
+          },
+          "then": {
+            "properties": {
+              "reason_withheld": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "reason_withheld": {
+                "const": true
+              }
+            },
+            "required": [
+              "reason_withheld"
+            ]
+          },
+          "then": {
+            "required": [
+              "reason_visibility"
+            ],
+            "properties": {
+              "reason_visibility": {
+                "enum": [
+                  "opaque",
+                  "withheld"
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": true
+    },
+    "attenuation": {
+      "type": "object",
+      "required": [
+        "mode",
+        "original_request_hash",
+        "effective_request_hash",
+        "changes",
+        "effective_constraints",
+        "require_new_permit"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "narrow",
+            "require_new_permit",
+            "deny_if_not_accepted"
+          ]
+        },
+        "original_request_hash": {
+          "$ref": "#/$defs/profileHash"
+        },
+        "effective_request_hash": {
+          "$ref": "#/$defs/profileHash"
+        },
+        "changes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/attenuationChange"
+          }
+        },
+        "effective_constraints": {
+          "$ref": "#/$defs/effectiveConstraints"
+        },
+        "require_new_permit": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true
+    },
+    "proof": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": [
+            "detached_jws",
+            "jwt",
+            "vc_proof",
+            "external",
+            "none"
+          ]
+        },
+        "alg": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kid": {
+          "type": "string",
+          "minLength": 1
+        },
+        "signature_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "type": "object",
+            "properties": {
+              "outcome": {
+                "const": "attenuate"
+              }
+            },
+            "required": [
+              "outcome"
+            ]
+          }
+        },
+        "required": [
+          "decision"
+        ]
+      },
+      "then": {
+        "required": [
+          "attenuation"
+        ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "attenuation"
+          ]
+        }
+      }
+    }
+  ],
+  "additionalProperties": true
+}
