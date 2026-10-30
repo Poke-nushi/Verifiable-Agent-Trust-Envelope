@@ -262,6 +262,12 @@ the original operation, actual write order or a mapping between protocol
 identities. General JOSE/PKI, certificate/revocation handling and independent
 issuer/key selection remain outside that experimental contract.
 
+The [JCS / ES256 example](../reference/recipient-jcs-signature-authority/README.md)
+adds a separate local signing contract for canonical JSON. It reuses the same
+receiver-selected authority policy and preserves the existing receipt result.
+External issuer/key mappings and interoperability with another implementation
+of that signing contract remain unverified.
+
 The separate [Required Record Review](../reference/required-records/README.md)
 detects omitted records against an explicit receiver-selected set of operations
 or known attempts. Its Python API and JSON CLI keep record coverage, arrival

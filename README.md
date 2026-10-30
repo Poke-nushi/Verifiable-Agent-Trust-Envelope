@@ -98,6 +98,10 @@ alongside that assessment, use the
 [Recipient Signature and Issuer Authority Example](reference/recipient-signature-authority/README.md).
 It keeps signature, authority and receipt-linkage results separate under an
 experimental P-256 / SHA-256 contract with public test keys.
+For JSON payloads signed with the explicit JCS / ES256 contract, use the
+[JCS Signature and Issuer Authority Example](reference/recipient-jcs-signature-authority/README.md).
+It verifies signatures over canonical JSON with Node and returns the same
+separate assessment categories for supported VATE receipts.
 
 To find records omitted from a receiver-selected set of operations or known
 attempts, use [Required Record Review](reference/required-records/README.md).
@@ -540,6 +544,8 @@ The most useful feedback is:
   Call receipt and S3 assessments through a versioned local Python API or JSON CLI
 - [reference/recipient-signature-authority/README.md](reference/recipient-signature-authority/README.md)
   Inspect detached signatures and receiver-selected record authority alongside receipt linkage
+- [reference/recipient-jcs-signature-authority/README.md](reference/recipient-jcs-signature-authority/README.md)
+  Verify JCS / ES256 signatures and receiver-selected record authority alongside receipt linkage
 - [reference/required-records/README.md](reference/required-records/README.md)
   Find missing records within a receiver-selected set of operations or known attempts
 - [reference/musubi-set2-receiving-sample/README.md](reference/musubi-set2-receiving-sample/README.md)
@@ -644,7 +650,7 @@ want language-level examples of the same digest-bound reference and A2A metadata
 shapes:
 
 ```bash
-npm ci
+npm ci --ignore-scripts
 npm run ts:check
 npm run ts:test
 ```

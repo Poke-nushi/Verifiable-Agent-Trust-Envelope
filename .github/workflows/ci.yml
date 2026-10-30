@@ -43,6 +43,17 @@ jobs:
       - name: Prepare Python standard-library bytecode
         run: python -B scripts/prepare_ci_stdlib.py
 
+      - name: Set up Node.js for the JCS signature example
+        uses: actions/setup-node@v7.0.0
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Build the TypeScript verifier
+        run: |
+          npm ci --ignore-scripts
+          npm run ts:check
+
       - name: Run execution evidence tests
         run: python -B -m unittest discover -s reference/execution-evidence-demo -p 'test_*.py' -v
 
@@ -80,6 +91,12 @@ jobs:
           python -B -m unittest discover -s reference/recipient-signature-authority -p 'test_*.py' -v
           output_dir="$(mktemp -d)"
           python -B reference/recipient-signature-authority/run_trial.py --openssl "$VATE_TRIAL_OPENSSL" --openssl-sha256 "$VATE_TRIAL_OPENSSL_SHA256" --output "$output_dir/run"
+
+      - name: Check JCS signatures with receiver-selected issuer authority
+        run: |
+          python -B -m unittest discover -s reference/recipient-jcs-signature-authority -p 'test_*.py' -v
+          output_dir="$(mktemp -d)"
+          python -B reference/recipient-jcs-signature-authority/run_trial.py --output "$output_dir/run"
 
       - name: Check required records and receiver-selected review controls
         run: |
@@ -421,7 +438,7 @@ jobs:
           cache: npm
 
       - name: Install Node dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Check TypeScript helpers
         run: |
