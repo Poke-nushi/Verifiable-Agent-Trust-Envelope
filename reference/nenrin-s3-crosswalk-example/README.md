@@ -134,6 +134,31 @@ Four digest bases stay separate:
 | CW-07 | The structured VATE result projection, including target, version, body digest and byte length |
 | CW-09 | The NENRIN action object using `musubi-canonical-v0`, distinct from its `args_sha256` |
 
+### Digest rules and input validation
+
+CW-04 uses the crosswalk selector
+`vate-v0.3-fixture-json;ascii-escaped;sorted;compact;no-floats`.
+Its preimage contains exactly `action`, `body_digest`, `bucket`, `byte_length`,
+`contract`, `endpoint_profile_id`, `if_none_match`, `key` and `operation_id`;
+it has no `action_binding` member. CW-09 selects `musubi-canonical-v0` for the
+NENRIN action. Neither selector means RFC 8785 JCS.
+
+The crosswalk parser rejects duplicate keys after escape decoding,
+floating-point tokens (including `1.0`), negative zero, unsafe integers,
+isolated surrogates and excessive nesting. These are this example's input
+restrictions, not a definition of JCS or of every VATE fixture input.
+An unrecognized action-binding basis yields `not_assessed`, without retrying
+under another basis. That finding cannot satisfy the corresponding check.
+
+In [tests/test_crosswalk.py](tests/test_crosswalk.py),
+`test_hand_written_canonical_byte_contrast` shows the `é` byte difference,
+`test_strict_parser_and_bounds` exercises rejection, and
+`test_unknown_profiles_not_reinterpreted` checks the unsupported-basis path.
+The [digest-basis guide](../../docs/conformance/digest-basis.md#reproduce-the-byte-and-rejection-checks)
+links these tests with the separate TypeScript fixture and JCS checks.
+
+### Other relationship findings
+
 CW-07 can match in the target-mismatch case because it compares a projection
 built from the effective request. It does not override CW-06 or the native
 `post_observation_binding` and `evidence_bound_unchecked` findings. CW-08

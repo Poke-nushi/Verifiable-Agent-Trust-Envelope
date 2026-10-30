@@ -1,0 +1,9 @@
+{
+  "agentId": "did:aps:z6Mkfoo",
+  "actionType": "code_execution",
+  "scopeRequired": [
+    "commerce:read",
+    "commerce:write"
+  ],
+  "timestamp": "2026-05-21T00:00:00Z"
+}

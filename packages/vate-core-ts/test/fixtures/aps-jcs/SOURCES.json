@@ -1,0 +1,44 @@
+{
+  "repository": "https://github.com/aeoess/agent-passport-system",
+  "commit": "f95c9168187cbac0493099fe4a7cddaff653bf39",
+  "license": "Apache-2.0",
+  "files": [
+    {
+      "path": "jcs-test-vectors.json",
+      "upstream_path": "tests/cross-impl/jcs-test-vectors.json",
+      "url": "https://github.com/aeoess/agent-passport-system/blob/f95c9168187cbac0493099fe4a7cddaff653bf39/tests/cross-impl/jcs-test-vectors.json",
+      "sha256": "cfdda9c1e0f2a1fd5a27e82edb4ecc9d87b74af2cf10b26a48b7a7389dadcf13",
+      "bytes": 5250,
+      "transformation": "none"
+    },
+    {
+      "path": "LICENSE",
+      "upstream_path": "LICENSE",
+      "url": "https://github.com/aeoess/agent-passport-system/blob/f95c9168187cbac0493099fe4a7cddaff653bf39/LICENSE",
+      "sha256": "c6276a9c8c67588338d8439b0c7d27b3451335fc652e02a2be990e81c51ef40a",
+      "bytes": 10768,
+      "transformation": "none"
+    },
+    {
+      "path": "NOTICE",
+      "upstream_path": "NOTICE",
+      "url": "https://github.com/aeoess/agent-passport-system/blob/f95c9168187cbac0493099fe4a7cddaff653bf39/NOTICE",
+      "sha256": "2cbbf6bd3d5104e0ce2bc918999dfe8cbb94296d43e1098acb5846be2ca28be7",
+      "bytes": 815,
+      "transformation": "none"
+    },
+    {
+      "path": "action-ref-preimage.json",
+      "derived_from": "jcs-test-vectors.json#/vectors/8/input",
+      "sha256": "bd8446898160f79b7e5e27eda5f132fe3d7df9e6deab66545d38287b3c284311",
+      "bytes": 176,
+      "transformation": "Extract v09-action-ref-tuple input and write indented UTF-8 JSON with a final newline."
+    }
+  ],
+  "example": {
+    "vector_id": "v09-action-ref-tuple",
+    "basis_selector": "rfc8785-jcs",
+    "expected_sha256": "956fb10ca09e093086c856517a8f93c11416f5b84b0a01634bc5ebfff41670d3"
+  },
+  "scope": "Pinned test data; no APS implementation, live receipt, signature verification or independent execution is included."
+}

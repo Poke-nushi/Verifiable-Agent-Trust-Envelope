@@ -184,6 +184,11 @@ Two paths address additional recipient requirements:
   connects OpenSSL P-256 / SHA-256 verification and receiver-selected
   record-issuing grants to the existing receipt assessment. Signed bytes,
   authority under that policy and receipt linkage remain separate results.
+  The separate [JCS / ES256 example](reference/recipient-jcs-signature-authority/README.md)
+  uses an explicit detached-JWS contract for canonical JSON and the same
+  receiver policy. Its TypeScript helper also verifies signatures over generic
+  JSON payloads; issuer-authority assessment is limited to the supported VATE
+  receipt context.
   Next, exercise independently selected issuer/key/scope mappings with another
   receiver. The public test-key controls do not establish real issuer identity
   or authority at the original operation.
