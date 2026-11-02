@@ -1,0 +1,18 @@
+{
+  "host_audit": {
+    "path": "fixtures/synthetic/host-audit.jsonl",
+    "raw_sha256": "1b3ae6c3845773269a5df3020689f3faa44db7b9aea0dfaa8020246f23940d0e"
+  },
+  "guardian_envelopes": {
+    "path": "fixtures/synthetic/guardian-envelopes.jsonl",
+    "raw_sha256": "1fbd646a9060a367b4e6bfc5bc54794bd713dd1600f6f088a553a36aaec35bef"
+  },
+  "host_events": {
+    "path": "fixtures/synthetic/host-events.jsonl",
+    "raw_sha256": "41002ac8806b46932163c4502dc062e67cc9e3892d04574213a183daa408b44f"
+  },
+  "proxy": {
+    "path": "fixtures/synthetic/proxy.jsonl",
+    "raw_sha256": "6c076db7621be5a15f7ee77a4924ac43278fea2cef294a0039a85b1eca0f1600"
+  }
+}

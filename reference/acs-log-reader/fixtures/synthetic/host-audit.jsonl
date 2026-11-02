@@ -1,0 +1,1 @@
+{"failure":{"kind":"timeout"},"method":"steps/toolCallRequest","outcome":"proceeded","posture":"proceed","posture_source":"negotiated","recorded_at":"2026-01-01T00:00:05.000Z","rpc_id":"demo-request-main","session_id":"demo-host-session","synthetic":true}
