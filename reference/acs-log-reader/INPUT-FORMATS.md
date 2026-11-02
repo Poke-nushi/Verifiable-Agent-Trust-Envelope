@@ -18,6 +18,9 @@ offset timestamps are not supported. Host tool intervals use integer Unix epoch
 milliseconds. When a source is unavailable, use its explicit `--NAME-absent`
 flag; do not create an empty placeholder file.
 
+Optional command timestamp files use a separate plain-text format with up to
+nine fractional digits, described below. They do not change the JSONL formats.
+
 ## Host audit
 
 For a selected `rpc_id`, the reader requires `recorded_at`, `session_id`,
@@ -96,3 +99,37 @@ response.
 If your logs use another shape, preserve those originals and document any
 transformation separately. The report's source hashes identify exactly the
 files supplied to this reader.
+
+## Command self-timestamps (optional)
+
+Use `--command-start PATH` and `--command-end PATH` for files containing the
+start and end stamps recorded inside a command. Each file is one ASCII UTC
+timestamp, optionally followed by LF or CRLF. For example, the complete
+[synthetic start file](fixtures/synthetic/command-start.txt) is:
+
+```text
+2026-01-01T00:00:05.015000001Z
+```
+
+The [synthetic end file](fixtures/synthetic/command-end.txt) is:
+
+```text
+2026-01-01T00:00:05.017000003Z
+```
+
+The format is `YYYY-MM-DDTHH:MM:SS[.fffffffff]Z`, with an optional fraction
+of one to nine digits. Offset times, leap seconds, hour 24, blank lines,
+additional text and surrounding whitespace are not accepted. Both files
+are invented observations for the synthetic example.
+
+Omit both options to use the original four-log reader. When using timestamp
+inputs, explicitly mark any missing side with `--command-start-absent` or
+`--command-end-absent`. An empty, unreadable or malformed file is an input error.
+
+The report adds these files to `sources` with their exact raw hashes and retains
+each timestamp and line reference in `command_self_timestamps`. The caller
+selects which files to supply together. The files do not establish that the
+stamps belong to the same command or to the selected ACS request. Timing
+comparisons preserve this unresolved association, including when an end stamp
+precedes a start stamp. See [the time contract](CONTRACT.md#optional-command-self-timestamps)
+for comparison fields and their decimal-string nanosecond values.

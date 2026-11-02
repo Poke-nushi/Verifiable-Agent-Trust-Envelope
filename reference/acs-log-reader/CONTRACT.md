@@ -6,13 +6,24 @@ admission receipt, authorization, execution ticket or retry instruction.
 
 ## Inputs
 
-See [INPUT-FORMATS.md](INPUT-FORMATS.md) for the four input shapes and examples.
+See [INPUT-FORMATS.md](INPUT-FORMATS.md) for the four JSONL shapes and optional
+command timestamp files.
 
-`assess(inputs, selection_raw)` accepts an exact plain dict of four keys:
+`assess(inputs, selection_raw, *, command_timestamps=None)` accepts an exact
+plain dict of four keys in `inputs`:
 `host_audit`, `guardian_envelopes`, `host_events`, `proxy`. Values are immutable
 Python `bytes`, or explicit `None` for absence. Each is JSONL; every line is an
 object. A missing file, empty file, JSON null or malformed JSON is not absence.
 The CLI requires a path or explicit `--NAME-absent` for each source.
+
+The optional `command_timestamps` argument is either `None` (disabled), or an
+exact plain dict with `command_start` and `command_end`, each immutable bytes
+or explicit `None`. These files contain one UTC timestamp, not JSON. If either
+CLI timestamp option is used, both sides require a path or their respective
+`--command-start-absent` / `--command-end-absent` flag. Omitting all timestamp
+options preserves the original four-input report, including its raw-byte form.
+Each timestamp path option accepts one occurrence; repeated paths for the same
+side are rejected before any input files are read.
 
 Selection is JSON bytes with exactly `profile`, `request_id`, `acs_session_id`,
 `host_session_id`. IDs are selected by the receiver, 1–256 characters without
@@ -104,6 +115,37 @@ settlement versus dispatch, cancellation, or the moment of actual effects.
 Decision commitment and dispatch remain unknown. Event time is never used as
 receiver arrival time. A reversed reported tool interval is invalid input.
 
+### Optional command self-timestamps
+
+Each timestamp file contains `YYYY-MM-DDTHH:MM:SS[.fffffffff]Z`, with zero to
+nine fractional digits (omit the dot when there is no fraction). Years 0001–9999
+and valid calendar dates are accepted; hour 24, leap seconds, offsets, whitespace
+and additional lines are rejected. A final LF or CRLF is optional. The same
+file/line hash conventions apply; the exact timestamp text is retained as
+`reported_at`. The 1 MiB file and 65536-byte line bounds also apply.
+
+`command_self_timestamps.start` and `.end` are independent observation groups.
+The caller supplies their labels and capture membership; the files contain no
+action or session ID. Pair, request and execution bindings stay `unresolved`,
+even if command text or times match other records. The reader does not extract
+timestamps from shell commands, stdout or filenames.
+
+`timing.command_self_timestamp_comparisons` contains `start_vs_host_fallback_log`,
+`end_vs_start`, and `guardian_response_vs_start`. They report start minus fallback,
+end minus start, and Guardian response minus start, respectively. Differences use
+integer arithmetic and are returned as decimal **strings** in `delta_nanoseconds`, preserving large values
+for JSON consumers. Original timestamp precision does not establish clock accuracy.
+Missing or ambiguous supported observations leave the affected comparison
+`unresolved`; Guardian comparisons also require a unique selected request.
+
+The comparison basis is receiver-supplied files and unverified source wall
+clocks. No common execution or causal ordering is established. In particular,
+`end_vs_start` is the difference between two supplied stamps, not a proven
+command runtime. Reversed or equal stamps remain visible as `before` or `equal`;
+they are not reordered or rejected as though they were a bound execution interval.
+These observations never populate `dispatch_at` or `decision_committed_at`, nor
+change the host decision, Guardian decision, result-hook judgment or action links.
+
 Signature, issuer authority, log completeness, independent execution,
 execution/retry permission and ACS conformance remain explicitly not_assessed.
 There is no whole-report valid/trusted/pass flag. Exit 0 means a report was
@@ -130,7 +172,7 @@ example's behavior. Its input records are invented and do not assert an actual
 host or Guardian run. The inbox example needs a trusted whole VATE source tree
 and its existing validation dependencies; the reader and tests use only Python's
 standard library. `--source-root` selects that tree when the sample folder is
-copied elsewhere. Imports and evaluator initialization precede output creation.
+copied elsewhere.
 
 ## Pinned published capture replay
 
