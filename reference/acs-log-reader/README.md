@@ -67,6 +67,34 @@ To reproduce the reading of AngeYobo's published ACS #435 capture, follow
 raw hashes and a local replay command. The upstream logs and scripts are not
 included in this folder.
 
+### Include command start and end stamps
+
+If the command records its own start and end timestamps in separate files,
+pass them with `--command-start` and `--command-end`. For the synthetic example:
+
+```bash
+python3 -B acs_reader.py \
+  --selection selection.example.json \
+  --host-audit fixtures/synthetic/host-audit.jsonl \
+  --guardian-envelopes fixtures/synthetic/guardian-envelopes.jsonl \
+  --host-events fixtures/synthetic/host-events.jsonl \
+  --proxy fixtures/synthetic/proxy.jsonl \
+  --command-start fixtures/synthetic/command-start.txt \
+  --command-end fixtures/synthetic/command-end.txt
+```
+
+The report retains each timestamp and its source hash and compares the supplied
+times with the host fallback and Guardian response. It preserves up to nine
+fractional digits; `delta_nanoseconds` values are decimal strings. Use
+`--command-end-absent`, for example, if only the start file has arrived.
+Omitting both timestamp options keeps the original report unchanged.
+
+Command stamps remain separate from the host's exact dispatch or
+decision-commitment time. The files alone do not establish that the stamps
+describe one execution or link it to an approval. See the
+[input format](INPUT-FORMATS.md#command-self-timestamps-optional) and
+[time contract](CONTRACT.md#optional-command-self-timestamps).
+
 ## Keep originals and both readings
 
 This optional storage example requires the **whole VATE checkout or source
@@ -102,6 +130,8 @@ python3 -S -B -m unittest discover -s . -p 'test_*.py' -v
 Tests use the self-authored fixture and local mutations. They cover missing
 inputs, malformed JSON, conflicting/reused IDs, incorrect direction/method
 labels, numeric bounds, file handling, output identity and command comparison.
+They also cover optional timestamp precision, missing and invalid stamps,
+reversed reported order, source hashes and unchanged four-log reports.
 They require no network access or host/Guardian process.
 
 ## Interpret the result

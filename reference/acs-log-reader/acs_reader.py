@@ -13,6 +13,7 @@ import sys
 
 PROFILE = 'vate-local-acs-log-reader-v1'
 SOURCES = ('host_audit', 'guardian_envelopes', 'host_events', 'proxy')
+COMMAND_TIMESTAMP_SOURCES = ('command_start', 'command_end')
 REQUEST = 'steps/toolCallRequest'
 RESULT = 'steps/toolCallResult'
 MAX_BYTES = 1024 * 1024
@@ -142,6 +143,54 @@ def millis(value, ref):
     return dt.isoformat(timespec='milliseconds').replace('+00:00', 'Z')
 
 
+def read_command_timestamp(raw, name):
+    if raw is None:
+        return [], {'state': 'absent'}
+    need(type(raw) is bytes and 0 < len(raw) <= MAX_BYTES, 'INVALID_BYTES_OR_SIZE', name)
+    # Preserve raw line identity, including CR in CRLF, just like JSONL sources.
+    line = raw[:-1] if raw.endswith(b'\n') else raw
+    need(b'\n' not in line, 'EXPECTED_SINGLE_TIMESTAMP', name, 1)
+    need(0 < len(line) <= MAX_LINE, 'INVALID_LINE_SIZE', name, 1)
+    value_bytes = line[:-1] if raw.endswith(b'\r\n') else line
+    try:
+        value = value_bytes.decode('ascii')
+    except UnicodeError:
+        raise InputError('INVALID_TIMESTAMP', name, 1) from None
+    need(re.fullmatch(r'[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{1,9})?Z', value),
+         'INVALID_TIMESTAMP', name, 1)
+    try:
+        # Constructor ranges are stable across Python versions; some ISO
+        # parsers normalize 24:00:00. Keep that spelling outside this format.
+        datetime(int(value[:4]), int(value[5:7]), int(value[8:10]),
+                 int(value[11:13]), int(value[14:16]), int(value[17:19]))
+    except ValueError:
+        raise InputError('INVALID_TIMESTAMP', name, 1) from None
+    ref = {'input': name, 'line': 1, 'line_raw_sha256': digest(line)}
+    return [{'source': ref, 'reported_at': value, 'supported': True}], {
+        'state': 'present', 'raw_sha256': digest(raw), 'byte_length': len(raw), 'rows': 1}
+
+
+def timestamp_nanoseconds(value):
+    """Exact arithmetic for already validated UTC timestamps, without floats."""
+    seconds, _, fraction = value[:-1].partition('.')
+    dt = datetime.fromisoformat(seconds)
+    whole = ((dt.toordinal() * 24 + dt.hour) * 60 + dt.minute) * 60 + dt.second
+    return whole * 1000000000 + int(fraction.ljust(9, '0'))
+
+
+def command_wall_order(first, second):
+    if first is None or second is None:
+        return {'status': 'unresolved', 'reason': 'UNIQUE_SUPPORTED_OBSERVATIONS_REQUIRED'}
+    delta = timestamp_nanoseconds(second) - timestamp_nanoseconds(first)
+    return {'status': 'observed_timestamp_order',
+            'relation': 'after' if delta > 0 else 'before' if delta < 0 else 'equal',
+            # Decimal text avoids lossy JSON-number conversion for large intervals.
+            'delta_nanoseconds': str(delta),
+            'clock_basis': 'source_wall_clocks_not_independently_verified',
+            'association_basis': 'receiver_supplied_files_only',
+            'same_execution_proven': False, 'host_arrival_or_dispatch_order_proven': False}
+
+
 def obj(value, ref):
     need(type(value) is dict, 'INVALID_RECORD_SHAPE', ref['input'], ref['line'])
     return value
@@ -213,8 +262,12 @@ def wall_order(first, second):
             'host_arrival_or_dispatch_order_proven': False}
 
 
-def assess(inputs, selection_raw):
+def assess(inputs, selection_raw, *, command_timestamps=None):
     need(type(inputs) is dict and set(inputs) == set(SOURCES), 'INVALID_INPUT_SET', 'inputs')
+    if command_timestamps is not None:
+        need(type(command_timestamps) is dict and len(command_timestamps) == 2
+             and all(name in command_timestamps for name in COMMAND_TIMESTAMP_SOURCES),
+             'INVALID_COMMAND_TIMESTAMP_SET', 'command_timestamps')
     selection = parse_json(selection_raw, 'selection')
     need(set(selection) == {'profile', 'request_id', 'acs_session_id', 'host_session_id'}, 'INVALID_SELECTION', 'selection')
     need(selection['profile'] == PROFILE, 'UNSUPPORTED_PROFILE', 'selection')
@@ -370,7 +423,7 @@ def assess(inputs, selection_raw):
                       and h['posture'] == negotiated['on_decision_failure'] else 'not_assessed', 'authenticated': False}
     if h and negotiated and h['posture_source'] == 'negotiated' and h['posture'] != negotiated['on_decision_failure']:
         fallback_match['status'] = 'mismatched'
-    return {'kind': 'acs-log-reading-report', 'profile': PROFILE,
+    report = {'kind': 'acs-log-reading-report', 'profile': PROFILE,
             'selection': {**selection, 'raw_sha256': digest(selection_raw)}, 'sources': sources,
             'scope': 'selected_fields_of_supplied_capture_files_only',
             'host_effective_decision': host_group, 'guardian_request': request_group,
@@ -388,6 +441,23 @@ def assess(inputs, selection_raw):
             'not_assessed': ['signature', 'issuer_authority', 'clock_synchronization', 'log_completeness',
                              'independent_execution', 'execution_permission', 'retry_permission', 'acs_conformance'],
             'no_execution_ticket': True}
+    # Opt-in extension: legacy four-input reports keep their exact byte form.
+    if command_timestamps is not None:
+        stamps = {}
+        for name in COMMAND_TIMESTAMP_SOURCES:
+            observations, sources[name] = read_command_timestamp(command_timestamps[name], name)
+            stamps[name] = group(observations, sources[name])
+        start, end = (sole(stamps[name]) for name in COMMAND_TIMESTAMP_SOURCES)
+        start_at, end_at = (record['reported_at'] if record else None for record in (start, end))
+        report['command_self_timestamps'] = {
+            'start': stamps['command_start'], 'end': stamps['command_end'],
+            'association_basis': 'receiver_supplied_files_only',
+            'pair_binding': 'unresolved', 'request_binding': 'unresolved', 'execution_binding': 'unresolved'}
+        report['timing']['command_self_timestamp_comparisons'] = {
+            'start_vs_host_fallback_log': command_wall_order(h['recorded_at'] if h else None, start_at),
+            'end_vs_start': command_wall_order(start_at, end_at),
+            'guardian_response_vs_start': command_wall_order(start_at, d['recorded_at'] if d and unique else None)}
+    return report
 
 
 def read_file(path, source):
@@ -420,10 +490,26 @@ def main(argv=None):
         choice = parser.add_mutually_exclusive_group(required=True)
         choice.add_argument('--' + spelling, dest=name)
         choice.add_argument('--' + spelling + '-absent', action='store_true')
+    for name in COMMAND_TIMESTAMP_SOURCES:
+        spelling = name.replace('_', '-')
+        choice = parser.add_mutually_exclusive_group()
+        choice.add_argument('--' + spelling, dest=name, action='append')
+        choice.add_argument('--' + spelling + '-absent', action='store_true')
     try:
         args = parser.parse_args(argv)
+        for name in COMMAND_TIMESTAMP_SOURCES:
+            paths = getattr(args, name)
+            need(paths is None or len(paths) == 1, 'INVALID_ARGUMENTS', 'cli')
+            if paths is not None:
+                setattr(args, name, paths[0])
+        selected = [getattr(args, name) is not None or getattr(args, name + '_absent')
+                    for name in COMMAND_TIMESTAMP_SOURCES]
+        need(not any(selected) or all(selected), 'INCOMPLETE_COMMAND_TIMESTAMP_INPUTS', 'cli')
         inputs = {name: read_file(getattr(args, name), name) if getattr(args, name) is not None else None for name in SOURCES}
-        report = assess(inputs, read_file(args.selection, 'selection'))
+        command_timestamps = None if not any(selected) else {
+            name: read_file(getattr(args, name), name) if getattr(args, name) is not None else None
+            for name in COMMAND_TIMESTAMP_SOURCES}
+        report = assess(inputs, read_file(args.selection, 'selection'), command_timestamps=command_timestamps)
         print(encode(report).decode())
         return 0
     except InputError as exc:
