@@ -1,0 +1,9 @@
+{
+  "kind": "self-authored-synthetic-fixture",
+  "created_for": "VATE ACS log reader regression and documentation examples",
+  "actual_host_or_guardian_execution": false,
+  "based_on": "reader field contract for ACS 0.1.0 saved capture shapes",
+  "upstream_log_bytes_copied": false,
+  "identifiers_times_commands_and_outcomes": "invented test data",
+  "source_wall_clock_delta_microseconds": 3132000
+}

@@ -1,0 +1,144 @@
+# ACS capture reader v1 — local contract
+
+Offline reader for the saved ACS #435 log shapes. Profile:
+`vate-local-acs-log-reader-v1`. It consumes observations, never issues an
+admission receipt, authorization, execution ticket or retry instruction.
+
+## Inputs
+
+See [INPUT-FORMATS.md](INPUT-FORMATS.md) for the four input shapes and examples.
+
+`assess(inputs, selection_raw)` accepts an exact plain dict of four keys:
+`host_audit`, `guardian_envelopes`, `host_events`, `proxy`. Values are immutable
+Python `bytes`, or explicit `None` for absence. Each is JSONL; every line is an
+object. A missing file, empty file, JSON null or malformed JSON is not absence.
+The CLI requires a path or explicit `--NAME-absent` for each source.
+
+Selection is JSON bytes with exactly `profile`, `request_id`, `acs_session_id`,
+`host_session_id`. IDs are selected by the receiver, 1–256 characters without
+ASCII whitespace/control characters. This selection scopes the supplied files;
+it does not authenticate their origin, sessions, identifiers or membership in
+one capture. V1 supports string RPC IDs and ACS version 0.1.0 only.
+
+Bounds: 1 MiB per input (including selection), depth 32 for all JSON. The four
+JSONL sources additionally allow at most 512 lines and 65536 bytes per line;
+selection is one JSON document and has no separate line-count/line-size limit. Duplicate
+JSON keys, invalid UTF-8/lone surrogates, nonfinite numbers and numbers outside
+the safe-integer magnitude are rejected. Fractional numbers remain Decimal;
+fields requiring integers reject booleans and decimal-token values. LF and
+CRLF are accepted. Blank lines are rejected. An optional final LF is retained
+in the source digest. Each report reference includes source key, one-based
+line and SHA-256 of original line bytes excluding LF (including CR if present).
+The entire source digest identifies the exact JSONL, including line endings.
+Expanded result/hello request-response associations share a 1024-record budget;
+exceeding it is an input error. Reused IDs cannot cause unbounded report expansion.
+
+The CLI reads bounded regular files and rejects final symlinks where
+O_NOFOLLOW is available. Parent path components are not sandboxed. It follows
+no paths or URLs embedded in inputs, invokes no external commands and uses no
+network or added dependency. File paths and exception details are not echoed.
+
+## Interpreted fields and ambiguity
+
+Host audit records for the selected request retain posture, posture source,
+failure kind, outcome, timestamp and session. Supported posture/outcome pairs
+are proceed/proceeded and deny/blocked, for steps/toolCallRequest and the
+selected host session. Unsupported combinations remain not_assessed.
+
+Guardian toolCallRequest request/response records retain their own judgment.
+The outer logged RPC ID, JSON-RPC ID and inner request_id must agree. Requests
+must also agree with their logged method. Only final allow/deny responses are
+interpreted as supported decisions; other decisions, versions, progress and
+RPC errors cannot establish a binding. Missing records, unsupported records
+and repeated/conflicting records are distinct. Repeated records are retained,
+not silently deduplicated, ordered into a winner, or overwritten.
+
+The host/Guardian relation is matched_by_rpc_id only with one supported host
+record, one supported selected-session Guardian request, one supported final
+response, and no other request using that RPC ID anywhere in the supplied
+Guardian log. This means identifier equality within selected capture files,
+not authentication or a proven causal relationship.
+
+Handshake observations pair a hello request in the selected ACS session with
+its response using the logged RPC ID and JSON-RPC ID. An unknown inner
+request_id field in a hello response is never used for selection. Reused hello
+IDs prevent confirmation. Only negotiated version
+0.1.0, proceed/deny and timeout_config containing only positive default_ms are
+interpreted. Per-method/unknown timeout configuration stays not_assessed.
+A matching fallback means equality of reported values, not an authorization.
+Hello request observations remain visible even when their responses are absent.
+For each recognized request method (toolCallRequest, toolCallResult, hello), a
+known method on either the outer log or inner envelope triggers envelope,
+direction, ID and method checks before session or request selection. This applies
+to all recognized envelopes in the supplied Guardian log, including unselected
+RPCs; corrupt envelopes are input errors, not missing observations. Unknown
+methods remain opaque. Their inner request_id extensions are never counted as
+RPC identity; reuse counts use outer logged or JSON-RPC IDs only.
+
+Result hooks have their own RPC IDs and responses. An allow response to a
+toolCallResult is never an allow for the original toolCallRequest. No action
+reference extension is implemented. Result-to-request and execution-to-request
+binding therefore remain unresolved, including when an extra reference field
+appears. Unknown fields are retained in originals, not trusted or interpreted.
+If a result RPC ID is reused in any supplied session or method, a nonempty
+candidate response group is ambiguous and response_association is unresolved.
+With no candidate responses, the group remains not_observed while the request
+reuse count and unresolved association remain visible. The result request
+and candidate response records remain visible, without choosing a pairing.
+
+Host tool observations retain reported status, exit code and tool interval.
+An outer tool_use event must contain an inner part.type of tool.
+An exact bash command-text hash match is only a candidate cue. No command or
+output text is copied into the report. The host interval may include Guardian
+waiting; its start is not mapped to dispatch. Multiple candidates remain
+multiple. The observed host outcome is not independent execution evidence.
+The command-text comparison is null if either command is unavailable or the
+supported bash comparison does not apply; false requires two comparable texts.
+
+## Time and trust
+
+Timestamp comparisons are between reported source wall clocks only. The
+Guardian response time is not arrival at the host. The output makes no claim
+about clock synchronization, whether a host received/applied a late decision,
+settlement versus dispatch, cancellation, or the moment of actual effects.
+Decision commitment and dispatch remain unknown. Event time is never used as
+receiver arrival time. A reversed reported tool interval is invalid input.
+
+Signature, issuer authority, log completeness, independent execution,
+execution/retry permission and ACS conformance remain explicitly not_assessed.
+There is no whole-report valid/trusted/pass flag. Exit 0 means a report was
+generated, including absence, ambiguity and unassessed cases; 64 means invalid
+input and 70 means an unexpected internal error. Output is deterministic for
+identical inputs. Raw source identity, line identity and weak ID/text matching
+are distinct from authenticated evidence.
+
+## Existing VATE storage integration
+
+`run_example.py` takes the four hash-pinned, self-authored synthetic logs in
+`SAMPLE-PINS.json`. It reads host logs
+first and adds Guardian/proxy logs in a second local stage. This is not a replay
+of the original network timing. It stores originals and derived reader reports
+as distinct opaque records in recipient-inbox, leaves received_at unknown,
+and exports both assessments and all original bytes. The required-record review
+set is explicitly empty; its selected_empty result verifies persistence/history,
+not native ACS semantic support. The separate reader reports perform the narrow
+interpretation described above.
+The example uses the bounded regular-file reader for pins, sources and selection,
+checks each source hash immediately, and validates both reader stages before
+creating the new output directory. example_invoked_acs_host=false describes this
+example's behavior. Its input records are invented and do not assert an actual
+host or Guardian run. The inbox example needs a trusted whole VATE source tree
+and its existing validation dependencies; the reader and tests use only Python's
+standard library. `--source-root` selects that tree when the sample folder is
+copied elsewhere. Imports and evaluator initialization precede output creation.
+
+## Pinned published capture replay
+
+`check_capture.py --directory PATH` reads four locally supplied files named by
+`PUBLISHED-CAPTURE.json`. It checks each raw SHA-256 and byte length immediately,
+uses the pinned `published-selection.json`, and verifies the complete report's
+raw-byte hash including its final LF. It fetches nothing and executes no capture
+scripts. A missing or changed source is an input error. A successful replay means
+that these capture bytes produced the pinned reading, not that their origin,
+contents or execution are authenticated. Use `acs_reader.py` directly for new
+captures, with a receiver-selected set of IDs, rather than changing the pins.

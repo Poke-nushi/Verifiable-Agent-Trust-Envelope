@@ -1,0 +1,35 @@
+{
+  "source_url": "https://gist.github.com/AngeYobo/fe5cd44a864b4d54809cf1ded1e6d956/3ed175e24f4f4c5078aeddf5a0e301a4efd77aba",
+  "revision": "3ed175e24f4f4c5078aeddf5a0e301a4efd77aba",
+  "author": "AngeYobo",
+  "files": {
+    "host_audit": {
+      "filename": "host-audit.jsonl",
+      "raw_sha256": "ba67c73e372cd927fb2788567e16cb78221bf159e3472b03d933b473d8eec3f6",
+      "byte_length": 338,
+      "raw_url": "https://gist.githubusercontent.com/AngeYobo/fe5cd44a864b4d54809cf1ded1e6d956/raw/005115918fc6b07762d6b45fb7c517e75a0192ca/host-audit.jsonl"
+    },
+    "guardian_envelopes": {
+      "filename": "guardian-envelopes.jsonl",
+      "raw_sha256": "e90560d249fca37064b08e6d7825bfc152392c7100fccfbbf6f45e71e2793532",
+      "byte_length": 5277,
+      "raw_url": "https://gist.githubusercontent.com/AngeYobo/fe5cd44a864b4d54809cf1ded1e6d956/raw/43daf1c94455b684dcc7686a310f5832107d943a/guardian-envelopes.jsonl"
+    },
+    "host_events": {
+      "filename": "host-events.jsonl",
+      "raw_sha256": "6800989cdb3a3c4aef742f4ba8a159c5cf150bfaa89027d08fadf02a6495ff09",
+      "byte_length": 3311,
+      "raw_url": "https://gist.githubusercontent.com/AngeYobo/fe5cd44a864b4d54809cf1ded1e6d956/raw/209481a5dc71a29bae0a68aa5c7c1243087d548f/host-events.jsonl"
+    },
+    "proxy": {
+      "filename": "proxy.jsonl",
+      "raw_sha256": "f351882fd7f6d45854c897e1cc82cdc2b3151d353515e0a3f2b45d281fa84f11",
+      "byte_length": 3833,
+      "raw_url": "https://gist.githubusercontent.com/AngeYobo/fe5cd44a864b4d54809cf1ded1e6d956/raw/73cde1c51a942a01bf942b000f5941a63fec268d/proxy.jsonl"
+    }
+  },
+  "selection_file": "published-selection.json",
+  "selection_sha256": "a98252912bd9c41e214e4f0f30abf9caec5bb18eb9579d6d837e62cbee2afbd5",
+  "expected_report_sha256": "0adcd9fb15ebca72851bd5e6b5de1813cc783bd5f255ce88de6bce5125177277",
+  "expected_report_byte_length": 7831
+}

@@ -1,0 +1,5 @@
+{"sessionID":"demo-host-session","synthetic":true,"type":"session_open"}
+{"part":{"callID":"demo-call-first","sessionID":"demo-host-session","state":{"input":{"command":"printf DEMO_FIRST"},"metadata":{"exit":0},"output":"demo-output-body","status":"completed","time":{"end":1767225600300,"start":1767225600100}},"tool":"bash","type":"tool"},"sessionID":"demo-host-session","synthetic":true,"type":"tool_use"}
+{"sessionID":"demo-host-session","synthetic":true,"type":"step_finish"}
+{"sessionID":"demo-host-session","synthetic":true,"type":"step_start"}
+{"part":{"callID":"demo-call-main","sessionID":"demo-host-session","state":{"input":{"command":"printf DEMO_MAIN"},"metadata":{"exit":0},"output":"demo-output-body","status":"completed","time":{"end":1767225605200,"start":1767225600000}},"tool":"bash","type":"tool"},"sessionID":"demo-host-session","synthetic":true,"type":"tool_use"}

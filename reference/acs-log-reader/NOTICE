@@ -1,0 +1,17 @@
+VATE ACS Log Reader
+
+The reader, tests, replay wrapper, storage example and self-authored synthetic
+fixtures are provided under the Apache License 2.0 in LICENSE.
+
+The supported capture shapes were examined using AngeYobo's published capture
+in the OWASP Agent Control Standard discussion:
+https://github.com/GenAI-Security-Project/agent-control-standard/issues/435
+https://github.com/GenAI-Security-Project/agent-control-standard/issues/436
+https://gist.github.com/AngeYobo/fe5cd44a864b4d54809cf1ded1e6d956/3ed175e24f4f4c5078aeddf5a0e301a4efd77aba
+
+PUBLISHED-CAPTURE.json records references and raw hashes for that capture.
+The original capture files and upstream tools are not redistributed here.
+This folder's license does not relicense materials obtained from those links.
+
+fixtures/synthetic contains invented data created for this reader's examples
+and regression tests. It is not a copy of a host/Guardian execution capture.

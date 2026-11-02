@@ -1,0 +1,5 @@
+{"event":"received","method":"steps/toolCallRequest","rpc_id":"demo-request-main","synthetic":true,"t_wall":"2026-01-01T00:00:00.000Z"}
+{"event":"held","method":"steps/toolCallRequest","rpc_id":"demo-request-main","synthetic":true,"t_wall":"2026-01-01T00:00:00.001Z"}
+{"event":"forwarded","method":"steps/toolCallRequest","rpc_id":"demo-request-main","synthetic":true,"t_wall":"2026-01-01T00:00:08.000Z"}
+{"decision":"deny","event":"response","method":"steps/toolCallRequest","rpc_id":"demo-request-main","synthetic":true,"t_wall":"2026-01-01T00:00:08.132Z"}
+{"event":"client_gone","method":"steps/toolCallRequest","rpc_id":"demo-request-main","synthetic":true,"t_wall":"2026-01-01T00:00:08.133Z"}

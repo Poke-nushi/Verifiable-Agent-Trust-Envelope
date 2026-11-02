@@ -116,6 +116,13 @@ Its [package intake example](reference/recipient-inbox/PACKAGE-INTAKE.md) derive
 collection status from actual file reads and registration, keeping collection
 failure separate from missing records.
 
+To read ACS capture logs while preserving the host's effective decision and
+the Guardian's answer separately, use the
+[ACS Log Reader](reference/acs-log-reader/README.md). It retains unresolved
+action links and raw-file/line hashes. The folder includes synthetic regression
+examples, a pinned published-capture replay path and an optional Inbox history
+example.
+
 For a worked connection to another protocol's records, use the
 [MUSUBI set2 recipient sample](reference/musubi-set2-receiving-sample/README.md).
 It checks request bindings, replays the pinned settlement calculation, preserves
