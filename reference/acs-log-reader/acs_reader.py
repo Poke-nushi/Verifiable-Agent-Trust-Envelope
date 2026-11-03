@@ -262,6 +262,46 @@ def wall_order(first, second):
             'host_arrival_or_dispatch_order_proven': False}
 
 
+def guardian_sequence_numbers(records):
+    """Check the supplied log's optional sequence without repairing or sorting it."""
+    numbers, previous, reason = {}, None, None
+    for row, ref in records:
+        value = row.get('seq')
+        if type(value) is not int or not 0 <= value <= MAX_INTEGER:
+            reason = reason or ('MISSING_GUARDIAN_SEQUENCE' if 'seq' not in row else 'INVALID_GUARDIAN_SEQUENCE')
+            continue
+        numbers[ref['line']] = value
+        if previous is not None and value <= previous:
+            reason = reason or 'NON_INCREASING_GUARDIAN_SEQUENCE'
+        previous = value
+    return numbers, reason
+
+
+def guardian_log_order(request, hook, numbers, sequence_reason):
+    """Compare log observations, without associating a result with an action."""
+    unresolved = {'status': 'unresolved', 'reason': 'UNIQUE_SUPPORTED_OBSERVATIONS_REQUIRED'}
+    request_line = request['source']['line'] if request else None
+    result_line = hook['source']['line']
+    order = {'selected_request_source': request['source'] if request else None,
+             'selected_request_seq': numbers.get(request_line), 'result_seq': numbers.get(result_line),
+             'file_order': dict(unresolved), 'sequence_order': dict(unresolved),
+             'recorded_time_order': wall_order(None, None),
+             'scope': 'supplied_guardian_log_only', 'same_action_proven': False}
+    if request is None or not hook['supported']:
+        return order
+    order['file_order'] = {'status': 'observed_file_order',
+                           'relation': 'before' if result_line < request_line else 'after',
+                           'clock_comparison_required': False}
+    if sequence_reason is None:
+        order['sequence_order'] = {'status': 'observed_sequence_order',
+            'relation': 'before' if numbers[result_line] < numbers[request_line] else 'after',
+            'clock_comparison_required': False}
+    else:
+        order['sequence_order'] = {'status': 'unresolved', 'reason': sequence_reason}
+    order['recorded_time_order'] = wall_order(request['recorded_at'], hook['recorded_at'])
+    return order
+
+
 def assess(inputs, selection_raw, *, command_timestamps=None):
     need(type(inputs) is dict and set(inputs) == set(SOURCES), 'INVALID_INPUT_SET', 'inputs')
     if command_timestamps is not None:
@@ -417,6 +457,10 @@ def assess(inputs, selection_raw, *, command_timestamps=None):
     # Reused RPC IDs, even under another method/session, cannot establish a unique response association.
     all_target_requests = [r for r, _ in grows if r.get('direction') == 'request' and target in rpc_ids(r)]
     unique = request is not None and len(all_target_requests) == 1
+    sequence_numbers, sequence_reason = guardian_sequence_numbers(grows)
+    for hook in hooks:
+        hook['order_vs_selected_request'] = guardian_log_order(
+            request if unique else None, hook, sequence_numbers, sequence_reason)
     binding = {'status': 'matched_by_rpc_id' if h and d and unique else 'unresolved',
                'assurance': 'identifier_equality_with_receiver_selected_sessions_only', 'authenticated': False}
     fallback_match = {'status': 'matched_by_value' if h and negotiated and h['posture_source'] == 'negotiated'
@@ -441,7 +485,7 @@ def assess(inputs, selection_raw, *, command_timestamps=None):
             'not_assessed': ['signature', 'issuer_authority', 'clock_synchronization', 'log_completeness',
                              'independent_execution', 'execution_permission', 'retry_permission', 'acs_conformance'],
             'no_execution_ticket': True}
-    # Opt-in extension: legacy four-input reports keep their exact byte form.
+    # Opt-in extension: omitting timestamps adds no command-timestamp fields.
     if command_timestamps is not None:
         stamps = {}
         for name in COMMAND_TIMESTAMP_SOURCES:

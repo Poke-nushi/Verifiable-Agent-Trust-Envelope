@@ -21,7 +21,7 @@ exact plain dict with `command_start` and `command_end`, each immutable bytes
 or explicit `None`. These files contain one UTC timestamp, not JSON. If either
 CLI timestamp option is used, both sides require a path or their respective
 `--command-start-absent` / `--command-end-absent` flag. Omitting all timestamp
-options preserves the original four-input report, including its raw-byte form.
+options omits command timestamp sources, observations and comparisons.
 Each timestamp path option accepts one occurrence; repeated paths for the same
 side are rejected before any input files are read.
 
@@ -97,6 +97,49 @@ With no candidate responses, the group remains not_observed while the request
 reuse count and unresolved association remain visible. The result request
 and candidate response records remain visible, without choosing a pairing.
 
+### Guardian log order
+
+Every result hook in the selected ACS session has `order_vs_selected_request`.
+This compares that result notification with the receiver-selected Guardian
+tool-request observation; it does not select a result for that request.
+`selected_request_source` identifies the request's original line and hash.
+`result_seq` and `selected_request_seq` retain supported top-level `seq`
+values, or null when missing or unsupported.
+If no unique supported selected request can be used, including RPC ID reuse,
+both `selected_request_source` and `selected_request_seq` are null. This can
+occur even when `guardian_request.status` is `observed`; the request's own
+observation remains in `guardian_request`.
+
+With one supported selected request, no reuse of its RPC ID anywhere in the
+Guardian log, and a supported result hook with a unique RPC ID:
+
+- `file_order` records whether the result row is before or after the request
+  row in the supplied file.
+- `sequence_order` reports `observed_sequence_order` only when every supplied
+  Guardian row has a nonnegative integer-token `seq` no greater than
+  9007199254740991, strictly increasing in file order. Gaps are allowed.
+  Missing, invalid, repeated or decreasing sequence values leave this field
+  `unresolved`. The reader neither sorts the log nor repairs its sequence.
+- `recorded_time_order` compares Guardian `recorded_at` timestamps. Its signed
+  `delta_microseconds` is result minus selected request. Equal or reversed
+  clock readings do not change file or sequence order.
+
+File and sequence comparisons set `clock_comparison_required` to false.
+Without unique supported request/result observations, all three comparisons
+remain `unresolved`. Missing or inconsistent sequence metadata alone leaves
+the separate file and timestamp comparisons available. Within the reader's
+JSON bounds, invalid sequence metadata does not itself make the whole log
+invalid input.
+
+These are observations within the supplied Guardian log, identified by its
+file and line hashes. They do not authenticate the logger, establish collection
+completeness or actual network arrival, or bind either RPC to an execution.
+`same_action_proven` remains false and request-to-result/execution links remain
+`unresolved`. Hooks are compared separately; their order, timestamps and
+responses never choose one as the selected request's result.
+
+### Host tool observations
+
 Host tool observations retain reported status, exit code and tool interval.
 An outer tool_use event must contain an inner part.type of tool.
 An exact bash command-text hash match is only a candidate cue. No command or
@@ -114,6 +157,12 @@ about clock synchronization, whether a host received/applied a late decision,
 settlement versus dispatch, cancellation, or the moment of actual effects.
 Decision commitment and dispatch remain unknown. Event time is never used as
 receiver arrival time. A reversed reported tool interval is invalid input.
+
+`delta_microseconds` is a JSON integer. Consumers that read JSON numbers as
+binary64 floating-point values may round integers outside the safe range
+of -9007199254740991 to 9007199254740991. Use an integer-preserving JSON reader
+when exact values outside that range are needed. This applies to both the
+Guardian-to-host timestamp comparison and each hook's `recorded_time_order`.
 
 ### Optional command self-timestamps
 

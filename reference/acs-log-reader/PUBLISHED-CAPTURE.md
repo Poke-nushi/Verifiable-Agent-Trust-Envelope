@@ -49,8 +49,8 @@ copying JSON through an editor can change whitespace or line endings.
 
 ## Expected reading
 
-The output is 7831 bytes including the final LF, with SHA-256
-`0adcd9fb15ebca72851bd5e6b5de1813cc783bd5f255ce88de6bce5125177277`.
+The output is 9253 bytes including the final LF, with SHA-256
+`c129e1e41938ec7a8c37b8eb92e902a2cef095a6526520b2a7004e1ab74c6930`.
 This is a fixed reading of these four files:
 
 | Observation | What the reader retains |
@@ -58,8 +58,14 @@ This is a fixed reading of these four files:
 | Host fallback | The host reports a timeout and `proceed` / `proceeded`. The handshake reports a default timeout of 5000 ms. |
 | Original Guardian response | `deny`, recorded 3.132 seconds after the host fallback. This is a comparison of source timestamps, not proof of arrival or application at the host. |
 | Result hooks | Separate request IDs and their `allow` responses. They do not change the original request's decision. |
+| Guardian log order | Each result hook is compared with the selected request. Result RPC `d4442b9e-7738-4f6d-9e5c-b70ce0b11d9f` has sequence 7, before request sequence 9; the ordering comparison uses no clock values. The hook's association with that request remains unresolved. |
 | Execution and results | Request-to-execution and request-to-result links remain `unresolved`. Command-text equality is only a candidate cue. |
 | Dispatch and commitment | Unknown. A reported host tool interval may include time spent waiting for the Guardian. |
+
+This report includes per-hook order observations. The
+[earlier reading](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/blob/d3c17f1bc60fd1d3c367a6f944eaf03f0b2afdb7/reference/acs-log-reader/PUBLISHED-CAPTURE.md#expected-reading)
+remains pinned to its original reader revision; the four input files and their
+hashes are unchanged.
 
 The upstream fixture run recorded exit 1 with `Unexpected hook coverage`.
 Generating this reader report does not turn that run into a passing test. The

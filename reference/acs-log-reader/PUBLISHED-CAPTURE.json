@@ -30,6 +30,6 @@
   },
   "selection_file": "published-selection.json",
   "selection_sha256": "a98252912bd9c41e214e4f0f30abf9caec5bb18eb9579d6d837e62cbee2afbd5",
-  "expected_report_sha256": "0adcd9fb15ebca72851bd5e6b5de1813cc783bd5f255ce88de6bce5125177277",
-  "expected_report_byte_length": 7831
+  "expected_report_sha256": "c129e1e41938ec7a8c37b8eb92e902a2cef095a6526520b2a7004e1ab74c6930",
+  "expected_report_byte_length": 9253
 }

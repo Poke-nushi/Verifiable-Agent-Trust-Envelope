@@ -1,8 +1,10 @@
 # ACS Log Reader
 
-Read saved ACS 0.1.0 captures while keeping the host's effective decision
-separate from the Guardian's answer. The report preserves file and line hashes,
-result-hook responses, and unresolved links to execution records. An optional
+Read saved ACS 0.1.0 captures in the [supported log formats](INPUT-FORMATS.md),
+keeping the host's effective decision separate from the Guardian's answer.
+The report preserves file and line hashes,
+Guardian log order, result-hook responses, and unresolved links to execution
+records. An optional
 [Recipient Inbox](../recipient-inbox/README.md) example retains the originals
 and successive readings when more logs arrive.
 
@@ -32,11 +34,21 @@ they were not emitted by a running host or Guardian.
 | `host_effective_decision` | Host reports a timeout followed by negotiated `proceed` / `proceeded`. |
 | `guardian_decision` | Guardian reports `deny` for the original request. |
 | `result_hook_observations` | Result notifications have separate IDs and their own `allow` responses. |
+| `result_hook_observations[].order_vs_selected_request` | Result RPCs are recorded before the selected request. For `demo-result-main`, Guardian sequence 7 precedes 9; its recorded timestamp is 2.950 seconds earlier. |
 | `bindings.request_to_result` and `bindings.request_to_execution` | `unresolved`: the capture has no supported action reference. |
 | `timing` | Guardian response is recorded 3.132 seconds after the host fallback; host arrival, commitment and dispatch times remain unknown. |
 
 A result-hook `allow` never replaces the original request's decision. A late
 Guardian decision never overwrites the recorded host decision.
+
+Each result hook in the selected ACS session includes `order_vs_selected_request`.
+`file_order` describes positions in the supplied Guardian file. `sequence_order`
+uses its optional `seq` values, independently of clocks. `recorded_time_order`
+compares the two Guardian `recorded_at` timestamps, with result minus request
+in `delta_microseconds`. Missing or inconsistent sequence metadata leaves
+`sequence_order` unresolved; the file and timestamp observations remain available.
+All result hooks in the selected session are shown. Their order does not establish
+which result belongs to the selected request; `same_action_proven` remains false.
 
 ## Read your capture
 
@@ -87,7 +99,7 @@ The report retains each timestamp and its source hash and compares the supplied
 times with the host fallback and Guardian response. It preserves up to nine
 fractional digits; `delta_nanoseconds` values are decimal strings. Use
 `--command-end-absent`, for example, if only the start file has arrived.
-Omitting both timestamp options keeps the original report unchanged.
+Omitting both timestamp options leaves out the command timestamp fields.
 
 Command stamps remain separate from the host's exact dispatch or
 decision-commitment time. The files alone do not establish that the stamps
@@ -132,6 +144,8 @@ inputs, malformed JSON, conflicting/reused IDs, incorrect direction/method
 labels, numeric bounds, file handling, output identity and command comparison.
 They also cover optional timestamp precision, missing and invalid stamps,
 reversed reported order, source hashes and unchanged four-log reports.
+Guardian order tests cover missing, invalid, repeated and reset sequence values,
+disagreement with timestamps, and ambiguous request or result IDs.
 They require no network access or host/Guardian process.
 
 ## Interpret the result

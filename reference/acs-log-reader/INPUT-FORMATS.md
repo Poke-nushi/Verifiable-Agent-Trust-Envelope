@@ -45,6 +45,15 @@ its `params` contains the same `request_id`, a `timestamp`, a `metadata` object
 with `session_id`, and a `payload` object.
 Supported requests use `acs_version: "0.1.0"` in `params`.
 
+An optional top-level `seq` is a Guardian log sequence number. The reader uses
+nonnegative integer tokens up to 9007199254740991; booleans and decimal-token
+values are unsupported. Sequence order requires a supported `seq` on every row
+of the supplied Guardian file, including unknown methods, with values strictly
+increasing in file order. Gaps are allowed. Missing, invalid, repeated or
+decreasing values leave `sequence_order` unresolved rather than rejecting an
+otherwise readable log. File positions and recorded timestamps are reported
+separately. See [the order contract](CONTRACT.md#guardian-log-order).
+
 An original tool-request and its final response can look like this:
 
 ```jsonl
@@ -122,7 +131,7 @@ of one to nine digits. Offset times, leap seconds, hour 24, blank lines,
 additional text and surrounding whitespace are not accepted. Both files
 are invented observations for the synthetic example.
 
-Omit both options to use the original four-log reader. When using timestamp
+Omit both options to read only the four logs. When using timestamp
 inputs, explicitly mark any missing side with `--command-start-absent` or
 `--command-end-absent`. An empty, unreadable or malformed file is an input error.
 
