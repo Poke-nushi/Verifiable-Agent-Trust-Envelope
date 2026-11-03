@@ -5,7 +5,7 @@
   },
   "guardian_envelopes": {
     "path": "fixtures/synthetic/guardian-envelopes.jsonl",
-    "raw_sha256": "1fbd646a9060a367b4e6bfc5bc54794bd713dd1600f6f088a553a36aaec35bef"
+    "raw_sha256": "369a9272243277c9ae3f62dc0740fe3ade794e76ce123da615cc104d13dbcd00"
   },
   "host_events": {
     "path": "fixtures/synthetic/host-events.jsonl",
