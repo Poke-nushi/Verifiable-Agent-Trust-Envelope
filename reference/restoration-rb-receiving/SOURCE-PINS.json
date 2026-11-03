@@ -1,0 +1,57 @@
+{
+  "format_version": 1,
+  "scope": "reference source identities for the local RB record reader; sources are not fetched at runtime",
+  "digest_basis": "SHA-256 of raw source file bytes",
+  "upstream_repository": "https://github.com/probityai/agent-evidence-vectors",
+  "upstream_commit": "1177028f6276f439768ab7d02fb734054832612c",
+  "upstream_tag_at_comparison": "v0.31.2",
+  "sources": [
+    {
+      "url": "https://www.ietf.org/archive/id/draft-gilda-audit-restoration-evidence-00.txt",
+      "sha256": "0ae1b94c226cf85b006dfb34abf2180e9dcbda34ad30b9933067df37eafec745",
+      "bytes": 58293,
+      "download_url": "https://www.ietf.org/archive/id/draft-gilda-audit-restoration-evidence-00.txt"
+    },
+    {
+      "url": "https://github.com/probityai/agent-evidence-vectors/blob/1177028f6276f439768ab7d02fb734054832612c/vectors-restart-records/MANIFEST.json",
+      "sha256": "7a3cd31da92c7349f508b8225f032dd43d16cb983ea647ac0027586bed31a6d0",
+      "bytes": 52718,
+      "download_url": "https://raw.githubusercontent.com/probityai/agent-evidence-vectors/1177028f6276f439768ab7d02fb734054832612c/vectors-restart-records/MANIFEST.json"
+    },
+    {
+      "url": "https://github.com/probityai/agent-evidence-vectors/blob/1177028f6276f439768ab7d02fb734054832612c/profiles/restoration-evidence.md",
+      "sha256": "dc4d1d19ce3deaf50ab994222dc17d7c2cd4baceef5cddf32f2d744195a419d5",
+      "bytes": 6358,
+      "download_url": "https://raw.githubusercontent.com/probityai/agent-evidence-vectors/1177028f6276f439768ab7d02fb734054832612c/profiles/restoration-evidence.md"
+    },
+    {
+      "url": "https://github.com/probityai/agent-evidence-vectors/blob/1177028f6276f439768ab7d02fb734054832612c/spec/predicates/revocation-boundary.md",
+      "sha256": "ba4c1b5643a08f044669a852f6621ecbf98f7e08b1ef30cb9858523a5728f3e2",
+      "bytes": 3639,
+      "download_url": "https://raw.githubusercontent.com/probityai/agent-evidence-vectors/1177028f6276f439768ab7d02fb734054832612c/spec/predicates/revocation-boundary.md"
+    },
+    {
+      "url": "https://github.com/probityai/agent-evidence-vectors/blob/1177028f6276f439768ab7d02fb734054832612c/vectors-restart-records/check_vectors.py",
+      "sha256": "8ca8586de5766dbe99257ece5cb10115d76da0ce74232af9af78d596cc911c2c",
+      "bytes": 32652,
+      "download_url": "https://raw.githubusercontent.com/probityai/agent-evidence-vectors/1177028f6276f439768ab7d02fb734054832612c/vectors-restart-records/check_vectors.py"
+    },
+    {
+      "url": "https://github.com/probityai/agent-evidence-vectors/blob/1177028f6276f439768ab7d02fb734054832612c/packages/vocabulary/registry.json",
+      "sha256": "3ef95018e06cae376b02490782356429e295275de2528c5f0affa69779b69427",
+      "bytes": 53483,
+      "download_url": "https://raw.githubusercontent.com/probityai/agent-evidence-vectors/1177028f6276f439768ab7d02fb734054832612c/packages/vocabulary/registry.json"
+    },
+    {
+      "url": "https://github.com/probityai/agent-evidence-vectors/blob/1177028f6276f439768ab7d02fb734054832612c/packages/vocabulary/vocabulary.yaml",
+      "sha256": "1c5ff80bd97237a603afc402db692ffe5abe15e4a7f9eca13f20068ada347fdc",
+      "bytes": 119610,
+      "download_url": "https://raw.githubusercontent.com/probityai/agent-evidence-vectors/1177028f6276f439768ab7d02fb734054832612c/packages/vocabulary/vocabulary.yaml"
+    }
+  ],
+  "selected_registry_digest": {
+    "sha256": "1c5ff80bd97237a603afc402db692ffe5abe15e4a7f9eca13f20068ada347fdc",
+    "basis": "raw file bytes of packages/vocabulary/vocabulary.yaml",
+    "registry_index_field": "source_sha256"
+  }
+}
