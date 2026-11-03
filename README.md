@@ -123,6 +123,13 @@ action links and raw-file/line hashes. The folder includes synthetic regression
 examples, a pinned published-capture replay path and an optional Inbox history
 example.
 
+To compare a Revocation Boundary (RB) record with a receiver-selected target
+and local observations, use the
+[Restoration RB receiving example](reference/restoration-rb-receiving/README.md).
+It separates record consistency, target and plan binding, and observation
+consistency, while preserving the original inputs and incomplete counts.
+The folder includes synthetic examples and a controlled file-boundary capture.
+
 For a worked connection to another protocol's records, use the
 [MUSUBI set2 recipient sample](reference/musubi-set2-receiving-sample/README.md).
 It checks request bindings, replays the pinned settlement calculation, preserves

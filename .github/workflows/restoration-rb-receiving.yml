@@ -1,0 +1,44 @@
+name: Restoration RB receiving
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  receiving:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.14"]
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Test copied reader without site packages
+        run: |
+          isolated_dir=$(mktemp -d "$RUNNER_TEMP/rb-reader.XXXXXX")
+          cp -R reference/restoration-rb-receiving "$isolated_dir/reader"
+          python -E -s -S -B "$isolated_dir/reader/test_rb_receiving.py"
+          python -E -s -S -B -O "$isolated_dir/reader/test_rb_receiving.py"
+          python -E -s -S -B "$isolated_dir/reader/run_examples.py" --out "$isolated_dir/examples"
+      - name: Install existing VATE validation dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Test capture and Inbox from a source archive
+        run: |
+          archive_dir=$(mktemp -d "$RUNNER_TEMP/rb-source.XXXXXX")
+          output_dir=$(mktemp -d "$RUNNER_TEMP/rb-output.XXXXXX")
+          git archive HEAD | tar -x -C "$archive_dir"
+          python -E -s -S -B "$archive_dir/reference/restoration-rb-receiving/test_capture.py"
+          python -E -s -S -B -O "$archive_dir/reference/restoration-rb-receiving/test_capture.py"
+          python -E -s -S -B "$archive_dir/reference/restoration-rb-receiving/run_capture.py" --out "$output_dir/capture"
+          python -E -s -B "$archive_dir/reference/restoration-rb-receiving/run_examples.py" --with-inbox --out "$output_dir/inbox"
