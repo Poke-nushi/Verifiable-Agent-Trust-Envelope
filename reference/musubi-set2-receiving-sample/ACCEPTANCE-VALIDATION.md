@@ -1,7 +1,9 @@
 # Foreign acceptance and retention validation
 
 Local verification on 2026-10-24 for `hs51-war-bindings-v0-1` and repeated
-retention in the MUSUBI sample. The fixed VATE source files remain those in
+retention in the MUSUBI sample, using WAR 1.4.1 at `6b2f730`.
+Later 1.4.3 runs are recorded separately in [WAR143-VALIDATION.md](WAR143-VALIDATION.md).
+The fixed VATE source files remain those in
 `vate-source.json`; no Inbox core limits or native MUSUBI semantics changed.
 The external records, verifier and trust roots are identified in
 [ACCEPTANCE-CONTRACT.md](ACCEPTANCE-CONTRACT.md) and the example's source pins.
@@ -118,7 +120,12 @@ The repository's portable sample check passed the 27 base binding tests,
 capacity groups. Native replay is substituted only where the individual suite
 declares that scope; the separate full replay above uses the actual sandbox.
 
-## Reproduce the record and binding checks
+## Historical test setup (2026-10-24)
+
+The layout, counts and commands below describe the 2026-10-24 harness.
+For the current checkout, use the preparation and commands in
+[WAR143-VALIDATION.md](WAR143-VALIDATION.md#reproduce-the-portable-suites), which
+include both supported verifier sources.
 
 After saving the separately supplied originals, verifier and vectors described
 in the README, arrange the explicit evidence directory as follows. The two
@@ -129,15 +136,15 @@ context files are already distributed with this sample.
 | `sources/context/bundle.json` | `sample/originals/workers/hs-ledger/nenrin/musubi-v0/ca2a-companion-v0/pilot51/set2/bundle.json` |
 | `sources/context/audit-selection.json` | `sample/audit-selection.json` |
 | `sources/acceptance/hs51-musubi-2-A.json`, `hs51-musubi-2-B.json`, `hs51-aps-A.json`, `hs51-aps-B.json` | Four pinned originals linked from the README. |
-| `sources/war/verifier/war_verify.py` | Pinned verifier linked from the README. |
+| `sources/war/verifier/war_verify.py` | WAR 1.4.1 at `6b2f730`, as used by the historical harness. |
 | `sources/war/vectors/31-tsa-freetsa-verified.json` and `32-tsa-digicert-verified.json` | Pinned vectors linked from the README. |
 
 The test harness checks the raw source and fixture hashes before use. It does
 not download dependencies, create signatures or change those input files.
 
-The repository's MUSUBI CI job runs both suites on Linux with Python 3.11–3.14.
-Its `scripts/prepare_musubi_acceptance_tests.py` preparation step fetches the
-seven pinned external files over HTTPS and copies the two distributed context
+At that time, the MUSUBI CI job ran both suites on Linux with Python 3.11–3.14.
+Its `scripts/prepare_musubi_acceptance_tests.py` preparation step fetched the
+seven pinned external files over HTTPS and copied the two distributed context
 files into a new evidence directory, checking all nine raw hashes before writing.
 The test commands then use those saved files. They exercise record signatures
 and receiver bindings; native MUSUBI output is substituted in the binding suite.

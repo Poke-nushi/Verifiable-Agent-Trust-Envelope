@@ -16,8 +16,12 @@ import math
 import re
 
 PROFILE = 'hs51-war-bindings-v0-1'
-WAR_SOURCE_SHA256 = 'ac3ac35d9356cbb5f3371c19a2113ad03c1fd486c247a2ed586bdfdbdd32ae49'
-WAR_SOURCE_COMMIT = '6b2f730b81e0818826f274742d883c2b475d5227'
+WAR_SOURCE_SHA256 = 'a8a63a9fcfdcf578bfb256c222af22f189263aaec79af182b384008a68cec5dc'
+WAR_SOURCE_COMMIT = '6bb7d0b9246c3c535aba9c294d26181496d00614'
+LEGACY_WAR_SOURCE_SHA256 = 'ac3ac35d9356cbb5f3371c19a2113ad03c1fd486c247a2ed586bdfdbdd32ae49'
+LEGACY_WAR_SOURCE_COMMIT = '6b2f730b81e0818826f274742d883c2b475d5227'
+WAR_SOURCES = {WAR_SOURCE_SHA256: WAR_SOURCE_COMMIT,
+               LEGACY_WAR_SOURCE_SHA256: LEGACY_WAR_SOURCE_COMMIT}
 EXPECTED_KEYS = frozenset(('occurrence_id', 'request_sha256', 'execution_sha256',
                            'audit_sha256', 'checker_public_key_hex',
                            'producer_public_key_hex', 'criteria_sha256'))
@@ -216,10 +220,11 @@ def _criteria_rows(value):
     return result
 
 
-def evaluate(raw: bytes, expected: dict, roots: list[bytes], war) -> dict:
+def evaluate(raw: bytes, expected: dict, roots: list[bytes], war, *,
+             verifier_sha256: str = WAR_SOURCE_SHA256) -> dict:
     """Check one raw record against receiver-selected bindings and trust anchors.
 
-    The caller MUST verify WAR_SOURCE_SHA256 before importing ``war`` and run it
+    The caller MUST verify the selected supported source hash before importing ``war`` and run it
     with bounded resources and without network/home access. No source is loaded
     here. JSON numbers are restricted to safe integers; unsupported numeric
     semantics are rejected before upstream JCS or cryptographic processing.
@@ -228,8 +233,8 @@ def evaluate(raw: bytes, expected: dict, roots: list[bytes], war) -> dict:
         'profile': PROFILE, 'status': 'rejected', 'reason_codes': [], 'work_verdict': None,
         'raw_sha256': _sha(raw) if type(raw) is bytes else None,
         'checks': {}, 'declared': {}, 'verified_claims': {},
-        'provenance': {'required_war_source_sha256': WAR_SOURCE_SHA256,
-                       'required_war_source_commit': WAR_SOURCE_COMMIT,
+        'provenance': {'required_war_source_sha256': verifier_sha256,
+                       'required_war_source_commit': WAR_SOURCES.get(verifier_sha256) if type(verifier_sha256) is str else None,
                        'verifier_identity_check': 'caller_required'},
         'not_checked': ['audit_content_reassessment', 'organizational_independence',
                         'current_certificate_revocation', 'full_PKI_policy',
@@ -254,6 +259,8 @@ def evaluate(raw: bytes, expected: dict, roots: list[bytes], war) -> dict:
             raise _Stop(result['reason_codes'][0], status)
 
     try:
+        _need(type(verifier_sha256) is str and verifier_sha256 in WAR_SOURCES,
+              'unsupported_verifier_source', 'unavailable')
         doc = _object(_bounded_json(raw))
         record = _object(doc.get('record'))
         body = _object(record.get('receipt'))
@@ -377,6 +384,36 @@ def evaluate(raw: bytes, expected: dict, roots: list[bytes], war) -> dict:
         result['unsigned_sidecar_fields_ignored'] = ['producer'] if 'producer' in side else []
         result['provenance']['canonical_receipt_sha256'] = receipt_hash
         finish_checks()
+
+        # WAR 1.4.3 needs the stated producer key to derive independence. Use
+        # the receiver-selected native bindings, never an unverified incoming
+        # key mapping. Retain the received bytes and this derived input separately.
+        if verifier_sha256 == WAR_SOURCE_SHA256:
+            producer_id = producer['key_id']
+            producer_public = bytes.fromhex(expected['producer_public_key_hex'])
+            if producer_id in by_id:
+                entry = by_id[producer_id]
+                check('incoming_producer_key', entry.get('alg') == 'Ed25519'
+                      and _b64(entry.get('public_key_base64'), 32) == producer_public,
+                      'producer_key_mismatch')
+            check('producer_prime_order_key', war.key_is_canonical_prime_order(producer_public) is True,
+                  'producer_key_invalid')
+            check('distinct_party_keys', public != producer_public and key_id != producer_id,
+                  'party_key_collision')
+            finish_checks()
+            keyset = {'version': keyset['version'], 'keys': [
+                {'key_id': key_id, 'alg': 'Ed25519',
+                 'public_key_base64': base64.b64encode(public).decode('ascii')},
+                {'key_id': producer_id, 'alg': 'Ed25519',
+                 'public_key_base64': base64.b64encode(producer_public).decode('ascii')},
+            ]}
+            result['provenance']['war_key_input'] = keyset
+            result['provenance']['war_key_input_basis'] = 'receiver_selected_MUSUBI_bindings'
+            _need(callable(getattr(war, 'independence_of', None)), 'evaluator_unavailable', 'unavailable')
+            result['derived_independence'] = war.independence_of(parties, keyset, body.get('independence'))
+            check('derived_independence_matches', result['derived_independence'] == body.get('independence'),
+                  'independence_mismatch')
+            finish_checks()
 
         criteria_raw = _b64(doc.get('criteria_file_base64'), MAX_CRITERIA)
         check('criteria_raw_hash', _sha(criteria_raw) == expected['criteria_sha256'], 'criteria_hash_mismatch')
