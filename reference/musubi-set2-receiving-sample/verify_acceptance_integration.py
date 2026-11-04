@@ -18,7 +18,7 @@ import unittest
 from unittest.mock import patch
 
 import acceptance_adapter as adapter
-from acceptance_checks import evaluate
+from acceptance_checks import LEGACY_WAR_SOURCE_SHA256, evaluate
 from receiving import InputError, assess, decode, encoded, sha, validate_selection, make_summary
 from run_acceptance_example import ROOT, prepare_inputs
 
@@ -195,6 +195,37 @@ class IntegrationTests(unittest.TestCase):
             p = Path(tmp)/'war_verify.py'
             p.write_text('raise RuntimeError("not executed")\n')
             with self.assertRaises(InputError): adapter.prepare(self.s, self.o, p)
+
+    def test_selected_old_and_new_sources_cannot_be_interchanged(self):
+        new = EVIDENCE/'sources/war/verifier/war_verify.py'
+        old = EVIDENCE/'sources/war-legacy/verifier/war_verify.py'
+        with self.assertRaises(InputError): adapter.prepare(self.s, self.o, old)
+        self.s['acceptance_verification']['verifier_sha256'] = LEGACY_WAR_SOURCE_SHA256
+        with self.assertRaises(InputError): adapter.prepare(self.s, self.o, new)
+        job = adapter.prepare(self.s, self.o, old)
+        self.assertEqual(LEGACY_WAR_SOURCE_SHA256, job['input']['verifier_sha256'])
+
+    def test_result_from_another_verifier_cannot_attach(self):
+        for value in (LEGACY_WAR_SOURCE_SHA256, '0' * 64, None):
+            self.v = copy.deepcopy(self.verified)
+            self.v['results']['hs51-musubi-2-A:acceptance']['provenance']['required_war_source_sha256'] = value
+            self.assertEqual('unresolved', row(self.report(), 'A')['binding_status'])
+
+    def test_worker_rejects_selected_source_mismatch_before_execute(self):
+        import acceptance_worker
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            source = EVIDENCE/'sources/war/verifier/war_verify.py'
+            (folder/'war_verify.py').write_bytes(source.read_bytes())
+            job = adapter.prepare(self.s, self.o, source)
+            job['input']['verifier_sha256'] = LEGACY_WAR_SOURCE_SHA256
+            (folder/'input.json').write_bytes(encoded(job['input']))
+            with patch.object(acceptance_worker, '__file__', str(folder/'acceptance_worker.py')), \
+                 patch.object(acceptance_worker, 'evaluate') as evaluate_mock, \
+                 patch.object(sys, 'argv', ['acceptance_worker.py', str(folder/'input.json')]):
+                with self.assertRaisesRegex(ValueError, 'pin mismatch'):
+                    acceptance_worker.main()
+                evaluate_mock.assert_not_called()
 
     def test_worker_aggregates_internal_failure_and_recovery_keeps_error_exit(self):
         import acceptance_worker

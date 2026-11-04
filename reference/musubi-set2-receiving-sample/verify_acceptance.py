@@ -21,7 +21,7 @@ from unittest.mock import patch
 
 from acceptance_checks import (EXPECTED_KEYS, MAX_CRITERIA, MAX_DEPTH, MAX_RAW,
                                MAX_ROOTS, MAX_STRING, MAX_TOKEN, MAX_TOKENS,
-                               PROFILE, WAR_SOURCE_SHA256, evaluate)
+                               PROFILE, WAR_SOURCE_SHA256, LEGACY_WAR_SOURCE_SHA256, evaluate)
 from receiving import decode as receiving_decode
 
 PINS = {
@@ -49,9 +49,9 @@ def _b64(raw):
     return base64.b64encode(raw).decode('ascii')
 
 
-def _load_pinned_source(path):
+def _load_pinned_source(path, expected_hash=WAR_SOURCE_SHA256):
     source = path.read_bytes()
-    if _sha(source) != WAR_SOURCE_SHA256:
+    if _sha(source) != expected_hash:
         raise ValueError('WAR source does not match the approved source pin')
     module = ModuleType('pinned_hs51_war')
     module.__file__ = str(path)
@@ -145,6 +145,56 @@ class AcceptanceTests(unittest.TestCase):
         result = self.run_case(raw=self.b_raw, expected=self.expected['hs51-musubi-2-B'],
                                status='verified', work_verdict='fail')
         self.assertTrue(all(result['checks'].values()))
+
+    def test_new_WAR_receives_selected_keys_without_changing_original(self):
+        before = copy.deepcopy(self.a)
+        result = self.run_case(raw=self.a_raw, status='verified', work_verdict='pass')
+        self.assertEqual(before, self.a)
+        self.assertEqual(1, len(self.a['keys']['keys']))
+        self.assertEqual('independent', result['declared']['independence'])
+        self.assertEqual('independent', result['derived_independence'])
+        keys = result['provenance']['war_key_input']['keys']
+        self.assertEqual(2, len(keys))
+        self.assertEqual(self.expected_a['producer_public_key_hex'], keys[1]['key_id'])
+        self.assertEqual(bytes.fromhex(self.expected_a['producer_public_key_hex']),
+                         base64.b64decode(keys[1]['public_key_base64'], validate=True))
+        self.assertEqual(WAR_SOURCE_SHA256, result['provenance']['required_war_source_sha256'])
+
+    def test_matching_supplied_producer_key_verifies(self):
+        doc = copy.deepcopy(self.a)
+        doc['keys']['keys'].append(copy.deepcopy(self.baseline['provenance']['war_key_input']['keys'][1]))
+        result = self.run_case(doc=doc, status='verified', work_verdict='pass')
+        self.assertEqual(self.baseline['provenance']['war_key_input'], result['provenance']['war_key_input'])
+
+    def test_supplied_producer_key_cannot_override_selected_key(self):
+        for public in (bytes.fromhex(self.expected_a['checker_public_key_hex']), bytes(range(32))):
+            doc = copy.deepcopy(self.a)
+            doc['keys']['keys'].append({'key_id': self.expected_a['producer_public_key_hex'],
+                                       'alg': 'Ed25519', 'public_key_base64': _b64(public)})
+            self.run_case(doc=doc, code='producer_key_mismatch')
+
+    def test_duplicate_producer_key_is_rejected_before_selection(self):
+        doc = copy.deepcopy(self.a)
+        key = self.baseline['provenance']['war_key_input']['keys'][1]
+        doc['keys']['keys'].extend([key, key])
+        self.run_case(doc=doc, code='checker_keyset_ambiguous')
+
+    def test_legacy_WAR_remains_explicit_and_does_not_rewrite_its_key_input(self):
+        legacy = _load_pinned_source(EVIDENCE_ROOT/'sources/war-legacy/verifier/war_verify.py',
+                                     LEGACY_WAR_SOURCE_SHA256)
+        for raw, case, verdict in ((self.a_raw, 'A', 'pass'), (self.b_raw, 'B', 'fail')):
+            result = evaluate(raw, self.expected['hs51-musubi-2-' + case], self.roots, legacy,
+                              verifier_sha256=LEGACY_WAR_SOURCE_SHA256)
+            self.assertEqual(('verified', verdict), (result['status'], result['work_verdict']))
+            self.assertEqual(LEGACY_WAR_SOURCE_SHA256, result['provenance']['required_war_source_sha256'])
+            self.assertNotIn('war_key_input', result['provenance'])
+            self.assertNotIn('derived_independence', result)
+
+    def test_unknown_source_selection_cannot_verify(self):
+        for selected in ('0' * 64, None, []):
+            result = evaluate(self.a_raw, self.expected_a, self.roots, self.war, verifier_sha256=selected)
+            self.assertEqual('unavailable', result['status'])
+            self.assertEqual(['unsupported_verifier_source'], result['reason_codes'])
 
     def test_APS_same_audit_cannot_fill_MUSUBI_A(self):
         result = self.run_case(doc=self.aps_a, code='request_binding_mismatch')

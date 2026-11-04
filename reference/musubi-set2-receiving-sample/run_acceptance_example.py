@@ -10,6 +10,7 @@ import sys
 from types import SimpleNamespace
 
 from acceptance_adapter import PROFILE, VERIFIER_SHA256
+from acceptance_checks import WAR_SOURCES
 from prepare_environment import ROOT, check_environment, check_vate
 from receiving import (SavedOutputError, decode, encoded, failure_result, need, now,
                        read, run, sha, verified_files, write_json)
@@ -26,8 +27,10 @@ ROOT_HASHES = ['a6379e7cecc05faa3cbf076013d745e327bbbaa38c0b9af22469d4701d18aabc
                '552f7bdcf1a7af9e6ce672017f4f12abf77240c78e761ac203d1d9d20ac89988']
 
 
-def prepare_inputs(acceptance_dir, tsa_roots, output):
+def prepare_inputs(acceptance_dir, tsa_roots, output, *, verifier_sha256=VERIFIER_SHA256):
     """No downloads. The example's pins are independent of the supplied records."""
+    need(type(verifier_sha256) is str and verifier_sha256 in WAR_SOURCES,
+         'unsupported acceptance verifier source')
     manifest = decode(read(ROOT/'sample', 'audit-manifest.json'))
     originals = verified_files(ROOT/'sample/originals', manifest['files'])
     rows = copy.deepcopy(manifest['files'])
@@ -53,7 +56,7 @@ def prepare_inputs(acceptance_dir, tsa_roots, output):
                      'basis': 'receiver_selected_fixed_WAR_vector_31_32_trust_anchor'})
     selection.update(assessment_time=now(), acceptance_binding_profile=PROFILE,
                      question='Verify signed foreign acceptance for the selected A/B occurrences and preserve earlier assessments.',
-                     acceptance_verification={'verifier_sha256': VERIFIER_SHA256, 'tsa_roots': selected_roots})
+                     acceptance_verification={'verifier_sha256': verifier_sha256, 'tsa_roots': selected_roots})
     for r in selection['requirements']:
         if r['kind'] == 'acceptance' and r['required']:
             r.update(files=['foreign-acceptance/' + r['occurrence_id'] + '.json'],
@@ -74,13 +77,15 @@ def example(args, completed):
     need(Path(sys.prefix).resolve() == environment/'venv', 'run with prepared environment/venv/bin/python -B')
     check_environment(environment)
     check_vate(args.vate_root)
-    need(sha(read(args.acceptance_verifier.parent, args.acceptance_verifier.name)) == VERIFIER_SHA256,
+    verifier_sha256 = sha(read(args.acceptance_verifier.parent, args.acceptance_verifier.name))
+    need(verifier_sha256 in WAR_SOURCES,
          'acceptance verifier source mismatch')
     output = args.output.resolve()
     need(not output.is_relative_to(ROOT) and not output.is_relative_to(environment),
          'put results outside sample and prepared runtime')
     output.mkdir(parents=True, exist_ok=False)
-    selection, originals = prepare_inputs(args.acceptance_dir, args.tsa_roots, output/'intake')
+    selection, originals = prepare_inputs(args.acceptance_dir, args.tsa_roots, output/'intake',
+                                          verifier_sha256=verifier_sha256)
     audit_example(args.vate_root, environment, output/'history', completed)
     previous = output/'history/audits/RESULT.json'
     saved = {name: read(output/'history'/name, 'assessment.json') for name in ('baseline', 'audits')}

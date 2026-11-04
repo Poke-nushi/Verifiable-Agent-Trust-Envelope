@@ -6,9 +6,10 @@ from pathlib import Path
 import re
 
 from receiving import decode, encoded, need, read, sha
+from acceptance_checks import WAR_SOURCE_SHA256, WAR_SOURCES
 
 PROFILE = 'hs51-war-bindings-v0-1'
-VERIFIER_SHA256 = 'ac3ac35d9356cbb5f3371c19a2113ad03c1fd486c247a2ed586bdfdbdd32ae49'
+VERIFIER_SHA256 = WAR_SOURCE_SHA256
 ROOT = Path(__file__).resolve().parent
 
 
@@ -17,7 +18,8 @@ def validate(s, originals):
         return
     need(s['acceptance_binding_profile'] == PROFILE, 'unsupported acceptance binding profile')
     config = s['acceptance_verification']
-    need(config['verifier_sha256'] == VERIFIER_SHA256, 'unsupported acceptance verifier source')
+    need(type(config['verifier_sha256']) is str and config['verifier_sha256'] in WAR_SOURCES,
+         'unsupported acceptance verifier source')
     roots = config['tsa_roots']
     need(type(roots) is list and len(roots) <= 8, 'TSA root count bound')
     names = set()
@@ -65,8 +67,8 @@ def prepare(s, originals, verifier_path):
     validate(s, originals)
     need(verifier_path is not None, 'selected acceptance profile requires --acceptance-verifier')
     source = read(verifier_path.parent, verifier_path.name, 256*1024)
-    need(sha(source) == VERIFIER_SHA256, 'acceptance verifier source pin mismatch')
     config = s['acceptance_verification']
+    need(sha(source) == config['verifier_sha256'], 'acceptance verifier source pin mismatch')
     items = []
     for r in s['requirements']:
         if r['kind'] != 'acceptance' or not r['required'] or len(r['files']) != 1:
@@ -78,7 +80,7 @@ def prepare(s, originals, verifier_path):
             continue
         items.append({'id': r['id'], 'expected': expected,
                       'raw_base64': base64.b64encode(originals[r['files'][0]]).decode('ascii')})
-    return {'input': {'profile': PROFILE, 'items': items,
+    return {'input': {'profile': PROFILE, 'items': items, 'verifier_sha256': config['verifier_sha256'],
                      'tsa_roots_base64': [base64.b64encode(originals[r['path']]).decode('ascii')
                                           for r in config['tsa_roots']]},
             'sources': {'war_verify.py': source,
@@ -110,7 +112,10 @@ def bind(s, originals, records, verification):
             continue
         result = results.get(r['id'])
         if (type(result) is not dict or result.get('expected') != expected
-                or result.get('raw_sha256') != sha(originals[r['files'][0]])):
+                or result.get('raw_sha256') != sha(originals[r['files'][0]])
+                or type(result.get('provenance')) is not dict
+                or result['provenance'].get('required_war_source_sha256')
+                != s['acceptance_verification']['verifier_sha256']):
             r.update(binding_status='unresolved', reason='acceptance_evaluator_unavailable')
             continue
         r['foreign_acceptance'] = result

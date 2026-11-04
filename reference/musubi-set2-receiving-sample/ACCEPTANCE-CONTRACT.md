@@ -23,13 +23,19 @@ MUSUBI occurrence; A cannot fill B or C.
 
 ## Verifier and execution
 
-The supported external verifier is
-[work-acceptance-record at `6b2f730`](https://github.com/maximusrufus/work-acceptance-record/blob/6b2f730b81e0818826f274742d883c2b475d5227/verifier/war_verify.py),
-with raw SHA-256
-`ac3ac35d9356cbb5f3371c19a2113ad03c1fd486c247a2ed586bdfdbdd32ae49`.
-Supply it explicitly with `receiving.py --acceptance-verifier`; the sample
-does not download, install or bundle that source. A differing source is refused
-before execution.
+Select one exact Work Acceptance Record verifier in
+`acceptance_verification.verifier_sha256`:
+
+| WAR profile | Source | Raw SHA-256 |
+| --- | --- | --- |
+| 1.4.3 | [`6bb7d0b`](https://github.com/maximusrufus/work-acceptance-record/blob/6bb7d0b9246c3c535aba9c294d26181496d00614/verifier/war_verify.py) | `a8a63a9fcfdcf578bfb256c222af22f189263aaec79af182b384008a68cec5dc` |
+| 1.4.1, retained for reproduction | [`6b2f730`](https://github.com/maximusrufus/work-acceptance-record/blob/6b2f730b81e0818826f274742d883c2b475d5227/verifier/war_verify.py) | `ac3ac35d9356cbb5f3371c19a2113ad03c1fd486c247a2ed586bdfdbdd32ae49` |
+
+Supply the selected source with `receiving.py --acceptance-verifier`. Both the
+receiver and worker check its bytes against that selection before execution.
+Results from another verifier pin cannot fill the selected requirement.
+The sample does not download, install or bundle the verifier. The example
+selects the pin matching the explicitly supplied supported source.
 
 The adapter copies the pinned verifier and its own wrapper into the existing
 macOS sandbox. It uses the prepared Python runtime, denies networking and
@@ -39,6 +45,26 @@ findings are retained with the assessment. Timeout, failed sandbox or malformed
 worker output leaves the record unassessed and reports an evaluator error.
 Portable checks exercise parsing, cryptography, binding and storage; full
 native replay requires macOS.
+
+## WAR 1.4.3 key input
+
+For 1.4.3, the adapter builds a two-key input from the selected checker and
+producer bindings. The checker key comes from the verified criteria commitment;
+the producer key comes from the verified execution receipt. The received
+checker key must match the selected checker. An omitted producer key is supplied
+from that execution receipt; a supplied contradictory producer key or duplicate
+key ID is rejected. The two selected party keys must be distinct.
+
+The original acceptance file remains unchanged. The derived key input is saved
+as `provenance.war_key_input`, alongside `selected_bindings` and the verifier
+source identity. `declared.independence` retains the signed claim;
+`derived_independence` records the selected WAR rule's result. These are key/name
+checks, not an assessment of organizational independence.
+
+Selections of 1.4.1 retain the earlier incoming-key evaluation path. Re-evaluate
+with a new selection and a new assessment to use 1.4.3; retain the earlier
+assessment with its original pin. The [1.4.3 validation](WAR143-VALIDATION.md)
+and [earlier validation](ACCEPTANCE-VALIDATION.md) describe their separate runs.
 
 ## Checked content
 
