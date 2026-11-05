@@ -444,6 +444,7 @@ jobs:
         run: |
           npm run ts:check
           npm run ts:test
+          node --test reference/border-receiving-cli/test_receive.mjs
           npm audit --audit-level=moderate
 
       - name: Check whitespace
