@@ -1,0 +1,31 @@
+name: UIBC evidence receiving
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reader:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python: ["3.11", "3.14"]
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Run copied standalone reader without site packages
+        run: |
+          isolated_dir=$(mktemp -d "$RUNNER_TEMP/uibc-reader.XXXXXX")
+          cp -R reference/uibc-receiving-example "$isolated_dir/reader"
+          python -S -B -m unittest discover -s "$isolated_dir/reader" -p 'test_*.py' -v
+          python -S -B "$isolated_dir/reader/run_examples.py"
