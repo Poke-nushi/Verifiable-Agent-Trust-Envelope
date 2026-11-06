@@ -33,8 +33,10 @@ AuthZEN implementation results.
 
 Use the commands in [README.md](README.md) to repeat the package checks.
 The [GitHub workflow](../../.github/workflows/authzen-receipt-vectors.yml)
-defines Linux runs for Python 3.11 and 3.14; those runs have not been executed
-for this candidate. Local results do not establish Linux behavior.
+passed fixed-input replay and all 22 tests on Ubuntu with CPython 3.11.18 and
+3.14.10 in [run 42225782073](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/actions/runs/42225782073),
+using commit
+[`bd4a473`](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/commit/bd4a473972c7eb82d5f66b6554b43e19ba2ed1fd).
 
 No live AuthZEN PDP or PEP was exercised. Fresh PDP evaluation, PEP atomic
 reservation and signed receipt registration remain separate integration checks.
