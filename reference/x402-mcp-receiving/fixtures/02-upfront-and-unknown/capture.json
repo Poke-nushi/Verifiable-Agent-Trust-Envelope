@@ -1,0 +1,65 @@
+{
+  "carrier": "return",
+  "client_kind": "sync",
+  "context": {
+    "attempt_id": "02-upfront-and-unknown",
+    "operation_id": "synthetic-operation",
+    "server_id": "synthetic-server"
+  },
+  "exception_type": null,
+  "export_profile": "local-x402-python-mcp-export-v1",
+  "local_observations": {
+    "client_recovered": null,
+    "payment_phase": "before_handler",
+    "reapproval": "not_recorded"
+  },
+  "origin": "synthetic_fixture",
+  "request_sha256": "5f124f8d2f8e92843e2a7b6d57da48fd9d377ddf74ff7009a7ed8fef2cdfb9fe",
+  "result": {
+    "content": [
+      {
+        "text": "Payment metering failed",
+        "type": "text"
+      },
+      {
+        "text": "Payment cancellation outcome unknown",
+        "type": "text"
+      }
+    ],
+    "is_error": true,
+    "payment_made": true,
+    "payment_response": {
+      "amount": "1000",
+      "network": "eip155:84532",
+      "success": true,
+      "transaction": "synthetic-deposit-not-a-real-transaction"
+    },
+    "raw_result": {
+      "content": [
+        {
+          "text": "Payment metering failed",
+          "type": "text"
+        },
+        {
+          "text": "Payment cancellation outcome unknown",
+          "type": "text"
+        }
+      ],
+      "is_error": true,
+      "meta": {
+        "x402/payment-response": {
+          "amount": "1000",
+          "network": "eip155:84532",
+          "success": true,
+          "transaction": "synthetic-deposit-not-a-real-transaction"
+        }
+      },
+      "structured_content": null
+    }
+  },
+  "sdk": {
+    "package": "x402",
+    "source_commit": "2ef9f3872fbc0cfc93b1143f26ed668d13a7725e",
+    "version": "2.27.0"
+  }
+}

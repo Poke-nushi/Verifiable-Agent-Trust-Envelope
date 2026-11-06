@@ -116,6 +116,12 @@ Its [package intake example](reference/recipient-inbox/PACKAGE-INTAKE.md) derive
 collection status from actual file reads and registration, keeping collection
 failure separate from missing records.
 
+To retain x402 MCP results when cancellation is unknown or payment reapproval
+is declined, use the [x402 MCP receiving example](reference/x402-mcp-receiving/README.md).
+It keeps receipt observations, tool errors and local recovery claims separate,
+with synthetic examples, saved fixed-SDK test captures and an Inbox replay that
+preserves successive attempts.
+
 To read ACS capture logs while preserving the host's effective decision and
 the Guardian's answer separately, use the
 [ACS Log Reader](reference/acs-log-reader/README.md). It retains unresolved

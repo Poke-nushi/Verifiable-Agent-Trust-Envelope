@@ -1,0 +1,57 @@
+{
+  "carrier": "return",
+  "client_kind": "sync",
+  "context": {
+    "attempt_id": "application-call-001",
+    "operation_id": "sdk-intake-04-success-control",
+    "server_id": "local-sdk-test-server"
+  },
+  "exception_type": null,
+  "export_profile": "local-x402-python-mcp-export-v1",
+  "local_observations": {
+    "client_recovered": false,
+    "payment_phase": "unknown",
+    "reapproval": "not_recorded"
+  },
+  "origin": "retained_sdk_export",
+  "request_sha256": "e34997e7cc485e4259f9c0d7e156863314b8ee197b06f4dcb88f4e038215f9e5",
+  "result": {
+    "content": [
+      {
+        "text": "local SDK control output",
+        "type": "text"
+      }
+    ],
+    "is_error": false,
+    "payment_made": true,
+    "payment_response": {
+      "amount": "1000",
+      "network": "x402:cash",
+      "success": true,
+      "transaction": "local-test-receipt-04-success-control"
+    },
+    "raw_result": {
+      "content": [
+        {
+          "text": "local SDK control output",
+          "type": "text"
+        }
+      ],
+      "is_error": false,
+      "meta": {
+        "x402/payment-response": {
+          "amount": "1000",
+          "network": "x402:cash",
+          "success": true,
+          "transaction": "local-test-receipt-04-success-control"
+        }
+      },
+      "structured_content": null
+    }
+  },
+  "sdk": {
+    "package": "x402",
+    "source_commit": "2ef9f3872fbc0cfc93b1143f26ed668d13a7725e",
+    "version": "2.27.0"
+  }
+}

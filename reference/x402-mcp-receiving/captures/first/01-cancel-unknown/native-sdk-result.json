@@ -1,0 +1,30 @@
+{
+  "content": [
+    {
+      "text": "Payment metering failed",
+      "type": "text"
+    },
+    {
+      "text": "Payment cancellation outcome unknown",
+      "type": "text"
+    }
+  ],
+  "is_error": true,
+  "payment_made": true,
+  "payment_response": null,
+  "raw_result": {
+    "content": [
+      {
+        "text": "Payment metering failed",
+        "type": "text"
+      },
+      {
+        "text": "Payment cancellation outcome unknown",
+        "type": "text"
+      }
+    ],
+    "is_error": true,
+    "meta": {},
+    "structured_content": null
+  }
+}

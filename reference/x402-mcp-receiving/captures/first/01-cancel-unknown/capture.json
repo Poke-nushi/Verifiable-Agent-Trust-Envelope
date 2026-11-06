@@ -1,0 +1,53 @@
+{
+  "carrier": "return",
+  "client_kind": "sync",
+  "context": {
+    "attempt_id": "application-call-001",
+    "operation_id": "sdk-intake-01-cancel-unknown",
+    "server_id": "local-sdk-test-server"
+  },
+  "exception_type": null,
+  "export_profile": "local-x402-python-mcp-export-v1",
+  "local_observations": {
+    "client_recovered": false,
+    "payment_phase": "unknown",
+    "reapproval": "not_recorded"
+  },
+  "origin": "retained_sdk_export",
+  "request_sha256": "ce8ff9f0e3d9ab30f518560f9a4a8c770e7750d7e6ced6c90ef2344f723ca733",
+  "result": {
+    "content": [
+      {
+        "text": "Payment metering failed",
+        "type": "text"
+      },
+      {
+        "text": "Payment cancellation outcome unknown",
+        "type": "text"
+      }
+    ],
+    "is_error": true,
+    "payment_made": true,
+    "payment_response": null,
+    "raw_result": {
+      "content": [
+        {
+          "text": "Payment metering failed",
+          "type": "text"
+        },
+        {
+          "text": "Payment cancellation outcome unknown",
+          "type": "text"
+        }
+      ],
+      "is_error": true,
+      "meta": {},
+      "structured_content": null
+    }
+  },
+  "sdk": {
+    "package": "x402",
+    "source_commit": "2ef9f3872fbc0cfc93b1143f26ed668d13a7725e",
+    "version": "2.27.0"
+  }
+}

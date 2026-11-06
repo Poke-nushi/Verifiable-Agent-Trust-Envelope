@@ -1,0 +1,64 @@
+{
+  "carrier": "return",
+  "client_kind": "sync",
+  "context": {
+    "attempt_id": "application-call-001",
+    "operation_id": "sdk-intake-03-reapproval-return",
+    "server_id": "local-sdk-test-server"
+  },
+  "exception_type": null,
+  "export_profile": "local-x402-python-mcp-export-v1",
+  "local_observations": {
+    "client_recovered": true,
+    "payment_phase": "unknown",
+    "reapproval": "denied"
+  },
+  "origin": "retained_sdk_export",
+  "request_sha256": "a8fe51377a8e55e56591cbbd4fe2aefd0a73fb15de2daa0f3125e95aa17195df",
+  "result": {
+    "content": [
+      {
+        "text": "{\"x402Version\": 2, \"error\": \"local_test_correction_required\", \"resource\": {\"url\": \"mcp://tool/sdk_intake_tool\", \"description\": \"Tool: sdk_intake_tool\", \"mimeType\": \"application/json\"}, \"accepts\": [{\"scheme\": \"cash\", \"network\": \"x402:cash\", \"asset\": \"USD\", \"amount\": \"1000\", \"payTo\": \"test-recipient-no-wallet\", \"maxTimeoutSeconds\": 300, \"extra\": {}}]}",
+        "type": "text"
+      }
+    ],
+    "is_error": true,
+    "payment_made": true,
+    "payment_response": null,
+    "raw_result": {
+      "content": [
+        {
+          "text": "{\"x402Version\": 2, \"error\": \"local_test_correction_required\", \"resource\": {\"url\": \"mcp://tool/sdk_intake_tool\", \"description\": \"Tool: sdk_intake_tool\", \"mimeType\": \"application/json\"}, \"accepts\": [{\"scheme\": \"cash\", \"network\": \"x402:cash\", \"asset\": \"USD\", \"amount\": \"1000\", \"payTo\": \"test-recipient-no-wallet\", \"maxTimeoutSeconds\": 300, \"extra\": {}}]}",
+          "type": "text"
+        }
+      ],
+      "is_error": true,
+      "meta": {},
+      "structured_content": {
+        "accepts": [
+          {
+            "amount": "1000",
+            "asset": "USD",
+            "extra": {},
+            "maxTimeoutSeconds": 300,
+            "network": "x402:cash",
+            "payTo": "test-recipient-no-wallet",
+            "scheme": "cash"
+          }
+        ],
+        "error": "local_test_correction_required",
+        "resource": {
+          "description": "Tool: sdk_intake_tool",
+          "mimeType": "application/json",
+          "url": "mcp://tool/sdk_intake_tool"
+        },
+        "x402Version": 2
+      }
+    }
+  },
+  "sdk": {
+    "package": "x402",
+    "source_commit": "2ef9f3872fbc0cfc93b1143f26ed668d13a7725e",
+    "version": "2.27.0"
+  }
+}

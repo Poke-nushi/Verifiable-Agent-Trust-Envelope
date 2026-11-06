@@ -1,0 +1,93 @@
+{
+  "wheel_sha256": "df76cac8ca44c6d73896f1759547f66acb06918f1f7da4a46836021f7f79f7f5",
+  "files": [
+    {
+      "path": "python/x402/mcp/README.md",
+      "present_in_wheel": true,
+      "sha256": "783541334ee86e7ae7a75467ae1d9adbf60ee1066b7dec83df1b732c99a41d1f",
+      "matches_fixed_source": false
+    },
+    {
+      "path": "python/x402/mcp/client.py",
+      "present_in_wheel": true,
+      "sha256": "a702af50477b09f63d7163664c4a254c342ed4272be19f90196b098f1c7a09bf",
+      "matches_fixed_source": false
+    },
+    {
+      "path": "python/x402/mcp/client_async.py",
+      "present_in_wheel": true,
+      "sha256": "73870ce2843140d2a8efc8815d1c2d99c0c8fa0a1a41982657cfc28e61764481",
+      "matches_fixed_source": false
+    },
+    {
+      "path": "python/x402/mcp/server.py",
+      "present_in_wheel": true,
+      "sha256": "deefbfea982430aba861f680fc7e1e5e2aeb23cd794d5850af0994e8c8045913",
+      "matches_fixed_source": false
+    },
+    {
+      "path": "python/x402/mcp/server_async.py",
+      "present_in_wheel": true,
+      "sha256": "86fc1903d46c322735cdbf4c8e4687eec895d7dd9402b1c4156f0f79290886e3",
+      "matches_fixed_source": false
+    },
+    {
+      "path": "python/x402/mcp/server_sync.py",
+      "present_in_wheel": true,
+      "sha256": "9cd85414f44c0ea0a688c412390fd160b8835eee75921f4b9d9bc1d36f07f2f6",
+      "matches_fixed_source": false
+    },
+    {
+      "path": "python/x402/mcp/types.py",
+      "present_in_wheel": true,
+      "sha256": "7660a51836e0a222c580b72b736d152b4abea32236b94cbc45ddbd268af632e7",
+      "matches_fixed_source": false
+    },
+    {
+      "path": "python/x402/mcp/utils.py",
+      "present_in_wheel": true,
+      "sha256": "48442b181ff66a29efac1d46aa80799d521d7863fe92839705646dc8bf479216",
+      "matches_fixed_source": false
+    },
+    {
+      "path": "python/x402/tests/unit/mcp/test_client_timeout.py",
+      "present_in_wheel": false
+    },
+    {
+      "path": "python/x402/tests/unit/mcp/test_server_wrappers.py",
+      "present_in_wheel": false
+    },
+    {
+      "path": "python/x402/pyproject.toml",
+      "present_in_wheel": false
+    },
+    {
+      "path": "python/x402/payment_flow.py",
+      "present_in_wheel": true,
+      "sha256": "81d72369fd93791c73d3e55775783b2ecd1faa82ff62df9b2459f26f81729a1a",
+      "matches_fixed_source": true
+    },
+    {
+      "path": "python/x402/client_base.py",
+      "present_in_wheel": true,
+      "sha256": "a1fd11f2f25d9314a58676be1af7953d0b9ba75e6278ab0f4187f2e6364a9bd0",
+      "matches_fixed_source": true
+    },
+    {
+      "path": "python/x402/schemas/hooks.py",
+      "present_in_wheel": true,
+      "sha256": "ef17cc1dccc761683e58c092fbd28a3ee7178d078c5a9b64b3064b053ea2b441",
+      "matches_fixed_source": true
+    },
+    {
+      "path": "python/x402/schemas/responses.py",
+      "present_in_wheel": true,
+      "sha256": "4eddbb49611af8c4ab9ed92d7c6d1ebbe96731ae39d23f05733f73819b6cfe42",
+      "matches_fixed_source": true
+    }
+  ],
+  "source_commit": "2ef9f3872fbc0cfc93b1143f26ed668d13a7725e",
+  "wheel_name": "x402-2.27.0-py3-none-any.whl",
+  "pypi_version_url": "https://pypi.org/pypi/x402/2.27.0/json",
+  "wheel_executed": false
+}

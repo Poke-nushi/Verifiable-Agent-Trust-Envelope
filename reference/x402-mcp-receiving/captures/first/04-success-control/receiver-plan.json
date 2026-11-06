@@ -1,0 +1,9 @@
+{
+  "context": {
+    "attempt_id": "application-call-001",
+    "operation_id": "sdk-intake-04-success-control",
+    "server_id": "local-sdk-test-server"
+  },
+  "profile": "vate-local-x402-mcp-receiving-v1",
+  "request_sha256": "e34997e7cc485e4259f9c0d7e156863314b8ee197b06f4dcb88f4e038215f9e5"
+}

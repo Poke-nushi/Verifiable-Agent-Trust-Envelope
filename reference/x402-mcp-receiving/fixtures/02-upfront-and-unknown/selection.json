@@ -1,0 +1,10 @@
+{
+  "capture_sha256": "c713d6982abb3f7886a4a818341372296a4abb7c948a6a4eeb46b5b9bd4dc779",
+  "context": {
+    "attempt_id": "02-upfront-and-unknown",
+    "operation_id": "synthetic-operation",
+    "server_id": "synthetic-server"
+  },
+  "profile": "vate-local-x402-mcp-receiving-v1",
+  "request_sha256": "5f124f8d2f8e92843e2a7b6d57da48fd9d377ddf74ff7009a7ed8fef2cdfb9fe"
+}

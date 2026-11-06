@@ -1,0 +1,57 @@
+{
+  "sdk_source_commit": "2ef9f3872fbc0cfc93b1143f26ed668d13a7725e",
+  "sdk_version_label": "2.27.0",
+  "source_is_not_pypi_release": true,
+  "packages": [
+    {
+      "name": "nest-asyncio",
+      "version": "1.6.0",
+      "wheel_sha256": [
+        "87af6efd6b5e897c81050477ef65c62e2b2f35d51703cae01aff2905b1852e1c"
+      ]
+    },
+    {
+      "name": "pydantic",
+      "version": "2.14.3",
+      "wheel_sha256": [
+        "3f7b347782ab7e4cf4c798496ae3a82787d9f21ec12676a9c564355eeef8daa8"
+      ]
+    },
+    {
+      "name": "pydantic_core",
+      "version": "2.50.4",
+      "wheel_sha256": [
+        "0af56dbf8822ba9f4efcbbfdc15478f8b6fb08f1609860cb50aa2cc8476b3c34",
+        "0ec20aca2b067369913716847f7dfe5f4dddf16a46965b7a70bbad5defaaba86",
+        "3a48a5254d15a0ad050318bfc7a9566d4ec740118187e8f303e47a6840287eb7",
+        "3de6c2a4df2af0ac9ab4dc1488746fe8b1a90e27955d870d9edda3187d20092b",
+        "5c074454dc6d4f6f4ba6561a56bf33a14db7651d882a5a5321ba3ae8868e082d",
+        "5c1013647be741647895c102831dcf79c34209662dbb683df9efb864417ed7d5",
+        "70dbc9f83c41f37a4faa62dae5203853847223a891da446f48ef2efcfd5df806",
+        "a4bb174bd65f795c39ad6642d9d5bdc43351b306b7d0a654ab0d0abb38be245f",
+        "f1d62fb172db35c6478c9323da34ff37d1f3d37d7d44337a9d94ba8c583e5730"
+      ]
+    },
+    {
+      "name": "annotated-types",
+      "version": "0.8.0",
+      "wheel_sha256": [
+        "f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0"
+      ]
+    },
+    {
+      "name": "typing_extensions",
+      "version": "4.16.0",
+      "wheel_sha256": [
+        "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8"
+      ]
+    },
+    {
+      "name": "typing-inspection",
+      "version": "0.4.5",
+      "wheel_sha256": [
+        "bc210535442b39e1bf2805e0c7a17dfd6a4ace760c84c7f7d16245d23a6b1c39"
+      ]
+    }
+  ]
+}

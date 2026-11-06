@@ -1,0 +1,10 @@
+{
+  "capture_sha256": "f56f6f36e27ff249bd74b96a61ea8b5515d937cc86a5cce4c48d6f31e668be18",
+  "context": {
+    "attempt_id": "01-cancel-unknown",
+    "operation_id": "synthetic-operation",
+    "server_id": "synthetic-server"
+  },
+  "profile": "vate-local-x402-mcp-receiving-v1",
+  "request_sha256": "5f124f8d2f8e92843e2a7b6d57da48fd9d377ddf74ff7009a7ed8fef2cdfb9fe"
+}

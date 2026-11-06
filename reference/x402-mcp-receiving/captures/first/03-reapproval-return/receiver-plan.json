@@ -1,0 +1,9 @@
+{
+  "context": {
+    "attempt_id": "application-call-001",
+    "operation_id": "sdk-intake-03-reapproval-return",
+    "server_id": "local-sdk-test-server"
+  },
+  "profile": "vate-local-x402-mcp-receiving-v1",
+  "request_sha256": "a8fe51377a8e55e56591cbbd4fe2aefd0a73fb15de2daa0f3125e95aa17195df"
+}

@@ -1,0 +1,9 @@
+{
+  "context": {
+    "attempt_id": "application-call-001",
+    "operation_id": "sdk-intake-01-cancel-unknown",
+    "server_id": "local-sdk-test-server"
+  },
+  "profile": "vate-local-x402-mcp-receiving-v1",
+  "request_sha256": "ce8ff9f0e3d9ab30f518560f9a4a8c770e7750d7e6ced6c90ef2344f723ca733"
+}

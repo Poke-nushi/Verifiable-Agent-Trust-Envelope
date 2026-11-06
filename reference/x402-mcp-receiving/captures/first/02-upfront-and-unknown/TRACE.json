@@ -1,0 +1,83 @@
+{
+  "capture_ref": {
+    "bytes": 1797,
+    "sha256": "7c1020dad5dcdad0c6d2329cedc7543ceafd096b8da6916237eaf19dcd4140c4"
+  },
+  "case": "02-upfront-and-unknown",
+  "cryptographic_signature_verified": false,
+  "events": [
+    {
+      "kind": "in_process_tool_call",
+      "payment_present": false,
+      "request_sha256": "9d7c90ccb3a58f668d76a2be86039fa4ae24e1593fd33e0c9764e11785161659",
+      "sequence": 1
+    },
+    {
+      "allowed": true,
+      "kind": "application_approval",
+      "sequence": 2
+    },
+    {
+      "amount": "1000",
+      "cryptographic_signature": false,
+      "kind": "test_payload_created",
+      "sequence": 3
+    },
+    {
+      "kind": "in_process_tool_call",
+      "payment_present": true,
+      "request_sha256": "9d7c90ccb3a58f668d76a2be86039fa4ae24e1593fd33e0c9764e11785161659",
+      "sequence": 4
+    },
+    {
+      "kind": "sdk_settlement_phase",
+      "phase": "before-handler",
+      "sequence": 5
+    },
+    {
+      "amount": "1000",
+      "kind": "facilitator_settle",
+      "sequence": 6,
+      "test_double": true
+    },
+    {
+      "inject_invalid_amount": true,
+      "kind": "metering_hook",
+      "sequence": 7
+    },
+    {
+      "kind": "cancellation_fault_injected",
+      "reason": "after_verify_aborted",
+      "sequence": 8,
+      "test_double": true
+    },
+    {
+      "kind": "sdk_payment_response_hook",
+      "recovered": false,
+      "sequence": 9,
+      "settlement_present": true
+    }
+  ],
+  "mcp_wire_transport_used": false,
+  "real_payment_used": false,
+  "real_sdk_modules": [
+    "x402.client",
+    "x402.server",
+    "x402.mcp.client",
+    "x402.mcp.server_sync"
+  ],
+  "sdk_raw_result_type": "x402.mcp.types.MCPToolResult",
+  "sdk_result_ref": {
+    "bytes": 1015,
+    "sha256": "11e92877fd4a1eb8fec41740e813ee78e0d29a931fb5aad0f6c7aabf3c7be84d"
+  },
+  "sdk_result_type": "x402.mcp.client.MCPToolCallResult",
+  "test_doubles": [
+    "InProcessTransport",
+    "LocalFacilitator",
+    "LocalScheme",
+    "local tool handler",
+    "application approval/response/metering hooks",
+    "FaultDispatcher"
+  ]
+}

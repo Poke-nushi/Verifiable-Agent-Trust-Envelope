@@ -1,0 +1,78 @@
+{
+  "capture_ref": {
+    "bytes": 1287,
+    "sha256": "15e90cb738e79c2fb6fb9008330b0022375a9baecb2bba1b85ac1ab227c2605c"
+  },
+  "case": "01-cancel-unknown",
+  "cryptographic_signature_verified": false,
+  "events": [
+    {
+      "kind": "in_process_tool_call",
+      "payment_present": false,
+      "request_sha256": "ce8ff9f0e3d9ab30f518560f9a4a8c770e7750d7e6ced6c90ef2344f723ca733",
+      "sequence": 1
+    },
+    {
+      "allowed": true,
+      "kind": "application_approval",
+      "sequence": 2
+    },
+    {
+      "amount": "1000",
+      "cryptographic_signature": false,
+      "kind": "test_payload_created",
+      "sequence": 3
+    },
+    {
+      "kind": "in_process_tool_call",
+      "payment_present": true,
+      "request_sha256": "ce8ff9f0e3d9ab30f518560f9a4a8c770e7750d7e6ced6c90ef2344f723ca733",
+      "sequence": 4
+    },
+    {
+      "accepted": true,
+      "kind": "facilitator_verify",
+      "sequence": 5,
+      "test_double": true
+    },
+    {
+      "inject_invalid_amount": true,
+      "kind": "metering_hook",
+      "sequence": 6
+    },
+    {
+      "kind": "cancellation_fault_injected",
+      "reason": "after_verify_aborted",
+      "sequence": 7,
+      "test_double": true
+    },
+    {
+      "kind": "sdk_payment_response_hook",
+      "recovered": false,
+      "sequence": 8,
+      "settlement_present": false
+    }
+  ],
+  "mcp_wire_transport_used": false,
+  "real_payment_used": false,
+  "real_sdk_modules": [
+    "x402.client",
+    "x402.server",
+    "x402.mcp.client",
+    "x402.mcp.server_sync"
+  ],
+  "sdk_raw_result_type": "x402.mcp.types.MCPToolResult",
+  "sdk_result_ref": {
+    "bytes": 551,
+    "sha256": "5fe6f2afb9476d995ef3a2a38ff074ffe37853ad53e1e4d9f9abb0c9dd833590"
+  },
+  "sdk_result_type": "x402.mcp.client.MCPToolCallResult",
+  "test_doubles": [
+    "InProcessTransport",
+    "LocalFacilitator",
+    "LocalScheme",
+    "local tool handler",
+    "application approval/response/metering hooks",
+    "FaultDispatcher"
+  ]
+}

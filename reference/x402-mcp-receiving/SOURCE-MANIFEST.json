@@ -1,0 +1,110 @@
+{
+  "files": [
+    {
+      "bytes": 9560,
+      "path": "python/x402/mcp/README.md",
+      "sha256": "21752eb395438811371a75e42ba8cc6d91cdefadaca72648ce5bef51c888cd87",
+      "url": "https://github.com/x402-foundation/x402/blob/2ef9f3872fbc0cfc93b1143f26ed668d13a7725e/python/x402/mcp/README.md"
+    },
+    {
+      "bytes": 24909,
+      "path": "python/x402/mcp/client.py",
+      "sha256": "0addfaf3d8e621ca9deb646e3f25070cd0670978c71818454ab2caf09b505ae3",
+      "url": "https://github.com/x402-foundation/x402/blob/2ef9f3872fbc0cfc93b1143f26ed668d13a7725e/python/x402/mcp/client.py"
+    },
+    {
+      "bytes": 26432,
+      "path": "python/x402/mcp/client_async.py",
+      "sha256": "7b4d75615e76402ab1842a640bbe3cc825b10f2a2499cb059cc335424be3fa80",
+      "url": "https://github.com/x402-foundation/x402/blob/2ef9f3872fbc0cfc93b1143f26ed668d13a7725e/python/x402/mcp/client_async.py"
+    },
+    {
+      "bytes": 26402,
+      "path": "python/x402/mcp/server.py",
+      "sha256": "07380848e4fa1b9603e307c2e82274d4c959bf4779e3d4d30cf1337c9cb119f1",
+      "url": "https://github.com/x402-foundation/x402/blob/2ef9f3872fbc0cfc93b1143f26ed668d13a7725e/python/x402/mcp/server.py"
+    },
+    {
+      "bytes": 31276,
+      "path": "python/x402/mcp/server_async.py",
+      "sha256": "2506cc95639dbbeeb3e5eeda1af4396f9560abc94b9a63f34724b2bf3dc7c068",
+      "url": "https://github.com/x402-foundation/x402/blob/2ef9f3872fbc0cfc93b1143f26ed668d13a7725e/python/x402/mcp/server_async.py"
+    },
+    {
+      "bytes": 25244,
+      "path": "python/x402/mcp/server_sync.py",
+      "sha256": "d5ff668fff39931c3914fc57a949f8f20885aa1e94234178f6d2502b4fc3e95d",
+      "url": "https://github.com/x402-foundation/x402/blob/2ef9f3872fbc0cfc93b1143f26ed668d13a7725e/python/x402/mcp/server_sync.py"
+    },
+    {
+      "bytes": 12771,
+      "path": "python/x402/mcp/types.py",
+      "sha256": "18d194cc773abe51dc48a7d37e3df81453ce018c0e855a72326bbf497cafe52b",
+      "url": "https://github.com/x402-foundation/x402/blob/2ef9f3872fbc0cfc93b1143f26ed668d13a7725e/python/x402/mcp/types.py"
+    },
+    {
+      "bytes": 19973,
+      "path": "python/x402/mcp/utils.py",
+      "sha256": "ca18c5f125df3ebe38309d2f66549474fecee41cd56effc5fda22b606e5411ae",
+      "url": "https://github.com/x402-foundation/x402/blob/2ef9f3872fbc0cfc93b1143f26ed668d13a7725e/python/x402/mcp/utils.py"
+    },
+    {
+      "bytes": 31271,
+      "path": "python/x402/tests/unit/mcp/test_client_timeout.py",
+      "sha256": "c75d29dcbd39fbb305020aa64b0880e4e0d8d128deeab7d2270af26b7f6b7d24",
+      "url": "https://github.com/x402-foundation/x402/blob/2ef9f3872fbc0cfc93b1143f26ed668d13a7725e/python/x402/tests/unit/mcp/test_client_timeout.py"
+    },
+    {
+      "bytes": 45555,
+      "path": "python/x402/tests/unit/mcp/test_server_wrappers.py",
+      "sha256": "ff857a29e7f8c83f2a1052f788cc0f7a39b396637b8b49a33a1c8461297235f9",
+      "url": "https://github.com/x402-foundation/x402/blob/2ef9f3872fbc0cfc93b1143f26ed668d13a7725e/python/x402/tests/unit/mcp/test_server_wrappers.py"
+    },
+    {
+      "bytes": 5702,
+      "path": "python/x402/pyproject.toml",
+      "sha256": "0ed7767c7dca3a21c7ccdb013797a57c3926a4bd3cf2042ddd34c1d90466f4cb",
+      "url": "https://github.com/x402-foundation/x402/blob/2ef9f3872fbc0cfc93b1143f26ed668d13a7725e/python/x402/pyproject.toml"
+    },
+    {
+      "bytes": 5878,
+      "path": "python/x402/payment_flow.py",
+      "sha256": "81d72369fd93791c73d3e55775783b2ecd1faa82ff62df9b2459f26f81729a1a",
+      "url": "https://github.com/x402-foundation/x402/blob/2ef9f3872fbc0cfc93b1143f26ed668d13a7725e/python/x402/payment_flow.py"
+    },
+    {
+      "bytes": 38440,
+      "path": "python/x402/client_base.py",
+      "sha256": "a1fd11f2f25d9314a58676be1af7953d0b9ba75e6278ab0f4187f2e6364a9bd0",
+      "url": "https://github.com/x402-foundation/x402/blob/2ef9f3872fbc0cfc93b1143f26ed668d13a7725e/python/x402/client_base.py"
+    },
+    {
+      "bytes": 13792,
+      "path": "python/x402/schemas/hooks.py",
+      "sha256": "ef17cc1dccc761683e58c092fbd28a3ee7178d078c5a9b64b3064b053ea2b441",
+      "url": "https://github.com/x402-foundation/x402/blob/2ef9f3872fbc0cfc93b1143f26ed668d13a7725e/python/x402/schemas/hooks.py"
+    },
+    {
+      "bytes": 3636,
+      "path": "python/x402/schemas/responses.py",
+      "sha256": "4eddbb49611af8c4ab9ed92d7c6d1ebbe96731ae39d23f05733f73819b6cfe42",
+      "url": "https://github.com/x402-foundation/x402/blob/2ef9f3872fbc0cfc93b1143f26ed668d13a7725e/python/x402/schemas/responses.py"
+    }
+  ],
+  "fixtures": {
+    "01-cancel-unknown": "test_server_wrappers.py:test_unknown_cancellation_returns_error_without_new_offer",
+    "02-upfront-and-unknown": "test_server_wrappers.py:test_metering_failure_reports_only_known_cancellation_outcomes and payment_flow.py:resolve_failure_path_settlement",
+    "03-reapproval-return": "test_client_timeout.py:test_sync_corrective_retry_rechecks_approval",
+    "04-reapproval-exception-result": "test_client_timeout.py:test_corrective_retry_reruns_every_payment_gate (approval/required)",
+    "05-reapproval-exception-mcp-result": "test_client_timeout.py:test_corrective_retry_reruns_every_payment_gate (before)",
+    "construction": "hand-authored SDK-field exports derived from fixed source and native test expectations; not SDK output",
+    "payment_phase_reapproval_recovered": "synthetic exporter observations; not verified protocol evidence",
+    "receiver_context_and_hashes": "synthetic receiver selection",
+    "request_capture": "SDK call arguments, not MCP wire JSON-RPC"
+  },
+  "kind": "fixed_upstream_source_references",
+  "ref": "2ef9f3872fbc0cfc93b1143f26ed668d13a7725e",
+  "repo": "x402-foundation/x402",
+  "synthetic_fixture_origin": "hand-authored; not SDK execution",
+  "sdk_execution_examples": "captures/"
+}
