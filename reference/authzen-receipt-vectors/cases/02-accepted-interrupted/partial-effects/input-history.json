@@ -1,0 +1,1 @@
+{"case":"02-accepted-interrupted","clock":"fixed_fixture_clock","history_basis":"original_provider_export_bytes","snapshots":["interrupted","after-handoff"],"variant":"partial-effects"}
