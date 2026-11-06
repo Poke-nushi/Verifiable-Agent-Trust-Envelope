@@ -1,0 +1,2155 @@
+{
+  "repository": "https://github.com/x402-foundation/x402",
+  "source_commit": "2ef9f3872fbc0cfc93b1143f26ed668d13a7725e",
+  "archive_url": "https://codeload.github.com/x402-foundation/x402/tar.gz/2ef9f3872fbc0cfc93b1143f26ed668d13a7725e",
+  "archive_sha256": "be37c284e4efe5f816c3663ca403c3907e06d33701b0c9c28c06253893c0cf72",
+  "archive_bytes": 38505903,
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 11324,
+      "sha256": "50e6751797c50dedd75ef1b8a0d9e42f5f8472e9fbce91f34718e9f97b0c780a"
+    },
+    {
+      "path": "NOTICE",
+      "bytes": 574,
+      "sha256": "0b8a03260dc87d976ea6f24d7ff1fb3f8f361cff317f9dd0da0b8d96936eabf6"
+    },
+    {
+      "path": "python/x402/CHANGELOG.md",
+      "bytes": 57054,
+      "sha256": "a24164ef21acb0e06c8279995bc8d42d7fd11674b59a8358288e85e76de334d4"
+    },
+    {
+      "path": "python/x402/LICENSE",
+      "bytes": 11324,
+      "sha256": "50e6751797c50dedd75ef1b8a0d9e42f5f8472e9fbce91f34718e9f97b0c780a"
+    },
+    {
+      "path": "python/x402/NOTICE",
+      "bytes": 574,
+      "sha256": "0b8a03260dc87d976ea6f24d7ff1fb3f8f361cff317f9dd0da0b8d96936eabf6"
+    },
+    {
+      "path": "python/x402/README.md",
+      "bytes": 10144,
+      "sha256": "76698ad9f33c74a7f9a9e052cb2b68fe692f392d7bad8336eece96d32d3fb00a"
+    },
+    {
+      "path": "python/x402/__init__.py",
+      "bytes": 7702,
+      "sha256": "262095f3452c7057f5f141a469d98c372aef1838b6dd51976ccb678cd1ba61cf"
+    },
+    {
+      "path": "python/x402/changelog.d/.gitignore",
+      "bytes": 11,
+      "sha256": "e1f6cb56844dfb267d9d6a774197cb946ab1f3f30a05c9d2c930f6eb4f3f50de"
+    },
+    {
+      "path": "python/x402/changelog.d/3735.bugfix.md",
+      "bytes": 2102,
+      "sha256": "4b2293ba5bf34d4c0297bf9e02e0f777b981b3700353c81dce345302c70f9ad7"
+    },
+    {
+      "path": "python/x402/client.py",
+      "bytes": 17138,
+      "sha256": "0f09e26c3ff561858bdd7bb61b4dc9f41b406834f2164f68410577f5ba2f6377"
+    },
+    {
+      "path": "python/x402/client_base.py",
+      "bytes": 38440,
+      "sha256": "a1fd11f2f25d9314a58676be1af7953d0b9ba75e6278ab0f4187f2e6364a9bd0"
+    },
+    {
+      "path": "python/x402/extensions/README.md",
+      "bytes": 6700,
+      "sha256": "364bc31ce2f10e59c139271bdc86d1c730c8e3c7234db757b2d81533c769abf2"
+    },
+    {
+      "path": "python/x402/extensions/__init__.py",
+      "bytes": 8698,
+      "sha256": "a534ed033a6a3b4f58b0d1ee336a597001438a3f25178752f458f6b3f93a1c38"
+    },
+    {
+      "path": "python/x402/extensions/bazaar/__init__.py",
+      "bytes": 4015,
+      "sha256": "fc5b7a038070b0badb6b621dd25cdb0d25b544a144a82b153d19eed6ddcc77e3"
+    },
+    {
+      "path": "python/x402/extensions/bazaar/facilitator.py",
+      "bytes": 31174,
+      "sha256": "8d376370cf2ca3221955de3d535a4d7d26ab24772c9d8d6ed6e2f0ce8bb8c246"
+    },
+    {
+      "path": "python/x402/extensions/bazaar/facilitator_client.py",
+      "bytes": 16061,
+      "sha256": "b253830117790dba236ef53b6ec39b81ec95a55d7387da3353ffd94efcc26cc2"
+    },
+    {
+      "path": "python/x402/extensions/bazaar/resource_service.py",
+      "bytes": 13592,
+      "sha256": "88049b38dd0f6885ba26a9e156a2ef22aab1f80f5652ddbcac48206b49a101e7"
+    },
+    {
+      "path": "python/x402/extensions/bazaar/server.py",
+      "bytes": 9682,
+      "sha256": "9dbc44fb1cf7eaf2199d44fe87ff70f1873be628e4576999214aeff829efdfc7"
+    },
+    {
+      "path": "python/x402/extensions/bazaar/types.py",
+      "bytes": 5636,
+      "sha256": "016fc6c968e6432af424db65698b42094ca36968bbb3451958bc4a638cad2ec9"
+    },
+    {
+      "path": "python/x402/extensions/bazaar/v1/__init__.py",
+      "bytes": 637,
+      "sha256": "084ee1c2d611b989336c0568631691e4d8a735e2f7b248405a5c791741185b2c"
+    },
+    {
+      "path": "python/x402/extensions/bazaar/v1/facilitator.py",
+      "bytes": 9698,
+      "sha256": "31726a3203e9d656220150540bdc4e468f5ac0f8f05da0a6507651a8484cde0b"
+    },
+    {
+      "path": "python/x402/extensions/builder_code/README.md",
+      "bytes": 6777,
+      "sha256": "ce6e68207f257e56ae7b96830156fde1c0bb1a25ee649581c57f562ef590f267"
+    },
+    {
+      "path": "python/x402/extensions/builder_code/__init__.py",
+      "bytes": 2786,
+      "sha256": "4124bce74636a7a6712a15d821bd372614638c29c7f7c58b07b9642c8ade458e"
+    },
+    {
+      "path": "python/x402/extensions/builder_code/cbor.py",
+      "bytes": 10763,
+      "sha256": "538f6c0b88c4b6bee4f4e5efced38d90a90eef45443025cf4ac1cba2d9c98bd9"
+    },
+    {
+      "path": "python/x402/extensions/builder_code/client.py",
+      "bytes": 2782,
+      "sha256": "5e6fab000b9f3ffdcee7e5ef84d025574e9ea00d1f6839e127008a0f7deec0ec"
+    },
+    {
+      "path": "python/x402/extensions/builder_code/facilitator.py",
+      "bytes": 6338,
+      "sha256": "10bfedd1ecd74bbf589210185845307385d5d31b30a5f90a594e91490659984e"
+    },
+    {
+      "path": "python/x402/extensions/builder_code/server.py",
+      "bytes": 3528,
+      "sha256": "78941c4d617b31a1556dad7bbed844c5c25e66b549e3272c1b401545ddace661"
+    },
+    {
+      "path": "python/x402/extensions/builder_code/types.py",
+      "bytes": 3671,
+      "sha256": "5da8097e3a51737b0f3ae3534a902605f0d465980faa7fd4d2d92d20094b74db"
+    },
+    {
+      "path": "python/x402/extensions/eip2612_gas_sponsoring/__init__.py",
+      "bytes": 664,
+      "sha256": "2e089565c81599b627275c83193dc7124a58f04a1132e4bad823ad8f9e34185c"
+    },
+    {
+      "path": "python/x402/extensions/eip2612_gas_sponsoring/client.py",
+      "bytes": 2317,
+      "sha256": "e3724c45f3a3c25efd24aee1683384e8c17c3da176d78b5038577d680f5d96bd"
+    },
+    {
+      "path": "python/x402/extensions/eip2612_gas_sponsoring/facilitator.py",
+      "bytes": 2762,
+      "sha256": "fc1f4ef91a2dc75b6737f68296d9b84c05b28bf2c4184a38479642019d761a0e"
+    },
+    {
+      "path": "python/x402/extensions/eip2612_gas_sponsoring/schema.py",
+      "bytes": 1792,
+      "sha256": "aec5792e445f61870806db784eb272cb7c19f7d3f3e2aa28a9207950fa01721f"
+    },
+    {
+      "path": "python/x402/extensions/eip2612_gas_sponsoring/server.py",
+      "bytes": 836,
+      "sha256": "9e5d5cd9191530ab8270ba2416fd26201e45924a40bc0215bfb574a89294ca7e"
+    },
+    {
+      "path": "python/x402/extensions/eip2612_gas_sponsoring/types.py",
+      "bytes": 1666,
+      "sha256": "071376b785fb3e5280dcb41865224b990c714ba18a897f0efb86053e3b960c49"
+    },
+    {
+      "path": "python/x402/extensions/erc20_approval_gas_sponsoring/__init__.py",
+      "bytes": 954,
+      "sha256": "f898789153d3191d14963684b0590ece54d90466a87f1460d334f26dfe3d30e1"
+    },
+    {
+      "path": "python/x402/extensions/erc20_approval_gas_sponsoring/client.py",
+      "bytes": 2671,
+      "sha256": "30be00d1211b038bcf840670c2f1a3f1133b17c5ef6260f04f1b7319d41e5d47"
+    },
+    {
+      "path": "python/x402/extensions/erc20_approval_gas_sponsoring/facilitator.py",
+      "bytes": 5378,
+      "sha256": "29a878437fb01468aa7490e1e772d0ff8059baaef153890e781d174c0529bb5b"
+    },
+    {
+      "path": "python/x402/extensions/erc20_approval_gas_sponsoring/schema.py",
+      "bytes": 1436,
+      "sha256": "a12acb8a4eb4c66327f73c7496b6a2252a2f11aee07af4f2d9aed32a872ca551"
+    },
+    {
+      "path": "python/x402/extensions/erc20_approval_gas_sponsoring/server.py",
+      "bytes": 904,
+      "sha256": "0a4ecf97684ee6849bd126f3dace8e792ab0f69bd78a8bb638522e884d87ff0f"
+    },
+    {
+      "path": "python/x402/extensions/erc20_approval_gas_sponsoring/types.py",
+      "bytes": 3251,
+      "sha256": "074accbabb630a6bf073152860e7b6fa8376664befb05973178b7f2ec999316f"
+    },
+    {
+      "path": "python/x402/extensions/payment_identifier/__init__.py",
+      "bytes": 3484,
+      "sha256": "a6d7644a61cd06f6a3aae2ec2a158163219477a290256d83aeead2be25cbc15f"
+    },
+    {
+      "path": "python/x402/extensions/payment_identifier/client.py",
+      "bytes": 3134,
+      "sha256": "7a1d54dc29ee9f4c903760638f4ac78896d825bda8b9dba17844476c928087b1"
+    },
+    {
+      "path": "python/x402/extensions/payment_identifier/schema.py",
+      "bytes": 706,
+      "sha256": "4a68a47c84817873ae9c09f3b8de808cbf2f192bc2274cf555744879f12fd55a"
+    },
+    {
+      "path": "python/x402/extensions/payment_identifier/server.py",
+      "bytes": 3213,
+      "sha256": "09a36d4567276e2a9db67d7fee40d06f784d0654794795c2197f098bff24b15d"
+    },
+    {
+      "path": "python/x402/extensions/payment_identifier/types.py",
+      "bytes": 1895,
+      "sha256": "c4ef7bc1479e20d12db70dc5b71ece8a892e170bd0165057eb792b5af9445f68"
+    },
+    {
+      "path": "python/x402/extensions/payment_identifier/utils.py",
+      "bytes": 1644,
+      "sha256": "22159765b4ff9a455a0113782efc7fdec2c81afd07aa6f4d231eebbbfa0bcd90"
+    },
+    {
+      "path": "python/x402/extensions/payment_identifier/validation.py",
+      "bytes": 11420,
+      "sha256": "5302c0f586fab41b044e562a9c2adf2746e76e379b83b31c2e1b68528ad14b2b"
+    },
+    {
+      "path": "python/x402/extensions/sign_in_with_x/__init__.py",
+      "bytes": 3468,
+      "sha256": "603fbcdbfad9055c71bf76f2ea9be46da64e67ab1ac90d5bafb3fb3ae72a8731"
+    },
+    {
+      "path": "python/x402/extensions/sign_in_with_x/client.py",
+      "bytes": 3597,
+      "sha256": "c6e756e14c88c6ff755ad3eb1d32724884e3535334f7b62ce529fbae25294159"
+    },
+    {
+      "path": "python/x402/extensions/sign_in_with_x/declare.py",
+      "bytes": 1416,
+      "sha256": "12cb51a1cd67cddc50c691d9991f5f041291e3c078aee74f0c3a008a9d524e54"
+    },
+    {
+      "path": "python/x402/extensions/sign_in_with_x/encode.py",
+      "bytes": 379,
+      "sha256": "63fee9160bf069de365b503628b3d86274cbc9b23f3b5ec869ddf5ad3f1792f5"
+    },
+    {
+      "path": "python/x402/extensions/sign_in_with_x/evm.py",
+      "bytes": 3817,
+      "sha256": "49e6efbddcc79559b68a611f728fa3866de3499bd4f3e2207c5ef45c8c54e8af"
+    },
+    {
+      "path": "python/x402/extensions/sign_in_with_x/hooks.py",
+      "bytes": 9889,
+      "sha256": "dc9f66be6400d7e0312b0c6be15d1e7038e93f28510615ed645899caccef5036"
+    },
+    {
+      "path": "python/x402/extensions/sign_in_with_x/message.py",
+      "bytes": 744,
+      "sha256": "8044288ff4af6eb5e7ddc685a6e41b64683a45281301d7d833261d43e450ce58"
+    },
+    {
+      "path": "python/x402/extensions/sign_in_with_x/parse.py",
+      "bytes": 985,
+      "sha256": "1b91ed491bedfd4bb45fa03e064038abf039bb51402234cfcfb7c049507dbb56"
+    },
+    {
+      "path": "python/x402/extensions/sign_in_with_x/schema.py",
+      "bytes": 1336,
+      "sha256": "64d53d567614d8dac681578a271078b012b57093f6ce66a221901e17a662166b"
+    },
+    {
+      "path": "python/x402/extensions/sign_in_with_x/server.py",
+      "bytes": 4954,
+      "sha256": "f9f28264ab6044b7a47a4de31dad7628b9176c53b1b2349ae310f224900e6e54"
+    },
+    {
+      "path": "python/x402/extensions/sign_in_with_x/sign.py",
+      "bytes": 4357,
+      "sha256": "ecf34680a1862747499e2eae78f7db0d2bfa4a559ac4c22af89687ba1f3f6031"
+    },
+    {
+      "path": "python/x402/extensions/sign_in_with_x/solana.py",
+      "bytes": 4014,
+      "sha256": "e18a0ee7ed99ddc0971110de6453d2cd97928f2631040a1b9fe0072c1c99949a"
+    },
+    {
+      "path": "python/x402/extensions/sign_in_with_x/storage.py",
+      "bytes": 989,
+      "sha256": "a5e4db477887267308a15bb6aff1a9bb06c341813ec1663e89b5ad83291534aa"
+    },
+    {
+      "path": "python/x402/extensions/sign_in_with_x/types.py",
+      "bytes": 4624,
+      "sha256": "51cdbf27449f864490790a81c32875d12bceb727dcb33eeb3f80779948b7a1e6"
+    },
+    {
+      "path": "python/x402/extensions/sign_in_with_x/validate.py",
+      "bytes": 4666,
+      "sha256": "241623dd27a3165076b28d1c7ebedc5480bd831ea6ea8e813239913f7efba534"
+    },
+    {
+      "path": "python/x402/extensions/sign_in_with_x/verify.py",
+      "bytes": 3177,
+      "sha256": "3100b5a51b80b4182a4039a09e1afc91f5e7d71ca39e2ee6de966a2d2f15da48"
+    },
+    {
+      "path": "python/x402/facilitator.py",
+      "bytes": 13923,
+      "sha256": "7ef91218261d1d3814d5a3e76123435a6f8804ec9f0768d3d5dd8971eb35b3ed"
+    },
+    {
+      "path": "python/x402/facilitator_base.py",
+      "bytes": 21700,
+      "sha256": "9b002e1b588ccf322dec10d8913222e41e81017d2a9f5f202f52ef407a8a8f9b"
+    },
+    {
+      "path": "python/x402/hook_adapters.py",
+      "bytes": 11805,
+      "sha256": "2021af8c8a4fc9f498de9854ad821da8c41c551cb9026b08ef82856face5249e"
+    },
+    {
+      "path": "python/x402/hook_policy.py",
+      "bytes": 9063,
+      "sha256": "8a037afd7419527f9f67257537f796f90ae4bb31c385cf7bf307d558f41ed952"
+    },
+    {
+      "path": "python/x402/http/README.md",
+      "bytes": 3601,
+      "sha256": "ef5c78d43ad2650498dbd0a9890e0f0c4306571d82830d5aacef74bc182c0ca6"
+    },
+    {
+      "path": "python/x402/http/__init__.py",
+      "bytes": 3710,
+      "sha256": "81ab0b6320d62d35066421d0c86ec99aa274bd271c86addc3370db56131fb136"
+    },
+    {
+      "path": "python/x402/http/background_init.py",
+      "bytes": 1440,
+      "sha256": "9efe53a6b664afdfb03175c5cd48d146e4ae49140abde985720e5d0be6f286be"
+    },
+    {
+      "path": "python/x402/http/clients/README.md",
+      "bytes": 3233,
+      "sha256": "78e1d9e280525b7bb70c9c697d04a18a3ae57e3bb9ed3472398b70c5c8a65cb6"
+    },
+    {
+      "path": "python/x402/http/clients/__init__.py",
+      "bytes": 1878,
+      "sha256": "a16334dc20324de11472cb6880a94c59367a5740df928b2920726f321fb767db"
+    },
+    {
+      "path": "python/x402/http/clients/httpx.py",
+      "bytes": 14584,
+      "sha256": "7ce644c7f8afd2c64dd3b8092748544c5d7b8ecc6c128fd7d00adeca4feb7aee"
+    },
+    {
+      "path": "python/x402/http/clients/requests.py",
+      "bytes": 13081,
+      "sha256": "df669bafa0c4abdd37a3a9995b05a2c5566339d80faed37d8e34e9bbb69e2149"
+    },
+    {
+      "path": "python/x402/http/constants.py",
+      "bytes": 570,
+      "sha256": "8eaa27002e21ec0be432f7eafbad41b8a613c25345c8716d34bfe811bd76c9af"
+    },
+    {
+      "path": "python/x402/http/extension_responses.py",
+      "bytes": 1383,
+      "sha256": "938fba31b8e5c80bdc3370a2d3ce912ffb177fd12dc0aad05c71edec9c22c300"
+    },
+    {
+      "path": "python/x402/http/facilitator_client.py",
+      "bytes": 19471,
+      "sha256": "be44acaebe6354192b649982f82d1a4ee4978967f5a07c11df0d156094c9ff69"
+    },
+    {
+      "path": "python/x402/http/facilitator_client_base.py",
+      "bytes": 8317,
+      "sha256": "8c57d83ed5329ea7f0f9e7cfc569090fa0fa96798d4bac10ff0157eeb4b4762f"
+    },
+    {
+      "path": "python/x402/http/middleware/README.md",
+      "bytes": 4571,
+      "sha256": "afade68809ea83e9e6b3d83694c3cd2f464f4e6a68bcc170af7c48445f301723"
+    },
+    {
+      "path": "python/x402/http/middleware/__init__.py",
+      "bytes": 2331,
+      "sha256": "7c3a2f88859f09f8445d0f540f740dbf12cc550401fbb9e44d432362f27c0308"
+    },
+    {
+      "path": "python/x402/http/middleware/_bazaar_utils.py",
+      "bytes": 5191,
+      "sha256": "e28c0fa9a3b2a2149a4ad4f9375d73de76c396148d90805f30e959ef3f2383a8"
+    },
+    {
+      "path": "python/x402/http/middleware/fastapi.py",
+      "bytes": 21881,
+      "sha256": "4807e104281c560b7199b1ed47c7c934337da570e1dba778482e5422fe43724e"
+    },
+    {
+      "path": "python/x402/http/middleware/flask.py",
+      "bytes": 27089,
+      "sha256": "103d91381b825a169b6c2772464a93e09a022bd8fb27a2add55ee309c8cf205a"
+    },
+    {
+      "path": "python/x402/http/paywall/__init__.py",
+      "bytes": 14897,
+      "sha256": "c18c4e588bd2db13ab92e2b091140063d96e8b64fa0ec2941edc96aade8436a2"
+    },
+    {
+      "path": "python/x402/http/paywall/avm_paywall_template.py",
+      "bytes": 3623621,
+      "sha256": "6a6ca29bb0884dbe7428a6a6f910bcdc76a91d4c0798b915dfe869a9fb056271"
+    },
+    {
+      "path": "python/x402/http/paywall/evm_paywall_template.py",
+      "bytes": 2534744,
+      "sha256": "f7ab072fb14b7c9070dd0d7e5d107d118f5af94ba08a51f65378e8754ed37275"
+    },
+    {
+      "path": "python/x402/http/paywall/svm_paywall_template.py",
+      "bytes": 1645936,
+      "sha256": "2afaea6f9035731cdd8de7cbd1685677a57f3984facadb6af4d0943df5edd966"
+    },
+    {
+      "path": "python/x402/http/types.py",
+      "bytes": 8320,
+      "sha256": "15b7faa8b9d72a4d56d1d55366566aaf9dec6c1e8c4b1667a091890126ab0fae"
+    },
+    {
+      "path": "python/x402/http/utils.py",
+      "bytes": 6382,
+      "sha256": "bbd0ad0793c4b676857d078ba4814ae45aad8689e1cdbc4db67baf52e68df4f6"
+    },
+    {
+      "path": "python/x402/http/x402_http_client.py",
+      "bytes": 15599,
+      "sha256": "696a8ed9d192ad76d88f991ce67a6688ac10add37e83149f15fe0a439a7f6699"
+    },
+    {
+      "path": "python/x402/http/x402_http_client_base.py",
+      "bytes": 7646,
+      "sha256": "531dab8bf8a35e866b548f695e3d12a8327f7e9484d0edcc33210821d4ad8472"
+    },
+    {
+      "path": "python/x402/http/x402_http_server.py",
+      "bytes": 25373,
+      "sha256": "2cf91c121edfb5e4dbc8c912f87ffab21c8bc6c35aad7e73c7210059df0fe922"
+    },
+    {
+      "path": "python/x402/http/x402_http_server_base.py",
+      "bytes": 56353,
+      "sha256": "75a44744ee4cfd1c998236b4b6da246a889591b65c0f798cf1aff3caa81973cf"
+    },
+    {
+      "path": "python/x402/interfaces.py",
+      "bytes": 16187,
+      "sha256": "671b68f1de8d88209c0643f233c272ea2b37eb75b69cb1e4c2593fffc8cc4660"
+    },
+    {
+      "path": "python/x402/mcp/CHANGELOG.md",
+      "bytes": 2244,
+      "sha256": "8698010e697bf351b147373a2d04fac8afbb01f5a5211c8c13d6f50bd12d9891"
+    },
+    {
+      "path": "python/x402/mcp/README.md",
+      "bytes": 9560,
+      "sha256": "21752eb395438811371a75e42ba8cc6d91cdefadaca72648ce5bef51c888cd87"
+    },
+    {
+      "path": "python/x402/mcp/__init__.py",
+      "bytes": 4294,
+      "sha256": "135390b6d0a4b109974b33ae0cc71a302d7d4a919f10889c0f44fcc378a063e5"
+    },
+    {
+      "path": "python/x402/mcp/client.py",
+      "bytes": 24909,
+      "sha256": "0addfaf3d8e621ca9deb646e3f25070cd0670978c71818454ab2caf09b505ae3"
+    },
+    {
+      "path": "python/x402/mcp/client_async.py",
+      "bytes": 26432,
+      "sha256": "7b4d75615e76402ab1842a640bbe3cc825b10f2a2499cb059cc335424be3fa80"
+    },
+    {
+      "path": "python/x402/mcp/constants.py",
+      "bytes": 290,
+      "sha256": "e3c9aed822e13688b83fc772aab66ff2291de411dbf6fac83d7d0a4b597b76b5"
+    },
+    {
+      "path": "python/x402/mcp/server.py",
+      "bytes": 26402,
+      "sha256": "07380848e4fa1b9603e307c2e82274d4c959bf4779e3d4d30cf1337c9cb119f1"
+    },
+    {
+      "path": "python/x402/mcp/server_async.py",
+      "bytes": 31276,
+      "sha256": "2506cc95639dbbeeb3e5eeda1af4396f9560abc94b9a63f34724b2bf3dc7c068"
+    },
+    {
+      "path": "python/x402/mcp/server_sync.py",
+      "bytes": 25244,
+      "sha256": "d5ff668fff39931c3914fc57a949f8f20885aa1e94234178f6d2502b4fc3e95d"
+    },
+    {
+      "path": "python/x402/mcp/tests/__init__.py",
+      "bytes": 43,
+      "sha256": "900d0bf310f74cb6188fb890265fa0a75265b3b7870432e5600d35fe93a3f0c6"
+    },
+    {
+      "path": "python/x402/mcp/tests/conftest.py",
+      "bytes": 5943,
+      "sha256": "651f0dd42c4e187a57e78274b5cf71e24a818aab440a4f27e9f9c74e74aa91be"
+    },
+    {
+      "path": "python/x402/mcp/tests/test_client.py",
+      "bytes": 19024,
+      "sha256": "ea07d57f626671eee15f09ffa959221dd239d15de0effabafc179ef997f556e2"
+    },
+    {
+      "path": "python/x402/mcp/tests/test_client_async.py",
+      "bytes": 19082,
+      "sha256": "44f9cc9eeea7aee30e75d1feca1ef15a98664fe2d28d63edb765395642a4e0ae"
+    },
+    {
+      "path": "python/x402/mcp/tests/test_server.py",
+      "bytes": 35503,
+      "sha256": "617ce3c924ec0b60a6fd740f1a427cbd7a375c749e31a01e7d0a8d93bf780dcb"
+    },
+    {
+      "path": "python/x402/mcp/tests/test_server_async.py",
+      "bytes": 28371,
+      "sha256": "2774d0f26b4eb4fea39243f1e79a3ae5ab4a5c72a7e62a4176d62dedbfd53eb6"
+    },
+    {
+      "path": "python/x402/mcp/tests/test_server_fastmcp.py",
+      "bytes": 6621,
+      "sha256": "017c68cdb040ba8a009572817a70f240bcf82dc158d672ff9c0e29703db880fd"
+    },
+    {
+      "path": "python/x402/mcp/tests/test_utils.py",
+      "bytes": 14401,
+      "sha256": "0c0d7194b5c6e92af63f178ad06cf6ce88e7676d084499aa76ff37d4af99f28c"
+    },
+    {
+      "path": "python/x402/mcp/types.py",
+      "bytes": 12771,
+      "sha256": "18d194cc773abe51dc48a7d37e3df81453ce018c0e855a72326bbf497cafe52b"
+    },
+    {
+      "path": "python/x402/mcp/utils.py",
+      "bytes": 19973,
+      "sha256": "ca18c5f125df3ebe38309d2f66549474fecee41cd56effc5fda22b606e5411ae"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/README.md",
+      "bytes": 4192,
+      "sha256": "5f7ef85fc33577d8de35fa328e47dfc3cbf22abf77a66c0e7346f59480965ab0"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/__init__.py",
+      "bytes": 5848,
+      "sha256": "e227e6d8720d17590ba4c58f5581bec315692b100e462f1de4339c9ec2d5c2c5"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/asset_cache.py",
+      "bytes": 5137,
+      "sha256": "aecc670107acebe541ecd6381896bc221c1fbbe1e95df5551211fe0be08d6845"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/__init__.py",
+      "bytes": 2611,
+      "sha256": "97122a7a1bfff2d470ab4dec33bd923c77a835a9e78e646367799f9cab94ccb7"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/abi.py",
+      "bytes": 7414,
+      "sha256": "21238534b11590d4ac9783cb796b79c523726a7c08480cb0e6160bb93d816372"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/authorizer_signer.py",
+      "bytes": 3726,
+      "sha256": "e3b3f86a579dbc1954a4a7c62aa0f010e8f3f40d64e9d78075d4b02af5db5c18"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/client/__init__.py",
+      "bytes": 2754,
+      "sha256": "07b657f8f2559228178337ab329ed6d4ad9062017bc7cbba8aeab34cd51587ea"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/client/channel.py",
+      "bytes": 10739,
+      "sha256": "72a466b111f2f3e87ff999e8a217ff2dc0ed6de79677db19af569b4f80b49580"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/client/config.py",
+      "bytes": 7684,
+      "sha256": "2f25804f5c07bc9409fa90dd73e3d39b7a4b59ed82273a2cc7ec38299e6d6d0a"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/client/eip3009.py",
+      "bytes": 3253,
+      "sha256": "a1e46e4446dfb468efe2c0bd8549eec5af9f91673a8f67b2a846d79a3853f0df"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/client/file_storage.py",
+      "bytes": 1557,
+      "sha256": "d69c10039849af18ecad1381c02a2684f1a9c6ecb6def17544fabe43caa2779e"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/client/hooks.py",
+      "bytes": 3258,
+      "sha256": "4ca3c1a8e2cc4f40a820ccceb65cd281c6f954cec95e0590fa2dd7ce62bf6ea6"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/client/permit2.py",
+      "bytes": 3223,
+      "sha256": "34955b8dc2646861dc08e224e3a6710c46d743c975b316485fb12cc9dd5c8646"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/client/recovery.py",
+      "bytes": 5285,
+      "sha256": "95365a76d676618d00d470ad5159400faf414cd40fb98e01dfc142c0136f0239"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/client/refund.py",
+      "bytes": 10431,
+      "sha256": "5292efe1722d1595fa95c3568058f70a748d41fefd69426c80affd59b8815d0b"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/client/scheme.py",
+      "bytes": 15558,
+      "sha256": "16a343da5e879a889145e89817a8e11d747a5edf3a131c177c1d631b4fc38bec"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/client/storage.py",
+      "bytes": 3908,
+      "sha256": "cec5a99776f49cfb8efbd8316260f1a71f376c1ab4fbffa10deb252b0934261a"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/client/voucher.py",
+      "bytes": 1469,
+      "sha256": "c83cc497e0e60e73f02cb595aad1bd5b9ffda6458899c6f0168549f08c7ee3e8"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/constants.py",
+      "bytes": 5666,
+      "sha256": "d6a1eb9c4197d7e91957f7ac3a410ae7685a422798072c0ed34ceab05384685b"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/encoding.py",
+      "bytes": 3036,
+      "sha256": "b0738bb1bbdb61f64d4a33780eb4af9cdd2816c2ed1f755c186353dd25fd35db"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/errors.py",
+      "bytes": 6492,
+      "sha256": "8fdd0ab66dc7db374696e4b080914c432cce36eea1593940597b20a2f699be20"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/facilitator/__init__.py",
+      "bytes": 243,
+      "sha256": "f1482d409f7167c60ee3e28b31af9cff64f15f8a190d7fe119166f9d4c6ab6da"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/facilitator/claim.py",
+      "bytes": 3822,
+      "sha256": "ed722ba7668ae8b12804f47adc3ef0df2bd0b2b97f427e3d367a73d36ea802fc"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/facilitator/deposit.py",
+      "bytes": 34199,
+      "sha256": "6a76fc05ae67e69b7e37c4b59a4473aa0f9f20bee6237578c59f3b5b9a244fdd"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/facilitator/deposit_eip3009.py",
+      "bytes": 6861,
+      "sha256": "df8b7f1ffb0384831591505343a6703340d8816863a24eb45eb397cf1be10df8"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/facilitator/deposit_permit2.py",
+      "bytes": 11943,
+      "sha256": "0b8fd66b1221d5b4349a9027bb5b404ac784e5f1b0413a67080fed378e149dd0"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/facilitator/refund.py",
+      "bytes": 13012,
+      "sha256": "958b62351457b0b5e3b8b570cd1561071940d122fb44b49cdeee4002932e7e2c"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/facilitator/scheme.py",
+      "bytes": 7462,
+      "sha256": "0b7ae1b54aa43be02f977d96256a02bf7d225785157e8baa9b0d2b6306042ca6"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/facilitator/settle.py",
+      "bytes": 5241,
+      "sha256": "d6d8be4b87daa698ab140629cbb41c118fea4366dff3861a48fa1a9bba654cc8"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/facilitator/utils.py",
+      "bytes": 8317,
+      "sha256": "6cb96b9ab441ec6db23f1451c42b00ac17a8fc39085444d462758f1e52fef972"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/facilitator/voucher.py",
+      "bytes": 3683,
+      "sha256": "13fcf63534fce3a75249a149df3866c24b6e0d118331bfa47077a026cb807f6a"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/server/__init__.py",
+      "bytes": 1505,
+      "sha256": "4bbfc8d3e0c01f529e03a2e3d24937069d7032e1f33b417d7323fde15e4425fe"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/server/channel_manager.py",
+      "bytes": 14579,
+      "sha256": "77f95a79f4198dd58a1e8ec1604167f14054378a441f2d511627d3b92ce96f23"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/server/channel_manager_common.py",
+      "bytes": 7734,
+      "sha256": "0422f681a39f438e97bf91fc9e649435e2d1c915e1c5cc55e624c78bd6937c7b"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/server/channel_manager_sync.py",
+      "bytes": 13662,
+      "sha256": "32a6be9f3172e78eff0bd520717f6dc8440abf5f8cf18620b436c055834ee61a"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/server/file_storage.py",
+      "bytes": 3992,
+      "sha256": "8f5b68d0f927957647746d5dbddf8cfd8cc6801d3a3d45fcefa9ee813413fe84"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/server/scheme.py",
+      "bytes": 19132,
+      "sha256": "7d53d34e1516344253922dc3f90d02fe6da5e88c0ca03eb5b3fd401020d64912"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/server/settle.py",
+      "bytes": 14101,
+      "sha256": "9401eb81c01b6a44723e3dcff5e673edadec778d78fdf94fa916c3f4e793ea50"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/server/storage.py",
+      "bytes": 6730,
+      "sha256": "846f66caefab935b869b4d3b1cc785ee1715579e293567d9bbd96dc4bd2e012c"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/server/utils.py",
+      "bytes": 2877,
+      "sha256": "79608bf67257db308f3a560da6b6dfb3062a2d78afa36902835ce915f1128bb3"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/server/verify.py",
+      "bytes": 17406,
+      "sha256": "b8129d73969e1206b356d223d9998ad8485a94131de95a761ecf7a8ee44180e6"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/storage_utils.py",
+      "bytes": 1941,
+      "sha256": "20a55d0b339ddca141720e40ca10f4c1188a47df8ba38d4fa90bbfaa558294ea"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/types.py",
+      "bytes": 20841,
+      "sha256": "157c3f152cd1c3348b2dfb395bcad4f28495ad58acfe78a3207def3f416ea61f"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/batch_settlement/utils.py",
+      "bytes": 5102,
+      "sha256": "a474655dd8eeb681da2b746f7f726c3dd869d91a3ba3ee136e8bae325c2b622c"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/constants.py",
+      "bytes": 17586,
+      "sha256": "5209e5516b4c5a197663b440b653671aed7cc3624a3acfb4938df1fdb76dffe6"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/data_suffix.py",
+      "bytes": 3574,
+      "sha256": "22d5704582b1fad6481ea17bf52a2ce1c0a51508b3dec714dd94c89b52d7049d"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/default_assets.py",
+      "bytes": 11178,
+      "sha256": "f5144a4ab0c92580007ad4658e43c7e3e62d74410ae158f308a03711b6f6ca0b"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/eip712.py",
+      "bytes": 7108,
+      "sha256": "bf58d848c82b3120828b56a1a7cd0969dd0e356573c8e142bf54b39a83036944"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/erc6492.py",
+      "bytes": 2844,
+      "sha256": "16af2a26c2c0373235fe83ee6f3aeb7d5b7b8e569d29ccf569c6ffcbc00c3d61"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/erc7702.py",
+      "bytes": 1393,
+      "sha256": "913c04a3853dc95b420e78176379357255db1799bedfc87b1bd4406fc262d3e5"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/exact/__init__.py",
+      "bytes": 772,
+      "sha256": "d1510805afaeb95ddb1fc8f89ffd3d1e367376e778bdd28d381d29d7ef8a0099"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/exact/client.py",
+      "bytes": 10079,
+      "sha256": "e54f45c8329ed3561c333c5ce4a5151b4a38d91b6a0f22d06fea2ab680e6950d"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/exact/eip3009_utils.py",
+      "bytes": 14639,
+      "sha256": "a09fb7d9256617e91283b1ed3e6c612d33f44ad3d3188c04905ebb085e38666e"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/exact/facilitator.py",
+      "bytes": 25667,
+      "sha256": "04ec9fc151a84a5c227f5419ee7e9adbd6d645362bdbcd3ad47553ed66436915"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/exact/permit2_utils.py",
+      "bytes": 30928,
+      "sha256": "8b67b2eb41cb914e075f08cd0e586786cb22ee8d577a22053602c34e3d7f42d8"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/exact/register.py",
+      "bytes": 4994,
+      "sha256": "2c518bfb518e4e56b39914a036c0c8ce758fab62a398d3a5de2a7bf68d913f29"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/exact/server.py",
+      "bytes": 7338,
+      "sha256": "6b6ec2953b834533a6b706af07e2f6d1932a99e9372a244c1f1931f9f0464d01"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/exact/v1/__init__.py",
+      "bytes": 478,
+      "sha256": "8058602b2d81e19a7c404dcbaa780f67f24f419b8ff9d2b7a4f7a59d10916fc3"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/exact/v1/client.py",
+      "bytes": 4623,
+      "sha256": "09c13e02883a934dd60ba8328ea4ecf3cbb0def4829160b00df50cf2840d9ae0"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/exact/v1/facilitator.py",
+      "bytes": 17038,
+      "sha256": "8ff3b523eeaaa6955a23a173f13ad26e4e4d69324ea36fe26d01c4a3ae3eeae0"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/multicall.py",
+      "bytes": 7199,
+      "sha256": "cf02369b87d5d561c22d9e2d6cdf3c2aebc733930d0abd0b25f4fa20480184bb"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/settle_receipt.py",
+      "bytes": 5975,
+      "sha256": "dc1887f862f4fd07740f7b2e653bc551307ee7dc7ff0cfd780641db11dfd943b"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/signer.py",
+      "bytes": 6640,
+      "sha256": "33fdf1afc034158e94ee5ca7916ccbded51553d3b0808717440d9845f6829a7b"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/signers.py",
+      "bytes": 21452,
+      "sha256": "3dcacff8de1aa28c5ad2f0da601d41cc612af06a4d00e94b32a554c9218e378d"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/types.py",
+      "bytes": 17338,
+      "sha256": "da3cb091d95a3d8729441b63cbd82500d74f054b0fe02003c8bfcfda41f61903"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/upto/__init__.py",
+      "bytes": 471,
+      "sha256": "8c5a8e74724bf6f94328420047a26039841826a0a3da5a515f572612555085e9"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/upto/client.py",
+      "bytes": 10046,
+      "sha256": "95edb255f5615c357346eb95d244fc09d02a406205ead67a71c6a2a1f113b9fc"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/upto/facilitator.py",
+      "bytes": 4035,
+      "sha256": "3ba82aa1ca4b6e8a8420c2391bb98f88f0e18a9bb9d1cc9e3c29d9254bfbb9f2"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/upto/permit2_utils.py",
+      "bytes": 32919,
+      "sha256": "1bef649673ba2c7d938bc38f1a5164b731bd125880a8fc3b0ee2b37a0561e86d"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/upto/server.py",
+      "bytes": 4972,
+      "sha256": "ca7151b75171341218c9bfe873e2012a05b8d3981c766559d1f334433d361d4d"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/utils.py",
+      "bytes": 7625,
+      "sha256": "2475b9e781eca608871565c1833226cae5d00af148b0df4d479e6d72d78e307d"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/v1/__init__.py",
+      "bytes": 54,
+      "sha256": "121d22046694091b3739a511f02d18dc13747fe4566005e6caec1c857c2ca804"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/v1/constants.py",
+      "bytes": 1079,
+      "sha256": "e18dbfea02e2306901d78baafd3f71bda4926c253b8650a88a2fac06d142cef2"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/v1/utils.py",
+      "bytes": 1482,
+      "sha256": "78ce435ab6852a482ee94b03d4e0a1b74599f3abf63007c8cbaf660e3753d269"
+    },
+    {
+      "path": "python/x402/mechanisms/evm/verify.py",
+      "bytes": 10279,
+      "sha256": "81f7bbecec20f4f62d0529170a8341f9636afd6e41f17441710411be6f5ef240"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/README.md",
+      "bytes": 5569,
+      "sha256": "ef83ed59bec8eadb05f08c3a3d96572113cc0a532ccf66770d23ed4ea56ee679"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/__init__.py",
+      "bytes": 6074,
+      "sha256": "20ffa6068463d49d9587220cc9cbb8d8b03090d58760a3572ffaf6ef917b2daa"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/constants.py",
+      "bytes": 8185,
+      "sha256": "fa747d0fd1fa99556963b33960e078409156d5eefcb1a5b5b6db0fb2083f53a2"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/default_assets.py",
+      "bytes": 4867,
+      "sha256": "22b4ed60efcec165cc589f026fc924c6f1cb1be29c681b635ae29a876675358e"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/errors.py",
+      "bytes": 198,
+      "sha256": "044d484b1aa6f54d405da875f2ee7323d4e4bea547b4e3b0c4c1b277af991925"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/exact/__init__.py",
+      "bytes": 698,
+      "sha256": "d61350c5909dd863860a7d768689f9ad046c976789d370f42a7c7497062dd972"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/exact/client.py",
+      "bytes": 6477,
+      "sha256": "be0509748410c5d94909dcd47db06635d530036dbf82804cd6c8a71c3196e18d"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/exact/facilitator.py",
+      "bytes": 25802,
+      "sha256": "c5e1e1f44a36de607d374231ef10ace483588a91c06e9481fb5f99d92e538f64"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/exact/register.py",
+      "bytes": 4946,
+      "sha256": "0789da40863bf0675c3399895d848be7d161ee1bbea4284fba1ffab10728be7d"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/exact/server.py",
+      "bytes": 6526,
+      "sha256": "f44ea66b97ae45c7a439d064567fa631a000c72a4f1029205a6afb7cbbe54c33"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/exact/v1/__init__.py",
+      "bytes": 400,
+      "sha256": "79dbf873608949f7745456916d1e4674dd0bb8433aebab7dc9d1152466301bb5"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/exact/v1/client.py",
+      "bytes": 6717,
+      "sha256": "dcd025d6e2a3c2a18a7d2b21cf65178a1828222fa81be61ea723259e43dacbd9"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/exact/v1/facilitator.py",
+      "bytes": 16503,
+      "sha256": "15b7c022cbb069ebb9ebef6128d578d81e80d8363cee451987a5fc46a2eade0d"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/mint_cache.py",
+      "bytes": 1395,
+      "sha256": "887b8b18021cf8fa29a2bfadf4ea4eba1824158ee04114c16f823ad711c462cd"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/rpc.py",
+      "bytes": 7710,
+      "sha256": "2e9e76c9fb7a2b468d373b98b352a738739d96536ee712e139adee33942c868c"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/settlement_cache.py",
+      "bytes": 2110,
+      "sha256": "b55f3ce736c7b6307b441cd2330961ad46b919a2a281a036c47768158e76b543"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/signer.py",
+      "bytes": 4091,
+      "sha256": "e0cad569a04a227e132ba56d20df55c7b0202cade720eb87777f3093f7a82243"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/signers.py",
+      "bytes": 9893,
+      "sha256": "cd76e34ba407f97786440fd890f43acb97356968da1905191124e5f5a167763b"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/types.py",
+      "bytes": 1573,
+      "sha256": "c33c6c25479f23b48ce28aae5d959d86488b92cc96e92a336ebb334f3b5fef8b"
+    },
+    {
+      "path": "python/x402/mechanisms/svm/utils.py",
+      "bytes": 29315,
+      "sha256": "ad85697ca75ad9a1f3e8cfc015f06f5cdb2d7571a84498382c5d8291b1290c13"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/README.md",
+      "bytes": 7664,
+      "sha256": "263079c470c0aaa43052830f0b7559b129821751f2d4f18b1d20e2ace5c0785d"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/__init__.py",
+      "bytes": 7417,
+      "sha256": "6c2459475fbb5dfd178b76037218de30d4ce234aaf6f47187e72256de533f3f1"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/codecs/__init__.py",
+      "bytes": 1596,
+      "sha256": "24275d9b2cfefdcc45da43efad3b9b7c49b7db345bd6ec5abd34b04b3b27834b"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/codecs/common.py",
+      "bytes": 2107,
+      "sha256": "7af4fdbfab61a0bd67ec9216ec0d8efeafcfe57516136696eeb36ff07639f669"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/codecs/highload_v3.py",
+      "bytes": 3070,
+      "sha256": "ed0e5e278723467a572a11e5b86720eecbaeede2c887401c54c411c6acee5ecc"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/codecs/jetton.py",
+      "bytes": 3487,
+      "sha256": "81b73784327c69c72d8cd69ebd2e4e439142c1191f15b12864b1ce2e1098c7d6"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/codecs/w5.py",
+      "bytes": 5809,
+      "sha256": "907038eb452aa40102e6086786b6a0970826e625c0b150cd8df38a3cb8e60a26"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/constants.py",
+      "bytes": 6865,
+      "sha256": "4ac354a3b89bafa80acdb1dbfd8cc0beb73a3a87911e709560a3e54836220cf9"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/default_assets.py",
+      "bytes": 2106,
+      "sha256": "b7e4534e144d73cc258b01ebc447503e5438c6d703cc485b936fce002d19eb1a"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/exact/__init__.py",
+      "bytes": 393,
+      "sha256": "1568f55a257af67a9c52e858d4ef67c7dcbd7a133f63bdf49dca02ec40a42f38"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/exact/client.py",
+      "bytes": 10856,
+      "sha256": "e7985497eccf616c44ce8cd84050dd1b7723e6ad950d968898413474889d6d99"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/exact/codec.py",
+      "bytes": 3370,
+      "sha256": "74241a18f89e247ad6d360d307b572ffb1745ef66b51b7a4de53a893a20969ac"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/exact/facilitator.py",
+      "bytes": 21520,
+      "sha256": "e801fcff20cf20185a8d22a3024a62756dc1aceeb7b095b80d91e76dd14444a7"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/exact/server.py",
+      "bytes": 4776,
+      "sha256": "36d307a996ffa8e587e8c9f2b402b9cc8b3dec1299efc8e6344b38d1ddce4b4f"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/exact/settlement_batcher.py",
+      "bytes": 8281,
+      "sha256": "f44c0156da59d23356bf6574029f2cf643181c5d68f2f6e3241cb51f2ddf3059"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/provider.py",
+      "bytes": 28009,
+      "sha256": "fdf119bc71ab538661e40768f1179a6557624791fef8d989cb30840543c237f5"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/settlement_cache.py",
+      "bytes": 1477,
+      "sha256": "ba583de39902acd3dda282157e42389c8edf86c43d59e50430822631bbec5296"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/signer.py",
+      "bytes": 3104,
+      "sha256": "7561a2d029d753ac4c0c50105e89bae1f74140b11140fa39dc1a5acfbe4264f8"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/signers.py",
+      "bytes": 23136,
+      "sha256": "c839f4cf123eed72fbaf864472dcc62368445f0e6c69545009e22fd0b856e295"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/streaming.py",
+      "bytes": 19836,
+      "sha256": "8c900accf4dfda8e39da861a99917e370b272b2cc00297749441aebda5231955"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/trace_utils.py",
+      "bytes": 4640,
+      "sha256": "76e15cffb83fbd1eb6568e359738dd045e4d6dcbc625b95556c0b5b439a9d0fb"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/types.py",
+      "bytes": 2747,
+      "sha256": "745580c0bc21d4205a857e602689c5361c86c6c0d27071f40666b503a86db3a2"
+    },
+    {
+      "path": "python/x402/mechanisms/tvm/utils.py",
+      "bytes": 1623,
+      "sha256": "8677db58cda406c07b0f9faaba02ec9f0d59ee02ec461a995a69d4c48812078e"
+    },
+    {
+      "path": "python/x402/payment_flow.py",
+      "bytes": 5878,
+      "sha256": "81d72369fd93791c73d3e55775783b2ecd1faa82ff62df9b2459f26f81729a1a"
+    },
+    {
+      "path": "python/x402/pending_settlement_store.py",
+      "bytes": 5747,
+      "sha256": "d986d4925b5fcf0bf478f045df117930d4fe378101c1926c86800d5c6746da1e"
+    },
+    {
+      "path": "python/x402/py.typed",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "python/x402/pyproject.toml",
+      "bytes": 5702,
+      "sha256": "0ed7767c7dca3a21c7ccdb013797a57c3926a4bd3cf2042ddd34c1d90466f4cb"
+    },
+    {
+      "path": "python/x402/schemas/__init__.py",
+      "bytes": 5169,
+      "sha256": "f7a0455cbf1833bc2cf866b9a6e7603d5accf63be63d862e7f26ca109fc7c140"
+    },
+    {
+      "path": "python/x402/schemas/base.py",
+      "bytes": 1378,
+      "sha256": "20e6ffc21610aec0a7d06f94182d76353edf0c3a60811e06780373f47de9ed8d"
+    },
+    {
+      "path": "python/x402/schemas/config.py",
+      "bytes": 1758,
+      "sha256": "f61bb3735d937e02304018910b154ce74c9461fecbfe1ab690e0518915cd0b0a"
+    },
+    {
+      "path": "python/x402/schemas/errors.py",
+      "bytes": 3339,
+      "sha256": "29c434dcd452fc197a8e8d126ca142652f7295de7f341d9de7466f54b31a24d1"
+    },
+    {
+      "path": "python/x402/schemas/extensions.py",
+      "bytes": 6287,
+      "sha256": "160ed374ee8fbcd457b179786e81aa49519d00499e6479b88a89760280adf1c7"
+    },
+    {
+      "path": "python/x402/schemas/helpers.py",
+      "bytes": 11193,
+      "sha256": "12e74fa1da1361e2f4579cef0f4d32d3d92b45d5ae7d172953e101401e8a5419"
+    },
+    {
+      "path": "python/x402/schemas/hooks.py",
+      "bytes": 13792,
+      "sha256": "ef17cc1dccc761683e58c092fbd28a3ee7178d078c5a9b64b3064b053ea2b441"
+    },
+    {
+      "path": "python/x402/schemas/payments.py",
+      "bytes": 3512,
+      "sha256": "8b8dd93589cb06173af061c02808285e3f53457fc8f9ee9b5954a72b8399fe38"
+    },
+    {
+      "path": "python/x402/schemas/responses.py",
+      "bytes": 3636,
+      "sha256": "4eddbb49611af8c4ab9ed92d7c6d1ebbe96731ae39d23f05733f73819b6cfe42"
+    },
+    {
+      "path": "python/x402/schemas/v1.py",
+      "bytes": 2686,
+      "sha256": "53bdf2b5b987106e198b990686b012c4b75dd100219a887511fab1df67e15356"
+    },
+    {
+      "path": "python/x402/schemas/views.py",
+      "bytes": 2011,
+      "sha256": "27519764996b25019166c136e048324d0bcccbda000aa210177b1f8c46d6f5fd"
+    },
+    {
+      "path": "python/x402/server.py",
+      "bytes": 28443,
+      "sha256": "8207cad960f4f99c6232a8153d2417a5b4948e00c90aabc9795bc36b388e133b"
+    },
+    {
+      "path": "python/x402/server_base.py",
+      "bytes": 68332,
+      "sha256": "2aa2caca200a89ae9f5a8ab26c35bd51504be98f6680561d4ce50b13e40f7536"
+    },
+    {
+      "path": "python/x402/tests/__init__.py",
+      "bytes": 29,
+      "sha256": "eb46d469eef4d7fabd6df2d0ab3dc9543d85fbdeac3cc2dd4338d9f2dad8c4e3"
+    },
+    {
+      "path": "python/x402/tests/conftest.py",
+      "bytes": 1496,
+      "sha256": "d87b7939bb1aca7f4e993514e4cf9c88f17268a5bbc5c2fcf2aa7be0904eedd1"
+    },
+    {
+      "path": "python/x402/tests/integrations/__init__.py",
+      "bytes": 49,
+      "sha256": "ee80fb04732c051070c3be17ee723cfcd09c3285ce72ddde0066cb8fb6aeb945"
+    },
+    {
+      "path": "python/x402/tests/integrations/_settlement_pending_helpers.py",
+      "bytes": 1673,
+      "sha256": "090a3e12d3a5c488e693e798686bec08429ec61f81e795d5817e4a7576407b31"
+    },
+    {
+      "path": "python/x402/tests/integrations/_smart_accounts.py",
+      "bytes": 10546,
+      "sha256": "8d6f73940b14aca3c356fa162f0d029564006f2830afd207c7980de9849ededd"
+    },
+    {
+      "path": "python/x402/tests/integrations/test_async_behavior.py",
+      "bytes": 15618,
+      "sha256": "779bcdf561b8b219cc699291e14b0f8e5bbdaeae37a2409f83066a011a21e19e"
+    },
+    {
+      "path": "python/x402/tests/integrations/test_core.py",
+      "bytes": 18714,
+      "sha256": "fd7ba77a752a9a3977f5ca57cd06e5e742ad678a04c892478bebcfd8645bccf1"
+    },
+    {
+      "path": "python/x402/tests/integrations/test_evm.py",
+      "bytes": 31168,
+      "sha256": "e50638f756e68c24e2aa5d1ba76e4d0a20addd0278cd36adf6225ea4a3b06c24"
+    },
+    {
+      "path": "python/x402/tests/integrations/test_evm_batch_settlement.py",
+      "bytes": 11390,
+      "sha256": "c82e48a00fbe49d0a509df11acda72e3882b3f4cdf3f2721e16173be7062bd50"
+    },
+    {
+      "path": "python/x402/tests/integrations/test_evm_batch_settlement_charge_baseline.py",
+      "bytes": 11958,
+      "sha256": "039aedab5bb3d1b4029682e2e9f05fe2c8bc74672c973cc63b24c843d5ce83ab"
+    },
+    {
+      "path": "python/x402/tests/integrations/test_evm_batch_settlement_extended.py",
+      "bytes": 31000,
+      "sha256": "bfb59bf7f574c140797b1b38b481e59e391079fbd02e5659149e50189ff7f8e7"
+    },
+    {
+      "path": "python/x402/tests/integrations/test_evm_batch_settlement_settlement_pending.py",
+      "bytes": 13599,
+      "sha256": "4cc1906fc7f22e34549de27c8a6da09ae91cb586813d03ef097cf1bd8a9fbec9"
+    },
+    {
+      "path": "python/x402/tests/integrations/test_evm_settlement_pending.py",
+      "bytes": 11663,
+      "sha256": "700196f630bea63dbcebadc0fcedaee77cb949848f1a039ff51bac75653963ba"
+    },
+    {
+      "path": "python/x402/tests/integrations/test_evm_wallet_matrix.py",
+      "bytes": 11359,
+      "sha256": "4e71e62f5f02a0b584dde96aa54f6bbecdf5f514907d0d162cd29a7955af1900"
+    },
+    {
+      "path": "python/x402/tests/integrations/test_exact_4337_evm.py",
+      "bytes": 1331,
+      "sha256": "bbee632223591632295031586d6e60e53a71b8411013daac06a0dd61d36b2490"
+    },
+    {
+      "path": "python/x402/tests/integrations/test_exact_7579_evm.py",
+      "bytes": 1508,
+      "sha256": "554438f6aae84e4a2c2ed0afc8edf9c247e4c674ab2c0a0b1a1efae71a4dc8a4"
+    },
+    {
+      "path": "python/x402/tests/integrations/test_http_integration.py",
+      "bytes": 29239,
+      "sha256": "616f2b80c61823919e1365dbcdf7b4c25e8550f10a259ad0978e22012ff43878"
+    },
+    {
+      "path": "python/x402/tests/integrations/test_mcp_evm.py",
+      "bytes": 16516,
+      "sha256": "8292e23006cc31f2cebf6f8fd8900d54a052fc204eaa0651b87bcef06cab9b19"
+    },
+    {
+      "path": "python/x402/tests/integrations/test_payment_flows.py",
+      "bytes": 12386,
+      "sha256": "7896dcf1e553fa0d734feacd708db0981c00d8798fdb0481074b792b69ba8bf6"
+    },
+    {
+      "path": "python/x402/tests/integrations/test_svm.py",
+      "bytes": 19815,
+      "sha256": "8b512b41d2de9d9bb96ef33afddbfc9bcbcfd05e74cd69b46b8b7feff810931a"
+    },
+    {
+      "path": "python/x402/tests/integrations/test_svm_settlement_pending.py",
+      "bytes": 11632,
+      "sha256": "a9b75dee41d07f2be72477deb95583fa7ac7f0f52c9c76d2ad84e63fa2a4c6c6"
+    },
+    {
+      "path": "python/x402/tests/integrations/test_tvm.py",
+      "bytes": 27262,
+      "sha256": "d07531ff08527b4e9f8401dbbba8843cbe8319b2ac34896e0b445d5e6cc4c6e7"
+    },
+    {
+      "path": "python/x402/tests/mocks/__init__.py",
+      "bytes": 688,
+      "sha256": "05627fa27b2cb1ec8bf92cfece19216701f6328d1690606cf502e800ffbd9bfb"
+    },
+    {
+      "path": "python/x402/tests/mocks/cash.py",
+      "bytes": 12633,
+      "sha256": "18584c17aae530dfe2862e4fe903d38a588e6cb3dd9ab4030835b5cc97578322"
+    },
+    {
+      "path": "python/x402/tests/unit/__init__.py",
+      "bytes": 38,
+      "sha256": "b9e528d8d45e6d25f57a35b5f20d8952cb88891148ad67646cc9ee1afd0638de"
+    },
+    {
+      "path": "python/x402/tests/unit/core/__init__.py",
+      "bytes": 65,
+      "sha256": "e1a975c4fa2453950bee8a0ea0dabbf674bf0f6ff4f54c9163bd5e912868d64e"
+    },
+    {
+      "path": "python/x402/tests/unit/core/test_client.py",
+      "bytes": 52534,
+      "sha256": "5229cc9b2a5c6b6b0eeeb9e190a00661181b95a09163adebef3c2302170293d0"
+    },
+    {
+      "path": "python/x402/tests/unit/core/test_extension_echo_validation.py",
+      "bytes": 12248,
+      "sha256": "f638c56c92892719c92f5ec28fba9514130fdd634048ef2d82b71d331b993e5b"
+    },
+    {
+      "path": "python/x402/tests/unit/core/test_facilitator.py",
+      "bytes": 28574,
+      "sha256": "b3d1f5c37ead69217c4f3fbd7c9efb9db047ea1032b17bf04f82028e5e87765c"
+    },
+    {
+      "path": "python/x402/tests/unit/core/test_from_config.py",
+      "bytes": 8321,
+      "sha256": "7ba7dd3494bc27788c32c32e465572daa2ecfe1cbe4fd2b0529239a0dc5ce363"
+    },
+    {
+      "path": "python/x402/tests/unit/core/test_hook_adapters.py",
+      "bytes": 5440,
+      "sha256": "c6948d09c737b422b02ddbca3ba7b871dfa5599fd1bacde2fcfc1d151727527c"
+    },
+    {
+      "path": "python/x402/tests/unit/core/test_hook_policy.py",
+      "bytes": 9049,
+      "sha256": "96bb46badea8b137d93491c17b814dc0c292715c818a4a2ae825d87a4f85da15"
+    },
+    {
+      "path": "python/x402/tests/unit/core/test_payment_flow.py",
+      "bytes": 30150,
+      "sha256": "9cfbf742d69bfe2f650cd339c03f0ff5181ee9dcfd7dcc05d41422bc801dfaf4"
+    },
+    {
+      "path": "python/x402/tests/unit/core/test_pending_settlement_store.py",
+      "bytes": 4975,
+      "sha256": "7ebc2ec7b788a6aec143b7cce3d80e19481a5cf8133782fc7ec210fa4b97911c"
+    },
+    {
+      "path": "python/x402/tests/unit/core/test_server.py",
+      "bytes": 27411,
+      "sha256": "16b3ee24a42b679dd1761d3f20958fc9c4fd91a5886fae969709bc299cde1623"
+    },
+    {
+      "path": "python/x402/tests/unit/core/test_server_cancel_hooks.py",
+      "bytes": 3218,
+      "sha256": "5e75da21bcc9b94667dc5bb212f0b95f9431a5fa459a4aff0cedd97bda05cba2"
+    },
+    {
+      "path": "python/x402/tests/unit/core/test_server_enrichment_hooks.py",
+      "bytes": 6676,
+      "sha256": "1a8e387f58314b289ea0aabe2b7b3be73ee63227968e19018b6f69e10fdd5c57"
+    },
+    {
+      "path": "python/x402/tests/unit/core/test_server_hooks.py",
+      "bytes": 16995,
+      "sha256": "5a49049e1378ed93b3944c8d9b945a6429ffaed1f590142c4449d0c543330786"
+    },
+    {
+      "path": "python/x402/tests/unit/core/test_settle_pending_retry.py",
+      "bytes": 15596,
+      "sha256": "c0deeebf6dcd483cd4b27d048299477bc2e20f9a45c0665d6e8d9d6afa0c66a2"
+    },
+    {
+      "path": "python/x402/tests/unit/core/test_settlement_overrides.py",
+      "bytes": 10468,
+      "sha256": "c0ea68a275d8a7580467a596d4fa722a5e2965fe50bf96898f8b2bf667cfdd9a"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/__init__.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/bazaar/__init__.py",
+      "bytes": 48,
+      "sha256": "087f5ed5d7f7132d07698b3d5076c199215616dfc5f89e35007284602a5e1c50"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/bazaar/test_facilitator.py",
+      "bytes": 42882,
+      "sha256": "086b1ddd5b1d72392afc7a6d0f55d4cd4e84164ae16bc219fd98659545c84d3c"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/bazaar/test_facilitator_client.py",
+      "bytes": 24760,
+      "sha256": "2452344e3ac6f35d657b8d3927e3abb9d049fa0fb0ba5aa51a04aa66617469db"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/bazaar/test_resource_service.py",
+      "bytes": 4252,
+      "sha256": "5945bee743ca0574ef979549c1f55d5a1e35ad6b3f8aa38a97de623793c45e41"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/bazaar/test_server.py",
+      "bytes": 15952,
+      "sha256": "8a0c77bff6ce367a7eff42d50ba5ef92c9b2d7323c8892fabb7cfee6532d0911"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/bazaar/test_types.py",
+      "bytes": 7002,
+      "sha256": "4919646f70aff01b1f67636ccfe8829144e81aeed0e723bd931752a14fa43a0b"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/bazaar/test_v1.py",
+      "bytes": 9470,
+      "sha256": "8d03a5c5d3e1ed882d10cea704c99c2e2c2bb00d4f57ae390c4ffd8882ee7118"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/builder_code/__init__.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/builder_code/test_cbor.py",
+      "bytes": 7476,
+      "sha256": "1823cc13b1acde80239cd695152d953a8f0fd2fc6db56bab3190c183a9b6d2f7"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/builder_code/test_client.py",
+      "bytes": 7121,
+      "sha256": "128678b4f0bce811151cb08ab5d2acc11fdb4ccae19734a820af0284dcae7b15"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/builder_code/test_facilitator.py",
+      "bytes": 9618,
+      "sha256": "6010bb6debdeace882e9bc70192bdf66bfbb66acb45a04d0e348e49ab0be1a09"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/builder_code/test_server.py",
+      "bytes": 2506,
+      "sha256": "185d220f3f9ecfb89389944daad2488c94b89e2e24837a20267dbec316afb31b"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/payment_identifier/__init__.py",
+      "bytes": 46,
+      "sha256": "0d8932900e7fb9e83a1ec5d5f1c36d6eb445607e60b62ecbb3407e38f7453718"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/payment_identifier/test_client.py",
+      "bytes": 4055,
+      "sha256": "fa18d97064afe5b9fb87c2493ddcccd41d5f57a6900c1116814211c274bea645"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/payment_identifier/test_server.py",
+      "bytes": 3217,
+      "sha256": "338c1b9b120501a553c1ab1a442659df667a0c46b729d0f7876f0710e3b4bbac"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/payment_identifier/test_types.py",
+      "bytes": 3143,
+      "sha256": "7bde3d2af97caabb0a6efe20b2c7100a70cee7370c0480d803aa2ad3f8771736"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/payment_identifier/test_utils.py",
+      "bytes": 3293,
+      "sha256": "30c514aaf59abcc149f8d4aa7fde13d75dd9c5427ee630f74c21ee8b6ea41c0c"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/payment_identifier/test_validation.py",
+      "bytes": 17203,
+      "sha256": "ac5dafb8e405da723ca045cf764a8d2bfb1dc2ef467ea23b1de9d2a36fe21d01"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/sign_in_with_x/test_sign_in_with_x.py",
+      "bytes": 39368,
+      "sha256": "4646330b3e0af8227baa6891c7418505b2eb108b24a025acc00de2761d1c29a0"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/test_eip2612_gas_sponsoring.py",
+      "bytes": 10394,
+      "sha256": "c6ed42ddcaf532e9a4fe46484616fc1df99087e882dfb4391d1943c29ebedba0"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/test_erc20_approval_gas_sponsoring.py",
+      "bytes": 6320,
+      "sha256": "c0770758de22faa2e43c1807f72713ea9937c02e35eb259a17b487384f424672"
+    },
+    {
+      "path": "python/x402/tests/unit/extensions/test_exports.py",
+      "bytes": 2550,
+      "sha256": "78d690d3f39be3e01a64fb55665f804e774f1a018fff8185197c1edee49e10ee"
+    },
+    {
+      "path": "python/x402/tests/unit/http/__init__.py",
+      "bytes": 34,
+      "sha256": "d8f6caad349bfe75746c876b2c603bf8cf604f2263b7eb9dc416d0b11d266661"
+    },
+    {
+      "path": "python/x402/tests/unit/http/clients/__init__.py",
+      "bytes": 42,
+      "sha256": "df13d339543ff4977f6ed3d31300619263b725f7d42e4868e47c62e2f1d8025b"
+    },
+    {
+      "path": "python/x402/tests/unit/http/clients/test_httpx.py",
+      "bytes": 43765,
+      "sha256": "27596cb62c22f085ff1a341b3fc391239637e8215279cc05d421538200bffe84"
+    },
+    {
+      "path": "python/x402/tests/unit/http/clients/test_requests.py",
+      "bytes": 38137,
+      "sha256": "5b5e24a6aa55c297f5cc4f9b7818c420e52306e76ffeef7c14c1062e0f2ca189"
+    },
+    {
+      "path": "python/x402/tests/unit/http/middleware/__init__.py",
+      "bytes": 51,
+      "sha256": "2882918b799b327e291cb52a2d30c7e73d8f17ef1ef4dae23e8d1e96fecce5f5"
+    },
+    {
+      "path": "python/x402/tests/unit/http/middleware/test_fastapi.py",
+      "bytes": 58649,
+      "sha256": "2a9e777f0af757f1c23deff9b3f31d0c207d8383fabbd90f504b04d2c98ebc67"
+    },
+    {
+      "path": "python/x402/tests/unit/http/middleware/test_flask.py",
+      "bytes": 57792,
+      "sha256": "b0984e7e3aa4e3baa556d8c7151354d1ca22977cfdcc278f770b3ad934780538"
+    },
+    {
+      "path": "python/x402/tests/unit/http/test_background_init.py",
+      "bytes": 4303,
+      "sha256": "acf09453bca8600d9e449b1e1b9afc808fed482663f6775b3c8c5c0799f8cfe7"
+    },
+    {
+      "path": "python/x402/tests/unit/http/test_bazaar_extension_validation.py",
+      "bytes": 23827,
+      "sha256": "ab141971da0daddb4b74669be31cf9f8d87dc098d546cde63a4e134baa0dd399"
+    },
+    {
+      "path": "python/x402/tests/unit/http/test_extension_responses.py",
+      "bytes": 1948,
+      "sha256": "5dd5be3ee9658ac5cbad20fbd73e80c25342a1fdd39432580db852e6707d297c"
+    },
+    {
+      "path": "python/x402/tests/unit/http/test_extension_transport_hooks.py",
+      "bytes": 5197,
+      "sha256": "6ed4acc6765756a71bd5f793f57b782020ccb6d1a0df01d47b115e7d3bf6f7a6"
+    },
+    {
+      "path": "python/x402/tests/unit/http/test_facilitator_client.py",
+      "bytes": 10523,
+      "sha256": "4d45646bc574a5e4cf8cb93ce859fd1ec919f5295de0ae2ec86d780bd98de968"
+    },
+    {
+      "path": "python/x402/tests/unit/http/test_http_hooks.py",
+      "bytes": 12061,
+      "sha256": "c27cccd3f271922799cea39098c7b6c40c5577a7ca31a7b496bc6783d2f32289"
+    },
+    {
+      "path": "python/x402/tests/unit/http/test_paywall.py",
+      "bytes": 7371,
+      "sha256": "044cf84f251174b0363d05b9d832f290ac70a193639e42e53e465857f120a713"
+    },
+    {
+      "path": "python/x402/tests/unit/http/test_route_matching.py",
+      "bytes": 12213,
+      "sha256": "33b89771606812e9b371e4ce1fc41294292d00f1aebabfe219d691032d654bbe"
+    },
+    {
+      "path": "python/x402/tests/unit/http/test_settlement_pending_transaction.py",
+      "bytes": 2816,
+      "sha256": "bf74200bd33b93379f185adebafa66e6f354905fc319695f2df257d16f73a957"
+    },
+    {
+      "path": "python/x402/tests/unit/http/test_utils.py",
+      "bytes": 16637,
+      "sha256": "dc134e38c4bd23d366ebb1510ac76d170408e81e8730f3a1ad97812d02532189"
+    },
+    {
+      "path": "python/x402/tests/unit/http/test_x402_http_client.py",
+      "bytes": 20100,
+      "sha256": "26a47b3e9ece2101cf1187c60e5dec93c0c45020c0a6ce8e7b65e6a10e2359a6"
+    },
+    {
+      "path": "python/x402/tests/unit/http/test_x402_http_client_hooks.py",
+      "bytes": 4696,
+      "sha256": "393a9f10a9ac3ca963b089e9e6611921c0bc31d1e0a1790f43c741e3e7415de5"
+    },
+    {
+      "path": "python/x402/tests/unit/mcp/test_client_timeout.py",
+      "bytes": 31271,
+      "sha256": "c75d29dcbd39fbb305020aa64b0880e4e0d8d128deeab7d2270af26b7f6b7d24"
+    },
+    {
+      "path": "python/x402/tests/unit/mcp/test_mcp_dependency.py",
+      "bytes": 543,
+      "sha256": "f5d35e1f1d83b4a39fcf98ad6efb5cdefea859b036ccbc3e97d68c2b371c2782"
+    },
+    {
+      "path": "python/x402/tests/unit/mcp/test_server_wrappers.py",
+      "bytes": 45555,
+      "sha256": "ff857a29e7f8c83f2a1052f788cc0f7a39b396637b8b49a33a1c8461297235f9"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/__init__.py",
+      "bytes": 36,
+      "sha256": "fb97a83d2355b9d546739cb5f85593ed491a2b1f310ebddd016bea961b403c44"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/__init__.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/client/__init__.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/client/test_channel.py",
+      "bytes": 14105,
+      "sha256": "92fdcfa9e58bf4ec41defde0794fa32e15a38e484555988048dff5b54992fefb"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/client/test_config.py",
+      "bytes": 6509,
+      "sha256": "1f06090d2f561f8ff7c53d9e637b1162462ca39dcca02eda0a5cae29e436a1fc"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/client/test_eip3009.py",
+      "bytes": 6616,
+      "sha256": "6651d23bda734a51149f2e9346ea2d9ccbb1be6334f8c9c78226d18ce384ebf7"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/client/test_file_storage.py",
+      "bytes": 3394,
+      "sha256": "d412d6b58696d533e075c795a836db458c5d0fed75f261a7dbecb916a0cdd9b1"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/client/test_hooks.py",
+      "bytes": 15281,
+      "sha256": "91adf06ce9ae3368eb0b54abd3537dfa49c66b6a9e8504b71281f86d06dfcff2"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/client/test_permit2.py",
+      "bytes": 5419,
+      "sha256": "249fafb521b51a99636a5b2b70b0d627045ea62d5de41d4ff1c03cf5a6332a27"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/client/test_recovery.py",
+      "bytes": 12500,
+      "sha256": "d1c37694ee00c30f4c7e2687de3238fee6699a52b4b57d4e3621b0d0dd673189"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/client/test_refund.py",
+      "bytes": 9485,
+      "sha256": "f06a93c6e8d3bd78a3e48f50e578af956156a535193f96e2cabcc4eaa953d08b"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/client/test_scheme.py",
+      "bytes": 15161,
+      "sha256": "2618323c26b746c5c542f83d2da99270f2a4ee89e8e05065765160e8ba41cd24"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/client/test_storage.py",
+      "bytes": 2971,
+      "sha256": "9cffa58878ac93c7ab5316495519911444d61f06d30fe36719a8e7c62a90fe4e"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/client/test_voucher.py",
+      "bytes": 3032,
+      "sha256": "e8f82fac984bf6f297fcf0357487ded7b8fff285b67fa000164e6d3645adcdbb"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/facilitator/__init__.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/facilitator/test_charge_baseline.py",
+      "bytes": 8832,
+      "sha256": "5cd20a0ef854cbc660d8f933df1104b1db4dbd791d5095eda743703739c986bc"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/facilitator/test_deposit_erc6492.py",
+      "bytes": 6919,
+      "sha256": "b5a6294a873de3e7a80d2225b7687b423ffc2d12db18c8eb0be6efc0c1df027c"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/facilitator/test_deposit_helpers.py",
+      "bytes": 5306,
+      "sha256": "4549ef508878f32c13b088566c64c14800620e736dcf18450be3645a1f9d5383"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/facilitator/test_deposit_settlement_pending.py",
+      "bytes": 12541,
+      "sha256": "d7b8e70541e1e1320f9dcc547a692f6a4729fe13b85f94fc761a5fdbf1555afa"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/facilitator/test_errors.py",
+      "bytes": 2134,
+      "sha256": "1eaaae4911cb75efe564e35f994b82bc55dfd9b32fb6954cff850f9abb6a44ac"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/facilitator/test_refund_event.py",
+      "bytes": 1838,
+      "sha256": "7289e42c86bac2144c6843b8f893c57814a9058b554ccd83e7c1419bf46ecc6c"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/facilitator/test_scheme.py",
+      "bytes": 21027,
+      "sha256": "2dd546ec57acc3ae4d96ea4da23b5dc369a96f4615a3523229deadae5de12bac"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/facilitator/test_utils.py",
+      "bytes": 7051,
+      "sha256": "7fedf76aa18a7c36bd8be58a0b3c5d9aaf967bad21abe55166eb269fd4685099"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/facilitator/test_voucher_typed.py",
+      "bytes": 5842,
+      "sha256": "9cb89e570e7dfed91cd4d97779cbf88e137b54d1da6bbc6357e46175a0e38fd3"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/server/__init__.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/server/test_channel_manager.py",
+      "bytes": 18263,
+      "sha256": "5b53799ce702e3386d07d0bfbf0f4f7a86fd39e2f1bc728388ff95064daca48b"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/server/test_file_storage.py",
+      "bytes": 4407,
+      "sha256": "f9449513e628ac16275bcb486c7d3b9d36c4e7c2df37363053d46292b7fb074f"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/server/test_hooks.py",
+      "bytes": 26244,
+      "sha256": "b7fd2674e56327393674a5dea6795b38ac7d5b3cfa8660308561013a89904ac1"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/server/test_scheme.py",
+      "bytes": 17684,
+      "sha256": "163fd4d61cfaba84ba77703d7bd66f9860857b42f0d5f8c1a6d2822465b95e6e"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/server/test_storage.py",
+      "bytes": 7003,
+      "sha256": "91b9942a48a207553632ab2fb55555a721c1d76d9fd2f905950f58f960404074"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/server/test_uint_extra.py",
+      "bytes": 1350,
+      "sha256": "4a65642964c457752a7ca092c9b3ea9ee4d11c3709b7f1a06e375418b360c095"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/test_authorizer_signer.py",
+      "bytes": 7068,
+      "sha256": "154f1b44c420391d2f34336c8475ac073061fd862d11e20ef6eccd435d48176f"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/test_constants.py",
+      "bytes": 7165,
+      "sha256": "1c3e8753a7e2efc522d5dd710ea7066b0a0a36ef44ab8052fea9b4c302cd14eb"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/test_encoding.py",
+      "bytes": 4520,
+      "sha256": "21f12d5754a46a81c5f5bd245e829cc480ac914fe23d57eeb62d5ccdc6213349"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/test_storage_utils.py",
+      "bytes": 2930,
+      "sha256": "d49cb74cd587f5f78685ec56ce132888c62d8b68d171edcbe5a5679e9c00dc83"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/test_types.py",
+      "bytes": 10691,
+      "sha256": "f00deca7c926c624dcde3c4716b8bc92c7c5654a0827388ff242568c739e56c5"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/batch_settlement/test_utils.py",
+      "bytes": 4768,
+      "sha256": "ba1a4d06afc47db1c67188a543e50078319c3bde6ef47baaa96f11c0aaaf4863"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_asset_cache.py",
+      "bytes": 4341,
+      "sha256": "cf98afac89e81b9a52713b412e75f06f6cc1442bbca634cb4a283b48f1c04451"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_client.py",
+      "bytes": 14432,
+      "sha256": "d413eced8ea64c67551d2dd56a23711fbbc8e4d8a4b2e58578b57f8ce87bfafe"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_default_assets.py",
+      "bytes": 2150,
+      "sha256": "f7d468bb23193e059436be5860aff303b7634ef00ea1ede4022237eaef223273"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_eip3009_transfer_event.py",
+      "bytes": 2955,
+      "sha256": "ca44fadd312072371a22a22c07bd00243ec88065624e5137b9a09dfe093712fd"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_erc6492_calldata.py",
+      "bytes": 3272,
+      "sha256": "b13c695fae9e439837f3552bfaf25865803575f8df0dfae0f590ba4a3e1f373f"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_erc7702.py",
+      "bytes": 1640,
+      "sha256": "792a45a0c8588239d10201e2ca807ad77187ea89a2d766f2eaf2651130cc1423"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_facilitator.py",
+      "bytes": 47406,
+      "sha256": "f4ce9facd952601bd9f1e5a4aa562bbb82a818b4b6ff645203f8f9c43f54a770"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_index.py",
+      "bytes": 16347,
+      "sha256": "65c9ff5fa84107857c30ce8ffd55f1e3feeac0f70f2b7779d0df61f5452ef2bb"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_is_valid_tx_hash.py",
+      "bytes": 949,
+      "sha256": "27d7a5873f1b834ba30ea65772ef762f8e840566b733a35afabed1d058ff592a"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_permit2.py",
+      "bytes": 39245,
+      "sha256": "94d9afbc7ffe8cd7608647ac1943c27cd602fac0bbe7b6ce81d165708061b257"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_register.py",
+      "bytes": 2241,
+      "sha256": "7367816331f7e0225e31ebb3e0e08dc2584217d66856cdc75e0887d7169243d4"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_server.py",
+      "bytes": 25517,
+      "sha256": "9d0521f8cb083177639ffcb607b18476ca07dae41f74b58dee6dab56e3927904"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_settle_receipt.py",
+      "bytes": 10805,
+      "sha256": "6ff73b75c49a2c3f2e43725774a38d11fc907343f8de433675eb59703f9a67d0"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_signer.py",
+      "bytes": 9675,
+      "sha256": "e6fb65628e9b7e878d47be7a01a7ae7e6cfbee0abf43ad982b909a751f948057"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_truncate_error_message.py",
+      "bytes": 767,
+      "sha256": "6c3d4e7f4ab4f4558284e3db4514b5b83abe544c23c9c882c5b8ec0c01125660"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_types.py",
+      "bytes": 10059,
+      "sha256": "2926c6b6ea1717ec138aadce7ac2c210d0489cd13d6da5dd21fca72a20d06f03"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_upto_client.py",
+      "bytes": 6040,
+      "sha256": "c152ff4b563a38e08fa671f842c7384b59b1d769cfe406f75c217b5146aab4f1"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_upto_facilitator.py",
+      "bytes": 45745,
+      "sha256": "ef5d677729fa9bdbb6f118ae76b407b30fbc2844b3cff5c4c091c2af4b0a5fdc"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_upto_permit2.py",
+      "bytes": 4406,
+      "sha256": "b80484ee977f36f954b8eeb846942e96a182a5f067d69d99a6ac18672b08b933"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_upto_server.py",
+      "bytes": 7334,
+      "sha256": "66e08d7909c3d66c1ef179d073df04ed84925ad724cb8e4e77004e9b8628cc80"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_v1_utils.py",
+      "bytes": 2491,
+      "sha256": "97fd1560b1cfefb64ac5848f927ad3961c111190965ed73a5e51a01bbac58d71"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_verify.py",
+      "bytes": 3540,
+      "sha256": "868c5b3fc84f8386f9fc2eecc46bf100af5032a0e5606aac3a78b1a42deff09c"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/evm/test_verify_strict.py",
+      "bytes": 6213,
+      "sha256": "440109fc9d8eed42f8cd7159f5b3943f001b2e64dfbefcf9ec5dfdc0f556c960"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/svm/__init__.py",
+      "bytes": 36,
+      "sha256": "c8fc34d46dc97cf1cbc26104966cad61e1be7432ff44c0a4b312966ba0fe946b"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/svm/test_client.py",
+      "bytes": 10132,
+      "sha256": "8f5832c944a91485320bf49b098e5023e4fc0759e61e8fb6fa84eb6b32b1a2de"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/svm/test_confirmation.py",
+      "bytes": 13320,
+      "sha256": "9b4436ceb30e264f3bc26aff5092b66eb36b8a81fc01882588dfa6418eba702c"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/svm/test_default_assets.py",
+      "bytes": 1298,
+      "sha256": "66ac20cb558611e39eff4e777a251c7727a32b0dced3bcd61b52f812fd2f5586"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/svm/test_duplicate_tx.py",
+      "bytes": 23148,
+      "sha256": "62e9fa55221b5d1de8533b121dbf87d136d76f06e8797eab5db7691a8a3434d0"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/svm/test_facilitator.py",
+      "bytes": 33433,
+      "sha256": "ae3081386d9291f198b2f32d20c5e2b754e25f542cc199ecdc87a63d328b1173"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/svm/test_index.py",
+      "bytes": 10670,
+      "sha256": "7345ee82909f294f1ce87faf98b0e0541d900a8921de6f2ace29ed00ce2c575e"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/svm/test_recipient_ata_diagnostics.py",
+      "bytes": 14919,
+      "sha256": "eba9bc122c33c49b59446d536c369d1ad554e74d326f6ed5d3506711530cd072"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/svm/test_register.py",
+      "bytes": 2366,
+      "sha256": "98fa398d12b80780cbf5cfe0ad2f409614eabe22bcac31ddca6217cf613910ef"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/svm/test_rpc.py",
+      "bytes": 2436,
+      "sha256": "d4ce4db2373603969cbe4d1116d0c3599585f0063780b7b54d77d366bf672719"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/svm/test_server.py",
+      "bytes": 24795,
+      "sha256": "d1b9691afe5d50879637c4c4f17805ab8e1a17bef008baccb16466cde7a83f6f"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/svm/test_signer.py",
+      "bytes": 11082,
+      "sha256": "6930f5d48893ac1096b000acf4a8613be07ecf2c960f52edb29dbb6fc5ab7ecd"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/svm/test_transaction_v1.py",
+      "bytes": 17756,
+      "sha256": "84becf37cf0fadc86f98c428a8ca56cb1c6452545b2cff85442341a33827afa9"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/svm/test_transaction_versions.py",
+      "bytes": 28574,
+      "sha256": "54f7ba29333605e02f6289b7250ec3cc12720dc108243dcb7205350b66989fb7"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/svm/test_types.py",
+      "bytes": 2897,
+      "sha256": "5b79cfa21735f4b359cda171e826f0d8ecab95ba71ea9d579f0cd7bfeaa7c5e8"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/__init__.py",
+      "bytes": 40,
+      "sha256": "b219145e8bede415ec6a896d03e3907d5894d210eac3cae43abdf5092cbbadbc"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/builders.py",
+      "bytes": 4608,
+      "sha256": "aa3acffaa93a2167f97b32d1c47960660d3d1851da26a715f70652f2b9d9aed5"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/fakes.py",
+      "bytes": 10320,
+      "sha256": "850237ed1c184c16f44d61c94fafb83c7303fb1d7f4c9f006297129e0f9a7adb"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/helpers.py",
+      "bytes": 1338,
+      "sha256": "3d09fdae28ddca8e791c627a1f33dba8fbf882936649c4f0c2048da809697421"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/test_client.py",
+      "bytes": 11658,
+      "sha256": "76c3c8ce3f4ef07411030716650ab7f661958c56dcbec9c3e2d9278f9517c0cf"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/test_codec.py",
+      "bytes": 7457,
+      "sha256": "ab280e2c613f48ea223167f0f73f236ad539811f6ce957856123e03917253e5c"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/test_constants.py",
+      "bytes": 3594,
+      "sha256": "5b5aec9c3bc91d921e88db6963d978c78a93bb427fac1388c67bfa8efa540bc5"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/test_default_assets.py",
+      "bytes": 1539,
+      "sha256": "539b24e53c061f1fa70cc9c84148cd170da3295a8a22424f77ed9191d7af7839"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/test_facilitator.py",
+      "bytes": 23035,
+      "sha256": "fdfcdff8d544af0b425836ea7259077b55e8b7d42dec6e9b7af0e75bd79c86b6"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/test_highload_v3.py",
+      "bytes": 423,
+      "sha256": "e681209db7ab6e95914813e686e763462e1556a55d69e757c67489d60814ebd2"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/test_index.py",
+      "bytes": 4215,
+      "sha256": "ff3c0ed86b2ef614249ef10e67bc4ed6b5448e74533ddec01b39d8b629395873"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/test_provider.py",
+      "bytes": 24122,
+      "sha256": "59994e8ea73fbb07c43465e18932ac1aa47027323a1e35121003fa8ab6a9802f"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/test_server.py",
+      "bytes": 9531,
+      "sha256": "4afc3732a553d516eca4ddb78027aa67f0e599f777adbdccf03f60007e185798"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/test_settlement_batcher.py",
+      "bytes": 7069,
+      "sha256": "1051cb32c09de8c1d7ed4ad4c8b7d76d21c2a31ac784b588c5ebaadad1b76573"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/test_settlement_cache.py",
+      "bytes": 1182,
+      "sha256": "683aee24e7a7a685e58fb12f128c4012fffa80070d9bc359dcc960ac65c0cc88"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/test_signers.py",
+      "bytes": 14539,
+      "sha256": "4ffb6a63bbe86003d472adf00b898dc2519fe4afd999d5f7add18ee1f2bc563b"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/test_streaming.py",
+      "bytes": 10420,
+      "sha256": "2c66fc6231d4a82d4801b491e871eff161dd26652077c91687025fc4c38c15cf"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/test_trace_utils.py",
+      "bytes": 5827,
+      "sha256": "9b9db4d3daa256fff669e4c8b5a295d87742f14d110bb6ed3d32fbbdc67a63c4"
+    },
+    {
+      "path": "python/x402/tests/unit/mechanisms/tvm/test_types.py",
+      "bytes": 4370,
+      "sha256": "519bda0873e72deed41f9116076086587da2b78b3cc0cba5f6747e570bed2adf"
+    },
+    {
+      "path": "python/x402/tests/unit/schemas/test_payments.py",
+      "bytes": 3069,
+      "sha256": "d1b50fd38d820e19b94edf2e6ad498ecf7672ef1c019a766d8df68f733787f38"
+    },
+    {
+      "path": "python/x402/uv.lock",
+      "bytes": 967563,
+      "sha256": "e8a4df3f3c7cebf32d96173c781834075b4bcefcb3cf649730a93c6001b443fe"
+    }
+  ],
+  "existing_pins_matched": 15
+}

@@ -1,0 +1,70 @@
+{
+  "carrier": "return",
+  "client_kind": "sync",
+  "context": {
+    "attempt_id": "application-call-001",
+    "operation_id": "sdk-intake-02-upfront-and-unknown",
+    "server_id": "local-sdk-test-server"
+  },
+  "exception_type": null,
+  "export_profile": "local-x402-python-mcp-export-v1",
+  "local_observations": {
+    "client_recovered": false,
+    "payment_phase": "before_handler",
+    "reapproval": "not_recorded"
+  },
+  "origin": "retained_sdk_export",
+  "request_sha256": "9d7c90ccb3a58f668d76a2be86039fa4ae24e1593fd33e0c9764e11785161659",
+  "result": {
+    "content": [
+      {
+        "text": "Payment metering failed",
+        "type": "text"
+      },
+      {
+        "text": "Payment cancellation outcome unknown",
+        "type": "text"
+      }
+    ],
+    "is_error": true,
+    "payment_made": true,
+    "payment_response": {
+      "amount": "1000",
+      "network": "x402:cash",
+      "success": true,
+      "transaction": "local-test-receipt-02-upfront-and-unknown"
+    },
+    "raw_result": {
+      "content": [
+        {
+          "text": "Payment metering failed",
+          "type": "text"
+        },
+        {
+          "text": "Payment cancellation outcome unknown",
+          "type": "text"
+        }
+      ],
+      "is_error": true,
+      "meta": {
+        "x402/payment-response": {
+          "amount": "1000",
+          "errorMessage": null,
+          "errorReason": null,
+          "extensions": null,
+          "extra": null,
+          "network": "x402:cash",
+          "payer": null,
+          "success": true,
+          "transaction": "local-test-receipt-02-upfront-and-unknown"
+        }
+      },
+      "structured_content": null
+    }
+  },
+  "sdk": {
+    "package": "x402",
+    "source_commit": "2ef9f3872fbc0cfc93b1143f26ed668d13a7725e",
+    "version": "2.27.0"
+  }
+}

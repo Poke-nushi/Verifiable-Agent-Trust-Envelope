@@ -1,0 +1,71 @@
+{
+  "capture_ref": {
+    "bytes": 2374,
+    "sha256": "0cec678f443c7eb3dc0d7eef55f0e9bcdb0cb0f80251d37e428d9e5982d0393e"
+  },
+  "case": "03-reapproval-return",
+  "cryptographic_signature_verified": false,
+  "events": [
+    {
+      "kind": "in_process_tool_call",
+      "payment_present": false,
+      "request_sha256": "a8fe51377a8e55e56591cbbd4fe2aefd0a73fb15de2daa0f3125e95aa17195df",
+      "sequence": 1
+    },
+    {
+      "allowed": true,
+      "kind": "application_approval",
+      "sequence": 2
+    },
+    {
+      "amount": "1000",
+      "cryptographic_signature": false,
+      "kind": "test_payload_created",
+      "sequence": 3
+    },
+    {
+      "kind": "in_process_tool_call",
+      "payment_present": true,
+      "request_sha256": "a8fe51377a8e55e56591cbbd4fe2aefd0a73fb15de2daa0f3125e95aa17195df",
+      "sequence": 4
+    },
+    {
+      "accepted": false,
+      "kind": "facilitator_verify",
+      "sequence": 5,
+      "test_double": true
+    },
+    {
+      "kind": "sdk_payment_response_hook",
+      "recovered": true,
+      "sequence": 6,
+      "settlement_present": false
+    },
+    {
+      "allowed": false,
+      "kind": "application_approval",
+      "sequence": 7
+    }
+  ],
+  "mcp_wire_transport_used": false,
+  "real_payment_used": false,
+  "real_sdk_modules": [
+    "x402.client",
+    "x402.server",
+    "x402.mcp.client",
+    "x402.mcp.server_sync"
+  ],
+  "sdk_raw_result_type": "x402.mcp.types.MCPToolResult",
+  "sdk_result_ref": {
+    "bytes": 1620,
+    "sha256": "dc266ef1e94bbd26aecaa4f5875c424942c859820af316a06989c23c74e29be9"
+  },
+  "sdk_result_type": "x402.mcp.client.MCPToolCallResult",
+  "test_doubles": [
+    "InProcessTransport",
+    "LocalFacilitator",
+    "LocalScheme",
+    "local tool handler",
+    "application approval/response/metering hooks"
+  ]
+}

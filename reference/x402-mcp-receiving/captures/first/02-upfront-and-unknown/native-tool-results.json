@@ -1,0 +1,61 @@
+[
+  {
+    "content": [
+      {
+        "text": "{\"x402Version\": 2, \"error\": \"Payment required to access this tool\", \"resource\": {\"url\": \"mcp://tool/sdk_intake_tool\", \"description\": \"Tool: sdk_intake_tool\", \"mimeType\": \"application/json\"}, \"accepts\": [{\"scheme\": \"cash\", \"network\": \"x402:cash\", \"asset\": \"USD\", \"amount\": \"1000\", \"payTo\": \"test-recipient-no-wallet\", \"maxTimeoutSeconds\": 300, \"extra\": {\"paymentFlow\": \"upfront\"}}]}",
+        "type": "text"
+      }
+    ],
+    "is_error": true,
+    "meta": {},
+    "structured_content": {
+      "accepts": [
+        {
+          "amount": "1000",
+          "asset": "USD",
+          "extra": {
+            "paymentFlow": "upfront"
+          },
+          "maxTimeoutSeconds": 300,
+          "network": "x402:cash",
+          "payTo": "test-recipient-no-wallet",
+          "scheme": "cash"
+        }
+      ],
+      "error": "Payment required to access this tool",
+      "resource": {
+        "description": "Tool: sdk_intake_tool",
+        "mimeType": "application/json",
+        "url": "mcp://tool/sdk_intake_tool"
+      },
+      "x402Version": 2
+    }
+  },
+  {
+    "content": [
+      {
+        "text": "Payment metering failed",
+        "type": "text"
+      },
+      {
+        "text": "Payment cancellation outcome unknown",
+        "type": "text"
+      }
+    ],
+    "is_error": true,
+    "meta": {
+      "x402/payment-response": {
+        "amount": "1000",
+        "errorMessage": null,
+        "errorReason": null,
+        "extensions": null,
+        "extra": null,
+        "network": "x402:cash",
+        "payer": null,
+        "success": true,
+        "transaction": "local-test-receipt-02-upfront-and-unknown"
+      }
+    },
+    "structured_content": null
+  }
+]

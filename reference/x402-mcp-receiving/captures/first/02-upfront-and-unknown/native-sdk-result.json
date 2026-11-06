@@ -1,0 +1,47 @@
+{
+  "content": [
+    {
+      "text": "Payment metering failed",
+      "type": "text"
+    },
+    {
+      "text": "Payment cancellation outcome unknown",
+      "type": "text"
+    }
+  ],
+  "is_error": true,
+  "payment_made": true,
+  "payment_response": {
+    "amount": "1000",
+    "network": "x402:cash",
+    "success": true,
+    "transaction": "local-test-receipt-02-upfront-and-unknown"
+  },
+  "raw_result": {
+    "content": [
+      {
+        "text": "Payment metering failed",
+        "type": "text"
+      },
+      {
+        "text": "Payment cancellation outcome unknown",
+        "type": "text"
+      }
+    ],
+    "is_error": true,
+    "meta": {
+      "x402/payment-response": {
+        "amount": "1000",
+        "errorMessage": null,
+        "errorReason": null,
+        "extensions": null,
+        "extra": null,
+        "network": "x402:cash",
+        "payer": null,
+        "success": true,
+        "transaction": "local-test-receipt-02-upfront-and-unknown"
+      }
+    },
+    "structured_content": null
+  }
+}

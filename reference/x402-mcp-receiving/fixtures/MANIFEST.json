@@ -1,0 +1,135 @@
+{
+  "cases": {
+    "01-cancel-unknown": {
+      "capture": {
+        "byte_length": 1267,
+        "digest": {
+          "alg": "sha-256",
+          "value": "f56f6f36e27ff249bd74b96a61ea8b5515d937cc86a5cce4c48d6f31e668be18"
+        },
+        "digest_basis": "raw_file_sha256"
+      },
+      "request": {
+        "byte_length": 73,
+        "digest": {
+          "alg": "sha-256",
+          "value": "5f124f8d2f8e92843e2a7b6d57da48fd9d377ddf74ff7009a7ed8fef2cdfb9fe"
+        },
+        "digest_basis": "raw_file_sha256"
+      },
+      "selection": {
+        "byte_length": 366,
+        "digest": {
+          "alg": "sha-256",
+          "value": "f5ba630c467e3982e556ee43d1aee17a7996b293a212deaf02e6abec84c68d26"
+        },
+        "digest_basis": "raw_file_sha256"
+      }
+    },
+    "02-upfront-and-unknown": {
+      "capture": {
+        "byte_length": 1638,
+        "digest": {
+          "alg": "sha-256",
+          "value": "c713d6982abb3f7886a4a818341372296a4abb7c948a6a4eeb46b5b9bd4dc779"
+        },
+        "digest_basis": "raw_file_sha256"
+      },
+      "request": {
+        "byte_length": 73,
+        "digest": {
+          "alg": "sha-256",
+          "value": "5f124f8d2f8e92843e2a7b6d57da48fd9d377ddf74ff7009a7ed8fef2cdfb9fe"
+        },
+        "digest_basis": "raw_file_sha256"
+      },
+      "selection": {
+        "byte_length": 371,
+        "digest": {
+          "alg": "sha-256",
+          "value": "3cb892b90336580f052c3586c1d815b0654da25c71643f86e82eb3ae7509583b"
+        },
+        "digest_basis": "raw_file_sha256"
+      }
+    },
+    "03-reapproval-return": {
+      "capture": {
+        "byte_length": 1534,
+        "digest": {
+          "alg": "sha-256",
+          "value": "3e98efea7087b0c450c9babf47ecc79d9eeb18cd03752aec99ad087ddc25d0a1"
+        },
+        "digest_basis": "raw_file_sha256"
+      },
+      "request": {
+        "byte_length": 73,
+        "digest": {
+          "alg": "sha-256",
+          "value": "5f124f8d2f8e92843e2a7b6d57da48fd9d377ddf74ff7009a7ed8fef2cdfb9fe"
+        },
+        "digest_basis": "raw_file_sha256"
+      },
+      "selection": {
+        "byte_length": 369,
+        "digest": {
+          "alg": "sha-256",
+          "value": "43343f90262d2facf5d9d97d5b83e878ea05906c8035ce27371bc78c63b686d1"
+        },
+        "digest_basis": "raw_file_sha256"
+      }
+    },
+    "04-reapproval-exception-result": {
+      "capture": {
+        "byte_length": 1573,
+        "digest": {
+          "alg": "sha-256",
+          "value": "e70c4eedb765e504eaff608010e3b5e0734ee3650bfba1a0659d55a19fb5685c"
+        },
+        "digest_basis": "raw_file_sha256"
+      },
+      "request": {
+        "byte_length": 73,
+        "digest": {
+          "alg": "sha-256",
+          "value": "5f124f8d2f8e92843e2a7b6d57da48fd9d377ddf74ff7009a7ed8fef2cdfb9fe"
+        },
+        "digest_basis": "raw_file_sha256"
+      },
+      "selection": {
+        "byte_length": 379,
+        "digest": {
+          "alg": "sha-256",
+          "value": "b51bee4949618209594459c734e5661c1f022a8d193cef85ea56b835e364f3f8"
+        },
+        "digest_basis": "raw_file_sha256"
+      }
+    },
+    "05-reapproval-exception-mcp-result": {
+      "capture": {
+        "byte_length": 1571,
+        "digest": {
+          "alg": "sha-256",
+          "value": "60637448c86061e02a1332cc02d6ff49337ab7519faab75567080bd662d292de"
+        },
+        "digest_basis": "raw_file_sha256"
+      },
+      "request": {
+        "byte_length": 73,
+        "digest": {
+          "alg": "sha-256",
+          "value": "5f124f8d2f8e92843e2a7b6d57da48fd9d377ddf74ff7009a7ed8fef2cdfb9fe"
+        },
+        "digest_basis": "raw_file_sha256"
+      },
+      "selection": {
+        "byte_length": 383,
+        "digest": {
+          "alg": "sha-256",
+          "value": "259ab8b905b20ace3f2fd5b7f50b966a847740b3d70aeaf59b652ee32a74cf83"
+        },
+        "digest_basis": "raw_file_sha256"
+      }
+    }
+  },
+  "origin": "synthetic_not_native_sdk_capture"
+}

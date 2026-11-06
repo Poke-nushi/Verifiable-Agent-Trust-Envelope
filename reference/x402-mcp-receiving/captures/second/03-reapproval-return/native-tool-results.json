@@ -1,0 +1,62 @@
+[
+  {
+    "content": [
+      {
+        "text": "{\"x402Version\": 2, \"error\": \"Payment required to access this tool\", \"resource\": {\"url\": \"mcp://tool/sdk_intake_tool\", \"description\": \"Tool: sdk_intake_tool\", \"mimeType\": \"application/json\"}, \"accepts\": [{\"scheme\": \"cash\", \"network\": \"x402:cash\", \"asset\": \"USD\", \"amount\": \"1000\", \"payTo\": \"test-recipient-no-wallet\", \"maxTimeoutSeconds\": 300, \"extra\": {}}]}",
+        "type": "text"
+      }
+    ],
+    "is_error": true,
+    "meta": {},
+    "structured_content": {
+      "accepts": [
+        {
+          "amount": "1000",
+          "asset": "USD",
+          "extra": {},
+          "maxTimeoutSeconds": 300,
+          "network": "x402:cash",
+          "payTo": "test-recipient-no-wallet",
+          "scheme": "cash"
+        }
+      ],
+      "error": "Payment required to access this tool",
+      "resource": {
+        "description": "Tool: sdk_intake_tool",
+        "mimeType": "application/json",
+        "url": "mcp://tool/sdk_intake_tool"
+      },
+      "x402Version": 2
+    }
+  },
+  {
+    "content": [
+      {
+        "text": "{\"x402Version\": 2, \"error\": \"local_test_correction_required\", \"resource\": {\"url\": \"mcp://tool/sdk_intake_tool\", \"description\": \"Tool: sdk_intake_tool\", \"mimeType\": \"application/json\"}, \"accepts\": [{\"scheme\": \"cash\", \"network\": \"x402:cash\", \"asset\": \"USD\", \"amount\": \"1000\", \"payTo\": \"test-recipient-no-wallet\", \"maxTimeoutSeconds\": 300, \"extra\": {}}]}",
+        "type": "text"
+      }
+    ],
+    "is_error": true,
+    "meta": {},
+    "structured_content": {
+      "accepts": [
+        {
+          "amount": "1000",
+          "asset": "USD",
+          "extra": {},
+          "maxTimeoutSeconds": 300,
+          "network": "x402:cash",
+          "payTo": "test-recipient-no-wallet",
+          "scheme": "cash"
+        }
+      ],
+      "error": "local_test_correction_required",
+      "resource": {
+        "description": "Tool: sdk_intake_tool",
+        "mimeType": "application/json",
+        "url": "mcp://tool/sdk_intake_tool"
+      },
+      "x402Version": 2
+    }
+  }
+]

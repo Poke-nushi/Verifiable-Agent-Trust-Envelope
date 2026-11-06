@@ -1,0 +1,197 @@
+{
+  "capture_script_sha256": "28e68247ad6298a1189f13adb73d555778aebb82bb74411c99c5980229e88a0e",
+  "cases": [
+    {
+      "capture": {
+        "bytes": 2374,
+        "sha256": "0cec678f443c7eb3dc0d7eef55f0e9bcdb0cb0f80251d37e428d9e5982d0393e"
+      },
+      "case": "03-reapproval-return",
+      "result": {
+        "bytes": 1620,
+        "sha256": "dc266ef1e94bbd26aecaa4f5875c424942c859820af316a06989c23c74e29be9"
+      }
+    }
+  ],
+  "export_serialization": "explicit SDK attributes; receipt model_dump json/by_alias/exclude_none",
+  "external_service_or_payment": false,
+  "files": {
+    "03-reapproval-return/TRACE.json": {
+      "bytes": 1790,
+      "sha256": "b4d5d2e9d9f546affe99dacd5d5cef015408b7ca70c91edc80765b6abb88d119"
+    },
+    "03-reapproval-return/capture.json": {
+      "bytes": 2374,
+      "sha256": "0cec678f443c7eb3dc0d7eef55f0e9bcdb0cb0f80251d37e428d9e5982d0393e"
+    },
+    "03-reapproval-return/native-sdk-result.json": {
+      "bytes": 1620,
+      "sha256": "dc266ef1e94bbd26aecaa4f5875c424942c859820af316a06989c23c74e29be9"
+    },
+    "03-reapproval-return/native-tool-results.json": {
+      "bytes": 2141,
+      "sha256": "174fbc6d0fdceb8e4be4e14fb8be6de8902ca43674d25a7f2986dfe9efbd83ef"
+    },
+    "03-reapproval-return/receiver-plan.json": {
+      "bytes": 298,
+      "sha256": "3a026544a9cc1884c72805e3f3e3dfa15fadc9519eb9e05cc07c010d17e3105a"
+    },
+    "03-reapproval-return/request.json": {
+      "bytes": 106,
+      "sha256": "a8fe51377a8e55e56591cbbd4fe2aefd0a73fb15de2daa0f3125e95aa17195df"
+    }
+  },
+  "imported_sdk_modules": [
+    {
+      "module": "x402",
+      "path": "x402/__init__.py",
+      "sha256": "262095f3452c7057f5f141a469d98c372aef1838b6dd51976ccb678cd1ba61cf"
+    },
+    {
+      "module": "x402.client",
+      "path": "x402/client.py",
+      "sha256": "0f09e26c3ff561858bdd7bb61b4dc9f41b406834f2164f68410577f5ba2f6377"
+    },
+    {
+      "module": "x402.client_base",
+      "path": "x402/client_base.py",
+      "sha256": "a1fd11f2f25d9314a58676be1af7953d0b9ba75e6278ab0f4187f2e6364a9bd0"
+    },
+    {
+      "module": "x402.facilitator",
+      "path": "x402/facilitator.py",
+      "sha256": "7ef91218261d1d3814d5a3e76123435a6f8804ec9f0768d3d5dd8971eb35b3ed"
+    },
+    {
+      "module": "x402.facilitator_base",
+      "path": "x402/facilitator_base.py",
+      "sha256": "9b002e1b588ccf322dec10d8913222e41e81017d2a9f5f202f52ef407a8a8f9b"
+    },
+    {
+      "module": "x402.hook_adapters",
+      "path": "x402/hook_adapters.py",
+      "sha256": "2021af8c8a4fc9f498de9854ad821da8c41c551cb9026b08ef82856face5249e"
+    },
+    {
+      "module": "x402.hook_policy",
+      "path": "x402/hook_policy.py",
+      "sha256": "8a037afd7419527f9f67257537f796f90ae4bb31c385cf7bf307d558f41ed952"
+    },
+    {
+      "module": "x402.interfaces",
+      "path": "x402/interfaces.py",
+      "sha256": "671b68f1de8d88209c0643f233c272ea2b37eb75b69cb1e4c2593fffc8cc4660"
+    },
+    {
+      "module": "x402.mcp",
+      "path": "x402/mcp/__init__.py",
+      "sha256": "135390b6d0a4b109974b33ae0cc71a302d7d4a919f10889c0f44fcc378a063e5"
+    },
+    {
+      "module": "x402.mcp.client",
+      "path": "x402/mcp/client.py",
+      "sha256": "0addfaf3d8e621ca9deb646e3f25070cd0670978c71818454ab2caf09b505ae3"
+    },
+    {
+      "module": "x402.mcp.constants",
+      "path": "x402/mcp/constants.py",
+      "sha256": "e3c9aed822e13688b83fc772aab66ff2291de411dbf6fac83d7d0a4b597b76b5"
+    },
+    {
+      "module": "x402.mcp.server_sync",
+      "path": "x402/mcp/server_sync.py",
+      "sha256": "d5ff668fff39931c3914fc57a949f8f20885aa1e94234178f6d2502b4fc3e95d"
+    },
+    {
+      "module": "x402.mcp.types",
+      "path": "x402/mcp/types.py",
+      "sha256": "18d194cc773abe51dc48a7d37e3df81453ce018c0e855a72326bbf497cafe52b"
+    },
+    {
+      "module": "x402.mcp.utils",
+      "path": "x402/mcp/utils.py",
+      "sha256": "ca18c5f125df3ebe38309d2f66549474fecee41cd56effc5fda22b606e5411ae"
+    },
+    {
+      "module": "x402.payment_flow",
+      "path": "x402/payment_flow.py",
+      "sha256": "81d72369fd93791c73d3e55775783b2ecd1faa82ff62df9b2459f26f81729a1a"
+    },
+    {
+      "module": "x402.pending_settlement_store",
+      "path": "x402/pending_settlement_store.py",
+      "sha256": "d986d4925b5fcf0bf478f045df117930d4fe378101c1926c86800d5c6746da1e"
+    },
+    {
+      "module": "x402.schemas",
+      "path": "x402/schemas/__init__.py",
+      "sha256": "f7a0455cbf1833bc2cf866b9a6e7603d5accf63be63d862e7f26ca109fc7c140"
+    },
+    {
+      "module": "x402.schemas.base",
+      "path": "x402/schemas/base.py",
+      "sha256": "20e6ffc21610aec0a7d06f94182d76353edf0c3a60811e06780373f47de9ed8d"
+    },
+    {
+      "module": "x402.schemas.config",
+      "path": "x402/schemas/config.py",
+      "sha256": "f61bb3735d937e02304018910b154ce74c9461fecbfe1ab690e0518915cd0b0a"
+    },
+    {
+      "module": "x402.schemas.errors",
+      "path": "x402/schemas/errors.py",
+      "sha256": "29c434dcd452fc197a8e8d126ca142652f7295de7f341d9de7466f54b31a24d1"
+    },
+    {
+      "module": "x402.schemas.extensions",
+      "path": "x402/schemas/extensions.py",
+      "sha256": "160ed374ee8fbcd457b179786e81aa49519d00499e6479b88a89760280adf1c7"
+    },
+    {
+      "module": "x402.schemas.helpers",
+      "path": "x402/schemas/helpers.py",
+      "sha256": "12e74fa1da1361e2f4579cef0f4d32d3d92b45d5ae7d172953e101401e8a5419"
+    },
+    {
+      "module": "x402.schemas.hooks",
+      "path": "x402/schemas/hooks.py",
+      "sha256": "ef17cc1dccc761683e58c092fbd28a3ee7178d078c5a9b64b3064b053ea2b441"
+    },
+    {
+      "module": "x402.schemas.payments",
+      "path": "x402/schemas/payments.py",
+      "sha256": "8b8dd93589cb06173af061c02808285e3f53457fc8f9ee9b5954a72b8399fe38"
+    },
+    {
+      "module": "x402.schemas.responses",
+      "path": "x402/schemas/responses.py",
+      "sha256": "4eddbb49611af8c4ab9ed92d7c6d1ebbe96731ae39d23f05733f73819b6cfe42"
+    },
+    {
+      "module": "x402.schemas.v1",
+      "path": "x402/schemas/v1.py",
+      "sha256": "53bdf2b5b987106e198b990686b012c4b75dd100219a887511fab1df67e15356"
+    },
+    {
+      "module": "x402.schemas.views",
+      "path": "x402/schemas/views.py",
+      "sha256": "27519764996b25019166c136e048324d0bcccbda000aa210177b1f8c46d6f5fd"
+    },
+    {
+      "module": "x402.server",
+      "path": "x402/server.py",
+      "sha256": "8207cad960f4f99c6232a8153d2417a5b4948e00c90aabc9795bc36b388e133b"
+    },
+    {
+      "module": "x402.server_base",
+      "path": "x402/server_base.py",
+      "sha256": "2aa2caca200a89ae9f5a8ab26c35bd51504be98f6680561d4ce50b13e40f7536"
+    }
+  ],
+  "network_guard_attempts": [],
+  "network_guard_is_full_os_sandbox": false,
+  "origin": "real_pinned_sdk_with_local_test_doubles",
+  "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+  "sdk_source_commit": "2ef9f3872fbc0cfc93b1143f26ed668d13a7725e",
+  "source_commit": "2ef9f3872fbc0cfc93b1143f26ed668d13a7725e"
+}

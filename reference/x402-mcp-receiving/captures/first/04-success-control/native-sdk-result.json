@@ -1,0 +1,34 @@
+{
+  "content": [
+    {
+      "text": "local SDK control output",
+      "type": "text"
+    }
+  ],
+  "is_error": false,
+  "payment_made": true,
+  "payment_response": {
+    "amount": "1000",
+    "network": "x402:cash",
+    "success": true,
+    "transaction": "local-test-receipt-04-success-control"
+  },
+  "raw_result": {
+    "content": [
+      {
+        "text": "local SDK control output",
+        "type": "text"
+      }
+    ],
+    "is_error": false,
+    "meta": {
+      "x402/payment-response": {
+        "amount": "1000",
+        "network": "x402:cash",
+        "success": true,
+        "transaction": "local-test-receipt-04-success-control"
+      }
+    },
+    "structured_content": null
+  }
+}

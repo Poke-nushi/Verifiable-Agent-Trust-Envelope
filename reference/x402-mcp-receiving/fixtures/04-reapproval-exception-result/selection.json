@@ -1,0 +1,10 @@
+{
+  "capture_sha256": "e70c4eedb765e504eaff608010e3b5e0734ee3650bfba1a0659d55a19fb5685c",
+  "context": {
+    "attempt_id": "04-reapproval-exception-result",
+    "operation_id": "synthetic-operation",
+    "server_id": "synthetic-server"
+  },
+  "profile": "vate-local-x402-mcp-receiving-v1",
+  "request_sha256": "5f124f8d2f8e92843e2a7b6d57da48fd9d377ddf74ff7009a7ed8fef2cdfb9fe"
+}
