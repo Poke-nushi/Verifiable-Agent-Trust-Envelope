@@ -1,0 +1,1 @@
+{"case":"01-lost-response-recovery","clock":"fixed_fixture_clock","history_basis":"original_provider_export_bytes","snapshots":["pending","recovered"],"variant":"without-prior-receipt"}

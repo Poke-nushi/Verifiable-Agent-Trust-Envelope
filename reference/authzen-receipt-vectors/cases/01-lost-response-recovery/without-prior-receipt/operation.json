@@ -1,0 +1,1 @@
+{"action":"demo.create_file_set","contract":"vate-demo-file-set-v1","operation_key":"operation-one","target":{"files":[{"name":"first.txt","text":"first local effect\n"},{"name":"second.txt","text":"second local effect\n"}],"resource":"urn:vate:handoff:store-49661119db224404a6e8be0068e0c2c2:resource-059f626662be466ea546b30c119e8dff"}}

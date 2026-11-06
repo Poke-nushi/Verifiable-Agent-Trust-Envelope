@@ -1,0 +1,29 @@
+name: AuthZEN receipt vectors
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  vectors:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python: ["3.11", "3.14"]
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Replay originals and exercise capture without site packages
+        run: |
+          python -E -s -S -B reference/authzen-receipt-vectors/verify.py
+          python -E -s -S -B -m unittest discover -s reference/authzen-receipt-vectors -p 'test_*.py' -v

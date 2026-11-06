@@ -554,6 +554,8 @@ The most useful feedback is:
   Signed runtime-key status, provider acceptance ordering, and recovery after admission
 - [reference/runtime-handoff-sample/README.md](reference/runtime-handoff-sample/README.md)
   Unknown-result handoff between two runtimes, receipt intake, and saved-evidence reassessment
+- [reference/authzen-receipt-vectors/README.md](reference/authzen-receipt-vectors/README.md)
+  Four recovery and retry comparison cases for AuthZEN #795, with fixed inputs and expected results
 - [reference/receipt-linkage-example/README.md](reference/receipt-linkage-example/README.md)
   Inspect a stored admission/post-execution pair with existing receipt checks
 - [reference/s3-observation-example/README.md](reference/s3-observation-example/README.md)
