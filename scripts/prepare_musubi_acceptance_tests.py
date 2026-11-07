@@ -18,6 +18,7 @@ SAMPLE = ROOT / "reference/musubi-set2-receiving-sample"
 sys.path.insert(0, str(SAMPLE))
 from verify_acceptance import PINS  # noqa: E402
 from acceptance_checks import (WAR_SOURCE_COMMIT, WAR_SOURCE_SHA256,
+                               WAR143_SOURCE_COMMIT, WAR143_SOURCE_SHA256,
                                LEGACY_WAR_SOURCE_COMMIT, LEGACY_WAR_SOURCE_SHA256)  # noqa: E402
 
 MAX_BYTES = 1024 * 1024
@@ -33,6 +34,10 @@ WAR_BASE = (
 LEGACY_WAR_BASE = (
     "https://raw.githubusercontent.com/maximusrufus/work-acceptance-record/"
     + LEGACY_WAR_SOURCE_COMMIT + "/"
+)
+WAR143_BASE = (
+    "https://raw.githubusercontent.com/maximusrufus/work-acceptance-record/"
+    + WAR143_SOURCE_COMMIT + "/"
 )
 LOCAL = {
     "sources/context/bundle.json": SAMPLE / "sample/originals/workers/hs-ledger/"
@@ -55,6 +60,7 @@ def prepare(output):
     if output.exists() or output.is_symlink():
         raise ValueError("evidence output must be a new directory")
     pins = dict(PINS, **{"sources/war/verifier/war_verify.py": WAR_SOURCE_SHA256,
+                        "sources/war143/verifier/war_verify.py": WAR143_SOURCE_SHA256,
                         "sources/war-legacy/verifier/war_verify.py": LEGACY_WAR_SOURCE_SHA256})
     files = {}
     for name, expected in pins.items():
@@ -64,6 +70,10 @@ def prepare(output):
             raw = fetch(ACCEPTANCE_BASE + name.removeprefix("sources/acceptance/"))
         elif name.startswith("sources/war-legacy/"):
             raw = fetch(LEGACY_WAR_BASE + name.removeprefix("sources/war-legacy/"))
+        elif name.startswith("sources/war143/"):
+            raw = fetch(WAR143_BASE + name.removeprefix("sources/war143/"))
+        elif name.startswith("sources/war148/"):
+            raw = fetch(WAR_BASE + name.removeprefix("sources/war148/"))
         elif name.startswith("sources/war/vectors/"):
             raw = fetch(LEGACY_WAR_BASE + name.removeprefix("sources/war/"))
         elif name.startswith("sources/war/"):

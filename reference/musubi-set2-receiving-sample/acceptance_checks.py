@@ -16,11 +16,14 @@ import math
 import re
 
 PROFILE = 'hs51-war-bindings-v0-1'
-WAR_SOURCE_SHA256 = 'a8a63a9fcfdcf578bfb256c222af22f189263aaec79af182b384008a68cec5dc'
-WAR_SOURCE_COMMIT = '6bb7d0b9246c3c535aba9c294d26181496d00614'
+WAR_SOURCE_SHA256 = '508855993696357745f94e2405dbe9205421e62f42c678db3487e342c9fda359'
+WAR_SOURCE_COMMIT = '3e53aac24ee5298b2316a10dceeaddb99695cc8c'
+WAR143_SOURCE_SHA256 = 'a8a63a9fcfdcf578bfb256c222af22f189263aaec79af182b384008a68cec5dc'
+WAR143_SOURCE_COMMIT = '6bb7d0b9246c3c535aba9c294d26181496d00614'
 LEGACY_WAR_SOURCE_SHA256 = 'ac3ac35d9356cbb5f3371c19a2113ad03c1fd486c247a2ed586bdfdbdd32ae49'
 LEGACY_WAR_SOURCE_COMMIT = '6b2f730b81e0818826f274742d883c2b475d5227'
 WAR_SOURCES = {WAR_SOURCE_SHA256: WAR_SOURCE_COMMIT,
+               WAR143_SOURCE_SHA256: WAR143_SOURCE_COMMIT,
                LEGACY_WAR_SOURCE_SHA256: LEGACY_WAR_SOURCE_COMMIT}
 EXPECTED_KEYS = frozenset(('occurrence_id', 'request_sha256', 'execution_sha256',
                            'audit_sha256', 'checker_public_key_hex',
@@ -385,10 +388,11 @@ def evaluate(raw: bytes, expected: dict, roots: list[bytes], war, *,
         result['provenance']['canonical_receipt_sha256'] = receipt_hash
         finish_checks()
 
-        # WAR 1.4.3 needs the stated producer key to derive independence. Use
+        # WAR 1.4.3 and 1.4.8 need the stated producer key to derive independence. Use
         # the receiver-selected native bindings, never an unverified incoming
         # key mapping. Retain the received bytes and this derived input separately.
-        if verifier_sha256 == WAR_SOURCE_SHA256:
+        relying_party_keys = None
+        if verifier_sha256 in (WAR_SOURCE_SHA256, WAR143_SOURCE_SHA256):
             producer_id = producer['key_id']
             producer_public = bytes.fromhex(expected['producer_public_key_hex'])
             if producer_id in by_id:
@@ -410,7 +414,17 @@ def evaluate(raw: bytes, expected: dict, roots: list[bytes], war, *,
             result['provenance']['war_key_input'] = keyset
             result['provenance']['war_key_input_basis'] = 'receiver_selected_MUSUBI_bindings'
             _need(callable(getattr(war, 'independence_of', None)), 'evaluator_unavailable', 'unavailable')
-            result['derived_independence'] = war.independence_of(parties, keyset, body.get('independence'))
+            if verifier_sha256 == WAR_SOURCE_SHA256:
+                # 1.4.8's relying-party list comes only from verified native
+                # bindings. Never use a list supplied by the acceptance issuer.
+                relying_party_keys = {'version': keyset['version'],
+                                      'keys': [dict(key) for key in keyset['keys']]}
+                result['provenance']['war_relying_party_key_input'] = relying_party_keys
+                result['provenance']['war_relying_party_key_input_basis'] = 'receiver_selected_MUSUBI_bindings'
+                derived = war.independence_of(parties, keyset, body.get('independence'), relying_party_keys)
+            else:
+                derived = war.independence_of(parties, keyset, body.get('independence'))
+            result['derived_independence'] = derived
             check('derived_independence_matches', result['derived_independence'] == body.get('independence'),
                   'independence_mismatch')
             finish_checks()
@@ -447,12 +461,15 @@ def evaluate(raw: bytes, expected: dict, roots: list[bytes], war, *,
             _bounded_der(token)
         # Pass only the selected inputs and anchors; incoming roots/expected
         # outcomes/verification instructions cannot select trust or success.
-        upstream = war.vector_outcome({'inputs': {
+        upstream_inputs = {
             'receipt': record, 'keys': keyset,
             'criteria_file_base64': doc['criteria_file_base64'],
             'criteria_tsr_base64': doc['criteria_tsr_base64'],
             'receipt_tsr_base64': doc['receipt_tsr_base64'],
-        }}, tsa_roots=roots)
+        }
+        if relying_party_keys is not None:
+            upstream_inputs['relying_party_keys'] = relying_party_keys
+        upstream = war.vector_outcome({'inputs': upstream_inputs}, tsa_roots=roots)
         _object(upstream, 'evaluator_output_invalid')
         result['upstream_outcome'] = upstream
         check('upstream_not_refused', upstream.get('refused', False) is False, 'upstream_refused')

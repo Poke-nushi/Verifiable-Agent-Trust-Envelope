@@ -18,7 +18,7 @@ import unittest
 from unittest.mock import patch
 
 import acceptance_adapter as adapter
-from acceptance_checks import LEGACY_WAR_SOURCE_SHA256, evaluate
+from acceptance_checks import LEGACY_WAR_SOURCE_SHA256, WAR143_SOURCE_SHA256, evaluate
 from receiving import InputError, assess, decode, encoded, sha, validate_selection, make_summary
 from run_acceptance_example import ROOT, prepare_inputs
 
@@ -198,15 +198,18 @@ class IntegrationTests(unittest.TestCase):
 
     def test_selected_old_and_new_sources_cannot_be_interchanged(self):
         new = EVIDENCE/'sources/war/verifier/war_verify.py'
-        old = EVIDENCE/'sources/war-legacy/verifier/war_verify.py'
-        with self.assertRaises(InputError): adapter.prepare(self.s, self.o, old)
-        self.s['acceptance_verification']['verifier_sha256'] = LEGACY_WAR_SOURCE_SHA256
-        with self.assertRaises(InputError): adapter.prepare(self.s, self.o, new)
-        job = adapter.prepare(self.s, self.o, old)
-        self.assertEqual(LEGACY_WAR_SOURCE_SHA256, job['input']['verifier_sha256'])
+        for path, pin in (('war-legacy', LEGACY_WAR_SOURCE_SHA256), ('war143', WAR143_SOURCE_SHA256)):
+            with self.subTest(pin=pin):
+                old = EVIDENCE/f'sources/{path}/verifier/war_verify.py'
+                self.s['acceptance_verification']['verifier_sha256'] = adapter.VERIFIER_SHA256
+                with self.assertRaises(InputError): adapter.prepare(self.s, self.o, old)
+                self.s['acceptance_verification']['verifier_sha256'] = pin
+                with self.assertRaises(InputError): adapter.prepare(self.s, self.o, new)
+                job = adapter.prepare(self.s, self.o, old)
+                self.assertEqual(pin, job['input']['verifier_sha256'])
 
     def test_result_from_another_verifier_cannot_attach(self):
-        for value in (LEGACY_WAR_SOURCE_SHA256, '0' * 64, None):
+        for value in (LEGACY_WAR_SOURCE_SHA256, WAR143_SOURCE_SHA256, '0' * 64, None):
             self.v = copy.deepcopy(self.verified)
             self.v['results']['hs51-musubi-2-A:acceptance']['provenance']['required_war_source_sha256'] = value
             self.assertEqual('unresolved', row(self.report(), 'A')['binding_status'])
