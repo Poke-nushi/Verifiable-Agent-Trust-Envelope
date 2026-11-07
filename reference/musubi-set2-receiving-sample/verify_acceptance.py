@@ -21,7 +21,8 @@ from unittest.mock import patch
 
 from acceptance_checks import (EXPECTED_KEYS, MAX_CRITERIA, MAX_DEPTH, MAX_RAW,
                                MAX_ROOTS, MAX_STRING, MAX_TOKEN, MAX_TOKENS,
-                               PROFILE, WAR_SOURCE_SHA256, LEGACY_WAR_SOURCE_SHA256, evaluate)
+                               PROFILE, WAR_SOURCE_SHA256, WAR143_SOURCE_SHA256,
+                               LEGACY_WAR_SOURCE_SHA256, evaluate)
 from receiving import decode as receiving_decode
 
 PINS = {
@@ -33,6 +34,15 @@ PINS = {
     'sources/acceptance/hs51-aps-B.json': '0b2a26dc95b28d3c529c2b196357ec3c4aa02dc97eb8c5aa02c2b52170df993b',
     'sources/war/vectors/31-tsa-freetsa-verified.json': '3bdbd6cc0f401fe8a834fba962d3b139830bf3e1807434f6d8d3607cc3ca2862',
     'sources/war/vectors/32-tsa-digicert-verified.json': '83a81b8a02ab780f6e1bd4653ca5c0218cddef55b460d81fd479e9c7409b1859',
+    'sources/war148/vectors/110-producer-key-only-in-issuer-keys.json': 'ff0890ec311e5d5945dc685da793b74a2b35d8f12223c755d8217307ef9ae957',
+    'sources/war148/vectors/111-producer-key-also-in-relying-party-keys.json': 'f8fab2bf0a5450f256e94ce771011985abfda63ca3009deceb11655998313cc0',
+    'sources/war148/vectors/112-relying-party-key-non-canonical-base64.json': '57c0de2083b4da99a93801d247c49b81970f7935eee291bfa9114777ee185230',
+    'sources/war148/vectors/113-relying-party-keys-repeated-key-id.json': 'ad670780af3b31b9252c5029d012adf5aa05f08e1c48b1a7d7ac6d199b81e5a0',
+    'sources/war148/vectors/114-producer-key-neutral-point.json': '4c32d3be83594a46cbece696f7e2c8b66e2dc6baf066e9fad052faaa933909c8',
+    'sources/war148/vectors/115-neutral-point-from-unrelated-list.json': '6af00df17fd532d4bd51ad2bfd122ddec395fd8613b7b9da532168a4e8764450',
+    'sources/war148/vectors/116-signature-r-neutral-point.json': '6ade886e9ef677adf1d83fcc770071a9227051a04f83d3c26765b36726884fa6',
+    'sources/war148/vectors/117-criteria-file-duplicate-member-name.json': '2c6c4e659245ce5e60985323429bac748d2e053cc2cf555ed621722a7f7d2940',
+    'sources/war148/vectors/118-criteria-file-lone-surrogate.json': '23990e9a540aa876b227ddd43c515471548a664f163332bc89e3107ffbb2a5ed',
 }
 EVIDENCE_ROOT = None
 
@@ -165,6 +175,85 @@ class AcceptanceTests(unittest.TestCase):
         doc['keys']['keys'].append(copy.deepcopy(self.baseline['provenance']['war_key_input']['keys'][1]))
         result = self.run_case(doc=doc, status='verified', work_verdict='pass')
         self.assertEqual(self.baseline['provenance']['war_key_input'], result['provenance']['war_key_input'])
+
+    def test_receiver_key_list_reaches_both_upstream_checks(self):
+        with patch.object(self.war, 'independence_of', wraps=self.war.independence_of) as independence, \
+                patch.object(self.war, 'vector_outcome', wraps=self.war.vector_outcome) as vector:
+            result = self.run_case(raw=self.a_raw, status='verified', work_verdict='pass')
+        selected = result['provenance']['war_relying_party_key_input']
+        self.assertEqual(result['provenance']['war_key_input'], selected)
+        self.assertEqual('receiver_selected_MUSUBI_bindings',
+                         result['provenance']['war_relying_party_key_input_basis'])
+        self.assertEqual(selected, independence.call_args_list[0].args[3])
+        self.assertEqual(selected, vector.call_args.args[0]['inputs']['relying_party_keys'])
+
+    def test_incoming_relying_party_list_cannot_select_trust(self):
+        for supplied in ({'keys': []}, {'keys': [self.a['keys']['keys'][0]]}, 'untrusted'):
+            with self.subTest(supplied=supplied):
+                doc = copy.deepcopy(self.a)
+                doc['relying_party_keys'] = supplied
+                result = self.run_case(doc=doc, status='verified', work_verdict='pass')
+                self.assertEqual(self.baseline['provenance'], result['provenance'])
+
+    def test_WAR143_remains_explicit_with_its_original_key_input(self):
+        war143 = _load_pinned_source(EVIDENCE_ROOT/'sources/war143/verifier/war_verify.py',
+                                     WAR143_SOURCE_SHA256)
+        for raw, case, verdict in ((self.a_raw, 'A', 'pass'), (self.b_raw, 'B', 'fail')):
+            result = evaluate(raw, self.expected['hs51-musubi-2-' + case], self.roots, war143,
+                              verifier_sha256=WAR143_SOURCE_SHA256)
+            self.assertEqual(('verified', verdict), (result['status'], result['work_verdict']))
+            self.assertEqual(WAR143_SOURCE_SHA256, result['provenance']['required_war_source_sha256'])
+            self.assertEqual(2, len(result['provenance']['war_key_input']['keys']))
+            self.assertEqual('independent', result['derived_independence'])
+            self.assertNotIn('war_relying_party_key_input', result['provenance'])
+
+    def test_new_upstream_vectors_match_their_expected_outcomes(self):
+        # These exercise WAR directly, not HS51 receipt/Inbox compatibility.
+        for name, vector in self.docs.items():
+            if not name.startswith('sources/war148/vectors/'):
+                continue
+            with self.subTest(vector=name):
+                outcome = self.war.vector_outcome(vector)
+                self.assertEqual(vector['expected'], {key: outcome.get(key) for key in vector['expected']})
+
+    def test_valid_key_neutral_R_signature_is_rejected_only_by_new_pin(self):
+        vector = self.docs['sources/war148/vectors/116-signature-r-neutral-point.json']
+        record = vector['inputs']['receipt']
+        message = self.war.jcs(record['receipt']).encode('utf-8')
+        signature = base64.b64decode(record['signature']['value'], validate=True)
+        public = base64.b64decode(vector['inputs']['keys']['keys'][0]['public_key_base64'], validate=True)
+        war143 = _load_pinned_source(EVIDENCE_ROOT/'sources/war143/verifier/war_verify.py',
+                                     WAR143_SOURCE_SHA256)
+        self.assertTrue(self.war.key_is_canonical_prime_order(public))
+        self.assertTrue(war143.verify_ed25519(signature, message, public))
+        self.assertFalse(self.war.verify_ed25519(signature, message, public))
+
+    def test_receipt_and_sidecar_use_the_selected_signature_verifier(self):
+        with patch.object(self.war, 'verify_ed25519', wraps=self.war.verify_ed25519) as verifier:
+            self.run_case(raw=self.a_raw, status='verified', work_verdict='pass')
+        checked = [call.args[0] for call in verifier.call_args_list]
+        self.assertIn(base64.b64decode(self.a['record']['signature']['value']), checked)
+        self.assertIn(base64.b64decode(self.a['bindings_sidecar']['signature']), checked)
+
+    def test_decoded_criteria_ambiguity_is_rejected_before_upstream(self):
+        for name, code in (('117-criteria-file-duplicate-member-name.json', 'duplicate_json_key'),
+                           ('118-criteria-file-lone-surrogate.json', 'invalid_unicode')):
+            with self.subTest(vector=name):
+                vector = self.docs['sources/war148/vectors/' + name]
+                encoded = vector['inputs']['criteria_file_base64']
+                digest = _sha(base64.b64decode(encoded, validate=True))
+                doc = copy.deepcopy(self.a)
+                doc['criteria_file_base64'] = encoded
+                doc['record']['receipt']['criteria']['sha256'] = digest
+                doc['bindings_sidecar']['criteria_id'] = digest
+                doc['bindings_sidecar']['receipt_sha256'] = _sha(
+                    self.war.jcs(doc['record']['receipt']).encode('utf-8'))
+                # Isolate the decoded-criteria parser with an unsigned mutation.
+                # This test bypasses signatures; it is not signed evidence.
+                with patch.object(self.war, 'verify_ed25519', return_value=True), \
+                        patch.object(self.war, 'vector_outcome') as upstream:
+                    self.run_case(doc=doc, expected=dict(self.expected_a, criteria_sha256=digest), code=code)
+                    upstream.assert_not_called()
 
     def test_supplied_producer_key_cannot_override_selected_key(self):
         for public in (bytes.fromhex(self.expected_a['checker_public_key_hex']), bytes(range(32))):

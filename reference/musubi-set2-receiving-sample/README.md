@@ -153,7 +153,7 @@ external files separately:
 
 - The four `hs51-*.json` originals in the
   [published acceptance set](https://github.com/babyblueviper1/preaction-governance-conformance/tree/235aaabc45ebe6fa36dd02ca2cd6a44a69297d93/examples/hs51-acceptance-set).
-- The exact [WAR 1.4.3 verifier source](https://github.com/maximusrufus/work-acceptance-record/blob/6bb7d0b9246c3c535aba9c294d26181496d00614/verifier/war_verify.py)
+- The exact [WAR 1.4.8 verifier source](https://github.com/maximusrufus/work-acceptance-record/blob/3e53aac24ee5298b2316a10dceeaddb99695cc8c/verifier/war_verify.py)
   pinned in [ACCEPTANCE-CONTRACT.md](ACCEPTANCE-CONTRACT.md).
 - A JSON array of the two base64 DER trust roots in the `inputs.tsa_roots_base64`
   fields of [vector 31](https://github.com/maximusrufus/work-acceptance-record/blob/6b2f730b81e0818826f274742d883c2b475d5227/vectors/31-tsa-freetsa-verified.json)
@@ -161,11 +161,12 @@ external files separately:
   Combine the two arrays into one array. The example checks the roots' raw SHA-256 fingerprints against its
   fixed receiver selection. Incoming records cannot supply those roots.
 
-The adapter supplies WAR 1.4.3 with the checker and producer keys from the
-receiver-selected MUSUBI records. It preserves the received acceptance bytes
-and saves the derived key input separately. WAR 1.4.1 remains available for
-reproduction using the older source listed in the contract; the example records
-which supported verifier was supplied. See [1.4.3 validation](WAR143-VALIDATION.md).
+The adapter supplies WAR 1.4.8 with the checker and producer keys from the
+receiver-selected MUSUBI records, including its separate relying-party key
+input. It preserves the received acceptance bytes and saves both derived key
+inputs with the assessment. WAR 1.4.3 and 1.4.1 remain available for reproduction
+using the exact sources listed in the contract; the example records which
+verifier was supplied. See [1.4.8 validation](WAR148-VALIDATION.md).
 
 Set these paths to the saved files and choose a new output directory:
 
@@ -352,6 +353,7 @@ unexpected symlinks, mismatched VATE source and attempts to replace an existing
 environment. They use temporary copies and do not install packages.
 
 See [VALIDATION.md](VALIDATION.md) for the base sample's tested Python versions,
-[WAR143-VALIDATION.md](WAR143-VALIDATION.md) for current WAR receiving checks,
+[WAR148-VALIDATION.md](WAR148-VALIDATION.md) for current WAR receiving checks,
+[WAR143-VALIDATION.md](WAR143-VALIDATION.md) for the earlier 1.4.3 runs,
 [ACCEPTANCE-VALIDATION.md](ACCEPTANCE-VALIDATION.md) for the earlier acceptance and retention runs,
 and [THIRD_PARTY.md](THIRD_PARTY.md) for source attribution and licenses.

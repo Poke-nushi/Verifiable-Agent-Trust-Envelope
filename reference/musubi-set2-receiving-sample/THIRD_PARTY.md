@@ -28,10 +28,14 @@ received originals.
 
 The optional foreign acceptance example uses the caller's separately obtained
 [HS51 acceptance set](https://github.com/babyblueviper1/preaction-governance-conformance/tree/235aaabc45ebe6fa36dd02ca2cd6a44a69297d93/examples/hs51-acceptance-set)
-and [WAR verifier](https://github.com/maximusrufus/work-acceptance-record/blob/6bb7d0b9246c3c535aba9c294d26181496d00614/verifier/war_verify.py).
-The earlier `6b2f730` source remains supported for reproduction; both exact pins
+and [WAR verifier](https://github.com/maximusrufus/work-acceptance-record/blob/3e53aac24ee5298b2316a10dceeaddb99695cc8c/verifier/war_verify.py).
+The earlier `6bb7d0b` and `6b2f730` sources remain supported for reproduction; all exact pins
 are listed in [ACCEPTANCE-CONTRACT.md](ACCEPTANCE-CONTRACT.md).
-Those records, the verifier source and its TSA-root test vectors are not bundled
+Those records, the verifier source and its test vectors are not bundled
 in this sample. The sample's Apache-2.0 license does not grant rights to those
 separate materials. Their exact bytes and the caller-selected roots are retained
 in local run exports for inspection and recovery.
+
+WAR 1.4.8's [license map](https://github.com/maximusrufus/work-acceptance-record/blob/3e53aac24ee5298b2316a10dceeaddb99695cc8c/LICENSES.md)
+assigns Apache-2.0 to verifier code, CC0 1.0 to test vectors and CC BY 4.0 to
+text. Earlier pins retain the license terms stated in their own releases.

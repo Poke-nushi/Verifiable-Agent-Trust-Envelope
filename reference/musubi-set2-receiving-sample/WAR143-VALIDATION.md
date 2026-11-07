@@ -58,6 +58,13 @@ use that new output's `RECOVERY.json` and the same database.
 
 ## Reproduce the portable suites
 
+The historical suites are preserved in the
+[pre-1.4.8 source snapshot](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/tree/c7533ad70c20e71b7912cdf708f33220e49c1f00/reference/musubi-set2-receiving-sample).
+Use that snapshot to repeat these commands with the historical suite. Current
+`main` expands the suites and defaults to 1.4.8; see
+[WAR148-VALIDATION.md](WAR148-VALIDATION.md) for the current commands and retained
+1.4.3 regression checks.
+
 From the repository root, choose a new evidence directory. Preparation fetches
 the fixed public inputs and checks their raw hashes; it installs no packages.
 The next two commands execute the pinned verifiers on those inputs.
