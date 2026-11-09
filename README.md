@@ -71,6 +71,11 @@ For a pinned Vaara stdio proxy and credential-gateway path, use the
 It checks four disclosed evidence cases and can create a new local file-operation
 capture, including changed arguments and response loss.
 
+The [Vaara recipient example](docs/interop/vaara-recipient-example.md) checks saved
+Vaara 2.17.0 evidence and retains earlier and later assessments in Recipient Inbox.
+It separates native verification and argument binding from receiver-selected
+call association when a receipt is withheld, swapped or delivered.
+
 To check two stored VATE receipts without running an operation, use the
 [Receipt Linkage Example](reference/receipt-linkage-example/README.md). It
 reuses the existing core and runner checks and distinguishes matching receipts,
