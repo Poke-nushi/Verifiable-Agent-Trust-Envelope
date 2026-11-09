@@ -115,6 +115,12 @@ reassessment across locally staged receipt delivery. The collector trust
 decision remains explicit; valid signatures alone do not identify the selected
 call. This package does not change the archived release or conformance corpus.
 
+Also added on `main` after v0.6.0, the
+[OAuth permission-change trial and VATE linkage example](docs/interop/oauth-persisted-grant-trial.md)
+provide separate fixed downloads for ten real Hydra/OpenFGA cases and optional
+admission/result correspondence with retained receiver history. These local,
+sequential examples preserve the archived release and conformance corpus.
+
 ### Release And Review References
 
 The current public review surface is:

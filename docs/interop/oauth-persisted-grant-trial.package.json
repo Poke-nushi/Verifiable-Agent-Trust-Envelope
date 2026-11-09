@@ -1,0 +1,25 @@
+{
+  "format": "vate-oauth-trial-download-1",
+  "archive": "oauth-persisted-grant-trial-20261110.zip",
+  "url": "https://vate.rognalia.com/downloads/oauth-persisted-grant/2026-11-10/oauth-persisted-grant-trial-20261110.zip",
+  "size_bytes": 28876,
+  "sha256": "8a4891bdc10bf33f7e8b265264f6586edf17d604c20142b50f005b9d0b25921d",
+  "manifest_sha256": "f4c89e6d056ce21309865cfd128794d8f42879400eef994edd484f8414276e6c",
+  "archive_files": 17,
+  "manifest_payload_files": 16,
+  "source_pins": {},
+  "native_runtime": {
+    "bundled": false,
+    "versions": {
+      "ory_hydra": "26.2.0",
+      "openfga": "1.22.1"
+    },
+    "archive_pins": "NATIVE-RELEASES.json inside the archive"
+  },
+  "tested_environment": {
+    "platform": "macOS arm64",
+    "python": "3.14.8"
+  },
+  "package_license": "Apache-2.0",
+  "scope": "ten sequential persisted-grant cases with Hydra/OpenFGA; fixture policy administration and calendar action; interoperability review aid, not production approval or general compatibility evidence"
+}
