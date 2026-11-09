@@ -1,0 +1,33 @@
+{
+  "format": "vate-vaara-recipient-download-1",
+  "archive": "vaara-recipient-example-20261109-r2.zip",
+  "url": "https://vate.rognalia.com/downloads/vaara-recipient/2026-11-09/vaara-recipient-example-20261109-r2.zip",
+  "size_bytes": 201288,
+  "sha256": "9fa7d3d39dd7e331cec5938afab6c0ea97c3305447802a10dd6b3d128e965aed",
+  "manifest_sha256": "4650e22dfa57981c30e9df0464348f28fdcb0deb77929b7d621894ecc3e2c33b",
+  "archive_files": 58,
+  "manifest_payload_files": 57,
+  "source_pins": {
+    "vate": "1c04c5545ee6891a34f4fffdf7772af544ba811f",
+    "vaara_comparison": "90311e7214c8a20a86af7a58e400ead661355984"
+  },
+  "native_runtime": {
+    "bundled": false,
+    "versions": {
+      "vaara": "2.17.0",
+      "rfc8785": "0.1.4",
+      "cryptography": "50.0.1",
+      "cbor2": "6.2.1",
+      "cffi": "2.0.0",
+      "pycparser": "2.23"
+    }
+  },
+  "tested_receiver": {
+    "platform": "macOS arm64",
+    "python": "3.14.8",
+    "jsonschema": "4.26.0",
+    "sandbox": "/usr/bin/sandbox-exec"
+  },
+  "package_license": "Apache-2.0",
+  "scope": "saved local Vaara evidence, receiver-selected call association and retained Recipient Inbox reassessment; experimental review aid, not production approval or general compatibility evidence"
+}

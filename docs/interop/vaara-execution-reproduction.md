@@ -5,6 +5,9 @@ received by a file handler, its output, and the linked VATE records. The package
 lets you inspect saved evidence first, then run the pinned stdio proxy and
 credential gateway yourself.
 
+For receiving saved Vaara 2.17.0 evidence and retaining reassessment history,
+see the separate [Vaara recipient example](vaara-recipient-example.md).
+
 ## Get the fixed package
 
 [Download the reproduction ZIP](https://vate.rognalia.com/downloads/vaara-vate/2026-09-16/vate-reproduction-local-draft-01.zip)

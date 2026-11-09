@@ -108,6 +108,13 @@ The demonstration scenarios are separate from that corpus. See
 [external SUT coverage](docs/conformance/external-sut-coverage.md) for the
 partial native-implementation records and their historical evaluation pins.
 
+Added on `main` after v0.6.0, the
+[Vaara recipient example](docs/interop/vaara-recipient-example.md) checks saved
+native evidence, receiver-selected call association and retained Inbox
+reassessment across locally staged receipt delivery. The collector trust
+decision remains explicit; valid signatures alone do not identify the selected
+call. This package does not change the archived release or conformance corpus.
+
 ### Release And Review References
 
 The current public review surface is:
