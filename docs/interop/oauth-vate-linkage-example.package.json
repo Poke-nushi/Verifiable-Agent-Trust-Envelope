@@ -1,0 +1,27 @@
+{
+  "format": "vate-oauth-trial-download-1",
+  "archive": "oauth-vate-linkage-example-20261110.zip",
+  "url": "https://vate.rognalia.com/downloads/oauth-vate-linkage/2026-11-10/oauth-vate-linkage-example-20261110.zip",
+  "size_bytes": 339097,
+  "sha256": "5c0a1d884c299b323262d79477180fd56d589e22bad29cf515cb025afea8f41e",
+  "manifest_sha256": "29d93107142f57b9eedd1f87c195b15b2f9ddf31ed7f37cc8d288570275b0237",
+  "archive_files": 162,
+  "manifest_payload_files": 161,
+  "source_pins": {
+    "vate": "ccaba140edc2f7afc9b15bcbdb1281ff12690360"
+  },
+  "native_runtime": {
+    "bundled": false,
+    "versions": {
+      "ory_hydra": "26.2.0",
+      "openfga": "1.22.1"
+    },
+    "archive_pins": "NATIVE-RELEASES.json inside the archive"
+  },
+  "tested_environment": {
+    "platform": "macOS arm64",
+    "python": "3.14.8"
+  },
+  "package_license": "Apache-2.0",
+  "scope": "same ten native cases plus unsigned admission/result linkage and retained receiver history under local collector trust; interoperability review aid, not production approval or general compatibility evidence"
+}

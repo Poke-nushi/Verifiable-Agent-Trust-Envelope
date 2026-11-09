@@ -76,6 +76,11 @@ Vaara 2.17.0 evidence and retains earlier and later assessments in Recipient Inb
 It separates native verification and argument binding from receiver-selected
 call association when a receipt is withheld, swapped or delivered.
 
+The [OAuth permission-change trial](docs/interop/oauth-persisted-grant-trial.md)
+uses Hydra and OpenFGA to exercise ten persisted-grant cases with the same token.
+Use it independently, or add the VATE example to check admission/result
+correspondence and retain receiver history when results are swapped or delayed.
+
 To check two stored VATE receipts without running an operation, use the
 [Receipt Linkage Example](reference/receipt-linkage-example/README.md). It
 reuses the existing core and runner checks and distinguishes matching receipts,
