@@ -132,6 +132,14 @@ expected/observed value; `EVENTS.json` records the native HTTP observations.
 ordered **delegation, user_permission**. Permission changes affect the next
 request without issuing a replacement token; the checks are sequential.
 
+Each request must pass token validation and **both** policy checks:
+`delegation AND user_permission`. The AS credential may update delegation but
+must not update user permission or bypass the policy administration adapter.
+The owner credential must not update delegation.
+Changes to delegation cannot authorize an action rejected by the independent
+user-permission check. Reproductions must preserve this conjunction and these
+writer restrictions.
+
 In the combined package with its Python environment prepared, run the same
 ten native cases with VATE linkage:
 
@@ -159,6 +167,8 @@ The trial selects persisted-grant mode explicitly. Its `calendar.read` token
 scope does not create user permission or select transient-grant mode.
 Subjects are fixed for one user, client and action. Hydra performs code/S256
 PKCE, introspection and revocation; OpenFGA performs real Check/Write calls.
+These cases do not model parent grants or revocation along an agent delegation
+chain.
 Login/consent, the calendar action and the policy administration adapter's
 credential/namespace rules are fixture code.
 
