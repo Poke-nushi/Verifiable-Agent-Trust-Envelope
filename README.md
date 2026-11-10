@@ -81,6 +81,11 @@ uses Hydra and OpenFGA to exercise ten persisted-grant cases with the same token
 Use it independently, or add the VATE example to check admission/result
 correspondence and retain receiver history when results are swapped or delayed.
 
+The separate [first-hop revocation trial](docs/interop/oauth-first-hop-revocation-trial.md)
+revokes user → A while B's token, child grant and independent user permission
+remain. Fourteen Hydra/OpenFGA cases expose the chain check, fixed-parent guard
+and writer restrictions; the package runs independently of VATE.
+
 To check two stored VATE receipts without running an operation, use the
 [Receipt Linkage Example](reference/receipt-linkage-example/README.md). It
 reuses the existing core and runner checks and distinguishes matching receipts,

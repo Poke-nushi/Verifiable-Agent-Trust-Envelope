@@ -1,0 +1,50 @@
+{
+  "format": "vate-oauth-trial-download-1",
+  "archive": "oauth-first-hop-revocation-trial-20261110.zip",
+  "url": "https://vate.rognalia.com/downloads/oauth-first-hop-revocation/2026-11-10/oauth-first-hop-revocation-trial-20261110.zip",
+  "size_bytes": 45473,
+  "sha256": "f34795280c075cb6bf45220afeab13bac58c1c9b76f0610b69fa335776876926",
+  "manifest_sha256": "07c01a579374e7f4845511f1e7f6585b22464e0fd5182f5ae9811cd5a5be3788",
+  "archive_files": 23,
+  "manifest_payload_files": 22,
+  "source_pins": {
+    "package": "oauth-first-hop-revocation-trial-20261110",
+    "source_sha256": {
+      "run_chain.py": "491fb48464b4a7e59bf574e609457811f89cf76da8ee54b963645d1eef145fc9",
+      "test_chain.py": "d138bfe80590359701fcd713279086236406f04eeec1747c450ca2f603406273",
+      "MODEL.json": "c558e2d1764c82933faf46bd038340acfcaf281fa77a40f0482860bc30eb79b6",
+      "GRANTS.json": "0c113b6ba3161a121819306698d23ddf71f1431d357d2e6c9e838d85cf27bc42"
+    },
+    "derived_from": {
+      "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+      "oauth_trial_commit": "bf601ae59cb824d9624b4955f0953c0671a5c3af",
+      "oauth_trial_source_sha256": "f402f92c4d92f30f07242cdf2b8845fb02df5d1bbb71b6470ed4261dc4f078a3"
+    },
+    "package_helpers": {
+      "source_package_sha256": "8a4891bdc10bf33f7e8b265264f6586edf17d604c20142b50f005b9d0b25921d",
+      "files": {
+        "setup_native.py": "164655927a6fb366fca1eb70a0f99bf5586d80b163d47b86d78c8827af872303",
+        "verify_package.py": "3245b1ebb5ff1b1eb6e9be221f5b479a57280bb31ad2cf943f46609e0915e12c",
+        "test_package.py": "4e73aaa32801352b0d3a031b85496f5681cfb9cd787a1be671e2abdb6d2b2dbb"
+      }
+    },
+    "case_identity": "Case identifiers belong to this first-hop package; they differ from the separate ten-case permission-change trial."
+  },
+  "native_runtime": {
+    "bundled": false,
+    "versions": {
+      "ory_hydra": "26.2.0",
+      "openfga": "1.22.1"
+    },
+    "platforms": [
+      "Darwin-arm64"
+    ],
+    "archive_pins": "NATIVE-RELEASES.json inside the archive"
+  },
+  "tested_environment": {
+    "platform": "macOS arm64",
+    "python": "3.14.8"
+  },
+  "package_license": "Apache-2.0",
+  "scope": "14 sequential fixed-path first-hop revocation cases; same AS role writes both hops; synthetic resource action; no delegation issuance or VATE receipt conversion; interoperability review aid, not production approval or general compatibility evidence"
+}
