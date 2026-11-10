@@ -169,6 +169,9 @@ Subjects are fixed for one user, client and action. Hydra performs code/S256
 PKCE, introspection and revocation; OpenFGA performs real Check/Write calls.
 These cases do not model parent grants or revocation along an agent delegation
 chain.
+For that condition, use the separate
+[first-hop revocation trial](oauth-first-hop-revocation-trial.md), which keeps
+B's token and child grant unchanged while revoking user → A.
 Login/consent, the calendar action and the policy administration adapter's
 credential/namespace rules are fixture code.
 

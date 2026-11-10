@@ -121,6 +121,13 @@ provide separate fixed downloads for ten real Hydra/OpenFGA cases and optional
 admission/result correspondence with retained receiver history. These local,
 sequential examples preserve the archived release and conformance corpus.
 
+The [first-hop delegation revocation trial](docs/interop/oauth-first-hop-revocation-trial.md)
+adds a separate 14-case Hydra/OpenFGA package: revoking user → A denies B
+without changing B's token, child grant or independent user permission.
+Controls distinguish the fixed-parent guard, leaf-only policy and unavailable
+PDP. The trial uses one stored path and does not implement delegation issuance
+or produce VATE receipts.
+
 ### Release And Review References
 
 The current public review surface is:
