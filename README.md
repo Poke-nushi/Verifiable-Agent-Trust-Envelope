@@ -86,6 +86,11 @@ revokes user → A while B's token, child grant and independent user permission
 remain. Fourteen Hydra/OpenFGA cases expose the chain check, fixed-parent guard
 and writer restrictions; the package runs independently of VATE.
 
+The [UIBC v0.3 receiving example](reference/uibc-v03-receiving-example/README.md)
+separates evidence and seal checks from a receiver-selected key match. Its
+22 fixed conditions include a changed package signed again with another key;
+the standalone folder includes both native replay and an independent reader.
+
 To check two stored VATE receipts without running an operation, use the
 [Receipt Linkage Example](reference/receipt-linkage-example/README.md). It
 reuses the existing core and runner checks and distinguishes matching receipts,

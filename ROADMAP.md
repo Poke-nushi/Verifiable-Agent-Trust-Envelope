@@ -24,6 +24,12 @@ earlier judgments when conditions change. Existing file-operation and payment
 examples provide different contexts for those questions. A further example
 should address a concrete integration or maintenance problem.
 
+The [UIBC v0.3 receiving example](reference/uibc-v03-receiving-example/README.md)
+provides one source-pinned update path: 22 conditions compare selected evidence
+and seal checks while retaining a separate receiver-selected key result. It
+includes native replay, an independent reader and bounded Ed25519 input tests;
+the earlier UIBC 0.2 example remains available at its original pin.
+
 ### v0.5.0: Execution Evidence And Recipient Review
 
 The `v0.5.0` discussion-draft pre-release collects execution-evidence examples,

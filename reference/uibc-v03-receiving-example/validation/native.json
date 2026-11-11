@@ -1,0 +1,2013 @@
+{
+  "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+  "cases": [
+    {
+      "case": "published-open",
+      "package": "published",
+      "hmac_key_file": null,
+      "public_key_file": null,
+      "inputs": {
+        "evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+        "evidence/files/_log.txt": "54a09cb3bc85e5a0966718f34b88218a7eccbcb07960761a4ffd6958bd2c56b7",
+        "evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+        "identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+        "lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+        "manifest.json": "997208bb06fe78c7a01d6047595e87266f13b89d1a44dca6cedc95f58dbf3455",
+        "signatures/seal.json": "4e22187396118d5406039c7a6a45b47c2ab896a39acc199b0f658497599b27c5"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "PASS",
+        "subject": "sample-support-agent",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='sample-support-agent', manifest.agent_id='sample-support-agent'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "2 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c, manifest=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "PASS",
+            "detail": "Ed25519 seal valid (key_id 56475aa75463474c...) - third-party verifiable, no secret involved"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "public-key",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "No violation was detected within the observed evidence boundary."
+      },
+      "expected_native_result": "PASS",
+      "expected_receiver_status": "not_assessed"
+    },
+    {
+      "case": "published-pinned",
+      "package": "published",
+      "hmac_key_file": null,
+      "public_key_file": "published.pub",
+      "inputs": {
+        "evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+        "evidence/files/_log.txt": "54a09cb3bc85e5a0966718f34b88218a7eccbcb07960761a4ffd6958bd2c56b7",
+        "evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+        "identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+        "lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+        "manifest.json": "997208bb06fe78c7a01d6047595e87266f13b89d1a44dca6cedc95f58dbf3455",
+        "signatures/seal.json": "4e22187396118d5406039c7a6a45b47c2ab896a39acc199b0f658497599b27c5"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "PASS",
+        "subject": "sample-support-agent",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='sample-support-agent', manifest.agent_id='sample-support-agent'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "2 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c, manifest=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "PASS",
+            "detail": "Ed25519 seal valid (key_id 56475aa75463474c...) - third-party verifiable, no secret involved"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "public-key",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "No violation was detected within the observed evidence boundary."
+      },
+      "expected_native_result": "PASS",
+      "expected_receiver_status": "matched"
+    },
+    {
+      "case": "published-wrong-pin",
+      "package": "published",
+      "hmac_key_file": null,
+      "public_key_file": "attacker.pub",
+      "inputs": {
+        "evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+        "evidence/files/_log.txt": "54a09cb3bc85e5a0966718f34b88218a7eccbcb07960761a4ffd6958bd2c56b7",
+        "evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+        "identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+        "lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+        "manifest.json": "997208bb06fe78c7a01d6047595e87266f13b89d1a44dca6cedc95f58dbf3455",
+        "signatures/seal.json": "4e22187396118d5406039c7a6a45b47c2ab896a39acc199b0f658497599b27c5"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "FAIL",
+        "subject": "sample-support-agent",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='sample-support-agent', manifest.agent_id='sample-support-agent'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "2 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c, manifest=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "FAIL",
+            "detail": "public key does not match the pinned --pubkey (possible key substitution or wrong pin)"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "unattested",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "Violations were detected within the observed evidence boundary."
+      },
+      "expected_native_result": "FAIL",
+      "expected_receiver_status": "mismatched"
+    },
+    {
+      "case": "published-hmac-mode",
+      "package": "published",
+      "hmac_key_file": "hmac.hex",
+      "public_key_file": null,
+      "inputs": {
+        "evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+        "evidence/files/_log.txt": "54a09cb3bc85e5a0966718f34b88218a7eccbcb07960761a4ffd6958bd2c56b7",
+        "evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+        "identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+        "lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+        "manifest.json": "997208bb06fe78c7a01d6047595e87266f13b89d1a44dca6cedc95f58dbf3455",
+        "signatures/seal.json": "4e22187396118d5406039c7a6a45b47c2ab896a39acc199b0f658497599b27c5"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "FAIL",
+        "subject": "sample-support-agent",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='sample-support-agent', manifest.agent_id='sample-support-agent'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "2 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c, manifest=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "FAIL",
+            "detail": "seal algorithm is Ed25519; the provided --key is an HMAC owner key and cannot check it - re-run without --key, or pin the signer with --pubkey"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "unattested",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "Violations were detected within the observed evidence boundary."
+      },
+      "expected_native_result": "FAIL",
+      "expected_receiver_status": "mismatched"
+    },
+    {
+      "case": "tampered-open",
+      "package": "tampered",
+      "hmac_key_file": null,
+      "public_key_file": null,
+      "inputs": {
+        "evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+        "evidence/files/_log.txt": "b1aab67c872f169a74bd2671eef9a074049caff2d1a06738fc12789d65d7dcbd",
+        "evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+        "identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+        "lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+        "manifest.json": "997208bb06fe78c7a01d6047595e87266f13b89d1a44dca6cedc95f58dbf3455",
+        "signatures/seal.json": "4e22187396118d5406039c7a6a45b47c2ab896a39acc199b0f658497599b27c5"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "FAIL",
+        "subject": "sample-support-agent",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='sample-support-agent', manifest.agent_id='sample-support-agent'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "2 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "FAIL",
+            "detail": "2 entries checked; hash mismatch on 'files/_log.txt'"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "INCONCLUSIVE",
+            "detail": "skipped: evidence missing or S4 failed"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "PASS",
+            "detail": "Ed25519 seal valid (key_id 56475aa75463474c...) - third-party verifiable, no secret involved"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "public-key",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "Violations were detected within the observed evidence boundary."
+      },
+      "expected_native_result": "FAIL",
+      "expected_receiver_status": "mismatched"
+    },
+    {
+      "case": "tampered-pinned",
+      "package": "tampered",
+      "hmac_key_file": null,
+      "public_key_file": "published.pub",
+      "inputs": {
+        "evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+        "evidence/files/_log.txt": "b1aab67c872f169a74bd2671eef9a074049caff2d1a06738fc12789d65d7dcbd",
+        "evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+        "identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+        "lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+        "manifest.json": "997208bb06fe78c7a01d6047595e87266f13b89d1a44dca6cedc95f58dbf3455",
+        "signatures/seal.json": "4e22187396118d5406039c7a6a45b47c2ab896a39acc199b0f658497599b27c5"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "FAIL",
+        "subject": "sample-support-agent",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='sample-support-agent', manifest.agent_id='sample-support-agent'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "2 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "FAIL",
+            "detail": "2 entries checked; hash mismatch on 'files/_log.txt'"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "INCONCLUSIVE",
+            "detail": "skipped: evidence missing or S4 failed"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "PASS",
+            "detail": "Ed25519 seal valid (key_id 56475aa75463474c...) - third-party verifiable, no secret involved"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "public-key",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "Violations were detected within the observed evidence boundary."
+      },
+      "expected_native_result": "FAIL",
+      "expected_receiver_status": "mismatched"
+    },
+    {
+      "case": "forged-open",
+      "package": "forged",
+      "hmac_key_file": null,
+      "public_key_file": null,
+      "inputs": {
+        "evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+        "evidence/files/_log.txt": "b1aab67c872f169a74bd2671eef9a074049caff2d1a06738fc12789d65d7dcbd",
+        "evidence/index.json": "170315eef69586329334271287b2d7bde6ae67d9e09235d72bb3b5a31288d087",
+        "identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+        "lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+        "manifest.json": "54458ee540298afd58a00c2a8272fc3c601bee0dbaf95597a3e2d7523fdb5be6",
+        "signatures/seal.json": "4e22187396118d5406039c7a6a45b47c2ab896a39acc199b0f658497599b27c5"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "FAIL",
+        "subject": "sample-support-agent",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='sample-support-agent', manifest.agent_id='sample-support-agent'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "2 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=a9d9d09354b2fabe6a567f2b8cf8525050a72a190fed458a44710e09dde7f82f, manifest=a9d9d09354b2fabe6a567f2b8cf8525050a72a190fed458a44710e09dde7f82f"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "FAIL",
+            "detail": "Ed25519 signature invalid: identity/manifest do not match the seal"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "unattested",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "Violations were detected within the observed evidence boundary."
+      },
+      "expected_native_result": "FAIL",
+      "expected_receiver_status": "mismatched"
+    },
+    {
+      "case": "forged-pinned",
+      "package": "forged",
+      "hmac_key_file": null,
+      "public_key_file": "published.pub",
+      "inputs": {
+        "evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+        "evidence/files/_log.txt": "b1aab67c872f169a74bd2671eef9a074049caff2d1a06738fc12789d65d7dcbd",
+        "evidence/index.json": "170315eef69586329334271287b2d7bde6ae67d9e09235d72bb3b5a31288d087",
+        "identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+        "lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+        "manifest.json": "54458ee540298afd58a00c2a8272fc3c601bee0dbaf95597a3e2d7523fdb5be6",
+        "signatures/seal.json": "4e22187396118d5406039c7a6a45b47c2ab896a39acc199b0f658497599b27c5"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "FAIL",
+        "subject": "sample-support-agent",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='sample-support-agent', manifest.agent_id='sample-support-agent'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "2 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=a9d9d09354b2fabe6a567f2b8cf8525050a72a190fed458a44710e09dde7f82f, manifest=a9d9d09354b2fabe6a567f2b8cf8525050a72a190fed458a44710e09dde7f82f"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "FAIL",
+            "detail": "Ed25519 signature invalid: identity/manifest do not match the seal"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "unattested",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "Violations were detected within the observed evidence boundary."
+      },
+      "expected_native_result": "FAIL",
+      "expected_receiver_status": "mismatched"
+    },
+    {
+      "case": "resealed-open",
+      "package": "resealed",
+      "hmac_key_file": null,
+      "public_key_file": null,
+      "inputs": {
+        "evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+        "evidence/files/_log.txt": "b1aab67c872f169a74bd2671eef9a074049caff2d1a06738fc12789d65d7dcbd",
+        "evidence/index.json": "170315eef69586329334271287b2d7bde6ae67d9e09235d72bb3b5a31288d087",
+        "identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+        "lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+        "manifest.json": "54458ee540298afd58a00c2a8272fc3c601bee0dbaf95597a3e2d7523fdb5be6",
+        "signatures/seal.json": "f9fbed94b38a214088b037f135f631719ee5551f37d40222788ec36eb8aa3a97"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "PASS",
+        "subject": "sample-support-agent",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='sample-support-agent', manifest.agent_id='sample-support-agent'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "2 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=a9d9d09354b2fabe6a567f2b8cf8525050a72a190fed458a44710e09dde7f82f, manifest=a9d9d09354b2fabe6a567f2b8cf8525050a72a190fed458a44710e09dde7f82f"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "PASS",
+            "detail": "Ed25519 seal valid (key_id 03537aebbf30b9ec...) - third-party verifiable, no secret involved"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "public-key",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "No violation was detected within the observed evidence boundary."
+      },
+      "expected_native_result": "PASS",
+      "expected_receiver_status": "not_assessed"
+    },
+    {
+      "case": "resealed-owner-pin",
+      "package": "resealed",
+      "hmac_key_file": null,
+      "public_key_file": "published.pub",
+      "inputs": {
+        "evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+        "evidence/files/_log.txt": "b1aab67c872f169a74bd2671eef9a074049caff2d1a06738fc12789d65d7dcbd",
+        "evidence/index.json": "170315eef69586329334271287b2d7bde6ae67d9e09235d72bb3b5a31288d087",
+        "identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+        "lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+        "manifest.json": "54458ee540298afd58a00c2a8272fc3c601bee0dbaf95597a3e2d7523fdb5be6",
+        "signatures/seal.json": "f9fbed94b38a214088b037f135f631719ee5551f37d40222788ec36eb8aa3a97"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "FAIL",
+        "subject": "sample-support-agent",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='sample-support-agent', manifest.agent_id='sample-support-agent'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "2 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=a9d9d09354b2fabe6a567f2b8cf8525050a72a190fed458a44710e09dde7f82f, manifest=a9d9d09354b2fabe6a567f2b8cf8525050a72a190fed458a44710e09dde7f82f"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "FAIL",
+            "detail": "public key does not match the pinned --pubkey (possible key substitution or wrong pin)"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "unattested",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "Violations were detected within the observed evidence boundary."
+      },
+      "expected_native_result": "FAIL",
+      "expected_receiver_status": "mismatched"
+    },
+    {
+      "case": "resealed-attacker-pin",
+      "package": "resealed",
+      "hmac_key_file": null,
+      "public_key_file": "attacker.pub",
+      "inputs": {
+        "evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+        "evidence/files/_log.txt": "b1aab67c872f169a74bd2671eef9a074049caff2d1a06738fc12789d65d7dcbd",
+        "evidence/index.json": "170315eef69586329334271287b2d7bde6ae67d9e09235d72bb3b5a31288d087",
+        "identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+        "lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+        "manifest.json": "54458ee540298afd58a00c2a8272fc3c601bee0dbaf95597a3e2d7523fdb5be6",
+        "signatures/seal.json": "f9fbed94b38a214088b037f135f631719ee5551f37d40222788ec36eb8aa3a97"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "PASS",
+        "subject": "sample-support-agent",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='sample-support-agent', manifest.agent_id='sample-support-agent'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "2 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=a9d9d09354b2fabe6a567f2b8cf8525050a72a190fed458a44710e09dde7f82f, manifest=a9d9d09354b2fabe6a567f2b8cf8525050a72a190fed458a44710e09dde7f82f"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "PASS",
+            "detail": "Ed25519 seal valid (key_id 03537aebbf30b9ec...) - third-party verifiable, no secret involved"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "public-key",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "No violation was detected within the observed evidence boundary."
+      },
+      "expected_native_result": "PASS",
+      "expected_receiver_status": "matched"
+    },
+    {
+      "case": "identity-changed",
+      "package": "identity-changed",
+      "hmac_key_file": null,
+      "public_key_file": "published.pub",
+      "inputs": {
+        "evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+        "evidence/files/_log.txt": "54a09cb3bc85e5a0966718f34b88218a7eccbcb07960761a4ffd6958bd2c56b7",
+        "evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+        "identity.json": "e33d4a06ba1bd092ec8eb6dd589873b0449b5e8c4f7d5cfcfb5cd22dd18d45cf",
+        "lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+        "manifest.json": "997208bb06fe78c7a01d6047595e87266f13b89d1a44dca6cedc95f58dbf3455",
+        "signatures/seal.json": "4e22187396118d5406039c7a6a45b47c2ab896a39acc199b0f658497599b27c5"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "FAIL",
+        "subject": "sample-support-agent",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='sample-support-agent', manifest.agent_id='sample-support-agent'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "2 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c, manifest=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "FAIL",
+            "detail": "Ed25519 signature invalid: identity/manifest do not match the seal"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "unattested",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "Violations were detected within the observed evidence boundary."
+      },
+      "expected_native_result": "FAIL",
+      "expected_receiver_status": "mismatched"
+    },
+    {
+      "case": "unsigned-open",
+      "package": "unsigned",
+      "hmac_key_file": null,
+      "public_key_file": null,
+      "inputs": {
+        "evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+        "evidence/files/_log.txt": "54a09cb3bc85e5a0966718f34b88218a7eccbcb07960761a4ffd6958bd2c56b7",
+        "evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+        "identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+        "lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+        "manifest.json": "997208bb06fe78c7a01d6047595e87266f13b89d1a44dca6cedc95f58dbf3455"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "INCONCLUSIVE",
+        "subject": "sample-support-agent",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='sample-support-agent', manifest.agent_id='sample-support-agent'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "2 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c, manifest=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "INCONCLUSIVE",
+            "detail": "package unsigned: evidence chain is internally consistent but provenance is unattested"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "unattested",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "No violation was detected, but verification is incomplete: at least one check could not be resolved within the observed evidence boundary."
+      },
+      "expected_native_result": "INCONCLUSIVE",
+      "expected_receiver_status": "not_assessed"
+    },
+    {
+      "case": "unsigned-pin",
+      "package": "unsigned",
+      "hmac_key_file": null,
+      "public_key_file": "published.pub",
+      "inputs": {
+        "evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+        "evidence/files/_log.txt": "54a09cb3bc85e5a0966718f34b88218a7eccbcb07960761a4ffd6958bd2c56b7",
+        "evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+        "identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+        "lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+        "manifest.json": "997208bb06fe78c7a01d6047595e87266f13b89d1a44dca6cedc95f58dbf3455"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "INCONCLUSIVE",
+        "subject": "sample-support-agent",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='sample-support-agent', manifest.agent_id='sample-support-agent'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "2 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c, manifest=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "INCONCLUSIVE",
+            "detail": "package unsigned: evidence chain is internally consistent but provenance is unattested"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "unattested",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "No violation was detected, but verification is incomplete: at least one check could not be resolved within the observed evidence boundary."
+      },
+      "expected_native_result": "INCONCLUSIVE",
+      "expected_receiver_status": "not_assessed"
+    },
+    {
+      "case": "unsigned-hmac",
+      "package": "unsigned",
+      "hmac_key_file": "hmac.hex",
+      "public_key_file": null,
+      "inputs": {
+        "evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+        "evidence/files/_log.txt": "54a09cb3bc85e5a0966718f34b88218a7eccbcb07960761a4ffd6958bd2c56b7",
+        "evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+        "identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+        "lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+        "manifest.json": "997208bb06fe78c7a01d6047595e87266f13b89d1a44dca6cedc95f58dbf3455"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "FAIL",
+        "subject": "sample-support-agent",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='sample-support-agent', manifest.agent_id='sample-support-agent'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "2 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c, manifest=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "FAIL",
+            "detail": "strict mode (--key): package is unsigned - owner demands a sealed submission"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "unattested",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "Violations were detected within the observed evidence boundary."
+      },
+      "expected_native_result": "FAIL",
+      "expected_receiver_status": "mismatched"
+    },
+    {
+      "case": "hmac-published-open",
+      "package": "hmac-published",
+      "hmac_key_file": null,
+      "public_key_file": null,
+      "inputs": {
+        "evidence/files/action-log.txt": "823f8c9abbf6d7252f2731330155932d616a41f326546f1ef10fb85f37329709",
+        "evidence/files/run-summary.txt": "a8e6a809464e4d985baf26520e87e4e7bc27fc07688f41fa9b1427a396f3a6dd",
+        "evidence/index.json": "b18aad3098c431a5327e25fe8dba2720aa065db284d361c0a8ee988cad4acb9a",
+        "identity.json": "95c803aeec313285ff6acd39410f9e2d2fd178319786e1b73bf0059320d9e12f",
+        "lifecycle.json": "a8777a2d71a457c27bd3c0c2d8a3162b29a6915eb7b2773e5b81857c746a3870",
+        "manifest.json": "c0af050edcf048e2d693e6e253587cad6db903a0825a97485e7051698d8aae54",
+        "signatures/seal.json": "7818a90e7d31d2c0715ade3f9fc9d7e6fdbd5c4c8f75a25fc9668ff069695b65"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "INCONCLUSIVE",
+        "subject": "fx-agent-001",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='fx-agent-001', manifest.agent_id='fx-agent-001'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "3 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=a9348d857ee5efb322db8c4e611f59e0a727116745987c5a9613f571f2e9287a, manifest=a9348d857ee5efb322db8c4e611f59e0a727116745987c5a9613f571f2e9287a"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "INCONCLUSIVE",
+            "detail": "HMAC seal present but no verification key provided (--key); symmetric seals cannot be checked publicly - an Ed25519 seal can"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "unattested",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "No violation was detected, but verification is incomplete: at least one check could not be resolved within the observed evidence boundary."
+      },
+      "expected_native_result": "INCONCLUSIVE",
+      "expected_receiver_status": "not_assessed"
+    },
+    {
+      "case": "hmac-open",
+      "package": "hmac-regenerated",
+      "hmac_key_file": null,
+      "public_key_file": null,
+      "inputs": {
+        "evidence/files/action-log.txt": "823f8c9abbf6d7252f2731330155932d616a41f326546f1ef10fb85f37329709",
+        "evidence/files/run-summary.txt": "a8e6a809464e4d985baf26520e87e4e7bc27fc07688f41fa9b1427a396f3a6dd",
+        "evidence/index.json": "400425557a5ea2d200b48d177ef870f17bced4a7cd587bd3d6592fb082b2392b",
+        "identity.json": "c6277c65abd38241d3e513ab8cc659db94064dd26311a7c7a0d77ae4bbf833e8",
+        "lifecycle.json": "04e29d15a5baf556b37c29241e7949380365e662552a74b82a251d4d5f78937d",
+        "manifest.json": "2f18cfae068d555931cc0b55d62d702633f238a8aa6e789db846ee7ad1493c88",
+        "signatures/seal.json": "5dbdc8167def44507181ff995df960b4695703a631b3400389d62c84f101b84d"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "INCONCLUSIVE",
+        "subject": "fx-agent-001",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='fx-agent-001', manifest.agent_id='fx-agent-001'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "3 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=a9348d857ee5efb322db8c4e611f59e0a727116745987c5a9613f571f2e9287a, manifest=a9348d857ee5efb322db8c4e611f59e0a727116745987c5a9613f571f2e9287a"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "INCONCLUSIVE",
+            "detail": "HMAC seal present but no verification key provided (--key); symmetric seals cannot be checked publicly - an Ed25519 seal can"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "unattested",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "No violation was detected, but verification is incomplete: at least one check could not be resolved within the observed evidence boundary."
+      },
+      "expected_native_result": "INCONCLUSIVE",
+      "expected_receiver_status": "not_assessed"
+    },
+    {
+      "case": "hmac-strict",
+      "package": "hmac-regenerated",
+      "hmac_key_file": "hmac.hex",
+      "public_key_file": null,
+      "inputs": {
+        "evidence/files/action-log.txt": "823f8c9abbf6d7252f2731330155932d616a41f326546f1ef10fb85f37329709",
+        "evidence/files/run-summary.txt": "a8e6a809464e4d985baf26520e87e4e7bc27fc07688f41fa9b1427a396f3a6dd",
+        "evidence/index.json": "400425557a5ea2d200b48d177ef870f17bced4a7cd587bd3d6592fb082b2392b",
+        "identity.json": "c6277c65abd38241d3e513ab8cc659db94064dd26311a7c7a0d77ae4bbf833e8",
+        "lifecycle.json": "04e29d15a5baf556b37c29241e7949380365e662552a74b82a251d4d5f78937d",
+        "manifest.json": "2f18cfae068d555931cc0b55d62d702633f238a8aa6e789db846ee7ad1493c88",
+        "signatures/seal.json": "5dbdc8167def44507181ff995df960b4695703a631b3400389d62c84f101b84d"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "PASS",
+        "subject": "fx-agent-001",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='fx-agent-001', manifest.agent_id='fx-agent-001'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "3 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=a9348d857ee5efb322db8c4e611f59e0a727116745987c5a9613f571f2e9287a, manifest=a9348d857ee5efb322db8c4e611f59e0a727116745987c5a9613f571f2e9287a"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "PASS",
+            "detail": "HMAC-SHA256 seal valid (key_id b79b16f7a8f1b51c...)"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "owner-key",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "No violation was detected within the observed evidence boundary."
+      },
+      "expected_native_result": "PASS",
+      "expected_receiver_status": "matched"
+    },
+    {
+      "case": "hmac-wrong-key",
+      "package": "hmac-regenerated",
+      "hmac_key_file": "wrong.hex",
+      "public_key_file": null,
+      "inputs": {
+        "evidence/files/action-log.txt": "823f8c9abbf6d7252f2731330155932d616a41f326546f1ef10fb85f37329709",
+        "evidence/files/run-summary.txt": "a8e6a809464e4d985baf26520e87e4e7bc27fc07688f41fa9b1427a396f3a6dd",
+        "evidence/index.json": "400425557a5ea2d200b48d177ef870f17bced4a7cd587bd3d6592fb082b2392b",
+        "identity.json": "c6277c65abd38241d3e513ab8cc659db94064dd26311a7c7a0d77ae4bbf833e8",
+        "lifecycle.json": "04e29d15a5baf556b37c29241e7949380365e662552a74b82a251d4d5f78937d",
+        "manifest.json": "2f18cfae068d555931cc0b55d62d702633f238a8aa6e789db846ee7ad1493c88",
+        "signatures/seal.json": "5dbdc8167def44507181ff995df960b4695703a631b3400389d62c84f101b84d"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "FAIL",
+        "subject": "fx-agent-001",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='fx-agent-001', manifest.agent_id='fx-agent-001'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "3 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=a9348d857ee5efb322db8c4e611f59e0a727116745987c5a9613f571f2e9287a, manifest=a9348d857ee5efb322db8c4e611f59e0a727116745987c5a9613f571f2e9287a"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "FAIL",
+            "detail": "key mismatch: seal was not created by this key (possible key substitution or wrong key)"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "unattested",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "Violations were detected within the observed evidence boundary."
+      },
+      "expected_native_result": "FAIL",
+      "expected_receiver_status": "mismatched"
+    },
+    {
+      "case": "hmac-public-pin",
+      "package": "hmac-regenerated",
+      "hmac_key_file": null,
+      "public_key_file": "published.pub",
+      "inputs": {
+        "evidence/files/action-log.txt": "823f8c9abbf6d7252f2731330155932d616a41f326546f1ef10fb85f37329709",
+        "evidence/files/run-summary.txt": "a8e6a809464e4d985baf26520e87e4e7bc27fc07688f41fa9b1427a396f3a6dd",
+        "evidence/index.json": "400425557a5ea2d200b48d177ef870f17bced4a7cd587bd3d6592fb082b2392b",
+        "identity.json": "c6277c65abd38241d3e513ab8cc659db94064dd26311a7c7a0d77ae4bbf833e8",
+        "lifecycle.json": "04e29d15a5baf556b37c29241e7949380365e662552a74b82a251d4d5f78937d",
+        "manifest.json": "2f18cfae068d555931cc0b55d62d702633f238a8aa6e789db846ee7ad1493c88",
+        "signatures/seal.json": "5dbdc8167def44507181ff995df960b4695703a631b3400389d62c84f101b84d"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "INCONCLUSIVE",
+        "subject": "fx-agent-001",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='fx-agent-001', manifest.agent_id='fx-agent-001'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "3 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=a9348d857ee5efb322db8c4e611f59e0a727116745987c5a9613f571f2e9287a, manifest=a9348d857ee5efb322db8c4e611f59e0a727116745987c5a9613f571f2e9287a"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "INCONCLUSIVE",
+            "detail": "HMAC seal present but no verification key provided (--key); symmetric seals cannot be checked publicly - an Ed25519 seal can"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "unattested",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "No violation was detected, but verification is incomplete: at least one check could not be resolved within the observed evidence boundary."
+      },
+      "expected_native_result": "INCONCLUSIVE",
+      "expected_receiver_status": "not_assessed"
+    },
+    {
+      "case": "schema-v03",
+      "package": "schema-v03",
+      "hmac_key_file": null,
+      "public_key_file": "schema-v03.pub",
+      "inputs": {
+        "evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+        "evidence/files/_log.txt": "54a09cb3bc85e5a0966718f34b88218a7eccbcb07960761a4ffd6958bd2c56b7",
+        "evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+        "identity.json": "6c92567604e215f0807d29b83da77f5deb0c0782bced07bb633ec1260e3f0a60",
+        "lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+        "manifest.json": "2a033d9da2f76c9f353eff084f6a5b5cd55aa4a0462841948f9e0f7a28ea1952",
+        "signatures/seal.json": "ad4461f37f44b50185f0e14d60b644f3226690106dc2087bbcd11a8406e61991"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "PASS",
+        "subject": "sample-support-agent",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='sample-support-agent', manifest.agent_id='sample-support-agent'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "2 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c, manifest=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "PASS",
+            "detail": "Ed25519 seal valid (key_id fb447a59f4c851d7...) - third-party verifiable, no secret involved"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "public-key",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "No violation was detected within the observed evidence boundary."
+      },
+      "expected_native_result": "PASS",
+      "expected_receiver_status": "matched"
+    },
+    {
+      "case": "bad-signature",
+      "package": "bad-signature",
+      "hmac_key_file": null,
+      "public_key_file": "published.pub",
+      "inputs": {
+        "evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+        "evidence/files/_log.txt": "54a09cb3bc85e5a0966718f34b88218a7eccbcb07960761a4ffd6958bd2c56b7",
+        "evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+        "identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+        "lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+        "manifest.json": "997208bb06fe78c7a01d6047595e87266f13b89d1a44dca6cedc95f58dbf3455",
+        "signatures/seal.json": "38418853d59abe639af72049576b9e8549ce6ab2824431d6b4b85a2ace12a7cc"
+      },
+      "native": {
+        "verifier_id": "uibc-core-verifier",
+        "verifier_version": "0.3.0",
+        "spec_version": "uibc-core/0.3.0-proposal",
+        "result": "FAIL",
+        "subject": "sample-support-agent",
+        "checks": [
+          {
+            "id": "S1",
+            "name": "package structure",
+            "result": "PASS",
+            "detail": "all required files present"
+          },
+          {
+            "id": "S2",
+            "name": "identity consistency",
+            "result": "PASS",
+            "detail": "identity.agent_id='sample-support-agent', manifest.agent_id='sample-support-agent'"
+          },
+          {
+            "id": "S3",
+            "name": "lifecycle state machine",
+            "result": "PASS",
+            "detail": "2 events, chain valid"
+          },
+          {
+            "id": "S4",
+            "name": "evidence integrity",
+            "result": "PASS",
+            "detail": "2 entries checked; all hashes match"
+          },
+          {
+            "id": "S5",
+            "name": "evidence root",
+            "result": "PASS",
+            "detail": "computed=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c, manifest=1ad658ecbfa5b47aa7aaa468f06f9eb4df7cc68055bd632a72b43abef601323c"
+          },
+          {
+            "id": "S6",
+            "name": "seal signature",
+            "result": "FAIL",
+            "detail": "Ed25519 signature invalid: identity/manifest do not match the seal"
+          }
+        ],
+        "root_algorithm": "sha256(canonical-json(sorted(content_hashes))) v0.1-provisional",
+        "assurance": "unattested",
+        "scope": "Structure, identity consistency, lifecycle state machine, evidence content hashes, evidence root, and the seal signature of this submission package only. Ed25519 seals are verified publicly in every mode; HMAC seals only in strict --key mode.",
+        "limitations": [
+          "HMAC-SHA256 seals (v0.2) are symmetric: verification requires the owner key. Ed25519 seals (v0.3) are third-party verifiable with the public key recorded in the seal.",
+          "Key substitution is detectable only when verifying with the owner key (--key), a pinned public key (--pubkey), or out-of-band key pinning.",
+          "Evidence Root algorithm is provisional (pending canonical serialization ratification).",
+          "Timestamps are not independently anchored.",
+          "Lifecycle event signatures (event.signature) are not ratified and not verified.",
+          "No behavioral evaluation is performed (Evaluation is out of verifier scope, archive SS15)."
+        ],
+        "checked": [
+          "structure",
+          "identity",
+          "lifecycle",
+          "evidence hashes",
+          "evidence root",
+          "seal signature"
+        ],
+        "not_checked": [
+          "lifecycle event signatures",
+          "external timestamp anchoring",
+          "behavioral evaluation",
+          "memory fidelity/continuity"
+        ],
+        "statement": "Violations were detected within the observed evidence boundary."
+      },
+      "expected_native_result": "FAIL",
+      "expected_receiver_status": "mismatched"
+    }
+  ],
+  "source_commit": "dc9eba3146e4e32bb1356f24ce8d72249a64702a",
+  "inputs": {
+    "attacker.pub": "10ac190966d820899ffa5d751433d6c5cea88a7cd062f4e90a3cf3c1698d9f5d",
+    "bad-signature/evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+    "bad-signature/evidence/files/_log.txt": "54a09cb3bc85e5a0966718f34b88218a7eccbcb07960761a4ffd6958bd2c56b7",
+    "bad-signature/evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+    "bad-signature/identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+    "bad-signature/lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+    "bad-signature/manifest.json": "997208bb06fe78c7a01d6047595e87266f13b89d1a44dca6cedc95f58dbf3455",
+    "bad-signature/signatures/seal.json": "38418853d59abe639af72049576b9e8549ce6ab2824431d6b4b85a2ace12a7cc",
+    "forged/evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+    "forged/evidence/files/_log.txt": "b1aab67c872f169a74bd2671eef9a074049caff2d1a06738fc12789d65d7dcbd",
+    "forged/evidence/index.json": "170315eef69586329334271287b2d7bde6ae67d9e09235d72bb3b5a31288d087",
+    "forged/identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+    "forged/lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+    "forged/manifest.json": "54458ee540298afd58a00c2a8272fc3c601bee0dbaf95597a3e2d7523fdb5be6",
+    "forged/signatures/seal.json": "4e22187396118d5406039c7a6a45b47c2ab896a39acc199b0f658497599b27c5",
+    "hmac-published/evidence/files/action-log.txt": "823f8c9abbf6d7252f2731330155932d616a41f326546f1ef10fb85f37329709",
+    "hmac-published/evidence/files/run-summary.txt": "a8e6a809464e4d985baf26520e87e4e7bc27fc07688f41fa9b1427a396f3a6dd",
+    "hmac-published/evidence/index.json": "b18aad3098c431a5327e25fe8dba2720aa065db284d361c0a8ee988cad4acb9a",
+    "hmac-published/identity.json": "95c803aeec313285ff6acd39410f9e2d2fd178319786e1b73bf0059320d9e12f",
+    "hmac-published/lifecycle.json": "a8777a2d71a457c27bd3c0c2d8a3162b29a6915eb7b2773e5b81857c746a3870",
+    "hmac-published/manifest.json": "c0af050edcf048e2d693e6e253587cad6db903a0825a97485e7051698d8aae54",
+    "hmac-published/signatures/seal.json": "7818a90e7d31d2c0715ade3f9fc9d7e6fdbd5c4c8f75a25fc9668ff069695b65",
+    "hmac-regenerated/evidence/files/action-log.txt": "823f8c9abbf6d7252f2731330155932d616a41f326546f1ef10fb85f37329709",
+    "hmac-regenerated/evidence/files/run-summary.txt": "a8e6a809464e4d985baf26520e87e4e7bc27fc07688f41fa9b1427a396f3a6dd",
+    "hmac-regenerated/evidence/index.json": "400425557a5ea2d200b48d177ef870f17bced4a7cd587bd3d6592fb082b2392b",
+    "hmac-regenerated/identity.json": "c6277c65abd38241d3e513ab8cc659db94064dd26311a7c7a0d77ae4bbf833e8",
+    "hmac-regenerated/lifecycle.json": "04e29d15a5baf556b37c29241e7949380365e662552a74b82a251d4d5f78937d",
+    "hmac-regenerated/manifest.json": "2f18cfae068d555931cc0b55d62d702633f238a8aa6e789db846ee7ad1493c88",
+    "hmac-regenerated/signatures/seal.json": "5dbdc8167def44507181ff995df960b4695703a631b3400389d62c84f101b84d",
+    "hmac.hex": "8c6f4357371efea8bde29f0a5b35ecbb1a3e413c0408b89b475426a4d2de5550",
+    "identity-changed/evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+    "identity-changed/evidence/files/_log.txt": "54a09cb3bc85e5a0966718f34b88218a7eccbcb07960761a4ffd6958bd2c56b7",
+    "identity-changed/evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+    "identity-changed/identity.json": "e33d4a06ba1bd092ec8eb6dd589873b0449b5e8c4f7d5cfcfb5cd22dd18d45cf",
+    "identity-changed/lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+    "identity-changed/manifest.json": "997208bb06fe78c7a01d6047595e87266f13b89d1a44dca6cedc95f58dbf3455",
+    "identity-changed/signatures/seal.json": "4e22187396118d5406039c7a6a45b47c2ab896a39acc199b0f658497599b27c5",
+    "published/evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+    "published/evidence/files/_log.txt": "54a09cb3bc85e5a0966718f34b88218a7eccbcb07960761a4ffd6958bd2c56b7",
+    "published/evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+    "published/identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+    "published/lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+    "published/manifest.json": "997208bb06fe78c7a01d6047595e87266f13b89d1a44dca6cedc95f58dbf3455",
+    "published/signatures/seal.json": "4e22187396118d5406039c7a6a45b47c2ab896a39acc199b0f658497599b27c5",
+    "published.pub": "25f578ee40fd903d47753dab144a834d683f759efa4c7e62b874873fcec40a06",
+    "resealed/evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+    "resealed/evidence/files/_log.txt": "b1aab67c872f169a74bd2671eef9a074049caff2d1a06738fc12789d65d7dcbd",
+    "resealed/evidence/index.json": "170315eef69586329334271287b2d7bde6ae67d9e09235d72bb3b5a31288d087",
+    "resealed/identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+    "resealed/lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+    "resealed/manifest.json": "54458ee540298afd58a00c2a8272fc3c601bee0dbaf95597a3e2d7523fdb5be6",
+    "resealed/signatures/seal.json": "f9fbed94b38a214088b037f135f631719ee5551f37d40222788ec36eb8aa3a97",
+    "schema-v03/evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+    "schema-v03/evidence/files/_log.txt": "54a09cb3bc85e5a0966718f34b88218a7eccbcb07960761a4ffd6958bd2c56b7",
+    "schema-v03/evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+    "schema-v03/identity.json": "6c92567604e215f0807d29b83da77f5deb0c0782bced07bb633ec1260e3f0a60",
+    "schema-v03/lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+    "schema-v03/manifest.json": "2a033d9da2f76c9f353eff084f6a5b5cd55aa4a0462841948f9e0f7a28ea1952",
+    "schema-v03/signatures/seal.json": "ad4461f37f44b50185f0e14d60b644f3226690106dc2087bbcd11a8406e61991",
+    "schema-v03.pub": "04736f844204f240c4ad000f18c49a4525e89e738c55a00c868b4d8b73f6570b",
+    "tampered/evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+    "tampered/evidence/files/_log.txt": "b1aab67c872f169a74bd2671eef9a074049caff2d1a06738fc12789d65d7dcbd",
+    "tampered/evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+    "tampered/identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+    "tampered/lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+    "tampered/manifest.json": "997208bb06fe78c7a01d6047595e87266f13b89d1a44dca6cedc95f58dbf3455",
+    "tampered/signatures/seal.json": "4e22187396118d5406039c7a6a45b47c2ab896a39acc199b0f658497599b27c5",
+    "unsigned/evidence/files/_eval.txt": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e",
+    "unsigned/evidence/files/_log.txt": "54a09cb3bc85e5a0966718f34b88218a7eccbcb07960761a4ffd6958bd2c56b7",
+    "unsigned/evidence/index.json": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951",
+    "unsigned/identity.json": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf",
+    "unsigned/lifecycle.json": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4",
+    "unsigned/manifest.json": "997208bb06fe78c7a01d6047595e87266f13b89d1a44dca6cedc95f58dbf3455",
+    "wrong.hex": "4e100a67147e5df3eb702920fdc8d76bf08a6e2f0de9b904eeab3c1ced56ab0a"
+  }
+}

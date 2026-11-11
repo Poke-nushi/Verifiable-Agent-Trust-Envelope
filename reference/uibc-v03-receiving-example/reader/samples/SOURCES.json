@@ -1,0 +1,343 @@
+{
+  "kind": "uibc-receiving-sample-inventory",
+  "upstream_repository": "zhaoxinghua09-cell/uibc-core",
+  "upstream_commit": "163d81b030ef16a58fa21ec70caee70ace53f1e3",
+  "upstream_source_hashes": [
+    {
+      "path": "LICENSE",
+      "bytes": 11356,
+      "sha256": "31d805cc507abd0f22819fc7ba1b941d8b44f2980e4a98878daa527722bedd9d",
+      "git_blob": "77aba781ceea8ee6ea07980942c4693971825a1a"
+    },
+    {
+      "path": "README.en.md",
+      "bytes": 6463,
+      "sha256": "e83a1a67b457dc0f37923787df9649b0df07a7d78cba68c1c0c31c3169d51d31",
+      "git_blob": "e7c978558245595a7e319ab7bccc07a8136a454d"
+    },
+    {
+      "path": "fixtures/EXPECTED.md",
+      "bytes": 8280,
+      "sha256": "3ac5c945910d4f584297626cd2add19e93d532893e5e6d53e37e849242d9ecd4",
+      "git_blob": "48e6570e2f3eec8be6588d471b99430829d7159c"
+    },
+    {
+      "path": "fixtures/clean.uibc/evidence/files/action-log.txt",
+      "bytes": 68,
+      "sha256": "823f8c9abbf6d7252f2731330155932d616a41f326546f1ef10fb85f37329709",
+      "git_blob": "36595d7ab73283f804420339ecceaf36a7b28d35"
+    },
+    {
+      "path": "fixtures/clean.uibc/evidence/files/run-summary.txt",
+      "bytes": 68,
+      "sha256": "a8e6a809464e4d985baf26520e87e4e7bc27fc07688f41fa9b1427a396f3a6dd",
+      "git_blob": "93a8dd085ad3b733dbcca98fcd5f36826941a194"
+    },
+    {
+      "path": "fixtures/clean.uibc/evidence/index.json",
+      "bytes": 685,
+      "sha256": "1f97f2f78221e25900ff0c98604c8fa250cb64710a49de046671be0db14cd2e3",
+      "git_blob": "18ed24a32b6dc232c3e1f674fa33c5df026290af"
+    },
+    {
+      "path": "fixtures/clean.uibc/identity.json",
+      "bytes": 222,
+      "sha256": "c9fb142a2d6f26c8307c36765599bbcc4228a7322af67976fbe83f449a6d13e7",
+      "git_blob": "260b90d0a466bca08518618709350ae24470956d"
+    },
+    {
+      "path": "fixtures/clean.uibc/lifecycle.json",
+      "bytes": 1008,
+      "sha256": "3b0d58143f3daf7449b953d5fb1e0bf1b9818c97647ff1a55ebb3a159957f1df",
+      "git_blob": "e5ae0366656ae56ebc04fae4e300d61d7b169950"
+    },
+    {
+      "path": "fixtures/clean.uibc/manifest.json",
+      "bytes": 275,
+      "sha256": "fbc3285122f2abad52df65a9566f3b8031496fbaf39e3506a80afc1a7761cc7d",
+      "git_blob": "56bf7e5f71eb4681edee955e4795678ea6a606e0"
+    },
+    {
+      "path": "fixtures/clean.uibc/signatures/seal.json",
+      "bytes": 275,
+      "sha256": "84664c8c49753a4c71a8c30ef34d5f57325cc515e75038716db8c73b111e5bf3",
+      "git_blob": "568c631fd7904051f846aa1fbe10227b9631263e"
+    },
+    {
+      "path": "fixtures/generate_fixtures.py",
+      "bytes": 20242,
+      "sha256": "c1ce5acec42c4ae805062fa10f31a6ced02ea982d6271bfe521fb5b43ff72ed3",
+      "git_blob": "bfbba9245f0b5f2a1b7299ac6cdc2e68f1893a6e"
+    },
+    {
+      "path": "fixtures/tampered.uibc/evidence/files/action-log.txt",
+      "bytes": 73,
+      "sha256": "0f58a906d255f9429cd13d7d8c9ccb0f41cdf1441c01e57a4667b8b1a4bf7f58",
+      "git_blob": "c751a7c286cddb241474cc6bb5c5b4fa13e1c4cd"
+    },
+    {
+      "path": "fixtures/tampered.uibc/evidence/files/run-summary.txt",
+      "bytes": 68,
+      "sha256": "a8e6a809464e4d985baf26520e87e4e7bc27fc07688f41fa9b1427a396f3a6dd",
+      "git_blob": "93a8dd085ad3b733dbcca98fcd5f36826941a194"
+    },
+    {
+      "path": "fixtures/tampered.uibc/evidence/index.json",
+      "bytes": 685,
+      "sha256": "d6601cc58945390d301b1bf4f17f3bc954b721d75b7023feda1d7262da1e992a",
+      "git_blob": "f0225af4911b3ecf27d5afcc3660526cd4a8f355"
+    },
+    {
+      "path": "fixtures/tampered.uibc/identity.json",
+      "bytes": 222,
+      "sha256": "ba787cb28a04274fabd25f08a4a42d32d335713cc1089e44b6efe6de169e50a6",
+      "git_blob": "68f4ef3b278e7bdfbd4cc6b2116243321338337d"
+    },
+    {
+      "path": "fixtures/tampered.uibc/lifecycle.json",
+      "bytes": 1008,
+      "sha256": "ac77051049dee530496e1667d66e3e0cfb0d7478be002d88969e802cafb0889b",
+      "git_blob": "08000ccdd0facccf74a4d35a68eabb83a7146711"
+    },
+    {
+      "path": "fixtures/tampered.uibc/manifest.json",
+      "bytes": 275,
+      "sha256": "d2a381b74a76724546240b645e320abf3c4b83e1b9c6ea78dd6d134a505a2604",
+      "git_blob": "b5104d27cf27d71d4ff1707722ab16629b72ceb1"
+    },
+    {
+      "path": "fixtures/tampered.uibc/signatures/seal.json",
+      "bytes": 275,
+      "sha256": "469519b5e30a670ebb3836a982f8d9837e9e8fb23a61df3653ff33a9fd5ac72d",
+      "git_blob": "69c1a1f00fabcef97b29e802a623c3cc15ff1803"
+    },
+    {
+      "path": "uibc_core/__init__.py",
+      "bytes": 1054,
+      "sha256": "ff863a60272fca1aa71bcd490cf0138ce578e51f1b3ca36a6633fb1bad1bf936",
+      "git_blob": "4dcf1f18d2f30677064ea9a6c45c0273a50c2820"
+    },
+    {
+      "path": "uibc_core/canonical.py",
+      "bytes": 1477,
+      "sha256": "5002cb2289abf1a7d622129e9df666114700e11b970d8bc269143f5271939490",
+      "git_blob": "0e484765be628a7cdfe83402294446d5eb0d63e3"
+    },
+    {
+      "path": "uibc_core/certificate.py",
+      "bytes": 5658,
+      "sha256": "266f46af65b4d11ff80df9b870c70094349ba93101a16f8e521d383c8d79d3fd",
+      "git_blob": "c638d24eb427597d1cab57e211807047da670d44"
+    },
+    {
+      "path": "uibc_core/cli.py",
+      "bytes": 14501,
+      "sha256": "1df4bd0063cdf4ec8cc0e9f0e839715b42a2bbf21ab12574158fcc235410b514",
+      "git_blob": "d57757274741b0b5c62e17d2c7374f22a03ebd68"
+    },
+    {
+      "path": "uibc_core/gate.py",
+      "bytes": 7070,
+      "sha256": "ef102f252875b657604e4817bb03cc08fa5048ff3de30b295a798405c270562b",
+      "git_blob": "d2430dd30a3a8f97c3d6a86a17a4aa18d39fd4d8"
+    },
+    {
+      "path": "uibc_core/lifecycle.py",
+      "bytes": 2464,
+      "sha256": "66e68018a3d28097dc03878e01989ab249bcaa94d4b977dac884be534e0ebc8b",
+      "git_blob": "8f250f906423a86506999c3ccfa70f22062852ea"
+    },
+    {
+      "path": "uibc_core/memory.py",
+      "bytes": 9090,
+      "sha256": "4b08b63d2031fc21787222f8cf6e624ff3bb2272f2a68682603381634ed2d28c",
+      "git_blob": "def20b2ddcf3624b146ec55520c3374d5568e2b8"
+    },
+    {
+      "path": "uibc_core/runtime.py",
+      "bytes": 3723,
+      "sha256": "eff5ffaddf70e78be51087d063ad7db20ef0c4e70a2c1964a04fadb7ac3d899c",
+      "git_blob": "ba74be881d2ff2b05a8afb53d311357c96d4a70c"
+    },
+    {
+      "path": "uibc_core/signing.py",
+      "bytes": 2704,
+      "sha256": "cad899dc926365ea70b822bc13c9c6fee6357d9af724d2ff674426b46309677c",
+      "git_blob": "724bc56b692d6ac80d35ecda7c9f1f833db6e600"
+    },
+    {
+      "path": "uibc_core/verify.py",
+      "bytes": 8381,
+      "sha256": "78cc6439333d08c0baf7db906f0556d4572d66e5ba15ef64303b8cf55fb2ded5",
+      "git_blob": "48f4f47494b70c3a0c4b542c5aa8a9d41305e617"
+    },
+    {
+      "path": "fixtures/_matrix_gate.py",
+      "bytes": 3183,
+      "sha256": "f1f29eff4d889b81da96de01ad88429ecfcec78fe51762a1ec0b5c2e6bd36dbb",
+      "git_blob": "5d29b826dc4d08f0d67b03bc26fe5297025838e2"
+    }
+  ],
+  "files": [
+    {
+      "path": "samples/UIBC-LICENSE.txt",
+      "bytes": 11356,
+      "sha256": "31d805cc507abd0f22819fc7ba1b941d8b44f2980e4a98878daa527722bedd9d"
+    },
+    {
+      "path": "samples/native-replay.json",
+      "bytes": 22602,
+      "sha256": "a8f692f858cab8cd784b13f72573471409a749d2565a8a3490bd2f263895bc03"
+    },
+    {
+      "path": "samples/published/clean.uibc/evidence/files/action-log.txt",
+      "bytes": 68,
+      "sha256": "823f8c9abbf6d7252f2731330155932d616a41f326546f1ef10fb85f37329709"
+    },
+    {
+      "path": "samples/published/clean.uibc/evidence/files/run-summary.txt",
+      "bytes": 68,
+      "sha256": "a8e6a809464e4d985baf26520e87e4e7bc27fc07688f41fa9b1427a396f3a6dd"
+    },
+    {
+      "path": "samples/published/clean.uibc/evidence/index.json",
+      "bytes": 685,
+      "sha256": "1f97f2f78221e25900ff0c98604c8fa250cb64710a49de046671be0db14cd2e3"
+    },
+    {
+      "path": "samples/published/clean.uibc/identity.json",
+      "bytes": 222,
+      "sha256": "c9fb142a2d6f26c8307c36765599bbcc4228a7322af67976fbe83f449a6d13e7"
+    },
+    {
+      "path": "samples/published/clean.uibc/lifecycle.json",
+      "bytes": 1008,
+      "sha256": "3b0d58143f3daf7449b953d5fb1e0bf1b9818c97647ff1a55ebb3a159957f1df"
+    },
+    {
+      "path": "samples/published/clean.uibc/manifest.json",
+      "bytes": 275,
+      "sha256": "fbc3285122f2abad52df65a9566f3b8031496fbaf39e3506a80afc1a7761cc7d"
+    },
+    {
+      "path": "samples/published/clean.uibc/signatures/seal.json",
+      "bytes": 275,
+      "sha256": "84664c8c49753a4c71a8c30ef34d5f57325cc515e75038716db8c73b111e5bf3"
+    },
+    {
+      "path": "samples/published/tampered.uibc/evidence/files/action-log.txt",
+      "bytes": 73,
+      "sha256": "0f58a906d255f9429cd13d7d8c9ccb0f41cdf1441c01e57a4667b8b1a4bf7f58"
+    },
+    {
+      "path": "samples/published/tampered.uibc/evidence/files/run-summary.txt",
+      "bytes": 68,
+      "sha256": "a8e6a809464e4d985baf26520e87e4e7bc27fc07688f41fa9b1427a396f3a6dd"
+    },
+    {
+      "path": "samples/published/tampered.uibc/evidence/index.json",
+      "bytes": 685,
+      "sha256": "d6601cc58945390d301b1bf4f17f3bc954b721d75b7023feda1d7262da1e992a"
+    },
+    {
+      "path": "samples/published/tampered.uibc/identity.json",
+      "bytes": 222,
+      "sha256": "ba787cb28a04274fabd25f08a4a42d32d335713cc1089e44b6efe6de169e50a6"
+    },
+    {
+      "path": "samples/published/tampered.uibc/lifecycle.json",
+      "bytes": 1008,
+      "sha256": "ac77051049dee530496e1667d66e3e0cfb0d7478be002d88969e802cafb0889b"
+    },
+    {
+      "path": "samples/published/tampered.uibc/manifest.json",
+      "bytes": 275,
+      "sha256": "d2a381b74a76724546240b645e320abf3c4b83e1b9c6ea78dd6d134a505a2604"
+    },
+    {
+      "path": "samples/published/tampered.uibc/signatures/seal.json",
+      "bytes": 275,
+      "sha256": "469519b5e30a670ebb3836a982f8d9837e9e8fb23a61df3653ff33a9fd5ac72d"
+    },
+    {
+      "path": "samples/regenerated/DISPOSABLE-TEST-KEY.hex",
+      "bytes": 65,
+      "sha256": "8c6f4357371efea8bde29f0a5b35ecbb1a3e413c0408b89b475426a4d2de5550"
+    },
+    {
+      "path": "samples/regenerated/clean.uibc/evidence/files/action-log.txt",
+      "bytes": 68,
+      "sha256": "823f8c9abbf6d7252f2731330155932d616a41f326546f1ef10fb85f37329709"
+    },
+    {
+      "path": "samples/regenerated/clean.uibc/evidence/files/run-summary.txt",
+      "bytes": 68,
+      "sha256": "a8e6a809464e4d985baf26520e87e4e7bc27fc07688f41fa9b1427a396f3a6dd"
+    },
+    {
+      "path": "samples/regenerated/clean.uibc/evidence/index.json",
+      "bytes": 685,
+      "sha256": "400425557a5ea2d200b48d177ef870f17bced4a7cd587bd3d6592fb082b2392b"
+    },
+    {
+      "path": "samples/regenerated/clean.uibc/identity.json",
+      "bytes": 222,
+      "sha256": "c6277c65abd38241d3e513ab8cc659db94064dd26311a7c7a0d77ae4bbf833e8"
+    },
+    {
+      "path": "samples/regenerated/clean.uibc/lifecycle.json",
+      "bytes": 1008,
+      "sha256": "04e29d15a5baf556b37c29241e7949380365e662552a74b82a251d4d5f78937d"
+    },
+    {
+      "path": "samples/regenerated/clean.uibc/manifest.json",
+      "bytes": 275,
+      "sha256": "2f18cfae068d555931cc0b55d62d702633f238a8aa6e789db846ee7ad1493c88"
+    },
+    {
+      "path": "samples/regenerated/clean.uibc/signatures/seal.json",
+      "bytes": 275,
+      "sha256": "5dbdc8167def44507181ff995df960b4695703a631b3400389d62c84f101b84d"
+    },
+    {
+      "path": "samples/regenerated/tampered.uibc/evidence/files/action-log.txt",
+      "bytes": 73,
+      "sha256": "0f58a906d255f9429cd13d7d8c9ccb0f41cdf1441c01e57a4667b8b1a4bf7f58"
+    },
+    {
+      "path": "samples/regenerated/tampered.uibc/evidence/files/run-summary.txt",
+      "bytes": 68,
+      "sha256": "a8e6a809464e4d985baf26520e87e4e7bc27fc07688f41fa9b1427a396f3a6dd"
+    },
+    {
+      "path": "samples/regenerated/tampered.uibc/evidence/index.json",
+      "bytes": 685,
+      "sha256": "400425557a5ea2d200b48d177ef870f17bced4a7cd587bd3d6592fb082b2392b"
+    },
+    {
+      "path": "samples/regenerated/tampered.uibc/identity.json",
+      "bytes": 222,
+      "sha256": "c6277c65abd38241d3e513ab8cc659db94064dd26311a7c7a0d77ae4bbf833e8"
+    },
+    {
+      "path": "samples/regenerated/tampered.uibc/lifecycle.json",
+      "bytes": 1008,
+      "sha256": "04e29d15a5baf556b37c29241e7949380365e662552a74b82a251d4d5f78937d"
+    },
+    {
+      "path": "samples/regenerated/tampered.uibc/manifest.json",
+      "bytes": 275,
+      "sha256": "2f18cfae068d555931cc0b55d62d702633f238a8aa6e789db846ee7ad1493c88"
+    },
+    {
+      "path": "samples/regenerated/tampered.uibc/signatures/seal.json",
+      "bytes": 275,
+      "sha256": "5dbdc8167def44507181ff995df960b4695703a631b3400389d62c84f101b84d"
+    }
+  ],
+  "published": "Git blob bytes, unchanged; no corresponding owner key supplied.",
+  "regenerated": "Separate packages built by the pinned upstream generator on this Mac; a disposable test key is included outside the packages.",
+  "native_replay": "Saved native results; run_examples.py replays the independent reader, not the upstream verifier.",
+  "observed_at": "2026-11-05",
+  "platform": "macOS"
+}
