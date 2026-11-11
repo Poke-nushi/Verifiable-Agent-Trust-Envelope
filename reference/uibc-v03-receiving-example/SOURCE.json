@@ -1,0 +1,186 @@
+{
+  "repository": "zhaoxinghua09-cell/uibc-core",
+  "commit": "dc9eba3146e4e32bb1356f24ce8d72249a64702a",
+  "files": [
+    {
+      "path": "LICENSE",
+      "git_blob": "77aba781ceea8ee6ea07980942c4693971825a1a",
+      "bytes": 11356,
+      "sha256": "31d805cc507abd0f22819fc7ba1b941d8b44f2980e4a98878daa527722bedd9d"
+    },
+    {
+      "path": "NOTICE",
+      "git_blob": "4354cdc73896df75f9a127e8faf114b173b0f6ad",
+      "bytes": 1430,
+      "sha256": "6a4de671186e6c844ec30c3070b8152f1a37d19eff84a17b8166c1c83e952fbd"
+    },
+    {
+      "path": "docs/verdict-and-seal-semantics.md",
+      "git_blob": "846090862122cc35907e43f16355e5a0e2184449",
+      "bytes": 6890,
+      "sha256": "ddfd8c24d5f1859ffef298f165577af59941a09d0dfa9a3a7f1fbd99503c1877"
+    },
+    {
+      "path": "examples/sample-owner.pub",
+      "git_blob": "d247af6bea896382fdb79b3e395ed95935561398",
+      "bytes": 64,
+      "sha256": "25f578ee40fd903d47753dab144a834d683f759efa4c7e62b874873fcec40a06"
+    },
+    {
+      "path": "examples/sample-package/evidence/files/_eval.txt",
+      "git_blob": "4fbfab09f30d881bf509dad1e4dba7731e05bfa4",
+      "bytes": 115,
+      "sha256": "6140233ffa382dcae22aed6de32a4a475e0be0d68a2116a358eb30d50db2e94e"
+    },
+    {
+      "path": "examples/sample-package/evidence/files/_log.txt",
+      "git_blob": "65b40b2c2bbf6dd53f69e361ed4cd096b5045de5",
+      "bytes": 169,
+      "sha256": "54a09cb3bc85e5a0966718f34b88218a7eccbcb07960761a4ffd6958bd2c56b7"
+    },
+    {
+      "path": "examples/sample-package/evidence/index.json",
+      "git_blob": "587139b2f22190980515299ea25f11162a7a1198",
+      "bytes": 714,
+      "sha256": "623f8fe78022c6aeb095bc55b1e405c15826ffbbff29045d2b53dc6b42ed3951"
+    },
+    {
+      "path": "examples/sample-package/identity.json",
+      "git_blob": "fe0391f9fa7d8af5ef5983a8fbbaac9c6eddee80",
+      "bytes": 229,
+      "sha256": "79b45625562acc780f8d6d70b4a2ea2b5c1e4b18f08f8cfe1b0149497ae435bf"
+    },
+    {
+      "path": "examples/sample-package/lifecycle.json",
+      "git_blob": "7041f397533501078732cd069d80e0232354dc1c",
+      "bytes": 696,
+      "sha256": "62f9c936a8f0d754907a37290817c4ba005152b4a05fcad9dde4195abecfa9b4"
+    },
+    {
+      "path": "examples/sample-package/manifest.json",
+      "git_blob": "d48317f6b2f9a945f36d06f1988981208061b5f3",
+      "bytes": 283,
+      "sha256": "997208bb06fe78c7a01d6047595e87266f13b89d1a44dca6cedc95f58dbf3455"
+    },
+    {
+      "path": "examples/sample-package/signatures/seal.json",
+      "git_blob": "4ead1eee93ecedab33c90872bf51aa8e07d66e65",
+      "bytes": 392,
+      "sha256": "4e22187396118d5406039c7a6a45b47c2ab896a39acc199b0f658497599b27c5"
+    },
+    {
+      "path": "fixtures/clean.uibc/evidence/files/action-log.txt",
+      "git_blob": "36595d7ab73283f804420339ecceaf36a7b28d35",
+      "bytes": 68,
+      "sha256": "823f8c9abbf6d7252f2731330155932d616a41f326546f1ef10fb85f37329709"
+    },
+    {
+      "path": "fixtures/clean.uibc/evidence/files/run-summary.txt",
+      "git_blob": "93a8dd085ad3b733dbcca98fcd5f36826941a194",
+      "bytes": 68,
+      "sha256": "a8e6a809464e4d985baf26520e87e4e7bc27fc07688f41fa9b1427a396f3a6dd"
+    },
+    {
+      "path": "fixtures/clean.uibc/evidence/index.json",
+      "git_blob": "175c69cb7e33a30ff0fc57c1e2950ec6de513032",
+      "bytes": 685,
+      "sha256": "b18aad3098c431a5327e25fe8dba2720aa065db284d361c0a8ee988cad4acb9a"
+    },
+    {
+      "path": "fixtures/clean.uibc/identity.json",
+      "git_blob": "cbd08b726382d893f58f82abd9e3dc89c3435b69",
+      "bytes": 222,
+      "sha256": "95c803aeec313285ff6acd39410f9e2d2fd178319786e1b73bf0059320d9e12f"
+    },
+    {
+      "path": "fixtures/clean.uibc/lifecycle.json",
+      "git_blob": "bde5aae79ad0d569c865b881fc61dd20b802f7ad",
+      "bytes": 1008,
+      "sha256": "a8777a2d71a457c27bd3c0c2d8a3162b29a6915eb7b2773e5b81857c746a3870"
+    },
+    {
+      "path": "fixtures/clean.uibc/manifest.json",
+      "git_blob": "42eb6266730486d722fa6152a8d66b12455ee303",
+      "bytes": 275,
+      "sha256": "c0af050edcf048e2d693e6e253587cad6db903a0825a97485e7051698d8aae54"
+    },
+    {
+      "path": "fixtures/clean.uibc/signatures/seal.json",
+      "git_blob": "985ad3ae0baafc30983a3ad0eb212a27832f8dcd",
+      "bytes": 275,
+      "sha256": "7818a90e7d31d2c0715ade3f9fc9d7e6fdbd5c4c8f75a25fc9668ff069695b65"
+    },
+    {
+      "path": "tests/test_seal_v03.py",
+      "git_blob": "dfe7214f6fd6af7262697dfae0976404095347bb",
+      "bytes": 10349,
+      "sha256": "5de887dfb8d2d2ad5d44f67842cb6bc5cbbbf1d06b5bf394747b0445ae60c8b8"
+    },
+    {
+      "path": "uibc_core/__init__.py",
+      "git_blob": "5dc756ac7c488c3b5e0a4ba2134b349b04ab0cb7",
+      "bytes": 1054,
+      "sha256": "2dcc9ed18f55f69c6ede037621d84388d1e06cb46ae8f8d56cfe3eaf9d4f3ddd"
+    },
+    {
+      "path": "uibc_core/canonical.py",
+      "git_blob": "0e484765be628a7cdfe83402294446d5eb0d63e3",
+      "bytes": 1477,
+      "sha256": "5002cb2289abf1a7d622129e9df666114700e11b970d8bc269143f5271939490"
+    },
+    {
+      "path": "uibc_core/certificate.py",
+      "git_blob": "c638d24eb427597d1cab57e211807047da670d44",
+      "bytes": 5658,
+      "sha256": "266f46af65b4d11ff80df9b870c70094349ba93101a16f8e521d383c8d79d3fd"
+    },
+    {
+      "path": "uibc_core/cli.py",
+      "git_blob": "93f358f313f761c1eaaa63291b3d9883bde1db86",
+      "bytes": 19613,
+      "sha256": "7dd0857bf3fa20a3dc565a02031f31fc043f8c5784d4e8f875b94fa107f35dd8"
+    },
+    {
+      "path": "uibc_core/ed25519.py",
+      "git_blob": "383254d32318b63696985502578b17b86b8fe1bb",
+      "bytes": 4281,
+      "sha256": "3f0c44820c02712c09cfecd579a70c9246951d2e1a642132c751bfe615529723"
+    },
+    {
+      "path": "uibc_core/gate.py",
+      "git_blob": "7a366d8b5b2246440b85f25b3f546ee85df8f1ac",
+      "bytes": 7116,
+      "sha256": "f65ea5f2de3d86be6df0cb991569ae3709af03a050c492522596075ef1584d02"
+    },
+    {
+      "path": "uibc_core/lifecycle.py",
+      "git_blob": "8f250f906423a86506999c3ccfa70f22062852ea",
+      "bytes": 2464,
+      "sha256": "66e68018a3d28097dc03878e01989ab249bcaa94d4b977dac884be534e0ebc8b"
+    },
+    {
+      "path": "uibc_core/memory.py",
+      "git_blob": "def20b2ddcf3624b146ec55520c3374d5568e2b8",
+      "bytes": 9090,
+      "sha256": "4b08b63d2031fc21787222f8cf6e624ff3bb2272f2a68682603381634ed2d28c"
+    },
+    {
+      "path": "uibc_core/runtime.py",
+      "git_blob": "3f9566a454dbd21a639a980dad850ab44fdd3842",
+      "bytes": 3737,
+      "sha256": "d214b92b741c22e6f823fad195c28e8df76c7d50a4a410686e77b65a0800829c"
+    },
+    {
+      "path": "uibc_core/signing.py",
+      "git_blob": "2aa3423321f36fad475cc6abf7d0d343b353ecba",
+      "bytes": 5286,
+      "sha256": "f08e25d9370efd28cf84069f74a69c866079cb56be79df769b463a68c60d5ffa"
+    },
+    {
+      "path": "uibc_core/verify.py",
+      "git_blob": "156a9c6ce51eb721fd7a4d08c194a5d45f8729f4",
+      "bytes": 12323,
+      "sha256": "1bec7fa3578a3bf8e8e4c9a372498512664f26615fe30c56a9b7905654fc24ab"
+    }
+  ]
+}

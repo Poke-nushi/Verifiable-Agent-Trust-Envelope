@@ -1,0 +1,9 @@
+{
+  "schema": "uibc-core/0.2.2-proposal",
+  "agent_id": "sample-support-agent",
+  "agent_version": "1.0.0",
+  "created_at": "2026-11-10T08:15:39Z",
+  "evidence_count": 2,
+  "evidence_root": "a9d9d09354b2fabe6a567f2b8cf8525050a72a190fed458a44710e09dde7f82f",
+  "status": "SUBMITTED"
+}

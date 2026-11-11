@@ -29,3 +29,34 @@ jobs:
           cp -R reference/uibc-receiving-example "$isolated_dir/reader"
           python -S -B -m unittest discover -s "$isolated_dir/reader" -p 'test_*.py' -v
           python -S -B "$isolated_dir/reader/run_examples.py"
+
+  reader-v03:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python: ["3.11", "3.14"]
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Replay the copied v0.3 package with pinned wheels
+        run: |
+          isolated_dir=$(mktemp -d "$RUNNER_TEMP/uibc-v03.XXXXXX")
+          cp -R reference/uibc-v03-receiving-example "$isolated_dir/package"
+          cd "$isolated_dir/package"
+          python -B verify_package.py
+          python -m venv "$isolated_dir/runtime"
+          py="$isolated_dir/runtime/bin/python"
+          "$py" -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r requirements.lock
+          "$py" -B -m unittest discover -s reader -p 'test_*.py' -v
+          "$py" -O -B -m unittest discover -s reader -p 'test_*.py' -v
+          "$py" -B compare_fixed.py --engine native --output "$isolated_dir/native.json"
+          "$py" -B compare_fixed.py --engine vate --output "$isolated_dir/receiver.json"
+          "$py" -B generate_native.py --output "$isolated_dir/generated"
+          # Compare file hashes and reports; Git does not retain empty directories.
+          "$py" -c 'import json,sys; a=json.load(open("validation/native.json")); b=json.load(open(sys.argv[1])); assert all(a[k] == b[k] for k in ("cases", "inputs", "source_commit"))' "$isolated_dir/generated/validation/native.json"
+          "$py" -B verify_package.py

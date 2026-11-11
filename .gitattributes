@@ -24,3 +24,6 @@ reference/post-admission-revocation-sample/** text eol=lf
 reference/runtime-handoff-sample/** text eol=lf
 # Preserve the copied capture helper's fixed upstream bytes.
 reference/runtime-handoff-sample/reference/s3-observation-example/sandbox_macos.py whitespace=-blank-at-eof
+
+# Preserve the pinned UIBC sources, fixtures and hash-addressed package bytes.
+reference/uibc-v03-receiving-example/** -text whitespace=cr-at-eol,-blank-at-eof
