@@ -8,7 +8,7 @@ the package and signed it again with another key.
 This standalone VATE reference example includes an independent reader, pinned
 UIBC source, disposable test material and 22 comparison conditions. Copy this
 whole folder to run it outside the VATE checkout. The earlier
-[UIBC 0.2 receiving example](../uibc-receiving-example/README.md) retains its
+[UIBC 0.2 receiving example](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/tree/main/reference/uibc-receiving-example) retains its
 original source pin and results.
 
 ## Run the comparison
