@@ -249,6 +249,18 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Check out the MUSUBI sample's pinned VATE source
+        uses: actions/checkout@v7.0.1
+        with:
+          ref: f044b208bcb8046fd4aa262094b4b77271ba7b27
+          path: .ci/musubi-vate-source
+          persist-credentials: false
+
+      - name: Export pinned VATE source without Git metadata
+        run: |
+          mkdir "$RUNNER_TEMP/vate-musubi-source"
+          git -C .ci/musubi-vate-source archive HEAD | tar -x -C "$RUNNER_TEMP/vate-musubi-source"
+
       - name: Set up Python
         uses: actions/setup-python@v7.0.0
         with:
@@ -262,13 +274,13 @@ jobs:
         run: python -B scripts/prepare_ci_stdlib.py
 
       - name: Check published sample and experiment file integrity
-        run: python -B scripts/check_musubi_sample.py --integrity-only
+        run: python -B scripts/check_musubi_sample.py --integrity-only --vate-root "$RUNNER_TEMP/vate-musubi-source"
 
       - name: Check binding, audit intake and output recovery from a source archive
         run: |
           archive_dir="$(mktemp -d)"
           git archive HEAD | tar -x -C "$archive_dir"
-          python -B "$archive_dir/scripts/check_musubi_sample.py"
+          python -B "$archive_dir/scripts/check_musubi_sample.py" --vate-root "$RUNNER_TEMP/vate-musubi-source"
 
       - name: Check pinned foreign records and receiver bindings from a source archive
         run: |

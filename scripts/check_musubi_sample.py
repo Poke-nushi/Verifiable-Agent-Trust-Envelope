@@ -3,6 +3,8 @@
 No native dependencies are installed. The temporary runtime is a test fixture
 using the caller's existing validation dependencies, not a prepared evaluator.
 Actual sandboxed native replay has a separate macOS validation record.
+Use --vate-root to select the source checkout or archive pinned by the sample
+when the current repository has moved beyond that version.
 """
 from __future__ import annotations
 
@@ -53,12 +55,12 @@ def check_manifest(root):
     return len(listed)
 
 
-def check_integrity():
+def check_integrity(vate_root):
     counts = {"sample_files": check_manifest(SAMPLE), "record_files": check_manifest(RECORD),
               "audit_record_files": check_manifest(AUDIT_RECORD)}
     pin = json.loads((SAMPLE / "vate-source.json").read_bytes())
     for row in pin["files"]:
-        raw = (ROOT / row["path"]).read_bytes()
+        raw = (vate_root / row["path"]).read_bytes()
         require(sha(raw) == row["sha256"] and len(raw) == row["bytes"],
                 f"VATE source differs from sample pin: {row['path']}")
     execution = json.loads((RECORD / "native-execution.json").read_bytes())
@@ -99,7 +101,7 @@ def test_runtime(environment):
     return python
 
 
-def run_portable():
+def run_portable(vate_root):
     env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
     with tempfile.TemporaryDirectory(prefix="vate-musubi-portable-") as directory:
         root = Path(directory).resolve()
@@ -113,14 +115,14 @@ def run_portable():
         for name in ("cli", "recovery"):
             output = root / name
             subprocess.run([str(python), "-B", str(SAMPLE / f"verify_{name}.py"),
-                            "--environment", str(environment), "--vate-root", str(ROOT),
+                            "--environment", str(environment), "--vate-root", str(vate_root),
                             "--output", str(output)], check=True, env=env, timeout=240)
             result = json.loads((output / "RESULT.json").read_bytes())
             require(result["status"] == "pass", f"{name} checks failed")
             counts[name] = len(result["cases"])
         audit_output = root / "audit"
         subprocess.run([str(python), "-B", str(SAMPLE / "verify_audits.py"), "--portable",
-                        "--environment", str(environment), "--vate-root", str(ROOT),
+                        "--environment", str(environment), "--vate-root", str(vate_root),
                         "--output", str(audit_output)], check=True, env=env, timeout=240)
         audit = json.loads((audit_output / "VERIFICATION.json").read_bytes())
         require(audit["status"] == "pass" and audit["real_native_replays"] == 0
@@ -130,7 +132,7 @@ def run_portable():
         counts["audit_native_replays"] = audit["real_native_replays"]
         capacity_output = root / "capacity"
         subprocess.run([str(python), "-B", str(SAMPLE / "verify_capacity.py"),
-                        "--vate-root", str(ROOT), "--output", str(capacity_output)],
+                        "--vate-root", str(vate_root), "--output", str(capacity_output)],
                        check=True, env=env, timeout=240)
         capacity = json.loads((capacity_output / "CAPACITY-RESULT.json").read_bytes())
         require(capacity["status"] == "pass", "capacity checks failed")
@@ -141,11 +143,14 @@ def run_portable():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--integrity-only", action="store_true")
+    parser.add_argument("--vate-root", type=Path, default=ROOT,
+                        help="VATE source checkout or archive matching the sample's vate-source.json")
     args = parser.parse_args()
     try:
-        result = check_integrity()
+        vate_root = args.vate_root.resolve()
+        result = check_integrity(vate_root)
         if not args.integrity_only:
-            result.update(run_portable())
+            result.update(run_portable(vate_root))
         print(json.dumps({"status": "pass", **result,
                           "scope": "file integrity and portable tests; no native replay"}))
     except (ValueError, KeyError, OSError, subprocess.SubprocessError) as exc:
