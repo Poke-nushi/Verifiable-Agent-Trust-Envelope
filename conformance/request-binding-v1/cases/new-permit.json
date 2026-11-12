@@ -1,0 +1,24 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "request-binding-new-permit",
+  "title": "Request binding: new-permit",
+  "category": "positive",
+  "purpose": "Check the selected purchase operation, admission context and effective constraints from raw preimages.",
+  "artifacts": {
+    "admission_request": "conformance/request-binding-v1/fixtures/new-permit/admission-request.json",
+    "admission_receipt": "conformance/request-binding-v1/fixtures/new-permit/admission-receipt.json",
+    "request_binding_manifest": "conformance/request-binding-v1/fixtures/new-permit/binding-manifest.json"
+  },
+  "request_binding": {
+    "required_contract": "vate-request-binding-v1"
+  },
+  "expected": {
+    "admission_decision": "attenuate",
+    "should_execute": false,
+    "reason_codes": [
+      "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+    ],
+    "checks": []
+  }
+}

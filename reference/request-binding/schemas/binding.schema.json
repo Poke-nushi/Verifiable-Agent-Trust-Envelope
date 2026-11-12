@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:request-binding:binding:v1",
+  "type": "object",
+  "properties": {
+    "contract": {
+      "const": "vate-request-binding-v1"
+    },
+    "preimage_profile": {
+      "const": "vate-purchase-cap-request-v1"
+    },
+    "canonicalization": {
+      "const": "vate-v0.3-fixture-json"
+    },
+    "transformation_profile": {
+      "const": "vate-max-amount-only-v1"
+    },
+    "admission_request_ref": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "pattern": "^urn:sha256:[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "media_type": {
+          "const": "application/json"
+        },
+        "digest": {
+          "type": "object",
+          "properties": {
+            "alg": {
+              "const": "sha-256"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            }
+          },
+          "required": [
+            "alg",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "uri",
+        "media_type",
+        "digest"
+      ],
+      "additionalProperties": false
+    },
+    "original_ref": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "pattern": "^urn:sha256:[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "media_type": {
+          "const": "application/json"
+        },
+        "digest": {
+          "type": "object",
+          "properties": {
+            "alg": {
+              "const": "sha-256"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            }
+          },
+          "required": [
+            "alg",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "uri",
+        "media_type",
+        "digest"
+      ],
+      "additionalProperties": false
+    },
+    "effective_ref": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "pattern": "^urn:sha256:[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "media_type": {
+          "const": "application/json"
+        },
+        "digest": {
+          "type": "object",
+          "properties": {
+            "alg": {
+              "const": "sha-256"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            }
+          },
+          "required": [
+            "alg",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "uri",
+        "media_type",
+        "digest"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "contract",
+    "preimage_profile",
+    "canonicalization",
+    "transformation_profile",
+    "admission_request_ref",
+    "original_ref"
+  ],
+  "additionalProperties": false
+}

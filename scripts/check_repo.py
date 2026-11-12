@@ -6656,6 +6656,7 @@ def main() -> int:
     check_case_artifact_reference_fail_closed()
     check_unhashable_validator_inputs_fail_closed()
     check_context_binding_key_contract()
+    run([sys.executable, str(ROOT / "scripts/test_al2_context_binding.py")])
     check_corpus_index_requires_cases()
     check_bundle_case_coverage_binding()
     check_bundle_sut_actual_projection_binding()
@@ -7732,6 +7733,8 @@ def main() -> int:
             ]
         )
         run([sys.executable, str(VATE_CORE), "self-test"])
+        run([sys.executable, "-m", "unittest", "discover", "-s",
+             str(ROOT / "reference/request-binding"), "-p", "test_*.py"])
         subprocess.run(
             [sys.executable, str(A2A_ADAPTER), "run-demo"],
             cwd=ROOT,

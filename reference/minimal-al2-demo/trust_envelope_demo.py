@@ -977,6 +977,9 @@ def verify_demo(out_dir: Path, *, status_mode: str, status_base: str | None = No
         "checked_at": iso(utc_now()),
         "status_mode": status_mode,
         "checks": checks,
+        "request_binding": {"status": "not_checked", "pass": None,
+                            "binding_requirement_met": False,
+                            "cause": "LEGACY_AER_PROFILE"},
     }
     write_json(out_dir / "verification-report.json", report)
     return report

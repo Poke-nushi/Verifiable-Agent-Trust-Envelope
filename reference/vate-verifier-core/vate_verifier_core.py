@@ -11,11 +11,17 @@ from __future__ import annotations
 import argparse
 import copy
 import hashlib
+import importlib.util
 import json
 import re
+import sys
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
-from typing import Any
+from functools import lru_cache
+from pathlib import Path
+from threading import RLock
+from typing import Any, Iterator
 
 PROFILE = "VATE-AL2-Verifier-Admission-v0.3"
 VERSION = "vate-0.3"
@@ -310,6 +316,30 @@ def set_amount(request: dict[str, Any], currency: str, value: Decimal | float) -
     return effective
 
 
+@lru_cache(maxsize=1)
+def request_binding_module() -> Any:
+    """Load the installed binding implementation, never a producer-chosen path."""
+    path = Path(__file__).resolve().parents[1] / "request-binding/request_binding.py"
+    name = "request_binding"
+    existing = sys.modules.get(name)
+    if existing is not None:
+        if (Path(getattr(existing, "__file__", "")).resolve() != path
+                or not callable(getattr(existing, "admit_bound", None))):
+            raise RuntimeError("request-binding module name is occupied by a different implementation")
+        return existing
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("request-binding implementation unavailable")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module  # dataclass annotations resolve the defining module.
+    try:
+        spec.loader.exec_module(module)
+    except Exception:
+        sys.modules.pop(name, None)
+        raise
+    return module
+
+
 class VateVerifier:
     """Small verifier core for AL2 admission examples."""
 
@@ -326,8 +356,46 @@ class VateVerifier:
         self.trust_bundle = trust_bundle or {"issuers": []}
         self.fail_closed = fail_closed
         self._seen_request_ids: set[str] = set()
+        self._replay_lock = RLock()
+        self._replay_transaction_state: dict[str, Any] | None = None
 
-    def admit(self, admission_request: Any, *, now: datetime | None = None) -> dict[str, Any]:
+    @contextmanager
+    def _replay_transaction(self, request_id: str) -> Iterator[None]:
+        """Keep a new replay entry only when bound issuance returns successfully."""
+        with self._replay_lock:
+            previous_state = self._replay_transaction_state
+            state = {"request_id": request_id, "consumed": False}
+            self._replay_transaction_state = state
+            try:
+                yield
+            except BaseException:
+                # Other admissions use this lock. Never remove an entry that
+                # this call did not consume, including a nested call's commit.
+                if state["consumed"]:
+                    self._seen_request_ids.discard(request_id)
+                raise
+            finally:
+                self._replay_transaction_state = previous_state
+
+    def admit(self, admission_request: bytes, *, original: bytes,
+              now: datetime | None = None, require_new_permit: bool = False) -> Any:
+        """Return a BoundAdmission after checking raw purchase-cap preimages.
+
+        Missing, unsupported, or inconsistent input raises ValueError (a missing
+        required argument raises TypeError); no permissive receipt is returned.
+        The result retains immutable input, receipt, effective, and assessment
+        bytes. See reference/request-binding/CONTRACT.md for the supported domain.
+        """
+        return request_binding_module().admit_bound(
+            self, admission_request, original, now=now if now is not None else utc_now(),
+            require_new_permit=require_new_permit)
+
+    def _evaluate_policy(self, admission_request: Any, *, now: datetime | None = None) -> dict[str, Any]:
+        """Internal policy primitive; its receipt candidate has no preimage assurance.
+
+        Profile adapters must validate their own originals and transformations
+        before exposing an admission. This is also the fixture-level test seam.
+        """
         now = now or utc_now()
         failures = self._validate_admission_request(admission_request, now=now)
         if failures:
@@ -594,9 +662,13 @@ class VateVerifier:
                 if status_checked_at_time is None:
                     return ["SCHEMA_INVALID"]
 
-        if request["request_id"] in self._seen_request_ids:
-            return ["REPLAY_DETECTED"]
-        self._seen_request_ids.add(request["request_id"])
+        with self._replay_lock:
+            if request["request_id"] in self._seen_request_ids:
+                return ["REPLAY_DETECTED"]
+            self._seen_request_ids.add(request["request_id"])
+            state = self._replay_transaction_state
+            if state is not None and state["request_id"] == request["request_id"]:
+                state["consumed"] = True
 
         if target.get("audience") != request.get("audience"):
             return ["AUDIENCE_MISMATCH"]
@@ -809,19 +881,19 @@ def run_self_test() -> None:
     )
 
     def assert_schema_invalid_denial(request: Any) -> dict[str, Any]:
-        result = verifier.admit(request, now=now)
+        result = verifier._evaluate_policy(request, now=now)
         assert result["decision"] == "deny"
         assert result["reason_codes"] == ["SCHEMA_INVALID", "FAIL_CLOSED"]
         assert is_profile_hash(result["admission_receipt"]["request"]["input_hash"])
         return result
 
-    attenuated = verifier.admit(sample_request(), now=now)
+    attenuated = verifier._evaluate_policy(sample_request(), now=now)
     assert attenuated["decision"] == "attenuate"
     assert attenuated["admission_receipt"]["attenuation"]["effective_request_hash"]
 
     allowed_request = set_amount(sample_request(), "USD", Decimal("10.00"))
     allowed_request["request_id"] = "areq-core-self-test-allow-001"
-    allowed = verifier.admit(allowed_request, now=now)
+    allowed = verifier._evaluate_policy(allowed_request, now=now)
     assert allowed["decision"] == "allow"
     allowed_receipt = allowed["admission_receipt"]
     assert allowed_receipt["request"]["constraints"]["max_amount"]["value"] == "10.00"
@@ -842,7 +914,7 @@ def run_self_test() -> None:
     assert_schema_invalid_denial(malformed_expires_at_request)
     corrected_after_malformed_request = sample_request()
     corrected_after_malformed_request["request_id"] = malformed_expires_at_request["request_id"]
-    corrected_after_malformed = verifier.admit(corrected_after_malformed_request, now=now)
+    corrected_after_malformed = verifier._evaluate_policy(corrected_after_malformed_request, now=now)
     assert corrected_after_malformed["decision"] == "attenuate"
 
     malformed_status_checked_at_request = sample_request()
@@ -855,7 +927,7 @@ def run_self_test() -> None:
     assert_schema_invalid_denial(malformed_status_checked_at_request)
     corrected_after_malformed_status_request = sample_request()
     corrected_after_malformed_status_request["request_id"] = malformed_status_checked_at_request["request_id"]
-    corrected_after_malformed_status = verifier.admit(corrected_after_malformed_status_request, now=now)
+    corrected_after_malformed_status = verifier._evaluate_policy(corrected_after_malformed_status_request, now=now)
     assert corrected_after_malformed_status["decision"] == "attenuate"
 
     malformed_status_freshness_request = sample_request()
@@ -893,7 +965,7 @@ def run_self_test() -> None:
     valid_protocol_hint_request = set_amount(sample_request(), "USD", Decimal("10.00"))
     valid_protocol_hint_request["request_id"] = "areq-core-self-test-valid-protocol-hint-001"
     valid_protocol_hint_request["evidence_refs"][0]["protocol_hint"] = "x402"
-    valid_protocol_hint = verifier.admit(valid_protocol_hint_request, now=now)
+    valid_protocol_hint = verifier._evaluate_policy(valid_protocol_hint_request, now=now)
     assert valid_protocol_hint["decision"] == "allow"
 
     bad_protocol_hint_request = sample_request()
@@ -908,12 +980,12 @@ def run_self_test() -> None:
     assert_schema_invalid_denial(huge_amount_request)
     corrected_after_huge_amount_request = sample_request()
     corrected_after_huge_amount_request["request_id"] = huge_amount_request["request_id"]
-    corrected_after_huge_amount = verifier.admit(corrected_after_huge_amount_request, now=now)
+    corrected_after_huge_amount = verifier._evaluate_policy(corrected_after_huge_amount_request, now=now)
     assert corrected_after_huge_amount["decision"] == "attenuate"
 
     currency_mismatch_request = set_amount(sample_request(), "JPY", Decimal("20.00"))
     currency_mismatch_request["request_id"] = "areq-core-self-test-currency-mismatch-001"
-    currency_mismatch = verifier.admit(currency_mismatch_request, now=now)
+    currency_mismatch = verifier._evaluate_policy(currency_mismatch_request, now=now)
     assert currency_mismatch["decision"] == "deny"
     assert currency_mismatch["reason_codes"] == ["POLICY_DENIED", "FAIL_CLOSED"]
 
@@ -928,7 +1000,7 @@ def run_self_test() -> None:
     )
     fractional_policy_request = set_amount(sample_request(), "USD", Decimal("0.02"))
     fractional_policy_request["request_id"] = "areq-core-self-test-fractional-policy-001"
-    fractional_policy = fractional_policy_verifier.admit(fractional_policy_request, now=now)
+    fractional_policy = fractional_policy_verifier._evaluate_policy(fractional_policy_request, now=now)
     assert fractional_policy["decision"] == "attenuate"
     fractional_attenuation = fractional_policy["admission_receipt"]["attenuation"]
     assert fractional_attenuation["effective_constraints"]["max_amount"]["value"] == "0.015"
@@ -938,12 +1010,12 @@ def run_self_test() -> None:
     denied_request = sample_request()
     denied_request["request_id"] = "areq-core-self-test-deny-001"
     denied_request["target"]["audience"] = "https://unexpected.example/a2a"
-    denied = verifier.admit(denied_request, now=now)
+    denied = verifier._evaluate_policy(denied_request, now=now)
     assert denied["decision"] == "deny"
     assert denied["reason_codes"] == ["AUDIENCE_MISMATCH", "FAIL_CLOSED"]
     corrected_after_semantic_denial_request = sample_request()
     corrected_after_semantic_denial_request["request_id"] = denied_request["request_id"]
-    corrected_after_semantic_denial = verifier.admit(corrected_after_semantic_denial_request, now=now)
+    corrected_after_semantic_denial = verifier._evaluate_policy(corrected_after_semantic_denial_request, now=now)
     assert corrected_after_semantic_denial["decision"] == "deny"
     assert corrected_after_semantic_denial["reason_codes"] == ["REPLAY_DETECTED", "FAIL_CLOSED"]
 
@@ -987,7 +1059,7 @@ def run_self_test() -> None:
     precise_request = sample_request()
     precise_request.update(request_id="areq-core-self-test-precise-clock", issued_at="2026-07-01T00:01:00.700000Z")
     precise_original = copy.deepcopy(precise_request)
-    precise = verifier.admit(precise_request, now=precise_now)
+    precise = verifier._evaluate_policy(precise_request, now=precise_now)
     assert precise["decision"] == "attenuate"
     precise_receipt = precise["admission_receipt"]
     assert precise_receipt["issued_at"] == "2026-07-01T00:01:00.800000Z"
@@ -1009,7 +1081,7 @@ def run_self_test() -> None:
     expired_request = sample_request()
     expired_request["request_id"] = "areq-core-self-test-expired-window"
     expired_original = copy.deepcopy(expired_request)
-    expired = verifier.admit(expired_request, now=expired_now)
+    expired = verifier._evaluate_policy(expired_request, now=expired_now)
     assert expired["decision"] == "deny"
     assert expired["reason_codes"] == ["PERMIT_EXPIRED", "FAIL_CLOSED"]
     expired_receipt = expired["admission_receipt"]

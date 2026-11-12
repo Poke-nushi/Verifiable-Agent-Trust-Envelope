@@ -67,6 +67,8 @@ Each result entry represents one corpus case:
 - required `artifacts` for the case's declared or legacy-derived evaluated inputs
 - optional per-case `artifact_mode` override
 - required `generated_artifacts` when the effective mode is `generated-receipts`
+- required `request_binding_artifacts` when the corpus case declares a
+  `request_binding.required_contract`
 - optional `limitations`
 
 The example file is:
@@ -104,6 +106,22 @@ comparison path. It checks that submitted references match the corpus fixture
 digests; it does not establish that the SUT evaluated those bytes or issued a
 receipt. An independent receipt-generation result should opt into
 `generated-receipts` explicitly.
+
+For a case that requires the [request-binding v1 contract](../../reference/request-binding/CONTRACT.md),
+`request_binding_artifacts` is a separate digest-addressed local manifest of
+the original/effective request and admission wrapper bytes. Both modes check
+those bytes against the case-selected admission request. Generated mode uses
+the submitted admission receipt; fixture mode uses the corpus receipt. An
+unmet binding requirement fails the case, even if its reported decision matches.
+See the [runner example](../../reference/request-binding/README.md#use-the-ordinary-runner)
+for the manifest format, sample results and bundle verification.
+
+New reports include `request_binding_required` on each case and a separate
+`request_binding_coverage` summary. Counts of required and satisfied binding
+cases do not follow from the overall pass count. The original 76-case corpus
+has no request-binding requirement. Historical reports without coverage fields
+establish no preimage-check coverage. `verify-bundle` validates supplied
+coverage against the corpus and recomputed binding assessments.
 
 ## Evaluated Corpus Artifact References
 
@@ -149,6 +167,13 @@ Receipt artifact references require:
 - `digest.value` as lowercase SHA-256 hex
 
 ### AL2 Context Bindings
+
+The runner first requires the case's context facts to agree with its admission
+records under the [context-to-receipt correspondence rules](corpus-format.md#al2-context-to-receipt-correspondence).
+This applies to `run`, `compare`, and `verify-bundle`, including cases with
+explicit `sut_inputs`. Matching artifact digests alone does not satisfy these
+relationships. The check does not add expected receipts to the SUT's inputs or
+establish that the SUT performed the recorded observations.
 
 When the corpus case includes `al2_context_checks`, the result entry must
 include `artifacts.verification_context[]` entries with:

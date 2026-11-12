@@ -1,0 +1,212 @@
+{
+  "version": "vate-sut-results-2026-09",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "generated_at": "2026-11-12T00:00:01Z",
+  "artifact_mode": "generated-receipts",
+  "implementation": {
+    "name": "VATE bound-request reference sample",
+    "type": "reference",
+    "version": "1",
+    "language": "Python"
+  },
+  "corpus": {
+    "profile": "VATE-AL2-Verifier-Admission-v0.3",
+    "digest": {
+      "alg": "sha-256",
+      "value": "23d2934e30207868ee40727050595d6aa306fd5f86ba3cf7a8f9bfaa375c0c99"
+    }
+  },
+  "results": [
+    {
+      "case_id": "request-binding-allow",
+      "status": "completed",
+      "outcome": "allow",
+      "should_execute": true,
+      "reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "checks": [],
+      "artifacts": {
+        "admission_receipt": {
+          "uri": "conformance/request-binding-v1/fixtures/allow/admission-receipt.json",
+          "media_type": "application/vate-admission-receipt+json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "70f334568b787d4547c02e6128552d7c70db7bf6790f440e1d95dd2b9bd72223"
+          }
+        },
+        "post_execution_receipt": {
+          "uri": "conformance/request-binding-v1/fixtures/allow/post-execution.json",
+          "media_type": "application/vate-post-execution-receipt+json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "ab91ad2277afe0e32230895df6e91f6d51336c558e317c0669b7dc6a3e8bd644"
+          }
+        }
+      },
+      "request_binding_artifacts": {
+        "uri": "allow/binding-manifest.json",
+        "media_type": "application/json",
+        "digest": {
+          "alg": "sha-256",
+          "value": "c19cfe43aae5d0c4230ef0e859340c8915d15d035e61aecfb125a192bef1a519"
+        }
+      },
+      "generated_artifacts": {
+        "admission_receipt": {
+          "uri": "allow/admission-receipt.json",
+          "media_type": "application/vate-admission-receipt+json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "70f334568b787d4547c02e6128552d7c70db7bf6790f440e1d95dd2b9bd72223"
+          },
+          "local_path": "allow/admission-receipt.json"
+        },
+        "post_execution_receipt": {
+          "uri": "allow/post-execution.json",
+          "media_type": "application/vate-post-execution-receipt+json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "ab91ad2277afe0e32230895df6e91f6d51336c558e317c0669b7dc6a3e8bd644"
+          },
+          "local_path": "allow/post-execution.json"
+        }
+      }
+    },
+    {
+      "case_id": "request-binding-attenuate",
+      "status": "completed",
+      "outcome": "attenuate",
+      "should_execute": true,
+      "reason_codes": [
+        "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+      ],
+      "checks": [],
+      "artifacts": {
+        "admission_receipt": {
+          "uri": "conformance/request-binding-v1/fixtures/attenuate/admission-receipt.json",
+          "media_type": "application/vate-admission-receipt+json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "bc7e122766d69ac87efa3e208a1d5074433951d2240f3214d4d173babf4b8899"
+          }
+        },
+        "post_execution_receipt": {
+          "uri": "conformance/request-binding-v1/fixtures/attenuate/post-execution.json",
+          "media_type": "application/vate-post-execution-receipt+json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "b27607310ff676e5895e1098f6eb87699340085383527fce7a2f208da89bdf71"
+          }
+        }
+      },
+      "request_binding_artifacts": {
+        "uri": "attenuate/binding-manifest.json",
+        "media_type": "application/json",
+        "digest": {
+          "alg": "sha-256",
+          "value": "efc018e64e869d67042bfe2298cb5a40e479853945fe3249e72207c7bdc40c89"
+        }
+      },
+      "generated_artifacts": {
+        "admission_receipt": {
+          "uri": "attenuate/admission-receipt.json",
+          "media_type": "application/vate-admission-receipt+json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "bc7e122766d69ac87efa3e208a1d5074433951d2240f3214d4d173babf4b8899"
+          },
+          "local_path": "attenuate/admission-receipt.json"
+        },
+        "post_execution_receipt": {
+          "uri": "attenuate/post-execution.json",
+          "media_type": "application/vate-post-execution-receipt+json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "b27607310ff676e5895e1098f6eb87699340085383527fce7a2f208da89bdf71"
+          },
+          "local_path": "attenuate/post-execution.json"
+        }
+      }
+    },
+    {
+      "case_id": "request-binding-deny-over-cap",
+      "status": "completed",
+      "outcome": "deny",
+      "should_execute": false,
+      "reason_codes": [
+        "POLICY_DENIED"
+      ],
+      "checks": [],
+      "artifacts": {
+        "admission_receipt": {
+          "uri": "conformance/request-binding-v1/fixtures/deny-over-cap/admission-receipt.json",
+          "media_type": "application/vate-admission-receipt+json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "650bbc1cc3f0f737b54049401c6f9f9db71c7828b13e83e3032da87df11477d3"
+          }
+        }
+      },
+      "request_binding_artifacts": {
+        "uri": "deny-over-cap/binding-manifest.json",
+        "media_type": "application/json",
+        "digest": {
+          "alg": "sha-256",
+          "value": "b2fe6099a8cb2df615918c434d4ef9648ef5c1727569d240d09b51a62cc215ba"
+        }
+      },
+      "generated_artifacts": {
+        "admission_receipt": {
+          "uri": "deny-over-cap/admission-receipt.json",
+          "media_type": "application/vate-admission-receipt+json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "650bbc1cc3f0f737b54049401c6f9f9db71c7828b13e83e3032da87df11477d3"
+          },
+          "local_path": "deny-over-cap/admission-receipt.json"
+        }
+      }
+    },
+    {
+      "case_id": "request-binding-new-permit",
+      "status": "completed",
+      "outcome": "attenuate",
+      "should_execute": false,
+      "reason_codes": [
+        "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+      ],
+      "checks": [],
+      "artifacts": {
+        "admission_receipt": {
+          "uri": "conformance/request-binding-v1/fixtures/new-permit/admission-receipt.json",
+          "media_type": "application/vate-admission-receipt+json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "20430e5b7c5f480e5a7f9eedf16a2dd0ab86a0069122f3ad655ec96e7053dc43"
+          }
+        }
+      },
+      "request_binding_artifacts": {
+        "uri": "new-permit/binding-manifest.json",
+        "media_type": "application/json",
+        "digest": {
+          "alg": "sha-256",
+          "value": "980be492d05d65c36974580b56fa15f310c0d419a3ba844d3115467a8a0cc63a"
+        }
+      },
+      "generated_artifacts": {
+        "admission_receipt": {
+          "uri": "new-permit/admission-receipt.json",
+          "media_type": "application/vate-admission-receipt+json",
+          "digest": {
+            "alg": "sha-256",
+            "value": "20430e5b7c5f480e5a7f9eedf16a2dd0ab86a0069122f3ad655ec96e7053dc43"
+          },
+          "local_path": "new-permit/admission-receipt.json"
+        }
+      }
+    }
+  ]
+}

@@ -89,6 +89,7 @@ export interface SutResultEntry {
   reason_codes: string[];
   artifacts?: SutResultArtifacts;
   generated_artifacts?: SutGeneratedArtifacts;
+  request_binding_artifacts?: DigestBoundReference;
   checks?: Array<{
     name: string;
     pass: boolean;

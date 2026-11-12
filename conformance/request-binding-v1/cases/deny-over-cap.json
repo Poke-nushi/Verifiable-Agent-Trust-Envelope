@@ -1,0 +1,24 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "request-binding-deny-over-cap",
+  "title": "Request binding: deny-over-cap",
+  "category": "negative",
+  "purpose": "Check the selected purchase operation, admission context and effective constraints from raw preimages.",
+  "artifacts": {
+    "admission_request": "conformance/request-binding-v1/fixtures/deny-over-cap/admission-request.json",
+    "admission_receipt": "conformance/request-binding-v1/fixtures/deny-over-cap/admission-receipt.json",
+    "request_binding_manifest": "conformance/request-binding-v1/fixtures/deny-over-cap/binding-manifest.json"
+  },
+  "request_binding": {
+    "required_contract": "vate-request-binding-v1"
+  },
+  "expected": {
+    "admission_decision": "deny",
+    "should_execute": false,
+    "reason_codes": [
+      "POLICY_DENIED"
+    ],
+    "checks": []
+  }
+}

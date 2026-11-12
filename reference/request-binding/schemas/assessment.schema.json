@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:request-binding:assessment:v1",
+  "type": "object",
+  "properties": {
+    "contract": {
+      "const": "vate-request-binding-assessment-v1"
+    },
+    "required_contract": {
+      "type": "string",
+      "minLength": 1
+    },
+    "receipt_digest": {
+      "type": "object",
+      "properties": {
+        "alg": {
+          "const": "sha-256"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        }
+      },
+      "required": [
+        "alg",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "status": {
+      "enum": [
+        "checked",
+        "not_checked"
+      ]
+    },
+    "pass": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "binding_requirement_met": {
+      "type": "boolean"
+    },
+    "decision_allows_immediate_execution": {
+      "type": "boolean"
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "checked",
+              "not_checked"
+            ]
+          },
+          "pass": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "cause": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "name",
+          "status",
+          "pass"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "checked"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "pass": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "pass": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "contract",
+    "required_contract",
+    "receipt_digest",
+    "status",
+    "pass",
+    "binding_requirement_met",
+    "decision_allows_immediate_execution",
+    "checks"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "checked"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "pass": {
+            "type": "boolean"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "pass": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "binding_requirement_met": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "checked"
+          },
+          "pass": {
+            "const": true
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "decision_allows_immediate_execution": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "binding_requirement_met": {
+            "const": true
+          }
+        }
+      }
+    }
+  ]
+}

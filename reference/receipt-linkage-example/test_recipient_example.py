@@ -141,7 +141,7 @@ class RecipientExampleTests(unittest.TestCase):
             ("2026-07-01T01:01:00.000001+01:00", "2026-07-01T00:01:00.000001Z"),
         ):
             with self.subTest(now=now_text):
-                result = core.VateVerifier(verifier_id="did:web:verifier.example").admit(
+                result = core.VateVerifier(verifier_id="did:web:verifier.example")._evaluate_policy(
                     core.sample_request(), now=core.parse_time(now_text))
                 receipt = result["admission_receipt"]
                 self.assertEqual(result["decision"], "allow")
@@ -155,7 +155,7 @@ class RecipientExampleTests(unittest.TestCase):
         request["issued_at"] = "2026-07-01T00:01:00.700000Z"
         original = encode(request)
         now = core.parse_time("2026-07-01T00:01:00.800000Z")
-        admission = core.VateVerifier(verifier_id="did:web:verifier.example").admit(
+        admission = core.VateVerifier(verifier_id="did:web:verifier.example")._evaluate_policy(
             request, now=now)["admission_receipt"]
         for start, expected in (("2026-07-01T00:01:00.100000Z", "mismatch"),
                                 ("2026-07-01T00:01:00.799999Z", "mismatch"),
@@ -178,7 +178,7 @@ class RecipientExampleTests(unittest.TestCase):
                 request = core.sample_request()
                 original = encode(request)
                 now = core.parse_time(now_text)
-                result = core.VateVerifier(verifier_id="did:web:verifier.example").admit(request, now=now)
+                result = core.VateVerifier(verifier_id="did:web:verifier.example")._evaluate_policy(request, now=now)
                 receipt = result["admission_receipt"]
                 self.assertEqual(result["decision"], "deny")
                 self.assertEqual(result["reason_codes"], ["PERMIT_EXPIRED", "FAIL_CLOSED"])
@@ -200,7 +200,7 @@ class RecipientExampleTests(unittest.TestCase):
             with self.subTest(issued_at=issued_at, now=now_text):
                 request = core.sample_request()
                 request.update(issued_at=issued_at, expires_at="2026-07-01T01:10:00+01:00")
-                result = core.VateVerifier(verifier_id="did:web:verifier.example").admit(
+                result = core.VateVerifier(verifier_id="did:web:verifier.example")._evaluate_policy(
                     request, now=core.parse_time(now_text))
                 receipt = result["admission_receipt"]
                 self.assertEqual(result["decision"], decision)

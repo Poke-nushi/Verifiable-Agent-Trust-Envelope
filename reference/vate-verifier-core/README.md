@@ -2,20 +2,51 @@
 
 This directory contains a dependency-free reference verifier core for the active `VATE AL2 Admission Interop Profile 2026-09`.
 
-It is intentionally small and not production-ready.
-The purpose is to make admission behavior testable before binding it to A2A, MCP, HTTP, or another transport.
+It is not production-ready.
+The default admission entry checks the original purchase request, admission
+context and any reduced cap before returning a receipt. It uses the
+[request-binding v1 contract](../request-binding/CONTRACT.md).
+
+Existing callers should follow the
+[request-binding migration guide](../request-binding/MIGRATION.md).
 
 ## API Shape
 
 ```python
-decision = verifier.admit(admission_request, now=now)
+result = verifier.admit(admission_request_bytes, original=original_operation_bytes, now=now)
 ```
 
-The returned object contains:
+Supply the original UTF-8 bytes for both objects. `now` is a timezone-aware
+datetime; omitting it uses the current UTC time. The returned `BoundAdmission`
+contains immutable bytes:
 
-- `decision`
-- `reason_codes`
-- `admission_receipt`
+- `request`, `original`, and `effective` (the last is absent for denial)
+- `receipt` and the independently recomputed `assessment`
+- `core_result`, the intermediate policy result
+
+Read the final decision from `receipt`, not `core_result`. A purchase above the
+effective cap is denied even when the intermediate policy result proposes
+attenuation. `require_new_permit=True` produces a non-executable candidate when
+the cap is narrowed.
+
+Calls without `original` raise `TypeError`. Invalid or unsupported raw inputs
+raise `ValueError` without returning an admission. The previous dictionary-only
+call is no longer a supported admission entry. The current default supports
+`vate-purchase-cap-request-v1`; other operation profiles need their own
+validated adapter.
+
+The default entry requires one `local_policy` evidence reference matching the
+configured policy's canonical digest, `policy_ref` (or `local` when absent),
+and `application/json` media type. It rejects unmatched or unsupported evidence
+before policy evaluation and replay-state consumption. The final receipt names
+the check `vate-local-policy-content-v1`; it establishes policy-content identity,
+while principal, actor and runtime authentication require their own verifier.
+
+`_evaluate_policy` is a private primitive that produces a receipt candidate
+without checking preimages. The file-set and S3 examples use it after their own
+profile checks. It must not be exposed as an admission endpoint. Receipt-pair
+linkage checks remain available through `validate_post_execution_linkage`;
+they do not inspect request preimages.
 
 Generated receipt timestamps preserve the supplied clock's microsecond precision
 and use UTC. If a request has already expired, its denial receipt records
@@ -29,7 +60,7 @@ expiry values retain their original timestamp representation.
 python3 reference/vate-verifier-core/vate_verifier_core.py self-test
 ```
 
-The self-test exercises:
+The self-test exercises the policy primitive and receipt linkage:
 
 - allow
 - attenuate
@@ -37,10 +68,20 @@ The self-test exercises:
 - receipt generation
 - post-execution linkage validation
 
+Test the public entry and A2A adapter, including missing or mismatched originals:
+
+```bash
+python3 -m unittest discover -s reference/request-binding -p 'test_*.py'
+```
+
+The [entry-point coverage](../request-binding/ENTRYPOINTS.md) identifies the
+current adapters, limited readers and historical replay paths.
+
 ## Limits
 
 This core does not implement production JOSE, VC, DID, or PKI processing.
-It provides hooks and deterministic behavior for conformance fixtures.
+The default entry produces bound purchase-cap receipts. Its private policy and
+proof hooks also support deterministic conformance fixtures.
 
 The core also applies defensive local bounds when parsing `max_amount` and
 side-effect `amount` values: amounts must be finite, non-negative decimals with

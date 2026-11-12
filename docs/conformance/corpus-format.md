@@ -304,6 +304,72 @@ block. For the AL2 v0.3 corpus:
 An external implementation should treat those arrays as part of the case
 contract, not as optional comments.
 
+### AL2 Context-to-Receipt Correspondence
+
+For cases declaring `al2_context_checks`, `run`, `compare`, and `verify-bundle`
+MUST also check the context facts against the case's admission records. The
+admission receipt MUST be available. If an admission request is declared, its
+request id, transaction id, action, input hash, principal, actor, and runtime
+MUST match the corresponding receipt fields. This comparison does not
+reconstruct the request body; the separate request-binding contract provides
+that check for its supported operation profile.
+
+The supported context selects exactly one receipt evidence entry: runtime
+binding/freshness selects `runtime_attestation`, status selects `status_bundle`,
+and request/nonce replay selects `admission_request`. A missing or ambiguous
+selection MUST fail; array order MUST NOT choose an entry. Multiple evidence
+entries of the selected type require a separate explicit selection contract.
+Other evidence entries and permitted annotations remain available.
+
+- A runtime binding's `actual` MUST equal the receipt's `subject.runtime`,
+  including for an expected mismatch. `expected` remains the fixture's declared
+  permit-bound runtime; this check does not authenticate that declaration.
+- Context `checked_at` MUST identify the same instant as the selected evidence's
+  verification time. Runtime binding contexts may omit their own `checked_at`.
+  The evidence verification time MUST be valid and no later than receipt
+  `issued_at`. Equivalent timestamp offsets are accepted.
+- Evidence `verification.result` MUST agree with the context. For a single
+  runtime check, or for status and replay checks: a matching
+  runtime, fresh active status/proof, or unused replay state is `verified`;
+  a stale active status/proof is `stale`; unavailable status is `unavailable`;
+  a runtime mismatch, revoked status, or consumed/replayed state is `failed`.
+  A failed context MUST have a `deny` receipt. Unavailable status with
+  `required: false` retains the existing nonblocking rule; its evidence result
+  MUST still be `unavailable`, not `verified`. When `status_result` is supplied
+  for status or replay evidence, it MUST equal the context status or state
+  (or `unavailable` when status availability is unavailable).
+- When runtime binding and freshness checks select the same evidence entry,
+  their derived results MUST be combined before comparing
+  `verification.result`. A runtime mismatch requires `failed`, including when
+  the proof is also stale. Otherwise, stale proof requires `stale`; matching
+  runtime with fresh proof requires `verified`. All declared context checks
+  MUST still satisfy their own expectations and record correspondence rules.
+  Multiple checks of the same kind MUST agree on their derived result; a
+  conflicting binding or freshness result MUST fail, regardless of order.
+  A standalone check retains its single-check result requirement: a matching
+  runtime alone does not justify a `stale` result without a declared stale
+  proof context. Failed binding or freshness still requires a `deny` receipt.
+- Request/nonce replay keys MUST equal the receipt's `request_id`, a colon,
+  and the context `nonce`. Consumed/replayed contexts MUST include a valid
+  `first_seen_at` no later than `checked_at`; the same ordering applies when
+  `first_seen_at` is supplied for an unused context.
+
+The normalized payment-authority replay case uses its existing alternative
+consume-key contract. `consume_key_basis` MUST select the single
+`normalized_payment_authority` SUT input and name
+`json-sorted-no-whitespace-vate-v0.3-fixture`. Its digest MUST be recomputed from
+that artifact; `replay_key` MUST be `vate-fixture-json-sha256:` followed by that
+digest. The selected `payment_mandate` receipt evidence and the matching request
+reference MUST carry the same digest. The observation nonce MUST differ from
+the authority's replay nonce and the consume key. Removing the basis MUST NOT
+fall back to the request/nonce contract.
+
+These checks establish consistency of supplied records. They do not establish
+issuer authentication, actual observation, freshness at dispatch, or atomic
+consume-once execution. Other evidence payloads remain outside this check.
+The explicit SUT input contract is unchanged: expected receipts used to check
+corpus consistency do not become authoritative SUT inputs.
+
 `linkage_checks[]` is intentionally kind-specific. A check is not complete just
 because it names a `kind` and `reason_code`:
 

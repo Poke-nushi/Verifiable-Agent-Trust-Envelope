@@ -1,0 +1,583 @@
+"""Request preimage binding used by the VATE core's default admission API.
+
+Only the purchase-cap profile and one max-amount replacement are supported.
+This module checks content relationships, not signatures or execution authority.
+"""
+
+from __future__ import annotations
+
+import copy
+import hashlib
+import importlib.util
+import json
+import re
+from dataclasses import dataclass
+from datetime import datetime
+from decimal import Decimal
+from pathlib import Path
+from typing import Any, Mapping
+
+ROOT = Path(__file__).resolve().parents[2]
+CONTRACT = "vate-request-binding-v1"
+PREIMAGE_PROFILE = "vate-purchase-cap-request-v1"
+TRANSFORMATION_PROFILE = "vate-max-amount-only-v1"
+CANONICALIZATION = "vate-v0.3-fixture-json"
+ASSESSMENT = "vate-request-binding-assessment-v1"
+MAX_BYTES = 2 * 1024 * 1024
+MAX_DEPTH = 64
+MAX_SAFE_INTEGER = 9007199254740991
+AMOUNT_RE = re.compile(r"(?:0|[1-9][0-9]{0,17})(?:\.[0-9]{1,8})?\Z")
+HASH_RE = re.compile(r"[0-9a-f]{64}\Z")
+ACTION = "commerce.purchase"
+
+
+def _load_core() -> Any:
+    spec = importlib.util.spec_from_file_location(
+        "request_binding_vate_core", ROOT / "reference/vate-verifier-core/vate_verifier_core.py")
+    if spec is None or spec.loader is None:
+        raise RuntimeError("VATE core unavailable")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+core = _load_core()
+
+
+class Invalid(ValueError):
+    """The supplied content failed a named binding check."""
+
+    def __init__(self, cause: str) -> None:
+        super().__init__(cause)
+        self.cause = cause
+
+
+class Unavailable(Invalid):
+    """Required content or a supported contract was not supplied."""
+
+
+def need(condition: bool, cause: str) -> None:
+    if not condition:
+        raise Invalid(cause)
+
+
+def exact(value: Any, required: set[str], optional: set[str] | None = None) -> None:
+    need(type(value) is dict and required <= value.keys()
+         and value.keys() <= required | (optional or set()), "SCHEMA_INVALID")
+
+
+def text(value: Any) -> None:
+    need(isinstance(value, str) and bool(value), "SCHEMA_INVALID")
+
+
+def _json_domain(value: Any, depth: int = 0) -> None:
+    need(depth <= MAX_DEPTH, "JSON_DEPTH_EXCEEDED")
+    if isinstance(value, str):
+        need(not any(0xD800 <= ord(char) <= 0xDFFF for char in value), "INVALID_UNICODE")
+    elif value is None or type(value) is bool:
+        return
+    elif type(value) is int:
+        need(abs(value) <= MAX_SAFE_INTEGER, "UNSAFE_JSON_INTEGER")
+    elif type(value) is list:
+        for item in value:
+            _json_domain(item, depth + 1)
+    elif type(value) is dict:
+        for key, item in value.items():
+            need(isinstance(key, str), "SCHEMA_INVALID")
+            _json_domain(key, depth + 1)
+            _json_domain(item, depth + 1)
+    else:
+        raise Invalid("UNSUPPORTED_JSON_VALUE")
+
+
+def encode(value: Any) -> bytes:
+    _json_domain(value)
+    raw = json.dumps(value, allow_nan=False, ensure_ascii=True, sort_keys=True,
+                     separators=(",", ":")).encode("utf-8")
+    need(len(raw) <= MAX_BYTES, "ARTIFACT_TOO_LARGE")
+    return raw
+
+
+class _JsonParser:
+    """Bounded token reader shared in behavior with the TypeScript receiver.
+
+    Validate in source order, before platform JSON integer/depth limits apply.
+    The standard decoder is used only for one quoted string at a time.
+    """
+
+    number = re.compile(r"-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?")
+    string_decoder = json.JSONDecoder()
+
+    def __init__(self, source: str) -> None:
+        self.source, self.offset = source, 0
+
+    def whitespace(self) -> None:
+        while self.offset < len(self.source) and self.source[self.offset] in " \n\r\t":
+            self.offset += 1
+
+    def consume(self, token: str) -> bool:
+        if not self.source.startswith(token, self.offset):
+            return False
+        self.offset += len(token)
+        return True
+
+    def string(self) -> str:
+        need(self.source[self.offset:self.offset + 1] == '"', "INVALID_JSON")
+        value, self.offset = self.string_decoder.raw_decode(self.source, self.offset)
+        _json_domain(value)
+        return value
+
+    def value(self, depth: int = 0) -> Any:
+        need(depth <= MAX_DEPTH, "JSON_DEPTH_EXCEEDED")
+        self.whitespace()
+        if self.source[self.offset:self.offset + 1] == '"':
+            return self.string()
+        if self.consume("{"):
+            result = {}
+            self.whitespace()
+            if self.consume("}"):
+                return result
+            while True:
+                self.whitespace()
+                key = self.string()
+                self.whitespace()
+                need(self.consume(":"), "INVALID_JSON")
+                item = self.value(depth + 1)
+                need(key not in result, "DUPLICATE_JSON_KEY")
+                result[key] = item
+                self.whitespace()
+                if self.consume("}"):
+                    return result
+                need(self.consume(","), "INVALID_JSON")
+        if self.consume("["):
+            items = []
+            self.whitespace()
+            if self.consume("]"):
+                return items
+            while True:
+                items.append(self.value(depth + 1))
+                self.whitespace()
+                if self.consume("]"):
+                    return items
+                need(self.consume(","), "INVALID_JSON")
+        for token, value in (("true", True), ("false", False), ("null", None)):
+            if self.consume(token):
+                return value
+        for token in ("NaN", "Infinity", "-Infinity"):
+            need(not self.consume(token), "UNSUPPORTED_JSON_NUMBER")
+        match = self.number.match(self.source, self.offset)
+        need(match is not None, "INVALID_JSON")
+        token = match.group()
+        self.offset = match.end()
+        need(not any(c in token for c in ".eE"), "UNSUPPORTED_JSON_NUMBER")
+        digits, limit = token.lstrip("-"), str(MAX_SAFE_INTEGER)
+        need(len(digits) < len(limit) or (len(digits) == len(limit) and digits <= limit),
+             "UNSAFE_JSON_INTEGER")
+        return int(token)
+
+    def parse(self) -> Any:
+        value = self.value()
+        self.whitespace()
+        need(self.offset == len(self.source), "INVALID_JSON")
+        return value
+
+
+def decode(raw: bytes) -> Any:
+    need(type(raw) is bytes, "SCHEMA_INVALID")
+    need(len(raw) <= MAX_BYTES, "ARTIFACT_TOO_LARGE")
+
+    try:
+        return _JsonParser(raw.decode("utf-8")).parse()
+    except Invalid:
+        raise
+    except (ValueError, UnicodeError, RecursionError) as exc:
+        raise Invalid("INVALID_JSON") from exc
+
+
+def digest(raw: bytes) -> dict[str, str]:
+    return {"alg": "sha-256", "value": hashlib.sha256(raw).hexdigest()}
+
+
+def object_hash(value: Any) -> str:
+    return "sha-256:" + digest(encode(value))["value"]
+
+
+def reference(raw: bytes) -> dict:
+    descriptor = digest(raw)
+    return {"uri": "urn:sha256:" + descriptor["value"],
+            "media_type": "application/json", "digest": descriptor}
+
+
+def validate_reference(ref: Any) -> None:
+    exact(ref, {"uri", "media_type", "digest"})
+    exact(ref["digest"], {"alg", "value"})
+    need(ref["digest"]["alg"] == "sha-256"
+         and isinstance(ref["digest"]["value"], str)
+         and HASH_RE.fullmatch(ref["digest"]["value"]) is not None, "SCHEMA_INVALID")
+    need(ref["media_type"] == "application/json"
+         and ref["uri"] == "urn:sha256:" + ref["digest"]["value"], "SCHEMA_INVALID")
+
+
+def resolve(ref: dict, artifacts: Mapping[str, bytes]) -> dict:
+    validate_reference(ref)
+    if ref["uri"] not in artifacts:
+        raise Unavailable("ARTIFACT_NOT_SUPPLIED")
+    raw = artifacts[ref["uri"]]
+    need(type(raw) is bytes, "SCHEMA_INVALID")
+    need(len(raw) <= MAX_BYTES, "ARTIFACT_TOO_LARGE")
+    need(digest(raw) == ref["digest"], "DIGEST_MISMATCH")
+    result = decode(raw)
+    need(type(result) is dict, "SCHEMA_INVALID")
+    return result
+
+
+def amount(value: Any) -> Decimal:
+    need(isinstance(value, str) and AMOUNT_RE.fullmatch(value) is not None,
+         "INVALID_DECIMAL_AMOUNT")
+    return Decimal(value)
+
+
+def money(value: Any) -> None:
+    exact(value, {"currency", "value"})
+    need(isinstance(value["currency"], str)
+         and re.fullmatch(r"[A-Z]{3}", value["currency"]) is not None, "SCHEMA_INVALID")
+    amount(value["value"])
+
+
+def constraints(value: Any) -> None:
+    exact(value, {"max_amount", "tool_allowlist"})
+    money(value["max_amount"])
+    allowed = value["tool_allowlist"]
+    need(type(allowed) is list and 0 < len(allowed) <= 32
+         and all(isinstance(tool, str) and tool for tool in allowed), "SCHEMA_INVALID")
+    need(len(set(allowed)) == len(allowed), "SCHEMA_INVALID")
+
+
+def validate_operation(operation: Any) -> None:
+    exact(operation, {"preimage_profile", "operation_id", "action", "target", "payload", "constraints"})
+    need(operation["preimage_profile"] == PREIMAGE_PROFILE
+         and operation["action"] == ACTION, "UNSUPPORTED_OPERATION_PROFILE")
+    text(operation["operation_id"])
+    exact(operation["target"], {"resource", "audience"})
+    for value in operation["target"].values():
+        text(value)
+    exact(operation["payload"], {"tool", "order_id", "amount"})
+    text(operation["payload"]["tool"])
+    text(operation["payload"]["order_id"])
+    money(operation["payload"]["amount"])
+    constraints(operation["constraints"])
+
+
+def payload_within_constraints(operation: dict) -> bool:
+    payload = operation["payload"]
+    cap = operation["constraints"]["max_amount"]
+    return (payload["amount"]["currency"] == cap["currency"]
+            and amount(payload["amount"]["value"]) <= amount(cap["value"])
+            and payload["tool"] in operation["constraints"]["tool_allowlist"])
+
+
+def validate_admission(request: Any, original: dict) -> None:
+    exact(request, {"version", "profile", "request_id", "transaction_id", "issued_at", "expires_at",
+                    "action", "target", "actor", "principal", "runtime", "audience", "input_hash",
+                    "constraints", "evidence_refs"})
+    need(request["version"] == core.VERSION and request["profile"] == core.PROFILE, "SCHEMA_INVALID")
+    for key in ("request_id", "transaction_id", "actor", "principal", "runtime", "audience"):
+        text(request[key])
+    issued, expires = core.safe_parse_time(request["issued_at"]), core.safe_parse_time(request["expires_at"])
+    need(issued is not None and expires is not None and issued <= expires, "INVALID_REQUEST_WINDOW")
+    refs = request["evidence_refs"]
+    need(type(refs) is list and bool(refs)
+         and all(type(ref) is dict and isinstance(ref.get("type"), str)
+                 and ("protocol_hint" not in ref or isinstance(ref["protocol_hint"], str))
+                 and core.is_valid_evidence_reference(ref) for ref in refs), "SCHEMA_INVALID")
+    need(len({(ref["type"], ref["uri"]) for ref in refs}) == len(refs), "DUPLICATE_EVIDENCE_REFERENCE")
+    need(request["input_hash"] == object_hash(original), "INPUT_HASH_MISMATCH")
+    need(request["transaction_id"] == original["operation_id"]
+         and request["action"] == original["action"]
+         and request["target"] == original["target"]
+         and request["audience"] == original["target"]["audience"]
+         and request["constraints"] == original["constraints"], "ADMISSION_REQUEST_MISMATCH")
+
+
+def action_binding(operation: dict) -> dict:
+    return {"type": "profile_defined_digest", "preimage_profile": PREIMAGE_PROFILE,
+            "canonicalization": CANONICALIZATION, "digest": digest(encode(operation))}
+
+
+def _same_json(left: Any, right: Any) -> bool:
+    """Compare decoded JSON without serializing or equating bools with ints."""
+    if type(left) is not type(right):
+        return False
+    if type(left) is dict:
+        return left.keys() == right.keys() and all(_same_json(left[key], right[key]) for key in left)
+    if type(left) is list:
+        return len(left) == len(right) and all(_same_json(a, b) for a, b in zip(left, right))
+    return left == right
+
+
+def _receipt_evidence_references(receipt: dict, request: dict) -> None:
+    """Bind reference identities, not the truth of their verification claims."""
+    expected = {(ref["type"], ref["uri"]): ref for ref in request["evidence_refs"]}
+    items = receipt.get("evidence")
+    need(type(items) is list and len(items) == len(expected), "RECEIPT_EVIDENCE_MISMATCH")
+    seen = set()
+    for item in items:
+        need(type(item) is dict and isinstance(item.get("type"), str)
+             and isinstance(item.get("uri"), str), "RECEIPT_EVIDENCE_MISMATCH")
+        key = (item["type"], item["uri"])
+        need(key in expected and key not in seen, "RECEIPT_EVIDENCE_MISMATCH")
+        seen.add(key)
+        ref = expected[key]
+        fields = ("type", "uri", "digest", "protocol_hint")
+        need(_same_json({k: item[k] for k in fields if k in item},
+                        {k: ref[k] for k in fields if k in ref}), "RECEIPT_EVIDENCE_MISMATCH")
+        # v0.3 receipt evidence does not require media_type. If supplied, it
+        # must preserve the request's value; annotation extensions stay intact.
+        need("media_type" not in item or item["media_type"] == ref["media_type"],
+             "RECEIPT_EVIDENCE_MISMATCH")
+
+
+def _receipt_context(receipt: dict, request: dict) -> str:
+    for key, expected in (("version", core.VERSION), ("profile", core.PROFILE), ("receipt_type", "admission")):
+        need(receipt.get(key) == expected, "SCHEMA_INVALID")
+    text(receipt.get("receipt_id"))
+    summary = receipt.get("request")
+    need(type(summary) is dict, "SCHEMA_INVALID")
+    for key in ("request_id", "transaction_id", "action", "input_hash", "constraints"):
+        need(summary.get(key) == request[key], "RECEIPT_REQUEST_MISMATCH")
+    subject = receipt.get("subject")
+    need(type(subject) is dict, "SCHEMA_INVALID")
+    for key in ("principal", "actor", "runtime"):
+        need(subject.get(key) == request[key], "RECEIPT_SUBJECT_MISMATCH")
+    decision = receipt.get("decision")
+    need(type(decision) is dict and decision.get("outcome") in ("allow", "attenuate", "deny"), "SCHEMA_INVALID")
+    codes = decision.get("reason_codes")
+    need(type(codes) is list and bool(codes)
+         and all(isinstance(code, str) and code for code in codes), "SCHEMA_INVALID")
+    issued, expires = core.safe_parse_time(receipt.get("issued_at")), core.safe_parse_time(receipt.get("expires_at"))
+    need(issued is not None and expires is not None and issued <= expires, "INVALID_RECEIPT_WINDOW")
+    if decision["outcome"] != "deny":
+        need(core.parse_time(request["issued_at"]) <= issued <= expires <= core.parse_time(request["expires_at"]),
+             "RECEIPT_WINDOW_EXCEEDS_REQUEST")
+    return decision["outcome"]
+
+
+def reconstruct(original: dict, attenuation: Any, codes: list[str]) -> dict:
+    exact(attenuation, {"mode", "original_request_hash", "effective_request_hash", "changes",
+                        "effective_constraints", "require_new_permit"})
+    need(type(attenuation["require_new_permit"]) is bool, "SCHEMA_INVALID")
+    need(attenuation["mode"] in ("narrow", "require_new_permit"), "UNSUPPORTED_TRANSFORMATION")
+    need(attenuation["mode"] != "require_new_permit" or attenuation["require_new_permit"], "SCHEMA_INVALID")
+    changes = attenuation["changes"]
+    need(type(changes) is list and len(changes) == 1, "UNSUPPORTED_TRANSFORMATION")
+    change = changes[0]
+    exact(change, {"op", "path", "from", "to", "reason_code"})
+    need(change["op"] == "replace" and change["path"] == "/constraints/max_amount/value",
+         "UNSUPPORTED_TRANSFORMATION")
+    need(change["reason_code"] == "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+         and change["reason_code"] in codes, "ATTENUATION_REASON_MISMATCH")
+    old = original["constraints"]["max_amount"]["value"]
+    need(type(change["from"]) is str and change["from"] == old, "ATTENUATION_FROM_MISMATCH")
+    need(amount(change["to"]) < amount(old), "CONSTRAINT_NOT_NARROWED")
+    result = copy.deepcopy(original)
+    result["constraints"]["max_amount"]["value"] = change["to"]
+    return result
+
+
+def assess_request_binding(receipt_bytes: bytes, artifacts: Mapping[str, bytes], *,
+                           required_contract: str = CONTRACT,
+                           expected_admission_request_ref: dict | None = None) -> dict:
+    """Return a receiver-generated assessment; never fetch URLs or mutate inputs.
+
+    The expected admission reference must come from the receiver's selected
+    request. A declaration or a self-reported pass inside a receipt is not a pin.
+    """
+    text(required_contract)
+    need(type(receipt_bytes) is bytes and isinstance(artifacts, Mapping), "SCHEMA_INVALID")
+    report: dict = {"contract": ASSESSMENT, "required_contract": required_contract,
+                    "receipt_digest": digest(receipt_bytes), "status": "not_checked", "pass": None,
+                    "binding_requirement_met": False, "decision_allows_immediate_execution": False,
+                    "checks": []}
+    check = "receipt.json"
+
+    def passed(name: str) -> None:
+        report["checks"].append({"name": name, "status": "checked", "pass": True})
+
+    try:
+        receipt = decode(receipt_bytes)
+        need(type(receipt) is dict, "SCHEMA_INVALID")
+        passed(check)
+        check = "binding.contract"
+        if "request_binding" not in receipt:
+            raise Unavailable("BINDING_NOT_DECLARED")
+        binding = receipt["request_binding"]
+        exact(binding, {"contract", "preimage_profile", "canonicalization", "transformation_profile",
+                        "admission_request_ref", "original_ref"}, {"effective_ref"})
+        if (required_contract != CONTRACT or binding["contract"] != CONTRACT
+                or binding["preimage_profile"] != PREIMAGE_PROFILE
+                or binding["canonicalization"] != CANONICALIZATION
+                or binding["transformation_profile"] != TRANSFORMATION_PROFILE):
+            raise Unavailable("UNSUPPORTED_BINDING_PROFILE")
+        for key in ("admission_request_ref", "original_ref", "effective_ref"):
+            if key in binding:
+                validate_reference(binding[key])
+        passed(check)
+        check = "receiver.admission_request"
+        if expected_admission_request_ref is None:
+            raise Unavailable("EXPECTED_ADMISSION_REQUEST_NOT_SUPPLIED")
+        validate_reference(expected_admission_request_ref)
+        need(binding["admission_request_ref"] == expected_admission_request_ref, "ADMISSION_REFERENCE_MISMATCH")
+        passed(check)
+        loaded: dict = {}
+        for name, field in (("original", "original_ref"), ("admission", "admission_request_ref")):
+            check = name + ".artifact"
+            loaded[name] = resolve(binding[field], artifacts)
+            passed(check)
+        original, request = loaded["original"], loaded["admission"]
+        check = "original.profile"
+        validate_operation(original)
+        passed(check)
+        check = "original.admission_binding"
+        validate_admission(request, original)
+        passed(check)
+        check = "receipt.context"
+        decision = _receipt_context(receipt, request)
+        passed(check)
+        check = "receipt.evidence_references"
+        _receipt_evidence_references(receipt, request)
+        passed(check)
+        check = "effective.artifact"
+        if decision == "deny":
+            need("effective_ref" not in binding and "attenuation" not in receipt
+                 and "action_binding" not in receipt["request"], "DENIED_EFFECTIVE_REQUEST")
+            passed(check)
+        else:
+            if "effective_ref" not in binding:
+                raise Unavailable("EFFECTIVE_REFERENCE_NOT_SUPPLIED")
+            effective = resolve(binding["effective_ref"], artifacts)
+            validate_operation(effective)
+            passed(check)
+            check = "attenuation.reconstruction"
+            if decision == "allow":
+                need("attenuation" not in receipt, "UNEXPECTED_ATTENUATION")
+                need(effective == original, "ALLOW_REQUEST_CHANGED")
+            else:
+                reconstructed = reconstruct(original, receipt.get("attenuation"), receipt["decision"]["reason_codes"])
+                need(effective == reconstructed, "EFFECTIVE_RECONSTRUCTION_MISMATCH")
+                attenuation = receipt["attenuation"]
+                need(attenuation["original_request_hash"] == object_hash(original), "ORIGINAL_HASH_MISMATCH")
+                need(attenuation["effective_request_hash"] == object_hash(effective), "EFFECTIVE_HASH_MISMATCH")
+                need(attenuation["effective_constraints"] == effective["constraints"], "EFFECTIVE_CONSTRAINTS_MISMATCH")
+            passed(check)
+            check = "effective.action_binding"
+            need(receipt["request"].get("action_binding") == action_binding(effective), "ACTION_BINDING_MISMATCH")
+            passed(check)
+            check = "effective.payload_constraints"
+            need(payload_within_constraints(original) and payload_within_constraints(effective), "PAYLOAD_EXCEEDS_CONSTRAINTS")
+            passed(check)
+        report.update(status="checked", **{"pass": True}, binding_requirement_met=True,
+                      decision_allows_immediate_execution=(decision == "allow" or
+                          decision == "attenuate" and not receipt["attenuation"]["require_new_permit"]))
+    except Invalid as exc:
+        missing = isinstance(exc, Unavailable)
+        report["status"] = "not_checked" if missing else "checked"
+        report["pass"] = None if missing else False
+        report["checks"].append({"name": check, "status": report["status"],
+                                 "pass": report["pass"], "cause": exc.cause})
+    report["checks"].append({"name": "evidence.authentication", "status": "not_checked",
+                             "pass": None, "cause": "EVIDENCE_AUTHENTICATION_NOT_PERFORMED"})
+    report["checks"].append({"name": "execution.actual_input", "status": "not_checked",
+                             "pass": None, "cause": "EXECUTION_OBSERVATION_NOT_SUPPLIED"})
+    return report
+
+
+@dataclass(frozen=True)
+class BoundAdmission:
+    """Immutable bytes retained alongside the receiver's assessment."""
+
+    original: bytes
+    request: bytes
+    core_result: bytes
+    receipt: bytes
+    effective: bytes | None
+    assessment: bytes
+
+
+def admit_bound(verifier: Any, admission_request_bytes: bytes, original_bytes: bytes, *,
+                now: datetime, require_new_permit: bool = False) -> BoundAdmission:
+    """Evaluate policy/replay once, then bind the original and effective objects.
+
+    Malformed or mismatched preimages raise Invalid before core admission. A
+    valid purchase that cannot meet the effective cap receives a denial.
+    """
+    need(type(require_new_permit) is bool, "SCHEMA_INVALID")
+    need(isinstance(now, datetime) and now.tzinfo is not None and now.utcoffset() is not None,
+         "INVALID_EVALUATION_TIME")
+    original, request = decode(original_bytes), decode(admission_request_bytes)
+    validate_operation(original)
+    validate_admission(request, original)
+    # The new entry accepts only the policy fields actually evaluated here.
+    policy = decode(encode(verifier.policy))
+    exact(policy, set(), {"policy_id", "policy_version", "policy_ref", "allowed_actions", "max_amount"})
+    for key in ("policy_id", "policy_version", "policy_ref"):
+        if key in policy:
+            text(policy[key])
+    if "max_amount" in policy:
+        money(policy["max_amount"])
+    if "allowed_actions" in policy:
+        need(type(policy["allowed_actions"]) is list and bool(policy["allowed_actions"])
+             and all(isinstance(action, str) and action for action in policy["allowed_actions"]), "SCHEMA_INVALID")
+    # This entry implements local policy evaluation only. Never label a
+    # runtime/issuer/permit proof verified merely because its reference parses.
+    refs = request["evidence_refs"]
+    need(len(refs) == 1 and refs[0]["type"] == "local_policy", "UNSUPPORTED_ADMISSION_EVIDENCE")
+    need(refs[0]["uri"] == policy.get("policy_ref", "local")
+         and refs[0]["media_type"] == "application/json"
+         and refs[0]["digest"] == digest(encode(policy)), "LOCAL_POLICY_REFERENCE_MISMATCH")
+    with verifier._replay_transaction(request["request_id"]):
+        return _issue_bound(verifier, original, request, original_bytes, admission_request_bytes,
+                            now=now, require_new_permit=require_new_permit)
+
+
+def _issue_bound(verifier: Any, original: dict, request: dict, original_bytes: bytes,
+                 admission_request_bytes: bytes, *, now: datetime, require_new_permit: bool) -> BoundAdmission:
+    """Construct and validate every returned artifact inside the replay transaction."""
+    core_result = verifier._evaluate_policy(request, now=now)
+    receipt = copy.deepcopy(core_result["admission_receipt"])
+    decision = receipt["decision"]["outcome"]
+    effective = None
+    if decision in ("allow", "attenuate"):
+        effective = copy.deepcopy(original)
+        if decision == "attenuate":
+            attenuation = receipt["attenuation"]
+            effective["constraints"] = copy.deepcopy(attenuation["effective_constraints"])
+            attenuation["original_request_hash"] = object_hash(original)
+            attenuation["effective_request_hash"] = object_hash(effective)
+            attenuation["changes"][0]["from"] = original["constraints"]["max_amount"]["value"]
+            attenuation["require_new_permit"] = require_new_permit
+            attenuation["mode"] = "require_new_permit" if require_new_permit else "narrow"
+        if (not payload_within_constraints(original) or not payload_within_constraints(effective)
+                or decision == "allow" and require_new_permit):
+            receipt = verifier._make_receipt(request, now=now, outcome="deny", reason_codes=["POLICY_DENIED"])
+            effective = None
+    receipt["proof"] = {"format": "none"}
+    receipt["evidence"][0]["verification"] = {
+        "result": "verified", "checked_at": receipt["issued_at"], "method": "vate-local-policy-content-v1"}
+    receipt["request"]["constraints"] = copy.deepcopy(request["constraints"])
+    binding = {"contract": CONTRACT, "preimage_profile": PREIMAGE_PROFILE,
+               "canonicalization": CANONICALIZATION, "transformation_profile": TRANSFORMATION_PROFILE,
+               "admission_request_ref": reference(admission_request_bytes), "original_ref": reference(original_bytes)}
+    artifacts = {reference(raw)["uri"]: raw for raw in (original_bytes, admission_request_bytes)}
+    effective_bytes = None
+    if effective is not None:
+        effective_bytes = encode(effective)
+        binding["effective_ref"] = reference(effective_bytes)
+        artifacts[binding["effective_ref"]["uri"]] = effective_bytes
+        receipt["request"]["action_binding"] = action_binding(effective)
+    receipt["request_binding"] = binding
+    receipt_bytes = encode(receipt)
+    assessment = assess_request_binding(receipt_bytes, artifacts,
+                                        expected_admission_request_ref=reference(admission_request_bytes))
+    need(assessment["binding_requirement_met"], "GENERATED_BINDING_FAILED")
+    return BoundAdmission(original_bytes, admission_request_bytes, encode(core_result), receipt_bytes,
+                          effective_bytes, encode(assessment))
