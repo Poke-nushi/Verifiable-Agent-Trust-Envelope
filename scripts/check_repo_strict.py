@@ -143,6 +143,22 @@ def iter_example_pairs() -> list[tuple[str, str]]:
         (str(path.relative_to(ROOT)), "schemas/status-context.schema.json")
         for path in sorted((ROOT / "conformance" / "al2-vate-v0.3" / "fixtures").glob("status-*-context.json"))
     )
+    binding_root = "reference/request-binding"
+    for directory in (ROOT / "conformance/request-binding-v1/fixtures", ROOT / "examples/conformance/request-binding"):
+        for filename, schema in (
+            ("original.json", f"{binding_root}/schemas/operation.schema.json"),
+            ("effective.json", f"{binding_root}/schemas/operation.schema.json"),
+            ("admission-request.json", "schemas/admission-request.schema.json"),
+            ("admission-receipt.json", "schemas/admission-receipt.schema.json"),
+            ("post-execution.json", "schemas/post-execution-receipt.schema.json"),
+            ("binding-manifest.json", f"{binding_root}/schemas/artifact-manifest.schema.json"),
+        ):
+            pairs.extend((str(path.relative_to(ROOT)), schema) for path in directory.glob("*/" + filename))
+    pairs.extend((str(path.relative_to(ROOT)), "schemas/sut-result.schema.json")
+                 for path in (ROOT / "examples/conformance/request-binding").glob("sut-results-*.json"))
+    pairs.extend((str(path.relative_to(ROOT)), "conformance/request-binding-v1/conformance-case.schema.json")
+                 for path in (ROOT / "conformance/request-binding-v1/cases").glob("*.json"))
+    pairs.append(("conformance/request-binding-v1/corpus.json", "schemas/conformance-corpus.schema.json"))
     return sorted(set(pairs))
 
 
@@ -1108,6 +1124,59 @@ def main() -> int:
             first = errors[0]
             path = ".".join(str(part) for part in first.path) or "root"
             raise SystemExit(f"{example_rel} failed strict validation at {path}: {first.message}")
+
+    binding_root = ROOT / "reference/request-binding"
+    binding_example = binding_root / "examples/purchase-cap"
+    for name, schema_path in (
+        ("original.json", binding_root / "schemas/operation.schema.json"),
+        ("effective.json", binding_root / "schemas/operation.schema.json"),
+        ("admission-request.json", ROOT / "schemas/admission-request.schema.json"),
+        ("admission-receipt.json", ROOT / "schemas/admission-receipt.schema.json"),
+        ("post-execution.json", ROOT / "schemas/post-execution-receipt.schema.json"),
+        ("assessment.json", binding_root / "schemas/assessment.schema.json"),
+    ):
+        schema = load_json(schema_path)
+        Draft202012Validator.check_schema(schema)
+        Draft202012Validator(schema, format_checker=format_checker).validate(load_json(binding_example / name))
+    binding_schema = load_json(binding_root / "schemas/binding.schema.json")
+    Draft202012Validator.check_schema(binding_schema)
+    Draft202012Validator(binding_schema).validate(
+        load_json(binding_example / "admission-receipt.json")["request_binding"])
+    for path in (ROOT / "conformance/request-binding-v1/fixtures").glob("*/admission-receipt.json"):
+        Draft202012Validator(binding_schema).validate(load_json(path)["request_binding"])
+    # Avoid a remote resolver while retaining the full assessment schema.
+    assessment_schema = load_json(binding_root / "schemas/assessment.schema.json")
+    embedded_assessment = {key: value for key, value in assessment_schema.items() if key not in ("$schema", "$id")}
+    report_schema = load_json(ROOT / "schemas/conformance-report.schema.json")
+    if report_schema["$defs"]["requestBindingAssessment"] != embedded_assessment:
+        raise SystemExit("conformance report request-binding assessment schema drift")
+    from vate_conformance import run_corpus, compare_sut_results
+    corpus = ROOT / "conformance/request-binding-v1"
+    reports = [run_corpus(corpus)] + [compare_sut_results(corpus, ROOT / "examples/conformance/request-binding" / filename)
+        for filename in ("sut-results-fixtures.json", "sut-results-generated.json")]
+    for report in reports:
+        if report.get("fatal_errors") or report["summary"]["failed"]:
+            raise SystemExit("request-binding runner sample failed")
+        Draft202012Validator(report_schema, format_checker=format_checker).validate(report)
+    # These are new-profile restrictions, not changes to legacy schemas.
+    operation_validator = Draft202012Validator(load_json(binding_root / "schemas/operation.schema.json"))
+    for bad_amount in (True, 25, "25.00\n", "01.00"):
+        operation = load_json(binding_example / "original.json")
+        operation["payload"]["amount"]["value"] = bad_amount
+        if operation_validator.is_valid(operation):
+            raise SystemExit("request-binding operation schema accepted an invalid amount")
+    operation = load_json(binding_example / "original.json")
+    operation["constraints"]["unknown_limit"] = True
+    if operation_validator.is_valid(operation):
+        raise SystemExit("request-binding operation schema accepted an unknown constraint")
+    for field in ("uri", "digest"):
+        binding = load_json(binding_example / "admission-receipt.json")["request_binding"]
+        if field == "uri":
+            binding["original_ref"]["uri"] += "\n"
+        else:
+            binding["original_ref"]["digest"]["value"] += "\n"
+        if Draft202012Validator(binding_schema).is_valid(binding):
+            raise SystemExit("request-binding schema accepted a line-terminated reference")
 
     sut_result_schema = load_json(ROOT / "schemas/sut-result.schema.json")
     sut_result_validator = Draft202012Validator(

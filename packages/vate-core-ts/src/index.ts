@@ -6,3 +6,4 @@ export * from "./external-json-digest.js";
 export * from "./jcs-es256.js";
 export * from "./artifact-reference.js";
 export * from "./sut-result.js";
+export * from "./request-binding.js";

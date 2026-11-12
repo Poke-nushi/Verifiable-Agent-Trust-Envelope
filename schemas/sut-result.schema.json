@@ -234,6 +234,15 @@
               "type": "string",
               "minLength": 1
             }
+          },
+          "request_binding_artifacts": {
+            "$ref": "#/$defs/receiptArtifactRef",
+            "description": "Local raw-byte preimage manifest for a case-required request-binding assessment. The manifest is application/json; its digest covers the exact supplied bytes. The selected corpus case pins the admission request.",
+            "properties": {
+              "media_type": {
+                "const": "application/json"
+              }
+            }
           }
         },
         "additionalProperties": true

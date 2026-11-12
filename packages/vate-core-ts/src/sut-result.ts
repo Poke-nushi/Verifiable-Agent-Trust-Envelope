@@ -1,4 +1,5 @@
 import type {
+  DigestBoundReference,
   ProofArtifactReference,
   SutArtifactMode,
   SutExplicitInputArtifacts,
@@ -18,6 +19,7 @@ interface CreateSutResultEntryBase {
   reasonCodes: string[];
   artifactMode?: SutArtifactMode;
   generatedArtifacts?: SutGeneratedArtifacts;
+  requestBindingArtifacts?: DigestBoundReference;
   checks?: SutResultEntry["checks"];
   limitations?: string[];
 }
@@ -167,6 +169,9 @@ export function createSutResultEntry(
     ...(artifacts ? { artifacts } : {}),
     ...(input.generatedArtifacts
       ? { generated_artifacts: input.generatedArtifacts }
+      : {}),
+    ...(input.requestBindingArtifacts
+      ? { request_binding_artifacts: input.requestBindingArtifacts }
       : {}),
     ...(limitations.length > 0 ? { limitations } : {}),
   };

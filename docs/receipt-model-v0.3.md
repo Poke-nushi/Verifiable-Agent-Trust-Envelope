@@ -146,8 +146,9 @@ decision, transaction, runtime, and effective request hash, must be compared
 under the applicable profile. The validity window, replay state, and effective
 constraints must be validated separately.
 
-The current reference runner validates the required attenuation structure,
-checks that the declared original and effective hashes use the profile hash
+For cases without an opt-in request-binding requirement, the reference runner
+validates the required attenuation structure, checks that the declared original
+and effective hashes use the profile hash
 grammar and differ, and carries the declared `effective_request_hash` into
 post-execution equality checks. It does not verify that
 `original_request_hash` equals the admission receipt's `request.input_hash`,
@@ -156,6 +157,20 @@ receive or reconstruct the original and effective request preimages, apply
 `effective_request_hash` from such an object. The recorded hashes, changes, and
 constraints therefore describe the verifier's narrowing decision; they are not,
 by themselves, proof that the transformation was executed.
+
+The [request-binding extension contract](../reference/request-binding/CONTRACT.md)
+provides Python/TypeScript receiver checks for original, effective and
+admission-request preimages. The current Python `VateVerifier.admit` requires
+those preimages by default and rejects the old dictionary-only call.
+Its purchase-cap profile defines
+`input_hash = original_request_hash = H(original operation)` and reconstructs
+one maximum-amount reduction before checking the effective operation hash.
+The [reproducible example](../reference/request-binding/README.md) includes
+the preimages and a separate assessment. Ordinary `run`, `compare` and
+`verify-bundle` perform these checks for cases that explicitly require the new
+contract, as in the separate `conformance/request-binding-v1` corpus. The
+existing 76-case corpus retains its prior coverage. These checks do not observe
+actual execution.
 
 A matching digest establishes content linkage, not current authority by itself.
 The verifier still evaluates status or revocation, freshness, and the remaining

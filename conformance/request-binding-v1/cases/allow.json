@@ -1,0 +1,81 @@
+{
+  "version": "vate-conformance-0.3",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "case_id": "request-binding-allow",
+  "title": "Request binding: allow",
+  "category": "positive",
+  "purpose": "Check the selected purchase operation, admission context and effective constraints from raw preimages.",
+  "artifacts": {
+    "admission_request": "conformance/request-binding-v1/fixtures/allow/admission-request.json",
+    "admission_receipt": "conformance/request-binding-v1/fixtures/allow/admission-receipt.json",
+    "request_binding_manifest": "conformance/request-binding-v1/fixtures/allow/binding-manifest.json",
+    "post_execution_receipt": "conformance/request-binding-v1/fixtures/allow/post-execution.json"
+  },
+  "request_binding": {
+    "required_contract": "vate-request-binding-v1"
+  },
+  "expected": {
+    "admission_decision": "allow",
+    "should_execute": true,
+    "reason_codes": [
+      "EVIDENCE_VERIFIED",
+      "POLICY_MATCH"
+    ],
+    "checks": []
+  },
+  "linkage_checks": [
+    {
+      "kind": "admission_digest",
+      "artifact": "admission_receipt",
+      "post_execution_path": "admission.digest",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_ADMISSION_DIGEST_MISMATCH"
+    },
+    {
+      "kind": "admission_receipt_id",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_LINKAGE_MISMATCH"
+    },
+    {
+      "kind": "admission_decision",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_LINKAGE_MISMATCH"
+    },
+    {
+      "kind": "admission_executable",
+      "expect_valid": true,
+      "reason_code": "POST_EXEC_ADMISSION_DENIED"
+    },
+    {
+      "kind": "transaction_id",
+      "admission_path": "request.transaction_id",
+      "post_execution_path": "execution.transaction_id",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_TRANSACTION_MISMATCH"
+    },
+    {
+      "kind": "runtime",
+      "admission_path": "subject.runtime",
+      "post_execution_path": "execution.runtime",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_RUNTIME_MISMATCH"
+    },
+    {
+      "kind": "effective_request_hash",
+      "admission_path": "request.input_hash",
+      "post_execution_path": "execution.effective_request_hash",
+      "expect_match": true,
+      "reason_code": "POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH"
+    },
+    {
+      "kind": "admission_time_window",
+      "expect_valid": true,
+      "reason_code": "POST_EXEC_ADMISSION_EXPIRED"
+    },
+    {
+      "kind": "effective_constraints",
+      "expect_valid": true,
+      "reason_code": "POST_EXEC_EFFECTIVE_CONSTRAINTS_EXCEEDED"
+    }
+  ]
+}

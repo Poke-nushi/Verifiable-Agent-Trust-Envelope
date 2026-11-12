@@ -10,6 +10,12 @@ It is intentionally focused:
 - it returns one of three decisions: `allow`, `attenuate`, or `deny`
 - it emits a verifier-signed admission receipt
 
+This demo uses the earlier AER profile. `verification_report.request_binding`
+marks v0.3 purchase-cap preimage binding `not_checked` and the binding
+requirement unmet. For that contract, use the
+[current core admission API](../vate-verifier-core/README.md) and its bound
+original/effective request artifacts.
+
 ## Start Here
 
 If you want the fastest path:

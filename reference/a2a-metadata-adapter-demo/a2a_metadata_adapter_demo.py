@@ -6,7 +6,9 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import os
 import re
+import stat
 import sys
 from pathlib import Path
 from typing import Any
@@ -33,10 +35,20 @@ def load_core():
 
 
 core = load_core()
+binding = core.request_binding_module()
 
 
 def read_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def read_raw(path: Path) -> bytes:
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    with os.fdopen(fd, "rb") as stream:
+        binding.need(stat.S_ISREG(os.fstat(stream.fileno()).st_mode), "NOT_A_REGULAR_FILE")
+        raw = stream.read(binding.MAX_BYTES + 1)
+    binding.need(len(raw) <= binding.MAX_BYTES, "ARTIFACT_TOO_LARGE")
+    return raw
 
 
 def resolve_local_uri(uri: str) -> Path:
@@ -48,12 +60,33 @@ def resolve_local_uri(uri: str) -> Path:
     relative_path = Path(local_path)
     if relative_path.is_absolute() or ".." in relative_path.parts:
         raise ValueError(f"local URI must not escape the repository root: {uri}")
-    resolved = (ROOT / relative_path).resolve()
+    candidate = ROOT
+    for part in relative_path.parts:
+        candidate = candidate / part
+        if candidate.is_symlink():
+            raise ValueError("local URI must not use symlinks")
+    resolved = candidate.resolve()
     try:
         resolved.relative_to(ROOT)
     except ValueError as exc:
         raise ValueError(f"local URI must remain under the repository root: {uri}") from exc
-    return resolved
+    return candidate
+
+
+def original_request_bytes(task_message: dict[str, Any]) -> bytes:
+    """Demo envelope transport; the ordinary VATE/A2A metadata is unchanged."""
+    declaration = task_message.get("demo_request_binding")
+    binding.exact(declaration, {"contract", "original_ref"})
+    binding.need(declaration["contract"] == binding.CONTRACT, "UNSUPPORTED_BINDING_CONTRACT")
+    ref = declaration["original_ref"]
+    binding.exact(ref, {"uri", "media_type", "digest"})
+    binding.text(ref["uri"])
+    binding.need(ref["media_type"] == "application/json" and is_digest_descriptor(ref["digest"]),
+                 "SCHEMA_INVALID")
+    binding.exact(ref["digest"], {"alg", "value"})
+    raw = read_raw(resolve_local_uri(ref["uri"]))
+    binding.need(binding.digest(raw) == ref["digest"], "ORIGINAL_ARTIFACT_DIGEST_MISMATCH")
+    return raw
 
 
 def is_digest_descriptor(value: Any) -> bool:
@@ -367,6 +400,8 @@ def make_task_response(
     }
     if "demo_local_failure_source" in decision:
         response["demo_local_failure_source"] = decision["demo_local_failure_source"]
+    if "request_binding_assessment" in decision:
+        response["request_binding_assessment"] = decision["request_binding_assessment"]
     if decision["decision"] in {"allow", "attenuate"}:
         post_execution_receipt = build_post_execution_receipt(receipt)
         response["post_execution_metadata_example"] = {
@@ -427,7 +462,8 @@ def adapt_task_message(task_message: Any) -> dict[str, Any]:
     else:
         reference = metadata["admission_request"]
         try:
-            admission_request = read_json(resolve_local_uri(reference["uri"]))
+            admission_bytes = read_raw(resolve_local_uri(reference["uri"]))
+            admission_request = binding.decode(admission_bytes)
         except (ValueError, OSError, json.JSONDecodeError) as exc:
             decision = {
                 "decision": "deny",
@@ -451,7 +487,24 @@ def adapt_task_message(task_message: Any) -> dict[str, Any]:
                     ),
                 }
             else:
-                decision = verifier.admit(admission_request, now=core.parse_time("2026-05-04T03:00:30Z"))
+                try:
+                    binding.need(metadata["transaction_id"] == admission_request.get("transaction_id"),
+                                 "TRANSACTION_MISMATCH")
+                    original = original_request_bytes(task_message)
+                    result = verifier.admit(admission_bytes, original=original,
+                                            now=core.parse_time("2026-05-04T03:00:30Z"))
+                    receipt = binding.decode(result.receipt)
+                    decision = {
+                        "decision": receipt["decision"]["outcome"],
+                        "reason_codes": receipt["decision"]["reason_codes"],
+                        "admission_receipt": receipt,
+                        "request_binding_assessment": binding.decode(result.assessment),
+                    }
+                except (ValueError, TypeError, OSError) as exc:
+                    decision = {
+                        "decision": "deny", "reason_codes": ["SCHEMA_INVALID", "FAIL_CLOSED"],
+                        "admission_receipt": make_schema_invalid_receipt(metadata, str(exc)),
+                    }
 
     return make_task_response(task_message, metadata, decision)
 

@@ -5,20 +5,31 @@
     "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.3": {
       "profile": "VATE-AL2-Verifier-Admission-v0.3",
       "phase": "admission_requested",
-      "transaction_id": "txn-20260504-001",
+      "transaction_id": "op-purchase-cap-001",
       "assurance_level": "AL2",
       "admission_request": {
         "type": "admission_request",
-        "uri": "local:examples/admission-request.example.json",
+        "uri": "local:reference/a2a-metadata-adapter-demo/admission-request.example.json",
         "media_type": "application/vate-admission-request+json",
         "digest": {
           "alg": "sha-256",
-          "value": "f96bdc7abead77240e9fa0f1bd4ed0c9069f8c10bdddd8a4deac8a35ee1582af"
+          "value": "ca1ce47c57905a91e412f36286d7436c9f330df59e41fc95eac793f86d38e88f"
         }
       },
       "issuer": "did:web:agent.example",
       "issued_at": "2026-05-04T03:00:00Z",
       "expires_at": "2026-05-04T03:05:00Z"
+    }
+  },
+  "demo_request_binding": {
+    "contract": "vate-request-binding-v1",
+    "original_ref": {
+      "uri": "local:reference/a2a-metadata-adapter-demo/original-request.example.json",
+      "media_type": "application/json",
+      "digest": {
+        "alg": "sha-256",
+        "value": "e0272ba735d6130d200237f40af3faca183e8587cec54451f5dce8a3bcce0ec9"
+      }
     }
   }
 }

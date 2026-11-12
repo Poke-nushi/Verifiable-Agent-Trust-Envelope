@@ -8,6 +8,11 @@ It is intentionally limited:
 - it uses compact JWS packaging backed by local OpenSSL keys rather than a full VC stack
 - it is designed to illustrate artifact generation, status retrieval, and verification order
 
+This demo uses the earlier AER profile. Its report's `request_binding` field
+marks v0.3 purchase-cap preimage binding `not_checked` and the binding
+requirement unmet. The [current binding example](../request-binding/README.md)
+provides that separate assessment.
+
 ## Start Here
 
 If you only want one quick path through the demo:

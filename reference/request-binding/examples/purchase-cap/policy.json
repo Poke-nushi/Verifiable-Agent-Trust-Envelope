@@ -1,0 +1,1 @@
+{"allowed_actions":["commerce.purchase"],"max_amount":{"currency":"USD","value":"25.00"},"policy_id":"purchase-cap-example","policy_ref":"urn:vate:example:purchase-cap-policy","policy_version":"1"}

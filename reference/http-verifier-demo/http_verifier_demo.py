@@ -793,6 +793,9 @@ def verify_execute_request(
         },
         "failed_checks": sorted(check["name"] for check in checks if not check["ok"]),
         "passed_checks": sorted(check["name"] for check in checks if check["ok"]),
+        "request_binding": {"status": "not_checked", "pass": None,
+                            "binding_requirement_met": False,
+                            "cause": "LEGACY_AER_PROFILE"},
     }
     if decision == "attenuate":
         report["effective_constraints"] = effective_constraints

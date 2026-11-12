@@ -2,8 +2,9 @@
 
 ## Status
 
-This package provides digest, artifact-reference, SUT-result and explicitly
-selected JCS signature helpers for VATE draft implementation reviews.
+This package provides request-binding receiver checks, digest, artifact-reference,
+SUT-result and explicitly selected JCS signature helpers for VATE draft
+implementation reviews.
 
 It is package-private and unpublished. Use the Python conformance runner for
 corpus checks and external SUT comparisons. This package is not a production
@@ -20,6 +21,7 @@ The package currently covers:
 - digest-bound artifact reference checks against caller-supplied bytes;
 - schema-shaped SUT result entries for `schemas/sut-result.schema.json`;
 - distinct `corpus-fixture-validation` and `generated-receipts` evidence fields;
+- explicit original/effective request binding for the purchase-cap v1 contract;
 
 `stableJsonString`, `stableJsonBytes`, and `digestDescriptorForJson` use the
 [limited Python fixture input contract](../../docs/conformance/digest-basis.md#typescript-object-helper-input-contract).
@@ -35,6 +37,56 @@ The helper deliberately does not:
 - provide general JOSE, PKI, Sigstore, or signed git proof verification;
 - decide issuer trust, status freshness, replay, or local policy;
 - imply production readiness, endorsement, or general compatibility.
+
+## Check Request Binding
+
+`assessRequestBinding` checks the original operation, effective operation and
+admission context against a receipt using the
+[request-binding v1 contract](../../reference/request-binding/CONTRACT.md).
+Pass the original UTF-8 bytes in a native `Map`, keyed by their digest URIs,
+and the receiver's independently selected admission-request reference:
+
+```typescript
+import { assessRequestBinding, requestBindingReference } from "@vate/reference-core";
+
+const artifacts = new Map([
+  [requestBindingReference(originalBytes).uri, originalBytes],
+  [requestBindingReference(effectiveBytes).uri, effectiveBytes],
+  [requestBindingReference(admissionBytes).uri, admissionBytes],
+]);
+const assessment = assessRequestBinding(receiptBytes, artifacts, {
+  requiredContract: "vate-request-binding-v1",
+  expectedAdmissionRequestRef: requestBindingReference(receiverSelectedAdmissionBytes),
+});
+```
+
+All byte variables above are `Uint8Array`. For a denial, omit effective bytes.
+The required contract defaults to v1. Missing preimages, declarations or receiver
+pins leave `binding_requirement_met` false, including when the status is
+`not_checked`. A successful assessment on a denial or new-permit candidate
+still has `decision_allows_immediate_execution: false`. Neither field verifies
+issuer authority or an actual dispatch.
+
+Receipt evidence must preserve the selected admission's references, including
+type, URI, digest and protocol hint. Missing, extra or duplicate references fail
+the binding check. Evidence authentication is reported separately as
+`evidence.authentication: not_checked`, even if the receipt asserts verification.
+
+The checker reads raw JSON before canonicalizing: duplicate keys, floating-point
+tokens, unsafe integers and unpaired Unicode surrogates fail. Amounts use exact
+decimal-string comparisons. `requestBindingObjectHash` computes the canonical
+operation hash from strict raw JSON; `requestBindingReference` hashes exact bytes.
+Their digest bases are distinct. The fixture basis remains separate from JCS.
+
+`createSutResultEntry` accepts `requestBindingArtifacts` to include the local,
+digest-bound preimage-manifest reference consumed by the Python runner. It
+records the reference; `compare` performs the verification. See the
+[ordinary-runner example](../../reference/request-binding/README.md#use-the-ordinary-runner)
+for both SUT modes and bundle verification.
+
+The package implements the receiver check. Admission policy evaluation and the
+default `VateVerifier.admit` generation entry remain in Python. The parity tests invoke the
+Python checker and compare complete assessments for valid and mutated inputs.
 
 ## Check an External JCS Reference
 

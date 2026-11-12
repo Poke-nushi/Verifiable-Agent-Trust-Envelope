@@ -1,0 +1,219 @@
+{
+  "version": "vate-conformance-corpus-2026-09",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "name": "request-binding-v1",
+  "root": "conformance/request-binding-v1",
+  "case_schema": "conformance/request-binding-v1/conformance-case.schema.json",
+  "conformance_report_schema": "schemas/conformance-report.schema.json",
+  "implementation_report_schema": "schemas/implementation-report.schema.json",
+  "digest_basis": {
+    "alg": "sha-256",
+    "canonicalization": "JSON objects are sorted by key with insignificant whitespace removed before hashing.",
+    "manifest_excludes": [
+      "conformance/request-binding-v1/corpus.json"
+    ]
+  },
+  "summary": {
+    "case_count": 4,
+    "category_counts": {
+      "negative": 1,
+      "positive": 3
+    },
+    "artifact_count": 26
+  },
+  "digest": {
+    "alg": "sha-256",
+    "value": "23d2934e30207868ee40727050595d6aa306fd5f86ba3cf7a8f9bfaa375c0c99"
+  },
+  "cases": [
+    {
+      "case_id": "request-binding-allow",
+      "path": "conformance/request-binding-v1/cases/allow.json",
+      "category": "positive",
+      "title": "Request binding: allow",
+      "expected_outcome": "allow",
+      "expected_should_execute": true,
+      "expected_primary_reason_code": "EVIDENCE_VERIFIED",
+      "expected_reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "validation_focus": [],
+      "artifacts": {
+        "admission_request": "conformance/request-binding-v1/fixtures/allow/admission-request.json",
+        "admission_receipt": "conformance/request-binding-v1/fixtures/allow/admission-receipt.json",
+        "request_binding_manifest": "conformance/request-binding-v1/fixtures/allow/binding-manifest.json",
+        "post_execution_receipt": "conformance/request-binding-v1/fixtures/allow/post-execution.json"
+      }
+    },
+    {
+      "case_id": "request-binding-attenuate",
+      "path": "conformance/request-binding-v1/cases/attenuate.json",
+      "category": "positive",
+      "title": "Request binding: attenuate",
+      "expected_outcome": "attenuate",
+      "expected_should_execute": true,
+      "expected_primary_reason_code": "LOCAL_POLICY_MAX_AMOUNT_NARROWED",
+      "expected_reason_codes": [
+        "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+      ],
+      "validation_focus": [],
+      "artifacts": {
+        "admission_request": "conformance/request-binding-v1/fixtures/attenuate/admission-request.json",
+        "admission_receipt": "conformance/request-binding-v1/fixtures/attenuate/admission-receipt.json",
+        "request_binding_manifest": "conformance/request-binding-v1/fixtures/attenuate/binding-manifest.json",
+        "post_execution_receipt": "conformance/request-binding-v1/fixtures/attenuate/post-execution.json"
+      }
+    },
+    {
+      "case_id": "request-binding-deny-over-cap",
+      "path": "conformance/request-binding-v1/cases/deny-over-cap.json",
+      "category": "negative",
+      "title": "Request binding: deny-over-cap",
+      "expected_outcome": "deny",
+      "expected_should_execute": false,
+      "expected_primary_reason_code": "POLICY_DENIED",
+      "expected_reason_codes": [
+        "POLICY_DENIED"
+      ],
+      "validation_focus": [],
+      "artifacts": {
+        "admission_request": "conformance/request-binding-v1/fixtures/deny-over-cap/admission-request.json",
+        "admission_receipt": "conformance/request-binding-v1/fixtures/deny-over-cap/admission-receipt.json",
+        "request_binding_manifest": "conformance/request-binding-v1/fixtures/deny-over-cap/binding-manifest.json"
+      }
+    },
+    {
+      "case_id": "request-binding-new-permit",
+      "path": "conformance/request-binding-v1/cases/new-permit.json",
+      "category": "positive",
+      "title": "Request binding: new-permit",
+      "expected_outcome": "attenuate",
+      "expected_should_execute": false,
+      "expected_primary_reason_code": "LOCAL_POLICY_MAX_AMOUNT_NARROWED",
+      "expected_reason_codes": [
+        "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+      ],
+      "validation_focus": [],
+      "artifacts": {
+        "admission_request": "conformance/request-binding-v1/fixtures/new-permit/admission-request.json",
+        "admission_receipt": "conformance/request-binding-v1/fixtures/new-permit/admission-receipt.json",
+        "request_binding_manifest": "conformance/request-binding-v1/fixtures/new-permit/binding-manifest.json"
+      }
+    }
+  ],
+  "manifest": [
+    {
+      "path": "conformance/request-binding-v1/cases/allow.json",
+      "sha256": "0b646b9fb0ff130a940c2856a506ece55feb89b8911053e4f49bc610943fe39b"
+    },
+    {
+      "path": "conformance/request-binding-v1/cases/attenuate.json",
+      "sha256": "da166871ad6f4673fe4a324026526bc910a4a8537e1867ddbb33a757cbf9f258"
+    },
+    {
+      "path": "conformance/request-binding-v1/cases/deny-over-cap.json",
+      "sha256": "d5eb21083e992588d6a82c751f578297d0a5bb3961bd2b5721ea8abc664f8484"
+    },
+    {
+      "path": "conformance/request-binding-v1/cases/new-permit.json",
+      "sha256": "1033c6eed8228302d96ade50cd6dccc7d99dddb8e64d005e405da9a97d7c2203"
+    },
+    {
+      "path": "conformance/request-binding-v1/conformance-case.schema.json",
+      "sha256": "8488522ec76fb28a7af9c840d335c5645ff4af10dc8336da4bccb3b808840864"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/allow/admission-receipt.json",
+      "sha256": "70f334568b787d4547c02e6128552d7c70db7bf6790f440e1d95dd2b9bd72223"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/allow/admission-request.json",
+      "sha256": "750661237f1855610411ad93b2585bab42bff339139d7efbc6ba8c75c73f0be5"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/allow/binding-manifest.json",
+      "sha256": "c19cfe43aae5d0c4230ef0e859340c8915d15d035e61aecfb125a192bef1a519"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/allow/effective.json",
+      "sha256": "6dd7ee01102c6e472169d48dd7a56bd080ace8f981f85974e05e9b4f793aafc4"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/allow/original.json",
+      "sha256": "6dd7ee01102c6e472169d48dd7a56bd080ace8f981f85974e05e9b4f793aafc4"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/allow/post-execution.json",
+      "sha256": "ab91ad2277afe0e32230895df6e91f6d51336c558e317c0669b7dc6a3e8bd644"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/attenuate/admission-receipt.json",
+      "sha256": "bc7e122766d69ac87efa3e208a1d5074433951d2240f3214d4d173babf4b8899"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/attenuate/admission-request.json",
+      "sha256": "879f15856a6436c9fc83ddbad46f6b801754534ba16029e4a932375a512395fb"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/attenuate/binding-manifest.json",
+      "sha256": "efc018e64e869d67042bfe2298cb5a40e479853945fe3249e72207c7bdc40c89"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/attenuate/effective.json",
+      "sha256": "059b0645e5baaed5f71e8814cf2b5b1c36042fb70fb19323dbf40a3838ee0a9e"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/attenuate/original.json",
+      "sha256": "d11a013daf8d92cfd593275ebd676b482bd668a23c9cd7266fcc68f92cd87e29"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/attenuate/post-execution.json",
+      "sha256": "b27607310ff676e5895e1098f6eb87699340085383527fce7a2f208da89bdf71"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/deny-over-cap/admission-receipt.json",
+      "sha256": "650bbc1cc3f0f737b54049401c6f9f9db71c7828b13e83e3032da87df11477d3"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/deny-over-cap/admission-request.json",
+      "sha256": "bfad7b78f9b767080cb353389995ab6e3b35a1a58ce3b4bbadd85912e3384c7f"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/deny-over-cap/binding-manifest.json",
+      "sha256": "b2fe6099a8cb2df615918c434d4ef9648ef5c1727569d240d09b51a62cc215ba"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/deny-over-cap/original.json",
+      "sha256": "8d446d23a694c2ea42177a3f72d73f8003bc7b2b48f6c90f37acb7432742ef02"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/new-permit/admission-receipt.json",
+      "sha256": "20430e5b7c5f480e5a7f9eedf16a2dd0ab86a0069122f3ad655ec96e7053dc43"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/new-permit/admission-request.json",
+      "sha256": "a4624065da131b04eef2da91e175e27c381ee7f39840068f6e2893c9a3349fc1"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/new-permit/binding-manifest.json",
+      "sha256": "980be492d05d65c36974580b56fa15f310c0d419a3ba844d3115467a8a0cc63a"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/new-permit/effective.json",
+      "sha256": "527a87da233d570df04c0527c3bc539ff88d85b409a8800ef2f52f544e232866"
+    },
+    {
+      "path": "conformance/request-binding-v1/fixtures/new-permit/original.json",
+      "sha256": "545499315b303b9c7e8a1760c3771c4ed063edd62331085dc731946d29bc45de"
+    }
+  ],
+  "runner": {
+    "command": "python3 scripts/vate_conformance.py run --corpus-root conformance/request-binding-v1 --report /tmp/vate-conformance-report.json",
+    "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/request-binding-v1 --out conformance/request-binding-v1/corpus.json"
+  },
+  "limitations": [
+    "This corpus index is an implementation aid, not a production endorsement statement.",
+    "Passing the listed cases does not imply production readiness or endorsement."
+  ]
+}

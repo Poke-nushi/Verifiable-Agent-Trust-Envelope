@@ -14,12 +14,15 @@ import base64
 import binascii
 import copy
 import hashlib
+import importlib.util
 import json
 import math
 import re
+import shlex
 import sys
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterator
 
@@ -605,6 +608,14 @@ def case_envelope_failures(case: dict[str, Any]) -> list[str]:
                 "expected.post_execution_outcome: expected success, partial_success, "
                 "failed, or cancelled"
             )
+    if "request_binding" in case:
+        binding = case["request_binding"]
+        if (not isinstance(binding, dict) or set(binding) != {"required_contract"}
+                or not isinstance(binding.get("required_contract"), str) or not binding["required_contract"]):
+            failures.append("request_binding: expected a nonempty required_contract")
+        for field in ("admission_request", "admission_receipt", "request_binding_manifest"):
+            if not isinstance(case_artifacts(case).get(field), str) or not case_artifacts(case)[field]:
+                failures.append(f"request_binding requires artifacts.{field}")
     failures.extend(case_check_collection_failures(case))
     return failures
 
@@ -1135,8 +1146,11 @@ def make_corpus_index(corpus_root: Path) -> dict[str, Any]:
         "cases": cases,
         "manifest": manifest,
         "runner": {
-            "command": "python3 scripts/vate_conformance.py run --corpus-root conformance/al2-vate-v0.3 --report /tmp/vate-conformance-report.json",
-            "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/al2-vate-v0.3 --out conformance/al2-vate-v0.3/corpus.json",
+            "command": "python3 scripts/vate_conformance.py run --corpus-root "
+                       f"{shlex.quote(display_path(corpus_root.resolve()))} --report /tmp/vate-conformance-report.json",
+            "index_command": "python3 scripts/vate_conformance.py index --corpus-root "
+                             f"{shlex.quote(display_path(corpus_root.resolve()))} --out "
+                             f"{shlex.quote(display_path((corpus_root / CORPUS_INDEX_FILENAME).resolve()))}",
         },
         "limitations": [
             "This corpus index is an implementation aid, not a production endorsement statement.",
@@ -2474,6 +2488,7 @@ def validate_evidence_vocab_object(value: Any, *, label: str) -> list[str]:
 
 def evaluate_al2_context_checks(case: dict[str, Any]) -> list[str]:
     failures: list[str] = []
+    runtime_results: list[tuple[str, str, Any]] = []
     checks = case.get("al2_context_checks", [])
     raw_sut_inputs = case.get("sut_inputs")
     sut_inputs = raw_sut_inputs if isinstance(raw_sut_inputs, list) else []
@@ -2514,6 +2529,202 @@ def evaluate_al2_context_checks(case: dict[str, Any]) -> list[str]:
             failures.extend(evaluate_context_status_check(check, artifact))
         else:
             failures.append(f"al2_context {check.get('artifact')}: unsupported kind {kind}")
+        failures.extend(evaluate_context_record_binding(case, check, artifact, runtime_results))
+    failures.extend(evaluate_runtime_context_results(runtime_results))
+    return failures
+
+
+def evaluate_runtime_context_results(results: list[tuple[str, str, Any]]) -> list[str]:
+    """Combine binding and freshness for the single selected runtime evidence."""
+    if not results:
+        return []
+    by_kind: dict[str, set[str]] = {}
+    for kind, expected, _actual in results:
+        by_kind.setdefault(kind, set()).add(expected)
+    label = "al2_context runtime_attestation.record_binding"
+    conflicts = [f"{label}: conflicting {kind} context results"
+                 for kind, values in sorted(by_kind.items()) if len(values) != 1]
+    if conflicts:
+        return conflicts
+    # A matching runtime alone does not make a stale proof verified. A
+    # mismatch remains a failure even when the same proof is also stale.
+    if by_kind.get("binding") == {"failed"}:
+        expected_result = "failed"
+    elif by_kind.get("freshness") == {"stale"}:
+        expected_result = "stale"
+    else:
+        expected_result = "verified"
+    if any(actual != expected_result for _kind, _expected, actual in results):
+        return [f"{label}: evidence.verification.result must be {expected_result} for these context facts"]
+    return []
+
+
+def context_digest_matches(value: Any, expected: dict[str, str]) -> bool:
+    """Compare digest identity without removing permitted annotations."""
+    return isinstance(value, dict) and all(value.get(key) == expected[key] for key in ("alg", "value"))
+
+
+def evaluate_context_record_binding(
+    case: dict[str, Any], check: dict[str, Any], context: dict[str, Any],
+    runtime_results: list[tuple[str, str, Any]],
+) -> list[str]:
+    """Check declared context facts against records, without authenticating them.
+
+    A self-consistent context is not sufficient: the runtime, evidence result,
+    observation time and consume key must describe the selected admission.
+    These legacy contexts select one evidence entry by type. Multiple entries
+    require a different, explicit selection contract rather than first-match.
+    Runtime result observations are collected for a combined comparison after
+    every declared context has been checked; other results are checked here.
+    """
+    label = f"al2_context {check.get('artifact')}.record_binding"
+    failures: list[str] = []
+    receipt = load_artifact(case, "admission_receipt")
+    if not isinstance(receipt, dict):
+        return [f"{label}: admission_receipt must be available"]
+    request = receipt.get("request")
+    subject = receipt.get("subject")
+    decision = receipt.get("decision")
+    if not isinstance(request, dict) or any(
+        not isinstance(request.get(key), str) or not request[key]
+        for key in ("request_id", "transaction_id", "action", "input_hash")
+    ):
+        failures.append(f"{label}: receipt.request requires request/transaction/action/input identifiers")
+    if not isinstance(subject, dict) or any(
+        not isinstance(subject.get(key), str) or not subject[key]
+        for key in ("principal", "actor", "runtime")
+    ):
+        failures.append(f"{label}: receipt.subject requires principal, actor and runtime")
+    if not isinstance(decision, dict) or not is_string_enum(decision.get("outcome"), {"allow", "attenuate", "deny"}):
+        failures.append(f"{label}: receipt.decision.outcome must be allow, attenuate or deny")
+    if failures:
+        return failures
+
+    admission = None
+    if "admission_request" in case_artifacts(case):
+        admission = load_artifact(case, "admission_request")
+        if not isinstance(admission, dict):
+            failures.append(f"{label}: admission_request must be available")
+        else:
+            for key in ("request_id", "transaction_id", "action", "input_hash"):
+                if admission.get(key) != request[key]:
+                    failures.append(f"{label}: admission_request.{key} differs from receipt.request.{key}")
+            for key in ("principal", "actor", "runtime"):
+                if admission.get(key) != subject[key]:
+                    failures.append(f"{label}: admission_request.{key} differs from receipt.subject.{key}")
+
+    kind = check.get("kind")
+    evidence_type = None
+    expected_result = None
+    expected_status = None
+    authority_digest = None
+    if kind == "binding":
+        if context.get("binding") != "runtime":
+            return failures + [f"{label}: unsupported context binding subject"]
+        evidence_type = "runtime_attestation"
+        if context.get("actual") != subject["runtime"]:
+            failures.append(f"{label}: context.actual differs from receipt.subject.runtime")
+        expected_result = "verified" if context.get("actual") == context.get("expected") else "failed"
+    elif kind in ("freshness", "status"):
+        if not is_string_enum(context.get("source"), {"runtime_attestation", "status_bundle"}):
+            return failures + [f"{label}: unsupported context source"]
+        evidence_type = context["source"]
+        if kind == "status" and evidence_type != "status_bundle":
+            return failures + [f"{label}: status context requires status_bundle"]
+        if evidence_type == "status_bundle":
+            shape_failures = status_context_shape_failures(context, label)
+            if shape_failures:
+                return failures + shape_failures
+        if evidence_type == "status_bundle" and context.get("availability") == "unavailable":
+            expected_result = "unavailable"
+            expected_status = "unavailable"
+        else:
+            observed = try_parse_time(context.get("checked_at"))
+            source_time = try_parse_time(context.get("source_issued_at"))
+            max_age = context.get("max_age_seconds", check.get("max_age_seconds"))
+            if observed is None or source_time is None or type(max_age) is not int or max_age < 0:
+                return failures + [f"{label}: context freshness facts must be valid"]
+            fresh = 0 <= (observed - source_time).total_seconds() <= max_age
+            expected_result = "verified" if fresh else "stale"
+            if evidence_type == "status_bundle":
+                expected_status = context.get("status")
+                if expected_status == "revoked":
+                    expected_result = "failed"
+    elif kind == "replay":
+        evidence_type = "admission_request"
+        expected_result = "verified" if context.get("state") == "unused" else "failed"
+        expected_status = context.get("state")
+        inputs = case.get("sut_inputs", [])
+        authority_inputs = [item for item in inputs if isinstance(item, dict)
+                            and item.get("role") == "normalized_payment_authority"] if isinstance(inputs, list) else []
+        if "consume_key_basis" in context or authority_inputs:
+            evidence_type = "payment_mandate"
+            basis = context.get("consume_key_basis")
+            if (len(authority_inputs) != 1 or not isinstance(basis, dict)
+                    or not isinstance(basis.get("artifact"), str)
+                    or basis["artifact"] != authority_inputs[0].get("artifact")
+                    or basis.get("canonicalization") != "json-sorted-no-whitespace-vate-v0.3-fixture"):
+                return failures + [f"{label}: consume_key_basis must select the declared normalized authority"]
+            authority, error = read_case_artifact(case, basis["artifact"])
+            if error:
+                return failures + [f"{label}: consume_key_basis authority unavailable: {error}"]
+            authority_digest = digest_descriptor(authority)
+            if not context_digest_matches(basis.get("digest"), authority_digest):
+                failures.append(f"{label}: consume_key_basis.digest differs from normalized authority content")
+            expected_key = "vate-fixture-json-sha256:" + authority_digest["value"]
+            if context.get("replay_key") != expected_key:
+                failures.append(f"{label}: consume_key replay_key differs from normalized authority digest")
+            authority_constraints = authority.get("constraints")
+            authority_nonce = authority_constraints.get("replay_nonce") if isinstance(authority_constraints, dict) else None
+            if context.get("nonce") == expected_key or context.get("nonce") == authority_nonce:
+                failures.append(f"{label}: consume_key observation nonce must differ from authority nonce and key")
+        elif context.get("replay_key") != request["request_id"] + ":" + str(context.get("nonce")):
+            failures.append(f"{label}: replay_key must bind receipt.request.request_id and context.nonce")
+        checked = try_parse_time(context.get("checked_at"))
+        if "first_seen_at" in context or is_string_enum(context.get("state"), {"consumed", "replayed"}):
+            first = try_parse_time(context.get("first_seen_at"))
+            if first is None or checked is None or first > checked:
+                failures.append(f"{label}: first_seen_at must be valid and no later than checked_at")
+    else:
+        return failures + [f"{label}: unsupported context kind"]
+
+    items = receipt.get("evidence")
+    if not isinstance(items, list) or not all(isinstance(item, dict) for item in items):
+        return failures + [f"{label}: receipt.evidence must be an array of evidence objects"]
+    selected = [item for item in items if item.get("type") == evidence_type]
+    if len(selected) != 1:
+        return failures + [f"{label}: receipt.evidence must select exactly one {evidence_type} entry"]
+    evidence = selected[0]
+    verification = evidence.get("verification")
+    if not isinstance(verification, dict):
+        return failures + [f"{label}: selected evidence.verification must be an object"]
+    if evidence_type == "runtime_attestation":
+        runtime_results.append((kind, expected_result, verification.get("result")))
+    elif verification.get("result") != expected_result:
+        failures.append(f"{label}: evidence.verification.result must be {expected_result} for these context facts")
+    if expected_status is not None and "status_result" in verification and verification["status_result"] != expected_status:
+        failures.append(f"{label}: evidence.verification.status_result differs from context state")
+    optional_unavailable = (evidence_type == "status_bundle" and expected_result == "unavailable"
+                            and context.get("required") is False)
+    if expected_result != "verified" and not optional_unavailable and decision["outcome"] != "deny":
+        failures.append(f"{label}: failed context requires receipt.decision.outcome=deny")
+
+    evidence_time = try_parse_time(verification.get("checked_at"))
+    receipt_time = try_parse_time(receipt.get("issued_at"))
+    if evidence_time is None or receipt_time is None or evidence_time > receipt_time:
+        failures.append(f"{label}: evidence checked_at must be valid and no later than receipt.issued_at")
+    if kind != "binding" or "checked_at" in context:
+        context_time = try_parse_time(context.get("checked_at"))
+        if context_time is None or context_time != evidence_time:
+            failures.append(f"{label}: context.checked_at differs from evidence.verification.checked_at")
+    if authority_digest is not None:
+        if not context_digest_matches(evidence.get("digest"), authority_digest):
+            failures.append(f"{label}: consume_key authority differs from receipt evidence digest")
+        refs = admission.get("evidence_refs") if isinstance(admission, dict) else None
+        matching = [ref for ref in refs if isinstance(ref, dict) and ref.get("type") == evidence_type
+                    and ref.get("uri") == evidence.get("uri")] if isinstance(refs, list) else []
+        if len(matching) != 1 or not context_digest_matches(matching[0].get("digest"), authority_digest):
+            failures.append(f"{label}: consume_key authority differs from admission_request evidence reference")
     return failures
 
 
@@ -2815,6 +3026,89 @@ def evaluate_context_replay_check(check: dict[str, Any], artifact: dict[str, Any
     return failures
 
 
+@lru_cache(maxsize=1)
+def request_binding_support() -> Any:
+    path = ROOT / "reference/request-binding/runner_binding.py"
+    spec = importlib.util.spec_from_file_location("vate_runner_request_binding", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("request-binding adapter unavailable")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def evaluate_request_binding(case: dict[str, Any], *, sut_result: dict[str, Any] | None = None,
+                             sut_results_path: Path | None = None,
+                             artifact_mode: str | None = None) -> dict[str, Any] | None:
+    if "request_binding" not in case:
+        if sut_result is not None and "request_binding_artifacts" in sut_result:
+            return {"assessment": None, "failures": ["request_binding_artifacts: case does not require binding"]}
+        return None
+    failures: list[str] = []
+    assessment = None
+    try:
+        config = case["request_binding"]
+        if (not isinstance(config, dict) or set(config) != {"required_contract"}
+                or not isinstance(config.get("required_contract"), str) or not config["required_contract"]):
+            raise ValueError("invalid required binding contract")
+        receipt_path = resolve_artifact_path(case, "admission_receipt")
+        manifest_path = resolve_artifact_path(case, "request_binding_manifest")
+        receipt_digest = manifest_digest = None
+        if sut_results_path is not None:
+            if sut_result is None:
+                raise ValueError("binding artifacts missing from SUT result")
+            manifest_ref = sut_result.get("request_binding_artifacts")
+            failures.extend(sut_artifact_ref_failures(manifest_ref, "request_binding_artifacts", require_media_type=True))
+            if not isinstance(manifest_ref, dict) or manifest_ref.get("media_type") != "application/json":
+                raise ValueError("request_binding_artifacts must reference an application/json manifest")
+            manifest_path, path_failures = resolve_sut_generated_artifact_path(
+                manifest_ref, sut_results_path, "request_binding_artifacts", reject_symlinks=True)
+            failures.extend(path_failures)
+            manifest_digest = manifest_ref.get("digest")
+            if artifact_mode == SUT_ARTIFACT_MODE_GENERATED:
+                generated = sut_result.get("generated_artifacts")
+                receipt_ref = generated.get("admission_receipt") if isinstance(generated, dict) else None
+                failures.extend(sut_artifact_ref_failures(receipt_ref, "binding.admission_receipt", require_media_type=True))
+                if not isinstance(receipt_ref, dict):
+                    raise ValueError("generated admission receipt required for binding")
+                receipt_path, path_failures = resolve_sut_generated_artifact_path(
+                    receipt_ref, sut_results_path, "binding.admission_receipt", reject_symlinks=True)
+                failures.extend(path_failures)
+                receipt_digest = receipt_ref.get("digest")
+            if failures or receipt_path is None or manifest_path is None:
+                raise ValueError("invalid SUT binding artifact references")
+        assessment = request_binding_support().assess(
+            required_contract=config["required_contract"], receipt_path=receipt_path,
+            admission_path=resolve_artifact_path(case, "admission_request"), manifest_path=manifest_path,
+            receipt_digest=receipt_digest, manifest_digest=manifest_digest,
+        )
+        if not assessment["binding_requirement_met"]:
+            failures.extend(check["cause"] for check in assessment["checks"]
+                            if "cause" in check and check["name"] not in {
+                                "execution.actual_input", "evidence.authentication"})
+            if not failures:
+                failures.append("required request binding was not established")
+    except (OSError, ValueError, TypeError) as exc:
+        failures.append(str(exc))
+    return {"assessment": assessment, "failures": failures}
+
+
+def request_binding_coverage(cases: list[dict[str, Any]]) -> dict[str, Any]:
+    """Report preimage coverage separately from fixture/implementation matches."""
+    required = [case for case in cases if case.get("request_binding_required") is True]
+    satisfied = 0
+    for case in required:
+        block = case.get("request_binding")
+        assessment = block.get("assessment") if isinstance(block, dict) else None
+        if (isinstance(assessment, dict) and block.get("failures") == []
+                and assessment.get("status") == "checked" and assessment.get("pass") is True
+                and assessment.get("binding_requirement_met") is True):
+            satisfied += 1
+    return {"required_cases": len(required), "satisfied_cases": satisfied,
+            "not_required_cases": len(cases) - len(required),
+            "all_cases_satisfied": bool(cases) and satisfied == len(cases)}
+
+
 def evaluate_case(case_path: Path) -> dict[str, Any]:
     case = read_json(case_path)
     admission_request = load_artifact(case, "admission_request")
@@ -2868,10 +3162,14 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
     failures.extend(evaluate_evidence_vocabulary_checks(admission_request, admission))
     failures.extend(evaluate_al2_context_checks(case))
     failures.extend(sut_input_contract_failures(case))
+    binding_result = evaluate_request_binding(case)
+    if binding_result is not None:
+        failures.extend("request_binding: " + failure for failure in binding_result["failures"])
 
-    return {
+    result = {
         "case_id": case["case_id"],
         "category": case["category"],
+        "request_binding_required": "request_binding" in case,
         "expected_outcome": expected,
         "actual_outcome": actual,
         "expected_should_execute": expected_execute,
@@ -2883,6 +3181,9 @@ def evaluate_case(case_path: Path) -> dict[str, Any]:
         "pass": not failures,
         "failures": failures,
     }
+    if binding_result is not None:
+        result["request_binding"] = binding_result
+    return result
 
 
 def run_corpus(corpus_root: Path) -> dict[str, Any]:
@@ -2921,6 +3222,7 @@ def run_corpus(corpus_root: Path) -> dict[str, Any]:
             "digest": digest,
         },
         "cases": cases,
+        "request_binding_coverage": request_binding_coverage(cases),
     }
     if not case_paths:
         fatal_errors.append("no conformance case files found")
@@ -3691,6 +3993,8 @@ def resolve_sut_generated_artifact_path(
     value: dict[str, Any],
     sut_results_path: Path,
     label: str,
+    *,
+    reject_symlinks: bool = False,
 ) -> tuple[Path | None, list[str]]:
     local_path = value.get("local_path")
     if local_path is not None and (not isinstance(local_path, str) or not local_path):
@@ -3709,24 +4013,35 @@ def resolve_sut_generated_artifact_path(
         return None, [f"{label}.local_path: parent traversal is not allowed"]
 
     artifact_root = sut_results_path.parent.resolve()
-    candidate = (artifact_root / raw_path).resolve()
-    if not candidate.is_relative_to(artifact_root):
+    candidate = artifact_root / raw_path
+    if reject_symlinks:
+        component = artifact_root
+        for part in raw_path.parts:
+            component /= part
+            if component.is_symlink():
+                return None, [f"{label}.local_path: symbolic links are not allowed"]
+    resolved = candidate.resolve()
+    if not resolved.is_relative_to(artifact_root):
         return None, [f"{label}.local_path: resolved path escapes the SUT result directory"]
     if not candidate.is_file():
         return None, [f"{label}: generated artifact file not found under {artifact_root.as_posix()}"]
-    return candidate, []
+    # Preserve the submitted path for the binding adapter's O_NOFOLLOW open.
+    return candidate if reject_symlinks else resolved, []
 
 
 def load_sut_generated_artifact(
     value: Any,
     sut_results_path: Path,
     label: str,
+    *,
+    require_request_binding: bool = False,
 ) -> tuple[dict[str, Any] | None, Path | None, list[str]]:
     failures = sut_artifact_ref_failures(value, label, require_media_type=True)
     if not isinstance(value, dict):
         return None, None, failures
 
-    path, path_failures = resolve_sut_generated_artifact_path(value, sut_results_path, label)
+    path, path_failures = resolve_sut_generated_artifact_path(
+        value, sut_results_path, label, reject_symlinks=require_request_binding)
     failures.extend(path_failures)
     if path is None:
         return None, None, failures
@@ -3743,9 +4058,12 @@ def load_sut_generated_artifact(
         return None, path, failures
 
     try:
-        with path.open("rb") as artifact_file:
-            raw_bytes = artifact_file.read(MAX_GENERATED_ARTIFACT_BYTES + 1)
-    except OSError as exc:
+        if require_request_binding:
+            raw_bytes = request_binding_support().read_raw(path)
+        else:
+            with path.open("rb") as artifact_file:
+                raw_bytes = artifact_file.read(MAX_GENERATED_ARTIFACT_BYTES + 1)
+    except (OSError, ValueError) as exc:
         failures.append(f"{label}: unable to read generated artifact: {exc}")
         return None, path, failures
     if len(raw_bytes) > MAX_GENERATED_ARTIFACT_BYTES:
@@ -3763,9 +4081,11 @@ def load_sut_generated_artifact(
         )
 
     try:
-        artifact_text = raw_bytes.decode("utf-8")
-        artifact = strict_json_loads(artifact_text)
-    except (UnicodeDecodeError, ValueError) as exc:
+        if require_request_binding:
+            artifact = request_binding_support().binding.decode(raw_bytes)
+        else:
+            artifact = strict_json_loads(raw_bytes.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError, RecursionError) as exc:
         failures.append(f"{label}: generated artifact must be a UTF-8 JSON object: {exc}")
         return None, path, failures
     if not isinstance(artifact, dict):
@@ -4134,6 +4454,7 @@ def generated_sut_artifact_failures(
                 generated.get("admission_receipt"),
                 sut_results_path,
                 label,
+                require_request_binding="request_binding" in case,
             )
             failures.extend(load_failures)
             admission_ref = generated.get("admission_receipt")
@@ -4216,8 +4537,7 @@ def generated_sut_artifact_failures(
                     )
 
     if (
-        case.get("category") == "linkage"
-        and generated_admission is not None
+        generated_admission is not None
         and generated_post is not None
         and expected_admission is not None
         and expected_post is not None
@@ -4237,18 +4557,19 @@ def generated_sut_artifact_failures(
         )
         generated_case = copy.deepcopy(case)
         generated_case.setdefault("artifacts", {})["admission_receipt"] = str(generated_admission_path)
-        generated_codes = actual_linkage_reason_codes(generated_case, generated_admission, generated_post)
-        if generated_codes != expected["expected_reason_codes"]:
-            failures.append(
-                "generated_artifacts.linkage.reason_codes: "
-                f"expected {expected['expected_reason_codes']} actual {generated_codes}"
-            )
-        generated_outcome = observed_outcome(generated_case, generated_admission, generated_post)
-        if generated_outcome != expected["expected_outcome"]:
-            failures.append(
-                "generated_artifacts.post_execution_receipt.result.outcome: "
-                f"expected {expected['expected_outcome']} actual {generated_outcome}"
-            )
+        if case.get("category") == "linkage":
+            generated_codes = actual_linkage_reason_codes(generated_case, generated_admission, generated_post)
+            if generated_codes != expected["expected_reason_codes"]:
+                failures.append(
+                    "generated_artifacts.linkage.reason_codes: "
+                    f"expected {expected['expected_reason_codes']} actual {generated_codes}"
+                )
+            generated_outcome = observed_outcome(generated_case, generated_admission, generated_post)
+            if generated_outcome != expected["expected_outcome"]:
+                failures.append(
+                    "generated_artifacts.post_execution_receipt.result.outcome: "
+                    f"expected {expected['expected_outcome']} actual {generated_outcome}"
+                )
         for failure in evaluate_linkage_checks(generated_case, generated_admission, generated_post):
             failures.append(f"generated_artifacts.linkage: {failure}")
         for failure in post_execution_policy_violation_token_failures(generated_post):
@@ -4513,6 +4834,7 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
         ]
         result = normalized_result["result"]
         failures = list(normalized_result["field_failures"])
+        failures.extend(evaluate_al2_context_checks(expected["case"]))
         artifact_mode = normalized_result["artifact_mode"]
         actual_outcome = normalized_result["actual_outcome"]
         actual_should_execute_value = normalized_result[
@@ -4593,10 +4915,15 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
                     "generated_artifacts: set artifact_mode to generated-receipts before claiming generated output"
                 )
 
+        binding_result = evaluate_request_binding(expected["case"], sut_result=result,
+                                                  sut_results_path=sut_results_path, artifact_mode=artifact_mode)
+        if binding_result is not None:
+            failures.extend("request_binding: " + failure for failure in binding_result["failures"])
         cases.append(
             {
                 "case_id": expected["case_id"],
                 "category": expected["category"],
+                "request_binding_required": "request_binding" in expected["case"],
                 "artifact_mode": artifact_mode,
                 "expected_outcome": expected["expected_outcome"],
                 "actual_outcome": actual_outcome,
@@ -4610,6 +4937,8 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
                 "failures": failures,
             }
         )
+        if binding_result is not None:
+            cases[-1]["request_binding"] = binding_result
 
     failed = sum(1 for case in cases if not case["pass"])
     skipped = normalized_sut_results["skipped_count"]
@@ -4641,6 +4970,7 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
             "implementation": sut_implementation,
         },
         "cases": cases,
+        "request_binding_coverage": request_binding_coverage(cases),
     }
     if fatal_errors:
         report["fatal_errors"] = fatal_errors
@@ -4882,6 +5212,80 @@ def artifact_mode_counts_contract_failures(
     return failures
 
 
+def json_value_equal(left: Any, right: Any) -> bool:
+    """Compare JSON structure without Python's boolean/number coercion."""
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, dict):
+        return left.keys() == right.keys() and all(json_value_equal(left[k], right[k]) for k in left)
+    if isinstance(left, list):
+        return len(left) == len(right) and all(json_value_equal(a, b) for a, b in zip(left, right))
+    return left == right
+
+
+def request_binding_report_contract_failures(value: Any, label: str) -> list[str]:
+    """Dependency-free validation of the closed request-binding report block."""
+    if not isinstance(value, dict):
+        return [f"{label}: expected object"]
+    failures: list[str] = []
+    if set(value) != {"assessment", "failures"}:
+        failures.append(f"{label}: expected exactly assessment and failures")
+    failures.extend(string_array_contract_failures(value.get("failures"), f"{label}.failures"))
+    assessment = value.get("assessment")
+    if assessment is None:
+        return failures
+    label += ".assessment"
+    if not isinstance(assessment, dict):
+        return failures + [f"{label}: expected object or null"]
+    fields = {"contract", "required_contract", "receipt_digest", "status", "pass", "binding_requirement_met",
+              "decision_allows_immediate_execution", "checks"}
+    if set(assessment) != fields:
+        failures.append(f"{label}: expected exactly {sorted(fields)}")
+    if assessment.get("contract") != "vate-request-binding-assessment-v1":
+        failures.append(f"{label}.contract: unsupported assessment contract")
+    failures.extend(non_empty_string_failure(assessment.get("required_contract"), f"{label}.required_contract"))
+    digest = assessment.get("receipt_digest")
+    failures.extend(digest_contract_failures(digest, f"{label}.receipt_digest"))
+    if isinstance(digest, dict) and set(digest) != {"alg", "value"}:
+        failures.append(f"{label}.receipt_digest: expected exactly alg and value")
+
+    def status_failures(item: dict[str, Any], path: str) -> list[str]:
+        status, passed = item.get("status"), item.get("pass")
+        if status == "checked":
+            return [] if type(passed) is bool else [f"{path}.pass: checked requires boolean"]
+        if status == "not_checked":
+            return [] if passed is None else [f"{path}.pass: not_checked requires null"]
+        return [f"{path}.status: expected checked or not_checked"]
+
+    failures.extend(status_failures(assessment, label))
+    for field in ("binding_requirement_met", "decision_allows_immediate_execution"):
+        if type(assessment.get(field)) is not bool:
+            failures.append(f"{label}.{field}: expected boolean")
+    if assessment.get("binding_requirement_met") is True and (
+            assessment.get("status") != "checked" or assessment.get("pass") is not True):
+        failures.append(f"{label}.binding_requirement_met: requires checked / true")
+    if (assessment.get("decision_allows_immediate_execution") is True
+            and assessment.get("binding_requirement_met") is not True):
+        failures.append(f"{label}.decision_allows_immediate_execution: requires binding_requirement_met")
+    checks = assessment.get("checks")
+    if not isinstance(checks, list) or not checks:
+        failures.append(f"{label}.checks: expected non-empty array")
+    else:
+        for index, check in enumerate(checks):
+            path = f"{label}.checks[{index}]"
+            if not isinstance(check, dict):
+                failures.append(f"{path}: expected object")
+                continue
+            required = {"name", "status", "pass"}
+            if not required <= set(check) <= required | {"cause"}:
+                failures.append(f"{path}: expected name, status, pass and optional cause")
+            failures.extend(non_empty_string_failure(check.get("name"), f"{path}.name"))
+            failures.extend(status_failures(check, path))
+            if "cause" in check:
+                failures.extend(non_empty_string_failure(check["cause"], f"{path}.cause"))
+    return failures
+
+
 def conformance_case_contract_failures(value: Any, label: str) -> list[str]:
     if not isinstance(value, dict):
         return [f"{label}: expected object"]
@@ -4950,6 +5354,10 @@ def conformance_case_contract_failures(value: Any, label: str) -> list[str]:
                 value.get("failures"), f"{label}.failures"
             )
         )
+    if "request_binding" in value:
+        failures.extend(request_binding_report_contract_failures(value["request_binding"], f"{label}.request_binding"))
+    if "request_binding_required" in value and type(value["request_binding_required"]) is not bool:
+        failures.append(f"{label}.request_binding_required: expected boolean")
     return failures
 
 
@@ -5138,6 +5546,16 @@ def conformance_report_contract_failures(report: dict[str, Any]) -> list[str]:
                 conformance_case_contract_failures(case, f"cases[{index}]")
             )
     failures.extend(conformance_summary_failures(report.get("summary"), cases))
+    if (isinstance(cases, list) and any(isinstance(case, dict)
+            and ("request_binding_required" in case or "request_binding" in case) for case in cases)
+            and "request_binding_coverage" not in report):
+        failures.append("request_binding_coverage: required for reports with binding coverage fields")
+    if "request_binding_coverage" in report:
+        if (not isinstance(cases, list) or any(not isinstance(case, dict)
+                or type(case.get("request_binding_required")) is not bool for case in cases)):
+            failures.append("request_binding_coverage: every case must state request_binding_required")
+        elif not json_value_equal(report["request_binding_coverage"], request_binding_coverage(cases)):
+            failures.append("request_binding_coverage: must equal the typed counts derived from cases")
     failures.extend(
         report_corpus_contract_failures(
             report.get("corpus"), "corpus", implementation=False
@@ -5378,6 +5796,9 @@ def conformance_case_expectation_failures(
         expected = expected_by_id.get(case_id)
         if expected is None:
             continue
+        binding_required = "request_binding" in expected["case"]
+        if (binding_required or "request_binding_required" in case) and case.get("request_binding_required") is not binding_required:
+            failures.append(f"conformance_report.cases[{index}].request_binding_required: does not match canonical case {case_id}")
         for field in fields:
             if case.get(field) != expected.get(field):
                 failures.append(
@@ -5551,6 +5972,17 @@ def verify_report_bundle(
             expected="valid authoritative SUT input contract",
             actual=failure,
         )
+
+    for _, case in case_records:
+        if case.get("al2_context_checks"):
+            context_failures = evaluate_al2_context_checks(case)
+            add_bundle_check(
+                checks,
+                f"al2_context.{case['case_id']}.correspondence",
+                not context_failures,
+                expected="context facts agree with selected admission records",
+                actual=context_failures,
+            )
 
     conformance_report = json_object_or_empty(raw_conformance_report, checks, "conformance_report")
     implementation_report = json_object_or_empty(raw_implementation_report, checks, "implementation_report")
@@ -6129,6 +6561,38 @@ def verify_report_bundle(
                 else None
             ),
         )
+
+    # A binding assertion must survive re-reading the original bytes, even if
+    # the SUT, conformance and implementation report digests were all updated.
+    binding_cases = {case["case_id"] for _, case in case_records if "request_binding" in case}
+    recorded_cases = conformance_cases if isinstance(conformance_cases, list) else []
+    asserted_cases = {case.get("case_id") for case in recorded_cases
+                      if isinstance(case, dict) and isinstance(case.get("case_id"), str) and "request_binding" in case}
+    if binding_cases or asserted_cases:
+        fresh = (compare_sut_results(corpus_root, sut_results_path) if sut_results_path is not None
+                 else run_corpus(corpus_root))
+        fresh_cases = {case["case_id"]: case for case in fresh["cases"]}
+        recorded = {case.get("case_id"): case for case in recorded_cases
+                    if isinstance(case, dict) and isinstance(case.get("case_id"), str)}
+        add_bundle_check(checks, "request_binding.coverage", asserted_cases == binding_cases,
+                         expected=sorted(binding_cases), actual=sorted(asserted_cases))
+        for case_id in sorted(binding_cases):
+            current = fresh_cases.get(case_id, {})
+            saved = recorded.get(case_id, {})
+            current_binding = current.get("request_binding")
+            add_bundle_check(checks, f"request_binding.{case_id}.recomputed",
+                             not fresh.get("fatal_errors") and current.get("pass") is True
+                             and isinstance(current_binding, dict) and not current_binding["failures"]
+                             and json_value_equal(saved.get("request_binding"), current_binding),
+                             expected="successful binding recomputed from supplied raw artifacts",
+                             actual=current_binding)
+
+    if binding_cases or asserted_cases or "request_binding_coverage" in conformance_report:
+        fresh_coverage = (fresh["request_binding_coverage"] if binding_cases or asserted_cases
+                          else request_binding_coverage([{"request_binding_required": False} for _ in case_records]))
+        add_bundle_check(checks, "request_binding.coverage_summary",
+                         json_value_equal(conformance_report.get("request_binding_coverage"), fresh_coverage),
+                         expected=fresh_coverage, actual=conformance_report.get("request_binding_coverage"))
 
     failed = sum(1 for check in checks if not check["pass"])
     report = {
