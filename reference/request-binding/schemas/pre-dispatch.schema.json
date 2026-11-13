@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:request-binding:pre-dispatch:v1",
+  "description": "Local checks before a synchronous dispatch callback. This record does not prove callback entry, remote acceptance or effects.",
+  "type": "object",
+  "properties": {
+    "contract": {"const": "vate-pre-dispatch-check-v1"},
+    "checked_at": {"type": "string", "format": "date-time"},
+    "usable_until": {"type": "string", "format": "date-time"},
+    "receipt_ref": {"$ref": "#/$defs/artifact"},
+    "admission_request_ref": {"$ref": "#/$defs/artifact"},
+    "original_ref": {"$ref": "#/$defs/artifact"},
+    "effective_ref": {"$ref": "#/$defs/artifact"},
+    "runtime_verification": {"$ref": "urn:vate:schema:request-binding:runtime-verification:v1"}
+  },
+  "required": ["contract", "checked_at", "usable_until", "receipt_ref", "admission_request_ref", "original_ref", "effective_ref", "runtime_verification"],
+  "additionalProperties": false,
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "properties": {
+        "uri": {"type": "string", "pattern": "^urn:sha256:[0-9a-f]{64}(?![\\s\\S])"},
+        "media_type": {"const": "application/json"},
+        "digest": {
+          "type": "object",
+          "properties": {
+            "alg": {"const": "sha-256"},
+            "value": {"type": "string", "pattern": "^[0-9a-f]{64}(?![\\s\\S])"}
+          },
+          "required": ["alg", "value"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["uri", "media_type", "digest"],
+      "additionalProperties": false
+    }
+  }
+}

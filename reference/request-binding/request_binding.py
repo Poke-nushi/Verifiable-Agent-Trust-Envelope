@@ -7,14 +7,18 @@ This module checks content relationships, not signatures or execution authority.
 from __future__ import annotations
 
 import copy
+from contextlib import contextmanager
 import hashlib
 import importlib.util
+import inspect
 import json
 import re
-from dataclasses import dataclass
-from datetime import datetime, timedelta
+import sys
+from dataclasses import dataclass, field, fields
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
+from threading import RLock
 from typing import Any, Callable, Mapping
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -31,6 +35,14 @@ HASH_RE = re.compile(r"[0-9a-f]{64}\Z")
 ACTION = "commerce.purchase"
 RUNTIME_CONTEXT = "vate-runtime-admission-context-v1"
 RUNTIME_VERIFICATION = "vate-runtime-evidence-verification-v1"
+PRE_DISPATCH = "vate-pre-dispatch-check-v1"
+# A timestamp-valid .pyc can execute stale code after a same-size source update.
+# Identify source only after it compiles to the code actually being executed.
+_source = Path(__file__).read_bytes()
+LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
+    and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
+        "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+del _source
 
 
 def _load_core() -> Any:
@@ -623,6 +635,311 @@ class BoundAdmission:
     runtime_verification: bytes | None = None
 
 
+@dataclass
+class _BoundaryState:
+    lock: Any = field(default_factory=RLock)
+    active: bool = False
+    clock_high: datetime | None = None
+
+
+@dataclass(frozen=True)
+class DispatchBoundary:
+    """Application-selected synchronous callback, clock and update order.
+
+    All writers of trust/configuration read by dispatch must use update().
+    The guard orders cooperating local updates; it cannot lock a remote issuer.
+    The callback receives only the admitted effective bytes and check record.
+    """
+
+    execute: Callable[[bytes, bytes], Any]
+    clock: Callable[[], datetime] = core.utc_now
+    _state: _BoundaryState = field(default_factory=_BoundaryState, init=False, repr=False, compare=False)
+
+    @contextmanager
+    def update(self):
+        """Serialize a local trust/configuration update with dispatch."""
+        with self._state.lock:
+            need(not self._state.active, "DISPATCH_REENTRANT_UPDATE")
+            yield
+
+    def _now(self) -> datetime:
+        try:
+            now = self.clock()
+            need(isinstance(now, datetime) and now.tzinfo is not None and now.utcoffset() is not None,
+                 "INVALID_DISPATCH_TIME")
+            # Same-zone datetime comparison ignores fold/offset changes. Use
+            # UTC instants so DST transitions cannot hide a clock rollback.
+            now = now.astimezone(timezone.utc)
+        except Invalid:
+            raise
+        except Exception:
+            raise Invalid("DISPATCH_CLOCK_UNAVAILABLE") from None
+        need(self._state.clock_high is None or now >= self._state.clock_high, "DISPATCH_CLOCK_ROLLBACK")
+        self._state.clock_high = now
+        return now
+
+
+@dataclass(frozen=True)
+class DispatchResult:
+    """Local pre-dispatch checks and the callback's unverified return value."""
+
+    checkpoint: bytes
+    value: Any
+
+
+class DispatchAttemptError(RuntimeError):
+    """Attempt consumed; callback entry and operation outcome are not established."""
+
+    def __init__(self, checkpoint: bytes) -> None:
+        super().__init__("DISPATCH_OUTCOME_UNCONFIRMED")
+        self.checkpoint = checkpoint
+
+
+@dataclass
+class _DispatchEntry:
+    bound: BoundAdmission
+    values: tuple
+    policy: bytes
+    adapter: RuntimeEvidenceVerifier
+    boundary: DispatchBoundary
+    verifier_id: str
+    fail_closed: bool
+    store: Any = None
+    store_configuration: bytes | None = None
+    attempted: bool = False
+
+
+def durable_state_module() -> Any:
+    """Load the optional installed store only when selected by the application."""
+    path = Path(__file__).with_name("durable_state.py").resolve()
+    existing = sys.modules.get("durable_state")
+    if existing is not None:
+        need(Path(getattr(existing, "__file__", "")).resolve() == path, "STATE_MODULE_CHANGED")
+        return existing
+    spec = importlib.util.spec_from_file_location("durable_state", path)
+    need(spec is not None and spec.loader is not None, "STATE_MODULE_UNAVAILABLE")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["durable_state"] = module
+    try:
+        spec.loader.exec_module(module)
+    except BaseException:
+        sys.modules.pop("durable_state", None)
+        raise
+    return module
+
+
+def _store_call(function, *args, **kwargs):
+    try:
+        return function(*args, **kwargs)
+    except durable_state_module().StateError as exc:
+        raise Invalid(exc.cause) from None
+
+
+def _selected_store(verifier: Any) -> Any:
+    store = verifier.state_store
+    need(type(store) is durable_state_module().DurableStateStore
+         and store.verifier_id == verifier.verifier_id, "STATE_CONFIGURATION_INVALID")
+    return store
+
+
+def _store_configuration(verifier: Any) -> bytes:
+    store = _selected_store(verifier)
+    adapter = verifier.runtime_evidence_verifier
+    _dispatch_configuration(verifier.dispatch_boundary, adapter)
+    need(vars(type(verifier)).get("_loaded_source_path") == Path(core.__file__).resolve()
+         and vars(type(verifier)).get("_loaded_source_sha256") == core.LOADED_SOURCE_SHA256,
+         "STATE_IMPLEMENTATION_CHANGED")
+    sources = {}
+    for module, relative in ((sys.modules[__name__], "reference/request-binding/request_binding.py"),
+                             (core, "reference/vate-verifier-core/vate_verifier_core.py"),
+                             (durable_state_module(), "reference/request-binding/durable_state.py")):
+        need(hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest() == module.LOADED_SOURCE_SHA256,
+             "STATE_IMPLEMENTATION_CHANGED")
+        sources[relative] = module.LOADED_SOURCE_SHA256
+    return encode({"contract": "vate-durable-admission-configuration-v1", "scope": store.scope,
+        "verifier_id": verifier.verifier_id, "policy": verifier.policy, "fail_closed": verifier.fail_closed,
+        "runtime_verifier": {"method": adapter.method, "media_type": adapter.media_type,
+            "max_age_seconds": adapter.max_age_seconds, "protocol_hint": adapter.protocol_hint}, "sources": sources})
+
+
+@dataclass(frozen=True)
+class StoredDispatchStatus:
+    state: str
+    record: bytes
+    checkpoint: bytes | None
+
+
+def dispatch_status(verifier: Any, request_id: str) -> StoredDispatchStatus:
+    store = _selected_store(verifier)
+    saved = _store_call(store.read, request_id)
+    checkpoint = saved["checkpoint"]
+    record = {"contract": "vate-durable-dispatch-status-v1", "store_anchor_digest": digest(store.anchor),
+        "scope": store.scope, "request_id": request_id, "operation_id": saved["operation_id"],
+        "state": saved["state"], "attempt_request_id": saved["attempt_request_id"],
+        "admission_request_ref": reference(saved["values"][1]), "receipt_ref": reference(saved["values"][3]),
+        "checkpoint_ref": reference(checkpoint) if checkpoint is not None else None}
+    return StoredDispatchStatus(saved["state"], encode(record), checkpoint)
+
+
+def restore_admission(verifier: Any, request_id: str) -> BoundAdmission:
+    store = _selected_store(verifier)
+    configuration = _store_configuration(verifier)
+    boundary = verifier.dispatch_boundary
+    with boundary._state.lock:
+        need(not boundary._state.active, "DISPATCH_REENTRANT")
+        saved = _store_call(store.read, request_id)
+        need(saved["executable"], "DISPATCH_NOT_EXECUTABLE")
+        need(saved["state"] == "ready", "DURABLE_OPERATION_ALREADY_ATTEMPTED")
+        need(saved["configuration"] == configuration, "STATE_CONFIGURATION_CHANGED")
+        bound = BoundAdmission(*saved["values"])
+        request = decode(bound.request)
+        need(request["request_id"] == request_id and request["transaction_id"] == saved["operation_id"],
+             "STATE_RECORD_CHANGED")
+        artifacts = {reference(raw)["uri"]: raw for raw in (bound.original, bound.request, bound.effective)}
+        assessment = assess_request_binding(bound.receipt, artifacts,
+            expected_admission_request_ref=reference(bound.request))
+        need(assessment["binding_requirement_met"] and assessment["decision_allows_immediate_execution"],
+             "DISPATCH_NOT_EXECUTABLE")
+        need(_store_configuration(verifier) == configuration, "STATE_CONFIGURATION_CHANGED")
+        with verifier._replay_lock:
+            verifier._seen_request_ids.add(request_id)
+            _register_dispatch(verifier, bound, verifier.policy, verifier.runtime_evidence_verifier,
+                               boundary, store_configuration=configuration)
+        return bound
+
+
+def _dispatch_configuration(boundary: Any, adapter: Any) -> None:
+    need(type(boundary) is DispatchBoundary and callable(boundary.execute) and callable(boundary.clock),
+         "INVALID_DISPATCH_BOUNDARY")
+    need(type(adapter) is RuntimeEvidenceVerifier, "DISPATCH_REQUIRES_RUNTIME_VERIFIER")
+    for function in (boundary.execute, getattr(boundary.execute, "__call__", None)):
+        need(not any(check(function) for check in (inspect.iscoroutinefunction,
+                 inspect.isgeneratorfunction, inspect.isasyncgenfunction)), "DISPATCH_CALLBACK_NOT_SYNCHRONOUS")
+
+
+def _bound_values(bound: BoundAdmission) -> tuple:
+    return tuple(getattr(bound, item.name) for item in fields(BoundAdmission))
+
+
+def _register_dispatch(verifier: Any, bound: BoundAdmission, policy: dict,
+                       adapter: Any, boundary: Any, *, store_configuration: bytes | None = None) -> None:
+    # Called only at the end of successful issuance, inside the replay lock.
+    if boundary is None or not decode(bound.assessment)["decision_allows_immediate_execution"]:
+        return
+    verifier._dispatch_entries[id(bound)] = _DispatchEntry(
+        bound, _bound_values(bound), encode(policy), adapter, boundary, verifier.verifier_id, verifier.fail_closed,
+        verifier.state_store, store_configuration)
+
+
+def dispatch_bound(verifier: Any, bound: BoundAdmission) -> DispatchResult:
+    """Reauthenticate immediately before invoking the configured callback once.
+
+    Only an admission issued or restored by this verifier is eligible. No caller
+    evaluation time, substitute operation, received verification result, or
+    new callback can be supplied to this entry point.
+    """
+    boundary = verifier.dispatch_boundary
+    _dispatch_configuration(boundary, verifier.runtime_evidence_verifier)
+    need(type(bound) is BoundAdmission, "DISPATCH_ADMISSION_NOT_ISSUED")
+    with boundary._state.lock:
+        need(not boundary._state.active, "DISPATCH_REENTRANT")
+        boundary._state.active = True
+        try:
+            with verifier._replay_lock:
+                entry = verifier._dispatch_entries.get(id(bound))
+                need(entry is not None and entry.bound is bound, "DISPATCH_ADMISSION_NOT_ISSUED")
+                need(not entry.attempted, "DISPATCH_ALREADY_ATTEMPTED")
+            need(_bound_values(bound) == entry.values, "DISPATCH_ADMISSION_CHANGED")
+
+            def configuration_unchanged() -> None:
+                need(verifier.dispatch_boundary is entry.boundary
+                     and verifier.runtime_evidence_verifier is entry.adapter
+                     and verifier.state_store is entry.store
+                     and verifier.verifier_id == entry.verifier_id
+                     and verifier.fail_closed == entry.fail_closed
+                     and encode(verifier.policy) == entry.policy, "DISPATCH_CONFIGURATION_CHANGED")
+                if entry.store is not None:
+                    need(_store_configuration(verifier) == entry.store_configuration, "STATE_CONFIGURATION_CHANGED")
+
+            def current_time() -> datetime:
+                return (boundary._now() if entry.store is None else
+                        _store_call(entry.store.observe_clock, boundary._now))
+
+            configuration_unchanged()
+            artifacts = {reference(raw)["uri"]: raw for raw in (bound.request, bound.original, bound.effective)}
+            assessment = assess_request_binding(bound.receipt, artifacts,
+                expected_admission_request_ref=reference(bound.request))
+            need(assessment["binding_requirement_met"] and assessment["decision_allows_immediate_execution"],
+                 "DISPATCH_NOT_EXECUTABLE")
+            request, receipt = decode(bound.request), decode(bound.receipt)
+            start, end = core.parse_time(receipt["issued_at"]), core.parse_time(receipt["expires_at"])
+
+            def in_window(instant: datetime, deadline: datetime) -> None:
+                need(start <= instant <= deadline, "DISPATCH_OUTSIDE_WINDOW")
+
+            now = current_time()
+            in_window(now, end)
+            ref, = (item for item in request["evidence_refs"] if item["type"] == "runtime_attestation")
+            verified = _verify_runtime_evidence(entry.adapter, ref, bound.runtime_evidence, request,
+                bound.request, bound.original, now)
+            configuration_unchanged()
+            deadline = min(end, core.parse_time(verified["usable_until"]))
+            checked_at = current_time()
+            in_window(checked_at, deadline)
+            checkpoint = encode({"contract": PRE_DISPATCH, "checked_at": core.iso(checked_at),
+                "usable_until": core.iso(deadline), "receipt_ref": reference(bound.receipt),
+                "admission_request_ref": reference(bound.request), "original_ref": reference(bound.original),
+                "effective_ref": reference(bound.effective), "runtime_verification": verified})
+            # Include verification and record construction time, not merely the
+            # time at entry. The final read also follows replay-lock contention
+            # with another admission; waiting must not bypass the deadline.
+            configuration_unchanged()
+            stored_digest = None
+            with verifier._replay_lock:
+                need(not entry.attempted, "DISPATCH_ALREADY_ATTEMPTED")
+                if entry.store is None:
+                    in_window(boundary._now(), deadline)
+                else:
+                    stored_digest = durable_state_module().record_digest(request["request_id"], request["transaction_id"],
+                        entry.store_configuration, entry.values, True)
+                    try:
+                        entry.store.claim(request["request_id"], entry.store_configuration, stored_digest,
+                            checkpoint, boundary._now, lambda instant: in_window(instant, deadline))
+                    except durable_state_module().StateError as exc:
+                        # A failed COMMIT may have persisted the claim. Never
+                        # treat this object's local state as retry authority.
+                        entry.attempted = True
+                        raise Invalid(exc.cause) from None
+                entry.attempted = True
+            # Never roll this state back: a raised callback can have effects.
+            # A callback return is not independently observed execution proof.
+            try:
+                if entry.store is not None:
+                    # Durable commit itself can outlive validity. Consumption
+                    # remains durable even when this final check stops entry.
+                    in_window(boundary._now(), deadline)
+                value = boundary.execute(bound.effective, checkpoint)
+                if inspect.iscoroutine(value):
+                    value.close()
+                need(not (inspect.isawaitable(value) or inspect.isgenerator(value) or inspect.isasyncgen(value)),
+                     "DISPATCH_DEFERRED_RESULT")
+                if entry.store is not None:
+                    entry.store.finish(request["request_id"], stored_digest, returned=True)
+                return DispatchResult(checkpoint, value)
+            except Exception:
+                # Distinguish an entered callback (including one raising
+                # Invalid) from a failed precheck, without exposing its data.
+                # BaseException interrupts still propagate with state consumed.
+                if entry.store is not None:
+                    try:
+                        entry.store.finish(request["request_id"], stored_digest, returned=False)
+                    except Exception:
+                        pass  # The already committed consumed fence remains.
+                raise DispatchAttemptError(checkpoint) from None
+        finally:
+            boundary._state.active = False
+
+
 def admit_bound(verifier: Any, admission_request_bytes: bytes, original_bytes: bytes, *,
                 now: datetime, require_new_permit: bool = False,
                 evidence_artifacts: Mapping[str, bytes] | None = None) -> BoundAdmission:
@@ -652,6 +969,11 @@ def admit_bound(verifier: Any, admission_request_bytes: bytes, original_bytes: b
     policy_refs = [ref for ref in refs if ref["type"] == "local_policy"]
     runtime_refs = [ref for ref in refs if ref["type"] == "runtime_attestation"]
     adapter = verifier.runtime_evidence_verifier
+    boundary = verifier.dispatch_boundary
+    store = verifier.state_store
+    store_configuration = _store_configuration(verifier) if store is not None else None
+    if boundary is not None:
+        _dispatch_configuration(boundary, adapter)
     if adapter is None:
         need(len(refs) == len(policy_refs) == 1, "UNSUPPORTED_ADMISSION_EVIDENCE")
     else:
@@ -675,10 +997,28 @@ def admit_bound(verifier: Any, admission_request_bytes: bytes, original_bytes: b
         # policy primitive can evaluate a policy different from the checked one.
         # Concurrent configuration writes remain unsupported by this API.
         need(_same_json(decode(encode(verifier.policy)), policy)
-             and verifier.runtime_evidence_verifier is adapter, "ADMISSION_CONFIGURATION_CHANGED")
-        return _issue_bound(verifier, original, request, original_bytes, admission_request_bytes,
-                            now=now, require_new_permit=require_new_permit,
-                            runtime_raw=runtime_raw, runtime_verification=runtime_verification)
+             and verifier.runtime_evidence_verifier is adapter and verifier.dispatch_boundary is boundary
+             and verifier.state_store is store,
+             "ADMISSION_CONFIGURATION_CHANGED")
+        def issue() -> BoundAdmission:
+            if store is not None:
+                need(_store_configuration(verifier) == store_configuration, "STATE_CONFIGURATION_CHANGED")
+            return _issue_bound(verifier, original, request, original_bytes, admission_request_bytes,
+                now=now, require_new_permit=require_new_permit, runtime_raw=runtime_raw,
+                runtime_verification=runtime_verification)
+
+        if store is None:
+            bound = issue()
+        else:
+            produced = []
+            def produce():
+                bound = issue()
+                produced.append(bound)
+                return _bound_values(bound), decode(bound.assessment)["decision_allows_immediate_execution"]
+            _store_call(store.issue, request["request_id"], request["transaction_id"], store_configuration, produce)
+            bound, = produced
+        _register_dispatch(verifier, bound, policy, adapter, boundary, store_configuration=store_configuration)
+        return bound
 
 
 def _issue_bound(verifier: Any, original: dict, request: dict, original_bytes: bytes,

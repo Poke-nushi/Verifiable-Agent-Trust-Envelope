@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:request-binding:durable-dispatch-status:v1",
+  "description": "Snapshot of trusted local attempt state. This record grants no execution permission and establishes no external effect.",
+  "type": "object",
+  "properties": {
+    "contract": {
+      "const": "vate-durable-dispatch-status-v1"
+    },
+    "store_anchor_digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "operation_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "state": {
+      "enum": [
+        "ready",
+        "not_executable",
+        "attempt_consumed",
+        "callback_returned",
+        "outcome_unknown",
+        "operation_already_attempted"
+      ]
+    },
+    "attempt_request_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "admission_request_ref": {
+      "$ref": "#/$defs/artifact"
+    },
+    "receipt_ref": {
+      "$ref": "#/$defs/artifact"
+    },
+    "checkpoint_ref": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/artifact"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "pattern": "^urn:sha256:[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "media_type": {
+          "const": "application/json"
+        },
+        "digest": {
+          "type": "object",
+          "properties": {
+            "alg": {
+              "const": "sha-256"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            }
+          },
+          "required": [
+            "alg",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "uri",
+        "media_type",
+        "digest"
+      ],
+      "additionalProperties": false
+    },
+    "digest": {
+      "type": "object",
+      "properties": {
+        "alg": {
+          "const": "sha-256"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        }
+      },
+      "required": [
+        "alg",
+        "value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "enum": [
+              "ready",
+              "not_executable"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "attempt_request_id": {
+            "type": "null"
+          },
+          "checkpoint_ref": {
+            "type": "null"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "attempt_request_id": {
+            "type": "string"
+          },
+          "checkpoint_ref": {
+            "$ref": "#/$defs/artifact"
+          }
+        }
+      }
+    }
+  ],
+  "required": [
+    "contract",
+    "store_anchor_digest",
+    "scope",
+    "request_id",
+    "operation_id",
+    "state",
+    "attempt_request_id",
+    "admission_request_ref",
+    "receipt_ref",
+    "checkpoint_ref"
+  ]
+}

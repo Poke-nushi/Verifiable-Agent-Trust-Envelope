@@ -143,14 +143,19 @@ continue to report `evidence.authentication` and `execution.actual_input` as
 conformance runner's request-binding coverage continues to measure content
 relationships, not execution of this authentication adapter.
 
-This contract does not supply a production JOSE/PKI or SPIFFE adapter. A protocol
-hint alone does not establish support for that protocol. The HMAC adapter in
+The optional [JWT/ES256 adapter](../runtime-jwt/README.md) implements one bounded
+signed-runtime profile with application-selected issuer grants. This contract
+does not supply production JOSE/PKI or SPIFFE processing. A protocol hint alone
+does not establish support for that protocol. The HMAC adapter in
 `test_runtime_evidence.py` is a test fixture using a per-test private key, not a
 public evidence format. It exercises authenticated-body verification and
 context/time rejection at this integration boundary.
 
-Checks use the supplied evaluation time; they do not observe dispatch, prove
-that an action ran, establish principal/actor authorization, or provide durable
-cross-process replay protection. Applications MUST recheck the applicable
-validity and revocation conditions at their execution boundary and MUST NOT
-change verifier configuration concurrently with admission.
+Admission checks use the supplied evaluation time. The optional
+[`VateVerifier.dispatch` entry](DISPATCH.md) repeats authentication and validity
+checks before a configured synchronous callback, with a shared guard for local
+trust updates. Applications using another execution path MUST implement its
+corresponding rechecks. Neither entry independently observes effects,
+establishes principal/actor authorization, or provides durable cross-process
+replay protection. Applications MUST NOT change verifier configuration
+concurrently with admission.

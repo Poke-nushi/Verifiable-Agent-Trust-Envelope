@@ -25,6 +25,12 @@ from typing import Any, Iterator
 
 PROFILE = "VATE-AL2-Verifier-Admission-v0.3"
 VERSION = "vate-0.3"
+# A timestamp-valid .pyc is not evidence that current source was executed.
+_source = Path(__file__).read_bytes()
+LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
+    and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
+        "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+del _source
 EXECUTABLE_ADMISSION_DECISIONS = {"allow", "attenuate"}
 SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 PROFILE_HASH_RE = re.compile(r"^sha-256:[0-9a-f]{64}$")
@@ -343,6 +349,11 @@ def request_binding_module() -> Any:
 class VateVerifier:
     """Small verifier core for AL2 admission examples."""
 
+    # Bind the actual policy implementation, even if binding loads this file
+    # again under another module name after a source update.
+    _loaded_source_path = Path(__file__).resolve()
+    _loaded_source_sha256 = LOADED_SOURCE_SHA256
+
     def __init__(
         self,
         *,
@@ -351,12 +362,17 @@ class VateVerifier:
         trust_bundle: dict[str, Any] | None = None,
         fail_closed: bool = True,
         runtime_evidence_verifier: Any | None = None,
+        dispatch_boundary: Any | None = None,
+        state_store: Any | None = None,
     ) -> None:
         self.verifier_id = verifier_id
         self.policy = policy or {}
         self.trust_bundle = trust_bundle or {"issuers": []}
         self.fail_closed = fail_closed
         self.runtime_evidence_verifier = runtime_evidence_verifier
+        self.dispatch_boundary = dispatch_boundary
+        self.state_store = state_store
+        self._dispatch_entries: dict[int, Any] = {}
         self._seen_request_ids: set[str] = set()
         self._replay_lock = RLock()
         self._replay_transaction_state: dict[str, Any] | None = None
@@ -392,6 +408,22 @@ class VateVerifier:
         return request_binding_module().admit_bound(
             self, admission_request, original, now=now if now is not None else utc_now(),
             require_new_permit=require_new_permit, evidence_artifacts=evidence_artifacts)
+
+    def dispatch(self, admission: Any) -> Any:
+        """Recheck a locally issued admission before the configured callback.
+
+        Requires a DispatchBoundary configured before admission. See the
+        request-binding DISPATCH.md contract for local update/retry semantics.
+        """
+        return request_binding_module().dispatch_bound(self, admission)
+
+    def restore_admission(self, request_id: str) -> Any:
+        """Restore an unconsumed admission from the selected durable store."""
+        return request_binding_module().restore_admission(self, request_id)
+
+    def dispatch_status(self, request_id: str) -> Any:
+        """Read durable attempt state; this does not authorize execution."""
+        return request_binding_module().dispatch_status(self, request_id)
 
     def _evaluate_policy(self, admission_request: Any, *, now: datetime | None = None) -> dict[str, Any]:
         """Internal policy primitive; its receipt candidate has no preimage assurance.

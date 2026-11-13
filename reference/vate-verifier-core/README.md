@@ -53,6 +53,27 @@ configuration, missing or failed runtime evidence prevents admission. An
 the evidence's validity or freshness limit.
 The application supplies the trusted authentication adapter; the core does
 not choose keys or treat a submitted verification result as authentication.
+The optional [JWT/ES256 adapter](../runtime-jwt/README.md) supplies one signed
+runtime-evidence path with application-selected issuer grants.
+
+Configure a [`DispatchBoundary`](../request-binding/DISPATCH.md) before admission
+to use `verifier.dispatch(result)`. This entry rechecks the runtime evidence
+and current validity before passing the exact effective bytes to the
+application's synchronous callback. Trust updates use the same boundary's
+`update()` guard. Each issued object can enter the callback once per verifier
+instance; an uncertain callback outcome requires reconciliation. The
+[ES256 dispatch example](../runtime-jwt/README.md#recheck-before-dispatch)
+shows rejection after expiry or a locally delivered revocation.
+
+For restart and process coordination, configure the optional
+[`DurableStateStore`](../request-binding/DURABLE-STATE.md). It preserves request
+replay decisions and records an operation's consumed attempt before callback
+entry. Reopening requires the store's independently retained identity anchor.
+Use `restore_admission(request_id)` for pending work and
+`dispatch_status(request_id)` to inspect the local record. An uncertain
+attempt stays consumed until application/provider reconciliation; the API
+does not release it. The store uses Python's standard-library SQLite on one
+trusted local filesystem.
 
 `_evaluate_policy` is a private primitive that produces a receipt candidate
 without checking preimages. The file-set and S3 examples use it after their own
