@@ -358,4 +358,3 @@ class NativeFixture:
                 content = content.replace(secret, "[REDACTED_EPHEMERAL_CREDENTIAL]")
             (self.output / (name + ".log")).write_text(content)
         save(self.output / "EVENTS.json", self.events)
-
