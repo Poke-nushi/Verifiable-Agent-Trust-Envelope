@@ -79,10 +79,11 @@ Cached information expires under the selected age and expiry limits.
 
 ## Remaining integration work
 
-The issuing application must translate its real authentication and authorization
-decisions into these grants and securely operate the signing authority. The
-snapshot format is specific to this purchase profile; it does not consume
-arbitrary OAuth tokens or IAM responses. Selecting and rotating the authority's
+The [selected Hydra/OpenFGA issuer](../authority-issuer/README.md) translates one
+fixed authentication/authorization mapping into these grants and exercises
+native local revocation through dispatch. Broader IAM mappings and durable
+signing-key operation remain application responsibilities. The snapshot format
+is specific to this purchase profile. Selecting and rotating the authority's
 root key, migrating stored admissions across source changes, and arranging
 reliable update delivery require separate application policies.
 

@@ -113,8 +113,11 @@ The optional [authority update integration](reference/authority-updates/README.m
 connects signed runtime and caller permission snapshots to ordinary Python
 admission and durable dispatch. It adds verified HTTPS intake, persistent
 revision checks and local ordering between policy updates and dispatch callbacks.
-Connecting a real issuing authority's IAM decisions and maintaining remote update
-delivery remain application integration work.
+The [selected authority issuer](reference/authority-issuer/README.md) connects
+native Hydra introspection and an OpenFGA permission/delegation check to those
+snapshots in a controlled local fixture. Durable signing-key operation,
+supervised remote update delivery and independent deployment testing remain
+application integration work.
 
 The main-branch conformance corpus remains 76 cases / 217 manifest artifacts.
 The demonstration scenarios are separate from that corpus. See

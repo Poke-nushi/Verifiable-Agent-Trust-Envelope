@@ -65,9 +65,12 @@ permission/delegation at admission and durable dispatch. It complements the
 [authority update integration](../reference/authority-updates/README.md)
 authenticates complete signed policy snapshots, offers verified HTTPS intake,
 and retains revision checks across restarts. Local updates and dispatch callbacks
-share an ordered policy lease. Actual IAM-to-grant translation, root-key
-selection/migration, reliable remote update delivery and deployment-wide
-authority policy remain application responsibilities. These Python paths do
+share an ordered policy lease. The
+[selected Hydra/OpenFGA issuer](../reference/authority-issuer/README.md) adds one
+fixed IAM-to-grant mapping and a native loopback revocation/recovery fixture.
+Broader IAM mappings, durable signing-key operation, root-key selection/migration,
+supervised remote update delivery and deployment-wide authority policy remain
+application responsibilities. These Python paths do
 not establish the caller's or runtime's transport peer identity or
 hardware-backed runtime attestation.
 
