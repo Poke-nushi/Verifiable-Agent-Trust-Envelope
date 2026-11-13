@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:request-binding:runtime-verification:v1",
+  "description": "Local runtime adapter result bound to evidence and admission bytes. A received copy is not independent authentication.",
+  "type": "object",
+  "properties": {
+    "contract": {
+      "const": "vate-runtime-evidence-verification-v1"
+    },
+    "evidence_ref": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "media_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "type": "object",
+          "properties": {
+            "alg": {
+              "const": "sha-256"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            }
+          },
+          "required": [
+            "alg",
+            "value"
+          ],
+          "additionalProperties": true
+        },
+        "type": {
+          "const": "runtime_attestation"
+        },
+        "protocol_hint": {
+          "const": "spiffe"
+        }
+      },
+      "required": [
+        "uri",
+        "media_type",
+        "digest",
+        "type"
+      ],
+      "additionalProperties": true
+    },
+    "admission_request_ref": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "pattern": "^urn:sha256:[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "media_type": {
+          "const": "application/json"
+        },
+        "digest": {
+          "type": "object",
+          "properties": {
+            "alg": {
+              "const": "sha-256"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            }
+          },
+          "required": [
+            "alg",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "uri",
+        "media_type",
+        "digest"
+      ],
+      "additionalProperties": false
+    },
+    "original_ref": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "pattern": "^urn:sha256:[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "media_type": {
+          "const": "application/json"
+        },
+        "digest": {
+          "type": "object",
+          "properties": {
+            "alg": {
+              "const": "sha-256"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            }
+          },
+          "required": [
+            "alg",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "uri",
+        "media_type",
+        "digest"
+      ],
+      "additionalProperties": false
+    },
+    "context_hash": {
+      "type": "string",
+      "pattern": "^sha-256:[0-9a-f]{64}(?![\\s\\S])"
+    },
+    "runtime": {
+      "type": "string",
+      "minLength": 1
+    },
+    "audience": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issuer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "not_before": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "usable_until": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "max_age_seconds": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "verification": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "verified"
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "checked_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "result",
+        "method",
+        "checked_at"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "contract",
+    "evidence_ref",
+    "admission_request_ref",
+    "original_ref",
+    "context_hash",
+    "runtime",
+    "audience",
+    "issuer",
+    "issued_at",
+    "not_before",
+    "valid_until",
+    "usable_until",
+    "max_age_seconds",
+    "verification"
+  ],
+  "additionalProperties": false
+}

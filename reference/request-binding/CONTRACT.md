@@ -165,7 +165,8 @@ narrowing also receives a denial. The supported policy fields are policy_id,
 policy_version, policy_ref, allowed_actions and max_amount; provided values
 must be well formed. Unknown policy evaluators MUST be rejected.
 
-This default entry evaluates exactly one `local_policy` evidence reference.
+Without a configured runtime verifier, this entry evaluates exactly one
+`local_policy` evidence reference.
 Its `uri` MUST equal the verifier-selected policy's `policy_ref` (or `local`
 when absent), its `media_type` MUST be `application/json`, and its digest MUST
 equal SHA-256 of that policy under the canonical JSON basis above. The policy
@@ -173,6 +174,14 @@ comes from the verifier configuration; the request MUST NOT select or replace
 it. Missing, inconsistent, duplicate or unsupported evidence MUST be rejected
 before policy evaluation and replay-state consumption. Other evidence types
 require an adapter that implements their verification contract.
+
+The optional [runtime evidence integration](RUNTIME-EVIDENCE.md) requires one
+`runtime_attestation` alongside that local-policy reference. The verifier is
+selected by application configuration, and its authenticated result MUST match
+the exact evidence bytes, request context, runtime, audience and evaluation
+time. Configuring it makes runtime evidence mandatory; omission MUST NOT
+fall back to the local-policy-only path. This does not change the receiver
+assessment's `evidence.authentication: not_checked` result.
 
 The final receipt records this content check as `verification.result: verified`
 with `method: vate-local-policy-content-v1`, including when the policy or payload

@@ -12,10 +12,10 @@ import importlib.util
 import json
 import re
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTRACT = "vate-request-binding-v1"
@@ -29,6 +29,8 @@ MAX_SAFE_INTEGER = 9007199254740991
 AMOUNT_RE = re.compile(r"(?:0|[1-9][0-9]{0,17})(?:\.[0-9]{1,8})?\Z")
 HASH_RE = re.compile(r"[0-9a-f]{64}\Z")
 ACTION = "commerce.purchase"
+RUNTIME_CONTEXT = "vate-runtime-admission-context-v1"
+RUNTIME_VERIFICATION = "vate-runtime-evidence-verification-v1"
 
 
 def _load_core() -> Any:
@@ -492,6 +494,122 @@ def assess_request_binding(receipt_bytes: bytes, artifacts: Mapping[str, bytes],
 
 
 @dataclass(frozen=True)
+class RuntimeEvidenceContext:
+    """Immutable expectations supplied to a verifier-selected adapter."""
+
+    admission_request: bytes
+    original: bytes
+    evidence_reference: bytes
+    context_hash: str
+    runtime: str
+    audience: str
+    now: datetime
+
+
+@dataclass(frozen=True)
+class AuthenticatedRuntimeClaims:
+    """Adapter output derived from authenticated evidence, never received JSON.
+
+    The adapter authenticates the issuer's authority for the runtime and these
+    claims. All times use the supported RFC3339 form; valid_until is inclusive.
+    Principal/actor authority and execution are not established by this result.
+    """
+
+    artifact_sha256: str
+    context_hash: str
+    runtime: str
+    audience: str
+    issuer: str
+    issued_at: str
+    not_before: str
+    valid_until: str
+
+
+@dataclass(frozen=True)
+class RuntimeEvidenceVerifier:
+    """Trusted application configuration, not a request-selected verifier.
+
+    verify must authenticate the exact bytes, use independently configured
+    trust material, and return AuthenticatedRuntimeClaims or raise on failure.
+    """
+
+    method: str
+    media_type: str
+    max_age_seconds: int
+    verify: Callable[[bytes, RuntimeEvidenceContext], AuthenticatedRuntimeClaims]
+    protocol_hint: str | None = None
+
+
+def runtime_context_hash(admission_request_bytes: bytes, original_bytes: bytes) -> str:
+    """Hash the validated request and policy refs, excluding runtime proof refs.
+
+    Excluding the runtime proof's reference avoids hashing a proof into itself.
+    The full admission bytes, including that reference, remain receipt-bound.
+    """
+    request, original = decode(admission_request_bytes), decode(original_bytes)
+    validate_operation(original)
+    validate_admission(request, original)
+    context = {**request, "evidence_refs": [ref for ref in request["evidence_refs"]
+                                           if ref["type"] != "runtime_attestation"]}
+    return object_hash({"contract": RUNTIME_CONTEXT, "admission": context})
+
+
+def _verify_runtime_evidence(adapter: Any, ref: dict, raw: bytes, request: dict,
+                             admission_bytes: bytes, original_bytes: bytes,
+                             now: datetime) -> dict:
+    need(type(adapter) is RuntimeEvidenceVerifier, "INVALID_RUNTIME_VERIFIER")
+    need(type(adapter.method) is str and bool(adapter.method)
+         and type(adapter.media_type) is str and bool(adapter.media_type)
+         and type(adapter.max_age_seconds) is int and adapter.max_age_seconds > 0
+         and callable(adapter.verify)
+         and (adapter.protocol_hint is None or type(adapter.protocol_hint) is str
+              and adapter.protocol_hint in core.ALLOWED_PROTOCOL_HINTS_BY_TYPE["runtime_attestation"]),
+         "INVALID_RUNTIME_VERIFIER")
+    try:
+        freshness_window = timedelta(seconds=adapter.max_age_seconds)
+    except OverflowError:
+        raise Invalid("INVALID_RUNTIME_VERIFIER") from None
+    need(ref["media_type"] == adapter.media_type and ref.get("protocol_hint") == adapter.protocol_hint,
+         "UNSUPPORTED_RUNTIME_EVIDENCE_FORMAT")
+    need(type(raw) is bytes and 0 < len(raw) <= MAX_BYTES, "INVALID_RUNTIME_EVIDENCE_BYTES")
+    raw_digest = digest(raw)
+    need(ref["digest"]["value"] == raw_digest["value"], "RUNTIME_EVIDENCE_DIGEST_MISMATCH")
+    context = RuntimeEvidenceContext(
+        admission_bytes, original_bytes, encode(ref),
+        runtime_context_hash(admission_bytes, original_bytes), request["runtime"], request["audience"], now)
+    try:
+        claims = adapter.verify(raw, context)
+    except Exception:
+        # Adapter diagnostics may contain native proof/key material. Return a
+        # stable failure without copying those details into an admission error.
+        raise Invalid("RUNTIME_EVIDENCE_VERIFICATION_FAILED") from None
+    need(type(claims) is AuthenticatedRuntimeClaims, "INVALID_RUNTIME_VERIFICATION_RESULT")
+    need(all(type(value) is str and bool(value) for value in (
+        claims.artifact_sha256, claims.context_hash, claims.runtime, claims.audience,
+        claims.issuer, claims.issued_at, claims.not_before, claims.valid_until)),
+        "INVALID_RUNTIME_VERIFICATION_RESULT")
+    need(claims.artifact_sha256 == raw_digest["value"], "RUNTIME_VERIFICATION_ARTIFACT_MISMATCH")
+    need(claims.context_hash == context.context_hash, "RUNTIME_VERIFICATION_CONTEXT_MISMATCH")
+    need(claims.runtime == request["runtime"], "RUNTIME_VERIFICATION_SUBJECT_MISMATCH")
+    need(claims.audience == request["audience"], "RUNTIME_VERIFICATION_AUDIENCE_MISMATCH")
+    issued, not_before, valid_until = (core.safe_parse_time(value) for value in
+                                      (claims.issued_at, claims.not_before, claims.valid_until))
+    need(issued is not None and not_before is not None and valid_until is not None
+         and issued <= valid_until and not_before <= valid_until, "INVALID_RUNTIME_EVIDENCE_WINDOW")
+    need(issued <= now and not_before <= now <= valid_until, "RUNTIME_EVIDENCE_OUTSIDE_WINDOW")
+    need(now - issued <= freshness_window, "RUNTIME_EVIDENCE_STALE")
+    # Avoid datetime overflow even for a large, otherwise valid max age.
+    usable_until = valid_until if freshness_window >= valid_until - issued else issued + freshness_window
+    return {"contract": RUNTIME_VERIFICATION, "evidence_ref": copy.deepcopy(ref),
+            "admission_request_ref": reference(admission_bytes), "original_ref": reference(original_bytes),
+            "context_hash": context.context_hash, "runtime": claims.runtime, "audience": claims.audience,
+            "issuer": claims.issuer, "issued_at": claims.issued_at, "not_before": claims.not_before,
+            "valid_until": claims.valid_until, "usable_until": core.iso(usable_until),
+            "max_age_seconds": adapter.max_age_seconds,
+            "verification": {"result": "verified", "checked_at": core.iso(now), "method": adapter.method}}
+
+
+@dataclass(frozen=True)
 class BoundAdmission:
     """Immutable bytes retained alongside the receiver's assessment."""
 
@@ -501,10 +619,13 @@ class BoundAdmission:
     receipt: bytes
     effective: bytes | None
     assessment: bytes
+    runtime_evidence: bytes | None = None
+    runtime_verification: bytes | None = None
 
 
 def admit_bound(verifier: Any, admission_request_bytes: bytes, original_bytes: bytes, *,
-                now: datetime, require_new_permit: bool = False) -> BoundAdmission:
+                now: datetime, require_new_permit: bool = False,
+                evidence_artifacts: Mapping[str, bytes] | None = None) -> BoundAdmission:
     """Evaluate policy/replay once, then bind the original and effective objects.
 
     Malformed or mismatched preimages raise Invalid before core admission. A
@@ -527,20 +648,42 @@ def admit_bound(verifier: Any, admission_request_bytes: bytes, original_bytes: b
     if "allowed_actions" in policy:
         need(type(policy["allowed_actions"]) is list and bool(policy["allowed_actions"])
              and all(isinstance(action, str) and action for action in policy["allowed_actions"]), "SCHEMA_INVALID")
-    # This entry implements local policy evaluation only. Never label a
-    # runtime/issuer/permit proof verified merely because its reference parses.
     refs = request["evidence_refs"]
-    need(len(refs) == 1 and refs[0]["type"] == "local_policy", "UNSUPPORTED_ADMISSION_EVIDENCE")
-    need(refs[0]["uri"] == policy.get("policy_ref", "local")
-         and refs[0]["media_type"] == "application/json"
-         and refs[0]["digest"] == digest(encode(policy)), "LOCAL_POLICY_REFERENCE_MISMATCH")
+    policy_refs = [ref for ref in refs if ref["type"] == "local_policy"]
+    runtime_refs = [ref for ref in refs if ref["type"] == "runtime_attestation"]
+    adapter = verifier.runtime_evidence_verifier
+    if adapter is None:
+        need(len(refs) == len(policy_refs) == 1, "UNSUPPORTED_ADMISSION_EVIDENCE")
+    else:
+        # Configuring runtime verification makes the proof mandatory. Removing
+        # it must not downgrade this call to local-policy-only admission.
+        need(len(refs) == 2 and len(policy_refs) == len(runtime_refs) == 1,
+             "RUNTIME_EVIDENCE_REQUIRED")
+    policy_ref = policy_refs[0]
+    need(policy_ref["uri"] == policy.get("policy_ref", "local")
+         and policy_ref["media_type"] == "application/json"
+         and policy_ref["digest"] == digest(encode(policy)), "LOCAL_POLICY_REFERENCE_MISMATCH")
+    need(evidence_artifacts is None or isinstance(evidence_artifacts, Mapping), "INVALID_EVIDENCE_ARTIFACTS")
+    artifacts = dict(evidence_artifacts) if evidence_artifacts is not None else {}
+    expected_uris = {ref["uri"] for ref in runtime_refs}
+    need(set(artifacts) == expected_uris, "EVIDENCE_ARTIFACT_SET_MISMATCH")
+    runtime_raw = artifacts[runtime_refs[0]["uri"]] if runtime_refs else None
+    runtime_verification = (_verify_runtime_evidence(adapter, runtime_refs[0], runtime_raw, request,
+                            admission_request_bytes, original_bytes, now) if runtime_refs else None)
     with verifier._replay_transaction(request["request_id"]):
+        # Detect configuration changes made during an adapter call before the
+        # policy primitive can evaluate a policy different from the checked one.
+        # Concurrent configuration writes remain unsupported by this API.
+        need(_same_json(decode(encode(verifier.policy)), policy)
+             and verifier.runtime_evidence_verifier is adapter, "ADMISSION_CONFIGURATION_CHANGED")
         return _issue_bound(verifier, original, request, original_bytes, admission_request_bytes,
-                            now=now, require_new_permit=require_new_permit)
+                            now=now, require_new_permit=require_new_permit,
+                            runtime_raw=runtime_raw, runtime_verification=runtime_verification)
 
 
 def _issue_bound(verifier: Any, original: dict, request: dict, original_bytes: bytes,
-                 admission_request_bytes: bytes, *, now: datetime, require_new_permit: bool) -> BoundAdmission:
+                 admission_request_bytes: bytes, *, now: datetime, require_new_permit: bool,
+                 runtime_raw: bytes | None, runtime_verification: dict | None) -> BoundAdmission:
     """Construct and validate every returned artifact inside the replay transaction."""
     core_result = verifier._evaluate_policy(request, now=now)
     receipt = copy.deepcopy(core_result["admission_receipt"])
@@ -561,8 +704,15 @@ def _issue_bound(verifier: Any, original: dict, request: dict, original_bytes: b
             receipt = verifier._make_receipt(request, now=now, outcome="deny", reason_codes=["POLICY_DENIED"])
             effective = None
     receipt["proof"] = {"format": "none"}
-    receipt["evidence"][0]["verification"] = {
-        "result": "verified", "checked_at": receipt["issued_at"], "method": "vate-local-policy-content-v1"}
+    for item in receipt["evidence"]:
+        item["verification"] = ({"result": "verified", "checked_at": receipt["issued_at"],
+                                 "method": "vate-local-policy-content-v1"}
+                                if item["type"] == "local_policy" else
+                                copy.deepcopy(runtime_verification["verification"]))
+    if runtime_verification is not None and receipt["decision"]["outcome"] != "deny":
+        deadline = runtime_verification["usable_until"]
+        if core.parse_time(deadline) < core.parse_time(receipt["expires_at"]):
+            receipt["expires_at"] = deadline
     receipt["request"]["constraints"] = copy.deepcopy(request["constraints"])
     binding = {"contract": CONTRACT, "preimage_profile": PREIMAGE_PROFILE,
                "canonicalization": CANONICALIZATION, "transformation_profile": TRANSFORMATION_PROFILE,
@@ -580,4 +730,5 @@ def _issue_bound(verifier: Any, original: dict, request: dict, original_bytes: b
                                         expected_admission_request_ref=reference(admission_request_bytes))
     need(assessment["binding_requirement_met"], "GENERATED_BINDING_FAILED")
     return BoundAdmission(original_bytes, admission_request_bytes, encode(core_result), receipt_bytes,
-                          effective_bytes, encode(assessment))
+                          effective_bytes, encode(assessment), runtime_raw,
+                          encode(runtime_verification) if runtime_verification is not None else None)

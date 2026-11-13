@@ -350,11 +350,13 @@ class VateVerifier:
         policy: dict[str, Any] | None = None,
         trust_bundle: dict[str, Any] | None = None,
         fail_closed: bool = True,
+        runtime_evidence_verifier: Any | None = None,
     ) -> None:
         self.verifier_id = verifier_id
         self.policy = policy or {}
         self.trust_bundle = trust_bundle or {"issuers": []}
         self.fail_closed = fail_closed
+        self.runtime_evidence_verifier = runtime_evidence_verifier
         self._seen_request_ids: set[str] = set()
         self._replay_lock = RLock()
         self._replay_transaction_state: dict[str, Any] | None = None
@@ -378,7 +380,8 @@ class VateVerifier:
                 self._replay_transaction_state = previous_state
 
     def admit(self, admission_request: bytes, *, original: bytes,
-              now: datetime | None = None, require_new_permit: bool = False) -> Any:
+              now: datetime | None = None, require_new_permit: bool = False,
+              evidence_artifacts: Any = None) -> Any:
         """Return a BoundAdmission after checking raw purchase-cap preimages.
 
         Missing, unsupported, or inconsistent input raises ValueError (a missing
@@ -388,7 +391,7 @@ class VateVerifier:
         """
         return request_binding_module().admit_bound(
             self, admission_request, original, now=now if now is not None else utc_now(),
-            require_new_permit=require_new_permit)
+            require_new_permit=require_new_permit, evidence_artifacts=evidence_artifacts)
 
     def _evaluate_policy(self, admission_request: Any, *, now: datetime | None = None) -> dict[str, Any]:
         """Internal policy primitive; its receipt candidate has no preimage assurance.

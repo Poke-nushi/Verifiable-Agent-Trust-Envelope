@@ -23,6 +23,8 @@ contains immutable bytes:
 - `request`, `original`, and `effective` (the last is absent for denial)
 - `receipt` and the independently recomputed `assessment`
 - `core_result`, the intermediate policy result
+- `runtime_evidence` and `runtime_verification` when a configured runtime
+  verifier is used (both are absent on the local-policy-only path)
 
 Read the final decision from `receipt`, not `core_result`. A purchase above the
 effective cap is denied even when the intermediate policy result proposes
@@ -41,6 +43,16 @@ and `application/json` media type. It rejects unmatched or unsupported evidence
 before policy evaluation and replay-state consumption. The final receipt names
 the check `vate-local-policy-content-v1`; it establishes policy-content identity,
 while principal, actor and runtime authentication require their own verifier.
+
+To require runtime evidence, configure a `RuntimeEvidenceVerifier` and supply
+the referenced bytes through `evidence_artifacts`. The
+[runtime integration contract](../request-binding/RUNTIME-EVIDENCE.md) defines
+the adapter result, request-context binding and freshness checks. With this
+configuration, missing or failed runtime evidence prevents admission. An
+`allow` or `attenuate` receipt, including a new-permit candidate, cannot outlive
+the evidence's validity or freshness limit.
+The application supplies the trusted authentication adapter; the core does
+not choose keys or treat a submitted verification result as authentication.
 
 `_evaluate_policy` is a private primitive that produces a receipt candidate
 without checking preimages. The file-set and S3 examples use it after their own
