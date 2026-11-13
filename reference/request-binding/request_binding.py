@@ -704,6 +704,7 @@ class _DispatchEntry:
     boundary: DispatchBoundary
     verifier_id: str
     fail_closed: bool
+    caller_authorizer: Any = None
     store: Any = None
     store_configuration: bytes | None = None
     attempted: bool = False
@@ -735,6 +736,41 @@ def _store_call(function, *args, **kwargs):
         raise Invalid(exc.cause) from None
 
 
+def caller_authority_module() -> Any:
+    path = Path(__file__).with_name("caller_authority.py").resolve()
+    existing = sys.modules.get("caller_authority")
+    if existing is not None:
+        need(Path(getattr(existing, "__file__", "")).resolve() == path, "CALLER_MODULE_CHANGED")
+        return existing
+    spec = importlib.util.spec_from_file_location("caller_authority", path)
+    need(spec is not None and spec.loader is not None, "CALLER_MODULE_UNAVAILABLE")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["caller_authority"] = module
+    try:
+        spec.loader.exec_module(module)
+    except BaseException:
+        sys.modules.pop("caller_authority", None)
+        raise
+    return module
+
+
+def _caller_configuration(verifier: Any) -> Any:
+    authorizer = verifier.caller_authorizer
+    if authorizer is not None:
+        caller_authority_module().descriptor(authorizer)
+        need(verifier.state_store is not None, "CALLER_AUTHORITY_REQUIRES_DURABLE_STATE")
+        _dispatch_configuration(verifier.dispatch_boundary, verifier.runtime_evidence_verifier)
+    return authorizer
+
+
+def _authorize_caller(authorizer: Any, proof: bytes | None, admission: bytes,
+                      original: bytes, now: datetime) -> dict | None:
+    if authorizer is None:
+        need(proof is None, "CALLER_AUTHORIZER_NOT_CONFIGURED")
+        return None
+    return caller_authority_module().verify(authorizer, proof, admission, original, now)
+
+
 def _selected_store(verifier: Any) -> Any:
     store = verifier.state_store
     need(type(store) is durable_state_module().DurableStateStore
@@ -750,16 +786,23 @@ def _store_configuration(verifier: Any) -> bytes:
          and vars(type(verifier)).get("_loaded_source_sha256") == core.LOADED_SOURCE_SHA256,
          "STATE_IMPLEMENTATION_CHANGED")
     sources = {}
-    for module, relative in ((sys.modules[__name__], "reference/request-binding/request_binding.py"),
+    modules = [(sys.modules[__name__], "reference/request-binding/request_binding.py"),
                              (core, "reference/vate-verifier-core/vate_verifier_core.py"),
-                             (durable_state_module(), "reference/request-binding/durable_state.py")):
+                             (durable_state_module(), "reference/request-binding/durable_state.py")]
+    caller = _caller_configuration(verifier)
+    if caller is not None:
+        modules.append((caller_authority_module(), "reference/request-binding/caller_authority.py"))
+    for module, relative in modules:
         need(hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest() == module.LOADED_SOURCE_SHA256,
              "STATE_IMPLEMENTATION_CHANGED")
         sources[relative] = module.LOADED_SOURCE_SHA256
-    return encode({"contract": "vate-durable-admission-configuration-v1", "scope": store.scope,
+    configuration = {"contract": "vate-durable-admission-configuration-v1", "scope": store.scope,
         "verifier_id": verifier.verifier_id, "policy": verifier.policy, "fail_closed": verifier.fail_closed,
         "runtime_verifier": {"method": adapter.method, "media_type": adapter.media_type,
-            "max_age_seconds": adapter.max_age_seconds, "protocol_hint": adapter.protocol_hint}, "sources": sources})
+            "max_age_seconds": adapter.max_age_seconds, "protocol_hint": adapter.protocol_hint}, "sources": sources}
+    if caller is not None:
+        configuration["caller_authorizer"] = caller_authority_module().descriptor(caller)
+    return encode(configuration)
 
 
 @dataclass(frozen=True)
@@ -828,10 +871,10 @@ def _register_dispatch(verifier: Any, bound: BoundAdmission, policy: dict,
         return
     verifier._dispatch_entries[id(bound)] = _DispatchEntry(
         bound, _bound_values(bound), encode(policy), adapter, boundary, verifier.verifier_id, verifier.fail_closed,
-        verifier.state_store, store_configuration)
+        verifier.caller_authorizer, verifier.state_store, store_configuration)
 
 
-def dispatch_bound(verifier: Any, bound: BoundAdmission) -> DispatchResult:
+def dispatch_bound(verifier: Any, bound: BoundAdmission, *, caller_proof: bytes | None = None) -> DispatchResult:
     """Reauthenticate immediately before invoking the configured callback once.
 
     Only an admission issued or restored by this verifier is eligible. No caller
@@ -854,6 +897,7 @@ def dispatch_bound(verifier: Any, bound: BoundAdmission) -> DispatchResult:
             def configuration_unchanged() -> None:
                 need(verifier.dispatch_boundary is entry.boundary
                      and verifier.runtime_evidence_verifier is entry.adapter
+                     and verifier.caller_authorizer is entry.caller_authorizer
                      and verifier.state_store is entry.store
                      and verifier.verifier_id == entry.verifier_id
                      and verifier.fail_closed == entry.fail_closed
@@ -882,14 +926,20 @@ def dispatch_bound(verifier: Any, bound: BoundAdmission) -> DispatchResult:
             ref, = (item for item in request["evidence_refs"] if item["type"] == "runtime_attestation")
             verified = _verify_runtime_evidence(entry.adapter, ref, bound.runtime_evidence, request,
                 bound.request, bound.original, now)
+            caller = _authorize_caller(entry.caller_authorizer, caller_proof, bound.request, bound.original, now)
             configuration_unchanged()
             deadline = min(end, core.parse_time(verified["usable_until"]))
+            if caller is not None:
+                deadline = min(deadline, core.parse_time(caller["usable_until"]))
             checked_at = current_time()
             in_window(checked_at, deadline)
-            checkpoint = encode({"contract": PRE_DISPATCH, "checked_at": core.iso(checked_at),
+            checkpoint_data = {"contract": PRE_DISPATCH, "checked_at": core.iso(checked_at),
                 "usable_until": core.iso(deadline), "receipt_ref": reference(bound.receipt),
                 "admission_request_ref": reference(bound.request), "original_ref": reference(bound.original),
-                "effective_ref": reference(bound.effective), "runtime_verification": verified})
+                "effective_ref": reference(bound.effective), "runtime_verification": verified}
+            if caller is not None:
+                checkpoint_data["caller_authorization"] = caller
+            checkpoint = encode(checkpoint_data)
             # Include verification and record construction time, not merely the
             # time at entry. The final read also follows replay-lock contention
             # with another admission; waiting must not bypass the deadline.
@@ -942,7 +992,8 @@ def dispatch_bound(verifier: Any, bound: BoundAdmission) -> DispatchResult:
 
 def admit_bound(verifier: Any, admission_request_bytes: bytes, original_bytes: bytes, *,
                 now: datetime, require_new_permit: bool = False,
-                evidence_artifacts: Mapping[str, bytes] | None = None) -> BoundAdmission:
+                evidence_artifacts: Mapping[str, bytes] | None = None,
+                caller_proof: bytes | None = None) -> BoundAdmission:
     """Evaluate policy/replay once, then bind the original and effective objects.
 
     Malformed or mismatched preimages raise Invalid before core admission. A
@@ -971,6 +1022,7 @@ def admit_bound(verifier: Any, admission_request_bytes: bytes, original_bytes: b
     adapter = verifier.runtime_evidence_verifier
     boundary = verifier.dispatch_boundary
     store = verifier.state_store
+    authorizer = _caller_configuration(verifier)
     store_configuration = _store_configuration(verifier) if store is not None else None
     if boundary is not None:
         _dispatch_configuration(boundary, adapter)
@@ -992,20 +1044,21 @@ def admit_bound(verifier: Any, admission_request_bytes: bytes, original_bytes: b
     runtime_raw = artifacts[runtime_refs[0]["uri"]] if runtime_refs else None
     runtime_verification = (_verify_runtime_evidence(adapter, runtime_refs[0], runtime_raw, request,
                             admission_request_bytes, original_bytes, now) if runtime_refs else None)
+    caller = _authorize_caller(authorizer, caller_proof, admission_request_bytes, original_bytes, now)
     with verifier._replay_transaction(request["request_id"]):
         # Detect configuration changes made during an adapter call before the
         # policy primitive can evaluate a policy different from the checked one.
         # Concurrent configuration writes remain unsupported by this API.
         need(_same_json(decode(encode(verifier.policy)), policy)
              and verifier.runtime_evidence_verifier is adapter and verifier.dispatch_boundary is boundary
-             and verifier.state_store is store,
+             and verifier.state_store is store and verifier.caller_authorizer is authorizer,
              "ADMISSION_CONFIGURATION_CHANGED")
         def issue() -> BoundAdmission:
             if store is not None:
                 need(_store_configuration(verifier) == store_configuration, "STATE_CONFIGURATION_CHANGED")
             return _issue_bound(verifier, original, request, original_bytes, admission_request_bytes,
                 now=now, require_new_permit=require_new_permit, runtime_raw=runtime_raw,
-                runtime_verification=runtime_verification)
+                runtime_verification=runtime_verification, caller_authorization=caller)
 
         if store is None:
             bound = issue()
@@ -1023,7 +1076,8 @@ def admit_bound(verifier: Any, admission_request_bytes: bytes, original_bytes: b
 
 def _issue_bound(verifier: Any, original: dict, request: dict, original_bytes: bytes,
                  admission_request_bytes: bytes, *, now: datetime, require_new_permit: bool,
-                 runtime_raw: bytes | None, runtime_verification: dict | None) -> BoundAdmission:
+                 runtime_raw: bytes | None, runtime_verification: dict | None,
+                 caller_authorization: dict | None = None) -> BoundAdmission:
     """Construct and validate every returned artifact inside the replay transaction."""
     core_result = verifier._evaluate_policy(request, now=now)
     receipt = copy.deepcopy(core_result["admission_receipt"])
@@ -1049,10 +1103,11 @@ def _issue_bound(verifier: Any, original: dict, request: dict, original_bytes: b
                                  "method": "vate-local-policy-content-v1"}
                                 if item["type"] == "local_policy" else
                                 copy.deepcopy(runtime_verification["verification"]))
-    if runtime_verification is not None and receipt["decision"]["outcome"] != "deny":
-        deadline = runtime_verification["usable_until"]
-        if core.parse_time(deadline) < core.parse_time(receipt["expires_at"]):
-            receipt["expires_at"] = deadline
+    for verified in (runtime_verification, caller_authorization):
+        if verified is not None and receipt["decision"]["outcome"] != "deny":
+            deadline = verified["usable_until"]
+            if core.parse_time(deadline) < core.parse_time(receipt["expires_at"]):
+                receipt["expires_at"] = deadline
     receipt["request"]["constraints"] = copy.deepcopy(request["constraints"])
     binding = {"contract": CONTRACT, "preimage_profile": PREIMAGE_PROFILE,
                "canonicalization": CANONICALIZATION, "transformation_profile": TRANSFORMATION_PROFILE,

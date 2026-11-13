@@ -208,8 +208,13 @@ rest and a safe archival policy are not supplied here. Claim rows MUST NOT be
 deleted merely because receipts expire. The reference store is unbounded and
 uses an integrity check per connection; it has no measured throughput claim.
 
-This remains a reference integration, not production approval. Caller
-possession, principal/actor authority, authenticated trust delivery, provider
+The optional [caller authority adapter](../caller-authority/CONTRACT.md) adds
+actor-signed instructions and principal-to-actor authorization. Caller tokens
+are supplied again at dispatch and are not stored. Its configuration is pinned
+per admission, with current grants rechecked after restore.
+
+This remains a reference integration, not production approval. Transport caller
+possession, authenticated trust delivery, provider
 idempotency, external acceptance deadlines and independent effect observation
 remain separate responsibilities. TypeScript's receiver binding assessment
 does not implement this Python state store or gain execution authority from it.

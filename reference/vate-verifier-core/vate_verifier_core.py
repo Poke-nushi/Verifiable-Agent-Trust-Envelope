@@ -364,6 +364,7 @@ class VateVerifier:
         runtime_evidence_verifier: Any | None = None,
         dispatch_boundary: Any | None = None,
         state_store: Any | None = None,
+        caller_authorizer: Any | None = None,
     ) -> None:
         self.verifier_id = verifier_id
         self.policy = policy or {}
@@ -372,6 +373,7 @@ class VateVerifier:
         self.runtime_evidence_verifier = runtime_evidence_verifier
         self.dispatch_boundary = dispatch_boundary
         self.state_store = state_store
+        self.caller_authorizer = caller_authorizer
         self._dispatch_entries: dict[int, Any] = {}
         self._seen_request_ids: set[str] = set()
         self._replay_lock = RLock()
@@ -397,7 +399,7 @@ class VateVerifier:
 
     def admit(self, admission_request: bytes, *, original: bytes,
               now: datetime | None = None, require_new_permit: bool = False,
-              evidence_artifacts: Any = None) -> Any:
+              evidence_artifacts: Any = None, caller_proof: bytes | None = None) -> Any:
         """Return a BoundAdmission after checking raw purchase-cap preimages.
 
         Missing, unsupported, or inconsistent input raises ValueError (a missing
@@ -407,15 +409,15 @@ class VateVerifier:
         """
         return request_binding_module().admit_bound(
             self, admission_request, original, now=now if now is not None else utc_now(),
-            require_new_permit=require_new_permit, evidence_artifacts=evidence_artifacts)
+            require_new_permit=require_new_permit, evidence_artifacts=evidence_artifacts, caller_proof=caller_proof)
 
-    def dispatch(self, admission: Any) -> Any:
+    def dispatch(self, admission: Any, *, caller_proof: bytes | None = None) -> Any:
         """Recheck a locally issued admission before the configured callback.
 
         Requires a DispatchBoundary configured before admission. See the
         request-binding DISPATCH.md contract for local update/retry semantics.
         """
-        return request_binding_module().dispatch_bound(self, admission)
+        return request_binding_module().dispatch_bound(self, admission, caller_proof=caller_proof)
 
     def restore_admission(self, request_id: str) -> Any:
         """Restore an unconsumed admission from the selected durable store."""

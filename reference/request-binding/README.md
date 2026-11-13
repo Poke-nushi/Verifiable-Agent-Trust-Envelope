@@ -46,6 +46,9 @@ now=now)` requires both preimages. Missing, unsupported or mismatched originals
 raise an error without issuing an admission. It returns a `BoundAdmission`
 containing receipt, preimage and assessment bytes;
 [example.py](example.py) shows the generation and receiver calls.
+The optional [caller authority integration](../caller-authority/README.md)
+adds actor-signed exact instructions, principal permission and delegation checks
+to the Python entry, with current-grant revalidation before durable dispatch.
 `assess_request_binding` accepts receipt bytes, a
 local artifact map, the required contract and the receiver's expected admission
 reference. Missing or unsupported binding is `not_checked`, with an unmet

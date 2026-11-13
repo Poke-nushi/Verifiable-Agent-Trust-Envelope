@@ -16,7 +16,7 @@ import tempfile
 API_CONTRACT = "vate-recipient-assessment-api-v1"
 WRAPPER_VERSION = "0.1.0"
 _HERE = Path(__file__).resolve().parent
-_MANIFEST_SHA256 = "06b70ba692c2d5f2bcd4678c5268c96bf727b871133cb9ce751d9c21ad6cd430"
+_MANIFEST_SHA256 = "24845618c0f2053443e2a826b886af18ea7294c72c49b041d7b6e67e9be85a71"
 _WRAPPER_FILES = ("vate_recipient.py", "_worker.py", "EVALUATOR-SOURCES.json")
 _LOADED_MODULE_CODE = sys._getframe().f_code
 _RECEIPT_LIMIT = 1024 * 1024

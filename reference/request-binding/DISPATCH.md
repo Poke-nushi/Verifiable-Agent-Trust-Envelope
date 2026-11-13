@@ -152,7 +152,11 @@ second callback entry with the same object after consumption.
 `DispatchResult.checkpoint` is immutable JSON bytes following
 [`pre-dispatch.schema.json`](schemas/pre-dispatch.schema.json). Validators MUST
 register [`runtime-verification.schema.json`](schemas/runtime-verification.schema.json)
-under its `$id` to resolve the embedded verification record. The checkpoint
+under its `$id` to resolve the embedded verification record. When optional
+[caller authority](../caller-authority/CONTRACT.md) is configured, dispatch also
+requires `caller_proof` and includes a fresh `caller_authorization` record;
+register [`caller-authorization.schema.json`](schemas/caller-authorization.schema.json)
+under its `$id` for that record. The checkpoint
 contains raw digest references to the admission receipt, request, original and
 effective operation, the newly computed runtime verification, `checked_at`
 after authentication, and the conservative usable deadline. The final clock
@@ -169,7 +173,9 @@ The original receiver assessment retains `evidence.authentication` and
 The entry is a reference integration and is not production-ready. By default, state is
 process-local and retained for the verifier's lifetime; it provides no durable
 or cross-process replay control. A restart loses both admission and dispatch
-state. Caller possession, principal/actor authority, deadlines at external
+state. The optional [caller authority adapter](../caller-authority/README.md)
+adds actor-signed request authorization under selected principal-to-actor grants.
+Transport caller possession, deadlines at external
 acceptance, cancellation of an in-flight operation and independent effect
 observation remain application/provider responsibilities. The final local
 clock check cannot make an external action atomic with that check.

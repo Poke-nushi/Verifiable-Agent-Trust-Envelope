@@ -58,6 +58,14 @@ The draft prefers pairwise presentation where practical, but it does not yet fre
 - hardware-backed attested runtimes
 - browser or mixed execution environments
 
+The optional [caller authority integration](../reference/caller-authority/README.md)
+checks actor-signed purchase instructions and application-selected principal
+permission/delegation at admission and durable dispatch. It complements the
+[runtime JWT adapter](../reference/runtime-jwt/README.md). Both use explicit
+local trust providers; authenticated remote trust delivery and deployment-wide
+authority policy remain application responsibilities. These Python paths do not
+establish transport peer identity or hardware-backed runtime attestation.
+
 ### 4. Receipt Semantics Need More Precision
 
 The draft now distinguishes admission receipts from post-execution receipts, but more work is still needed on:

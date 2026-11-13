@@ -21,6 +21,12 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "reference/request-binding"))
 import request_binding as binding
 
+_source = Path(__file__).read_bytes()
+LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
+    and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
+        "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+del _source
+
 PROFILE = "vate-runtime-jwt-es256-v1"
 TOKEN_TYPE = "vate-runtime-evidence+jwt"
 MEDIA_TYPE = "application/jwt"
@@ -101,14 +107,15 @@ class RuntimeTrustPolicy:
     grants: tuple[RuntimeIssuerGrant, ...]
 
 
-class RuntimeJwtVerifier:
-    def __init__(self, *, expected_profile: str, node: str | Path, node_sha256: str,
-                 trust_policy_provider: Callable[[], RuntimeTrustPolicy],
-                 max_token_age_seconds: int, max_policy_age_seconds: int,
+class Es256Backend:
+    """Pinned local Node crypto bridge shared by the two explicit JWT profiles."""
+
+    _loaded_source_path = Path(__file__).resolve()
+    _loaded_source_sha256 = LOADED_SOURCE_SHA256
+
+    def __init__(self, *, node: str | Path, node_sha256: str,
                  timeout_seconds: float = 10.0):
-        require(expected_profile == PROFILE and callable(trust_policy_provider)
-                and positive_seconds(max_token_age_seconds) and positive_seconds(max_policy_age_seconds)
-                and type(timeout_seconds) in (int, float) and math.isfinite(timeout_seconds)
+        require(type(timeout_seconds) in (int, float) and math.isfinite(timeout_seconds)
                 and 0 < timeout_seconds <= 60
                 and type(node_sha256) is str and re.fullmatch(r"[0-9a-f]{64}", node_sha256) is not None,
                 "INVALID_CONFIGURATION")
@@ -121,9 +128,6 @@ class RuntimeJwtVerifier:
         except (OSError, TypeError, ValueError, RuntimeError):
             raise RuntimeJwtError("BACKEND_UNAVAILABLE") from None
         self.node_sha256 = node_sha256
-        self.trust_policy_provider = trust_policy_provider
-        self.max_token_age_seconds = max_token_age_seconds
-        self.max_policy_age_seconds = max_policy_age_seconds
         self.timeout = timeout_seconds
         # Never inherit NODE_OPTIONS, preload hooks, or user OpenSSL settings.
         self.env = {"PATH": "/usr/bin:/bin", "LANG": "C", "LC_ALL": "C", "OPENSSL_CONF": os.devnull}
@@ -132,10 +136,6 @@ class RuntimeJwtVerifier:
         match = re.fullmatch(rb"v([0-9]+)\.[0-9]+\.[0-9]+\r?\n", version.stdout)
         require(version.returncode == 0 and not version.stderr and match is not None
                 and int(match[1]) >= 22, "UNSUPPORTED_BACKEND")
-
-    def as_runtime_verifier(self) -> binding.RuntimeEvidenceVerifier:
-        return binding.RuntimeEvidenceVerifier(method=PROFILE, media_type=MEDIA_TYPE,
-            max_age_seconds=self.max_token_age_seconds, verify=self.verify)
 
     def _check_backend(self) -> None:
         try:
@@ -173,6 +173,24 @@ class RuntimeJwtVerifier:
                 and result["request_sha256"] == hashlib.sha256(raw).hexdigest()
                 and type(result["verified"]) is bool, "BACKEND_FAILED")
         require(result["verified"], "INVALID_SIGNATURE")
+
+
+class RuntimeJwtVerifier(Es256Backend):
+    def __init__(self, *, expected_profile: str, node: str | Path, node_sha256: str,
+                 trust_policy_provider: Callable[[], RuntimeTrustPolicy],
+                 max_token_age_seconds: int, max_policy_age_seconds: int,
+                 timeout_seconds: float = 10.0):
+        require(expected_profile == PROFILE and callable(trust_policy_provider)
+                and positive_seconds(max_token_age_seconds) and positive_seconds(max_policy_age_seconds),
+                "INVALID_CONFIGURATION")
+        self.trust_policy_provider = trust_policy_provider
+        self.max_token_age_seconds = max_token_age_seconds
+        self.max_policy_age_seconds = max_policy_age_seconds
+        super().__init__(node=node, node_sha256=node_sha256, timeout_seconds=timeout_seconds)
+
+    def as_runtime_verifier(self) -> binding.RuntimeEvidenceVerifier:
+        return binding.RuntimeEvidenceVerifier(method=PROFILE, media_type=MEDIA_TYPE,
+            max_age_seconds=self.max_token_age_seconds, verify=self.verify)
 
     def _policy(self, now: datetime) -> tuple[RuntimeTrustPolicy, bytes, datetime]:
         try:

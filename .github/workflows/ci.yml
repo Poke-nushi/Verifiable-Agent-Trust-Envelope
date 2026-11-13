@@ -60,6 +60,9 @@ jobs:
       - name: Check signed runtime evidence through admission and dispatch
         run: python -B -m unittest discover -s reference/runtime-jwt -p 'test_*.py' -v
 
+      - name: Check signed caller authority and durable dispatch
+        run: python -B -m unittest discover -s reference/caller-authority -p 'test_*.py' -v
+
       - name: Run receipt linkage tests
         run: python -B -m unittest discover -s reference/receipt-linkage-example -p 'test_*.py' -v
 

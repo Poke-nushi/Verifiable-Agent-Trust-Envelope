@@ -56,6 +56,13 @@ not choose keys or treat a submitted verification result as authentication.
 The optional [JWT/ES256 adapter](../runtime-jwt/README.md) supplies one signed
 runtime-evidence path with application-selected issuer grants.
 
+To authorize the actor's exact instruction and its principal-to-actor delegation,
+configure the optional [caller authority adapter](../caller-authority/README.md).
+It requires runtime verification and durable dispatch state, checks the original
+declared scope against trusted grants, and requires `caller_proof` at admission
+and dispatch. Current authority is checked again after restart; a new proof
+cannot extend an existing receipt.
+
 Configure a [`DispatchBoundary`](../request-binding/DISPATCH.md) before admission
 to use `verifier.dispatch(result)`. This entry rechecks the runtime evidence
 and current validity before passing the exact effective bytes to the
