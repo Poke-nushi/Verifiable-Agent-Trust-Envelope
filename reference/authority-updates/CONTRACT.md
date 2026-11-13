@@ -180,6 +180,8 @@ TLS 1.2 is the minimum. It MUST refuse redirects, environment proxies and encode
 response bodies, and accept only status 200 with media type `application/jwt`.
 The response MUST fit the token limit. The selected signature is still required
 even when HTTPS succeeds. No authority credentials are sent by this helper.
+An explicit CA bundle may be supplied as `ca_file` or as nonempty `ca_data`
+(PEM text or DER bytes), but not both.
 
 The helper uses a positive socket timeout up to 30 seconds and checks an overall
 deadline before and after each bounded body read. These checks do not forcibly
@@ -187,11 +189,91 @@ cancel system DNS resolution or an operating-system call already blocked; they
 are not a hard wall-clock cancellation guarantee. Applications needing that
 guarantee must isolate and supervise transport separately.
 
+### Supervised HTTPS acquisition
+
+`SupervisedHttpsSnapshotSource` is an optional POSIX fetch callable for that
+isolation. Each call MUST use a fresh child running the existing HTTPS checks.
+Only the parent calls `AuthorityStore.refresh`; the worker MUST NOT open or
+change the authority or dispatch stores. Transport success supplies untrusted
+bytes to the existing signature, context, revision and freshness checks.
+
+Configuration MUST select an HTTPS URL and a positive timeout no greater than
+30 seconds. An explicit CA file MUST contain at most 1 MiB of PEM or DER data;
+its bytes are captured at construction and passed over the private input pipe.
+Later changes to that CA path MUST NOT change an existing source's trust.
+Without an explicit bundle the worker uses its Python installation's default
+CA locations. Environment-selected CA paths, proxies, TLS key logging, Python
+paths and loader settings MUST NOT be inherited.
+Parent-side configuration validation MUST NOT load environmental CA paths or
+TLS key-log settings and MUST NOT temporarily modify the application environment.
+
+The application trusts its running Python installation and the installed
+helper sources. The source captures executable and helper digests at
+construction and MUST reject detected changes before or after a call. Loaded
+helper code MUST match its source identity. These are local change checks, not
+independent software provenance or isolation from malicious host code.
+
+The parent MUST bound its request to 2 MiB and the worker's output to the
+65536-byte token limit. It MUST return output only after complete pipe input,
+output EOF and a zero worker exit status observed within the parent deadline.
+Empty or excessive output, worker failure and timeout MUST return failure,
+without returning a partial body or logging worker diagnostics. The child runs
+with isolated Python imports and no inherited application environment; it
+spawns no additional processes.
+
+The deadline starts before the parent starts a dedicated owner thread and covers
+worker startup, DNS, TLS, response reads and worker exit. Ownership MUST be
+recorded before starting that thread. The thread owns process creation through
+cleanup, so Python's main-thread SIGINT handling cannot interrupt its `Popen`
+construction and lose the child handle. This helper does not replace signal
+handlers or change signal masks.
+
+On timeout, failure or interruption the parent MUST request cancellation and
+attempt to close pipes, kill and reap any remaining child, allowing up to three
+additional seconds to confirm cleanup. If startup is still blocked, ownership
+MUST remain pending; when it proceeds, the owner MUST stop and reap its child.
+Unconfirmed cleanup MUST never return success. Ordinary failures report
+`AUTHORITY_FETCH_CLEANUP_FAILED`; a caller's `KeyboardInterrupt` or `SystemExit`
+MUST propagate even when cleanup is unconfirmed. The instance MUST expose
+`cleanup_required` until cleanup completes. Its diagnostic `pending_worker_pid`
+may be `None` while startup has not supplied a handle and MUST NOT be used as
+the cleanup-completion test.
+
+Cancellation before the owner enters its acquisition task MUST close a startup
+gate that prevents that attempt from ever creating a child. If no thread identity
+is available yet, cleanup may then complete: a thread that starts later MUST exit
+without entering acquisition. A missing thread identity alone MUST NOT clear
+an attempt whose owner has already entered acquisition.
+
+It MUST refuse further fetches until cleanup confirms either that startup has
+been cancelled at this gate, or that the owner has finished and any child is
+reaped. The application MUST preserve an instance with unconfirmed cleanup
+and investigate or clean up its pending attempt before replacing it or starting
+another attempt. Concurrent
+use of one instance MUST return busy. A forked process MUST construct its own
+source and MUST NOT use the inherited instance to fetch or clean up its parent's
+worker. OS process creation, scheduling and termination can themselves be delayed.
+This is a supervised transport deadline, not a hard real-time guarantee for
+the complete refresh, signature validation or store access.
+
+Use the callable through `source.refresh(fetch)` to apply the failure handling
+below. Refresh normalizes ordinary fetch failures to `AUTHORITY_REFRESH_FAILED`
+and propagates interruptions; callers MUST also check `fetch.cleanup_required`
+after either outcome. Calling the fetch alone does not change permission
+state. Refresh scheduling and serialization across callers remain application
+responsibilities; this
+helper does not start a background updater or serialize complete refreshes.
+
+### Installation and failure state
+
 `refresh(fetch)` retrieves bytes outside the lease lock, then validates and
 installs under that lock. Any fetch or acceptance failure MUST return failure.
-It attempts to persist an unavailable flag, preventing subsequent leases until
-a valid current-or-new snapshot recovers the store. If the store is busy or
-inaccessible, this marking can also fail: the refresh still fails and MUST NOT
+It attempts to persist an unavailable flag, including on `KeyboardInterrupt`
+or `SystemExit`, then propagates the interruption without normalizing it as an
+ordinary error. A recorded flag prevents subsequent leases until a valid
+current-or-new snapshot recovers the store. If the store is busy or
+inaccessible, or failure recording is itself interrupted, this marking can fail:
+the refresh still fails and MUST NOT
 be described as an acknowledged revocation or acknowledged suspension. A slow
 failed refresh may mark unavailable after another refresh succeeds; applications
 should serialize refresh scheduling if they need to avoid this conservative stop.

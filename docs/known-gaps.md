@@ -73,9 +73,12 @@ An optional [macOS Keychain signer](../reference/authority-keychain/README.md)
 adds protected persistent key use and publisher process-restart checks against
 the existing revision ledger. It uses a selected file-based Keychain; host
 reboot/unlock, key recovery and deployment-specific custody remain unverified.
-Broader IAM mappings, root-key selection/migration,
-supervised remote update delivery and deployment-wide authority policy remain
-application responsibilities. Both local stores require unchanged anchored
+The [supervised HTTPS source](../reference/authority-updates/README.md#bound-each-https-attempt)
+adds a parent-controlled process deadline and bounded output for one retrieval.
+It connects to the existing refresh failure and recovery behavior; scheduling,
+cross-caller serialization and deployment recovery remain application work.
+Broader IAM mappings, root-key selection/migration and deployment-wide authority
+policy remain application responsibilities. Both local stores require unchanged anchored
 filesystem identities. Their contracts provide no portable host recovery,
 re-anchoring or storage migration procedure; such a procedure must preserve
 revision, clock and replay history. These Python paths do

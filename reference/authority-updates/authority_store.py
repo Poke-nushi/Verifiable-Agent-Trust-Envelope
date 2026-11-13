@@ -286,13 +286,16 @@ class AuthorityStore:
         try:
             raw = fetch()
             return self.accept(raw)
-        except Exception:
+        except BaseException as error:
             try:
                 self.mark_unavailable()
             except s.AuthorityError:
                 # A busy/inaccessible store cannot acknowledge an update.
                 # The original refresh still fails; no success is reported.
                 pass
+            if not isinstance(error, Exception):
+                # Preserve cancellation/termination after attempting to block leases.
+                raise
             raise s.AuthorityError("AUTHORITY_REFRESH_FAILED") from None
 
     @contextmanager

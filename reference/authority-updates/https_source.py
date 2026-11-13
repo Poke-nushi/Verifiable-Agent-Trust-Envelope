@@ -1,7 +1,9 @@
 """Operator-selected HTTPS delivery; snapshot signatures remain mandatory."""
+import hashlib
 import math
 from pathlib import Path
 import ssl
+import sys
 import time
 from urllib.parse import urlsplit
 from urllib.error import HTTPError
@@ -9,27 +11,46 @@ from urllib.request import Request, build_opener, HTTPSHandler, HTTPRedirectHand
 
 from snapshot import AuthorityError, need, jwt
 
+_source = None
+try:
+    _source = Path(__file__).read_bytes()
+    LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
+        and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
+            "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+except (OSError, SyntaxError, ValueError):
+    LOADED_SOURCE_SHA256 = None
+del _source
+
 
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, *args, **kwargs):
         return None
 
 
+def validate_source_options(url, timeout_seconds):
+    """Validate request configuration without consulting TLS or environment state."""
+    need(type(url) is str and 0 < len(url) <= 4096 and all(ord(ch) > 32 and ord(ch) < 127 for ch in url),
+         "AUTHORITY_URL_INVALID")
+    try:
+        parsed = urlsplit(url)
+        valid = (parsed.scheme == "https" and parsed.hostname and "@" not in parsed.netloc
+                 and not parsed.fragment and parsed.port != 0)
+    except ValueError:
+        valid = False
+    need(valid, "AUTHORITY_URL_INVALID")
+    need(type(timeout_seconds) in (int, float) and math.isfinite(timeout_seconds)
+         and 0 < timeout_seconds <= 30, "AUTHORITY_TIMEOUT_INVALID")
+
+
 class HttpsSnapshotSource:
-    def __init__(self, url: str, *, ca_file: str | Path | None = None, timeout_seconds: float = 5.0):
-        need(type(url) is str and 0 < len(url) <= 4096 and all(ord(ch) > 32 and ord(ch) < 127 for ch in url),
-             "AUTHORITY_URL_INVALID")
-        try:
-            parsed = urlsplit(url)
-            valid = (parsed.scheme == "https" and parsed.hostname and "@" not in parsed.netloc
-                     and not parsed.fragment and parsed.port != 0)
-        except ValueError:
-            valid = False
-        need(valid, "AUTHORITY_URL_INVALID")
-        need(type(timeout_seconds) in (int, float) and math.isfinite(timeout_seconds)
-             and 0 < timeout_seconds <= 30, "AUTHORITY_TIMEOUT_INVALID")
+    def __init__(self, url: str, *, ca_file: str | Path | None = None,
+                 ca_data: str | bytes | None = None, timeout_seconds: float = 5.0):
+        validate_source_options(url, timeout_seconds)
+        need(ca_data is None or type(ca_data) in (str, bytes) and bool(ca_data) and ca_file is None,
+             "AUTHORITY_CA_CONFIGURATION_INVALID")
         self.url, self.timeout = url, timeout_seconds
-        self.context = ssl.create_default_context(cafile=str(ca_file) if ca_file is not None else None)
+        self.context = ssl.create_default_context(
+            cafile=str(ca_file) if ca_file is not None else None, cadata=ca_data)
         self.context.minimum_version = ssl.TLSVersion.TLSv1_2
 
     def __call__(self) -> bytes:
