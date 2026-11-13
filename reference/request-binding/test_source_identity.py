@@ -13,11 +13,26 @@ import unittest
 import request_binding as b
 
 
-CHILD = '''import builtins, json, sys
+CHILD = '''import builtins, json, py_compile, sys
 from pathlib import Path
 root = Path(sys.argv[1])
 sys.path.insert(0, str(root / "reference/request-binding"))
-if sys.argv[2] in ("ordinary", "mixed"):
+if sys.argv[2] in ("read_error", "compile_error"):
+    read_bytes = Path.read_bytes
+    def unavailable_source(path):
+        if path.name in ("request_binding.py", "vate_verifier_core.py", "durable_state.py"):
+            if sys.argv[2] == "read_error":
+                raise PermissionError("local source fixture")
+            return bytes([0])
+        return read_bytes(path)
+    Path.read_bytes = unavailable_source
+if sys.argv[2] == "sourceless_core":
+    # Load the binding helper before removing its source-only core dependency.
+    import request_binding
+    source = root / "reference/vate-verifier-core/vate_verifier_core.py"
+    py_compile.compile(str(source), cfile=str(source.with_suffix(".pyc")), doraise=True)
+    source.unlink()
+if sys.argv[2] in ("ordinary", "mixed", "sourceless_core"):
     sys.path.insert(0, str(root / "reference/vate-verifier-core"))
     import vate_verifier_core as ordinary_core
     if sys.argv[2] == "mixed":
@@ -42,9 +57,12 @@ import request_binding as b
 import test_runtime_evidence as fixtures
 s = b.durable_state_module()
 f = fixtures.RuntimeEvidenceTests(); f.setUp()
+if sys.argv[2] == "sourceless_core":
+    f.verifier = ordinary_core.VateVerifier(verifier_id=f.verifier.verifier_id,
+        policy=f.policy, runtime_evidence_verifier=f.adapter)
 without_store = b.decode(f.admit().assessment)["decision_allows_immediate_execution"]
 f.verifier = f.new_verifier()
-if sys.argv[2] in ("ordinary", "mixed"):
+if sys.argv[2] in ("ordinary", "mixed", "sourceless_core"):
     f.verifier = ordinary_core.VateVerifier(verifier_id=f.verifier.verifier_id,
         policy=f.policy, runtime_evidence_verifier=f.adapter)
 store = s.DurableStateStore.create(root / "state", scope="private identity fixture", verifier_id=f.verifier.verifier_id)
@@ -61,7 +79,8 @@ try:
 except b.Invalid as exc:
     state=exc.cause
 print(json.dumps({"digests":[b.LOADED_SOURCE_SHA256,b.core.LOADED_SOURCE_SHA256,s.LOADED_SOURCE_SHA256],
-    "cause":cause,"state":state,"calls":len(calls),"without_store":without_store}))
+    "cause":cause,"state":state,"calls":len(calls),"without_store":without_store,
+    "sourceless_digest":ordinary_core.LOADED_SOURCE_SHA256 if sys.argv[2] == "sourceless_core" else None}))
 '''
 
 
@@ -124,6 +143,24 @@ class SourceIdentityTests(unittest.TestCase):
             self.assertEqual(result["state"], "STATE_ADMISSION_NOT_FOUND")
             self.assertEqual(result["calls"], 0)
             self.assertTrue(result["without_store"])
+
+    def test_unavailable_source_blocks_only_durable_entry(self):
+        for mode in ("read_error", "compile_error", "sourceless_core"):
+            for optimize in (0, 1):
+                with self.subTest(mode=mode, optimize=optimize), tempfile.TemporaryDirectory() as temporary:
+                    root = Path(temporary)
+                    self.copy_sources(root)
+                    result = self.child(root, optimize=optimize, mode=mode)
+                    if mode == "sourceless_core":
+                        # This packaging case also changes the defining path;
+                        # the None-only guard has a separate durable-state test.
+                        self.assertIsNone(result["sourceless_digest"])
+                    else:
+                        self.assertEqual(result["digests"], [None, None, None])
+                    self.assertEqual(result["cause"], "STATE_IMPLEMENTATION_CHANGED")
+                    self.assertEqual(result["state"], "STATE_ADMISSION_NOT_FOUND")
+                    self.assertEqual(result["calls"], 0)
+                    self.assertTrue(result["without_store"])
 
     def test_ordinary_core_entry_accepts_same_source_and_rejects_mixed_versions(self):
         for optimize in (0, 1):

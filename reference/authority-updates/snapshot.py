@@ -15,10 +15,15 @@ PROFILE = "vate-authority-snapshot-v1"
 TOKEN_TYPE = "vate-authority-snapshot+jwt"
 MAX_REVISION = 2**53 - 1
 CLAIMS = {"iss", "aud", "scope", "epoch", "revision", "iat", "nbf", "exp", "runtime_grants", "delegation_grants"}
-_source = Path(__file__).read_bytes()
-LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
-    and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
-        "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+_source = None
+try:
+    _source = Path(__file__).read_bytes()
+    LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
+        and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
+            "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+except (OSError, SyntaxError, ValueError):
+    # Import remains available; identity-dependent entry points reject None.
+    LOADED_SOURCE_SHA256 = None
 del _source
 
 
@@ -34,7 +39,11 @@ def need(condition, cause):
 
 
 def module_identity(module) -> str:
-    digest = jwt.file_sha(Path(module.__file__))
+    need(module.LOADED_SOURCE_SHA256 is not None, "AUTHORITY_IMPLEMENTATION_CHANGED")
+    try:
+        digest = jwt.file_sha(Path(module.__file__))
+    except OSError:
+        raise AuthorityError("AUTHORITY_IMPLEMENTATION_CHANGED") from None
     need(digest == module.LOADED_SOURCE_SHA256, "AUTHORITY_IMPLEMENTATION_CHANGED")
     return digest
 

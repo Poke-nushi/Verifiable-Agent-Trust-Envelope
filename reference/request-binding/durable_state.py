@@ -26,10 +26,15 @@ MAX_BYTES = 2 * 1024 * 1024
 VALUE_NAMES = ("original", "request", "core_result", "receipt", "effective", "assessment",
                "runtime_evidence", "runtime_verification")
 # Bind the source digest to executed code, including when import uses a .pyc.
-_source = Path(__file__).read_bytes()
-LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
-    and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
-        "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+_source = None
+try:
+    _source = Path(__file__).read_bytes()
+    LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
+        and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
+            "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+except (OSError, SyntaxError, ValueError):
+    # Import remains available; identity-dependent entry points reject None.
+    LOADED_SOURCE_SHA256 = None
 del _source
 TABLES = {
     "identity": """CREATE TABLE identity (
@@ -234,7 +239,8 @@ class DurableStateStore:
         # No COMMIT retry: an error is an uncertain write, never callback authority.
         connection.execute("COMMIT")
 
-    def issue(self, request_id: str, operation_id: str, configuration: bytes, producer) -> None:
+    def issue(self, request_id: str, operation_id: str, configuration: bytes, producer, *,
+              evaluated_at: datetime, clock) -> None:
         identifier(request_id)
         identifier(operation_id)
         raw_bytes(configuration)
@@ -244,6 +250,12 @@ class DurableStateStore:
                     "DURABLE_REPLAY_DETECTED")
             require(connection.execute("SELECT 1 FROM operations WHERE operation_id=?", (operation_id,)).fetchone() is None,
                     "DURABLE_OPERATION_ALREADY_ATTEMPTED")
+            # Serialize the supplied evaluation time with admission and dispatch
+            # clock observations; a later writer may have advanced it during auth.
+            evaluated = self._clock(connection, lambda: evaluated_at)
+            # A caller-supplied future time must not advance the shared clock.
+            # Failure rolls back the tentative clock update with this transaction.
+            require(evaluated <= instant(clock()), "DURABLE_EVALUATION_TIME_AHEAD")
             values, executable = producer()
             digest = record_digest(request_id, operation_id, configuration, values, executable)
             connection.execute("INSERT INTO admissions VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",

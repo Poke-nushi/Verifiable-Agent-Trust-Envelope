@@ -63,14 +63,18 @@ checks actor-signed purchase instructions and application-selected principal
 permission/delegation at admission and durable dispatch. It complements the
 [runtime JWT adapter](../reference/runtime-jwt/README.md). The optional
 [authority update integration](../reference/authority-updates/README.md)
-authenticates complete signed policy snapshots, offers verified HTTPS intake,
-and retains revision checks across restarts. Local updates and dispatch callbacks
-share an ordered policy lease. The
+authenticates complete signed policy snapshots, offers HTTPS intake with server
+certificate and hostname checks,
+and retains revision checks across process restarts. Local updates and dispatch
+callbacks share an ordered policy lease. The
 [selected Hydra/OpenFGA issuer](../reference/authority-issuer/README.md) adds one
 fixed IAM-to-grant mapping and a native loopback revocation/recovery fixture.
 Broader IAM mappings, durable signing-key operation, root-key selection/migration,
 supervised remote update delivery and deployment-wide authority policy remain
-application responsibilities. These Python paths do
+application responsibilities. Both local stores require unchanged anchored
+filesystem identities. Their contracts provide no portable host recovery,
+re-anchoring or storage migration procedure; such a procedure must preserve
+revision, clock and replay history. These Python paths do
 not establish the caller's or runtime's transport peer identity or
 hardware-backed runtime attestation.
 

@@ -109,6 +109,17 @@ replacement and corruption; they do not prevent an administrator from restoring
 old contents into the same trusted files. Distributed storage, network
 filesystems and Windows are unsupported.
 
+Reopening after a process restart requires the original directory, database and
+lock-file device/inode pairs. After host restarts, remounts or container
+recreation, the store can be reopened only if those identities and the trusted
+contents remain intact.
+On a mismatch, preserve the original files and retained anchor and stop managed
+operations for investigation. Applications MUST NOT manufacture a new anchor,
+reset time/revision, or recreate either store to resume work. Re-anchoring and
+state migration are outside this contract; the
+[dispatch store](../request-binding/DURABLE-STATE.md#configure-and-reopen) has the
+same continuity requirement.
+
 Every update and policy lease MUST hold the same anchored exclusive POSIX file
 lock. Acquisition is nonblocking both within the store object and across
 processes. `AUTHORITY_BUSY` or reentrant failure means the update was not
@@ -117,6 +128,17 @@ stored snapshot and check freshness before use. Provider getters MUST require
 that thread's active lease, check current time, and return its immutable policy.
 Forked handles MUST fail; a child must reopen independently. Child cleanup MUST
 close inherited lock descriptors without explicitly unlocking the parent's lease.
+
+`AUTHORITY_STORE_UNAVAILABLE` covers I/O failure while accessing the anchored
+store or acquiring its lock. An unrelated I/O exception raised by a lease's
+consumer propagates unchanged; the lease and lock are still released.
+Source identity checks at lease, intake, status and managed-entry boundaries
+report unavailable or changed implementation source as
+`AUTHORITY_IMPLEMENTATION_CHANGED`; refresh wraps intake failures as
+`AUTHORITY_REFRESH_FAILED` even when it cannot record unavailability. During
+admission or dispatch clock sampling, the dispatch boundary instead normalizes
+failures from the authority clock callback to `DISPATCH_CLOCK_UNAVAILABLE`;
+see the [durable admission clock contract](../request-binding/DURABLE-STATE.md#admission-and-restore).
 
 `ManagedAuthorityVerifier` MUST acquire the ordinary dispatch boundary before
 the source lease for admission, restore and dispatch. It MUST hold the lease

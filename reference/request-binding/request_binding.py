@@ -38,10 +38,15 @@ RUNTIME_VERIFICATION = "vate-runtime-evidence-verification-v1"
 PRE_DISPATCH = "vate-pre-dispatch-check-v1"
 # A timestamp-valid .pyc can execute stale code after a same-size source update.
 # Identify source only after it compiles to the code actually being executed.
-_source = Path(__file__).read_bytes()
-LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
-    and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
-        "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+_source = None
+try:
+    _source = Path(__file__).read_bytes()
+    LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
+        and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
+            "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+except (OSError, SyntaxError, ValueError):
+    # Import remains available; identity-dependent entry points reject None.
+    LOADED_SOURCE_SHA256 = None
 del _source
 
 
@@ -662,7 +667,8 @@ class DispatchBoundary:
             need(not self._state.active, "DISPATCH_REENTRANT_UPDATE")
             yield
 
-    def _now(self) -> datetime:
+    def _sample_now(self) -> datetime:
+        """Read the selected clock without mutating process-local dispatch state."""
         try:
             now = self.clock()
             need(isinstance(now, datetime) and now.tzinfo is not None and now.utcoffset() is not None,
@@ -674,6 +680,10 @@ class DispatchBoundary:
             raise
         except Exception:
             raise Invalid("DISPATCH_CLOCK_UNAVAILABLE") from None
+        return now
+
+    def _now(self) -> datetime:
+        now = self._sample_now()
         need(self._state.clock_high is None or now >= self._state.clock_high, "DISPATCH_CLOCK_ROLLBACK")
         self._state.clock_high = now
         return now
@@ -793,8 +803,12 @@ def _store_configuration(verifier: Any) -> bytes:
     if caller is not None:
         modules.append((caller_authority_module(), "reference/request-binding/caller_authority.py"))
     for module, relative in modules:
-        need(hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest() == module.LOADED_SOURCE_SHA256,
-             "STATE_IMPLEMENTATION_CHANGED")
+        need(module.LOADED_SOURCE_SHA256 is not None, "STATE_IMPLEMENTATION_CHANGED")
+        try:
+            current_digest = hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest()
+        except OSError:
+            raise Invalid("STATE_IMPLEMENTATION_CHANGED") from None
+        need(current_digest == module.LOADED_SOURCE_SHA256, "STATE_IMPLEMENTATION_CHANGED")
         sources[relative] = module.LOADED_SOURCE_SHA256
     configuration = {"contract": "vate-durable-admission-configuration-v1", "scope": store.scope,
         "verifier_id": verifier.verifier_id, "policy": verifier.policy, "fail_closed": verifier.fail_closed,
@@ -1068,7 +1082,8 @@ def admit_bound(verifier: Any, admission_request_bytes: bytes, original_bytes: b
                 bound = issue()
                 produced.append(bound)
                 return _bound_values(bound), decode(bound.assessment)["decision_allows_immediate_execution"]
-            _store_call(store.issue, request["request_id"], request["transaction_id"], store_configuration, produce)
+            _store_call(store.issue, request["request_id"], request["transaction_id"], store_configuration,
+                        produce, evaluated_at=now, clock=boundary._sample_now)
             bound, = produced
         _register_dispatch(verifier, bound, policy, adapter, boundary, store_configuration=store_configuration)
         return bound

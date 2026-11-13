@@ -52,6 +52,18 @@ the scope or removing replay rows. Initialization failure can leave a partial
 directory and requires operator investigation. Automatic migration, backup
 restore and pruning are not supplied by this contract.
 
+Restart support requires the same trusted directory and database device/inode
+pairs. An OS restart, remount, container recreation or file copy is not a
+portable-state guarantee: reopening MUST still match the independently retained
+anchor. Deployments MUST establish that their storage preserves these identities
+over the restarts they intend to support. A mismatch MUST stop admission and
+dispatch while the operator preserves the existing files and anchor for
+investigation. Rewriting the anchor to match a new location, resetting the clock,
+or creating a replacement store does not establish continuity of the replay history. This
+contract has no re-anchoring or migration API. When using an authority store,
+apply the same rule to its database and lock file under the
+[authority-update contract](../authority-updates/CONTRACT.md#store-lock-and-managed-entry).
+
 ## Admission and restore
 
 Normal `admit` retains the exact eight `BoundAdmission` values, configuration
@@ -60,6 +72,36 @@ new-permit candidates retain admission replay state too. A duplicate
 `request_id` is rejected. An already consumed `transaction_id` is rejected even
 if the caller selects a different request ID. Here the admission request's
 `transaction_id` is the purchase operation's stable `operation_id`.
+
+The supplied evaluation time MUST be at least the store's persisted UTC
+high-water mark and no later than a fresh sample of the configured dispatch
+clock. `admit` checks both bounds after acquiring the database write lock and
+before policy evaluation and record creation. A successful admission, including
+a denial, commits its evaluation time with its record; a transaction rolled
+back before commit retains neither.
+
+`DURABLE_CLOCK_ROLLBACK` can occur without a clock moving backwards: another
+admission or dispatch may advance the shared mark while this request is being
+authenticated. This rejection leaves no new admission or replay entry. The
+application may retry `admit` with a newly sampled current time; all request,
+proof, authority and policy checks run again. It MUST NOT reset the shared mark
+or reuse the earlier authentication result to force acceptance.
+
+`DURABLE_EVALUATION_TIME_AHEAD` rejects a supplied time later than the dispatch
+clock without advancing the store or blocking previously admitted work. The
+selected clock itself remains trusted: a forward jump in that clock can still
+advance the shared mark for every admission and dispatch using this store.
+Investigate clock errors without resetting the stored history. Historical
+receipt assessment is separate from this live admission API. Dispatch still
+samples its configured clock and rechecks current permission before execution.
+
+Durable admission also requires the dispatch clock to be available and return
+a timezone-aware time. A clock callback failure yields
+`DISPATCH_CLOCK_UNAVAILABLE`; an invalid returned time yields
+`INVALID_DISPATCH_TIME`. With `ManagedAuthorityVerifier`, the callback samples
+the authority source: if freshness or implementation checks fail at this point,
+the failure is reported as `DISPATCH_CLOCK_UNAVAILABLE`. These failures roll
+back the admission transaction, including its tentative clock update.
 
 Two requests for one operation can be admitted before either dispatches. They
 compete for the same operation-level attempt. The first committed claim
@@ -96,8 +138,9 @@ therefore cannot claim the current source identity. The actual verifier class's
 defining core path and verified digest MUST also match the core used by binding;
 a previously loaded verifier cannot silently use a newer helper's identity.
 Custom verifier subclasses cannot inherit this implementation identity.
-Durable admission and
-restore require a Python implementation exposing the module frame/code check;
+Failure to read or compile source leaves the identity unavailable without
+aborting the import solely for that check. Durable admission and restore
+require a Python implementation exposing the module frame/code check;
 they fail closed when that identity cannot be established. This is a check
 against accidental source/cache mismatch, not isolation from code able to
 modify the running interpreter.
@@ -119,8 +162,8 @@ entry. SQLite is configured for rollback-journal `DELETE` mode and
 `synchronous=EXTRA`. Every operation opens, validates and closes a connection;
 connections are not shared between threads or inherited for worker use.
 
-Clock samples used by the initial check, completed-authentication check and
-claim are read after acquiring the database write lock. Their UTC high-water
+Dispatch clock samples used by the initial check, completed-authentication check
+and claim are read after acquiring the database write lock. Their UTC high-water
 mark persists in the same transaction, so a subsequent lower observation,
 including after restart, is rejected. The final check after claim commit also
 counts commit latency against the deadline. This last sample is guarded by
@@ -222,8 +265,11 @@ does not implement this Python state store or gain execution authority from it.
 The local regression suite exercises concurrent spawned interpreters,
 process exits after claim/during callback/after return, lost commit
 acknowledgements, unavailable state, clock rollback rejection and expired work after
-lock or commit delay. The JWT integration checks real ES256 authentication
-after reopening. These tests use local callbacks and no external operation.
+lock or commit delay. It also checks unavailable source identity, durable
+admission time ordering and synthetic device-identity mismatches; the latter
+does not simulate or validate a host reboot. The JWT integration checks real
+ES256 authentication after reopening. These tests use local callbacks and no
+external operation.
 
 SQLite behavior references: [transactions](https://www.sqlite.org/lang_transaction.html),
 [`synchronous`](https://www.sqlite.org/pragma.html#pragma_synchronous), and

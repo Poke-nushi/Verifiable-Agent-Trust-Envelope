@@ -1,6 +1,6 @@
 {
   "files": {
-    "reference/vate-verifier-core/vate_verifier_core.py": "2f795a5442f89de253dc5b7f4340ec76713968a27a508108be21fbfea971030b",
+    "reference/vate-verifier-core/vate_verifier_core.py": "b28a8bada4d51acdfc1f28bf6049e8fd15629b20c350270f01f6c62ef1e16b5a",
     "scripts/vate_conformance.py": "a4606184985295f713a6a428c71619350f7fab7580a6db58e663351a8d76626e",
     "schemas/admission-receipt.schema.json": "fc5fc085a741ce1e23e6435c9402f3838eaa701dd363ba84610a8989ad8af7fb",
     "schemas/post-execution-receipt.schema.json": "3451185169de5deb210a9f3319dd6217fbe6bf6bb0b8b835c9b7e5a874467892",

@@ -76,6 +76,30 @@ Use these meanings consistently:
 - An implementation report records one implementation run against one corpus
   snapshot. It is not an endorsement, certification, or production approval.
 
+## Optional Python Execution Integrations
+
+The optional [runtime](../reference/runtime-jwt/README.md) and
+[caller-authority](../reference/caller-authority/README.md) integrations verify
+ES256 signatures under their named profiles and operator-selected keys and
+grants. Describe these as reference implementations for the supported purchase
+profile. Signature validity, issuer authority and current permission to execute
+are separate checks. Corpus proof-artifact checks remain byte-level checks.
+
+[Dispatch revalidation](../reference/request-binding/DISPATCH.md) calls the
+configured runtime verifier and, when selected, caller authorizer before
+invoking the configured local callback.
+[Durable state](../reference/request-binding/DURABLE-STATE.md) preserves consumed
+attempts within one selected store and operation scope. These checks do not
+establish enforcement at an arbitrary remote service or exactly-once external
+effects.
+
+[Authority updates](../reference/authority-updates/README.md) apply authenticated
+snapshots to subsequent policy leases; expiry and age limits bound cached use.
+The [Hydra/OpenFGA issuer example](../reference/authority-issuer/README.md) covers
+one explicitly selected identity, resource and permission mapping. Describe
+its results as local integration observations, without implying instantaneous
+revocation, general IAM compatibility or production readiness.
+
 ## Allowed Phrasing
 
 These phrases are safe when they match the artifact being discussed:
@@ -105,8 +129,9 @@ Avoid these unless the surrounding sentence narrows the claim clearly:
   evidence and never widens upstream authority;
 - "AP2 integration" without saying AP2 artifacts are adjacent payment-authority
   evidence, not VATE-defined payment semantics;
-- "JOSE proof support" without saying the current fixtures are byte-level and
-  do not perform production cryptographic signature verification.
+- "JOSE proof support" without distinguishing byte-level corpus checks from
+  signature verification in a named optional reference profile, with its
+  selected backend, keys and authority policy.
 
 ## Forbidden Phrasing
 

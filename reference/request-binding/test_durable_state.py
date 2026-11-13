@@ -216,6 +216,99 @@ class DurableStateTests(unittest.TestCase):
         self.rejection(lambda: restarted.dispatch(restarted.restore_admission(self.request_id)), "DURABLE_CLOCK_ROLLBACK")
         self.assertEqual(self.calls, [])
 
+    def test_durable_admission_rejects_time_before_persisted_dispatch_clock(self):
+        bound = self.admit()
+        self.now += timedelta(seconds=2)
+        with patch.object(b, "_verify_runtime_evidence", side_effect=b.Invalid("RUNTIME_EVIDENCE_VERIFICATION_FAILED")):
+            self.rejection(lambda: self.verifier.dispatch(bound), "RUNTIME_EVIDENCE_VERIFICATION_FAILED")
+        self.change_request_id("new-after-clock-observation")
+        restarted = self.reopen()
+        self.fixture.verifier = restarted
+        with patch.object(restarted, "_evaluate_policy", wraps=restarted._evaluate_policy) as evaluate:
+            self.rejection(lambda: self.admit(now=self.now - timedelta(seconds=1)), "DURABLE_CLOCK_ROLLBACK")
+            evaluate.assert_not_called()
+        self.assertEqual(restarted._seen_request_ids, set())
+        self.rejection(lambda: restarted.dispatch_status(self.fixture.request["request_id"]), "STATE_ADMISSION_NOT_FOUND")
+        admitted = self.admit(now=self.now)
+        self.assertEqual(b.decode(admitted.receipt)["issued_at"], b.core.iso(self.now))
+        self.assertEqual(self.calls, [])
+
+    def test_successful_admission_persists_its_evaluation_time(self):
+        self.now += timedelta(seconds=2)
+        self.admit(now=self.now)
+        self.change_request_id("new-after-durable-admission")
+        self.fixture.verifier = self.reopen()
+        self.rejection(lambda: self.admit(now=self.now - timedelta(seconds=1)), "DURABLE_CLOCK_ROLLBACK")
+        self.admit(now=self.now)
+        self.assertEqual(self.calls, [])
+
+    def test_clock_advance_during_authentication_is_checked_before_issuance(self):
+        verify = b._verify_runtime_evidence
+        def advance(*args):
+            checked = verify(*args)
+            self.store.observe_clock(lambda: self.now + timedelta(seconds=1))
+            return checked
+        with patch.object(b, "_verify_runtime_evidence", side_effect=advance), \
+                patch.object(self.verifier, "_evaluate_policy", wraps=self.verifier._evaluate_policy) as evaluate:
+            self.rejection(self.admit, "DURABLE_CLOCK_ROLLBACK")
+            evaluate.assert_not_called()
+        self.rejection(self.status, "STATE_ADMISSION_NOT_FOUND")
+        self.assertEqual(self.verifier._seen_request_ids, set())
+        self.assertEqual(self.calls, [])
+        checked = len(self.fixture.calls)
+        self.now += timedelta(seconds=2)
+        self.admit(now=self.now)
+        self.assertEqual(len(self.fixture.calls), checked + 1)
+        self.assertEqual(self.verifier._seen_request_ids, {self.request_id})
+        self.assertEqual(self.status().state, "ready")
+
+    def test_failed_admission_transaction_does_not_commit_evaluation_clock(self):
+        self.now += timedelta(seconds=2)
+        with patch.object(self.store, "_commit", side_effect=sqlite3.OperationalError("fixture before commit")):
+            self.rejection(lambda: self.admit(now=self.now), "STATE_UNAVAILABLE")
+        self.rejection(self.status, "STATE_ADMISSION_NOT_FOUND")
+        self.now -= timedelta(seconds=2)
+        self.admit(now=self.now)
+        self.assertEqual(self.calls, [])
+
+    def test_future_evaluation_cannot_block_an_existing_pending_admission(self):
+        pending = self.admit()
+        self.change_request_id("future-evaluation")
+        with patch.object(self.verifier, "_evaluate_policy", wraps=self.verifier._evaluate_policy) as evaluate:
+            self.rejection(lambda: self.admit(now=self.now + timedelta(seconds=1)), "DURABLE_EVALUATION_TIME_AHEAD")
+            evaluate.assert_not_called()
+        self.rejection(lambda: self.verifier.dispatch_status("future-evaluation"), "STATE_ADMISSION_NOT_FOUND")
+        self.assertEqual(self.verifier._seen_request_ids, {self.request_id})
+        self.verifier.dispatch(pending)
+        self.assertEqual(len(self.calls), 1)
+
+    def test_admission_clock_failure_leaves_no_record_or_clock_update(self):
+        def unavailable():
+            raise OSError("fixture clock")
+        self.now += timedelta(seconds=2)
+        self.verifier.dispatch_boundary = b.DispatchBoundary(execute=self.callback, clock=unavailable)
+        self.rejection(self.admit, "DISPATCH_CLOCK_UNAVAILABLE")
+        self.rejection(self.status, "STATE_ADMISSION_NOT_FOUND")
+        self.configure(self.verifier, self.store)
+        self.now -= timedelta(seconds=2)
+        self.admit()
+        self.assertEqual(self.calls, [])
+
+    def test_deny_commits_evaluation_time_with_its_record(self):
+        self.fixture.policy["allowed_actions"] = ["other"]
+        self.fixture.request["evidence_refs"][0]["digest"] = b.digest(b.encode(self.fixture.policy))
+        self.fixture.claims["context_hash"] = b.runtime_context_hash(
+            b.encode(self.fixture.request), b.encode(self.fixture.original))
+        self.fixture.attach()
+        self.now += timedelta(seconds=2)
+        bound = self.admit(now=self.now)
+        self.assertEqual(b.decode(bound.receipt)["decision"]["outcome"], "deny")
+        restarted = self.reopen()
+        self.assertEqual(restarted.dispatch_status(self.request_id).state, "not_executable")
+        with self.assertRaisesRegex(s.StateError, "DURABLE_CLOCK_ROLLBACK"):
+            restarted.state_store.observe_clock(lambda: self.now - timedelta(seconds=1))
+        self.assertEqual(self.calls, [])
+
     def test_configuration_change_rejects_restore(self):
         self.admit()
         restarted = self.reopen()
@@ -227,6 +320,22 @@ class DurableStateTests(unittest.TestCase):
         self.admit()
         with patch.object(b, "LOADED_SOURCE_SHA256", "0" * 64):
             self.rejection(lambda: self.reopen().restore_admission(self.request_id), "STATE_IMPLEMENTATION_CHANGED")
+
+    def test_unreadable_loaded_source_rejects_restore_with_identity_cause(self):
+        self.admit()
+        restarted = self.reopen()
+        with patch.object(Path, "read_bytes", side_effect=PermissionError("local source fixture")):
+            self.rejection(lambda: restarted.restore_admission(self.request_id), "STATE_IMPLEMENTATION_CHANGED")
+
+    def test_none_identity_alone_rejects_admission_and_restore_before_source_read(self):
+        self.admit()
+        self.change_request_id("missing-loaded-identity")
+        with patch.object(b, "LOADED_SOURCE_SHA256", None), \
+                patch.object(Path, "read_bytes", side_effect=AssertionError("None identity must be rejected first")):
+            self.rejection(self.admit, "STATE_IMPLEMENTATION_CHANGED")
+            self.rejection(lambda: self.verifier.restore_admission(self.request_id), "STATE_IMPLEMENTATION_CHANGED")
+        self.assertEqual(self.status().state, "ready")
+        self.assertEqual(self.calls, [])
 
     def test_subclass_cannot_inherit_reference_implementation_identity(self):
         class AnotherImplementation(type(self.verifier)):
@@ -458,6 +567,19 @@ class DurableStateTests(unittest.TestCase):
             s.DurableStateStore.create(self.directory, scope="new", verifier_id=self.verifier.verifier_id)
         with self.assertRaisesRegex(s.StateError, "STATE_ANCHOR_INVALID"):
             s.DurableStateStore(self.directory, expected_anchor=self.store.anchor + b" ")
+
+    def test_device_identity_mismatch_requires_original_anchor_and_preserves_state(self):
+        self.admit()
+        for field in ("directory_device", "db_device"):
+            with self.subTest(field=field):
+                changed = json.loads(self.store.anchor)
+                changed[field] += 1
+                with self.assertRaisesRegex(s.StateError, "STATE_STORE_REPLACED"):
+                    s.DurableStateStore(self.directory, expected_anchor=s.encode(changed))
+        restarted = self.reopen()
+        self.assertEqual(restarted.dispatch_status(self.request_id).state, "ready")
+        restarted.dispatch(restarted.restore_admission(self.request_id))
+        self.assertEqual(len(self.calls), 1)
 
     def test_symlink_database_and_sidecar_rejected(self):
         db = self.directory / "state.sqlite3"

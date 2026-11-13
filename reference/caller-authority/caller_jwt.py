@@ -15,10 +15,15 @@ import runtime_jwt as jwt
 b = jwt.binding
 a = b.caller_authority_module()
 require = jwt.require
-_source = Path(__file__).read_bytes()
-LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
-    and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
-        "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+_source = None
+try:
+    _source = Path(__file__).read_bytes()
+    LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
+        and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
+            "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+except (OSError, SyntaxError, ValueError):
+    # Import remains available; identity-dependent entry points reject None.
+    LOADED_SOURCE_SHA256 = None
 del _source
 
 PROFILE = "vate-caller-jwt-es256-v1"
@@ -122,8 +127,12 @@ class CallerJwtAuthorizer:
                 "CALLER_IMPLEMENTATION_CHANGED")
         sources = {}
         for module in (sys.modules[__name__], jwt):
-            require(jwt.file_sha(Path(module.__file__)) == module.LOADED_SOURCE_SHA256,
-                    "CALLER_IMPLEMENTATION_CHANGED")
+            require(module.LOADED_SOURCE_SHA256 is not None, "CALLER_IMPLEMENTATION_CHANGED")
+            try:
+                current_digest = jwt.file_sha(Path(module.__file__))
+            except OSError:
+                raise jwt.RuntimeJwtError("CALLER_IMPLEMENTATION_CHANGED") from None
+            require(current_digest == module.LOADED_SOURCE_SHA256, "CALLER_IMPLEMENTATION_CHANGED")
             sources[str(Path(module.__file__).resolve().relative_to(ROOT))] = module.LOADED_SOURCE_SHA256
         identity = {"profile": PROFILE, "authority_id": self.authority_id,
             "max_token_age_seconds": self.max_token_age_seconds,

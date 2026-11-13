@@ -119,6 +119,22 @@ class CallerAuthorityTests(unittest.TestCase):
     def test_missing_proof_prevents_admission(self):
         self.reject(caller_proof=None)
 
+    def test_unreadable_source_keeps_caller_identity_error_typed(self):
+        file_sha = c.jwt.file_sha
+        sources = {Path(c.__file__), Path(c.jwt.__file__)}
+        def unreadable(path):
+            if path in sources:
+                raise PermissionError("fixture caller source")
+            return file_sha(path)
+        with patch.object(c.jwt, "file_sha", side_effect=unreadable):
+            for entry in (self.new_authorizer, self.authorizer.as_caller_authorizer,
+                          lambda: self.authorizer.verify(self.proof, self.context())):
+                with self.subTest(entry=entry), self.assertRaisesRegex(c.jwt.RuntimeJwtError, "CALLER_IMPLEMENTATION_CHANGED"):
+                    entry()
+            self.reject()
+        self.admit()
+        self.assertEqual(self.calls, [])
+
     def test_disabled_adapter_does_not_ignore_proof(self):
         self.f.verifier.caller_authorizer = None
         self.reject()

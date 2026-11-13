@@ -3,8 +3,8 @@
 Connect an application's signed permission feed to the ordinary Python purchase
 verifier. Each complete snapshot supplies runtime trust and principal-to-actor
 delegation grants. The integration authenticates the selected source, retains
-its revision across restarts, and reevaluates current permissions before the
-dispatch callback.
+its revision across process restarts, and reevaluates current permissions before
+the dispatch callback.
 
 This optional reference integration adds an HTTPS intake helper and a separate
 local policy store to the existing [runtime](../runtime-jwt/README.md) and
@@ -55,7 +55,9 @@ The application selects the authority's public key, issuer, audience, scope,
 epoch, minimum revision and maximum snapshot age. The feed cannot choose its
 own trusted key. Construct `SnapshotVerifier` with that `AuthoritySelection`,
 then create an `AuthorityStore` as `source` and retain its anchor independently.
-On restart, reopen the store with that anchor.
+After a process restart, reopen the store with that anchor and the same directory, database
+and lock-file identities. The [storage contract](CONTRACT.md#store-lock-and-managed-entry)
+defines the conditions for host restarts and the stop-on-mismatch behavior.
 
 Call `source.refresh(HttpsSnapshotSource(selected_url))` to fetch and apply a
 complete signed snapshot. The HTTPS helper verifies the server certificate and

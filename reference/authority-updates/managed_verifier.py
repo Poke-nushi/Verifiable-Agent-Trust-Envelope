@@ -7,10 +7,15 @@ import authority_store as store_module
 import snapshot as s
 
 b, c, jwt = s.b, s.c, s.jwt
-_source = Path(__file__).read_bytes()
-LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
-    and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
-        "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+_source = None
+try:
+    _source = Path(__file__).read_bytes()
+    LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
+        and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
+            "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+except (OSError, SyntaxError, ValueError):
+    # Import remains available; identity-dependent entry points reject None.
+    LOADED_SOURCE_SHA256 = None
 del _source
 
 

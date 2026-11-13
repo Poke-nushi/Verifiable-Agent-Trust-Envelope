@@ -20,10 +20,15 @@ TABLES = {
     "identity": "CREATE TABLE identity (singleton INTEGER PRIMARY KEY CHECK(singleton=1), store_id TEXT NOT NULL, selection BLOB NOT NULL)",
     "state": "CREATE TABLE state (singleton INTEGER PRIMARY KEY CHECK(singleton=1), revision INTEGER NOT NULL, issued_at INTEGER NOT NULL, raw BLOB, raw_sha256 TEXT, payload_sha256 TEXT, conflict INTEGER NOT NULL CHECK(conflict IN (0,1)), unavailable INTEGER NOT NULL CHECK(unavailable IN (0,1)), clock_high TEXT)"
 }
-_source = Path(__file__).read_bytes()
-LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
-    and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
-        "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+_source = None
+try:
+    _source = Path(__file__).read_bytes()
+    LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
+        and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
+            "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+except (OSError, SyntaxError, ValueError):
+    # Import remains available; identity-dependent entry points reject None.
+    LOADED_SOURCE_SHA256 = None
 del _source
 
 def _fd_registry():
@@ -134,22 +139,23 @@ class AuthorityStore:
         fd = None
         fd_guard, active_fds = _FD_GUARD, _ACTIVE_FDS
         try:
-            self._files()
-            with fd_guard:
-                fd = os.open(self.directory / "authority.lock", os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC)
-                active_fds.add(fd)
-            info = os.fstat(fd)
-            s.need((info.st_dev, info.st_ino) == (self._anchor["lock_device"], self._anchor["lock_inode"]),
-                   "AUTHORITY_STORE_REPLACED")
             try:
-                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except BlockingIOError:
-                raise s.AuthorityError("AUTHORITY_BUSY") from None
-            self._files()
+                self._files()
+                with fd_guard:
+                    fd = os.open(self.directory / "authority.lock", os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC)
+                    active_fds.add(fd)
+                info = os.fstat(fd)
+                s.need((info.st_dev, info.st_ino) == (self._anchor["lock_device"], self._anchor["lock_inode"]),
+                       "AUTHORITY_STORE_REPLACED")
+                try:
+                    fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except BlockingIOError:
+                    raise s.AuthorityError("AUTHORITY_BUSY") from None
+                self._files()
+            except OSError:
+                raise s.AuthorityError("AUTHORITY_STORE_UNAVAILABLE") from None
             self._local.active = True
             yield
-        except OSError:
-            raise s.AuthorityError("AUTHORITY_STORE_UNAVAILABLE") from None
         finally:
             if os.getpid() == self._pid:
                 self._local.active = False

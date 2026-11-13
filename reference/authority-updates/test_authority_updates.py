@@ -285,6 +285,55 @@ class AuthorityUpdateTests(unittest.TestCase):
             with source.lease():
                 pass
 
+    def test_lease_preserves_body_io_error_and_releases_lock(self):
+        raw, = self.setup_source(); self.source.accept(raw)
+        original = FileNotFoundError("fixture consumer I/O")
+        with self.assertRaises(FileNotFoundError) as observed:
+            with self.source.lease():
+                raise original
+        self.assertIs(observed.exception, original)
+        self.assertEqual(self.source.accept(raw)["revision"], 1)
+        self.assertEqual(self.calls, [])
+
+    def test_unreadable_identity_is_typed_at_each_authority_entry(self):
+        raw, = self.setup_source(); self.source.accept(raw)
+        def lease():
+            with self.source.lease():
+                self.fail("unreadable identity must not enter lease")
+        for entry in (lease, lambda: self.source.accept(raw), self.source.status, self.admit):
+            with self.subTest(entry=entry), patch.object(s.jwt, "file_sha", side_effect=PermissionError("fixture source")):
+                with self.assertRaisesRegex(s.AuthorityError, "AUTHORITY_IMPLEMENTATION_CHANGED"):
+                    entry()
+        with patch.object(s.jwt, "file_sha", side_effect=FileNotFoundError("fixture source")):
+            with self.assertRaisesRegex(s.AuthorityError, "AUTHORITY_REFRESH_FAILED"):
+                self.source.refresh(lambda: raw)
+        self.assertEqual(self.source.accept(raw)["revision"], 1)
+        self.assertEqual(self.calls, [])
+
+    def test_gate_io_error_is_store_unavailable_and_releases_lock(self):
+        raw, = self.setup_source(); self.source.accept(raw)
+        with patch.object(store_module.os, "open", side_effect=PermissionError("fixture store open")):
+            with self.assertRaisesRegex(s.AuthorityError, "AUTHORITY_STORE_UNAVAILABLE"):
+                with self.source.lease():
+                    self.fail("unavailable store must not enter lease")
+        self.assertEqual(self.source.accept(raw)["revision"], 1)
+
+    def test_device_identity_mismatch_preserves_original_store(self):
+        raw, = self.setup_source(); self.source.accept(raw)
+        self.admit()
+        for field in ("directory_device", "db_device", "lock_device"):
+            with self.subTest(field=field):
+                changed = b.decode(self.source.anchor)
+                changed[field] += 1
+                with self.assertRaisesRegex(s.AuthorityError, "AUTHORITY_STORE_REPLACED"):
+                    AuthorityStore(self.directory, verifier=self.source.verifier,
+                        expected_anchor=b.encode(changed), clock=lambda: self.now)
+        source, managed = self.reopen()
+        self.assertEqual(source.status()["revision"], 1)
+        restored = managed.restore_admission(self.f.f.request["request_id"])
+        managed.dispatch(restored, caller_proof=self.f.proof)
+        self.assertEqual(len(self.calls), 1)
+
     def test_lease_blocks_reentrant_updates_and_other_threads(self):
         raw, = self.setup_source(); self.source.accept(raw)
         outcomes = []

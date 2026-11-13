@@ -11,6 +11,43 @@ import unittest
 
 import snapshot as s
 
+UNAVAILABLE_SOURCE = '''import json, shutil, sys
+from pathlib import Path
+root = Path(sys.argv[1])
+sys.path.insert(0, str(root / "reference/authority-updates"))
+read_bytes = Path.read_bytes
+names = {"snapshot.py", "authority_store.py", "managed_verifier.py", "caller_jwt.py",
+    "runtime_jwt.py", "caller_authority.py", "request_binding.py", "durable_state.py", "vate_verifier_core.py"}
+def unavailable(path):
+    if path.name in names:
+        if sys.argv[2] == "read": raise PermissionError("local source fixture")
+        return bytes([0])
+    return read_bytes(path)
+Path.read_bytes = unavailable
+import managed_verifier as m
+modules = (m, m.s, m.store_module, m.c, m.jwt, m.b, m.b.core,
+    m.b.caller_authority_module(), m.b.durable_state_module())
+try:
+    m.s.module_identity(m.s)
+    cause = None
+except m.s.AuthorityError as exc:
+    cause = exc.cause
+node = Path(shutil.which("node")).resolve()
+# Public P-256 key from the existing RFC 7515 Appendix A.3 fixture.
+key = m.jwt.SPKI_PREFIX + m.jwt.decode_segment(b"f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU", 32) + \\
+    m.jwt.decode_segment(b"x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0", 32)
+selection = m.s.AuthoritySelection("urn:example:authority", "urn:example:verifier", "purchase",
+    "epoch-1", "key", key, 1, 30)
+try:
+    m.s.SnapshotVerifier(expected_profile=m.s.PROFILE, selection=selection,
+        node=node, node_sha256=m.jwt.file_sha(node))
+    constructor = None
+except m.s.AuthorityError as exc:
+    constructor = exc.cause
+print(json.dumps({"digests":[module.LOADED_SOURCE_SHA256 for module in modules],
+    "cause":cause, "constructor":constructor}))
+'''
+
 CHILD = '''import importlib, json, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(sys.argv[1]) / "reference/authority-updates"))
@@ -70,6 +107,19 @@ finally: f.doCleanups()
 
 
 class AuthoritySourceIdentityTests(unittest.TestCase):
+    def test_source_read_or_compile_failure_keeps_imports_available_without_identity(self):
+        for mode in ("read", "compile"):
+            for optimize in (0, 1):
+                with self.subTest(mode=mode, optimize=optimize):
+                    completed = subprocess.run([sys.executable, *(["-O"] if optimize else []), "-B", "-c",
+                        UNAVAILABLE_SOURCE, str(s.ROOT), mode], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                        text=True, timeout=35)
+                    self.assertEqual(completed.returncode, 0, completed.stderr)
+                    result = json.loads(completed.stdout)
+                    self.assertEqual(result["digests"], [None] * 9)
+                    self.assertEqual(result["cause"], "AUTHORITY_IMPLEMENTATION_CHANGED")
+                    self.assertEqual(result["constructor"], "AUTHORITY_IMPLEMENTATION_CHANGED")
+
     def copy_sources(self, root):
         for directory in ("request-binding", "vate-verifier-core", "runtime-jwt", "caller-authority", "authority-updates"):
             target = root / "reference" / directory; target.mkdir(parents=True)

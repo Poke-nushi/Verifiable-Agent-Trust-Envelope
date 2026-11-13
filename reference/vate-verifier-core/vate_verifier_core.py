@@ -26,10 +26,15 @@ from typing import Any, Iterator
 PROFILE = "VATE-AL2-Verifier-Admission-v0.3"
 VERSION = "vate-0.3"
 # A timestamp-valid .pyc is not evidence that current source was executed.
-_source = Path(__file__).read_bytes()
-LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
-    and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
-        "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+_source = None
+try:
+    _source = Path(__file__).read_bytes()
+    LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
+        and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
+            "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+except (OSError, SyntaxError, ValueError):
+    # Import remains available; identity-dependent entry points reject None.
+    LOADED_SOURCE_SHA256 = None
 del _source
 EXECUTABLE_ADMISSION_DECISIONS = {"allow", "attenuate"}
 SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")

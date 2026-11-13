@@ -57,6 +57,9 @@ jobs:
       - name: Run execution evidence tests
         run: python -B -m unittest discover -s reference/execution-evidence-demo -p 'test_*.py' -v
 
+      - name: Check request binding, source identity, and durable dispatch
+        run: python -B -m unittest discover -s reference/request-binding -p 'test_*.py' -v
+
       - name: Check signed runtime evidence through admission and dispatch
         run: python -B -m unittest discover -s reference/runtime-jwt -p 'test_*.py' -v
 
