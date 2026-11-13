@@ -175,6 +175,38 @@ class Es256Backend:
         require(result["verified"], "INVALID_SIGNATURE")
 
 
+
+def validate_policy(policy: RuntimeTrustPolicy, now: datetime, max_policy_age_seconds: int):
+    """Validate an application-selected snapshot without fetching or signing it."""
+    require(type(policy) is RuntimeTrustPolicy and type(policy.grants) is tuple
+            and len(policy.grants) <= 128, "INVALID_TRUST_POLICY")
+    issued, expires = numeric_date(policy.issued_at), numeric_date(policy.expires_at)
+    require(issued < expires and issued <= now < expires, "TRUST_POLICY_OUTSIDE_WINDOW")
+    freshness = timedelta(seconds=max_policy_age_seconds)
+    require(now - issued <= freshness, "TRUST_POLICY_STALE")
+    validity_end = expires - timedelta(microseconds=1)
+    deadline = validity_end if freshness >= validity_end - issued else issued + freshness
+    identities, keys, serialized = set(), {}, []
+    for grant in policy.grants:
+        require(type(grant) is RuntimeIssuerGrant and all(text(value) for value in
+            (grant.issuer, grant.kid, grant.runtime, grant.audience))
+            and type(grant.public_key_spki) is bytes and len(grant.public_key_spki) == 91
+            and grant.public_key_spki.startswith(SPKI_PREFIX) and type(grant.revoked) is bool,
+            "INVALID_TRUST_POLICY")
+        require(numeric_date(grant.not_before) < numeric_date(grant.expires_at), "INVALID_TRUST_POLICY")
+        identity = (grant.issuer, grant.kid, grant.runtime, grant.audience)
+        key_id = (grant.issuer, grant.kid)
+        require(identity not in identities and keys.get(key_id, grant.public_key_spki) == grant.public_key_spki,
+                "AMBIGUOUS_TRUST_POLICY")
+        identities.add(identity)
+        keys[key_id] = grant.public_key_spki
+        serialized.append({"issuer": grant.issuer, "kid": grant.kid, "runtime": grant.runtime,
+            "audience": grant.audience, "spki_base64": base64.b64encode(grant.public_key_spki).decode("ascii"),
+            "not_before": grant.not_before, "expires_at": grant.expires_at, "revoked": grant.revoked})
+    snapshot = binding.encode({"issued_at": policy.issued_at, "expires_at": policy.expires_at, "grants": serialized})
+    return policy, snapshot, deadline
+
+
 class RuntimeJwtVerifier(Es256Backend):
     def __init__(self, *, expected_profile: str, node: str | Path, node_sha256: str,
                  trust_policy_provider: Callable[[], RuntimeTrustPolicy],
@@ -197,33 +229,7 @@ class RuntimeJwtVerifier(Es256Backend):
             policy = self.trust_policy_provider()
         except Exception:
             raise RuntimeJwtError("TRUST_POLICY_UNAVAILABLE") from None
-        require(type(policy) is RuntimeTrustPolicy and type(policy.grants) is tuple
-                and len(policy.grants) <= 128, "INVALID_TRUST_POLICY")
-        issued, expires = numeric_date(policy.issued_at), numeric_date(policy.expires_at)
-        require(issued < expires and issued <= now < expires, "TRUST_POLICY_OUTSIDE_WINDOW")
-        freshness = timedelta(seconds=self.max_policy_age_seconds)
-        require(now - issued <= freshness, "TRUST_POLICY_STALE")
-        validity_end = expires - timedelta(microseconds=1)
-        deadline = validity_end if freshness >= validity_end - issued else issued + freshness
-        identities, keys, serialized = set(), {}, []
-        for grant in policy.grants:
-            require(type(grant) is RuntimeIssuerGrant and all(text(value) for value in
-                (grant.issuer, grant.kid, grant.runtime, grant.audience))
-                and type(grant.public_key_spki) is bytes and len(grant.public_key_spki) == 91
-                and grant.public_key_spki.startswith(SPKI_PREFIX) and type(grant.revoked) is bool,
-                "INVALID_TRUST_POLICY")
-            require(numeric_date(grant.not_before) < numeric_date(grant.expires_at), "INVALID_TRUST_POLICY")
-            identity = (grant.issuer, grant.kid, grant.runtime, grant.audience)
-            key_id = (grant.issuer, grant.kid)
-            require(identity not in identities and keys.get(key_id, grant.public_key_spki) == grant.public_key_spki,
-                    "AMBIGUOUS_TRUST_POLICY")
-            identities.add(identity)
-            keys[key_id] = grant.public_key_spki
-            serialized.append({"issuer": grant.issuer, "kid": grant.kid, "runtime": grant.runtime,
-                "audience": grant.audience, "spki_base64": base64.b64encode(grant.public_key_spki).decode("ascii"),
-                "not_before": grant.not_before, "expires_at": grant.expires_at, "revoked": grant.revoked})
-        snapshot = binding.encode({"issued_at": policy.issued_at, "expires_at": policy.expires_at, "grants": serialized})
-        return policy, snapshot, deadline
+        return validate_policy(policy, now, self.max_policy_age_seconds)
 
     def verify(self, raw: bytes, context: binding.RuntimeEvidenceContext) -> binding.AuthenticatedRuntimeClaims:
         require(type(raw) is bytes and 0 < len(raw) <= MAX_TOKEN_BYTES, "INVALID_COMPACT_JWT")

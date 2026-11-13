@@ -92,6 +92,9 @@ jobs:
           trial_sha="$(python -c 'import hashlib,pathlib,sys; print(hashlib.sha256(pathlib.Path(sys.argv[1]).read_bytes()).hexdigest())' "$trial_openssl")"
           echo "VATE_TRIAL_OPENSSL_SHA256=$trial_sha" >> "$GITHUB_ENV"
 
+      - name: Check authenticated authority intake and ordered updates
+        run: python -B -m unittest discover -s reference/authority-updates -p 'test_*.py' -v
+
       - name: Check detached signatures and receiver-selected issuer authority
         run: |
           python -B -m unittest discover -s reference/recipient-signature-authority -p 'test_*.py' -v

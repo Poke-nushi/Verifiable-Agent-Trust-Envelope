@@ -61,10 +61,15 @@ The draft prefers pairwise presentation where practical, but it does not yet fre
 The optional [caller authority integration](../reference/caller-authority/README.md)
 checks actor-signed purchase instructions and application-selected principal
 permission/delegation at admission and durable dispatch. It complements the
-[runtime JWT adapter](../reference/runtime-jwt/README.md). Both use explicit
-local trust providers; authenticated remote trust delivery and deployment-wide
-authority policy remain application responsibilities. These Python paths do not
-establish transport peer identity or hardware-backed runtime attestation.
+[runtime JWT adapter](../reference/runtime-jwt/README.md). The optional
+[authority update integration](../reference/authority-updates/README.md)
+authenticates complete signed policy snapshots, offers verified HTTPS intake,
+and retains revision checks across restarts. Local updates and dispatch callbacks
+share an ordered policy lease. Actual IAM-to-grant translation, root-key
+selection/migration, reliable remote update delivery and deployment-wide
+authority policy remain application responsibilities. These Python paths do
+not establish the caller's or runtime's transport peer identity or
+hardware-backed runtime attestation.
 
 ### 4. Receipt Semantics Need More Precision
 

@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:authority-snapshot:claims:v1",
+  "description": "Complete signed policy snapshot claims for the optional Python purchase adapter. Shape validation alone does not authenticate the source or validate permission semantics.",
+  "type": "object",
+  "properties": {
+    "iss": {
+      "$ref": "#/$defs/identifier"
+    },
+    "aud": {
+      "$ref": "#/$defs/identifier"
+    },
+    "scope": {
+      "$ref": "#/$defs/identifier"
+    },
+    "epoch": {
+      "$ref": "#/$defs/identifier"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "iat": {
+      "$ref": "#/$defs/numericDate"
+    },
+    "nbf": {
+      "$ref": "#/$defs/numericDate"
+    },
+    "exp": {
+      "$ref": "#/$defs/numericDate"
+    },
+    "runtime_grants": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "$ref": "#/$defs/runtimeGrant"
+      }
+    },
+    "delegation_grants": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "$ref": "#/$defs/delegationGrant"
+      }
+    }
+  },
+  "required": [
+    "iss",
+    "aud",
+    "scope",
+    "epoch",
+    "revision",
+    "iat",
+    "nbf",
+    "exp",
+    "runtime_grants",
+    "delegation_grants"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^[^\\u0000-\\u001f\\ud800-\\udfff]+(?![\\s\\S])"
+    },
+    "numericDate": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 253402300799
+    },
+    "spki": {
+      "type": "string",
+      "minLength": 124,
+      "maxLength": 124,
+      "pattern": "^[A-Za-z0-9+/]{122}==(?![\\s\\S])"
+    },
+    "runtimeGrant": {
+      "type": "object",
+      "properties": {
+        "issuer": {
+          "$ref": "#/$defs/identifier"
+        },
+        "kid": {
+          "$ref": "#/$defs/identifier"
+        },
+        "runtime": {
+          "$ref": "#/$defs/identifier"
+        },
+        "audience": {
+          "$ref": "#/$defs/identifier"
+        },
+        "public_key_spki_base64": {
+          "$ref": "#/$defs/spki"
+        },
+        "not_before": {
+          "$ref": "#/$defs/numericDate"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/numericDate"
+        },
+        "revoked": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "issuer",
+        "kid",
+        "runtime",
+        "audience",
+        "public_key_spki_base64",
+        "not_before",
+        "expires_at",
+        "revoked"
+      ],
+      "additionalProperties": false
+    },
+    "delegationGrant": {
+      "type": "object",
+      "properties": {
+        "grant_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "principal": {
+          "$ref": "#/$defs/identifier"
+        },
+        "actor": {
+          "$ref": "#/$defs/identifier"
+        },
+        "kid": {
+          "$ref": "#/$defs/identifier"
+        },
+        "runtime": {
+          "$ref": "#/$defs/identifier"
+        },
+        "audience": {
+          "$ref": "#/$defs/identifier"
+        },
+        "resource": {
+          "$ref": "#/$defs/identifier"
+        },
+        "action": {
+          "$ref": "#/$defs/identifier"
+        },
+        "public_key_spki_base64": {
+          "$ref": "#/$defs/spki"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}(?![\\s\\S])"
+        },
+        "max_amount": {
+          "type": "string",
+          "pattern": "^(?:0|[1-9][0-9]{0,17})(?:\\.[0-9]{1,8})?(?![\\s\\S])"
+        },
+        "tool_allowlist": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "not_before": {
+          "$ref": "#/$defs/numericDate"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/numericDate"
+        },
+        "revoked": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "grant_id",
+        "principal",
+        "actor",
+        "kid",
+        "runtime",
+        "audience",
+        "resource",
+        "action",
+        "public_key_spki_base64",
+        "currency",
+        "max_amount",
+        "tool_allowlist",
+        "not_before",
+        "expires_at",
+        "revoked"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

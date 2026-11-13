@@ -54,6 +54,41 @@ class AuthorityPolicy:
     grants: tuple[DelegationGrant, ...]
 
 
+
+def validate_policy(policy: AuthorityPolicy, now: datetime, max_policy_age_seconds: int):
+    """Validate an application-selected snapshot without fetching or signing it."""
+    require(type(policy) is AuthorityPolicy and type(policy.grants) is tuple
+            and len(policy.grants) <= 128, "INVALID_AUTHORITY_POLICY")
+    issued, expires = jwt.numeric_date(policy.issued_at), jwt.numeric_date(policy.expires_at)
+    require(issued < expires and issued <= now < expires, "AUTHORITY_POLICY_OUTSIDE_WINDOW")
+    freshness = timedelta(seconds=max_policy_age_seconds)
+    require(now - issued <= freshness, "AUTHORITY_POLICY_STALE")
+    end = expires - timedelta(microseconds=1)
+    deadline = end if freshness >= end - issued else issued + freshness
+    ids, keys, serialized = set(), {}, []
+    for grant in policy.grants:
+        require(type(grant) is DelegationGrant and all(jwt.text(getattr(grant, key)) for key in
+            ("grant_id", "principal", "actor", "kid", "runtime", "audience", "resource", "action"))
+            and type(grant.public_key_spki) is bytes and len(grant.public_key_spki) == 91
+            and grant.public_key_spki.startswith(jwt.SPKI_PREFIX) and type(grant.revoked) is bool
+            and type(grant.tool_allowlist) is tuple and 0 < len(grant.tool_allowlist) <= 32
+            and all(jwt.text(tool) for tool in grant.tool_allowlist)
+            and len(set(grant.tool_allowlist)) == len(grant.tool_allowlist), "INVALID_AUTHORITY_POLICY")
+        b.money({"currency": grant.currency, "value": grant.max_amount})
+        require(jwt.numeric_date(grant.not_before) < jwt.numeric_date(grant.expires_at), "INVALID_AUTHORITY_POLICY")
+        key_id = (grant.actor, grant.kid)
+        require(grant.grant_id not in ids and keys.get(key_id, grant.public_key_spki) == grant.public_key_spki,
+                "AMBIGUOUS_AUTHORITY_POLICY")
+        ids.add(grant.grant_id)
+        keys[key_id] = grant.public_key_spki
+        item = {key: value for key, value in vars(grant).items() if key not in ("public_key_spki", "tool_allowlist")}
+        item.update(spki_base64=base64.b64encode(grant.public_key_spki).decode("ascii"),
+                    tool_allowlist=list(grant.tool_allowlist))
+        serialized.append(item)
+    return policy, b.encode({"issued_at": policy.issued_at, "expires_at": policy.expires_at,
+                             "grants": serialized}), deadline
+
+
 class CallerJwtAuthorizer:
     # Own-class stamps survive a module reload without relabeling retained
     # old methods as the current implementation. Unstamped subclasses fail.
@@ -64,10 +99,13 @@ class CallerJwtAuthorizer:
                  node: str | Path, node_sha256: str,
                  authority_policy_provider: Callable[[], AuthorityPolicy],
                  max_token_age_seconds: int, max_policy_age_seconds: int,
-                 timeout_seconds: float = 10.0):
+                 timeout_seconds: float = 10.0, authority_source_configuration_id: str | None = None):
         require(expected_profile == PROFILE and jwt.text(authority_id)
                 and callable(authority_policy_provider) and jwt.positive_seconds(max_token_age_seconds)
                 and jwt.positive_seconds(max_policy_age_seconds), "INVALID_CALLER_CONFIGURATION")
+        require(authority_source_configuration_id is None or jwt.text(authority_source_configuration_id),
+                "INVALID_CALLER_CONFIGURATION")
+        self.authority_source_configuration_id = authority_source_configuration_id
         self.authority_id = authority_id
         self.authority_policy_provider = authority_policy_provider
         self.max_token_age_seconds = max_token_age_seconds
@@ -87,12 +125,15 @@ class CallerJwtAuthorizer:
             require(jwt.file_sha(Path(module.__file__)) == module.LOADED_SOURCE_SHA256,
                     "CALLER_IMPLEMENTATION_CHANGED")
             sources[str(Path(module.__file__).resolve().relative_to(ROOT))] = module.LOADED_SOURCE_SHA256
-        return b.object_hash({"profile": PROFILE, "authority_id": self.authority_id,
+        identity = {"profile": PROFILE, "authority_id": self.authority_id,
             "max_token_age_seconds": self.max_token_age_seconds,
             "max_policy_age_seconds": self.max_policy_age_seconds, "sources": sources,
             "node": str(self.backend.node), "node_sha256": self.backend.node_sha256,
             "bridge": str(self.backend.bridge), "bridge_sha256": self.backend.bridge_sha256,
-            "timeout_microseconds": int(self.backend.timeout * 1000000), "env": self.backend.env})
+            "timeout_microseconds": int(self.backend.timeout * 1000000), "env": self.backend.env}
+        if self.authority_source_configuration_id is not None:
+            identity["authority_source_configuration_id"] = self.authority_source_configuration_id
+        return b.object_hash(identity)
 
     def as_caller_authorizer(self) -> a.CallerAuthorityVerifier:
         require(self._identity() == self._configuration_id, "CALLER_CONFIGURATION_CHANGED")
@@ -104,36 +145,7 @@ class CallerJwtAuthorizer:
             policy = self.authority_policy_provider()
         except Exception:
             raise jwt.RuntimeJwtError("AUTHORITY_POLICY_UNAVAILABLE") from None
-        require(type(policy) is AuthorityPolicy and type(policy.grants) is tuple
-                and len(policy.grants) <= 128, "INVALID_AUTHORITY_POLICY")
-        issued, expires = jwt.numeric_date(policy.issued_at), jwt.numeric_date(policy.expires_at)
-        require(issued < expires and issued <= now < expires, "AUTHORITY_POLICY_OUTSIDE_WINDOW")
-        freshness = timedelta(seconds=self.max_policy_age_seconds)
-        require(now - issued <= freshness, "AUTHORITY_POLICY_STALE")
-        end = expires - timedelta(microseconds=1)
-        deadline = end if freshness >= end - issued else issued + freshness
-        ids, keys, serialized = set(), {}, []
-        for grant in policy.grants:
-            require(type(grant) is DelegationGrant and all(jwt.text(getattr(grant, key)) for key in
-                ("grant_id", "principal", "actor", "kid", "runtime", "audience", "resource", "action"))
-                and type(grant.public_key_spki) is bytes and len(grant.public_key_spki) == 91
-                and grant.public_key_spki.startswith(jwt.SPKI_PREFIX) and type(grant.revoked) is bool
-                and type(grant.tool_allowlist) is tuple and 0 < len(grant.tool_allowlist) <= 32
-                and all(jwt.text(tool) for tool in grant.tool_allowlist)
-                and len(set(grant.tool_allowlist)) == len(grant.tool_allowlist), "INVALID_AUTHORITY_POLICY")
-            b.money({"currency": grant.currency, "value": grant.max_amount})
-            require(jwt.numeric_date(grant.not_before) < jwt.numeric_date(grant.expires_at), "INVALID_AUTHORITY_POLICY")
-            key_id = (grant.actor, grant.kid)
-            require(grant.grant_id not in ids and keys.get(key_id, grant.public_key_spki) == grant.public_key_spki,
-                    "AMBIGUOUS_AUTHORITY_POLICY")
-            ids.add(grant.grant_id)
-            keys[key_id] = grant.public_key_spki
-            item = {key: value for key, value in vars(grant).items() if key not in ("public_key_spki", "tool_allowlist")}
-            item.update(spki_base64=base64.b64encode(grant.public_key_spki).decode("ascii"),
-                        tool_allowlist=list(grant.tool_allowlist))
-            serialized.append(item)
-        return policy, b.encode({"issued_at": policy.issued_at, "expires_at": policy.expires_at,
-                                 "grants": serialized}), deadline
+        return validate_policy(policy, now, self.max_policy_age_seconds)
 
     def verify(self, raw: bytes, context: a.CallerAuthorityContext) -> a.AuthenticatedCallerClaims:
         require(self._identity() == self._configuration_id, "CALLER_CONFIGURATION_CHANGED")

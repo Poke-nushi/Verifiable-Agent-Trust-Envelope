@@ -109,6 +109,13 @@ original operation's outcome.
 Independent issuer authenticity, cross-implementation A2A exchanges and
 production readiness remain unestablished.
 
+The optional [authority update integration](reference/authority-updates/README.md)
+connects signed runtime and caller permission snapshots to ordinary Python
+admission and durable dispatch. It adds verified HTTPS intake, persistent
+revision checks and local ordering between policy updates and dispatch callbacks.
+Connecting a real issuing authority's IAM decisions and maintaining remote update
+delivery remain application integration work.
+
 The main-branch conformance corpus remains 76 cases / 217 manifest artifacts.
 The demonstration scenarios are separate from that corpus. See
 [external SUT coverage](docs/conformance/external-sut-coverage.md) for the

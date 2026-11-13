@@ -54,6 +54,12 @@ existing Node executable path and expected digest, a trusted
 `authority_id` identifies the application-selected authority source. It is
 configuration, not a token assertion or authentication mechanism for that source.
 
+The optional `authority_source_configuration_id` is an application-selected
+nonempty identifier included in the adapter descriptor. The
+[authenticated snapshot integration](../authority-updates/CONTRACT.md) uses it
+to bind the selected intake configuration and anchored store. It does not
+authenticate a provider by itself.
+
 The provider MUST return an exact frozen `AuthorityPolicy` with integer
 `issued_at`, `expires_at` and a tuple of zero to 128 frozen `DelegationGrant`
 objects. A grant contains:

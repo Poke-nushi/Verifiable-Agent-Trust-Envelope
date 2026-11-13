@@ -74,6 +74,10 @@ source and require this mode at every exposed entry that needs it. Local
 grant fixtures demonstrate the checks; they do not establish real-world
 authority or an authenticated remote update channel.
 
+The optional [authority update integration](../authority-updates/README.md)
+adds signed complete-snapshot intake, an HTTPS helper and persistent revision
+checks. Its managed entry orders local policy updates against dispatch callbacks.
+
 The receipt and receiver assessment retain their existing format. Receiver
 assessment checks the content bindings; it does not authenticate a received
 caller-verification record or establish external execution. The TypeScript
