@@ -69,7 +69,11 @@ and retains revision checks across process restarts. Local updates and dispatch
 callbacks share an ordered policy lease. The
 [selected Hydra/OpenFGA issuer](../reference/authority-issuer/README.md) adds one
 fixed IAM-to-grant mapping and a native loopback revocation/recovery fixture.
-Broader IAM mappings, durable signing-key operation, root-key selection/migration,
+An optional [macOS Keychain signer](../reference/authority-keychain/README.md)
+adds protected persistent key use and publisher process-restart checks against
+the existing revision ledger. It uses a selected file-based Keychain; host
+reboot/unlock, key recovery and deployment-specific custody remain unverified.
+Broader IAM mappings, root-key selection/migration,
 supervised remote update delivery and deployment-wide authority policy remain
 application responsibilities. Both local stores require unchanged anchored
 filesystem identities. Their contracts provide no portable host recovery,

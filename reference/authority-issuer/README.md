@@ -66,6 +66,12 @@ private signing keys, OAuth access tokens and caller proofs. The fixture signer
 keeps its ephemeral private key in a child process and cannot recover that key
 after the process exits.
 
+For persistent signing-key integration, the optional
+[macOS Keychain signer](../authority-keychain/README.md) supplies the same
+callback interface and tests fresh publisher processes against one retained key
+and revision ledger. The native Hydra/OpenFGA example above continues to use
+its disposable in-memory signer.
+
 Unit tests use existing Node/OpenSSL and disposable local endpoints; they do
 not need Hydra/OpenFGA binaries:
 
@@ -90,8 +96,8 @@ not learn about a remote revocation until an update arrives; an undelivered
 update remains bounded by the last snapshot's expiry.
 
 One publisher per registration is supported. Independent concurrent publishers,
-durable signing-key custody, root-key/epoch migration, supervised update
+deployment-specific signing-key custody, root-key/epoch migration, supervised update
 delivery and independent deployment testing remain integration work. The
 service reads are sequential, not an atomic transaction across Hydra and
-OpenFGA. The existing TypeScript receipt checker is unchanged; this adapter
-connects to the Python admission and dispatch path.
+OpenFGA. This adapter connects to the Python admission and dispatch path; the
+TypeScript component checks receipt content.

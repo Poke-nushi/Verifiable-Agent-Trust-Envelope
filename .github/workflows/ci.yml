@@ -101,6 +101,9 @@ jobs:
       - name: Check selected authority issuance and source failures
         run: python -B -m unittest discover -s reference/authority-issuer -p 'test_*.py' -v
 
+      - name: Check persistent authority signing and publisher restarts
+        run: python -B -m unittest discover -s reference/authority-keychain -p 'test_*.py' -v
+
       - name: Check detached signatures and receiver-selected issuer authority
         run: |
           python -B -m unittest discover -s reference/recipient-signature-authority -p 'test_*.py' -v

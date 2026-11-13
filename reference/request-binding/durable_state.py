@@ -189,9 +189,13 @@ class DurableStateStore:
                 (self._anchor["db_device"], self._anchor["db_inode"]), "STATE_STORE_REPLACED")
         for suffix in ("-journal", "-wal", "-shm"):
             path = Path(str(db) + suffix)
-            if os.path.lexists(path):
+            try:
                 item = path.lstat()
-                require(stat.S_ISREG(item.st_mode) and item.st_nlink == 1, "STATE_SIDECAR_INVALID")
+            except FileNotFoundError:
+                # SQLite may remove a rollback journal after another writer's
+                # COMMIT. Inspect once; a prior existence check races that removal.
+                continue
+            require(stat.S_ISREG(item.st_mode) and item.st_nlink == 1, "STATE_SIDECAR_INVALID")
         return db
 
     @contextmanager

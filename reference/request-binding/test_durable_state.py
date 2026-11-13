@@ -593,6 +593,38 @@ class DurableStateTests(unittest.TestCase):
         sidecar.symlink_to(Path(self.tmp.name) / "absent")
         self.rejection(self.status, "STATE_SIDECAR_INVALID")
 
+    def test_disappearing_journal_during_file_check_preserves_valid_state(self):
+        self.admit()
+        journal = self.directory / "state.sqlite3-journal"
+        journal.write_bytes(b"")
+        original = Path.lstat
+        removed = False
+        def inspect(path, *args, **kwargs):
+            nonlocal removed
+            if path == journal and not removed:
+                # Another connection can remove its rollback journal after COMMIT.
+                journal.unlink()
+                removed = True
+            return original(path, *args, **kwargs)
+        with patch.object(Path, "lstat", inspect):
+            self.assertEqual(self.status().state, "ready")
+        self.assertTrue(removed)
+        self.verifier.dispatch(self.verifier.restore_admission(self.request_id))
+        self.assertEqual(len(self.calls), 1)
+
+    def test_unreadable_sidecar_metadata_still_stops_dispatch(self):
+        bound = self.admit()
+        journal = self.directory / "state.sqlite3-journal"
+        journal.write_bytes(b"")
+        original = Path.lstat
+        def inspect(path, *args, **kwargs):
+            if path == journal:
+                raise PermissionError("fixture metadata access denied")
+            return original(path, *args, **kwargs)
+        with patch.object(Path, "lstat", inspect):
+            self.rejection(lambda: self.verifier.dispatch(bound), "STATE_UNAVAILABLE")
+        self.assertEqual(self.calls, [])
+
     def test_two_processes_share_one_admission_replay_decision(self):
         self.run_processes("admit", count=2, expected=["admitted", "DURABLE_REPLAY_DETECTED"])
         self.assertEqual(self.status().state, "ready")

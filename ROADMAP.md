@@ -115,9 +115,12 @@ admission and durable dispatch. It adds verified HTTPS intake, persistent
 revision checks and local ordering between policy updates and dispatch callbacks.
 The [selected authority issuer](reference/authority-issuer/README.md) connects
 native Hydra introspection and an OpenFGA permission/delegation check to those
-snapshots in a controlled local fixture. Durable signing-key operation,
-supervised remote update delivery and independent deployment testing remain
-application integration work.
+snapshots in a controlled local fixture. The optional
+[macOS Keychain signer](reference/authority-keychain/README.md) retains one
+selected key across publisher process restarts alongside the
+existing revision ledger. Other custody backends, host reboot/unlock and key
+recovery, supervised remote update delivery and independent deployment testing
+remain application integration work.
 
 The main-branch conformance corpus remains 76 cases / 217 manifest artifacts.
 The demonstration scenarios are separate from that corpus. See
