@@ -4,6 +4,14 @@ This file records dated public changes to the discussion draft.
 
 ## Unreleased
 
+- Add optional Python runtime and caller ES256 profiles that bind authenticated
+  evidence and delegation grants to purchase admission and dispatch.
+- Add dispatch-time revalidation and local SQLite admission/attempt state,
+  plus authenticated authority snapshots and a selected Hydra/OpenFGA issuer
+  example for permission updates and revocation.
+- Keep ordinary module imports available without readable source files, report
+  lease consumer I/O errors unchanged, and reject durable admissions with stale
+  or future evaluation times.
 - Add an opt-in MUSUBI set2 audit/dataset receiving example. It checks the
   published A/C bytes against selected execution receipts, retains both
   assessments, and preserves missing B evidence and unresolved acceptance.

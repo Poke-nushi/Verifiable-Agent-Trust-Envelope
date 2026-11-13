@@ -57,6 +57,15 @@ jobs:
       - name: Run execution evidence tests
         run: python -B -m unittest discover -s reference/execution-evidence-demo -p 'test_*.py' -v
 
+      - name: Check request binding, source identity, and durable dispatch
+        run: python -B -m unittest discover -s reference/request-binding -p 'test_*.py' -v
+
+      - name: Check signed runtime evidence through admission and dispatch
+        run: python -B -m unittest discover -s reference/runtime-jwt -p 'test_*.py' -v
+
+      - name: Check signed caller authority and durable dispatch
+        run: python -B -m unittest discover -s reference/caller-authority -p 'test_*.py' -v
+
       - name: Run receipt linkage tests
         run: python -B -m unittest discover -s reference/receipt-linkage-example -p 'test_*.py' -v
 
@@ -85,6 +94,15 @@ jobs:
           echo "VATE_TRIAL_OPENSSL=$trial_openssl" >> "$GITHUB_ENV"
           trial_sha="$(python -c 'import hashlib,pathlib,sys; print(hashlib.sha256(pathlib.Path(sys.argv[1]).read_bytes()).hexdigest())' "$trial_openssl")"
           echo "VATE_TRIAL_OPENSSL_SHA256=$trial_sha" >> "$GITHUB_ENV"
+
+      - name: Check authenticated authority intake and ordered updates
+        run: python -B -m unittest discover -s reference/authority-updates -p 'test_*.py' -v
+
+      - name: Check selected authority issuance and source failures
+        run: python -B -m unittest discover -s reference/authority-issuer -p 'test_*.py' -v
+
+      - name: Check persistent authority signing and publisher restarts
+        run: python -B -m unittest discover -s reference/authority-keychain -p 'test_*.py' -v
 
       - name: Check detached signatures and receiver-selected issuer authority
         run: |

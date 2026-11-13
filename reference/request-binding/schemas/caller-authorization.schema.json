@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:request-binding:caller-authorization:v1",
+  "description": "Local request-specific caller authorization result. A received copy is not authority to execute. Proof bytes are not included.",
+  "type": "object",
+  "properties": {
+    "contract": {
+      "const": "vate-caller-authorization-v1"
+    },
+    "proof_ref": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "pattern": "^urn:sha256:[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "media_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "type": "object",
+          "properties": {
+            "alg": {
+              "const": "sha-256"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            }
+          },
+          "required": [
+            "alg",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "uri",
+        "media_type",
+        "digest"
+      ],
+      "additionalProperties": false
+    },
+    "admission_request_ref": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "pattern": "^urn:sha256:[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "media_type": {
+          "const": "application/json"
+        },
+        "digest": {
+          "type": "object",
+          "properties": {
+            "alg": {
+              "const": "sha-256"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            }
+          },
+          "required": [
+            "alg",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "uri",
+        "media_type",
+        "digest"
+      ],
+      "additionalProperties": false
+    },
+    "original_ref": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "pattern": "^urn:sha256:[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "media_type": {
+          "const": "application/json"
+        },
+        "digest": {
+          "type": "object",
+          "properties": {
+            "alg": {
+              "const": "sha-256"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            }
+          },
+          "required": [
+            "alg",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "uri",
+        "media_type",
+        "digest"
+      ],
+      "additionalProperties": false
+    },
+    "principal": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "actor": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "runtime": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "audience": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "authority_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "grant_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "not_before": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "usable_until": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "max_age_seconds": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2147483647
+    },
+    "verification": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "verified"
+        },
+        "checked_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "result",
+        "checked_at",
+        "method"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "contract",
+    "proof_ref",
+    "admission_request_ref",
+    "original_ref",
+    "principal",
+    "actor",
+    "runtime",
+    "audience",
+    "authority_id",
+    "grant_id",
+    "issued_at",
+    "not_before",
+    "valid_until",
+    "usable_until",
+    "max_age_seconds",
+    "verification"
+  ],
+  "additionalProperties": false
+}

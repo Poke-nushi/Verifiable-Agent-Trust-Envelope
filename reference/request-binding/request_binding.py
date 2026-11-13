@@ -7,15 +7,19 @@ This module checks content relationships, not signatures or execution authority.
 from __future__ import annotations
 
 import copy
+from contextlib import contextmanager
 import hashlib
 import importlib.util
+import inspect
 import json
 import re
-from dataclasses import dataclass
-from datetime import datetime
+import sys
+from dataclasses import dataclass, field, fields
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
-from typing import Any, Mapping
+from threading import RLock
+from typing import Any, Callable, Mapping
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTRACT = "vate-request-binding-v1"
@@ -29,6 +33,21 @@ MAX_SAFE_INTEGER = 9007199254740991
 AMOUNT_RE = re.compile(r"(?:0|[1-9][0-9]{0,17})(?:\.[0-9]{1,8})?\Z")
 HASH_RE = re.compile(r"[0-9a-f]{64}\Z")
 ACTION = "commerce.purchase"
+RUNTIME_CONTEXT = "vate-runtime-admission-context-v1"
+RUNTIME_VERIFICATION = "vate-runtime-evidence-verification-v1"
+PRE_DISPATCH = "vate-pre-dispatch-check-v1"
+# A timestamp-valid .pyc can execute stale code after a same-size source update.
+# Identify source only after it compiles to the code actually being executed.
+_source = None
+try:
+    _source = Path(__file__).read_bytes()
+    LOADED_SOURCE_SHA256 = (hashlib.sha256(_source).hexdigest() if hasattr(sys, "_getframe")
+        and sys._getframe().f_code == compile(_source, sys._getframe().f_code.co_filename,
+            "exec", dont_inherit=True, optimize=sys.flags.optimize) else None)
+except (OSError, SyntaxError, ValueError):
+    # Import remains available; identity-dependent entry points reject None.
+    LOADED_SOURCE_SHA256 = None
+del _source
 
 
 def _load_core() -> Any:
@@ -492,6 +511,122 @@ def assess_request_binding(receipt_bytes: bytes, artifacts: Mapping[str, bytes],
 
 
 @dataclass(frozen=True)
+class RuntimeEvidenceContext:
+    """Immutable expectations supplied to a verifier-selected adapter."""
+
+    admission_request: bytes
+    original: bytes
+    evidence_reference: bytes
+    context_hash: str
+    runtime: str
+    audience: str
+    now: datetime
+
+
+@dataclass(frozen=True)
+class AuthenticatedRuntimeClaims:
+    """Adapter output derived from authenticated evidence, never received JSON.
+
+    The adapter authenticates the issuer's authority for the runtime and these
+    claims. All times use the supported RFC3339 form; valid_until is inclusive.
+    Principal/actor authority and execution are not established by this result.
+    """
+
+    artifact_sha256: str
+    context_hash: str
+    runtime: str
+    audience: str
+    issuer: str
+    issued_at: str
+    not_before: str
+    valid_until: str
+
+
+@dataclass(frozen=True)
+class RuntimeEvidenceVerifier:
+    """Trusted application configuration, not a request-selected verifier.
+
+    verify must authenticate the exact bytes, use independently configured
+    trust material, and return AuthenticatedRuntimeClaims or raise on failure.
+    """
+
+    method: str
+    media_type: str
+    max_age_seconds: int
+    verify: Callable[[bytes, RuntimeEvidenceContext], AuthenticatedRuntimeClaims]
+    protocol_hint: str | None = None
+
+
+def runtime_context_hash(admission_request_bytes: bytes, original_bytes: bytes) -> str:
+    """Hash the validated request and policy refs, excluding runtime proof refs.
+
+    Excluding the runtime proof's reference avoids hashing a proof into itself.
+    The full admission bytes, including that reference, remain receipt-bound.
+    """
+    request, original = decode(admission_request_bytes), decode(original_bytes)
+    validate_operation(original)
+    validate_admission(request, original)
+    context = {**request, "evidence_refs": [ref for ref in request["evidence_refs"]
+                                           if ref["type"] != "runtime_attestation"]}
+    return object_hash({"contract": RUNTIME_CONTEXT, "admission": context})
+
+
+def _verify_runtime_evidence(adapter: Any, ref: dict, raw: bytes, request: dict,
+                             admission_bytes: bytes, original_bytes: bytes,
+                             now: datetime) -> dict:
+    need(type(adapter) is RuntimeEvidenceVerifier, "INVALID_RUNTIME_VERIFIER")
+    need(type(adapter.method) is str and bool(adapter.method)
+         and type(adapter.media_type) is str and bool(adapter.media_type)
+         and type(adapter.max_age_seconds) is int and adapter.max_age_seconds > 0
+         and callable(adapter.verify)
+         and (adapter.protocol_hint is None or type(adapter.protocol_hint) is str
+              and adapter.protocol_hint in core.ALLOWED_PROTOCOL_HINTS_BY_TYPE["runtime_attestation"]),
+         "INVALID_RUNTIME_VERIFIER")
+    try:
+        freshness_window = timedelta(seconds=adapter.max_age_seconds)
+    except OverflowError:
+        raise Invalid("INVALID_RUNTIME_VERIFIER") from None
+    need(ref["media_type"] == adapter.media_type and ref.get("protocol_hint") == adapter.protocol_hint,
+         "UNSUPPORTED_RUNTIME_EVIDENCE_FORMAT")
+    need(type(raw) is bytes and 0 < len(raw) <= MAX_BYTES, "INVALID_RUNTIME_EVIDENCE_BYTES")
+    raw_digest = digest(raw)
+    need(ref["digest"]["value"] == raw_digest["value"], "RUNTIME_EVIDENCE_DIGEST_MISMATCH")
+    context = RuntimeEvidenceContext(
+        admission_bytes, original_bytes, encode(ref),
+        runtime_context_hash(admission_bytes, original_bytes), request["runtime"], request["audience"], now)
+    try:
+        claims = adapter.verify(raw, context)
+    except Exception:
+        # Adapter diagnostics may contain native proof/key material. Return a
+        # stable failure without copying those details into an admission error.
+        raise Invalid("RUNTIME_EVIDENCE_VERIFICATION_FAILED") from None
+    need(type(claims) is AuthenticatedRuntimeClaims, "INVALID_RUNTIME_VERIFICATION_RESULT")
+    need(all(type(value) is str and bool(value) for value in (
+        claims.artifact_sha256, claims.context_hash, claims.runtime, claims.audience,
+        claims.issuer, claims.issued_at, claims.not_before, claims.valid_until)),
+        "INVALID_RUNTIME_VERIFICATION_RESULT")
+    need(claims.artifact_sha256 == raw_digest["value"], "RUNTIME_VERIFICATION_ARTIFACT_MISMATCH")
+    need(claims.context_hash == context.context_hash, "RUNTIME_VERIFICATION_CONTEXT_MISMATCH")
+    need(claims.runtime == request["runtime"], "RUNTIME_VERIFICATION_SUBJECT_MISMATCH")
+    need(claims.audience == request["audience"], "RUNTIME_VERIFICATION_AUDIENCE_MISMATCH")
+    issued, not_before, valid_until = (core.safe_parse_time(value) for value in
+                                      (claims.issued_at, claims.not_before, claims.valid_until))
+    need(issued is not None and not_before is not None and valid_until is not None
+         and issued <= valid_until and not_before <= valid_until, "INVALID_RUNTIME_EVIDENCE_WINDOW")
+    need(issued <= now and not_before <= now <= valid_until, "RUNTIME_EVIDENCE_OUTSIDE_WINDOW")
+    need(now - issued <= freshness_window, "RUNTIME_EVIDENCE_STALE")
+    # Avoid datetime overflow even for a large, otherwise valid max age.
+    usable_until = valid_until if freshness_window >= valid_until - issued else issued + freshness_window
+    return {"contract": RUNTIME_VERIFICATION, "evidence_ref": copy.deepcopy(ref),
+            "admission_request_ref": reference(admission_bytes), "original_ref": reference(original_bytes),
+            "context_hash": context.context_hash, "runtime": claims.runtime, "audience": claims.audience,
+            "issuer": claims.issuer, "issued_at": claims.issued_at, "not_before": claims.not_before,
+            "valid_until": claims.valid_until, "usable_until": core.iso(usable_until),
+            "max_age_seconds": adapter.max_age_seconds,
+            "verification": {"result": "verified", "checked_at": core.iso(now), "method": adapter.method}}
+
+
+@dataclass(frozen=True)
 class BoundAdmission:
     """Immutable bytes retained alongside the receiver's assessment."""
 
@@ -501,10 +636,378 @@ class BoundAdmission:
     receipt: bytes
     effective: bytes | None
     assessment: bytes
+    runtime_evidence: bytes | None = None
+    runtime_verification: bytes | None = None
+
+
+@dataclass
+class _BoundaryState:
+    lock: Any = field(default_factory=RLock)
+    active: bool = False
+    clock_high: datetime | None = None
+
+
+@dataclass(frozen=True)
+class DispatchBoundary:
+    """Application-selected synchronous callback, clock and update order.
+
+    All writers of trust/configuration read by dispatch must use update().
+    The guard orders cooperating local updates; it cannot lock a remote issuer.
+    The callback receives only the admitted effective bytes and check record.
+    """
+
+    execute: Callable[[bytes, bytes], Any]
+    clock: Callable[[], datetime] = core.utc_now
+    _state: _BoundaryState = field(default_factory=_BoundaryState, init=False, repr=False, compare=False)
+
+    @contextmanager
+    def update(self):
+        """Serialize a local trust/configuration update with dispatch."""
+        with self._state.lock:
+            need(not self._state.active, "DISPATCH_REENTRANT_UPDATE")
+            yield
+
+    def _sample_now(self) -> datetime:
+        """Read the selected clock without mutating process-local dispatch state."""
+        try:
+            now = self.clock()
+            need(isinstance(now, datetime) and now.tzinfo is not None and now.utcoffset() is not None,
+                 "INVALID_DISPATCH_TIME")
+            # Same-zone datetime comparison ignores fold/offset changes. Use
+            # UTC instants so DST transitions cannot hide a clock rollback.
+            now = now.astimezone(timezone.utc)
+        except Invalid:
+            raise
+        except Exception:
+            raise Invalid("DISPATCH_CLOCK_UNAVAILABLE") from None
+        return now
+
+    def _now(self) -> datetime:
+        now = self._sample_now()
+        need(self._state.clock_high is None or now >= self._state.clock_high, "DISPATCH_CLOCK_ROLLBACK")
+        self._state.clock_high = now
+        return now
+
+
+@dataclass(frozen=True)
+class DispatchResult:
+    """Local pre-dispatch checks and the callback's unverified return value."""
+
+    checkpoint: bytes
+    value: Any
+
+
+class DispatchAttemptError(RuntimeError):
+    """Attempt consumed; callback entry and operation outcome are not established."""
+
+    def __init__(self, checkpoint: bytes) -> None:
+        super().__init__("DISPATCH_OUTCOME_UNCONFIRMED")
+        self.checkpoint = checkpoint
+
+
+@dataclass
+class _DispatchEntry:
+    bound: BoundAdmission
+    values: tuple
+    policy: bytes
+    adapter: RuntimeEvidenceVerifier
+    boundary: DispatchBoundary
+    verifier_id: str
+    fail_closed: bool
+    caller_authorizer: Any = None
+    store: Any = None
+    store_configuration: bytes | None = None
+    attempted: bool = False
+
+
+def durable_state_module() -> Any:
+    """Load the optional installed store only when selected by the application."""
+    path = Path(__file__).with_name("durable_state.py").resolve()
+    existing = sys.modules.get("durable_state")
+    if existing is not None:
+        need(Path(getattr(existing, "__file__", "")).resolve() == path, "STATE_MODULE_CHANGED")
+        return existing
+    spec = importlib.util.spec_from_file_location("durable_state", path)
+    need(spec is not None and spec.loader is not None, "STATE_MODULE_UNAVAILABLE")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["durable_state"] = module
+    try:
+        spec.loader.exec_module(module)
+    except BaseException:
+        sys.modules.pop("durable_state", None)
+        raise
+    return module
+
+
+def _store_call(function, *args, **kwargs):
+    try:
+        return function(*args, **kwargs)
+    except durable_state_module().StateError as exc:
+        raise Invalid(exc.cause) from None
+
+
+def caller_authority_module() -> Any:
+    path = Path(__file__).with_name("caller_authority.py").resolve()
+    existing = sys.modules.get("caller_authority")
+    if existing is not None:
+        need(Path(getattr(existing, "__file__", "")).resolve() == path, "CALLER_MODULE_CHANGED")
+        return existing
+    spec = importlib.util.spec_from_file_location("caller_authority", path)
+    need(spec is not None and spec.loader is not None, "CALLER_MODULE_UNAVAILABLE")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["caller_authority"] = module
+    try:
+        spec.loader.exec_module(module)
+    except BaseException:
+        sys.modules.pop("caller_authority", None)
+        raise
+    return module
+
+
+def _caller_configuration(verifier: Any) -> Any:
+    authorizer = verifier.caller_authorizer
+    if authorizer is not None:
+        caller_authority_module().descriptor(authorizer)
+        need(verifier.state_store is not None, "CALLER_AUTHORITY_REQUIRES_DURABLE_STATE")
+        _dispatch_configuration(verifier.dispatch_boundary, verifier.runtime_evidence_verifier)
+    return authorizer
+
+
+def _authorize_caller(authorizer: Any, proof: bytes | None, admission: bytes,
+                      original: bytes, now: datetime) -> dict | None:
+    if authorizer is None:
+        need(proof is None, "CALLER_AUTHORIZER_NOT_CONFIGURED")
+        return None
+    return caller_authority_module().verify(authorizer, proof, admission, original, now)
+
+
+def _selected_store(verifier: Any) -> Any:
+    store = verifier.state_store
+    need(type(store) is durable_state_module().DurableStateStore
+         and store.verifier_id == verifier.verifier_id, "STATE_CONFIGURATION_INVALID")
+    return store
+
+
+def _store_configuration(verifier: Any) -> bytes:
+    store = _selected_store(verifier)
+    adapter = verifier.runtime_evidence_verifier
+    _dispatch_configuration(verifier.dispatch_boundary, adapter)
+    need(vars(type(verifier)).get("_loaded_source_path") == Path(core.__file__).resolve()
+         and vars(type(verifier)).get("_loaded_source_sha256") == core.LOADED_SOURCE_SHA256,
+         "STATE_IMPLEMENTATION_CHANGED")
+    sources = {}
+    modules = [(sys.modules[__name__], "reference/request-binding/request_binding.py"),
+                             (core, "reference/vate-verifier-core/vate_verifier_core.py"),
+                             (durable_state_module(), "reference/request-binding/durable_state.py")]
+    caller = _caller_configuration(verifier)
+    if caller is not None:
+        modules.append((caller_authority_module(), "reference/request-binding/caller_authority.py"))
+    for module, relative in modules:
+        need(module.LOADED_SOURCE_SHA256 is not None, "STATE_IMPLEMENTATION_CHANGED")
+        try:
+            current_digest = hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest()
+        except OSError:
+            raise Invalid("STATE_IMPLEMENTATION_CHANGED") from None
+        need(current_digest == module.LOADED_SOURCE_SHA256, "STATE_IMPLEMENTATION_CHANGED")
+        sources[relative] = module.LOADED_SOURCE_SHA256
+    configuration = {"contract": "vate-durable-admission-configuration-v1", "scope": store.scope,
+        "verifier_id": verifier.verifier_id, "policy": verifier.policy, "fail_closed": verifier.fail_closed,
+        "runtime_verifier": {"method": adapter.method, "media_type": adapter.media_type,
+            "max_age_seconds": adapter.max_age_seconds, "protocol_hint": adapter.protocol_hint}, "sources": sources}
+    if caller is not None:
+        configuration["caller_authorizer"] = caller_authority_module().descriptor(caller)
+    return encode(configuration)
+
+
+@dataclass(frozen=True)
+class StoredDispatchStatus:
+    state: str
+    record: bytes
+    checkpoint: bytes | None
+
+
+def dispatch_status(verifier: Any, request_id: str) -> StoredDispatchStatus:
+    store = _selected_store(verifier)
+    saved = _store_call(store.read, request_id)
+    checkpoint = saved["checkpoint"]
+    record = {"contract": "vate-durable-dispatch-status-v1", "store_anchor_digest": digest(store.anchor),
+        "scope": store.scope, "request_id": request_id, "operation_id": saved["operation_id"],
+        "state": saved["state"], "attempt_request_id": saved["attempt_request_id"],
+        "admission_request_ref": reference(saved["values"][1]), "receipt_ref": reference(saved["values"][3]),
+        "checkpoint_ref": reference(checkpoint) if checkpoint is not None else None}
+    return StoredDispatchStatus(saved["state"], encode(record), checkpoint)
+
+
+def restore_admission(verifier: Any, request_id: str) -> BoundAdmission:
+    store = _selected_store(verifier)
+    configuration = _store_configuration(verifier)
+    boundary = verifier.dispatch_boundary
+    with boundary._state.lock:
+        need(not boundary._state.active, "DISPATCH_REENTRANT")
+        saved = _store_call(store.read, request_id)
+        need(saved["executable"], "DISPATCH_NOT_EXECUTABLE")
+        need(saved["state"] == "ready", "DURABLE_OPERATION_ALREADY_ATTEMPTED")
+        need(saved["configuration"] == configuration, "STATE_CONFIGURATION_CHANGED")
+        bound = BoundAdmission(*saved["values"])
+        request = decode(bound.request)
+        need(request["request_id"] == request_id and request["transaction_id"] == saved["operation_id"],
+             "STATE_RECORD_CHANGED")
+        artifacts = {reference(raw)["uri"]: raw for raw in (bound.original, bound.request, bound.effective)}
+        assessment = assess_request_binding(bound.receipt, artifacts,
+            expected_admission_request_ref=reference(bound.request))
+        need(assessment["binding_requirement_met"] and assessment["decision_allows_immediate_execution"],
+             "DISPATCH_NOT_EXECUTABLE")
+        need(_store_configuration(verifier) == configuration, "STATE_CONFIGURATION_CHANGED")
+        with verifier._replay_lock:
+            verifier._seen_request_ids.add(request_id)
+            _register_dispatch(verifier, bound, verifier.policy, verifier.runtime_evidence_verifier,
+                               boundary, store_configuration=configuration)
+        return bound
+
+
+def _dispatch_configuration(boundary: Any, adapter: Any) -> None:
+    need(type(boundary) is DispatchBoundary and callable(boundary.execute) and callable(boundary.clock),
+         "INVALID_DISPATCH_BOUNDARY")
+    need(type(adapter) is RuntimeEvidenceVerifier, "DISPATCH_REQUIRES_RUNTIME_VERIFIER")
+    for function in (boundary.execute, getattr(boundary.execute, "__call__", None)):
+        need(not any(check(function) for check in (inspect.iscoroutinefunction,
+                 inspect.isgeneratorfunction, inspect.isasyncgenfunction)), "DISPATCH_CALLBACK_NOT_SYNCHRONOUS")
+
+
+def _bound_values(bound: BoundAdmission) -> tuple:
+    return tuple(getattr(bound, item.name) for item in fields(BoundAdmission))
+
+
+def _register_dispatch(verifier: Any, bound: BoundAdmission, policy: dict,
+                       adapter: Any, boundary: Any, *, store_configuration: bytes | None = None) -> None:
+    # Called only at the end of successful issuance, inside the replay lock.
+    if boundary is None or not decode(bound.assessment)["decision_allows_immediate_execution"]:
+        return
+    verifier._dispatch_entries[id(bound)] = _DispatchEntry(
+        bound, _bound_values(bound), encode(policy), adapter, boundary, verifier.verifier_id, verifier.fail_closed,
+        verifier.caller_authorizer, verifier.state_store, store_configuration)
+
+
+def dispatch_bound(verifier: Any, bound: BoundAdmission, *, caller_proof: bytes | None = None) -> DispatchResult:
+    """Reauthenticate immediately before invoking the configured callback once.
+
+    Only an admission issued or restored by this verifier is eligible. No caller
+    evaluation time, substitute operation, received verification result, or
+    new callback can be supplied to this entry point.
+    """
+    boundary = verifier.dispatch_boundary
+    _dispatch_configuration(boundary, verifier.runtime_evidence_verifier)
+    need(type(bound) is BoundAdmission, "DISPATCH_ADMISSION_NOT_ISSUED")
+    with boundary._state.lock:
+        need(not boundary._state.active, "DISPATCH_REENTRANT")
+        boundary._state.active = True
+        try:
+            with verifier._replay_lock:
+                entry = verifier._dispatch_entries.get(id(bound))
+                need(entry is not None and entry.bound is bound, "DISPATCH_ADMISSION_NOT_ISSUED")
+                need(not entry.attempted, "DISPATCH_ALREADY_ATTEMPTED")
+            need(_bound_values(bound) == entry.values, "DISPATCH_ADMISSION_CHANGED")
+
+            def configuration_unchanged() -> None:
+                need(verifier.dispatch_boundary is entry.boundary
+                     and verifier.runtime_evidence_verifier is entry.adapter
+                     and verifier.caller_authorizer is entry.caller_authorizer
+                     and verifier.state_store is entry.store
+                     and verifier.verifier_id == entry.verifier_id
+                     and verifier.fail_closed == entry.fail_closed
+                     and encode(verifier.policy) == entry.policy, "DISPATCH_CONFIGURATION_CHANGED")
+                if entry.store is not None:
+                    need(_store_configuration(verifier) == entry.store_configuration, "STATE_CONFIGURATION_CHANGED")
+
+            def current_time() -> datetime:
+                return (boundary._now() if entry.store is None else
+                        _store_call(entry.store.observe_clock, boundary._now))
+
+            configuration_unchanged()
+            artifacts = {reference(raw)["uri"]: raw for raw in (bound.request, bound.original, bound.effective)}
+            assessment = assess_request_binding(bound.receipt, artifacts,
+                expected_admission_request_ref=reference(bound.request))
+            need(assessment["binding_requirement_met"] and assessment["decision_allows_immediate_execution"],
+                 "DISPATCH_NOT_EXECUTABLE")
+            request, receipt = decode(bound.request), decode(bound.receipt)
+            start, end = core.parse_time(receipt["issued_at"]), core.parse_time(receipt["expires_at"])
+
+            def in_window(instant: datetime, deadline: datetime) -> None:
+                need(start <= instant <= deadline, "DISPATCH_OUTSIDE_WINDOW")
+
+            now = current_time()
+            in_window(now, end)
+            ref, = (item for item in request["evidence_refs"] if item["type"] == "runtime_attestation")
+            verified = _verify_runtime_evidence(entry.adapter, ref, bound.runtime_evidence, request,
+                bound.request, bound.original, now)
+            caller = _authorize_caller(entry.caller_authorizer, caller_proof, bound.request, bound.original, now)
+            configuration_unchanged()
+            deadline = min(end, core.parse_time(verified["usable_until"]))
+            if caller is not None:
+                deadline = min(deadline, core.parse_time(caller["usable_until"]))
+            checked_at = current_time()
+            in_window(checked_at, deadline)
+            checkpoint_data = {"contract": PRE_DISPATCH, "checked_at": core.iso(checked_at),
+                "usable_until": core.iso(deadline), "receipt_ref": reference(bound.receipt),
+                "admission_request_ref": reference(bound.request), "original_ref": reference(bound.original),
+                "effective_ref": reference(bound.effective), "runtime_verification": verified}
+            if caller is not None:
+                checkpoint_data["caller_authorization"] = caller
+            checkpoint = encode(checkpoint_data)
+            # Include verification and record construction time, not merely the
+            # time at entry. The final read also follows replay-lock contention
+            # with another admission; waiting must not bypass the deadline.
+            configuration_unchanged()
+            stored_digest = None
+            with verifier._replay_lock:
+                need(not entry.attempted, "DISPATCH_ALREADY_ATTEMPTED")
+                if entry.store is None:
+                    in_window(boundary._now(), deadline)
+                else:
+                    stored_digest = durable_state_module().record_digest(request["request_id"], request["transaction_id"],
+                        entry.store_configuration, entry.values, True)
+                    try:
+                        entry.store.claim(request["request_id"], entry.store_configuration, stored_digest,
+                            checkpoint, boundary._now, lambda instant: in_window(instant, deadline))
+                    except durable_state_module().StateError as exc:
+                        # A failed COMMIT may have persisted the claim. Never
+                        # treat this object's local state as retry authority.
+                        entry.attempted = True
+                        raise Invalid(exc.cause) from None
+                entry.attempted = True
+            # Never roll this state back: a raised callback can have effects.
+            # A callback return is not independently observed execution proof.
+            try:
+                if entry.store is not None:
+                    # Durable commit itself can outlive validity. Consumption
+                    # remains durable even when this final check stops entry.
+                    in_window(boundary._now(), deadline)
+                value = boundary.execute(bound.effective, checkpoint)
+                if inspect.iscoroutine(value):
+                    value.close()
+                need(not (inspect.isawaitable(value) or inspect.isgenerator(value) or inspect.isasyncgen(value)),
+                     "DISPATCH_DEFERRED_RESULT")
+                if entry.store is not None:
+                    entry.store.finish(request["request_id"], stored_digest, returned=True)
+                return DispatchResult(checkpoint, value)
+            except Exception:
+                # Distinguish an entered callback (including one raising
+                # Invalid) from a failed precheck, without exposing its data.
+                # BaseException interrupts still propagate with state consumed.
+                if entry.store is not None:
+                    try:
+                        entry.store.finish(request["request_id"], stored_digest, returned=False)
+                    except Exception:
+                        pass  # The already committed consumed fence remains.
+                raise DispatchAttemptError(checkpoint) from None
+        finally:
+            boundary._state.active = False
 
 
 def admit_bound(verifier: Any, admission_request_bytes: bytes, original_bytes: bytes, *,
-                now: datetime, require_new_permit: bool = False) -> BoundAdmission:
+                now: datetime, require_new_permit: bool = False,
+                evidence_artifacts: Mapping[str, bytes] | None = None,
+                caller_proof: bytes | None = None) -> BoundAdmission:
     """Evaluate policy/replay once, then bind the original and effective objects.
 
     Malformed or mismatched preimages raise Invalid before core admission. A
@@ -527,20 +1030,69 @@ def admit_bound(verifier: Any, admission_request_bytes: bytes, original_bytes: b
     if "allowed_actions" in policy:
         need(type(policy["allowed_actions"]) is list and bool(policy["allowed_actions"])
              and all(isinstance(action, str) and action for action in policy["allowed_actions"]), "SCHEMA_INVALID")
-    # This entry implements local policy evaluation only. Never label a
-    # runtime/issuer/permit proof verified merely because its reference parses.
     refs = request["evidence_refs"]
-    need(len(refs) == 1 and refs[0]["type"] == "local_policy", "UNSUPPORTED_ADMISSION_EVIDENCE")
-    need(refs[0]["uri"] == policy.get("policy_ref", "local")
-         and refs[0]["media_type"] == "application/json"
-         and refs[0]["digest"] == digest(encode(policy)), "LOCAL_POLICY_REFERENCE_MISMATCH")
+    policy_refs = [ref for ref in refs if ref["type"] == "local_policy"]
+    runtime_refs = [ref for ref in refs if ref["type"] == "runtime_attestation"]
+    adapter = verifier.runtime_evidence_verifier
+    boundary = verifier.dispatch_boundary
+    store = verifier.state_store
+    authorizer = _caller_configuration(verifier)
+    store_configuration = _store_configuration(verifier) if store is not None else None
+    if boundary is not None:
+        _dispatch_configuration(boundary, adapter)
+    if adapter is None:
+        need(len(refs) == len(policy_refs) == 1, "UNSUPPORTED_ADMISSION_EVIDENCE")
+    else:
+        # Configuring runtime verification makes the proof mandatory. Removing
+        # it must not downgrade this call to local-policy-only admission.
+        need(len(refs) == 2 and len(policy_refs) == len(runtime_refs) == 1,
+             "RUNTIME_EVIDENCE_REQUIRED")
+    policy_ref = policy_refs[0]
+    need(policy_ref["uri"] == policy.get("policy_ref", "local")
+         and policy_ref["media_type"] == "application/json"
+         and policy_ref["digest"] == digest(encode(policy)), "LOCAL_POLICY_REFERENCE_MISMATCH")
+    need(evidence_artifacts is None or isinstance(evidence_artifacts, Mapping), "INVALID_EVIDENCE_ARTIFACTS")
+    artifacts = dict(evidence_artifacts) if evidence_artifacts is not None else {}
+    expected_uris = {ref["uri"] for ref in runtime_refs}
+    need(set(artifacts) == expected_uris, "EVIDENCE_ARTIFACT_SET_MISMATCH")
+    runtime_raw = artifacts[runtime_refs[0]["uri"]] if runtime_refs else None
+    runtime_verification = (_verify_runtime_evidence(adapter, runtime_refs[0], runtime_raw, request,
+                            admission_request_bytes, original_bytes, now) if runtime_refs else None)
+    caller = _authorize_caller(authorizer, caller_proof, admission_request_bytes, original_bytes, now)
     with verifier._replay_transaction(request["request_id"]):
-        return _issue_bound(verifier, original, request, original_bytes, admission_request_bytes,
-                            now=now, require_new_permit=require_new_permit)
+        # Detect configuration changes made during an adapter call before the
+        # policy primitive can evaluate a policy different from the checked one.
+        # Concurrent configuration writes remain unsupported by this API.
+        need(_same_json(decode(encode(verifier.policy)), policy)
+             and verifier.runtime_evidence_verifier is adapter and verifier.dispatch_boundary is boundary
+             and verifier.state_store is store and verifier.caller_authorizer is authorizer,
+             "ADMISSION_CONFIGURATION_CHANGED")
+        def issue() -> BoundAdmission:
+            if store is not None:
+                need(_store_configuration(verifier) == store_configuration, "STATE_CONFIGURATION_CHANGED")
+            return _issue_bound(verifier, original, request, original_bytes, admission_request_bytes,
+                now=now, require_new_permit=require_new_permit, runtime_raw=runtime_raw,
+                runtime_verification=runtime_verification, caller_authorization=caller)
+
+        if store is None:
+            bound = issue()
+        else:
+            produced = []
+            def produce():
+                bound = issue()
+                produced.append(bound)
+                return _bound_values(bound), decode(bound.assessment)["decision_allows_immediate_execution"]
+            _store_call(store.issue, request["request_id"], request["transaction_id"], store_configuration,
+                        produce, evaluated_at=now, clock=boundary._sample_now)
+            bound, = produced
+        _register_dispatch(verifier, bound, policy, adapter, boundary, store_configuration=store_configuration)
+        return bound
 
 
 def _issue_bound(verifier: Any, original: dict, request: dict, original_bytes: bytes,
-                 admission_request_bytes: bytes, *, now: datetime, require_new_permit: bool) -> BoundAdmission:
+                 admission_request_bytes: bytes, *, now: datetime, require_new_permit: bool,
+                 runtime_raw: bytes | None, runtime_verification: dict | None,
+                 caller_authorization: dict | None = None) -> BoundAdmission:
     """Construct and validate every returned artifact inside the replay transaction."""
     core_result = verifier._evaluate_policy(request, now=now)
     receipt = copy.deepcopy(core_result["admission_receipt"])
@@ -561,8 +1113,16 @@ def _issue_bound(verifier: Any, original: dict, request: dict, original_bytes: b
             receipt = verifier._make_receipt(request, now=now, outcome="deny", reason_codes=["POLICY_DENIED"])
             effective = None
     receipt["proof"] = {"format": "none"}
-    receipt["evidence"][0]["verification"] = {
-        "result": "verified", "checked_at": receipt["issued_at"], "method": "vate-local-policy-content-v1"}
+    for item in receipt["evidence"]:
+        item["verification"] = ({"result": "verified", "checked_at": receipt["issued_at"],
+                                 "method": "vate-local-policy-content-v1"}
+                                if item["type"] == "local_policy" else
+                                copy.deepcopy(runtime_verification["verification"]))
+    for verified in (runtime_verification, caller_authorization):
+        if verified is not None and receipt["decision"]["outcome"] != "deny":
+            deadline = verified["usable_until"]
+            if core.parse_time(deadline) < core.parse_time(receipt["expires_at"]):
+                receipt["expires_at"] = deadline
     receipt["request"]["constraints"] = copy.deepcopy(request["constraints"])
     binding = {"contract": CONTRACT, "preimage_profile": PREIMAGE_PROFILE,
                "canonicalization": CANONICALIZATION, "transformation_profile": TRANSFORMATION_PROFILE,
@@ -580,4 +1140,5 @@ def _issue_bound(verifier: Any, original: dict, request: dict, original_bytes: b
                                         expected_admission_request_ref=reference(admission_request_bytes))
     need(assessment["binding_requirement_met"], "GENERATED_BINDING_FAILED")
     return BoundAdmission(original_bytes, admission_request_bytes, encode(core_result), receipt_bytes,
-                          effective_bytes, encode(assessment))
+                          effective_bytes, encode(assessment), runtime_raw,
+                          encode(runtime_verification) if runtime_verification is not None else None)

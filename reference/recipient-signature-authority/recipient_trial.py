@@ -31,9 +31,9 @@ HEX = re.compile(r"[0-9a-f]{64}\Z")
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 API_PINS = {
-    "vate_recipient.py": "061a622f524738dbadecb1d0a5b01c4a36aff08207fd80a3791ed98d579d8e35",
+    "vate_recipient.py": "9df0ee55882c1523ab5b488372cd1f58d1f618ffcfb90c55efb5b5876088fd71",
     "_worker.py": "5834df316c2d07c822d1e7f5c3733d61af68e1278c48f0e570199d0954564696",
-    "EVALUATOR-SOURCES.json": "acec344be14f54c36af27499b293dda72c7bf37f24b6ad69fbfd9ffcffe7449f",
+    "EVALUATOR-SOURCES.json": "8afd1078eaa966007d34719715496efb234090ab470eedbf681190d3f0fec963",
 }
 
 

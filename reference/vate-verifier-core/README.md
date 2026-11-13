@@ -23,6 +23,8 @@ contains immutable bytes:
 - `request`, `original`, and `effective` (the last is absent for denial)
 - `receipt` and the independently recomputed `assessment`
 - `core_result`, the intermediate policy result
+- `runtime_evidence` and `runtime_verification` when a configured runtime
+  verifier is used (both are absent on the local-policy-only path)
 
 Read the final decision from `receipt`, not `core_result`. A purchase above the
 effective cap is denied even when the intermediate policy result proposes
@@ -41,6 +43,44 @@ and `application/json` media type. It rejects unmatched or unsupported evidence
 before policy evaluation and replay-state consumption. The final receipt names
 the check `vate-local-policy-content-v1`; it establishes policy-content identity,
 while principal, actor and runtime authentication require their own verifier.
+
+To require runtime evidence, configure a `RuntimeEvidenceVerifier` and supply
+the referenced bytes through `evidence_artifacts`. The
+[runtime integration contract](../request-binding/RUNTIME-EVIDENCE.md) defines
+the adapter result, request-context binding and freshness checks. With this
+configuration, missing or failed runtime evidence prevents admission. An
+`allow` or `attenuate` receipt, including a new-permit candidate, cannot outlive
+the evidence's validity or freshness limit.
+The application supplies the trusted authentication adapter; the core does
+not choose keys or treat a submitted verification result as authentication.
+The optional [JWT/ES256 adapter](../runtime-jwt/README.md) supplies one signed
+runtime-evidence path with application-selected issuer grants.
+
+To authorize the actor's exact instruction and its principal-to-actor delegation,
+configure the optional [caller authority adapter](../caller-authority/README.md).
+It requires runtime verification and durable dispatch state, checks the original
+declared scope against trusted grants, and requires `caller_proof` at admission
+and dispatch. Current authority is checked again after restart; a new proof
+cannot extend an existing receipt.
+
+Configure a [`DispatchBoundary`](../request-binding/DISPATCH.md) before admission
+to use `verifier.dispatch(result)`. This entry rechecks the runtime evidence
+and current validity before passing the exact effective bytes to the
+application's synchronous callback. Trust updates use the same boundary's
+`update()` guard. Each issued object can enter the callback once per verifier
+instance; an uncertain callback outcome requires reconciliation. The
+[ES256 dispatch example](../runtime-jwt/README.md#recheck-before-dispatch)
+shows rejection after expiry or a locally delivered revocation.
+
+For restart and process coordination, configure the optional
+[`DurableStateStore`](../request-binding/DURABLE-STATE.md). It preserves request
+replay decisions and records an operation's consumed attempt before callback
+entry. Reopening requires the store's independently retained identity anchor.
+Use `restore_admission(request_id)` for pending work and
+`dispatch_status(request_id)` to inspect the local record. An uncertain
+attempt stays consumed until application/provider reconciliation; the API
+does not release it. The store uses Python's standard-library SQLite on one
+trusted local filesystem.
 
 `_evaluate_policy` is a private primitive that produces a receipt candidate
 without checking preimages. The file-set and S3 examples use it after their own

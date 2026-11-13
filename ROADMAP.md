@@ -109,6 +109,22 @@ original operation's outcome.
 Independent issuer authenticity, cross-implementation A2A exchanges and
 production readiness remain unestablished.
 
+The optional [authority update integration](reference/authority-updates/README.md)
+connects signed runtime and caller permission snapshots to ordinary Python
+admission and durable dispatch. It adds verified HTTPS intake, persistent
+revision checks and local ordering between policy updates and dispatch callbacks.
+The [selected authority issuer](reference/authority-issuer/README.md) connects
+native Hydra introspection and an OpenFGA permission/delegation check to those
+snapshots in a controlled local fixture. The optional
+[macOS Keychain signer](reference/authority-keychain/README.md) retains one
+selected key across publisher process restarts alongside the
+existing revision ledger. The
+[supervised HTTPS source](reference/authority-updates/README.md#bound-each-https-attempt)
+places each retrieval in a disposable process with a parent deadline and bounded
+output. Other custody backends, host reboot/unlock and key recovery, update
+scheduling and deployment recovery, and independent deployment testing remain
+application integration work.
+
 The main-branch conformance corpus remains 76 cases / 217 manifest artifacts.
 The demonstration scenarios are separate from that corpus. See
 [external SUT coverage](docs/conformance/external-sut-coverage.md) for the

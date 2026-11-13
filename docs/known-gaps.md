@@ -58,6 +58,33 @@ The draft prefers pairwise presentation where practical, but it does not yet fre
 - hardware-backed attested runtimes
 - browser or mixed execution environments
 
+The optional [caller authority integration](../reference/caller-authority/README.md)
+checks actor-signed purchase instructions and application-selected principal
+permission/delegation at admission and durable dispatch. It complements the
+[runtime JWT adapter](../reference/runtime-jwt/README.md). The optional
+[authority update integration](../reference/authority-updates/README.md)
+authenticates complete signed policy snapshots, offers HTTPS intake with server
+certificate and hostname checks,
+and retains revision checks across process restarts. Local updates and dispatch
+callbacks share an ordered policy lease. The
+[selected Hydra/OpenFGA issuer](../reference/authority-issuer/README.md) adds one
+fixed IAM-to-grant mapping and a native loopback revocation/recovery fixture.
+An optional [macOS Keychain signer](../reference/authority-keychain/README.md)
+adds protected persistent key use and publisher process-restart checks against
+the existing revision ledger. It uses a selected file-based Keychain; host
+reboot/unlock, key recovery and deployment-specific custody remain unverified.
+The [supervised HTTPS source](../reference/authority-updates/README.md#bound-each-https-attempt)
+adds a parent-controlled process deadline and bounded output for one retrieval.
+It connects to the existing refresh failure and recovery behavior; scheduling,
+cross-caller serialization and deployment recovery remain application work.
+Broader IAM mappings, root-key selection/migration and deployment-wide authority
+policy remain application responsibilities. Both local stores require unchanged anchored
+filesystem identities. Their contracts provide no portable host recovery,
+re-anchoring or storage migration procedure; such a procedure must preserve
+revision, clock and replay history. These Python paths do
+not establish the caller's or runtime's transport peer identity or
+hardware-backed runtime attestation.
+
 ### 4. Receipt Semantics Need More Precision
 
 The draft now distinguishes admission receipts from post-execution receipts, but more work is still needed on:

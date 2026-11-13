@@ -161,6 +161,18 @@ def vectors():
     value["R"]["evidence"].insert(0, {**value["R"]["evidence"][0], "uri": second["uri"], "annotation": True})
     add("matching reordered evidence with annotation", value, require_pass=True)
 
+    # A runtime adapter's receipt statement is still not receiver authentication.
+    value = bundle()
+    runtime_ref = {"type": "runtime_attestation", "uri": "urn:test:runtime-proof",
+                   "media_type": "application/json", "digest": b.digest(b"runtime fixture")}
+    value["A"]["evidence_refs"].append(runtime_ref)
+    value["R"]["evidence"].append({**runtime_ref, "verification": {
+        "result": "verified", "method": "test-runtime-adapter", "checked_at": value["R"]["issued_at"]}})
+    value["R"]["expires_at"] = "2026-11-12T00:00:01.000001Z"
+    add("runtime statement retains receiver authentication not_checked", value, require_pass=True)
+    value["R"]["evidence"][1]["digest"] = b.digest(b"different runtime fixture")
+    add("runtime evidence reference mismatch", value, cause="RECEIPT_EVIDENCE_MISMATCH")
+
     parses = []
     inputs = [(repr(v), v) for v in (
         b"{}", b"-0", b"[0,-0,9007199254740991,-9007199254740991]", b"1.0", b"1e0", b"NaN", b"Infinity", b"-Infinity",

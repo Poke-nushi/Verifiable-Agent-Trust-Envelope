@@ -20,7 +20,7 @@ from required_records import (Problem, encode, sha, native_error, MIB,
 
 HERE = Path(__file__).resolve().parent
 LOADED_BRIDGE_SHA256, LOADED_BRIDGE_ERROR = capture_loaded_source(Path(__file__), sys._getframe().f_code)
-PIN_SHA = '88e679639c996f74b5dadba8ae222e2e269d7d69dd1ca70c5e256ee1a8d81779'
+PIN_SHA = '19bb830e1fbafab4239ee91e8b2c74e80f3c7933d723e4335357e44010b6e28f'
 OUTPUT_CAP = 2*MIB
 
 
