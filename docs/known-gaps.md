@@ -75,12 +75,16 @@ the existing revision ledger. It uses a selected file-based Keychain; host
 reboot/unlock, key recovery and deployment-specific custody remain unverified.
 The [supervised HTTPS source](../reference/authority-updates/README.md#bound-each-https-attempt)
 adds a parent-controlled process deadline and bounded output for one retrieval.
+After request validation, a worker-local timer can end acquisition even if the
+supervising application exits abruptly; orphan reaping remains an OS or
+deployment-supervisor responsibility.
 The optional [refresh coordinator](../reference/authority-updates/README.md#coordinate-refresh-retry-and-shutdown)
 adds one instance's refresh/retry schedule, serialization with managed calls,
 and stop/reopen behavior. Its local execution block also applies when failure
 cannot be recorded in the shared store. The application must drive polling and
-route calls through that instance; cross-process scheduling, abrupt termination
-and deployment recovery remain application work.
+route calls through that instance. Local abrupt-exit tests cover retrieval,
+installation and dispatch recovery with the same anchored stores. Cross-process
+scheduling, host-level cleanup and deployment recovery remain application work.
 Broader IAM mappings, root-key selection/migration and deployment-wide authority
 policy remain application responsibilities. Both local stores require unchanged anchored
 filesystem identities. Their contracts provide no portable host recovery,

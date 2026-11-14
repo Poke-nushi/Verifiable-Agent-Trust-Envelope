@@ -1,4 +1,4 @@
-"""One HTTPS fetch in a disposable process, with bounded pipes and parent deadline."""
+"""One HTTPS fetch in a disposable process, with bounded pipes and owned deadlines."""
 from dataclasses import dataclass
 from contextlib import contextmanager
 import base64
@@ -284,6 +284,24 @@ class SupervisedHttpsSnapshotSource:
             attempt.cleanup_complete = True
 
 
+@contextmanager
+def _worker_deadline(timeout):
+    # The parent may die without running cleanup. Keep a local acquisition
+    # deadline even while the worker's main thread is blocked in DNS or TLS.
+    done = Event()
+    deadline = time.monotonic() + timeout
+    def expire():
+        if not done.wait(max(0, deadline - time.monotonic())):
+            os._exit(1)
+    guard = Thread(target=expire, name="authority-fetch-deadline", daemon=True)
+    guard.start()
+    try:
+        yield
+    finally:
+        done.set()
+        guard.join()
+
+
 def _worker():
     """Fixed private pipe protocol; never print errors, configuration or partial bodies."""
     try:
@@ -308,13 +326,15 @@ def _worker():
             ca = _ca_data(raw_ca)
         s.need(type(request["timeout_seconds"]) is str and 0 < len(request["timeout_seconds"]) <= 64,
                "AUTHORITY_FETCH_REQUEST_INVALID")
-        source = https.HttpsSnapshotSource(request["url"], ca_data=ca,
-                                           timeout_seconds=float(request["timeout_seconds"]))
-        raw = source()
-        s.need(all(_sha(path) == expected[path.name] for path in paths),
-               "AUTHORITY_FETCH_IMPLEMENTATION_CHANGED")
-        sys.stdout.buffer.write(raw)
-        sys.stdout.buffer.flush()
+        timeout = float(request["timeout_seconds"])
+        https.validate_source_options(request["url"], timeout)
+        with _worker_deadline(timeout):
+            source = https.HttpsSnapshotSource(request["url"], ca_data=ca, timeout_seconds=timeout)
+            raw = source()
+            s.need(all(_sha(path) == expected[path.name] for path in paths),
+                   "AUTHORITY_FETCH_IMPLEMENTATION_CHANGED")
+            sys.stdout.buffer.write(raw)
+            sys.stdout.buffer.flush()
         return 0
     except Exception:
         return 1
