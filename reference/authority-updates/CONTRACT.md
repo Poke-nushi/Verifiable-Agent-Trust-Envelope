@@ -285,3 +285,106 @@ This contract does not guarantee immediate remote revocation, cancellation
 after acceptance, global rollback protection across independent stores, or
 exactly-once external effects. IAM-to-grant translation and the issuing authority's
 operation remain application responsibilities.
+
+## Cooperative refresh lifecycle
+
+`RefreshingAuthorityVerifier` is an optional application integration aid over
+`ManagedAuthorityVerifier`, `AuthorityStore` and `SupervisedHttpsSnapshotSource`.
+It does not change the snapshot profile or VATE wire contracts. Its caller MUST
+give it exclusive use of the supplied fetch instance and route participating
+admission, restore and dispatch calls through the coordinator. Direct use of
+the underlying verifier, another coordinator or another process does not share
+its local execution gate or retry schedule.
+
+### Scheduling and local readiness
+
+Construction MUST start with refresh required, regardless of the persisted
+store's availability or snapshot lifetime. `poll()` MUST serialize cleanup,
+fetch, verification and installation with other calls on that instance. The
+managed entry points MUST perform a due refresh before invoking the underlying
+verifier. Concurrent or reentrant calls MUST raise `snapshot.AuthorityError`
+with `cause == "AUTHORITY_REFRESH_BUSY"`; they MUST NOT start another refresh
+or callback. Other coordinator failures use the same exception type and its
+`cause` code. Exceptions from the managed verifier retain their existing types.
+
+A successful due poll returns the store's installation metadata. Before the
+next due time it returns `None`; this includes the retry interval following a
+failure. A managed call during that retry interval MUST instead raise
+`AuthorityError` with code `AUTHORITY_REFRESH_RETRY_WAIT`. A poll failure MUST
+propagate. Once a due refresh attempt begins, failure of cleanup, acquisition,
+verification or installation MUST close this coordinator's execution gate even
+if the shared store cannot acknowledge an unavailable flag. It MUST NOT be
+reported as acknowledged suspension of other users of the store.
+
+Source or configuration checks that fail before the due-time decision MUST
+reject that call without changing the local readiness, retry schedule or last
+refresh failure. After those checks recover, subsequent calls use the existing
+deadline and MUST repeat the source, configuration and permission checks before
+execution. Stop requests and clock failures follow their separate rules below.
+
+The application selects finite positive refresh and retry intervals in seconds
+and drives `poll()` when no managed calls arrive. Intervals start after an
+attempt completes, using an application-selected monotonic clock. Non-numeric,
+non-finite, negative or backwards clock observations and unrepresentable future
+deadlines MUST block further attempts on that instance with
+`AUTHORITY_REFRESH_CLOCK_INVALID`. Cleanup and history inspection remain
+available. The monotonic schedule is process-local; the store's separate
+persistent wall-clock, revision, freshness and expiry checks remain unchanged.
+Neither an interval nor successful polling extends permission or receipt life.
+
+Pending supervised-fetch cleanup MUST complete before acquisition can start.
+A cleanup failure MUST block this coordinator and enter its retry interval;
+it does not establish that the shared store was marked unavailable. Ordinary
+refresh failures retain the existing `AUTHORITY_REFRESH_FAILED` behavior.
+The coordinator MUST NOT include raw exception text, tokens or endpoint data in
+its status record.
+
+`RefreshStatus` reports only local scheduling observations. Its phase is
+`refresh_required`, `refreshed`, `retry_wait`, `clock_failed`, `stop_requested`
+or `stopped`. `refreshed` means a successful installation with no refresh yet
+due; it MUST NOT be interpreted as permission to execute a particular request,
+store health, current remote authority or a completed external effect.
+`last_installed_revision` describes the last successful installation completed
+by this instance, including one followed by a stop request or scheduling error.
+It is not necessarily the current shared-store revision. A busy
+instance may refuse a status read. Invalid time detected while reading status
+raises the clock error and latches `clock_failed` for subsequent reads.
+
+### Stop and restart
+
+`request_stop()` requests a cooperative stop. After source and configuration
+checks, the coordinator MUST serialize its final stop check and acceptance of
+each managed call with stop requests. Passing that check is the handoff boundary:
+if stop is recorded first, the call MUST be rejected; if the call is accepted
+first, it may invoke managed verification and its callback even after
+`request_stop()` returns. The stop request MUST NOT wait for managed verification
+or callback completion. A stop request during acquisition MUST prevent that call
+from being accepted after acquisition completes, even if the snapshot was
+installed. `close()` MUST request stop and acknowledge completion only after
+obtaining exclusive ownership and completing pending fetch cleanup. Busy or
+failed cleanup MUST leave the instance in `stop_requested`; callers MUST retain
+it and retry cleanup. A completed close is idempotent. A stopped instance cannot
+be restarted.
+
+`KeyboardInterrupt`, `SystemExit` and other non-ordinary interruptions MUST
+propagate and request stop rather than schedule automatic retry. Already
+accepted callbacks or external effects may finish. Neither `request_stop()` nor
+`close()` establishes remote cancellation. The application still owns abrupt
+process-termination supervision and host-level cleanup.
+
+After process restart, the application MUST reopen the original stores with
+their independently retained anchors and construct new verifier, fetch and
+coordinator instances. A forked child MUST NOT use or close an inherited
+coordinator (`AUTHORITY_REFRESH_FORK_REOPEN_REQUIRED`). Construction does not
+recreate, clear or re-anchor either store. A valid current-or-new authenticated
+snapshot is required before managed calls resume, subject to the existing
+conflict and issuance rules. A successfully installed revocation remains a
+revocation. Durable attempt history MUST remain authoritative when deciding
+whether a retained admission may be dispatched.
+
+`dispatch_status()` reads the underlying durable history without polling or
+requiring local refresh readiness, including after close. It retains the
+underlying store and configuration checks and is not a new execution path.
+This lifecycle provides no deployment-wide scheduler, cross-process refresh
+fence, storage migration, root-key recovery, immediate remote revocation or
+exactly-once external effect guarantee.
