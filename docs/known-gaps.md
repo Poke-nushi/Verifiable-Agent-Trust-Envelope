@@ -1,19 +1,18 @@
 # Known Gaps
 
 This repository is a discussion draft.
-The goal of this note is to make the unresolved parts explicit rather than implied.
 
 ## Summary
 
-The current repo is strongest on:
+The current repository provides:
 
 - object-model framing
 - verifier ordering
 - status and attenuation semantics
-- a narrow AL2 verifier wedge
+- reference checks for the AL2 profile
 - receipt linkage and local observation assessment through a versioned API
 
-It is weaker on:
+Areas requiring further work include:
 
 - packaging profile finalization
 - multi-implementation interoperability
@@ -85,6 +84,10 @@ cannot be recorded in the shared store. The application must drive polling and
 route calls through that instance. Local abrupt-exit tests cover retrieval,
 installation and dispatch recovery with the same anchored stores. Cross-process
 scheduling, host-level cleanup and deployment recovery remain application work.
+The [native process-recovery example](../reference/authority-issuer/README.md#run-the-process-recovery-example)
+connects real local Hydra/OpenFGA and the retained Keychain key through supervised
+intake and managed dispatch, including fresh publisher/recipient processes and
+an interrupted recording callback. It retains the original host, stores and anchors.
 Broader IAM mappings, root-key selection/migration and deployment-wide authority
 policy remain application responsibilities. Both local stores require unchanged anchored
 filesystem identities. Their contracts provide no portable host recovery,
