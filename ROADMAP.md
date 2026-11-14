@@ -121,9 +121,12 @@ selected key across publisher process restarts alongside the
 existing revision ledger. The
 [supervised HTTPS source](reference/authority-updates/README.md#bound-each-https-attempt)
 places each retrieval in a disposable process with a parent deadline and bounded
-output. Other custody backends, host reboot/unlock and key recovery, update
-scheduling and deployment recovery, and independent deployment testing remain
-application integration work.
+output. The optional
+[refresh coordinator](reference/authority-updates/README.md#coordinate-refresh-retry-and-shutdown)
+serializes one application's refreshes and managed calls, schedules retries,
+and requires a fresh installation after process restart. Other custody backends,
+host reboot/unlock and key recovery, deployment-wide scheduling and recovery,
+and independent deployment testing remain application integration work.
 
 The main-branch conformance corpus remains 76 cases / 217 manifest artifacts.
 The demonstration scenarios are separate from that corpus. See

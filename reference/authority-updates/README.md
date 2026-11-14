@@ -124,8 +124,7 @@ preserve `fetch`, investigate the unfinished attempt and call
 `fetch.cleanup_pending()`. Startup may still be pending before a PID is available;
 `pending_worker_pid` is diagnostic and can be `None` even when cleanup is required.
 The cleanup method returns normally once the owner and worker have finished,
-or startup has been cancelled before acquisition could begin. In that latter
-case, a thread that starts later exits without creating a worker.
+or startup has been cancelled before acquisition could begin.
 On failure the method raises and retains ownership.
 The `fetch` instance refuses another attempt until cleanup succeeds. Cleanup
 does not make the failed refresh successful, so the example propagates that
@@ -145,6 +144,90 @@ Another interruption during failure recording can also prevent that acknowledgem
 See the [supervision contract](CONTRACT.md#supervised-https-acquisition) for
 the bounds and failure behavior.
 
+## Coordinate refresh, retry and shutdown
+
+Use `RefreshingAuthorityVerifier` to route one application's managed calls
+through a shared refresh schedule. Pass the existing `ManagedAuthorityVerifier`
+as `managed` and give the coordinator exclusive use of its supervised `fetch`:
+
+```python
+from refresh_lifecycle import RefreshingAuthorityVerifier
+
+session = RefreshingAuthorityVerifier(
+    verifier=managed,
+    fetch=fetch,
+    refresh_interval_seconds=5,
+    retry_interval_seconds=2,
+)
+session.poll()
+```
+
+Use `session.admit`, `session.restore_admission` and `session.dispatch` with the
+same arguments as the managed verifier. Each checks whether refresh is due
+before proceeding. The first call requires a successfully installed snapshot,
+even when the reopened store contains an unexpired snapshot. Complete refreshes
+and managed calls are serialized within this instance; competing calls raise
+`snapshot.AuthorityError` with `cause == "AUTHORITY_REFRESH_BUSY"`.
+
+The application calls `poll()` from its scheduler while no requests arrive.
+It returns installation metadata when it refreshes, `None` before the next
+attempt is due, and raises on failure. Coordinator errors use
+`snapshot.AuthorityError`; its `cause` attribute carries the error code.
+Errors from managed verification retain their existing exception types.
+`status().next_attempt_in_seconds` provides the delay for that scheduler.
+The selected intervals start after each attempt ends. Choose them with the
+snapshot age, expiry and expected delivery
+latency in mind; the store still rejects expired or stale permissions.
+
+A failed refresh blocks this session's managed calls until a later scheduled
+attempt installs a valid snapshot. This local block also applies when the
+store is busy and cannot persist its unavailable flag. Managed calls during the retry
+interval raise `AuthorityError` with code `AUTHORITY_REFRESH_RETRY_WAIT`;
+pending worker cleanup must succeed before another fetch. `status()` reports
+local scheduling state and the last revision installed by this session,
+including an installation followed by a stop request or scheduling error. It
+does not report a permission decision or confirm that other callers are blocked.
+
+Source or configuration checks that fail before a refresh attempt reject that
+call without changing local readiness or the retry schedule. After those checks
+recover, calls resume under the existing refresh deadline and permission checks.
+
+Request shutdown, then confirm it:
+
+```python
+session.request_stop()
+session.close()
+```
+
+`request_stop()` prevents further handoffs to managed verification. The handoff
+is accepted at a final stop check after source and configuration checks; that
+decision and stop requests are serialized. A call accepted first may still start
+managed verification and complete its callback after `request_stop()` returns.
+If stop is requested during acquisition, acquisition may finish, but that call
+cannot be accepted for managed verification. `close()` returns
+successfully only when no call holds the session and pending fetch cleanup has
+succeeded. If it raises a busy or cleanup error, shutdown remains unconfirmed;
+retain the session and retry `close()`. Interruptions such as `KeyboardInterrupt`
+propagate and request this same stop. The application must also arrange process
+supervision for abrupt
+termination; requesting stop cannot cancel an accepted remote effect.
+
+After a process restart, reopen both stores with their retained anchors and
+construct a new fetch and session. The new session requires a refresh before
+using retained admissions. Revision, clock and dispatch-attempt history remain
+in their original stores; refreshing does not extend a receipt's lifetime or
+authorize repeating an attempted dispatch. `dispatch_status()` remains available
+without refreshing, including after `close()`, to inspect that history.
+
+This coordinator starts no background updater and serializes only calls routed
+through it. The [lifecycle contract](CONTRACT.md#cooperative-refresh-lifecycle)
+defines its timing, stop and recovery rules. The focused tests include a real
+loopback HTTPS feed and fresh Python processes reopening both stores:
+
+```bash
+python3 -B -m unittest discover -s reference/authority-updates -p 'test_refresh_lifecycle.py' -v
+```
+
 ## Remaining integration work
 
 The [selected Hydra/OpenFGA issuer](../authority-issuer/README.md) translates one
@@ -155,7 +238,7 @@ signing key across publisher process restarts. Broader IAM mappings and
 deployment-specific key custody remain application responsibilities. The
 snapshot format is specific to this purchase profile. Selecting and rotating the authority's
 root key, migrating stored admissions across source changes, and arranging
-update scheduling and recovery require separate application policies.
+deployment-wide scheduling and recovery require separate application policies.
 
 Actor and runtime keys can change through higher complete snapshots. Independent
 stores do not share a global revision or replay fence. Caller/runtime network peer identity,
