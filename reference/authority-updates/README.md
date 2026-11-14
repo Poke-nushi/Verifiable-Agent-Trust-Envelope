@@ -116,6 +116,10 @@ TLS key-log settings.
 The deadline covers worker startup and retrieval, with up to three additional
 seconds to reap a stopped worker. OS scheduling and process creation can add
 delay; signature verification and store access have their own boundaries.
+After validating its private request, the worker starts its own timer with the
+configured timeout, before TLS setup and retrieval. That timer can end a stalled
+fetch even if the application exits abruptly. It does not cover worker startup
+or reap an orphan; deployment process supervision remains necessary.
 Through `source.refresh`, ordinary transport and installation errors are reported
 as `AUTHORITY_REFRESH_FAILED`. Interruptions such as `KeyboardInterrupt` and
 `SystemExit` propagate after an attempt to record the store as unavailable.
@@ -227,6 +231,22 @@ loopback HTTPS feed and fresh Python processes reopening both stores:
 ```bash
 python3 -B -m unittest discover -s reference/authority-updates -p 'test_refresh_lifecycle.py' -v
 ```
+
+The recovery tests also terminate local processes during retrieval, before and
+after snapshot installation, and around dispatch handoff, attempt recording and
+callback completion. They reopen the same anchored stores and check that a new
+refresh is required, installed revocation and revision/clock history remain in
+force, receipts are unchanged, and consumed attempts cannot execute again.
+An attempt recorded before termination remains consumed even if its callback
+never ran; an uncertain external outcome is not permission to retry.
+
+```bash
+python3 -B -m unittest discover -s reference/authority-updates -p 'test_lifecycle_recovery.py' -v
+```
+
+These are process-exit checks on one host, with synthetic signed snapshots and
+loopback HTTPS. They do not test host reboot, storage loss or migration, or
+independent recovery of an external effect.
 
 ## Remaining integration work
 

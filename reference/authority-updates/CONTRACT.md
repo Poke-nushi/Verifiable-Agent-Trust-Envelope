@@ -228,6 +228,16 @@ cleanup, so Python's main-thread SIGINT handling cannot interrupt its `Popen`
 construction and lose the child handle. This helper does not replace signal
 handlers or change signal masks.
 
+After validating the private request and its timeout, the worker MUST start its
+own deadline before constructing the TLS source. It uses the configured timeout
+and covers TLS setup, DNS, retrieval, source rechecks and pipe output. Expiry
+MUST terminate the worker with a nonzero status, including when its supervising
+application has exited without cleanup. This worker-local timer does not cover
+interpreter startup or request validation. The parent deadline still covers
+those stages while the parent is alive. Reaping an orphan remains the
+responsibility of its OS parent or deployment supervisor; the worker timer does
+not establish that cleanup occurred.
+
 On timeout, failure or interruption the parent MUST request cancellation and
 attempt to close pipes, kill and reap any remaining child, allowing up to three
 additional seconds to confirm cleanup. If startup is still blocked, ownership

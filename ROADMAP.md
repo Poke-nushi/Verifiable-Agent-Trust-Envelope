@@ -120,11 +120,17 @@ snapshots in a controlled local fixture. The optional
 selected key across publisher process restarts alongside the
 existing revision ledger. The
 [supervised HTTPS source](reference/authority-updates/README.md#bound-each-https-attempt)
-places each retrieval in a disposable process with a parent deadline and bounded
-output. The optional
+places each retrieval in a disposable process with bounded output, a parent
+deadline and a worker-local timer for validated requests that remains active
+after the parent exits.
+The optional
 [refresh coordinator](reference/authority-updates/README.md#coordinate-refresh-retry-and-shutdown)
 serializes one application's refreshes and managed calls, schedules retries,
-and requires a fresh installation after process restart. Other custody backends,
+and requires a fresh fetch and verified installation of a current-or-new snapshot
+after process restart. Local abrupt-exit tests
+cover retrieval, snapshot installation and dispatch recovery through the same
+anchored stores, preserving revision, clock, receipt and attempt history.
+Other custody backends,
 host reboot/unlock and key recovery, deployment-wide scheduling and recovery,
 and independent deployment testing remain application integration work.
 
