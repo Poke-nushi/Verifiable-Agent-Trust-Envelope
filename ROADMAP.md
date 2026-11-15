@@ -1,8 +1,7 @@
 # Roadmap
 
 This public roadmap describes reviewable technical direction for the VATE
-discussion draft. It intentionally avoids certification, endorsement,
-production-readiness, or official adjacent-protocol adoption claims.
+discussion draft.
 
 For public wording rules, see
 [docs/public-claim-boundary.md](docs/public-claim-boundary.md).
@@ -109,7 +108,8 @@ original operation's outcome.
 Independent issuer authenticity, cross-implementation A2A exchanges and
 production readiness remain unestablished.
 
-The optional [authority update integration](reference/authority-updates/README.md)
+Added on `main` after v0.6.0, the optional
+[authority update integration](reference/authority-updates/README.md)
 connects signed runtime and caller permission snapshots to ordinary Python
 admission and durable dispatch. It adds verified HTTPS intake, persistent
 revision checks and local ordering between policy updates and dispatch callbacks.
@@ -130,6 +130,10 @@ and requires a fresh fetch and verified installation of a current-or-new snapsho
 after process restart. Local abrupt-exit tests
 cover retrieval, snapshot installation and dispatch recovery through the same
 anchored stores, preserving revision, clock, receipt and attempt history.
+The [native process-recovery example](reference/authority-issuer/README.md#run-the-process-recovery-example)
+connects Hydra/OpenFGA, a retained Keychain key, supervised acquisition and the
+coordinator through fresh publisher/recipient processes and an interrupted
+recording callback on one host.
 Other custody backends,
 host reboot/unlock and key recovery, deployment-wide scheduling and recovery,
 and independent deployment testing remain application integration work.

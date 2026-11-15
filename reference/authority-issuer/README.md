@@ -70,7 +70,8 @@ For persistent signing-key integration, the optional
 [macOS Keychain signer](../authority-keychain/README.md) supplies the same
 callback interface and tests fresh publisher processes against one retained key
 and revision ledger. The native Hydra/OpenFGA example above continues to use
-its disposable in-memory signer.
+its disposable in-memory signer. The process-recovery example below connects
+the persistent signer to the same native services.
 
 Unit tests use existing Node/OpenSSL and disposable local endpoints; they do
 not need Hydra/OpenFGA binaries:
@@ -78,6 +79,49 @@ not need Hydra/OpenFGA binaries:
 ```sh
 python3 -B -m unittest discover -s reference/authority-issuer -p 'test_*.py' -v
 ```
+
+## Run the process-recovery example
+
+[`run_lifecycle.py`](run_lifecycle.py) connects native Hydra/OpenFGA, a persistent
+Keychain signing key, supervised HTTPS acquisition and the refresh coordinator
+to durable admission and dispatch. Publisher and recipient run in separate
+Python processes. Restarted processes reopen their original stores with the
+retained anchors and selected authority key.
+
+Use the same pinned binaries and executable selections as above, plus the
+existing macOS Swift compiler with Security and CryptoKit. The controller
+compiles the existing Keychain helpers, creates one disposable test Keychain,
+and removes it after stopping its processes. It checks that the user's default
+Keychain and search-list settings are unchanged at completion.
+
+```sh
+python3 -B reference/authority-issuer/run_lifecycle.py \
+  --native-root /path/to/pinned-native-directory \
+  --node /path/to/node --node-sha256 NODE_BINARY_SHA256 \
+  --openssl /path/to/openssl --openssl-sha256 OPENSSL_BINARY_SHA256 \
+  --output /tmp/vate-authority-lifecycle-example
+```
+
+The example checks permission, delegation and OAuth withdrawal; a locked
+signing key; failed HTTPS delivery; Hydra stop/restart with its original
+database; and fresh publisher/recipient processes. A recipient must fetch and
+verify an update after restart before resuming managed calls. A consumed
+attempt remains unavailable for retry, including when the recipient exits
+inside its recording callback before recording completion.
+
+`RUN.json` records matched observations, source/binary digests and artifact
+digests. Saved artifacts include signed snapshots, original receipts, effective requests, dispatch
+checkpoints, retained attempt statuses and recording-callback observations.
+Only a completed, successful run writes `RUN.json`; partial observations from
+a failed run are not a passing result. Credentials, caller proofs and private
+keys stay outside the saved bundle.
+
+This exercises process recovery on one host with the original stores, anchors
+and authority key. OpenFGA and the fixture actor/runtime signers stay alive
+while publisher/recipient processes restart. Host reboot, key loss/rotation,
+storage migration and recovery of a real external effect require separate
+operational procedures. The service connections and synthetic login/consent
+retain the native fixture conditions described above.
 
 ## Integrating an issuing application
 
@@ -96,8 +140,8 @@ not learn about a remote revocation until an update arrives; an undelivered
 update remains bounded by the last snapshot's expiry.
 
 One publisher per registration is supported. Independent concurrent publishers,
-deployment-specific signing-key custody, root-key/epoch migration, supervised update
-delivery and independent deployment testing remain integration work. The
+deployment-specific signing-key custody, root-key/epoch migration, deployment-wide
+delivery/recovery and independent deployment testing remain integration work. The
 service reads are sequential, not an atomic transaction across Hydra and
 OpenFGA. This adapter connects to the Python admission and dispatch path; the
 TypeScript component checks receipt content.

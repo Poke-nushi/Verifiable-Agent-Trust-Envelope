@@ -254,7 +254,11 @@ The [selected Hydra/OpenFGA issuer](../authority-issuer/README.md) translates on
 fixed authentication/authorization mapping into these grants and exercises
 native local revocation through dispatch. An optional
 [macOS Keychain signer](../authority-keychain/README.md) preserves one selected
-signing key across publisher process restarts. Broader IAM mappings and
+signing key across publisher process restarts. The
+[native process-recovery example](../authority-issuer/README.md#run-the-process-recovery-example)
+combines those services and signer with supervised acquisition, the refresh
+coordinator and durable dispatch, including publisher/recipient restarts and
+an interrupted recording callback. Broader IAM mappings and
 deployment-specific key custody remain application responsibilities. The
 snapshot format is specific to this purchase profile. Selecting and rotating the authority's
 root key, migrating stored admissions across source changes, and arranging

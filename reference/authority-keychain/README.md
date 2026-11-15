@@ -107,6 +107,12 @@ revision ledger, retained permission withdrawal, publication failure, explicit
 unlock recovery and old-snapshot rejection. IAM responses in these tests are
 simulated; the separate issuer example exercises real Hydra/OpenFGA.
 
+The [native process-recovery example](../authority-issuer/README.md#run-the-process-recovery-example)
+connects this signer to real local Hydra/OpenFGA, supervised HTTPS acquisition,
+the refresh coordinator and durable dispatch. It retains the selected key and
+original stores while publisher and recipient processes restart, and checks
+that a consumed attempt cannot run again after an interrupted callback.
+
 The test-only `fixture_keychain_admin.swift` creates, locks, unlocks and deletes
 only its disposable Keychain. Its random password stays in test-process memory
 and is passed through stdin. Tests do not change the user's default Keychain or
@@ -114,6 +120,6 @@ install permissive access rules. On other operating systems, native tests are
 skipped; wrapper failure tests still run.
 
 Process restart is covered; host reboot, unattended unlock, Keychain migration,
-key/epoch rotation, recovery after key loss and supervised delivery remain
+key/epoch rotation, recovery after key loss and deployment-wide recovery remain
 deployment work. Replacing or recovering a key requires explicit trust
 reselection, not automatic re-provisioning.
