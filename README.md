@@ -199,7 +199,8 @@ VATE is a public Apache-2.0 protocol discussion draft. The
 purchase instructions and changes the Python admission API. The
 [migration guide](reference/request-binding/MIGRATION.md) shows callers how to
 pass the original JSON bytes. The [release verification record](docs/release-gate-v0.7.0.md)
-identifies both fixture sets and their digests. The earlier `v0.6.0` archive is available at
+identifies both fixture sets and their digests. The archived v0.7.0 source is available at
+[10.5281/zenodo.24330626](https://doi.org/10.5281/zenodo.24330626). The earlier `v0.6.0` archive is available at
 [`10.5281/zenodo.23626404`](https://doi.org/10.5281/zenodo.23626404). The earlier `v0.5.0` archive
 remains available at [`10.5281/zenodo.23378498`](https://doi.org/10.5281/zenodo.23378498).
 The archived `v0.4.1` remains available at
@@ -245,8 +246,7 @@ Current repository state:
 - **Roadmap refresh date**: 2026-11-18
 - **Primary battlefield**: `AL2` external digital write
 - **Current GitHub review snapshot**: `v0.7.0` discussion-draft pre-release
-- **Latest verified Zenodo software archive**: `v0.6.0` · October 24, 2026 UTC
-  (October 25 JST) · [10.5281/zenodo.23626404](https://doi.org/10.5281/zenodo.23626404)
+- **Latest verified Zenodo software archive**: `v0.7.0` · November 18, 2026 · [10.5281/zenodo.24330626](https://doi.org/10.5281/zenodo.24330626)
 - **Active main-branch artifact line**: `2026-09`, retained in v0.7.0. The AL2
   profile identifier remains
   `VATE-AL2-Verifier-Admission-v0.3`
@@ -752,7 +752,8 @@ Actions*. Zenodo. [https://doi.org/10.5281/zenodo.22685689](https://doi.org/10.5
 
 The November 18, 2026 `v0.7.0` discussion-draft pre-release is identified by
 its [GitHub tag](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.7.0).
-The [concept DOI](https://doi.org/10.5281/zenodo.19839768) identifies the software series.
+The exact version DOI is [10.5281/zenodo.24330626](https://doi.org/10.5281/zenodo.24330626). The tag points to source commit
+`d96d31a2ecadca90a5c79cb8d3668e5390ee0177`. The [concept DOI](https://doi.org/10.5281/zenodo.19839768) identifies the software series.
 
 For the October 24, 2026 UTC (October 25 JST) `v0.6.0` discussion-draft
 pre-release, cite:
