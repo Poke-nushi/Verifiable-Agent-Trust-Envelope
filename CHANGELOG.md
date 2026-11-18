@@ -2,7 +2,11 @@
 
 This file records dated public changes to the discussion draft.
 
-## Unreleased
+## v0.7.0
+
+Released November 18, 2026 as a discussion-draft pre-release. The
+[release notes](docs/release-notes/v0.7.0.md) include a purchase example and
+the migration steps for Python callers of `VateVerifier.admit`.
 
 - The reference runner uses the same execution gate for admission reports and
   post-execution linkage. An invalid attenuation mode or new-permit flag closes

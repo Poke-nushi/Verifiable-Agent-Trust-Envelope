@@ -7,9 +7,10 @@ agent action was allowed, narrowed, or denied. It carries a declared input hash
 and digest-addressed evidence references into local admission, then links the
 resulting receipt to later outcome evidence.
 
-The [v0.6.0 release](docs/release-notes/v0.6.0.md) uses the **AL2 verifier
-admission profile v0.3**. The profile defines the admission rules and receipt
-model introduced below; its version is separate from the repository release.
+The [v0.7.0 release](docs/release-notes/v0.7.0.md) shows how a receiver can
+check the original and approved instructions for a purchase against its receipt.
+It uses the **AL2 verifier admission profile v0.3**, which defines the admission
+rules and receipt model introduced below.
 
 [Official website](https://vate.rognalia.com/) ·
 [Overview video (1:38)](https://vate.rognalia.com/#overview) ·
@@ -194,20 +195,20 @@ effective operations. [Run the purchase-cap example](reference/request-binding/R
 ## Status and Scope
 
 VATE is a public Apache-2.0 protocol discussion draft. The
-[`v0.6.0` release](docs/release-notes/v0.6.0.md) collects required-record review,
-persistent receiving and reassessment, fixed external-record examples and a
-post-admission runtime-key revocation sample. Its
-[release gate](docs/release-gate-v0.6.0.md) separates source validation from
-publication and archive verification. The `v0.6.0` archive is available at
+[`v0.7.0` release](docs/release-notes/v0.7.0.md) adds receiver checks for
+purchase instructions and changes the Python admission API. The
+[migration guide](reference/request-binding/MIGRATION.md) shows callers how to
+pass the original JSON bytes. The [release verification record](docs/release-gate-v0.7.0.md)
+identifies both fixture sets and their digests. The earlier `v0.6.0` archive is available at
 [`10.5281/zenodo.23626404`](https://doi.org/10.5281/zenodo.23626404). The earlier `v0.5.0` archive
 remains available at [`10.5281/zenodo.23378498`](https://doi.org/10.5281/zenodo.23378498).
 The archived `v0.4.1` remains available at
 [`10.5281/zenodo.22680789`](https://doi.org/10.5281/zenodo.22680789).
-`v0.6.0` keeps
+`v0.7.0` keeps
 the `VATE-AL2-Verifier-Admission-v0.3` semantic profile and uses the active
 `2026-09` machine-readable artifact line.
 
-**Current public status:** discussion draft · `v0.6.0` pre-release
+**Current public status:** discussion draft · `v0.7.0` pre-release
 · not production-ready · no production approval implied.
 
 VATE composes with A2A, MCP, OAuth, OpenID, VC, SPIFFE, AP2, x402, and payment
@@ -229,6 +230,7 @@ a human-in-the-loop workflow product.
 - `v0.4.1 AP2 replay-input and implementation-record maintenance pre-release`
 - `v0.5.0 execution-evidence and recipient-review pre-release`
 - `v0.6.0 receiving, reassessment and runtime-key revocation pre-release`
+- `v0.7.0 purchase request binding and authority lifecycle pre-release`
 - `not production-ready`
 - `not an official A2A extension, endorsement, certification, SDK, middleware package, or general compatibility proof`
 - `not an A2A core proposal or universal trust layer`
@@ -240,16 +242,18 @@ Current repository state:
 - **Repository type**: protocol discussion draft
 - **Document maturity**: early draft
 - **Primary language**: English
-- **Roadmap refresh date**: 2026-10-25
+- **Roadmap refresh date**: 2026-11-18
 - **Primary battlefield**: `AL2` external digital write
-- **Current GitHub review snapshot**: `v0.6.0` discussion-draft pre-release
+- **Current GitHub review snapshot**: `v0.7.0` discussion-draft pre-release
 - **Latest verified Zenodo software archive**: `v0.6.0` · October 24, 2026 UTC
   (October 25 JST) · [10.5281/zenodo.23626404](https://doi.org/10.5281/zenodo.23626404)
-- **Active main-branch artifact line**: `2026-09`, retained in v0.6.0; the AL2
+- **Active main-branch artifact line**: `2026-09`, retained in v0.7.0. The AL2
   profile identifier remains
   `VATE-AL2-Verifier-Admission-v0.3`
 - **Active main-branch corpus**: 76 cases / 217 manifest artifacts ·
   `sha-256:1bd35f100ccc6584ddfdf59122ba377606dbe929b219099f0fa1008b6aa0f5f1`
+- **Purchase request-binding corpus**: 4 cases / 26 manifest artifacts ·
+  `sha-256:48859e14eb7d61c0fc14b038562cd2965dcfb993752210309348ef6d3b0ebe93`
 - **Implemented artifacts**: v0.3 schemas and examples; a runnable AL2 fixture
   corpus with negative cases; SUT comparison and implementation-reporting
   formats; a dependency-free verifier core and A2A-shaped adapter demo;
@@ -289,7 +293,7 @@ script and Supplement S1 retain Apache-2.0.
 
 ## Reviewer Entry Points
 
-If you are reviewing the `v0.6.0` release, a historical snapshot,
+If you are reviewing the `v0.7.0` release, a historical snapshot,
 or later main-branch work, start here:
 
 - [Public claim boundary](docs/public-claim-boundary.md) - what this repository
@@ -745,6 +749,10 @@ Sato, T. (2026). *VATE: Verifier-Side Admission and Evidence Linkage for AI Agen
 Actions*. Zenodo. [https://doi.org/10.5281/zenodo.22685689](https://doi.org/10.5281/zenodo.22685689).
 
 ### Software Snapshots
+
+The November 18, 2026 `v0.7.0` discussion-draft pre-release is identified by
+its [GitHub tag](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/releases/tag/v0.7.0).
+The [concept DOI](https://doi.org/10.5281/zenodo.19839768) identifies the software series.
 
 For the October 24, 2026 UTC (October 25 JST) `v0.6.0` discussion-draft
 pre-release, cite:

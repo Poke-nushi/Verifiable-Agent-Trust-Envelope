@@ -50,7 +50,7 @@ expected outcomes, reason codes, required artifacts, and the `2026-09` exchange
 contract remain unchanged. Existing results remain tied to their recorded
 commit and digest; do not replace those pins with the current digest.
 
-The current unreleased corpus keeps those 76 cases and 217 manifest artifacts
+The `v0.7.0` AL2 corpus keeps those 76 cases and 217 manifest artifacts
 with digest
 `sha-256:1bd35f100ccc6584ddfdf59122ba377606dbe929b219099f0fa1008b6aa0f5f1`.
 Its case schema rejects trailing line breaks in digest strings. That schema is

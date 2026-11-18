@@ -8,6 +8,14 @@ For public wording rules, see
 
 ## Current Direction
 
+### v0.7.0 release
+
+The [v0.7.0 release notes](docs/release-notes/v0.7.0.md) show how a receiver
+checks the original and approved instructions for a purchase. The Python
+reference also demonstrates checking current authority before dispatch and
+migrating one stopped deployment. The [release verification record](docs/release-gate-v0.7.0.md)
+identifies the source and the two fixture sets an implementer can compare against.
+
 ### Planned Local Migration
 
 The [planned migration path](reference/planned-migration/README.md) addresses
@@ -181,6 +189,8 @@ or produce VATE receipts.
 
 The current public review surface is:
 
+- [v0.7.0 release notes](docs/release-notes/v0.7.0.md) and
+  [release verification](docs/release-gate-v0.7.0.md)
 - `v0.6.0` release notes and publication/archive gate:
   [docs/release-notes/v0.6.0.md](docs/release-notes/v0.6.0.md) and
   [docs/release-gate-v0.6.0.md](docs/release-gate-v0.6.0.md)
