@@ -39,9 +39,9 @@ its own results against either fixture set using
 
 ## TypeScript test dependencies
 
-Vitest 4.1.12 uses picomatch 4.0.7 to select test files. Certain matching
-patterns can consume excessive CPU time. For this lockfile, npm reported five
-affected development packages linked to [one advisory](https://github.com/advisories/GHSA-fc5q-39xc-vjpf).
+Vitest 4.1.12 uses picomatch 4.0.7 to select test files. At release, npm
+flagged five development packages under
+[one picomatch advisory](https://github.com/advisories/GHSA-fc5q-39xc-vjpf).
 The production-only audit reported zero findings. The TypeScript receipt
 helpers do not import picomatch. The Python purchase example runs independently.
 
@@ -50,13 +50,18 @@ Vitest or Vite configuration in the reviewed tree. Developers who run another
 checkout or supply their own settings select that checkout's code and search
 patterns. GitHub-hosted CI also limits the duration of its test jobs.
 
-CI audits all dependencies and separately audits production dependencies.
-While a maintainer review is active for an exact source tree, the full audit
-may accept this advisory on the reviewed development paths. It prints the
-original npm reports. Other findings at moderate severity or higher still
-block the check, as does an incomplete audit. Fork pull requests use the
-ordinary audit threshold. A compatible upstream fix can replace this review
-after a lockfile update and a new test run.
+The
+[tagged workflow](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/blob/v0.7.0/.github/workflows/ci.yml)
+printed the full and production-only npm reports. It allowed the advisory
+only on the reviewed development dependency paths for the approved source
+tree. Other findings of moderate severity or higher and incomplete audits
+failed the check. Fork pull requests used the ordinary threshold.
+
+GitHub withdrew the advisory on November 18, 2026 (UTC). On November 19 (JST),
+both the full and production-only npm audits reported zero findings with the
+original lockfile, which still pins picomatch 4.0.7. The
+[CI workflow](../.github/workflows/ci.yml) checks both scopes at the moderate
+severity threshold and rejects incomplete audit reports.
 
 ## Publication and citation
 

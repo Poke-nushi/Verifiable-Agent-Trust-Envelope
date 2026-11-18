@@ -432,28 +432,8 @@ jobs:
           git archive HEAD:reference/runtime-handoff-sample | tar -x -C "$archive_dir"
           python -E -s -B scripts/check_runtime_handoff_sample.py --sample-root "$archive_dir"
 
-  npm-review:
-    name: Development dependency review
-    runs-on: ubuntu-latest
-    permissions: {}
-    timeout-minutes: 2
-    outputs:
-      active: ${{ steps.review.outputs.active }}
-    steps:
-      # This job has no checkout. Project code receives only the review outcome.
-      - id: review
-        name: Check maintainer review
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-        env:
-          REVIEW_UNTIL: ${{ secrets.VATE_PICOMATCH_REVIEW_EXPIRY }}
-        run: |
-          if [[ "$REVIEW_UNTIL" =~ ^[1-9][0-9]{9}$ ]] && (( $(date -u +%s) < REVIEW_UNTIL )); then
-            echo 'active=true' >> "$GITHUB_OUTPUT"
-          fi
-
   validate:
     name: Repository checks
-    needs: npm-review
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -540,8 +520,6 @@ jobs:
           node --test reference/border-receiving-cli/test_receive.mjs
 
       - name: Audit full and production npm dependencies
-        env:
-          VATE_REVIEWED_NPM_TREE: ${{ needs.npm-review.outputs.active == 'true' && vars.VATE_PICOMATCH_REVIEW_TREE || '' }}
         run: |
           python -B -m unittest discover -s scripts -p test_check_npm_audit.py -v
           python -B scripts/check_npm_audit.py
