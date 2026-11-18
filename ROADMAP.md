@@ -185,6 +185,11 @@ Controls distinguish the fixed-parent guard, leaf-only policy and unavailable
 PDP. The trial uses one stored path and does not implement delegation issuance
 or produce VATE receipts.
 
+The [first-hop receiving example](docs/interop/oauth-first-hop-vate-example.md),
+published on `main` after v0.7.0, compares the baseline and v0.7.0 receipt readers
+on the same three selected observations and replays seven revisions of the
+receiver's history.
+
 ### Release And Review References
 
 The current public review surface is:

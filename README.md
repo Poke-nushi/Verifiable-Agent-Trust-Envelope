@@ -86,6 +86,9 @@ The separate [first-hop revocation trial](docs/interop/oauth-first-hop-revocatio
 revokes user → A while B's token, child grant and independent user permission
 remain. Fourteen Hydra/OpenFGA cases expose the chain check, fixed-parent guard
 and writer restrictions; the package runs independently of VATE.
+The [VATE receiving example](docs/interop/oauth-first-hop-vate-example.md)
+replays selected requests from that trial and shows how a late execution receipt
+completes the earlier permitted request.
 
 The [UIBC v0.3 receiving example](reference/uibc-v03-receiving-example/README.md)
 separates evidence and seal checks from a receiver-selected key match. Its

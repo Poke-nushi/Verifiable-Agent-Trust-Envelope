@@ -1,0 +1,42 @@
+{
+  "format": "vate-oauth-trial-download-1",
+  "archive": "oauth-first-hop-vate-v0.7.0.zip",
+  "url": "https://vate.rognalia.com/downloads/oauth-first-hop-vate/2026-11-19/oauth-first-hop-vate-v0.7.0.zip",
+  "size_bytes": 552058,
+  "sha256": "0283813ffd0e1201240f4c3db8347fa50a0b1ec770f1ef2d532e4154d89048ba",
+  "manifest_sha256": "4be3e0cf352577071fe2408958a12402aafa2c24f996343cd6ba91c94a4d0393",
+  "archive_files": 200,
+  "manifest_payload_files": 199,
+  "source_pins": {
+    "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+    "baseline_reader": {
+      "commit": "c32df11e4db1f93c4e514b89165050de93bb9be9",
+      "source_manifest_sha256": "b3746385dbadc571c1cc0456ac770b5bd402c71823c71980a0256475bb421e3a",
+      "files": 23
+    },
+    "release_reader": {
+      "commit": "d96d31a2ecadca90a5c79cb8d3668e5390ee0177",
+      "source_manifest_sha256": "e9259f82267dc60a89765528e5f129a755bfe7994f55fb52633dc2a003dbf253",
+      "files": 23,
+      "release": "v0.7.0"
+    }
+  },
+  "native_runtime": {
+    "bundled": false,
+    "versions": {
+      "ory_hydra": "26.2.0",
+      "openfga": "1.22.1"
+    },
+    "platforms": [
+      "Darwin-arm64"
+    ],
+    "archive_pins": "NATIVE-RELEASES.json inside the archive"
+  },
+  "tested_environment": {
+    "platform": "macOS arm64",
+    "python": "3.14.8",
+    "python_dependencies": "requirements.lock inside the archive"
+  },
+  "package_license": "Apache-2.0",
+  "scope": "One synthetic user-to-A-to-B path. The native trial runs 14 cases. The receipt comparison selects three observations. Seven Inbox revisions are replayed from the exported records and the receiver selection."
+}
