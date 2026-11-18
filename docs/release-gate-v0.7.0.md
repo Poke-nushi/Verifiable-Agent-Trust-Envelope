@@ -37,6 +37,27 @@ renewed. These are local reference runs. An external implementation can publish
 its own results against either fixture set using
 [`compare`](conformance/sut-adapter-contract.md).
 
+## TypeScript test dependencies
+
+Vitest 4.1.12 uses picomatch 4.0.7 to select test files. Certain matching
+patterns can consume excessive CPU time. For this lockfile, npm reported five
+affected development packages linked to [one advisory](https://github.com/advisories/GHSA-fc5q-39xc-vjpf).
+The production-only audit reported zero findings. The TypeScript receipt
+helpers do not import picomatch. The Python purchase example runs independently.
+
+The repository runs Vitest against its `packages` directory, with no custom
+Vitest or Vite configuration in the reviewed tree. Developers who run another
+checkout or supply their own settings select that checkout's code and search
+patterns. GitHub-hosted CI also limits the duration of its test jobs.
+
+CI audits all dependencies and separately audits production dependencies.
+While a maintainer review is active for an exact source tree, the full audit
+may accept this advisory on the reviewed development paths. It prints the
+original npm reports. Other findings at moderate severity or higher still
+block the check, as does an incomplete audit. Fork pull requests use the
+ordinary audit threshold. A compatible upstream fix can replace this review
+after a lockfile update and a new test run.
+
 ## Publication and citation
 
 Publication uses the tree that passed pull-request CI and was integrated into
