@@ -114,7 +114,8 @@ class SourceIdentityTests(unittest.TestCase):
         for optimize in (0, 1):
             for name, old, new, index in changes:
                 with self.subTest(module=name, optimize=optimize), tempfile.TemporaryDirectory() as temporary:
-                    root = Path(temporary)
+                    # Compile and load through the same path when Python relocates its cache.
+                    root = Path(temporary).resolve()
                     self.copy_sources(root)
                     file = root / name
                     original = file.read_bytes()

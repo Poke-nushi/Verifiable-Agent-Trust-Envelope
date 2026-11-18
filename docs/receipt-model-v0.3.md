@@ -158,11 +158,15 @@ receive or reconstruct the original and effective request preimages, apply
 constraints therefore describe the verifier's narrowing decision; they are not,
 by themselves, proof that the transformation was executed.
 
-The [request-binding extension contract](../reference/request-binding/CONTRACT.md)
-provides Python/TypeScript receiver checks for original, effective and
-admission-request preimages. The current Python `VateVerifier.admit` requires
-those preimages by default and rejects the old dictionary-only call.
-Its purchase-cap profile defines
+Under the [request-binding extension contract](../reference/request-binding/CONTRACT.md),
+the Python issuer calls `VateVerifier.admit(admission_request, original=original)`
+with the bytes of the admission request and the original operation. The old
+dictionary-only call is rejected. An `allow` or `attenuate` decision
+produces an effective operation. A `deny`
+decision produces none. Python and TypeScript receivers check the receipt
+against the independently selected admission request, the original operation,
+and, for `allow` or `attenuate`, the effective operation.
+The purchase-cap profile defines
 `input_hash = original_request_hash = H(original operation)` and reconstructs
 one maximum-amount reduction before checking the effective operation hash.
 The [reproducible example](../reference/request-binding/README.md) includes
@@ -247,11 +251,10 @@ Each change should identify:
 This is stricter than a human note such as "restricted".
 It lets another verifier, auditor, or runtime see exactly which authority was narrowed.
 
-For example, a verifier can record that a request for a USD 10000 transfer was
-admitted only as an effective USD 500 maximum, with human approval required
-above USD 100 and a 10-minute execution window. The receipt needs both hashes:
-the original request hash explains what was requested, and the effective request
-hash explains what was actually admitted.
+An agent may request authority to transfer up to USD 10000. The verifier can
+lower the limit to USD 500, require human approval above USD 100, and set a 10-minute
+execution window. The receipt's original request hash identifies the requested
+authority. Its effective request hash identifies the narrower authority admitted.
 
 ## Proof And Packaging
 

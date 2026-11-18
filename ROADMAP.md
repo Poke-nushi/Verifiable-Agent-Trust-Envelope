@@ -8,6 +8,20 @@ For public wording rules, see
 
 ## Current Direction
 
+### Planned Local Migration
+
+The [planned migration path](reference/planned-migration/README.md) addresses
+maintenance of the managed Python reference: one stopped deployment moves from
+the pinned `6758476` source to a selected successor, with a new authority key and
+new store locations. Original receipt/proof bytes and consumed-operation history
+are retained. Old stores are retired in the same transaction that creates the
+usable destination state. New operation admission requires a fresh authority
+observation under the new key.
+
+This transition keeps one administrator, host, filesystem and authority mapping.
+Key-loss recovery, stale backups, arbitrary upgrades and uninterrupted operation
+remain separate work. It does not relabel existing release or experiment pins.
+
 ### v0.6.0: Receiving, Reassessment and Runtime-Key Revocation
 
 The `v0.6.0` discussion-draft pre-release adds receiver-selected required-record checks, persistent

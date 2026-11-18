@@ -35,6 +35,7 @@ from handoff_model import replay
 from handoff_reader import assess
 from dependencies import demo
 from recipient_inbox import Engine, Inbox, InboxError, DELIVERY, PLAN, encoded, read_file, raw_ref
+from recipient_inbox import CONTRACT as INBOX_CONTRACT
 
 CONTRACT = "local-handoff-inbox-connection-v1"
 CAPSULE = CONTRACT + ":evidence"
@@ -114,6 +115,12 @@ def reader_sources():
     return {"handoff_candidate": PINS, "bridge_sha256": sha(SOURCE_RAW)}
 
 
+def source_selection(selected_raw):
+    """Pin the chosen reader even when no evidence capsule has been received."""
+    return encode({"contract": CONTRACT + ":selection", "selection_b64": b64(selected_raw),
+                   "reader_sources": reader_sources()})
+
+
 def requirements(s, operation, basis):
     return [{"requirement_id": row["id"], "obligation": "required", "record_kind": row["record_kind"],
         "binding_profile": "vate_receipt_operation_context", "due_at": row["due_at"], "basis_refs": [basis],
@@ -184,10 +191,15 @@ def compare_replay(old, new):
     a, b = deepcopy(old), deepcopy(new)
     differences = []
     for report in (a, b):
-        need(type(report["usage"]["elapsed_milliseconds"]) is int and
+        need(type(report) is dict and type(report.get("usage")) is dict and
+             type(report.get("native_calls")) is list, "REPLAY_REPORT_MISMATCH")
+        need(type(report["usage"].get("elapsed_milliseconds")) is int and
              report["usage"]["elapsed_milliseconds"] >= 0, "REPLAY_REPORT_MISMATCH")
+        for call in report["native_calls"]:
+            need(type(call) is dict and type(call.get("result")) is dict and
+                 type(call["result"].get("inputs", {})) is dict, "REPLAY_REPORT_MISMATCH")
         measured_size = sum(len(encoded(call["result"])) for call in report["native_calls"])
-        need(type(report["usage"]["native_result_bytes"]) is int and
+        need(type(report["usage"].get("native_result_bytes")) is int and
              report["usage"]["native_result_bytes"] == measured_size, "REPLAY_REPORT_MISMATCH")
     differences.append({"path": "/usage/elapsed_milliseconds", "old": a["usage"].pop("elapsed_milliseconds"),
                         "new": b["usage"].pop("elapsed_milliseconds")})
@@ -215,16 +227,20 @@ class Receiver:
         check_sample()
         self.path, self.selected_raw = Path(path), selected_raw
         self.s, self.context, self.operation = selection(selected_raw)
+        self.source_selection_raw = source_selection(selected_raw)
+        self.selection_ref = raw_ref(self.source_selection_raw)
         self.box = Inbox(path, Engine(ROOT), create=create)
         try:
             self.box.v.stamp(self.s["selected_at"])
             for row in self.s["requirements"]:
                 self.box.v.stamp(row["due_at"])
             with self.box.transaction():
-                self.box.db.execute("INSERT OR IGNORE INTO meta VALUES (?,?)", (CONTRACT, sha(selected_raw)))
-                found = self.box.db.execute("SELECT value FROM meta WHERE key=?", (CONTRACT,)).fetchone()[0]
-                need(found == sha(selected_raw), "DATABASE_SELECTION_MISMATCH")
-            self.selection_ref = self.box.put(selected_raw)
+                if create:
+                    self.box._put(self.source_selection_raw)
+                    self.box.db.execute("INSERT INTO meta VALUES (?,?)", (CONTRACT, sha(self.source_selection_raw)))
+                found = self.box.db.execute("SELECT value FROM meta WHERE key=?", (CONTRACT,)).fetchone()
+                need(found is not None and found[0] == sha(self.source_selection_raw), "DATABASE_SELECTION_MISMATCH")
+                need(self.box.get(self.selection_ref) == self.source_selection_raw, "DATABASE_SELECTION_MISMATCH")
         except BaseException:
             self.box.close()
             raise
@@ -235,6 +251,7 @@ class Receiver:
     def check(self):
         check_sample()
         need(Path(__file__).read_bytes() == SOURCE_RAW, "BRIDGE_SOURCE_CHANGED")
+        need(source_selection(self.selected_raw) == self.source_selection_raw, "RECEIVER_SOURCE_CHANGED")
         self.box.engine.check()
 
     @contextmanager
@@ -354,6 +371,7 @@ class Receiver:
             return self.report(state)
 
     def _selected_job(self, run_id):
+        self.check()
         _, job = self.box._run(run_id)
         plan = decode(self.box.get(job["plan_ref"]))
         review = decode(self.box.get(job["review_set_ref"]))
@@ -398,36 +416,68 @@ class Receiver:
             return self.box.export(run_id, destination)
 
 
+def _snapshot_export(folder, destination):
+    """Copy only manifest-verified bytes, one bounded file at a time."""
+    need((folder / "objects").is_dir() and not (folder / "objects").is_symlink(), "EXPORT_OBJECT_DIRECTORY")
+    manifest = decode(read_file(folder / "MANIFEST.json"))
+    need(type(manifest) is dict and manifest.get("contract") == INBOX_CONTRACT and
+         type(manifest.get("files")) is dict and
+         len(manifest["files"]) <= 4096, "EXPORT_MANIFEST")
+    controls = {"selection.json", "report.json", "runs.json"}
+    need(controls <= manifest["files"].keys(), "EXPORT_MEMBERSHIP")
+    destination.mkdir()
+    (destination / "objects").mkdir()
+    for name, expected in manifest["files"].items():
+        relative = Path(name)
+        need(name in controls or
+             (relative.as_posix() == name and len(relative.parts) == 2 and relative.parts[0] == "objects" and
+              len(relative.parts[1]) == 64 and all(c in "0123456789abcdef" for c in relative.parts[1])), "EXPORT_PATH")
+        need(type(expected) is dict and type(expected.get("raw_sha256")) is str and
+             len(expected["raw_sha256"]) == 64 and all(c in "0123456789abcdef" for c in expected["raw_sha256"]) and
+             type(expected.get("byte_length")) is int and expected["byte_length"] >= 0, "EXPORT_MANIFEST_ENTRY")
+        raw = read_file(folder / relative)
+        need(sha(raw) == expected["raw_sha256"] and len(raw) == expected["byte_length"], "EXPORT_HASH")
+        (destination / relative).write_bytes(raw)
+    return manifest
+
+
 def replay_export(selected_raw, folder):
     """Recheck frozen handoff evidence and the unchanged required-record selection."""
     check_sample()
-    folder = Path(folder)
     s, _, operation = selection(selected_raw)
-    need((folder / "objects").is_dir() and not (folder / "objects").is_symlink(), "EXPORT_OBJECT_DIRECTORY")
-    manifest = decode(read_file(folder / "MANIFEST.json"))
-    need(type(manifest) is dict and type(manifest.get("files")) is dict and
-         len(manifest["files"]) <= 4096, "EXPORT_MANIFEST")
-    for name, expected in manifest["files"].items():
-        relative = Path(name)
-        need(name in {"selection.json", "report.json", "runs.json"} or
-             (len(relative.parts) == 2 and relative.parts[0] == "objects" and
-              len(relative.parts[1]) == 64 and all(c in "0123456789abcdef" for c in relative.parts[1])), "EXPORT_PATH")
-        raw = read_file(folder / relative)
-        need(sha(raw) == expected["raw_sha256"] and len(raw) == expected["byte_length"], "EXPORT_HASH")
+    with tempfile.TemporaryDirectory(prefix="vate-handoff-inbox-replay-") as directory:
+        saved = Path(directory) / "verified-export"
+        manifest = _snapshot_export(Path(folder), saved)
+        return _replay_verified_export(selected_raw, s, operation, saved, manifest, Path(directory) / "report.json")
+
+
+def _replay_verified_export(selected_raw, s, operation, folder, manifest, output):
     frozen = decode(read_file(folder / "selection.json"))
     def read(ref):
-        need(type(ref) is dict and ref.get("path") == "objects/" + ref.get("digest", {}).get("value", "") and
+        need(type(ref) is dict and type(ref.get("digest")) is dict, "EXPORT_REFERENCE")
+        digest = ref["digest"]
+        need(digest.get("alg") == "sha-256" and type(digest.get("value")) is str and
+             len(digest["value"]) == 64 and all(c in "0123456789abcdef" for c in digest["value"]) and
+             type(ref.get("byte_length")) is int and ref["byte_length"] >= 0 and
+             type(ref.get("media_type")) is str and bool(ref["media_type"]) and
+             ref.get("path") == "objects/" + digest["value"] and
              ref["path"] in manifest["files"], "EXPORT_REFERENCE")
         raw = read_file(folder / ref["path"])
-        need(ref == raw_ref(raw, ref.get("media_type")), "EXPORT_REFERENCE_HASH")
+        need(encoded(ref) == encoded(raw_ref(raw, ref["media_type"])), "EXPORT_REFERENCE_HASH")
         return raw
     basis = frozen["selection_basis_ref"]
-    need(read(basis) == selected_raw and frozen["receiver_id"] == s["receiver_id"] and
+    selected = decode(read(basis))
+    need(type(selected) is dict and
+         set(selected) == {"contract", "selection_b64", "reader_sources"} and
+         selected["contract"] == CONTRACT + ":selection" and
+         unb64(selected["selection_b64"]) == selected_raw and frozen["receiver_id"] == s["receiver_id"] and
          frozen["review_set_selected_at"] == s["selected_at"], "EXPORT_RECEIVER_SELECTION")
+    need(selected["reader_sources"] == reader_sources() and read(basis) == source_selection(selected_raw),
+         "EXPORT_READER_VERSION")
     review = decode(read(frozen["review_set_ref"]))
-    need(review["requirements"] == requirements(s, operation, raw_ref(selected_raw)) and
+    need(review["requirements"] == requirements(s, operation, basis) and
          review["namespace"] == s["namespace"] and review["review_set_id"] == "handoff-required-receipts" and
-         review["population_basis_refs"] == [raw_ref(selected_raw)] and
+         review["population_basis_refs"] == [basis] and
          review["collection_scope"] == "receiver_selected_set_only", "EXPORT_REQUIREMENTS_CHANGED")
     capsules = {}
     for name in manifest["files"]:
@@ -453,16 +503,14 @@ def replay_export(selected_raw, folder):
                  new["observed_at"] >= old["observed_at"], "EXPORT_HISTORY_FORK")
     snapshot = decode(read(frozen["submission_snapshot_ref"]))
     check_projection(snapshot["entries"], capsules, read, s["namespace"])
-    basis = observation_basis(capsules, raw_ref(selected_raw), frozen["assessment_cutoff"],
+    basis = observation_basis(capsules, basis, frozen["assessment_cutoff"],
                               Engine(ROOT).validation.stamp)
     need(snapshot["collection_basis_ref"] == basis, "EXPORT_OBSERVATION_BASIS")
-    with tempfile.TemporaryDirectory(prefix="vate-handoff-inbox-replay-") as directory:
-        output = Path(directory) / "report.json"
-        run = subprocess.run([sys.executable, "-E", "-s", "-B",
-            str(ROOT / "reference/required-records/required_records.py"),
-            "--selection", str(folder / "selection.json"), "--base", "inbox=" + str(folder),
-            "--source-root", str(ROOT), "--output", str(output)], capture_output=True, timeout=120)
-        need(run.returncode == 0 and output.is_file(), "REPLAY_FAILED")
-        compare_replay(decode(read_file(folder / "report.json")), decode(read_file(output)))
+    run = subprocess.run([sys.executable, "-E", "-s", "-B",
+        str(ROOT / "reference/required-records/required_records.py"),
+        "--selection", str(folder / "selection.json"), "--base", "inbox=" + str(folder),
+        "--source-root", str(ROOT), "--output", str(output)], capture_output=True, timeout=120)
+    need(run.returncode == 0 and output.is_file(), "REPLAY_FAILED")
+    compare_replay(decode(read_file(folder / "report.json")), decode(read_file(output)))
     return {"capsules_reassessed": len(capsules), "required_records_replayed": True,
             "is_execution_ticket": False}

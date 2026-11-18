@@ -1,11 +1,87 @@
 {
-  "version": "vate-conformance-corpus-2026-09",
-  "profile": "VATE-AL2-Verifier-Admission-v0.3",
-  "name": "request-binding-v1",
-  "root": "conformance/request-binding-v1",
   "case_schema": "conformance/request-binding-v1/conformance-case.schema.json",
+  "cases": [
+    {
+      "artifacts": {
+        "admission_receipt": "conformance/request-binding-v1/fixtures/allow/admission-receipt.json",
+        "admission_request": "conformance/request-binding-v1/fixtures/allow/admission-request.json",
+        "post_execution_receipt": "conformance/request-binding-v1/fixtures/allow/post-execution.json",
+        "request_binding_manifest": "conformance/request-binding-v1/fixtures/allow/binding-manifest.json"
+      },
+      "case_id": "request-binding-allow",
+      "category": "positive",
+      "expected_outcome": "allow",
+      "expected_primary_reason_code": "EVIDENCE_VERIFIED",
+      "expected_reason_codes": [
+        "EVIDENCE_VERIFIED",
+        "POLICY_MATCH"
+      ],
+      "expected_should_execute": true,
+      "path": "conformance/request-binding-v1/cases/allow.json",
+      "title": "Request binding: allow",
+      "validation_focus": []
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "conformance/request-binding-v1/fixtures/attenuate/admission-receipt.json",
+        "admission_request": "conformance/request-binding-v1/fixtures/attenuate/admission-request.json",
+        "post_execution_receipt": "conformance/request-binding-v1/fixtures/attenuate/post-execution.json",
+        "request_binding_manifest": "conformance/request-binding-v1/fixtures/attenuate/binding-manifest.json"
+      },
+      "case_id": "request-binding-attenuate",
+      "category": "positive",
+      "expected_outcome": "attenuate",
+      "expected_primary_reason_code": "LOCAL_POLICY_MAX_AMOUNT_NARROWED",
+      "expected_reason_codes": [
+        "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+      ],
+      "expected_should_execute": true,
+      "path": "conformance/request-binding-v1/cases/attenuate.json",
+      "title": "Request binding: attenuate",
+      "validation_focus": []
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "conformance/request-binding-v1/fixtures/deny-over-cap/admission-receipt.json",
+        "admission_request": "conformance/request-binding-v1/fixtures/deny-over-cap/admission-request.json",
+        "request_binding_manifest": "conformance/request-binding-v1/fixtures/deny-over-cap/binding-manifest.json"
+      },
+      "case_id": "request-binding-deny-over-cap",
+      "category": "negative",
+      "expected_outcome": "deny",
+      "expected_primary_reason_code": "POLICY_DENIED",
+      "expected_reason_codes": [
+        "POLICY_DENIED"
+      ],
+      "expected_should_execute": false,
+      "path": "conformance/request-binding-v1/cases/deny-over-cap.json",
+      "title": "Request binding: deny-over-cap",
+      "validation_focus": []
+    },
+    {
+      "artifacts": {
+        "admission_receipt": "conformance/request-binding-v1/fixtures/new-permit/admission-receipt.json",
+        "admission_request": "conformance/request-binding-v1/fixtures/new-permit/admission-request.json",
+        "request_binding_manifest": "conformance/request-binding-v1/fixtures/new-permit/binding-manifest.json"
+      },
+      "case_id": "request-binding-new-permit",
+      "category": "positive",
+      "expected_outcome": "attenuate",
+      "expected_primary_reason_code": "LOCAL_POLICY_MAX_AMOUNT_NARROWED",
+      "expected_reason_codes": [
+        "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
+      ],
+      "expected_should_execute": false,
+      "path": "conformance/request-binding-v1/cases/new-permit.json",
+      "title": "Request binding: new-permit",
+      "validation_focus": []
+    }
+  ],
   "conformance_report_schema": "schemas/conformance-report.schema.json",
-  "implementation_report_schema": "schemas/implementation-report.schema.json",
+  "digest": {
+    "alg": "sha-256",
+    "value": "48859e14eb7d61c0fc14b038562cd2965dcfb993752210309348ef6d3b0ebe93"
+  },
   "digest_basis": {
     "alg": "sha-256",
     "canonicalization": "JSON objects are sorted by key with insignificant whitespace removed before hashing.",
@@ -13,94 +89,10 @@
       "conformance/request-binding-v1/corpus.json"
     ]
   },
-  "summary": {
-    "case_count": 4,
-    "category_counts": {
-      "negative": 1,
-      "positive": 3
-    },
-    "artifact_count": 26
-  },
-  "digest": {
-    "alg": "sha-256",
-    "value": "23d2934e30207868ee40727050595d6aa306fd5f86ba3cf7a8f9bfaa375c0c99"
-  },
-  "cases": [
-    {
-      "case_id": "request-binding-allow",
-      "path": "conformance/request-binding-v1/cases/allow.json",
-      "category": "positive",
-      "title": "Request binding: allow",
-      "expected_outcome": "allow",
-      "expected_should_execute": true,
-      "expected_primary_reason_code": "EVIDENCE_VERIFIED",
-      "expected_reason_codes": [
-        "EVIDENCE_VERIFIED",
-        "POLICY_MATCH"
-      ],
-      "validation_focus": [],
-      "artifacts": {
-        "admission_request": "conformance/request-binding-v1/fixtures/allow/admission-request.json",
-        "admission_receipt": "conformance/request-binding-v1/fixtures/allow/admission-receipt.json",
-        "request_binding_manifest": "conformance/request-binding-v1/fixtures/allow/binding-manifest.json",
-        "post_execution_receipt": "conformance/request-binding-v1/fixtures/allow/post-execution.json"
-      }
-    },
-    {
-      "case_id": "request-binding-attenuate",
-      "path": "conformance/request-binding-v1/cases/attenuate.json",
-      "category": "positive",
-      "title": "Request binding: attenuate",
-      "expected_outcome": "attenuate",
-      "expected_should_execute": true,
-      "expected_primary_reason_code": "LOCAL_POLICY_MAX_AMOUNT_NARROWED",
-      "expected_reason_codes": [
-        "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
-      ],
-      "validation_focus": [],
-      "artifacts": {
-        "admission_request": "conformance/request-binding-v1/fixtures/attenuate/admission-request.json",
-        "admission_receipt": "conformance/request-binding-v1/fixtures/attenuate/admission-receipt.json",
-        "request_binding_manifest": "conformance/request-binding-v1/fixtures/attenuate/binding-manifest.json",
-        "post_execution_receipt": "conformance/request-binding-v1/fixtures/attenuate/post-execution.json"
-      }
-    },
-    {
-      "case_id": "request-binding-deny-over-cap",
-      "path": "conformance/request-binding-v1/cases/deny-over-cap.json",
-      "category": "negative",
-      "title": "Request binding: deny-over-cap",
-      "expected_outcome": "deny",
-      "expected_should_execute": false,
-      "expected_primary_reason_code": "POLICY_DENIED",
-      "expected_reason_codes": [
-        "POLICY_DENIED"
-      ],
-      "validation_focus": [],
-      "artifacts": {
-        "admission_request": "conformance/request-binding-v1/fixtures/deny-over-cap/admission-request.json",
-        "admission_receipt": "conformance/request-binding-v1/fixtures/deny-over-cap/admission-receipt.json",
-        "request_binding_manifest": "conformance/request-binding-v1/fixtures/deny-over-cap/binding-manifest.json"
-      }
-    },
-    {
-      "case_id": "request-binding-new-permit",
-      "path": "conformance/request-binding-v1/cases/new-permit.json",
-      "category": "positive",
-      "title": "Request binding: new-permit",
-      "expected_outcome": "attenuate",
-      "expected_should_execute": false,
-      "expected_primary_reason_code": "LOCAL_POLICY_MAX_AMOUNT_NARROWED",
-      "expected_reason_codes": [
-        "LOCAL_POLICY_MAX_AMOUNT_NARROWED"
-      ],
-      "validation_focus": [],
-      "artifacts": {
-        "admission_request": "conformance/request-binding-v1/fixtures/new-permit/admission-request.json",
-        "admission_receipt": "conformance/request-binding-v1/fixtures/new-permit/admission-receipt.json",
-        "request_binding_manifest": "conformance/request-binding-v1/fixtures/new-permit/binding-manifest.json"
-      }
-    }
+  "implementation_report_schema": "schemas/implementation-report.schema.json",
+  "limitations": [
+    "This corpus index is an implementation aid, not a production endorsement statement.",
+    "Passing the listed cases does not imply production readiness or endorsement."
   ],
   "manifest": [
     {
@@ -121,7 +113,7 @@
     },
     {
       "path": "conformance/request-binding-v1/conformance-case.schema.json",
-      "sha256": "8488522ec76fb28a7af9c840d335c5645ff4af10dc8336da4bccb3b808840864"
+      "sha256": "2ce949d681b10bf0f2e7a1347a74d5de26fca7ee0e1b706b3d5f2bec18ddc756"
     },
     {
       "path": "conformance/request-binding-v1/fixtures/allow/admission-receipt.json",
@@ -208,12 +200,20 @@
       "sha256": "545499315b303b9c7e8a1760c3771c4ed063edd62331085dc731946d29bc45de"
     }
   ],
+  "name": "request-binding-v1",
+  "profile": "VATE-AL2-Verifier-Admission-v0.3",
+  "root": "conformance/request-binding-v1",
   "runner": {
     "command": "python3 scripts/vate_conformance.py run --corpus-root conformance/request-binding-v1 --report /tmp/vate-conformance-report.json",
     "index_command": "python3 scripts/vate_conformance.py index --corpus-root conformance/request-binding-v1 --out conformance/request-binding-v1/corpus.json"
   },
-  "limitations": [
-    "This corpus index is an implementation aid, not a production endorsement statement.",
-    "Passing the listed cases does not imply production readiness or endorsement."
-  ]
+  "summary": {
+    "artifact_count": 26,
+    "case_count": 4,
+    "category_counts": {
+      "negative": 1,
+      "positive": 3
+    }
+  },
+  "version": "vate-conformance-corpus-2026-09"
 }

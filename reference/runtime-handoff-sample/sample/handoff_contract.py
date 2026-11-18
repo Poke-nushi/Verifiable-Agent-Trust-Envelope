@@ -166,7 +166,9 @@ def make_authorization(context, operation, runtime, permit, evaluated_at):
         "evidence_refs": [{"type": "mission_permit", "uri": "local:" + permit["authorization_key"],
                            "media_type": "application/json", "digest": demo.digest(encode(permit))}],
     }
-    result = demo.core.VateVerifier(verifier_id="urn:vate:handoff:local-verifier", policy=context.data["policy"]).admit(
+    # This file-set adapter binds the operation and permit above and the
+    # provider ticket below. The generic bound-admission API uses purchase caps.
+    result = demo.core.VateVerifier(verifier_id="urn:vate:handoff:local-verifier", policy=context.data["policy"])._evaluate_policy(
         request, now=demo.time_value(evaluated_at))
     need(result["decision"] == "allow", "only original allow supported")
     receipt = copy.deepcopy(result["admission_receipt"])

@@ -19,6 +19,9 @@ Signature validity authenticates the selected source's statements; it does not
 independently establish a principal's permission. Inputs MUST NOT select their
 own authority, root key, scope or epoch. Root selection and its replacement are
 operator actions; this contract provides no automatic root-key or epoch migration.
+An explicit same-host root-key replacement is defined separately by the
+[planned migration contract](../planned-migration/CONTRACT.md). Its selected
+issuer, audience, scope and epoch remain fixed.
 
 The compact JWS MUST satisfy the existing
 [runtime wire restrictions](../runtime-jwt/CONTRACT.md#wire-format), including
@@ -120,6 +123,14 @@ state migration are outside this contract; the
 [dispatch store](../request-binding/DURABLE-STATE.md#configure-and-reopen) has the
 same continuity requirement.
 
+The optional planned migration moves all three selected stores through one
+attached-database transaction. It retains old signed originals and time/revision
+floors, retires old stores and begins with unavailable target policy. Both
+configured minimum revisions are preserved even when an authority store has
+never accepted a snapshot. A current new-key snapshot above the inherited
+revision floor is required before target policy leases. Ordinary reopen does
+not invoke this transition.
+
 Every update and policy lease MUST hold the same anchored exclusive POSIX file
 lock. Acquisition is nonblocking both within the store object and across
 processes. `AUTHORITY_BUSY` or reentrant failure means the update was not
@@ -139,6 +150,13 @@ report unavailable or changed implementation source as
 admission or dispatch clock sampling, the dispatch boundary instead normalizes
 failures from the authority clock callback to `DISPATCH_CLOCK_UNAVAILABLE`;
 see the [durable admission clock contract](../request-binding/DURABLE-STATE.md#admission-and-restore).
+
+For a migrated store, the additional shared migration-marker guard preserves
+`STATE_IMPLEMENTATION_CHANGED`, `STATE_MIGRATION_INACTIVE`,
+`STATE_MIGRATION_ANCHOR_CHANGED`, `STATE_MIGRATION_INVALID` and
+`STATE_IDENTIFIER_INVALID` as the cause of
+an `AuthorityError`. These are separate from the authority implementation check
+above; see [migration failure causes](../planned-migration/CONTRACT.md#failure-causes).
 
 `ManagedAuthorityVerifier` MUST acquire the ordinary dispatch boundary before
 the source lease for admission, restore and dispatch. It MUST hold the lease

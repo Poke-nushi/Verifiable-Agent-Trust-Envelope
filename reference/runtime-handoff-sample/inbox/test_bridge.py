@@ -408,6 +408,109 @@ class ConnectionTests(unittest.TestCase):
                 self.assertEqual(self.hashes(original), original_hashes)
                 self.assertEqual(r.box.get(final["inbox"]["report_ref"]), original_report)
 
+    def test_replay_reference_shapes_are_structured_errors(self):
+        r, _ = self.receiver(label="reference-shapes")
+        final = self.finish(r)
+        saved_report = r.box.get(final["inbox"]["report_ref"])
+        original = self.work / "reference-original"
+        r.export(final["inbox"]["run_id"], original)
+        original_hashes = self.hashes(original)
+        selected = self.work / "reference-selection.json"
+        selected.write_bytes(r.selected_raw)
+        command = [sys.executable, "-E", "-s", "-B", str(bridge.HERE / "receive_handoff.py"),
+                   "--selection", str(selected), "replay"]
+        mutations = [("digest", value) for value in (None, [], "bad", 0, False)]
+        mutations += [("digest.value", value) for value in (None, [], {}, 0, False, "", "A" * 64)]
+        mutations += [("byte_length", value) for value in (None, False, -1)]
+        mutations += [("media_type", value) for value in (None, [], False)]
+        for field in ("selection_basis_ref", "review_set_ref", "submission_snapshot_ref"):
+            for index, (key, value) in enumerate(mutations):
+                export = self.work / (field + "-" + str(index))
+                shutil.copytree(original, export)
+                frozen = decode((export / "selection.json").read_bytes())
+                if key == "digest.value":
+                    frozen[field]["digest"]["value"] = value
+                else:
+                    frozen[field][key] = value
+                raw = encode(frozen)
+                (export / "selection.json").write_bytes(raw)
+                manifest = decode((export / "MANIFEST.json").read_bytes())
+                manifest["files"]["selection.json"] = {"raw_sha256": sha(raw), "byte_length": len(raw)}
+                (export / "MANIFEST.json").write_bytes(encode(manifest))
+                before = self.hashes(export)
+                with self.subTest(field=field, key=key, value=value, entry="api"):
+                    with self.assertRaisesRegex(InboxError, "EXPORT_REFERENCE"):
+                        replay_export(r.selected_raw, export)
+                    self.assertEqual(self.hashes(export), before)
+                if key == "digest" and value in (None, []):
+                    with self.subTest(field=field, key=key, value=value, entry="cli"):
+                        done = subprocess.run(command + [str(export)], capture_output=True, timeout=120)
+                        self.assertEqual(done.returncode, 3, done.stdout + done.stderr)
+                        self.assertEqual(decode(done.stdout), {"status": "operation_error",
+                            "reason": "EXPORT_REFERENCE", "is_execution_ticket": False})
+                        self.assertEqual(done.stderr, b"")
+                        self.assertEqual(self.hashes(export), before)
+        self.assertTrue(replay_export(r.selected_raw, original)["required_records_replayed"])
+        self.assertEqual(self.hashes(original), original_hashes)
+        self.assertEqual(r.box.get(final["inbox"]["report_ref"]), saved_report)
+
+    def test_replay_report_container_shapes_are_structured_errors(self):
+        r, folder = self.receiver("a-completed-response-lost", label="report-shapes")
+        self.receive(r, folder, "bundle.json")
+        final = self.finish(r)
+        saved_report = r.box.get(final["inbox"]["report_ref"])
+        valid = decode(saved_report)
+        mutations = []
+        for value in (None, [], False, 0, "bad"):
+            mutations += [("usage", value), ("native_calls", value), ("result", value), ("inputs", value)]
+        for field, value in mutations:
+            with self.subTest(field=field, value=value):
+                changed = decode(saved_report)
+                if field in ("usage", "native_calls"):
+                    changed[field] = value
+                elif field == "result":
+                    changed["native_calls"][0]["result"] = value
+                else:
+                    changed["native_calls"][0]["result"]["inputs"] = value
+                if field in ("result", "inputs"):
+                    changed["usage"]["native_result_bytes"] = sum(
+                        len(bridge.encoded(call["result"])) for call in changed["native_calls"])
+                before = encode(changed)
+                for left, right in ((changed, valid), (valid, changed)):
+                    with self.assertRaisesRegex(InboxError, "REPLAY_REPORT_MISMATCH"):
+                        bridge.compare_replay(left, right)
+                self.assertEqual(encode(changed), before)
+        original = self.work / "report-original"
+        r.export(final["inbox"]["run_id"], original)
+        saved = self.hashes(original)
+        selected = self.work / "report-selection.json"
+        selected.write_bytes(r.selected_raw)
+        for field in ("result", "inputs"):
+            export = self.work / ("report-" + field)
+            shutil.copytree(original, export)
+            changed = decode(saved_report)
+            call = changed["native_calls"][0]
+            (call if field == "result" else call["result"])[field] = None
+            changed["usage"]["native_result_bytes"] = sum(
+                len(bridge.encoded(c["result"])) for c in changed["native_calls"])
+            raw = encode(changed)
+            (export / "report.json").write_bytes(raw)
+            manifest = decode((export / "MANIFEST.json").read_bytes())
+            manifest["files"]["report.json"] = {"raw_sha256": sha(raw), "byte_length": len(raw)}
+            (export / "MANIFEST.json").write_bytes(encode(manifest))
+            before = self.hashes(export)
+            with self.subTest(field=field, entry="cli"):
+                done = subprocess.run([sys.executable, "-E", "-s", "-B", str(bridge.HERE / "receive_handoff.py"),
+                    "--selection", str(selected), "replay", str(export)], capture_output=True, timeout=120)
+                self.assertEqual(done.returncode, 3, done.stdout + done.stderr)
+                self.assertEqual(decode(done.stdout), {"status": "operation_error",
+                    "reason": "REPLAY_REPORT_MISMATCH", "is_execution_ticket": False})
+                self.assertEqual(done.stderr, b"")
+                self.assertEqual(self.hashes(export), before)
+        self.assertTrue(replay_export(r.selected_raw, original)["required_records_replayed"])
+        self.assertEqual(self.hashes(original), saved)
+        self.assertEqual(r.box.get(final["inbox"]["report_ref"]), saved_report)
+
     def test_cli_replay_manifest_shapes_are_structured_errors(self):
         r, folder = self.receiver("a-completed-response-lost")
         self.receive(r, folder, "bundle.json")
@@ -439,6 +542,152 @@ class ConnectionTests(unittest.TestCase):
         self.assertEqual(control.stderr, b"")
         self.assertEqual(self.hashes(original), original_hashes)
         self.assertEqual(r.box.get(final["inbox"]["report_ref"]), original_report)
+
+    def test_cli_replay_requires_all_control_file_membership(self):
+        for empty in (False, True):
+            with self.subTest(empty=empty):
+                r, folder = self.receiver("a-completed-response-lost", label="membership-" + str(empty))
+                if not empty:
+                    self.receive(r, folder, "bundle.json")
+                final = self.finish(r)
+                original_report = r.box.get(final["inbox"]["report_ref"])
+                original = self.work / ("membership-original-" + str(empty))
+                r.export(final["inbox"]["run_id"], original)
+                moved = self.work / ("membership moved evidence " + str(empty))
+                original.rename(moved)
+                saved = self.hashes(moved)
+                selected = self.work / ("membership-selection-" + str(empty) + ".json")
+                selected.write_bytes(r.selected_raw)
+                command = [sys.executable, "-E", "-s", "-B", str(bridge.HERE / "receive_handoff.py"),
+                           "--selection", str(selected), "replay"]
+                control = subprocess.run(command + [str(moved)], capture_output=True, timeout=120)
+                self.assertEqual(control.returncode, 0, control.stdout + control.stderr)
+                self.assertEqual(decode(control.stdout), {"capsules_reassessed": 0 if empty else 1,
+                    "required_records_replayed": True, "is_execution_ticket": False})
+                cases = [("changed-report-listed", None, False, True, "EXPORT_HASH"),
+                         ("changed-report-unlisted", "report.json", False, True, "EXPORT_MEMBERSHIP")]
+                cases += [(name + "-" + str(remove), name, remove, False, "EXPORT_MEMBERSHIP")
+                          for name in ("selection.json", "report.json", "runs.json") for remove in (False, True)]
+                for label, missing, remove, change_report, reason in cases:
+                    with self.subTest(case=label):
+                        export = self.work / ("membership-" + str(empty) + "-" + label)
+                        shutil.copytree(moved, export)
+                        if change_report:
+                            report = decode((export / "report.json").read_bytes())
+                            report["usage"]["elapsed_milliseconds"] += 100000
+                            (export / "report.json").write_bytes(encode(report))
+                        if missing is not None:
+                            manifest = decode((export / "MANIFEST.json").read_bytes())
+                            del manifest["files"][missing]
+                            (export / "MANIFEST.json").write_bytes(encode(manifest))
+                            if remove:
+                                (export / missing).unlink()
+                        before = self.hashes(export)
+                        done = subprocess.run(command + [str(export)], capture_output=True, timeout=120)
+                        self.assertEqual(done.returncode, 3, done.stdout + done.stderr)
+                        self.assertEqual(decode(done.stdout), {"status": "operation_error", "reason": reason,
+                                                              "is_execution_ticket": False})
+                        self.assertEqual(done.stderr, b"")
+                        self.assertEqual(self.hashes(export), before)
+                self.assertEqual(self.hashes(moved), saved)
+                self.assertEqual(r.box.get(final["inbox"]["report_ref"]), original_report)
+
+    def test_replay_manifest_contract_and_entry_metadata(self):
+        r, _ = self.receiver(label="manifest-metadata")
+        final = self.finish(r)
+        original_report = r.box.get(final["inbox"]["report_ref"])
+        original = self.work / "manifest-metadata-original"
+        r.export(final["inbox"]["run_id"], original)
+        original_hashes = self.hashes(original)
+        manifest = decode((original / "MANIFEST.json").read_bytes())
+        # Empty diagnostic output is a legitimate stored object. False and 0.0
+        # compare equal to its length in Python, but are not integer metadata.
+        empty_name = next(name for name, item in manifest["files"].items() if item["byte_length"] == 0)
+        mutations = [({"missing_contract": True}, "EXPORT_MANIFEST")]
+        mutations += [({"contract": value}, "EXPORT_MANIFEST") for value in (None, False, 0, "other", [])]
+        mutations += [({"entry": value}, "EXPORT_MANIFEST_ENTRY") for value in (None, [], False, 0, "bad")]
+        mutations += [({"missing_field": key}, "EXPORT_MANIFEST_ENTRY") for key in ("raw_sha256", "byte_length")]
+        mutations += [({"field": "raw_sha256", "value": value}, "EXPORT_MANIFEST_ENTRY")
+                      for value in (None, False, 0, [], "", "a" * 63, "A" * 64, "a" * 64 + "\n")]
+        mutations += [({"field": "byte_length", "value": value}, "EXPORT_MANIFEST_ENTRY")
+                      for value in (None, False, True, "0", -1, [])]
+        mutations.append(({"field": "byte_length", "value": 0.0}, "floating-point JSON tokens"))
+        for index, (mutation, reason) in enumerate(mutations):
+            with self.subTest(mutation=mutation):
+                export = self.work / ("manifest-metadata-" + str(index))
+                shutil.copytree(original, export)
+                changed = decode(encode(manifest))
+                if "missing_contract" in mutation:
+                    del changed["contract"]
+                elif "contract" in mutation:
+                    changed["contract"] = mutation["contract"]
+                elif "entry" in mutation:
+                    changed["files"][empty_name] = mutation["entry"]
+                elif "missing_field" in mutation:
+                    del changed["files"][empty_name][mutation["missing_field"]]
+                else:
+                    changed["files"][empty_name][mutation["field"]] = mutation["value"]
+                (export / "MANIFEST.json").write_bytes(encode(changed))
+                before = self.hashes(export)
+                error_type = InboxError if reason.startswith("EXPORT_") else ValueError
+                with self.assertRaisesRegex(error_type, reason):
+                    replay_export(r.selected_raw, export)
+                self.assertEqual(self.hashes(export), before)
+        # Existing open metadata shapes remain open; known required fields keep
+        # their original meaning. Recalculated runtime measurements still replay.
+        annotated = self.work / "manifest-annotated"
+        shutil.copytree(original, annotated)
+        manifest["annotation"] = {"owner_note": "retained extension"}
+        for item in manifest["files"].values():
+            item["annotation"] = None
+        (annotated / "MANIFEST.json").write_bytes(encode(manifest))
+        before = self.hashes(annotated)
+        self.assertTrue(replay_export(r.selected_raw, annotated)["required_records_replayed"])
+        self.assertEqual(self.hashes(annotated), before)
+        self.assertEqual(self.hashes(original), original_hashes)
+        self.assertEqual(r.box.get(final["inbox"]["report_ref"]), original_report)
+
+    def test_native_replay_consumes_only_the_verified_snapshot(self):
+        for empty in (False, True):
+            with self.subTest(empty=empty):
+                r, folder = self.receiver("a-completed-response-lost", label="snapshot-" + str(empty))
+                if not empty:
+                    self.receive(r, folder, "bundle.json")
+                final = self.finish(r)
+                original_report = r.box.get(final["inbox"]["report_ref"])
+                export = self.work / ("snapshot-export-" + str(empty))
+                r.export(final["inbox"]["run_id"], export)
+                note = b"Unlisted local note; not evaluation input."
+                extra_object = "objects/" + sha(note)
+                (export / extra_object).write_bytes(note)
+                (export / "owner-note.txt").write_bytes(note)
+                before = self.hashes(export)
+                original_selection = (export / "selection.json").read_bytes()
+                run = bridge.subprocess.run
+                observed = []
+                def change_original_at_native_start(arguments, *args, **kwargs):
+                    if str(bridge.ROOT / "reference/required-records/required_records.py") not in arguments:
+                        return run(arguments, *args, **kwargs)
+                    base = Path(arguments[arguments.index("--base") + 1].removeprefix("inbox="))
+                    observed.append({"base": base, "extra_object": (base / extra_object).exists(),
+                                     "note": (base / "owner-note.txt").exists()})
+                    # A deterministic change between validation and native read:
+                    # the evaluator must use the already verified selection.
+                    (export / "selection.json").write_bytes(b"null")
+                    try:
+                        return run(arguments, *args, **kwargs)
+                    finally:
+                        (export / "selection.json").write_bytes(original_selection)
+                with patch.object(bridge.subprocess, "run", side_effect=change_original_at_native_start):
+                    result = replay_export(r.selected_raw, export)
+                self.assertEqual(result, {"capsules_reassessed": 0 if empty else 1,
+                    "required_records_replayed": True, "is_execution_ticket": False})
+                self.assertEqual(len(observed), 1)
+                self.assertNotEqual(observed[0]["base"], export)
+                self.assertFalse(observed[0]["extra_object"] or observed[0]["note"])
+                self.assertFalse(observed[0]["base"].exists())
+                self.assertEqual(self.hashes(export), before)
+                self.assertEqual(r.box.get(final["inbox"]["report_ref"]), original_report)
 
     def test_replay_has_no_trial_runner_dependency(self):
         r, folder = self.receiver("a-completed-response-lost")
@@ -484,8 +733,115 @@ class ConnectionTests(unittest.TestCase):
         r, f = self.receiver()
         self.receive(r, f)
         with patch.object(bridge, "reader_sources", return_value={"changed": True}):
-            with self.assertRaisesRegex(InboxError, "STORED_READER_VERSION"):
+            with self.assertRaisesRegex(InboxError, "RECEIVER_SOURCE_CHANGED"):
                 r.prepare(FINAL_CUTOFF, ASSESSED)
+
+    def test_missing_or_old_database_binding_is_not_resealed(self):
+        for missing in (False, True):
+            with self.subTest(missing=missing):
+                r, _ = self.receiver(label="old-binding-" + str(missing))
+                if missing:
+                    r.box.db.execute("DELETE FROM meta WHERE key=?", (bridge.CONTRACT,))
+                else:
+                    r.box.db.execute("UPDATE meta SET value=? WHERE key=?",
+                                     (sha(r.selected_raw), bridge.CONTRACT))
+                before = r.path.read_bytes()
+                with self.assertRaisesRegex(InboxError, "DATABASE_SELECTION_MISMATCH"):
+                    Receiver(r.path, r.selected_raw)
+                self.assertEqual(r.path.read_bytes(), before)
+
+    def test_source_editions_bind_empty_and_nonempty_jobs_and_exports(self):
+        # Every CLI invocation starts a fresh interpreter against real source
+        # files. A fully repinned comment-only edition isolates version binding
+        # from broken imports, stale digests, or changed evaluator behavior.
+        source = self.work / "source edition"
+        shutil.copytree(bridge.ROOT, source)
+        selected = self.work / "selected.json"
+        selected.write_bytes(choose(self.inputs / "a-completed-response-lost", "runtime-a"))
+        cli = source / "inbox/receive_handoff.py"
+        def call(*args, expected=0):
+            done = subprocess.run([sys.executable, "-E", "-s", "-B", str(cli),
+                "--selection", str(selected), *map(str, args)], capture_output=True, timeout=120)
+            self.assertEqual(done.returncode, expected, done.stdout.decode() + done.stderr.decode())
+            self.assertEqual(done.stderr, b"")
+            return decode(done.stdout)
+        def repin():
+            pins = source / "sample/SOURCE-PINS.json"
+            pins.write_bytes(encode({name: sha((source / "sample" / name).read_bytes())
+                                    for name in decode(pins.read_bytes())}))
+            manifest = source / "SOURCE-MANIFEST.json"
+            value = decode(manifest.read_bytes())
+            value["files"] = {name: sha((source / name).read_bytes()) for name in value["files"]}
+            manifest.write_bytes(encode(value))
+            check = subprocess.run([sys.executable, "-E", "-s", "-B", str(source / "check_environment.py"),
+                "--sources-only"], capture_output=True, timeout=30)
+            self.assertEqual(check.returncode, 0, check.stdout.decode() + check.stderr.decode())
+        repin()
+        original_sources = self.hashes(source)
+        cases = {}
+        for empty in (False, True):
+            database = self.work / ("source-" + str(empty) + ".sqlite3")
+            prefix = ("--db", database)
+            call(*prefix, "init")
+            if not empty:
+                call(*prefix, "receive", "--event", "one", "--bundle",
+                     self.inputs / "a-completed-response-lost/bundle.json", "--received-at", EARLY)
+            prepared = call(*prefix, "prepare", "--cutoff", FINAL_CUTOFF, "--assessed-at", ASSESSED)
+            run_id = prepared["run_id"]
+            report = call(*prefix, "run", run_id)
+            self.assertEqual(report["inbox"]["status"], "completed")
+            self.assertEqual(report["record_coverage"], {"expected-post": "missing" if empty else "present"})
+            self.assertEqual(call(*prefix, "status", run_id), report)
+            export = self.work / ("source-export-" + str(empty))
+            call(*prefix, "export", run_id, export)
+            relocated = self.work / ("relocated evidence " + str(empty))
+            export.rename(relocated)
+            before = self.hashes(relocated)
+            self.assertEqual(call("replay", relocated), {"capsules_reassessed": 0 if empty else 1,
+                "required_records_replayed": True, "is_execution_ticket": False})
+            frozen = decode((relocated / "selection.json").read_bytes())
+            basis = decode((relocated / frozen["selection_basis_ref"]["path"]).read_bytes())
+            self.assertEqual(unb64(basis["selection_b64"]), selected.read_bytes())
+            self.assertEqual(basis["reader_sources"], bridge.reader_sources())
+            self.assertEqual(self.hashes(relocated), before)
+            cases[empty] = (database, run_id, relocated, before, database.read_bytes())
+        self.assertEqual(self.hashes(source), original_sources)
+        for changed in ("sample/handoff_reader.py", "inbox/bridge.py"):
+            with self.subTest(changed=changed):
+                target = source / changed
+                original = target.read_bytes()
+                target.write_bytes(original + b"\n# Coherent source-identity regression edition.\n")
+                repin()
+                for empty, (database, run_id, export, saved, saved_db) in cases.items():
+                    with self.subTest(empty=empty):
+                        prefix = ("--db", database)
+                        for arguments in (("status", run_id), ("run", run_id),
+                                ("prepare", "--cutoff", FINAL_CUTOFF, "--assessed-at", ASSESSED),
+                                ("export", run_id, self.work / "must-not-export")):
+                            self.assertEqual(call(*prefix, *arguments, expected=3)["reason"],
+                                             "DATABASE_SELECTION_MISMATCH")
+                        self.assertEqual(call("replay", export, expected=3)["reason"], "EXPORT_READER_VERSION")
+                        self.assertEqual(self.hashes(export), saved)
+                        self.assertEqual(database.read_bytes(), saved_db)
+                # Selecting this new edition for a new store still allows a
+                # legitimate missing-record assessment and database-free replay.
+                fresh = self.work / (target.stem + "-new.sqlite3")
+                prefix = ("--db", fresh)
+                call(*prefix, "init")
+                run_id = call(*prefix, "prepare", "--cutoff", FINAL_CUTOFF,
+                              "--assessed-at", ASSESSED)["run_id"]
+                self.assertEqual(call(*prefix, "run", run_id)["record_coverage"], {"expected-post": "missing"})
+                export = self.work / (target.stem + "-new-export")
+                call(*prefix, "export", run_id, export)
+                self.assertEqual(call("replay", export)["capsules_reassessed"], 0)
+                target.write_bytes(original)
+                repin()
+        self.assertFalse((self.work / "must-not-export").exists())
+        for database, run_id, export, saved, saved_db in cases.values():
+            self.assertEqual(call("--db", database, "status", run_id)["inbox"]["status"], "completed")
+            self.assertTrue(call("replay", export)["required_records_replayed"])
+            self.assertEqual(self.hashes(export), saved)
+            self.assertEqual(database.read_bytes(), saved_db)
 
     def test_receipt_from_another_valid_capsule_cannot_be_substituted(self):
         r, f = self.receiver()

@@ -964,11 +964,16 @@ def check_admission_handoff_semantics_fail_closed() -> None:
     allow_receipt["request"]["constraints"] = {
         "max_amount": {"currency": "USD", "value": "10.00"}
     }
-    allow_receipt["attenuation"] = attenuate_receipt["attenuation"]
-
     expected_constraints = allow_receipt["request"]["constraints"]
     if conformance.admitted_effective_constraints(allow_receipt) != expected_constraints:
-        raise RuntimeError("allow decisions must not use stray attenuation constraints")
+        raise RuntimeError("allow decisions must select request constraints")
+    allow_receipt["attenuation"] = attenuate_receipt["attenuation"]
+    try:
+        conformance.admitted_effective_constraints(allow_receipt)
+    except ValueError:
+        pass
+    else:
+        raise RuntimeError("constraint selection must reject stray attenuation on allow decisions")
 
     expected_attenuation_failure = (
         "attenuation: must be absent unless decision.outcome is attenuate"
@@ -6657,6 +6662,17 @@ def main() -> int:
     check_unhashable_validator_inputs_fail_closed()
     check_context_binding_key_contract()
     run([sys.executable, str(ROOT / "scripts/test_al2_context_binding.py")])
+    run([sys.executable, str(ROOT / "scripts/test_conformance_boundaries.py")])
+    run([sys.executable, str(ROOT / "scripts/test_digest_identity.py")])
+    run([sys.executable, str(ROOT / "scripts/test_bundle_integrity.py")])
+    run([sys.executable, str(ROOT / "scripts/test_attenuation_constraints.py")])
+    run([sys.executable, str(ROOT / "scripts/test_corpus_references.py")])
+    run([sys.executable, "-m", "unittest", "discover", "-s",
+         str(ROOT / "reference/a2a-metadata-adapter-demo"), "-p", "test_*.py"])
+    run([sys.executable, "-m", "unittest", "discover", "-s",
+         str(ROOT / "reference/minimal-al2-demo"), "-p", "test_*.py"])
+    run([sys.executable, "-m", "unittest", "discover", "-s",
+         str(ROOT / "reference/http-verifier-demo"), "-p", "test_*.py"])
     check_corpus_index_requires_cases()
     check_bundle_case_coverage_binding()
     check_bundle_sut_actual_projection_binding()

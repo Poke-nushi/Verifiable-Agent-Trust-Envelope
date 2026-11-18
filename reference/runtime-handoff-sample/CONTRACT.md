@@ -62,6 +62,14 @@ the existing `receipt_pair` assessment path. The source capsule is the receipt
 delivery's evidence reference, so replay can reconstruct and check the
 projection instead of trusting its labels.
 
+At initialization, the receiver also stores one selection-basis object containing
+the separately supplied selection bytes and the selected sample/bridge source
+hashes. Its raw-byte digest binds the database metadata, every prepared job's
+selection and requirement references, and the exported selection. This binding
+exists before intake and also applies to zero-capsule assessments. An existing
+database without that matching binding is rejected; opening it never installs a
+new source identity or rewrites its records.
+
 Later accepted evidence must extend the previous accepted journal prefix and
 must not regress observation time. Forks and truncated histories are retained
 as unassessable input, without replacing the previous assessment. An earlier
@@ -96,12 +104,25 @@ part of a successful receipt export.
 ## Replay and source versions
 
 Replay takes a separately supplied receiver selection and does not reopen the
-provider or Inbox database. It checks export membership and hashes, the capsule
+provider or Inbox database. It checks the saved selection-basis object against
+that selection and the current sample/bridge sources even when there are no
+capsules. It also checks export membership and hashes, the capsule
 chain, receipt projection, cutoff, and required records, then reruns the fixed
 native evaluator. Report comparison distinguishes JSON booleans from numbers.
 Only measured elapsed time, a temporary native-bundle path, and the integer
 native-output byte count recalculated from retained calls are normalized.
 Decisions, reasons, selected inputs, and time boundaries are not normalized.
+
+A replayable export's manifest identifies the Recipient Inbox contract and
+lists `selection.json`, `report.json`, and `runs.json`, as well as its referenced
+objects. Each listed file has a lowercase SHA-256 raw-byte hash and a nonnegative
+integer byte length; missing or null values and boolean lengths are invalid.
+Additional manifest or entry annotations do not replace those required fields.
+Replay verifies and copies the listed files one at a time into a temporary
+snapshot, then uses only that snapshot for both reader and native evaluation.
+Unlisted local notes are not evaluation inputs. The run ledger's bytes are
+checked; this does not add semantic validation of its history or publisher
+authentication. The saved export and report remain unchanged.
 
 Preserve the source distribution, its location, and the Python environment used
 for the assessment. The receiver pins the sample and bridge sources as well as

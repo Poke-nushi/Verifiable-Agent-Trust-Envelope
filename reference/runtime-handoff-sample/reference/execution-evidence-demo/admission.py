@@ -88,7 +88,9 @@ def evaluate(operation: dict, permit: dict, policy: dict, *, resource: str,
     request = make_request(operation, permit, permit_uri)
     need(request["evidence_refs"][0]["digest"] == digest(encode(permit)), "permit digest mismatch")
     verifier = core.VateVerifier(verifier_id=VERIFIER, policy=policy)
-    core_result = verifier.admit(request, now=time_value(evaluated_at))
+    # This profile validates its own file-set preimage above and reconstructs
+    # any narrowing below; the generic admission entry supports purchase caps.
+    core_result = verifier._evaluate_policy(request, now=time_value(evaluated_at))
     receipt = copy.deepcopy(core_result["admission_receipt"])
     receipt["proof"] = {"format": "none"}
     effective = None

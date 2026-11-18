@@ -217,6 +217,14 @@ def digest(raw: bytes) -> dict[str, str]:
     return {"alg": "sha-256", "value": hashlib.sha256(raw).hexdigest()}
 
 
+def matches_digest(raw: bytes, expected: Any) -> bool:
+    """Match SHA-256 content identity, preserving any permitted annotations.
+
+    Consumers of closed reference shapes must still call validate_reference.
+    """
+    return core.is_digest_descriptor(expected) and expected["value"] == digest(raw)["value"]
+
+
 def object_hash(value: Any) -> str:
     return "sha-256:" + digest(encode(value))["value"]
 
@@ -244,7 +252,7 @@ def resolve(ref: dict, artifacts: Mapping[str, bytes]) -> dict:
     raw = artifacts[ref["uri"]]
     need(type(raw) is bytes, "SCHEMA_INVALID")
     need(len(raw) <= MAX_BYTES, "ARTIFACT_TOO_LARGE")
-    need(digest(raw) == ref["digest"], "DIGEST_MISMATCH")
+    need(matches_digest(raw, ref["digest"]), "DIGEST_MISMATCH")
     result = decode(raw)
     need(type(result) is dict, "SCHEMA_INVALID")
     return result
@@ -1050,7 +1058,7 @@ def admit_bound(verifier: Any, admission_request_bytes: bytes, original_bytes: b
     policy_ref = policy_refs[0]
     need(policy_ref["uri"] == policy.get("policy_ref", "local")
          and policy_ref["media_type"] == "application/json"
-         and policy_ref["digest"] == digest(encode(policy)), "LOCAL_POLICY_REFERENCE_MISMATCH")
+         and matches_digest(encode(policy), policy_ref["digest"]), "LOCAL_POLICY_REFERENCE_MISMATCH")
     need(evidence_artifacts is None or isinstance(evidence_artifacts, Mapping), "INVALID_EVIDENCE_ARTIFACTS")
     artifacts = dict(evidence_artifacts) if evidence_artifacts is not None else {}
     expected_uris = {ref["uri"] for ref in runtime_refs}

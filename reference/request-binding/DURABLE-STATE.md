@@ -64,6 +64,12 @@ contract has no re-anchoring or migration API. When using an authority store,
 apply the same rule to its database and lock file under the
 [authority-update contract](../authority-updates/CONTRACT.md#store-lock-and-managed-entry).
 
+The separate [planned migration contract](../planned-migration/CONTRACT.md)
+defines one explicit, stopped transition from the pinned `6758476` program to
+the selected successor. It copies every original record and replay row,
+retires the source stores, and binds new physical identities in one transaction.
+It does not add automatic repair or anchor replacement to ordinary reopen.
+
 ## Admission and restore
 
 Normal `admit` retains the exact eight `BoundAdmission` values, configuration
@@ -152,6 +158,13 @@ MUST preserve the scope's callback destination and authority policy. Current
 trust snapshots can refresh; each dispatch must use the current authenticated
 source. Code/configuration migration needs an explicit process that preserves
 all replay fences; changing identity or discarding state is not a migration.
+
+Under the selected [planned migration](../planned-migration/README.md), old
+admission configurations remain byte-for-byte intact and cannot be restored
+under the new program/source configuration. Historical `ready` means no attempt
+was recorded; it is not migrated execution permission. An unattempted operation
+needs a new request ID and newly bound caller/runtime proofs, retaining its
+stable operation ID. Consumed or outcome-unknown operations remain blocked.
 
 ## Durable claim before callback
 

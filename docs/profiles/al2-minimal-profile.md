@@ -6,7 +6,6 @@
 This document is a proposed profile, not part of the core of this draft.
 
 It describes a minimum practical profile for AL2 interactions where an external service or relying party accepts agent actions with meaningful digital side effects.
-This is also the primary v0.1 reference battlefield for the current repository.
 
 ---
 
@@ -32,7 +31,8 @@ An AL2 interaction should require:
 - `APC` - valid passport credential
 - `ARP` - fresh runtime proof
 - `AMP` - task-scoped mission permit
-- `AER` - admission receipt and, where execution proceeds, post-execution receipt for high-risk actions
+- `AER` - admission receipt before execution; for high-risk actions that execute,
+  also a post-execution receipt
 - online or bounded-freshness status checks
 
 ---
@@ -44,12 +44,17 @@ The relying party should verify:
 - issuer trust for the passport credential
 - attestor trust for the runtime proof
 - broker trust for the mission permit
+- status-authority trust for status bundles and events
 - audience restriction
 - action and resource scope
+- transaction identity across the request, mission permit, and receipts
 - permit expiry
 - runtime freshness
 - redelegation depth
 - applicable status for credential, runtime, and permit
+
+A valid signature from a known key is insufficient unless the verifier's trust
+policy also authorizes that signer for the artifact's role.
 
 ---
 
@@ -86,6 +91,11 @@ An AL2 receipt should include at least:
 - `input_hash` or input reference
 - `output_hash` or output reference
 
+For an admission receipt, the timestamps and `outcome` describe the verifier's
+evaluation, and the output hash or reference identifies its decision output.
+They do not establish that the requested operation executed. For a
+post-execution receipt, these fields describe the execution being reported.
+
 For verifier-signed admission receipts, AL2 should also include:
 
 - `decision`: `allow`, `attenuate`, or `deny`
@@ -115,6 +125,12 @@ Suggested handling:
 - `suspended`: deny
 - `revoked`: deny
 - `quarantined`: deny
+
+Narrowing must preserve the original permit's obligations. An empty permitted
+tool set permits no tool, and a required human approval cannot be removed by an
+attenuation effect. If the verifier cannot establish that a proposed change
+preserves or strengthens the original requirements, it should reject the
+attenuated operation.
 
 ---
 

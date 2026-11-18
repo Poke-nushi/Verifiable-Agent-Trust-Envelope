@@ -13,6 +13,10 @@ library and the existing Node.js 22+ ES256 backend. The store requires a trusted
 local POSIX filesystem. This discussion-draft implementation is not
 production-ready.
 
+For a stopped key/program/storage change, use the separate
+[planned migration path](../planned-migration/README.md). It retains old records
+and replay fences, then requires a fresh authority update under the new root.
+
 ## Run the local example
 
 From the repository root, using an existing Node.js 22+ installation:

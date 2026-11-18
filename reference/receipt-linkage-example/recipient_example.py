@@ -207,7 +207,12 @@ class RecipientExample:
                 yield ({"input": role, "kind": "semantic_input_invalid",
                                "path": path + ["currency"], "detail": "currency must be a 3-letter uppercase code"})
 
-        constraints = self.core.admitted_effective_constraints(admission)
+        try:
+            constraints = self.core.admitted_effective_constraints(admission)
+        except ValueError as exc:
+            yield {"input": "admission", "kind": "semantic_input_invalid",
+                   "detail": f"invalid effective constraint basis: {exc}"}
+            return
         constraint_path = (["attenuation", "effective_constraints"] if "attenuation" in admission
                            else ["request", "constraints"])
         # Issued receipts use canonical names. Do not silently drop an old
@@ -230,10 +235,21 @@ class RecipientExample:
             yield from validate("admission", constraint_path + ["tool_allowlist"],
                      constraints["tool_allowlist"], self.tool_allowlist_validator)
             for index, effect in enumerate(post["result"]["side_effects"]):
-                # These aliases and their precedence come from the pinned reference core.
-                aliases = [key for key in ("tool", "tool_id", "name") if key in effect]
+                # Match the pinned core: all supplied aliases must have valid
+                # types, even when another alias supplies the selected tool.
+                aliases = [key for key in self.core.EFFECT_TOOL_ALIASES if key in effect]
                 if aliases:
-                    selected = next((key for key in aliases if effect[key]), aliases[0])
+                    invalid = [key for key in aliases
+                               if effect[key] is not None and not isinstance(effect[key], str)]
+                    for key in invalid:
+                        yield from validate("post", ["result", "side_effects", index, key],
+                                            effect[key], self.tool_name_validator)
+                    if invalid:
+                        continue
+                    # Null and empty strings may fall through to a later alias.
+                    # If every alias is empty, validate one to report the issue.
+                    selected = next((key for key in aliases
+                                     if isinstance(effect[key], str) and effect[key] != ""), aliases[0])
                     yield from validate("post", ["result", "side_effects", index, selected],
                              effect[selected], self.tool_name_validator)
         return

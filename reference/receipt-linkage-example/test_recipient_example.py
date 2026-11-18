@@ -95,6 +95,37 @@ class RecipientExampleTests(unittest.TestCase):
         result = self.reader.assess(encode(admission), encode(self.linked_post(admission)))
         self.assertEqual(result["record_linkage"], "matched")
 
+    def test_reference_preconditions_report_invalid_constraint_basis(self):
+        for value in (None, [], {}):
+            with self.subTest(value=value):
+                admission = self.fixture("attenuate-max-amount")
+                admission["attenuation"]["effective_constraints"] = value
+                issues = list(self.reader.reference_input_issues(admission, self.linked_post(admission)))
+                self.assertEqual(len(issues), 1)
+                self.assertEqual(issues[0]["kind"], "semantic_input_invalid")
+                self.assertIn("invalid effective constraint basis", issues[0]["detail"])
+
+    def test_schema_valid_amount_outside_core_bounds_is_reported_as_unsupported(self):
+        for value in ("0.123456789", "1000000000000000000"):
+            with self.subTest(value=value):
+                admission = self.fixture("attenuate-max-amount")
+                admission["attenuation"]["effective_constraints"]["max_amount"]["value"] = value
+                result = self.reader.assess(encode(admission), encode(self.linked_post(admission)))
+                self.assertEqual(result["record_linkage"], "not_assessed")
+                self.assertIsNone(result["core_result"])
+                self.assertEqual([issue["kind"] for issue in result["input_issues"]], ["unsupported_amount"])
+
+    def test_digest_annotations_preserve_matching_and_mismatching_receipts(self):
+        admission = self.fixture("attenuate-max-amount")
+        post = self.linked_post(admission)
+        post["admission"]["digest"]["note"] = "descriptor annotation"
+        result = self.reader.assess(encode(admission), encode(post))
+        self.assertEqual(result["record_linkage"], "matched")
+        post["admission"]["digest"]["value"] = "0" * 64
+        result = self.reader.assess(encode(admission), encode(post))
+        self.assertEqual(result["record_linkage"], "mismatch")
+        self.assertIn("POST_EXEC_ADMISSION_DIGEST_MISMATCH", result["core_result"]["reason_codes"])
+
     def test_semantically_inconsistent_attenuation_is_not_assessed(self):
         admission = self.fixture("attenuate-requires-new-permit")
         admission["attenuation"]["require_new_permit"] = False
@@ -339,10 +370,13 @@ class RecipientExampleTests(unittest.TestCase):
         admission = json.loads(self.admission)
         admission["request"]["constraints"] = {}
         post = self.linked_post(admission)
-        post["result"]["side_effects"] = [{"tool": None}]
-        result = self.reader.assess(encode(admission), encode(post))
-        self.assertEqual(result["record_linkage"], "matched")
-        self.assertIn("reported_tools_without_tool_allowlist_constraint", result["not_checked"])
+        for effect in ({"tool": None}, {"tool": 0, "tool_id": "files/write", "name": []}):
+            with self.subTest(effect=effect):
+                post["result"]["side_effects"] = [effect]
+                result = self.reader.assess(encode(admission), encode(post))
+                self.assertEqual(result["record_linkage"], "matched")
+                self.assertEqual(result["input_issues"], [])
+                self.assertIn("reported_tools_without_tool_allowlist_constraint", result["not_checked"])
         admission["request"]["constraints"] = {"tool_allowlist": ["files/write"]}
         post = self.linked_post(admission)
         post["result"]["side_effects"] = [{"tool": "files/write"}]
@@ -551,6 +585,10 @@ class RecipientExampleTests(unittest.TestCase):
             ({"tool": "files/write", "name": "summary.txt"}, "matched"),
             ({"tool": "files/write", "tool_id": "files/delete"}, "matched"),
             ({"tool_id": "files/write", "name": "summary.txt"}, "matched"),
+            ({"tool": "files/delete", "tool_id": "files/write"}, "mismatch"),
+            ({"tool": None, "tool_id": "", "name": "files/write"}, "matched"),
+            ({"tool": "", "tool_id": None, "name": "files/write"}, "matched"),
+            ({"tool": "files/write", "tool_id": None, "name": ""}, "matched"),
             ({"name": "summary.txt"}, "mismatch"),
         ):
             with self.subTest(effect=effect):
@@ -559,6 +597,46 @@ class RecipientExampleTests(unittest.TestCase):
                 result = self.reader.assess(encode(admission), encode(post))
                 self.assertEqual(result["record_linkage"], expected)
                 self.assertEqual(result["input_issues"], [])
+
+    def test_mixed_tool_alias_types_are_not_assessed(self):
+        aliases = ("tool", "tool_id", "name")
+        for outcome in ("allow", "attenuate"):
+            admission = (json.loads(self.admission) if outcome == "allow"
+                         else self.fixture("attenuate-max-amount"))
+            constraints = (admission["request"]["constraints"] if outcome == "allow"
+                           else admission["attenuation"]["effective_constraints"])
+            allowed = constraints["tool_allowlist"][0]
+            post = self.linked_post(admission)
+            self.assertEqual(self.reader.assess(encode(admission), encode(post))["record_linkage"], "matched")
+            for invalid_alias in aliases:
+                for valid_alias in aliases:
+                    if invalid_alias == valid_alias:
+                        continue
+                    for invalid in (0, False, True, 42, 1.5, [], {}, ["files/write"]):
+                        with self.subTest(outcome=outcome, invalid_alias=invalid_alias,
+                                          valid_alias=valid_alias, invalid=invalid):
+                            post["result"]["side_effects"] = [{invalid_alias: invalid, valid_alias: allowed}]
+                            result = self.reader.assess(encode(admission), encode(post))
+                            self.assertEqual(result["record_linkage"], "not_assessed")
+                            self.assertIsNone(result["core_result"])
+                            self.assertEqual(result["linkage_checks_run"], [])
+                            self.assertEqual([(i["input"], i["kind"], i["path"]) for i in result["input_issues"]],
+                                             [("post", "semantic_input_invalid",
+                                               ["result", "side_effects", 0, invalid_alias])])
+
+    def test_tool_aliases_without_nonempty_string_are_not_assessed(self):
+        admission = json.loads(self.admission)
+        for effect in ({"tool": None, "tool_id": "", "name": None},
+                       {"tool": "", "tool_id": None, "name": ""}):
+            with self.subTest(effect=effect):
+                post = self.linked_post(admission)
+                post["result"]["side_effects"] = [effect]
+                result = self.reader.assess(encode(admission), encode(post))
+                self.assertEqual(result["record_linkage"], "not_assessed")
+                self.assertIsNone(result["core_result"])
+                self.assertEqual(result["linkage_checks_run"], [])
+                self.assertTrue(result["input_issues"])
+                self.assertTrue(all(i["kind"] == "semantic_input_invalid" for i in result["input_issues"]))
 
     def test_missing_effect_fields_do_not_establish_completeness(self):
         admission = json.loads(self.admission)

@@ -14,18 +14,28 @@ import binascii
 import copy
 import hashlib
 import json
+import math
+import re
 import shutil
+import stat
 import subprocess
 import tempfile
+from collections.abc import Callable
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal, InvalidOperation
+from functools import lru_cache
 from http import HTTPStatus
+from http.client import HTTPException
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from os.path import lexists
 from pathlib import Path
-from urllib.error import HTTPError, URLError
+from typing import Any
 from urllib.parse import unquote, urlparse
 from urllib.request import urlopen
 
 OPENSSL = shutil.which("openssl")
+TRUST_BUNDLE_VERSION = "app-trust-0.1"
 ROLE_ORDER = ("issuer", "attestor", "broker", "runtime", "status")
 ARTIFACT_SPECS = {
     "passport": {
@@ -57,10 +67,19 @@ STATUS_TYP = "asn+jws"
 STATUS_EVENT_TYP = "asn-event+jws"
 STATUS_CONTENT_TYPE = "application/asn+json"
 STATUS_EVENT_CONTENT_TYPE = "application/asn-event+json"
+STATUS_KINDS = ("passport", "runtime", "permit")
+BLOCKING_STATUS_STATES = frozenset({"suspended", "revoked", "quarantined"})
+STATUS_STATES = BLOCKING_STATUS_STATES.union(("active", "attenuated"))
+# Compare group parameters independently of the optional seed and point encoding.
+EC_GROUP_FORMAT = ("-param_enc", "explicit", "-conv_form", "uncompressed", "-no_seed", "-outform", "DER")
+TIMESTAMP = re.compile(
+    r"[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt][0-9]{2}:[0-9]{2}:[0-9]{2}"
+    r"(?:\.([0-9]+))?([Zz]|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])"
+)
 
 
 def utc_now() -> datetime:
-    return datetime.now(timezone.utc).replace(microsecond=0)
+    return datetime.now(timezone.utc)
 
 
 def iso(value: datetime) -> str:
@@ -68,11 +87,47 @@ def iso(value: datetime) -> str:
 
 
 def parse_time(value: str) -> datetime:
-    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    match = TIMESTAMP.fullmatch(value) if isinstance(value, str) else None
+    if match is None:
+        raise ValueError("timestamp must include a date, time and UTC offset")
+    if (match[1] or "")[6:].strip("0"):
+        raise ValueError("timestamp exceeds the demo's microsecond precision")
+    return datetime.fromisoformat(value.upper().replace("Z", "+00:00"))
 
 
 def canonical(obj: object) -> bytes:
-    return json.dumps(obj, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return json.dumps(obj, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")
+
+
+def unique_json_object(pairs: list[tuple[str, object]]) -> dict:
+    obj = dict(pairs)
+    if len(obj) != len(pairs):
+        raise ValueError("JSON contains a duplicate object member")
+    return obj
+
+
+def json_number(token: str) -> int | float:
+    number = float(token)
+    if not math.isfinite(number):
+        raise ValueError("JSON number exceeds the supported finite range")
+    try:
+        exact = Decimal(token)
+    except InvalidOperation as exc:
+        raise ValueError("invalid JSON number") from exc
+    # Preserve whole-number limits when a binary float would round them.
+    if exact == exact.to_integral_value() and exact != number:
+        return int(exact)
+    if exact != Decimal(str(number)):
+        raise ValueError("JSON number cannot be represented without losing decimal precision")
+    return number
+
+
+def parse_demo_json(text: str) -> Any:
+    try:
+        return json.loads(text, object_pairs_hook=unique_json_object,
+                          parse_float=json_number, parse_constant=json_number)
+    except RecursionError as exc:
+        raise ValueError("JSON nesting exceeds the supported depth") from exc
 
 
 def b64url_encode(data: bytes) -> str:
@@ -80,18 +135,22 @@ def b64url_encode(data: bytes) -> str:
 
 
 def b64url_decode(data: str) -> bytes:
-    padding = "=" * (-len(data) % 4)
-    return base64.urlsafe_b64decode(data + padding)
+    raw = base64.b64decode(data + "=" * (-len(data) % 4), altchars=b"-_", validate=True)
+    if not data or b64url_encode(raw) != data:
+        raise ValueError("compact JWS segments must use unpadded canonical base64url")
+    return raw
 
 
 def ensure_openssl() -> str:
     if not OPENSSL:
-        raise SystemExit("OpenSSL is required for this demo but was not found in PATH.")
+        raise RuntimeError("OpenSSL is required for this demo but was not found in PATH.")
     return OPENSSL
 
 
-def run_command(args: list[str], *, check: bool = True) -> subprocess.CompletedProcess[bytes]:
-    result = subprocess.run(args, capture_output=True, check=False)
+def run_command(
+    args: list[str], *, check: bool = True, input_data: bytes | None = None
+) -> subprocess.CompletedProcess[bytes]:
+    result = subprocess.run(args, input=input_data, capture_output=True, check=False)
     if check and result.returncode != 0:
         stderr = result.stderr.decode("utf-8", errors="replace").strip()
         raise RuntimeError(f"command failed ({' '.join(args)}): {stderr}")
@@ -159,16 +218,16 @@ def write_json(path: Path, data: dict) -> None:
 
 
 def read_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return parse_demo_json(path.read_text(encoding="utf-8"))
 
 
 def write_text(path: Path, data: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(data.rstrip() + "\n", encoding="utf-8")
+    path.write_text(data + "\n", encoding="utf-8")
 
 
 def read_text(path: Path) -> str:
-    return path.read_text(encoding="utf-8").strip()
+    return path.read_text(encoding="utf-8").removesuffix("\n")
 
 
 def key_path(out_dir: Path, role: str, kind: str) -> Path:
@@ -204,13 +263,34 @@ def generate_keypair(out_dir: Path, role: str) -> dict:
     }
 
 
-def spki_sha256(public_key: Path) -> str:
+@lru_cache(maxsize=1)
+def p256_group_parameters(openssl: str) -> bytes:
+    return run_command([openssl, "ecparam", "-name", "prime256v1", *EC_GROUP_FORMAT]).stdout
+
+
+def public_key_der(public_key: Path) -> bytes:
+    """Load the exact SPKI used for the fingerprint and ES256 verification."""
     openssl = ensure_openssl()
-    der = run_command(
-        [openssl, "pkey", "-pubin", "-in", str(public_key), "-outform", "DER"]
-    ).stdout
-    digest = hashlib.sha256(der).hexdigest()
-    return f"sha256:{digest}"
+    try:
+        if not public_key.is_file():
+            raise RuntimeError("the registered public key file is unavailable")
+        der = run_command(
+            [openssl, "pkey", "-pubin", "-in", str(public_key), "-outform", "DER"]
+        ).stdout
+        parameters = run_command(
+            [openssl, "ec", "-pubin", "-inform", "DER", "-param_out", "-param_enc", "explicit", "-outform", "DER"],
+            input_data=der,
+        )
+        group = run_command([openssl, "ecparam", "-inform", "DER", *EC_GROUP_FORMAT], input_data=parameters.stdout)
+        if not group.stdout or group.stdout != p256_group_parameters(openssl):
+            raise RuntimeError("the registered ES256 public key must identify the P-256 curve")
+        return der
+    except (OSError, ValueError) as exc:
+        raise RuntimeError("the registered public key could not be read") from exc
+
+
+def spki_sha256(public_key: Path) -> str:
+    return "sha256:" + hashlib.sha256(public_key_der(public_key)).hexdigest()
 
 
 def sign_bytes(data: bytes, private_key: Path) -> bytes:
@@ -235,12 +315,17 @@ def sign_bytes(data: bytes, private_key: Path) -> bytes:
         return signature_path.read_bytes()
 
 
-def verify_bytes(data: bytes, signature: bytes, public_key: Path) -> bool:
+def verify_bytes(data: bytes, signature: bytes, public_key: Path, *, expected_fingerprint: str | None = None) -> bool:
     openssl = ensure_openssl()
+    der = public_key_der(public_key)
+    if expected_fingerprint is not None and "sha256:" + hashlib.sha256(der).hexdigest() != expected_fingerprint:
+        raise RuntimeError("the registered public key differs from its local fingerprint")
     with tempfile.TemporaryDirectory() as tmp_dir_name:
         tmp_dir = Path(tmp_dir_name)
         payload_path = tmp_dir / "payload.bin"
         signature_path = tmp_dir / "signature.bin"
+        key_path = tmp_dir / "public.der"
+        key_path.write_bytes(der)
         payload_path.write_bytes(data)
         signature_path.write_bytes(signature)
         result = run_command(
@@ -249,14 +334,20 @@ def verify_bytes(data: bytes, signature: bytes, public_key: Path) -> bool:
                 "dgst",
                 "-sha256",
                 "-verify",
-                str(public_key),
+                str(key_path),
+                "-keyform",
+                "DER",
                 "-signature",
                 str(signature_path),
                 str(payload_path),
             ],
             check=False,
         )
-        return result.returncode == 0
+        if result.returncode == 0:
+            return True
+        if result.returncode == 1 and result.stdout.strip().lower() == b"verification failure":
+            return False
+        raise RuntimeError("OpenSSL could not complete signature verification")
 
 
 def build_compact_jws(payload: dict, *, key_info: dict, typ: str, cty: str) -> str:
@@ -276,11 +367,17 @@ def build_compact_jws(payload: dict, *, key_info: dict, typ: str, cty: str) -> s
 
 
 def decode_compact_jws(token: str) -> tuple[dict, dict, bytes, bytes]:
+    if not isinstance(token, str):
+        raise ValueError("compact JWS must be a string")
     parts = token.split(".")
     if len(parts) != 3:
         raise ValueError("compact JWS must have three parts")
-    protected = json.loads(b64url_decode(parts[0]).decode("utf-8"))
-    payload = json.loads(b64url_decode(parts[1]).decode("utf-8"))
+    protected = parse_demo_json(b64url_decode(parts[0]).decode("utf-8"))
+    payload = parse_demo_json(b64url_decode(parts[1]).decode("utf-8"))
+    if not isinstance(protected, dict) or not isinstance(payload, dict):
+        raise ValueError("demo JWS header and payload must be JSON objects")
+    if not isinstance(protected.get("kid"), str) or not protected["kid"]:
+        raise ValueError("demo JWS kid must be a non-empty string")
     signature = b64url_decode(parts[2])
     signing_input = f"{parts[0]}.{parts[1]}".encode("ascii")
     return protected, payload, signing_input, signature
@@ -305,7 +402,7 @@ def build_trust_bundle(now: datetime, keys: dict[str, dict]) -> dict:
             "spki_sha256": key_info["spki_sha256"],
         }
     return {
-        "version": "app-trust-0.1",
+        "version": TRUST_BUNDLE_VERSION,
         "generated_at": iso(now),
         "keys": entries,
     }
@@ -384,14 +481,149 @@ def build_status_entry_payload(status_store: dict, object_type: str) -> dict:
     return payload
 
 
-def build_demo_bundle(out_dir: Path) -> dict:
+class DemoOutputError(ValueError):
+    """The destination cannot be replaced without risking unrelated data."""
+
+
+@contextmanager
+def staged_output(destination: Path):
+    """Build beside the destination so a completed directory can be renamed into place."""
+    if (not destination.name or destination.name == ".." or destination.is_symlink()
+            or destination.resolve() in (Path.cwd(), *Path.cwd().parents)):
+        raise DemoOutputError("choose a dedicated demo directory by name")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix=".vate-stage-", dir=destination.parent) as work:
+        staged = Path(work) / "new"
+        staged.mkdir(mode=0o700)
+        yield staged
+
+
+def publish_output(staged: Path, destination: Path, *, optional_files=(), seed: Path | None = None,
+                   validate_previous: Callable[[Path, set[Path]], None] | None = None) -> None:
+    """Replace only a complete demo, an empty directory, or the explicitly selected seed file."""
+    files = {p.relative_to(staged) for p in staged.rglob("*") if p.is_file()}
+    allowed = files.union(optional_files)
+    directories = {parent for name in allowed for parent in name.parents}
+
+    def check_previous(root: Path) -> list[Path]:
+        seen = set()
+        entries = []
+
+        def visit(folder: Path) -> None:
+            for entry in folder.iterdir():
+                name = entry.relative_to(root)
+                mode = entry.lstat().st_mode
+                if name in allowed and stat.S_ISREG(mode):
+                    seen.add(name)
+                elif name in directories and stat.S_ISDIR(mode):
+                    visit(entry)
+                else:
+                    raise DemoOutputError(f"unrecognized demo output {destination / name}; choose a new directory")
+                entries.append(name)
+
+        if not stat.S_ISDIR(root.lstat().st_mode):
+            raise DemoOutputError(f"{destination} must be a directory")
+        visit(root)
+        if not entries:
+            return entries
+        if seed is not None and entries == [seed] and (root / seed).read_bytes() == (staged / seed).read_bytes():
+            return entries
+        if not files.issubset(seen):
+            raise DemoOutputError(f"incomplete or different demo at {destination}; choose a new directory")
+        for name in files:
+            if name.name == "trust-bundle.json":
+                try:
+                    trust = read_json(root / name)
+                except ValueError:
+                    trust = None
+                if (not isinstance(trust, dict) or trust.get("version") != TRUST_BUNDLE_VERSION
+                        or not isinstance(trust.get("keys"), dict) or not trust["keys"]):
+                    raise DemoOutputError(f"unrecognized trust bundle at {destination / name}; choose a new directory")
+        if validate_previous is not None:
+            validate_previous(root, seen)
+        return entries
+
+    # The lock also holds the previous generation until the new one is installed.
+    lock = destination.parent / f".{destination.name}.vate-update"
+    try:
+        lock.mkdir(mode=0o700)
+    except FileExistsError as exc:
+        raise DemoOutputError(f"another update or a recoverable prior generation exists at {lock}") from exc
+    previous = lock / "previous"
+    entries = []
+    try:
+        try:
+            if lexists(destination):
+                check_previous(destination)
+                destination.rename(previous)
+                entries = check_previous(previous)
+            staged.rename(destination)
+        except BaseException:
+            if lexists(previous) and not lexists(destination):
+                previous.rename(destination)
+            raise
+        if lexists(previous):
+            # Remove only inventoried entries. A newly added file keeps the
+            # previous directory recoverable instead of being swept up.
+            try:
+                for name in entries:
+                    path = previous / name
+                    if name in directories:
+                        path.rmdir()
+                    else:
+                        path.unlink()
+                previous.rmdir()
+            except OSError as exc:
+                raise DemoOutputError(f"new demo installed at {destination}; previous files remain at {previous}") from exc
+    finally:
+        if not lexists(previous):
+            lock.rmdir()
+
+
+def clear_bundle_reports(out_dir: Path) -> None:
+    for name in ("verification-report.json", "negative-test-report.json"):
+        (out_dir / name).unlink(missing_ok=True)
+
+
+def example_execution_receipt(permit: dict, runtime_proof: dict, completed_at: datetime) -> dict:
+    """Describe the fixture's instantaneous, completed synthetic action."""
+    return {
+        "version": "aer-0.1",
+        "receipt_id": "aer:demo-receipt",
+        "receipt_phase": "post_execution",
+        "transaction_id": permit["transaction_id"],
+        "actor": permit["actor"],
+        "principal": permit["principal"],
+        "runtime_ref": runtime_proof["runtime_id"],
+        "permit_ref": permit["permit_id"],
+        "verifier": permit["aud"],
+        "issuer_role": "runtime",
+        "skill": {"id": "report.generate", "version": "0.1.0"},
+        "input_hash": "sha256:demo-input",
+        "output_hash": "sha256:demo-output",
+        "policy_ref": permit["approval"]["policy_ref"],
+        "policy_id": permit["approval"]["policy_ref"],
+        "policy_version": "demo-policy-0.1",
+        "evidence_refs": ["urn:artifact:demo:summary-v1"],
+        "artifact_digests": {
+            "request": "sha256:demo-request",
+            "response": "sha256:demo-response",
+        },
+        "started_at": iso(completed_at),
+        "finished_at": iso(completed_at),
+        "outcome": "success",
+    }
+
+
+def build_demo_bundle(out_dir: Path, *, audience: str = "https://verifier.example/a2a",
+                      include_execution_receipt: bool = True) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
+    clear_bundle_reports(out_dir)
 
     now = utc_now()
     passport_expires = now + timedelta(days=30)
     runtime_expires = now + timedelta(minutes=5)
     permit_expires = now + timedelta(minutes=10)
-    finish = now + timedelta(seconds=27)
 
     keys = {role: generate_keypair(out_dir, role) for role in ROLE_ORDER}
     trust_bundle = build_trust_bundle(now, keys)
@@ -428,7 +660,7 @@ def build_demo_bundle(out_dir: Path) -> dict:
         },
         "challenge_binding": {
             "nonce": "nonce:demo-1234",
-            "aud": "https://verifier.example/a2a",
+            "aud": audience,
         },
         "presented_key": {
             "kid": keys["runtime"]["kid"],
@@ -445,7 +677,7 @@ def build_demo_bundle(out_dir: Path) -> dict:
         "transaction_id": "txn:demo-001",
         "actor": passport["subject"]["public_alias"],
         "principal": "user:pairwise:demo-service:01",
-        "aud": "https://verifier.example/a2a",
+        "aud": audience,
         "issued_at": iso(now),
         "actions": ["task.execute", "files.read"],
         "constraints": {
@@ -466,41 +698,15 @@ def build_demo_bundle(out_dir: Path) -> dict:
         },
     }
 
-    receipt = {
-        "version": "aer-0.1",
-        "receipt_id": "aer:demo-receipt",
-        "receipt_phase": "post_execution",
-        "transaction_id": permit["transaction_id"],
-        "actor": permit["actor"],
-        "principal": permit["principal"],
-        "runtime_ref": runtime_proof["runtime_id"],
-        "permit_ref": permit["permit_id"],
-        "verifier": permit["aud"],
-        "issuer_role": "runtime",
-        "skill": {"id": "report.generate", "version": "0.1.0"},
-        "input_hash": "sha256:demo-input",
-        "output_hash": "sha256:demo-output",
-        "policy_ref": permit["approval"]["policy_ref"],
-        "policy_id": permit["approval"]["policy_ref"],
-        "policy_version": "demo-policy-0.1",
-        "evidence_refs": ["urn:artifact:demo:summary-v1"],
-        "artifact_digests": {
-            "request": "sha256:demo-request",
-            "response": "sha256:demo-response",
-        },
-        "started_at": iso(now),
-        "finished_at": iso(finish),
-        "outcome": "success",
-    }
-
     status_store = build_status_store(now, passport, runtime_proof, permit)
 
     artifacts = {
         "passport": {"payload": passport},
         "runtime_proof": {"payload": runtime_proof},
         "permit": {"payload": permit},
-        "receipt": {"payload": receipt},
     }
+    if include_execution_receipt:
+        artifacts["receipt"] = {"payload": example_execution_receipt(permit, runtime_proof, now)}
     bundle = {
         "trust_bundle": trust_bundle,
         "status_store": status_store,
@@ -522,45 +728,43 @@ def issue_artifact_tokens(bundle: dict, out_dir: Path, *, keys: dict[str, dict] 
         }
         for role in ROLE_ORDER
     }
-    for artifact_name, spec in ARTIFACT_SPECS.items():
-        payload = bundle["artifacts"][artifact_name]["payload"]
-        bundle["artifacts"][artifact_name]["token"] = build_compact_jws(
-            payload,
+    for name, artifact in bundle["artifacts"].items():
+        spec = ARTIFACT_SPECS[name]
+        artifact["token"] = build_compact_jws(
+            artifact["payload"],
             key_info=key_lookup[spec["role"]],
             typ=spec["typ"],
             cty=spec["cty"],
         )
 
 
-def issue_status_tokens(bundle: dict, out_dir: Path, *, keys: dict[str, dict] | None = None) -> None:
-    key_lookup = keys or {
-        "status": {
-            "kid": "status-key-1",
-            "alg": "ES256",
-            "private_key": key_path(out_dir, "status", "private"),
-            "public_key": key_path(out_dir, "status", "public"),
-        }
+def _sign_status_payload(out_dir: Path, trust_bundle: dict, payload: dict, *, key_info: dict | None = None) -> str:
+    status_key = key_info or {
+        "kid": "status-key-1", "alg": "ES256", "private_key": key_path(out_dir, "status", "private"),
     }
-    status_key = key_lookup["status"]
-    bundle["status_tokens"]["stapled"] = build_compact_jws(
-        build_status_bundle_payload(bundle["status_store"], delivery="stapled"),
-        key_info=status_key,
-        typ=STATUS_TYP,
-        cty=STATUS_CONTENT_TYPE,
-    )
-    bundle["status_tokens"]["push"] = build_compact_jws(
-        build_status_event_payload(bundle["status_store"]),
-        key_info=status_key,
-        typ=STATUS_EVENT_TYP,
-        cty=STATUS_EVENT_CONTENT_TYPE,
-    )
+    if payload["version"] == "asn-event-0.1":
+        typ, cty = STATUS_EVENT_TYP, STATUS_EVENT_CONTENT_TYPE
+    else:
+        typ, cty = STATUS_TYP, STATUS_CONTENT_TYPE
+    token = build_compact_jws(payload, key_info=status_key, typ=typ, cty=cty)
+    verified = verify_role_bound_jws(out_dir=out_dir, trust_bundle=trust_bundle, token=token,
+                                     expected_typ=typ, expected_cty=cty, expected_role="status")
+    if not verified["ok"]:
+        raise RuntimeError("the status signing key does not match its local registration")
+    return token
+
+
+def issue_status_tokens(bundle: dict, out_dir: Path, *, keys: dict[str, dict] | None = None) -> None:
+    store, trust = bundle["status_store"], bundle["trust_bundle"]
+    key_info = keys["status"] if keys else None
+    stapled = _sign_status_payload(out_dir, trust, build_status_bundle_payload(store, "stapled"), key_info=key_info)
+    push = _sign_status_payload(out_dir, trust, build_status_event_payload(store), key_info=key_info)
+    bundle["status_tokens"].update(stapled=stapled, push=push)
 
 
 def write_bundle(out_dir: Path, bundle: dict, template_dir: Path | None = None) -> None:
+    clear_bundle_reports(out_dir)
     if template_dir:
-        if out_dir.exists():
-            shutil.rmtree(out_dir)
-        out_dir.mkdir(parents=True, exist_ok=True)
         shutil.copytree(template_dir / "keys", out_dir / "keys")
 
     write_json(out_dir / "trust-bundle.json", bundle["trust_bundle"])
@@ -568,11 +772,22 @@ def write_bundle(out_dir: Path, bundle: dict, template_dir: Path | None = None) 
     write_text(out_dir / "stapled-status.jws", bundle["status_tokens"]["stapled"])
     write_text(out_dir / "push-status-event.jws", bundle["status_tokens"]["push"])
 
-    for artifact_name, spec in ARTIFACT_SPECS.items():
-        basename = spec["basename"]
-        artifact = bundle["artifacts"][artifact_name]
+    for name, artifact in bundle["artifacts"].items():
+        basename = ARTIFACT_SPECS[name]["basename"]
         write_json(out_dir / f"{basename}.json", artifact["payload"])
         write_text(out_dir / f"{basename}.jws", artifact["token"])
+
+
+def generate_demo(out_dir: Path) -> None:
+    with staged_output(out_dir) as staged:
+        write_bundle(staged, build_demo_bundle(staged))
+        bundle_files = {p.relative_to(staged) for p in staged.rglob("*") if p.is_file()}
+        report = Path("verification-report.json")
+        optional = {report, Path("negative-test-report.json")}
+        for case in negative_cases(staged):
+            case_dir = Path("negative-cases") / case["name"]
+            optional.update(case_dir / f for f in bundle_files | {report})
+        publish_output(staged, out_dir, optional_files=optional)
 
 
 def load_bundle(out_dir: Path) -> dict:
@@ -594,11 +809,21 @@ def load_bundle(out_dir: Path) -> dict:
     }
 
 
+def registered_key(trust_bundle: dict, kid: str) -> dict:
+    keys = trust_bundle["keys"]
+    if not isinstance(kid, str) or kid not in keys:
+        return {}
+    key_entry = keys[kid]
+    if (not isinstance(key_entry, dict) or not isinstance(key_entry.get("public_key"), str)
+            or not key_entry["public_key"]
+            or ("spki_sha256" in key_entry and not isinstance(key_entry["spki_sha256"], str))):
+        raise RuntimeError("the local public key registration is incomplete")
+    return key_entry
+
+
 def resolve_public_key(out_dir: Path, trust_bundle: dict, kid: str) -> Path | None:
-    key_entry = trust_bundle["keys"].get(kid)
-    if not key_entry:
-        return None
-    return out_dir / key_entry["public_key"]
+    entry = registered_key(trust_bundle, kid)
+    return out_dir / entry["public_key"] if entry else None
 
 
 def verify_compact_jws(
@@ -609,6 +834,7 @@ def verify_compact_jws(
     expected_typ: str,
     expected_cty: str,
 ) -> dict:
+    """Check compact JWS packaging and signature, without assigning issuer authority."""
     try:
         header, payload, signing_input, signature_raw = decode_compact_jws(token)
     except (ValueError, json.JSONDecodeError, UnicodeDecodeError, binascii.Error) as exc:
@@ -620,9 +846,8 @@ def verify_compact_jws(
         }
 
     kid = header.get("kid", "")
-    key_entry = trust_bundle["keys"].get(kid)
     public_key = resolve_public_key(out_dir, trust_bundle, kid)
-    if not public_key or not public_key.exists():
+    if public_key is None:
         return {
             "ok": False,
             "header": header,
@@ -630,6 +855,7 @@ def verify_compact_jws(
             "details": f"unknown kid {kid}",
         }
 
+    key_entry = trust_bundle["keys"][kid]
     if header.get("typ") != expected_typ:
         return {
             "ok": False,
@@ -646,7 +872,7 @@ def verify_compact_jws(
             "details": f"unexpected cty {header.get('cty')}",
         }
 
-    if header.get("alg") != key_entry.get("alg"):
+    if header.get("alg") != "ES256" or key_entry.get("alg") != "ES256":
         return {
             "ok": False,
             "header": header,
@@ -664,45 +890,109 @@ def verify_compact_jws(
             "details": f"invalid JWS signature encoding: {exc}",
         }
 
-    ok = verify_bytes(signing_input, signature_der, public_key)
+    ok = verify_bytes(signing_input, signature_der, public_key, expected_fingerprint=key_entry.get("spki_sha256"))
     return {
         "ok": ok,
         "header": header,
         "payload": payload,
-        "details": f"verified compact JWS with kid {kid}",
+        "details": f"signature {'verified' if ok else 'does not match'} for kid {kid}",
     }
+
+
+def verify_role_bound_jws(
+    *,
+    out_dir: Path,
+    trust_bundle: dict,
+    token: str,
+    expected_typ: str,
+    expected_cty: str,
+    expected_role: str,
+) -> dict:
+    """Authenticate a demo artifact using a verifier-selected signer role.
+
+    Signature validity and role authorization remain separate report checks.
+    An unauthorized payload cannot supply identities to the caller.
+    """
+    if not isinstance(expected_role, str) or not expected_role:
+        raise ValueError("the verifier must select a non-empty expected signer role")
+    result = verify_compact_jws(out_dir=out_dir, trust_bundle=trust_bundle, token=token,
+                                expected_typ=expected_typ, expected_cty=expected_cty)
+    signature_ok = result["ok"]
+    role_ok = signature_ok and (
+        trust_bundle["keys"][result["header"]["kid"]].get("owner") == expected_role
+    )
+    return {**result, "signature_ok": signature_ok, "signer_role_ok": role_ok,
+            "signer_role_details": f"authenticated signer must have demo role {expected_role}",
+            "ok": role_ok, "payload": result["payload"] if role_ok else {}}
+
+
+def required_text(obj: object, field: str) -> str:
+    value = obj.get(field) if isinstance(obj, dict) else None
+    if not isinstance(value, str) or not value:
+        raise ValueError(f"{field} must be a non-empty string")
+    return value
+
+
+def matching_text(first: object, *others: object) -> bool:
+    return isinstance(first, str) and bool(first) and all(value == first for value in others)
+
+
+def runtime_key_bound(out_dir: Path, trust_bundle: dict, permit: dict, runtime_proof: dict) -> bool:
+    binding = permit.get("proof_binding")
+    presented = runtime_proof.get("presented_key")
+    if not isinstance(binding, dict) or not isinstance(presented, dict) or binding.get("type") != "cnf-kid":
+        return False
+    kid = presented.get("kid")
+    if not matching_text(kid, binding.get("kid")):
+        return False
+    public_key = resolve_public_key(out_dir, trust_bundle, kid)
+    if public_key is None:
+        return False
+    entry = trust_bundle["keys"][kid]
+    if entry.get("owner") != "runtime" or entry.get("alg") != "ES256":
+        return False
+    if "alg" in presented and presented["alg"] != entry["alg"]:
+        return False
+    # The local profile also accepts a kid-only binding. If the artifacts
+    # carry a fingerprint, both refer to the same registered public key.
+    fingerprint = spki_sha256(public_key)
+    if "spki_sha256" in entry and entry["spki_sha256"] != fingerprint:
+        raise RuntimeError("the registered runtime public key differs from its local fingerprint")
+    if "spki_sha256" not in binding and "spki_sha256" not in presented:
+        return True
+    return matching_text(fingerprint, binding.get("spki_sha256"), presented.get("spki_sha256"))
+
+
+def validated_permit_scope(permit: dict) -> tuple[str, list[str]]:
+    """Read the task identity and action names used by the legacy demos.
+
+    Authentication and the remaining permit constraints are checked separately.
+    """
+    transaction_id = required_text(permit, "transaction_id")
+    actions = permit.get("actions")
+    if (not isinstance(actions, list) or not actions
+            or any(not isinstance(action, str) or not action for action in actions)):
+        raise ValueError("permit actions must be a non-empty list of non-empty strings")
+    return transaction_id, actions
 
 
 def build_status_token(out_dir: Path, kind: str, *, object_type: str | None = None) -> str:
-    bundle = load_bundle(out_dir)
-    status_key = {
-        "kid": "status-key-1",
-        "alg": "ES256",
-        "private_key": key_path(out_dir, "status", "private"),
-    }
-    if kind == "bundle":
-        payload = build_status_bundle_payload(bundle["status_store"], delivery="pull")
-        return build_compact_jws(payload, key_info=status_key, typ=STATUS_TYP, cty=STATUS_CONTENT_TYPE)
-    if kind == "stapled":
-        payload = build_status_bundle_payload(bundle["status_store"], delivery="stapled")
-        return build_compact_jws(payload, key_info=status_key, typ=STATUS_TYP, cty=STATUS_CONTENT_TYPE)
-    if kind == "event":
-        payload = build_status_event_payload(bundle["status_store"])
-        return build_compact_jws(
-            payload,
-            key_info=status_key,
-            typ=STATUS_EVENT_TYP,
-            cty=STATUS_EVENT_CONTENT_TYPE,
-        )
-    if kind == "entry" and object_type:
-        payload = build_status_entry_payload(bundle["status_store"], object_type)
-        return build_compact_jws(payload, key_info=status_key, typ=STATUS_TYP, cty=STATUS_CONTENT_TYPE)
-    raise ValueError(f"unsupported status token kind {kind}")
+    store = read_json(out_dir / "status-store.json")
+    if kind in ("bundle", "stapled"):
+        payload = build_status_bundle_payload(store, delivery="pull" if kind == "bundle" else "stapled")
+    elif kind == "event":
+        payload = build_status_event_payload(store)
+    elif kind == "entry" and object_type:
+        payload = build_status_entry_payload(store, object_type)
+    else:
+        raise ValueError(f"unsupported status token kind {kind}")
+    return _sign_status_payload(out_dir, read_json(out_dir / "trust-bundle.json"), payload)
 
 
 def http_get_text(url: str) -> str:
     with urlopen(url) as response:
-        return response.read().decode("utf-8").strip()
+        body = response.read().decode("utf-8")
+        return body.removesuffix("\r\n") if body.endswith("\r\n") else body.removesuffix("\n")
 
 
 def normalize_status_payload(payload: dict) -> dict:
@@ -740,13 +1030,65 @@ def normalize_status_payload(payload: dict) -> dict:
     raise ValueError(f"unsupported status payload version {payload.get('version')}")
 
 
+class StatusEffectError(ValueError):
+    def __init__(self, field: str, message: str):
+        super().__init__(message)
+        self.field = field
+
+
+def validated_status_payload(payload: dict) -> dict:
+    """Check fields used by both bundle demos; signature and freshness are separate."""
+    payload = normalize_status_payload(payload)
+    for field in ("generated_at", "next_update_at"):
+        parse_time(payload[field])
+    entries = payload["entries"]
+    if not isinstance(entries, dict):
+        raise ValueError("status entries must be a JSON object")
+    for name in STATUS_KINDS:
+        entry = entries.get(name)
+        if not isinstance(entry, dict):
+            raise ValueError(f"missing or invalid {name} status entry")
+        if not isinstance(entry.get("id"), str) or not entry["id"]:
+            raise ValueError(f"{name} status id must be a non-empty string")
+        required_text(entry, "reason")
+        state = entry.get("state")
+        if not isinstance(state, str) or state not in STATUS_STATES:
+            raise ValueError(f"unsupported {name} status state")
+        if entry["state"] == "attenuated" or "effect" in entry:
+            effect = entry.get("effect")
+            if not isinstance(effect, dict) or not isinstance(effect.get("constraints"), dict):
+                raise StatusEffectError("constraints", f"{name} status effect requires a constraints object")
+            if effect.get("mode") != "narrow":
+                raise StatusEffectError("mode", f"{name} status effect requires mode=narrow")
+            if type(effect.get("require_new_permit")) is not bool:
+                raise StatusEffectError("require_new_permit", f"{name} status effect requires a boolean reissue flag")
+    return payload
+
+
+def status_attenuation_requirements(entries: dict) -> tuple[list[str], list[str]]:
+    """Return unsupported narrowing subjects and all explicit permit reissue requests."""
+    unsupported, reissue = [], []
+    for kind in STATUS_KINDS:
+        entry = entries[kind]
+        effect = entry.get("effect")
+        if effect is None:
+            continue
+        if effect["require_new_permit"]:
+            reissue.append(kind)
+        narrowed = entry["state"] == "attenuated"
+        if (narrowed and kind != "permit") or (not narrowed and effect["constraints"]):
+            unsupported.append(kind)
+    return unsupported, reissue
+
+
 def resolve_status(
     out_dir: Path,
     trust_bundle: dict,
     *,
     status_mode: str,
     status_base: str | None,
-) -> tuple[dict, list[dict]]:
+) -> tuple[dict | None, list[dict]]:
+    """Return usable authenticated status, or no status plus a failed check."""
     checks = []
 
     def record(name: str, ok: bool, details: str) -> None:
@@ -754,83 +1096,82 @@ def resolve_status(
 
     if status_mode == "pull":
         if not status_base:
-            raise SystemExit("pull mode requires --status-base")
+            record("status_pull_fetch", False, "pull mode requires --status-base")
+            return None, checks
         try:
             token = http_get_text(f"{status_base.rstrip('/')}/status/bundle")
-        except (HTTPError, URLError) as exc:
+        except (OSError, ValueError, HTTPException) as exc:
             record("status_pull_fetch", False, f"unable to fetch status bundle: {exc}")
-            return {"entries": {}}, checks
+            return None, checks
         record("status_pull_fetch", True, "fetched status bundle from remote service")
-        verification = verify_compact_jws(
-            out_dir=out_dir,
-            trust_bundle=trust_bundle,
-            token=token,
-            expected_typ=STATUS_TYP,
-            expected_cty=STATUS_CONTENT_TYPE,
-        )
-        record("status_signature", verification["ok"], verification["details"])
-        if not verification["payload"]:
-            return {"entries": {}}, checks
-        return normalize_status_payload(verification["payload"]), checks
+    elif status_mode in {"stapled", "push"}:
+        filename = "stapled-status.jws" if status_mode == "stapled" else "push-status-event.jws"
+        try:
+            token = read_text(out_dir / filename)
+        except (OSError, UnicodeError) as exc:
+            record("status_input", False, f"unable to read {filename}: {exc}")
+            return None, checks
+    else:
+        raise ValueError(f"unsupported status mode {status_mode}")
 
-    if status_mode == "stapled":
-        token = read_text(out_dir / "stapled-status.jws")
-        verification = verify_compact_jws(
-            out_dir=out_dir,
-            trust_bundle=trust_bundle,
-            token=token,
-            expected_typ=STATUS_TYP,
-            expected_cty=STATUS_CONTENT_TYPE,
-        )
-        record("status_signature", verification["ok"], verification["details"])
-        if not verification["payload"]:
-            return {"entries": {}}, checks
-        return normalize_status_payload(verification["payload"]), checks
-
-    if status_mode == "push":
-        token = read_text(out_dir / "push-status-event.jws")
-        verification = verify_compact_jws(
-            out_dir=out_dir,
-            trust_bundle=trust_bundle,
-            token=token,
-            expected_typ=STATUS_EVENT_TYP,
-            expected_cty=STATUS_EVENT_CONTENT_TYPE,
-        )
-        record("status_signature", verification["ok"], verification["details"])
-        if not verification["payload"]:
-            return {"entries": {}}, checks
-        return normalize_status_payload(verification["payload"]), checks
-
-    raise ValueError(f"unsupported status mode {status_mode}")
+    verification = verify_role_bound_jws(
+        out_dir=out_dir,
+        trust_bundle=trust_bundle,
+        token=token,
+        expected_typ=STATUS_EVENT_TYP if status_mode == "push" else STATUS_TYP,
+        expected_cty=STATUS_EVENT_CONTENT_TYPE if status_mode == "push" else STATUS_CONTENT_TYPE,
+        expected_role="status",
+    )
+    record("status_signature", verification["signature_ok"], verification["details"])
+    record("status_signer_role", verification["signer_role_ok"], verification["signer_role_details"])
+    if not verification["ok"]:
+        return None, checks
+    try:
+        payload = validated_status_payload(verification["payload"])
+    except (KeyError, TypeError, ValueError) as exc:
+        record("status_payload", False, f"unusable status payload: {exc}")
+        if isinstance(exc, StatusEffectError):
+            record("status_attenuation_effect", False, str(exc))
+        return None, checks
+    record("status_payload", True, "status contains timestamps and entries usable by this demo")
+    return payload, checks
 
 
-def verify_demo(out_dir: Path, *, status_mode: str, status_base: str | None = None) -> dict:
-    bundle = load_bundle(out_dir)
-    trust_bundle = bundle["trust_bundle"]
-
-    checks = []
-
+def collect_demo_checks(out_dir: Path, *, status_mode: str, status_base: str | None, checks: list[dict],
+                        checked_at: datetime) -> None:
     def record(name: str, ok: bool, details: str) -> None:
         checks.append({"name": name, "ok": ok, "details": details})
 
     record("status_mode", True, f"verification uses {status_mode} status delivery")
+    # Decoded JSON and status-store files are generator/service inputs. Only
+    # signed artifacts and the selected status delivery are verification inputs.
+    trust_bundle = read_json(out_dir / "trust-bundle.json")
 
     artifact_results = {}
     for artifact_name, spec in ARTIFACT_SPECS.items():
-        verification = verify_compact_jws(
+        verification = verify_role_bound_jws(
             out_dir=out_dir,
             trust_bundle=trust_bundle,
-            token=bundle["artifacts"][artifact_name]["token"],
+            token=read_text(out_dir / f"{spec['basename']}.jws"),
             expected_typ=spec["typ"],
             expected_cty=spec["cty"],
+            expected_role=spec["role"],
         )
         artifact_results[artifact_name] = verification
-        record(f"{artifact_name}_signature", verification["ok"], verification["details"])
+        record(f"{artifact_name}_signature", verification["signature_ok"], verification["details"])
+
+    if not all(result["signature_ok"] for result in artifact_results.values()):
+        return
+    record("artifact_signer_roles", all(result["signer_role_ok"] for result in artifact_results.values()),
+           "artifact tokens are signed by the roles selected by the demo profile")
+    if not all(result["signer_role_ok"] for result in artifact_results.values()):
+        return
 
     passport = artifact_results["passport"]["payload"]
     runtime_proof = artifact_results["runtime_proof"]["payload"]
     permit = artifact_results["permit"]["payload"]
     receipt = artifact_results["receipt"]["payload"]
+    permit_transaction, _ = validated_permit_scope(permit)
 
     artifact_kids = {
         artifact_results["passport"]["header"].get("kid"),
@@ -847,17 +1188,8 @@ def verify_demo(out_dir: Path, *, status_mode: str, status_base: str | None = No
     )
 
     record(
-        "artifact_signer_roles",
-        trust_bundle["keys"].get(artifact_results["passport"]["header"].get("kid"), {}).get("owner") == "issuer"
-        and trust_bundle["keys"].get(artifact_results["runtime_proof"]["header"].get("kid"), {}).get("owner")
-        == "attestor"
-        and trust_bundle["keys"].get(artifact_results["permit"]["header"].get("kid"), {}).get("owner") == "broker",
-        "passport, runtime proof, and permit tokens are signed by the expected demo roles",
-    )
-
-    record(
         "runtime_presented_key_owner",
-        trust_bundle["keys"].get(runtime_proof.get("presented_key", {}).get("kid"), {}).get("owner") == "runtime",
+        registered_key(trust_bundle, runtime_proof.get("presented_key", {}).get("kid")).get("owner") == "runtime",
         "the runtime-presented key resolves to a runtime-owned key in the trust bundle",
     )
 
@@ -866,14 +1198,13 @@ def verify_demo(out_dir: Path, *, status_mode: str, status_base: str | None = No
     )
     checks.extend(status_checks)
 
-    entries = status_payload.get("entries", {})
-    if status_payload:
-        now = utc_now()
+    if status_payload is not None:
+        entries = status_payload["entries"]
         generated_at = parse_time(status_payload["generated_at"])
         next_update_at = parse_time(status_payload["next_update_at"])
         record(
             "status_document_window",
-            generated_at <= now <= next_update_at,
+            generated_at <= checked_at <= next_update_at,
             "status document is fresh enough for the current verification time",
         )
 
@@ -888,58 +1219,47 @@ def verify_demo(out_dir: Path, *, status_mode: str, status_base: str | None = No
             "status entries reference the presented passport, runtime, and permit ids",
         )
 
-        blocking_states = {"suspended", "revoked", "quarantined"}
         record(
             "status_entries_not_blocked",
-            all(entries.get(name, {}).get("state") not in blocking_states for name in ("passport", "runtime", "permit")),
+            all(entries[name]["state"] not in BLOCKING_STATUS_STATES for name in STATUS_KINDS),
             "passport, runtime, and permit are not in a blocking status state",
         )
 
-        permit_status = entries.get("permit", {})
-        record(
-            "status_attenuation_effect",
-            permit_status.get("state") != "attenuated" or bool(permit_status.get("effect")),
-            "attenuated permit entries include a machine-readable effect object",
-        )
-        attenuation_effect = permit_status.get("effect", {})
+        unsupported, reissue = status_attenuation_requirements(entries)
+        record("status_attenuation_scope", not unsupported,
+               f"unsupported narrowing on {', '.join(unsupported)}" if unsupported else "supported status scope")
+        attenuated = entries["permit"]["state"] == "attenuated"
+        record("status_attenuation_effect", True,
+               "the signed status contains mode=narrow, a constraints object and a boolean reissue flag"
+               if attenuated else "no attenuation effect is required for this permit state")
         record(
             "status_attenuation_policy",
-            permit_status.get("state") != "attenuated"
-            or (
-                attenuation_effect.get("mode") == "narrow"
-                and attenuation_effect.get("require_new_permit") is False
-            ),
-            "attenuated permits can proceed only when the effect is narrow and does not require permit re-issuance",
+            not reissue,
+            f"new permit required by {', '.join(reissue)}" if reissue else "no status entry requires a new permit",
         )
 
     record(
         "subject_binding",
-        runtime_proof.get("subject_id") == passport.get("subject", {}).get("root_id"),
+        matching_text(runtime_proof.get("subject_id"), passport.get("subject", {}).get("root_id")),
         "runtime proof subject matches passport root id",
     )
 
     record(
         "actor_binding",
-        permit.get("actor") == passport.get("subject", {}).get("public_alias")
-        and receipt.get("actor") == permit.get("actor"),
+        matching_text(permit.get("actor"), passport.get("subject", {}).get("public_alias"), receipt.get("actor")),
         "permit actor and receipt actor match the passport alias",
     )
 
     record(
         "audience_binding",
-        runtime_proof.get("challenge_binding", {}).get("aud")
-        == permit.get("aud")
-        == receipt.get("verifier"),
+        matching_text(runtime_proof.get("challenge_binding", {}).get("aud"), permit.get("aud"), receipt.get("verifier")),
         "runtime proof audience, mission permit audience, and receipt verifier agree",
     )
 
     record(
         "proof_of_possession_binding",
-        permit.get("proof_binding", {}).get("kid")
-        == runtime_proof.get("presented_key", {}).get("kid")
-        == artifact_results["receipt"]["header"].get("kid")
-        and permit.get("proof_binding", {}).get("spki_sha256")
-        == runtime_proof.get("presented_key", {}).get("spki_sha256"),
+        runtime_key_bound(out_dir, trust_bundle, permit, runtime_proof)
+        and runtime_proof["presented_key"]["kid"] == artifact_results["receipt"]["header"]["kid"],
         "permit binding matches the runtime-presented key and receipt signer",
     )
 
@@ -950,38 +1270,72 @@ def verify_demo(out_dir: Path, *, status_mode: str, status_base: str | None = No
         "receipt issuer_role matches the observed signer role",
     )
 
+    record("receipt_phase", receipt.get("receipt_phase") == "post_execution",
+           "the signed receipt identifies a post-execution result")
     runtime_issued_at = parse_time(runtime_proof["issued_at"])
     runtime_expires_at = parse_time(runtime_proof["expires_at"])
     permit_issued_at = parse_time(permit["issued_at"])
     permit_expires_at = parse_time(permit["constraints"]["expires_at"])
     receipt_started_at = parse_time(receipt["started_at"])
     receipt_finished_at = parse_time(receipt["finished_at"])
+    record("receipt_completed", receipt_finished_at <= checked_at,
+           "the recorded execution finished by the verification time")
+    passport_from = parse_time(passport["valid_from"])
+    passport_until = parse_time(passport["valid_until"])
+    record(
+        "passport_window",
+        all(passport_from <= point <= passport_until for point in (receipt_started_at, receipt_finished_at)),
+        "the passport covers the recorded execution from start to finish",
+    )
     record(
         "permit_runtime_window",
-        runtime_issued_at <= receipt_started_at <= permit_expires_at
-        and permit_issued_at <= receipt_started_at
-        and receipt_finished_at <= runtime_expires_at,
-        "execution starts after runtime and permit issuance and completes before runtime and permit expiry",
+        max(runtime_issued_at, permit_issued_at)
+        <= receipt_started_at
+        <= receipt_finished_at
+        <= min(runtime_expires_at, permit_expires_at),
+        "execution starts at or after both issuance times, finishes at or after its start, "
+        "and finishes at or before both expiry times",
+    )
+
+    record(
+        "receipt_transaction_binding",
+        isinstance(receipt.get("transaction_id"), str)
+        and receipt["transaction_id"] == permit_transaction,
+        "receipt transaction matches the mission permit transaction",
     )
 
     record(
         "receipt_references",
-        receipt.get("runtime_ref") == runtime_proof.get("runtime_id")
-        and receipt.get("permit_ref") == permit.get("permit_id"),
+        matching_text(receipt.get("runtime_ref"), runtime_proof.get("runtime_id"))
+        and matching_text(receipt.get("permit_ref"), permit.get("permit_id")),
         "receipt references the generated runtime proof and mission permit",
     )
 
+
+def verify_demo(out_dir: Path, *, status_mode: str, status_base: str | None = None) -> dict:
+    # A later operational error must not leave an earlier success in place.
+    report_path = out_dir / "verification-report.json"
+    report_path.unlink(missing_ok=True)
+    checks = []
+    checked_at = utc_now()
+    try:
+        collect_demo_checks(out_dir, status_mode=status_mode, status_base=status_base, checks=checks, checked_at=checked_at)
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as exc:
+        # This legacy demo reads JSON and interprets its fields directly. Input
+        # read/shape/time failures deny verification; output errors still raise.
+        checks.append({"name": "verification_input", "ok": False,
+                       "details": f"unable to interpret verification input ({type(exc).__name__}): {exc}"})
     ok = all(check["ok"] for check in checks)
     report = {
         "ok": ok,
-        "checked_at": iso(utc_now()),
+        "checked_at": iso(checked_at),
         "status_mode": status_mode,
         "checks": checks,
         "request_binding": {"status": "not_checked", "pass": None,
                             "binding_requirement_met": False,
                             "cause": "LEGACY_AER_PROFILE"},
     }
-    write_json(out_dir / "verification-report.json", report)
+    write_json(report_path, report)
     return report
 
 
@@ -1071,7 +1425,7 @@ def negative_cases(template_dir: Path) -> list[dict]:
         {
             "name": "tampered-passport-alias",
             "description": "passport alias is modified inside the compact JWS without a new issuer signature",
-            "expected_failed_checks": ["passport_signature", "actor_binding"],
+            "expected_failed_checks": ["passport_signature"],
             "status_mode": "stapled",
             "mutate": tamper_passport_alias,
         },
@@ -1142,12 +1496,25 @@ def negative_cases(template_dir: Path) -> list[dict]:
 
 
 def run_negative_tests(source_dir: Path) -> dict:
+    report_path = source_dir / "negative-test-report.json"
+    report_path.unlink(missing_ok=True)
     base_bundle = load_bundle(source_dir)
     negative_dir = source_dir / "negative-cases"
-    if negative_dir.exists():
-        shutil.rmtree(negative_dir)
-    negative_dir.mkdir(parents=True, exist_ok=True)
+    with staged_output(negative_dir) as staged:
+        results = evaluate_negative_cases(source_dir, base_bundle, staged)
+        summary = {
+            "ok": all(result["ok"] for result in results),
+            "checked_at": iso(utc_now()),
+            "results": results,
+        }
+        new_report = staged.parent / report_path.name
+        write_json(new_report, summary)
+        publish_output(staged, negative_dir)
+        new_report.replace(report_path)
+    return summary
 
+
+def evaluate_negative_cases(source_dir: Path, base_bundle: dict, negative_dir: Path) -> list[dict]:
     results = []
     for case in negative_cases(source_dir):
         case_dir = negative_dir / case["name"]
@@ -1165,17 +1532,11 @@ def run_negative_tests(source_dir: Path) -> dict:
                 "expected_failed_checks": expected_failed,
                 "actual_failed_checks": actual_failed,
                 "ok": set(expected_failed).issubset(actual_failed),
-                "report": str((case_dir / "verification-report.json").relative_to(source_dir)),
+                "report": f"negative-cases/{case['name']}/verification-report.json",
             }
         )
 
-    summary = {
-        "ok": all(result["ok"] for result in results),
-        "checked_at": iso(utc_now()),
-        "results": results,
-    }
-    write_json(source_dir / "negative-test-report.json", summary)
-    return summary
+    return results
 
 
 def fetch_status(out_dir: Path, *, status_base: str, mode: str) -> None:
@@ -1188,6 +1549,7 @@ def fetch_status(out_dir: Path, *, status_base: str, mode: str) -> None:
 
     for url, path in targets:
         token = http_get_text(url)
+        clear_bundle_reports(out_dir)
         write_text(path, token)
 
 
@@ -1228,12 +1590,13 @@ def serve_status(out_dir: Path, *, host: str, port: int) -> None:
                     if entry["id"] != requested_id:
                         self.send_error(HTTPStatus.NOT_FOUND, "status entry not found")
                         return
-                    self.send_token(build_status_token(out_dir, "entry", object_type=object_type))
+                    payload = build_status_entry_payload(status_store, object_type)
+                    self.send_token(_sign_status_payload(out_dir, read_json(out_dir / "trust-bundle.json"), payload))
                     return
 
                 self.send_error(HTTPStatus.NOT_FOUND, "unsupported path")
-            except Exception as exc:  # pragma: no cover - demo error path
-                self.send_error(HTTPStatus.INTERNAL_SERVER_ERROR, str(exc))
+            except Exception:
+                self.send_error(HTTPStatus.INTERNAL_SERVER_ERROR, "status service unavailable")
 
         def send_token(self, token: str) -> None:
             body = token.encode("utf-8")
@@ -1296,12 +1659,12 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     if args.command == "generate-demo":
-        bundle = build_demo_bundle(Path(args.out))
-        write_bundle(Path(args.out), bundle)
+        generate_demo(Path(args.out))
     elif args.command == "verify-demo":
         verify_demo(Path(args.dir), status_mode=args.status_mode, status_base=args.status_base)
     elif args.command == "run-negative-tests":
-        run_negative_tests(Path(args.dir))
+        if not run_negative_tests(Path(args.dir))["ok"]:
+            raise SystemExit("one or more negative cases differed from the expected result")
     elif args.command == "fetch-status":
         fetch_status(Path(args.dir), status_base=args.status_base, mode=args.mode)
     elif args.command == "serve-status":
@@ -1309,4 +1672,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except DemoOutputError as exc:
+        raise SystemExit(str(exc)) from exc

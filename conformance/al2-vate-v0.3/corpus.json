@@ -1996,7 +1996,7 @@
   "conformance_report_schema": "schemas/conformance-report.schema.json",
   "digest": {
     "alg": "sha-256",
-    "value": "9f16ca68c32e57ee79a0c4080310fe90b63f337bbe827cad6b1017acc2b1a14e"
+    "value": "1bd35f100ccc6584ddfdf59122ba377606dbe929b219099f0fa1008b6aa0f5f1"
   },
   "digest_basis": {
     "alg": "sha-256",
@@ -2317,7 +2317,7 @@
     },
     {
       "path": "conformance/al2-vate-v0.3/conformance-case.schema.json",
-      "sha256": "69a905f13d9b03a2c7cc663bcfbc285ae8e502142d3b84022e7d251ff11677d5"
+      "sha256": "e81abbeeeea539abe83c24f9016e98d74827a18600e2e3fb90e577c5d2494059"
     },
     {
       "path": "conformance/al2-vate-v0.3/external/rcl/rcl-oracle-fixtures.v1.json",

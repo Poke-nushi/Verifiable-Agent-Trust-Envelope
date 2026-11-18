@@ -55,6 +55,32 @@ TABLES = {
         checked_at TEXT NOT NULL)""",
 }
 
+# Only the explicitly selected, offline migration tool writes this table. The
+# baseline implementation rejects its presence through its exact-schema check.
+MIGRATION_TABLE = "CREATE TABLE migration (singleton INTEGER PRIMARY KEY CHECK(singleton=1), migration_id TEXT NOT NULL, role TEXT NOT NULL CHECK(role IN ('prepared','retired','target')), anchor BLOB NOT NULL, program BLOB NOT NULL)"
+MIGRATION_SOURCES = (
+    "reference/authority-issuer/authority_issuer.py",
+    "reference/authority-issuer/service_client.py",
+    "reference/authority-keychain/keychain_bridge.swift",
+    "reference/authority-keychain/keychain_signer.py",
+    "reference/authority-updates/authority_store.py",
+    "reference/authority-updates/https_source.py",
+    "reference/authority-updates/managed_verifier.py",
+    "reference/authority-updates/refresh_lifecycle.py",
+    "reference/authority-updates/snapshot.py",
+    "reference/authority-updates/supervised_https.py",
+    "reference/caller-authority/caller_jwt.py",
+    "reference/request-binding/caller_authority.py",
+    "reference/request-binding/durable_state.py",
+    "reference/request-binding/example.py",
+    "reference/request-binding/request_binding.py",
+    "reference/runtime-jwt/runtime_jwt.py",
+    "reference/runtime-jwt/verify_es256.mjs",
+    "reference/vate-verifier-core/vate_verifier_core.py",
+    "reference/planned-migration/migration.py",
+    "reference/planned-migration/supported-source.json",
+)
+
 
 class StateError(ValueError):
     def __init__(self, cause: str):
@@ -83,6 +109,38 @@ def encode(value: object) -> bytes:
 
 def sha(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
+
+
+def migration_schema(connection, schema: dict, tables: dict, anchor: bytes) -> bool:
+    """Check the optional committed migration marker; never create or repair it."""
+    if schema == tables:
+        return True
+    if schema != {**tables, "migration": MIGRATION_TABLE}:
+        return False
+    rows = connection.execute("SELECT * FROM main.migration").fetchall()
+    require(len(rows) == 1 and rows[0]["singleton"] == 1, "STATE_MIGRATION_INVALID")
+    row = rows[0]
+    require(row["role"] == "target", "STATE_MIGRATION_INACTIVE")
+    identifier(row["migration_id"])
+    require(row["anchor"] == anchor, "STATE_MIGRATION_ANCHOR_CHANGED")
+    require(type(row["program"]) is bytes and len(row["program"]) <= 65536, "STATE_MIGRATION_INVALID")
+    try:
+        program = json.loads(row["program"])
+    except (ValueError, UnicodeError):
+        raise StateError("STATE_MIGRATION_INVALID") from None
+    require(type(program) is dict and set(program) == set(MIGRATION_SOURCES)
+            and encode(program) == row["program"], "STATE_MIGRATION_INVALID")
+    require(LOADED_SOURCE_SHA256 is not None, "STATE_IMPLEMENTATION_CHANGED")
+    root = Path(__file__).resolve().parents[2]
+    try:
+        require(sha(Path(__file__).read_bytes()) == LOADED_SOURCE_SHA256, "STATE_IMPLEMENTATION_CHANGED")
+        for name, expected in program.items():
+            require(type(expected) is str and re.fullmatch(r"[a-f0-9]{64}", expected) is not None,
+                    "STATE_MIGRATION_INVALID")
+            require(sha((root / name).read_bytes()) == expected, "STATE_IMPLEMENTATION_CHANGED")
+    except OSError:
+        raise StateError("STATE_IMPLEMENTATION_CHANGED") from None
+    return True
 
 
 def instant(value: datetime) -> datetime:
@@ -124,7 +182,7 @@ def record_digest(request_id: str, operation_id: str, configuration: bytes,
 
 class DurableStateStore:
     def __init__(self, directory: str | Path, *, expected_anchor: bytes, timeout: float = 2.0):
-        require(type(timeout) in (int, float) and math.isfinite(timeout) and 0 < timeout <= 30,
+        require(type(timeout) in (int, float) and 0 < timeout <= 30 and math.isfinite(timeout),
                 "STATE_CONFIGURATION_INVALID")
         require(type(expected_anchor) is bytes and len(expected_anchor) <= 16384, "STATE_ANCHOR_INVALID")
         try:
@@ -152,7 +210,7 @@ class DurableStateStore:
         """Explicit initialization only; an existing directory is never reused."""
         identifier(scope)
         identifier(verifier_id)
-        require(type(timeout) in (int, float) and math.isfinite(timeout) and 0 < timeout <= 30,
+        require(type(timeout) in (int, float) and 0 < timeout <= 30 and math.isfinite(timeout),
                 "STATE_CONFIGURATION_INVALID")
         directory = Path(directory).absolute()
         directory.mkdir(mode=0o700, parents=False, exist_ok=False)
@@ -214,7 +272,8 @@ class DurableStateStore:
                     and connection.execute("PRAGMA user_version").fetchone()[0] == VERSION, "STATE_MODE_INVALID")
             schema = {row["name"]: " ".join(row["sql"].split()) for row in connection.execute(
                 "SELECT name,sql FROM sqlite_master WHERE name NOT GLOB 'sqlite_*'")}
-            require(schema == {name: " ".join(sql.split()) for name, sql in TABLES.items()}, "STATE_SCHEMA_CHANGED")
+            require(migration_schema(connection, schema,
+                {name: " ".join(sql.split()) for name, sql in TABLES.items()}, self.anchor), "STATE_SCHEMA_CHANGED")
             identity = connection.execute("SELECT * FROM identity").fetchall()
             require(len(identity) == 1 and identity[0]["singleton"] == 1
                     and all(identity[0][key] == self._anchor[key] for key in ("store_id", "scope", "verifier_id")),

@@ -4,6 +4,16 @@
   "title": "Trust Envelope Verifier Policy",
   "description": "Draft JSON Schema for a local AL2-style verifier policy used by the HTTP verifier demo for this draft.",
   "type": "object",
+  "$defs": {
+    "acceptedStateList": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "not": { "enum": ["suspended", "revoked", "quarantined"] }
+      }
+    }
+  },
   "required": [
     "version",
     "policy_id",
@@ -61,25 +71,13 @@
       ],
       "properties": {
         "passport": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
+          "$ref": "#/$defs/acceptedStateList"
         },
         "runtime": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
+          "$ref": "#/$defs/acceptedStateList"
         },
         "permit": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
+          "$ref": "#/$defs/acceptedStateList"
         }
       },
       "additionalProperties": false
@@ -88,7 +86,8 @@
       "type": "object",
       "required": [
         "status_max_age_seconds",
-        "runtime_max_age_seconds"
+        "runtime_max_age_seconds",
+        "permit_max_age_seconds"
       ],
       "properties": {
         "status_max_age_seconds": {
@@ -96,6 +95,10 @@
           "minimum": 1
         },
         "runtime_max_age_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "permit_max_age_seconds": {
           "type": "integer",
           "minimum": 1
         }

@@ -185,10 +185,11 @@ separates byte linkage from actual dataset use and formal acceptance.
   and digest, transaction, runtime, effective request hash, and selected result
   fields.
 
-Attenuation is a first-class outcome. A request for a USD 10000 transfer can be
-admitted only with a USD 500 maximum, approval above USD 100, and a short
-execution window. The receipt records the declared original and effective
-request hashes so later evidence can be checked against the narrowed basis.
+In the purchase-cap example, an agent requests a USD 120.00 spending limit
+for a USD 24.50 purchase. The verifier lowers the limit to USD 25.00. The
+purchase amount stays at USD 24.50. A purchase above the effective limit is
+denied. The receiver can recompute both request hashes from the original and
+effective operations. [Run the purchase-cap example](reference/request-binding/README.md).
 
 ## Status and Scope
 
@@ -248,7 +249,7 @@ Current repository state:
   profile identifier remains
   `VATE-AL2-Verifier-Admission-v0.3`
 - **Active main-branch corpus**: 76 cases / 217 manifest artifacts ·
-  `sha-256:9f16ca68c32e57ee79a0c4080310fe90b63f337bbe827cad6b1017acc2b1a14e`
+  `sha-256:1bd35f100ccc6584ddfdf59122ba377606dbe929b219099f0fa1008b6aa0f5f1`
 - **Implemented artifacts**: v0.3 schemas and examples; a runnable AL2 fixture
   corpus with negative cases; SUT comparison and implementation-reporting
   formats; a dependency-free verifier core and A2A-shaped adapter demo;

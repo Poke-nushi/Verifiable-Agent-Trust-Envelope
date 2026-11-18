@@ -4,10 +4,12 @@ import errno
 import json
 import os
 from pathlib import Path
+import signal
 import subprocess
 import sqlite3
 import sys
 import tempfile
+import time
 import unittest
 from unittest.mock import patch
 
@@ -50,6 +52,146 @@ class InboxCase(unittest.TestCase):
                                  str(HERE), str(ROOT), str(self.box.path), *map(str, args)],
                                 capture_output=True, timeout=TEST_PROCESS_TIMEOUT)
         return result
+
+
+class InboxProcessCleanupTests(InboxCase):
+    @staticmethod
+    def processes():
+        rows = subprocess.run(["/bin/ps", "-axo", "pid=,ppid=,pgid=,stat="],
+                              capture_output=True, text=True, check=True).stdout
+        return {int(pid): (int(parent), int(group), state)
+                for pid, parent, group, state in (line.split() for line in rows.splitlines())}
+
+    def exercise_process_tree(self, mode):
+        self.receive()
+        prepared = self.box.prepare(encoded(self.plan))
+        real_popen = subprocess.Popen
+        launched, natives, directories = [], set(), []
+        unrelated = real_popen([sys.executable, "-c", "import time; time.sleep(60)"],
+                               start_new_session=True)
+        self.addCleanup(lambda: unrelated.wait(timeout=5))
+        self.addCleanup(lambda: unrelated.kill() if unrelated.poll() is None else None)
+        case = self
+
+        class Observed:
+            def __init__(self, process):
+                self.process, self.pid, self.first = process, process.pid, True
+
+            def poll(self):
+                return self.process.poll()
+
+            def wait(self, timeout=None):
+                if not self.first:
+                    return self.process.wait(timeout=timeout)
+                self.first = False
+                deadline = time.monotonic() + min(timeout, 10)
+                while self.process.poll() is None:
+                    table = case.processes()
+                    found = {pid for pid, row in table.items() if row[0] == self.pid}
+                    natives.update(found)
+                    for pid in found:
+                        case.assertEqual(table[pid][1], self.pid,
+                                         "native worker escaped the Inbox-owned group")
+                    if found and mode != "normal":
+                        for pid in found:
+                            os.kill(pid, signal.SIGSTOP)
+                        if mode == "interrupt":
+                            raise KeyboardInterrupt()
+                        if mode == "timeout":
+                            return self.process.wait(timeout=0.05)
+                        if mode == "leader_exit":
+                            os.kill(self.pid, signal.SIGKILL)
+                        if mode == "io_error":
+                            raise OSError(errno.EIO, "synthetic wait failure after native start")
+                        # native_timeout lets the actual native deadline expire
+                        # while its worker is stopped. Later calls cannot start.
+                        return self.process.wait(timeout=5)
+                    case.assertLess(time.monotonic(), deadline, "native process was not observed")
+                    time.sleep(0.005)
+                return self.process.wait(timeout=5)
+
+        def launch(command, **kwargs):
+            if any(str(arg).endswith("/required_records.py") for arg in command):
+                directories.append(Path(kwargs["env"]["TMPDIR"]))
+                # Poisoned inherited values must not change the explicit owner.
+                case.assertEqual(kwargs["env"]["VATE_INBOX_PROCESS_OWNER"], str(os.getpid()))
+                if mode == "native_timeout":
+                    bootstrap = ("import pathlib,runpy,sys;sys.argv=sys.argv[1:];"
+                        "sys.path.insert(0,str(pathlib.Path(sys.argv[0]).parent));"
+                        "import native_bridge;original=native_bridge.Bridge._run;"
+                        "native_bridge.Bridge._run=lambda self,raw,timeout:original(self,raw,0.5);"
+                        "runpy.run_path(sys.argv[0],run_name='__main__')")
+                    command = [*command[:2], "-c", bootstrap, *command[2:]]
+                process = real_popen(command, **kwargs)
+                launched.append(process)
+                return Observed(process)
+            return real_popen(command, **kwargs)
+
+        try:
+            with patch.dict(os.environ, {"VATE_INBOX_PROCESS_OWNER": "stale-owner",
+                    "VATE_INBOX_PROCESS_DIRECTORY": "/unrelated-stale-directory"}), \
+                    patch("recipient_inbox.subprocess.Popen", side_effect=launch):
+                if mode == "interrupt":
+                    with self.assertRaises(KeyboardInterrupt):
+                        self.box.run(prepared["run_id"])
+                    state = self.box.status(prepared["run_id"])
+                    self.assertEqual(state["status"], "prepared")
+                else:
+                    state = self.box.run(prepared["run_id"])
+                    self.assertEqual(state["status"], "completed" if mode == "normal" else "assessment_error", state)
+                    codes = {row["code"] for row in state["errors"]}
+                    if mode == "timeout":
+                        self.assertIn("EVALUATOR_TIMEOUT", codes)
+                    if mode == "io_error":
+                        self.assertIn("EVALUATOR_IO_ERROR", codes)
+                    if mode == "native_timeout":
+                        self.assertIn("NATIVE_EVALUATION_STOPPED", codes)
+                        self.assertIn("EVALUATION_LIMIT", {row.get("native_code") for row in state["errors"]})
+            self.assertTrue(natives, "test did not reach the real native process")
+            self.assertTrue(all(process.returncode is not None for process in launched))
+            deadline = time.monotonic() + 5
+            while True:
+                table = self.processes()
+                remaining = {pid: table[pid] for pid in natives if pid in table and not table[pid][2].startswith("Z")}
+                if not remaining:
+                    break
+                self.assertLess(time.monotonic(), deadline, str(remaining))
+                time.sleep(0.01)
+            self.assertTrue(all(not folder.exists() for folder in directories))
+            self.assertIsNone(unrelated.poll(), "cleanup touched a separately owned process")
+            if mode == "interrupt":
+                self.assertEqual(self.box.run(prepared["run_id"])["status"], "completed")
+        finally:
+            # Failure cleanup stays confined to groups/PIDs this test launched.
+            for process in launched:
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.wait(timeout=5)
+            for pid in natives:
+                row = self.processes().get(pid)
+                if row is not None and not row[2].startswith("Z"):
+                    os.kill(pid, signal.SIGKILL)
+
+    def test_tree_cleanup_after_normal_completion(self):
+        self.exercise_process_tree("normal")
+
+    def test_tree_cleanup_after_interruption_and_resume(self):
+        self.exercise_process_tree("interrupt")
+
+    def test_tree_cleanup_after_inbox_timeout(self):
+        self.exercise_process_tree("timeout")
+
+    def test_tree_cleanup_after_evaluator_leader_exit(self):
+        self.exercise_process_tree("leader_exit")
+
+    def test_tree_cleanup_after_wait_io_failure(self):
+        self.exercise_process_tree("io_error")
+
+    def test_native_deadline_stops_evaluation_tree(self):
+        self.exercise_process_tree("native_timeout")
+
 
 class InboxTests(InboxCase):
     def test_incomplete_then_late_after_reopen_preserves_previous_bytes(self):
@@ -103,6 +245,28 @@ class InboxTests(InboxCase):
         _, report = self.assess()
         self.assertEqual(coverage(report)["A"], "unresolved")
         self.assertEqual(self.box.get(self.box.put(b"{broken")), b"{broken")
+
+    def test_mixed_tool_alias_input_error_is_preserved_after_reopen(self):
+        post = json.loads(self.post)
+        post["result"]["side_effects"][0]["tool_id"] = False
+        raw = encoded(post)
+        original_ref = self.box.put(raw)
+        self.receive(originals={"admission": self.admission, "post": raw})
+        state, report = self.assess()
+        native = next(c["result"]["native_result"] for c in report["native_calls"] if c["kind"] == "receipt")
+        self.assertEqual(native["record_linkage"], "not_assessed")
+        self.assertIsNone(native["core_result"])
+        self.assertEqual(native["linkage_checks_run"], [])
+        self.assertEqual([(i["kind"], i["path"]) for i in native["input_issues"]],
+                         [("semantic_input_invalid", ["result", "side_effects", 0, "tool_id"])])
+        # Operation-level record presence is separate from semantic validity.
+        self.assertEqual(coverage(report)["A"], "present")
+        saved = self.box.get(state["report_ref"])
+        self.box.close()
+        self.box = Inbox(self.folder / "inbox.sqlite3", Engine(ROOT))
+        self.assertEqual(self.box.get(original_ref), raw)
+        self.assertEqual(self.box.get(state["report_ref"]), saved)
+        self.assertEqual(self.box.run(state["run_id"]), self.box.status(state["run_id"]))
 
     def test_duplicate_event_is_idempotent_but_reused_id_is_rejected(self):
         raw = delivery(self.box, self.plan, "same", {"post": self.post})

@@ -4,6 +4,109 @@ This file records dated public changes to the discussion draft.
 
 ## Unreleased
 
+- The reference runner uses the same execution gate for admission reports and
+  post-execution linkage. An invalid attenuation mode or new-permit flag closes
+  the gate, as does a reissue mode paired with a false flag.
+- Reject HTTP verifier policies that would admit a suspended, revoked, or
+  quarantined passport, runtime, or permit. Both AL2 demos verify that each
+  registered ES256 public key they use is on P-256. The status guide documents
+  the three entries needed for verification. The receipt model identifies
+  the operation bytes supplied at issuance and checked by receivers.
+- The Minimal status service can reissue a missing status token from its
+  store and checks each new token against the registered status key before
+  delivery. A signing-key mismatch returns HTTP 500.
+- Limit the HTTP demo's generated scenarios to admission inputs. Its receipt
+  records the evaluation interval, and all validity checks use the decision
+  time. Minimal accepts a completed execution only when its finish time is at
+  or before verification. Both demos retain microsecond precision, honor
+  reissue requests on every status entry, and reject unsupported passport or
+  runtime narrowing.
+- Distinguish a missing or unusable registered public key from an invalid
+  submitted signature. The HTTP demo returns 500 for a verifier key failure,
+  including a signing key that does not match the registered verifier key.
+  Minimal's negative-case command retires its previous summary on each run
+  and exits unsuccessfully if a case misses an expected failure.
+- The [2026-11-18 handoff validation](reference/runtime-handoff-sample/VALIDATION.md)
+  used a package with `SOURCE-MANIFEST.json` SHA-256
+  `147b9e4054eadafa8961e42158bb98acf075a3d57eb67284d1a0918510187211`.
+- Stage complete HTTP and Minimal AL2 demos before replacing an existing
+  generation. Refuse mixed or incomplete output directories and retire
+  previous reports when installing new artifacts. HTTP signing and storage
+  failures return 500.
+- Require a non-empty verifier ID in core admission receipts. Both legacy
+  demos check signed narrowing instructions for an explicit constraints
+  object and require canonical compact JWS segments. Minimal checks the
+  receipt's post-execution phase and the passport's validity throughout the
+  recorded execution.
+- Validate the complete local HTTP verifier policy before serving a request
+  or replacing a generated demo. An invalid policy cannot authorize an
+  operation. A missing generated policy stops startup, and an invalid direct
+  Python policy cannot produce a signed receipt.
+- Check subject and runtime-key bindings against usable identifiers and the
+  registered public key in the HTTP and Minimal AL2 demos. The HTTP verifier
+  also checks the passport assurance vocabulary and the permit's numeric
+  limits, preserves approval-field types, and omits an absent principal from
+  signed receipts.
+- Validate mission-permit action lists and transaction identifiers in the
+  HTTP and Minimal AL2 demos. Require the permit's transaction to match the
+  HTTP request or Minimal receipt, and enforce the HTTP policy's configured
+  permit age limit. Declare that limit as required in the policy schema and
+  validate all three freshness limits as positive integer seconds. Keep
+  rejection reports and denial receipts current, and update the shared
+  Minimal verifier in the current runtime-handoff distribution.
+- Require artifact signing keys to have the expected local trust role in the
+  HTTP and Minimal AL2 demos, including status in all supported delivery modes.
+  Reject empty tool intersections and approval weakening in HTTP attenuation;
+  retain the permit's original approval fields and validate supported effect
+  values. Apply the shared signer checks to the current runtime-handoff copy.
+- Replace earlier Minimal AL2 verification reports on status retrieval,
+  signature, and input failures; read only the selected status delivery and
+  apply the correction to the current runtime-handoff distribution. Keep the
+  HTTP demo's rejection reports current when shared JWS decoding fails, and
+  omit receipts that cannot be built from authenticated, usable inputs.
+  Preserve the rejected input's diagnostic digest for JSON `null` in the A2A adapter.
+- Require the legacy Minimal AL2 demo's complete execution interval to fall
+  within both the runtime and permit validity windows, including their endpoints.
+  Reject receipts that finish before they start or after either expiry, and
+  apply the same correction to the current runtime-handoff distribution.
+- Reject numeric JSON inputs that would lose decimal precision, preserve JSON
+  types in explicit linkage and report-metadata comparisons, and accept
+  permitted digest annotations consistently in receipt reference checks.
+  Align currency schema tokens and durable-store timeout errors with their
+  input contracts. Apply the runner, schema, and worker-cleanup corrections to
+  the standalone runtime-handoff sample with updated provenance and source pins.
+- Change the default Python `VateVerifier.admit` API to require request bytes
+  and original input bytes and return a bound admission. Callers must follow
+  the [API migration guide](reference/request-binding/MIGRATION.md).
+- Add request-binding assessments to conformance reports and optional
+  digest-addressed request-binding artifacts to SUT results. Existing reports
+  without those optional fields remain valid; the AL2 v0.3 profile is retained.
+- Cross-check AL2 verification-context records against the selected request,
+  receipt, runtime, timestamps and evidence results in `run`, `compare` and
+  `verify-bundle`.
+- Add TypeScript JCS digest and ES256 verification helpers, plus the shared
+  `assessRequestBinding` contract. Align A2A metadata timestamps with the Python
+  supported subset, including lowercase `t`/`z` and up to six fractional digits.
+- Reject trailing line breaks in schema hash and amount strings, and validate
+  A2A reference URI syntax and request-phase metadata before artifact access.
+  The case-schema correction changes the current corpus digests; historical
+  releases and submitted results retain their original pins.
+- Preserve JSON booleans during generated-receipt comparison and sum reported
+  decimal amounts without ambient rounding. Clean up native evaluator child
+  processes even after their supervisor exits, reject oversized JCS timeout
+  configuration, and validate the first retained clock after an empty-store
+  migration. Correct the Inbox CLI report-recovery instructions.
+- Add a standalone runtime-handoff and receipt sample and an offline ACS log
+  reader that retains command timestamps and Guardian record order.
+- Add receiving examples for pinned WAR 1.4.3 and 1.4.8, Restoration RB, Border
+  relay, UIBC (including v0.3), and x402 MCP results, with their selected evidence
+  and verification boundaries documented in each example.
+- Add AuthZEN recovery/retry receipt vectors and publish Vaara recipient,
+  persisted OAuth-grant and first-hop revocation reproduction guides.
+- Keep AuthZEN replay and fresh capture bound to their bundled historical
+  runtime when the current runtime-handoff sample changes. Preserve the
+  original vector bytes and source pins, and check the standalone source archive
+  in the dedicated CI workflow.
 - Add optional Python runtime and caller ES256 profiles that bind authenticated
   evidence and delegation grants to purchase admission and dispatch.
 - Add dispatch-time revalidation and local SQLite admission/attempt state,
@@ -12,10 +115,39 @@ This file records dated public changes to the discussion draft.
 - Keep ordinary module imports available without readable source files, report
   lease consumer I/O errors unchanged, and reject durable admissions with stale
   or future evaluation times.
-- Add an opt-in MUSUBI set2 audit/dataset receiving example. It checks the
+- Add persistent macOS Keychain authority signing and supervised HTTPS snapshot
+  retrieval, including coordinated refresh/shutdown and local recovery examples.
+- Add planned local key/program/store migration from pinned commit `6758476`,
+  preserving original receipts, consumed attempts and revision/time floors.
+  History hashing streams the existing digest byte sequence; key confirmation
+  revisions remain below the new live-authority minimum.
+  Migrated stores stay pinned to the exact target program; later program changes
+  require a separately supported transition.
+- Accept schema-permitted annotations on SUT digest descriptors and
+  receipt-internal admission digest descriptors in the ordinary runner. Reject
+  post-execution linkage for an attenuate receipt missing its effective hash.
+- Define the Python [receipt-pair API input contract](reference/vate-verifier-core/LINKAGE.md).
+  Reject malformed linkage inputs and contradictory attenuation, select constraints
+  by admission decision without fallback, and sum reported amounts independently
+  of the caller's decimal settings. Require canonical ASCII decimal strings
+  for amounts and explicit string-or-null tool aliases with defined precedence.
+- Align the core and runner's constraint selection and reject legacy constraint
+  aliases during linkage checks. Restrict timestamp digits to ASCII and document
+  the amount failure-code changes and the limits of linkage success codes.
+- With `tool_allowlist` configured, report malformed tool aliases as
+  `not_assessed`, even when another alias supplies a valid tool. Include the
+  invalid field in input diagnostics before linkage comparison. A valid
+  selected tool outside the allowlist remains `mismatch`.
+
+## v0.6.0
+
+- Added required-records review and persisted Recipient Inbox originals and
+  assessment history, plus a standalone post-admission runtime-key revocation
+  sample. See the [release notes](docs/release-notes/v0.6.0.md).
+- Added an opt-in MUSUBI set2 audit/dataset receiving example. It checks the
   published A/C bytes against selected execution receipts, retains both
   assessments, and preserves missing B evidence and unresolved acceptance.
-- Add the supplementary verification record and portable audit/storage
+- Added the supplementary verification record and portable audit/storage
   regressions to the existing Linux / Python 3.11–3.14 sample CI job.
 
 ## 2026-10-23 — main branch

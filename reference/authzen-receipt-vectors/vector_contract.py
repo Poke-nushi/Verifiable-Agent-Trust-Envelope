@@ -10,8 +10,10 @@ import sys
 import types
 
 ROOT = Path(__file__).resolve().parent
-SAMPLE = ROOT.parent / "runtime-handoff-sample"
 PIN = "f1286390445bb55b92865dc21737e6e0696cee15"
+# Historical vectors and fresh captures in this package use the same fixed
+# runtime. The current sibling sample evolves independently.
+SAMPLE = ROOT.parent / "historical-runtime" / PIN[:8] / "runtime-handoff-sample"
 SOURCE = {
     "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
     "commit": PIN,

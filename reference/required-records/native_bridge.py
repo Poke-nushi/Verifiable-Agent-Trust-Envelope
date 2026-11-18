@@ -20,8 +20,66 @@ from required_records import (Problem, encode, sha, native_error, MIB,
 
 HERE = Path(__file__).resolve().parent
 LOADED_BRIDGE_SHA256, LOADED_BRIDGE_ERROR = capture_loaded_source(Path(__file__), sys._getframe().f_code)
-PIN_SHA = '19bb830e1fbafab4239ee91e8b2c74e80f3c7933d723e4335357e44010b6e28f'
+PIN_SHA = '3c4253a1ba32fd97477138e2965599eaa8d1ca05bb72240e47d2492b87b790d0'
 OUTPUT_CAP = 2*MIB
+CLEANUP_SECONDS = 5
+INBOX_OWNER = 'VATE_INBOX_PROCESS_OWNER'
+INBOX_DIRECTORY = 'VATE_INBOX_PROCESS_DIRECTORY'
+
+
+def stop_owned_process_group(proc):
+    # start_new_session=True makes this PID the group we own. A reaped leader
+    # does not mean its evaluator/crypto descendants have finished.
+    try:
+        os.killpg(proc.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
+    finally:
+        proc.wait(timeout=CLEANUP_SECONDS)
+
+
+def inbox_process_owner():
+    """Accept delegation only in the Inbox's immediate session/group leader."""
+    directory = os.environ.get(INBOX_DIRECTORY)
+    if (os.environ.get(INBOX_OWNER) == str(os.getppid())
+            and os.getpid() == os.getpgrp() == os.getsid(0)
+            and directory and Path(directory).is_absolute()
+            and all(os.environ.get(name) == directory for name in ('TMPDIR', 'TMP', 'TEMP'))):
+        return Path(directory)
+    return None
+
+
+def abort_inbox_group(directory, error):
+    # The Inbox owns this directory and group. Keep a bounded cause before
+    # stopping the whole evaluation, including this process. No later native
+    # call may run after a timed-out/failed call leaves possible descendants.
+    try:
+        with (directory/'native-stop.json').open('xb') as stream:
+            stream.write(encode({'code': 'NATIVE_EVALUATION_STOPPED',
+                'detail': 'stopped the evaluation process group after a native process failure',
+                'native_code': str(error.get('code', 'NATIVE_PROCESS_INTERRUPTED'))[:128]}))
+    except OSError:
+        pass
+    os.killpg(os.getpgrp(), signal.SIGKILL)
+    raise RuntimeError('evaluation group did not stop')
+
+
+def reported_process_error(result):
+    # Native workers can return a well-formed evaluation error (for example an
+    # invalid policy) without a process failure. Preserve those report values.
+    # These codes specifically identify failure of a nested runtime process.
+    error = result.get('error')
+    if type(error) is dict and error.get('code') in (
+            'WORKER_TIMEOUT', 'WORKER_FAILED', 'WORKER_PROTOCOL_ERROR',
+            'VERIFIER_TIMEOUT', 'RECIPIENT_API_ERROR'):
+        return error
+    signatures = result.get('signatures', {})
+    if type(signatures) is dict:
+        for signature in signatures.values():
+            if type(signature) is dict and signature.get('reason') in (
+                    'VERIFIER_TIMEOUT', 'VERIFIER_EXECUTION_ERROR'):
+                return {'code': signature['reason']}
+    return None
 
 
 def verify_composer(expected):
@@ -127,38 +185,65 @@ class Bridge:
         return result, call_id
 
     def _run(self, raw, timeout):
+        owner = inbox_process_owner()
         with tempfile.TemporaryDirectory(prefix='vate-required-native-') as directory:
             folder = Path(directory); inp = folder/'input.json'; inp.write_bytes(raw)
             with (folder/'stdout').open('w+b') as out, (folder/'stderr').open('w+b') as err:
                 proc = None
+                result = native_error('NATIVE_PROCESS_INTERRUPTED', 'native process did not finish')
+                process_error = None
                 try:
+                    # Only the immediate Inbox child receives delegation.
+                    # Descendants cannot accidentally reuse inherited markers.
+                    env = {key: value for key, value in os.environ.items()
+                           if key not in (INBOX_OWNER, INBOX_DIRECTORY)}
+                    env.update(PYTHONDONTWRITEBYTECODE='1', TMPDIR=str(folder),
+                               TMP=str(folder), TEMP=str(folder))
                     proc = subprocess.Popen([sys.executable, '-I', '-B', '-X', 'pycache_prefix='+str(folder/'bytecode'), str(HERE/'native_bridge.py'), str(inp)],
-                        stdin=subprocess.DEVNULL, stdout=out, stderr=err, start_new_session=True,
-                        env={**os.environ, 'PYTHONDONTWRITEBYTECODE':'1',
-                             'TMPDIR':str(folder), 'TMP':str(folder), 'TEMP':str(folder)})
+                        stdin=subprocess.DEVNULL, stdout=out, stderr=err,
+                        start_new_session=owner is None, env=env)
                     end = time.monotonic()+timeout
                     while proc.poll() is None:
                         if time.monotonic() >= end or out.tell() > OUTPUT_CAP or err.tell() > 65536:
-                            os.killpg(proc.pid, signal.SIGKILL); proc.wait()
-                            return native_error('EVALUATION_LIMIT', 'native process time/output limit')
+                            result = native_error('EVALUATION_LIMIT', 'native process time/output limit')
+                            process_error = result['error']
+                            break
                         time.sleep(min(0.01, max(0.001, end-time.monotonic())))
-                    out.seek(0); data = out.read(OUTPUT_CAP+1)
-                    err.seek(0); errors = err.read(65537)
-                    if len(data) > OUTPUT_CAP or len(errors) > 65536:
-                        return native_error('EVALUATION_LIMIT', 'native process output limit')
-                    if proc.returncode != 0 or errors:
-                        return {'invocation': {'status':'error'}, 'error': {'code':'NATIVE_PROCESS_ERROR',
-                            'detail': 'worker failed', 'returncode':proc.returncode,
-                            'stdout_base64':base64.b64encode(data).decode(), 'stderr_base64':base64.b64encode(errors).decode()}}
-                    result = json.loads(data)
-                    if type(result) is not dict:
-                        raise ValueError('native response must be an object')
-                    return result
+                    else:
+                        out.seek(0); data = out.read(OUTPUT_CAP+1)
+                        err.seek(0); errors = err.read(65537)
+                        if len(data) > OUTPUT_CAP or len(errors) > 65536:
+                            result = native_error('EVALUATION_LIMIT', 'native process output limit')
+                            process_error = result['error']
+                        elif proc.returncode != 0 or errors:
+                            result = {'invocation': {'status':'error'}, 'error': {'code':'NATIVE_PROCESS_ERROR',
+                                'detail': 'worker failed', 'returncode':proc.returncode,
+                                'stdout_base64':base64.b64encode(data).decode(), 'stderr_base64':base64.b64encode(errors).decode()}}
+                            process_error = result['error']
+                        else:
+                            result = json.loads(data)
+                            if type(result) is not dict:
+                                raise ValueError('native response must be an object')
+                            process_error = reported_process_error(result)
                 except (OSError, ValueError) as exc:
-                    return native_error('NATIVE_PROCESS_ERROR', str(exc))
+                    result = native_error('NATIVE_PROCESS_ERROR', str(exc))
+                    process_error = result['error']
                 finally:
-                    if proc is not None and proc.poll() is None:
-                        os.killpg(proc.pid, signal.SIGKILL); proc.wait()
+                    if proc is not None:
+                        if owner is not None and (sys.exc_info()[0] is not None or process_error is not None):
+                            abort_inbox_group(owner, process_error or {'code': 'NATIVE_PROCESS_INTERRUPTED'})
+                        try:
+                            if owner is None:
+                                stop_owned_process_group(proc)
+                            else:
+                                # Normal worker completion: the Inbox retains
+                                # group ownership until its final cleanup.
+                                proc.wait(timeout=CLEANUP_SECONDS)
+                        except (OSError, subprocess.TimeoutExpired) as exc:
+                            if owner is not None:
+                                abort_inbox_group(owner, {'code': 'NATIVE_CLEANUP_ERROR'})
+                            result = native_error('NATIVE_CLEANUP_ERROR', str(exc))
+                return result
 
 
 def identities(value):

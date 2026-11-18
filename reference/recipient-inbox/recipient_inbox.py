@@ -26,6 +26,8 @@ MAX_OBJECT = 128 * MIB
 SNAPSHOT_HEADER_RESERVE = 4096
 READ_METADATA_RESERVE = 4 * MIB
 PROCESS_ENV = {"PATH": "/usr/bin:/bin", "LANG": "C", "LC_ALL": "C"}
+EVALUATOR_SECONDS = 90
+CLEANUP_SECONDS = 5
 REF_FIELDS = {"path_base", "path", "media_type", "digest_basis", "digest", "byte_length"}
 
 
@@ -461,19 +463,39 @@ class Inbox:
                     process = None
                     try:
                         process = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=out, stderr=err,
-                            env=PROCESS_ENV, start_new_session=True)
-                        returncode = process.wait(timeout=90)
+                            env={**PROCESS_ENV, "VATE_INBOX_PROCESS_OWNER": str(os.getpid()),
+                                 "VATE_INBOX_PROCESS_DIRECTORY": str(folder),
+                                 "TMPDIR": str(folder), "TMP": str(folder), "TEMP": str(folder)},
+                            start_new_session=True)
+                        returncode = process.wait(timeout=EVALUATOR_SECONDS)
                     except subprocess.TimeoutExpired:
-                        os.killpg(process.pid, signal.SIGKILL); process.wait()
                         errors.append({"code": "EVALUATOR_TIMEOUT", "detail": "stopped this evaluation process group"})
                     except OSError as exc:
                         errors.append({"code": "EVALUATOR_START" if process is None else "EVALUATOR_IO_ERROR", "detail": str(exc)})
-                        if process is not None and process.poll() is None:
-                            os.killpg(process.pid, signal.SIGKILL); process.wait()
-                    except BaseException:
-                        if process is not None and process.poll() is None:
-                            os.killpg(process.pid, signal.SIGKILL); process.wait()
-                        raise
+                    finally:
+                        if process is not None:
+                            # This group contains the reviewer, native workers,
+                            # and their descendants. Clean it on every exit;
+                            # a finished leader does not imply an empty group.
+                            try:
+                                try:
+                                    os.killpg(process.pid, signal.SIGKILL)
+                                except ProcessLookupError:
+                                    pass
+                                returncode = process.wait(timeout=CLEANUP_SECONDS)
+                            except (OSError, subprocess.TimeoutExpired) as exc:
+                                errors.append({"code": "EVALUATOR_CLEANUP", "detail": str(exc)})
+                stop_record = folder / "native-stop.json"
+                if stop_record.exists():
+                    try:
+                        stop = json.loads(read_file(stop_record, 1024))
+                        require(type(stop) is dict and set(stop) == {"code", "detail", "native_code"}
+                                and stop["code"] == "NATIVE_EVALUATION_STOPPED"
+                                and all(type(value) is str for value in stop.values()),
+                                "OUTPUT_ERROR", "invalid native process stop record")
+                        errors.append(stop)
+                    except (OSError, ValueError) as exc:
+                        errors.append({"code": "OUTPUT_ERROR", "detail": "native-stop.json: " + str(exc)})
                 if (folder / "report.json").exists():
                     try:
                         report_raw = read_file(folder / "report.json")

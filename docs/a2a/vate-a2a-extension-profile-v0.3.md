@@ -191,7 +191,7 @@ only a yes/no status.
 Example:
 
 ```text
-requested: transfer USD 10000
+requested: permission to transfer up to USD 10000
 admitted: max USD 500, approval required above USD 100, expires in 10 minutes
 receipt records: original_request_hash, effective_request_hash, evidence_refs,
 policy_snapshot.digest, reason_codes

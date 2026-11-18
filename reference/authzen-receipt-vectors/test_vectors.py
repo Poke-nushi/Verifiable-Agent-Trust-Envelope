@@ -9,7 +9,7 @@ import sys
 import tempfile
 import unittest
 
-from vector_contract import ROOT, SAMPLE, CASES, decode, encode, sha, verify, load_reader
+from vector_contract import ROOT, SAMPLE, PIN, CASES, decode, encode, sha, verify, load_reader
 
 
 class VectorTests(unittest.TestCase):
@@ -240,13 +240,29 @@ class VectorTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "source mismatch"):
             load_reader(sample)
 
-    def test_relocated_cli_with_optimization(self):
+    def test_relocated_cli_uses_fixed_source_without_fallback(self):
         destination = self.work / "relocated"
         shutil.copytree(ROOT, destination / ROOT.name)
-        shutil.copytree(SAMPLE, destination / SAMPLE.name)
-        result = subprocess.run([sys.executable, "-E", "-s", "-S", "-B", "-O",
-                                 str(destination / ROOT.name / "verify.py")],
-                                cwd=self.work, capture_output=True, text=True, timeout=60)
+        archived = destination / "historical-runtime" / PIN[:8] / "runtime-handoff-sample"
+        shutil.copytree(SAMPLE, archived)
+        command = [sys.executable, "-E", "-s", "-S", "-B", "-O",
+                   str(destination / ROOT.name / "verify.py")]
+        # An unrelated current sample must neither be imported nor selected.
+        current = destination / "runtime-handoff-sample"
+        current.mkdir()
+        (current / "SOURCE-MANIFEST.json").write_bytes(b"{}")
+        result = subprocess.run(command, cwd=self.work, capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assertEqual(decode(result.stdout)["status"], "matched")
+        # Even a byte-identical sibling is not an implicit replacement for a
+        # missing historical source. Explicit --sample remains supported.
+        shutil.rmtree(current)
+        archived.rename(current)
+        result = subprocess.run(command, cwd=self.work, capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 2, result.stderr + result.stdout)
+        self.assertEqual(decode(result.stdout)["status"], "error")
+        result = subprocess.run(command + ["--sample", str(current)], cwd=self.work,
+                                capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
         self.assertEqual(decode(result.stdout)["status"], "matched")
 

@@ -1,32 +1,90 @@
 {
+  "upstream_commit": "a872ef1de6c75ba1820d0589ab7baa5e38be4fc2",
   "unchanged_files": {
-    "reference/execution-evidence-demo/admission.py": "40abe60a4ee7e269a579ce22f35186013510ac10c3640642d5cf21cb696117f8",
     "reference/execution-evidence-demo/demo_contract.py": "f23ab66b0731f14cd6c76dd8c6ea9daa50f66c79a9fd050cad93591bb6d703ae",
-    "reference/minimal-al2-demo/trust_envelope_demo.py": "b0c380b04fe4f357e136456055832009ac41723bca2f47bd8a1ad70f18bdda94",
     "reference/post-admission-revocation-sample/sample/contract.py": "6dc9c377bf493f2574074caf4dc4eaba50093b8b300ae73f237ce9d242a825ec",
-    "reference/receipt-linkage-example/SOURCE-PINS.json": "fc2f2757e944fadd25123ec31595b4a428cd4e0d1642c307bc64100c1352c868",
-    "reference/receipt-linkage-example/recipient_example.py": "e91a4c1755a0f264b854c08788dc60e3b8681f111acbcf7b35554d2e8ee322cf",
-    "reference/recipient-assessment/EVALUATOR-SOURCES.json": "d9a0a12e8abd2dfbeef64dc4e5a6bf7bc9219e9e01424cc775d17d22c1fdb3d1",
     "reference/recipient-assessment/_worker.py": "5834df316c2d07c822d1e7f5c3733d61af68e1278c48f0e570199d0954564696",
-    "reference/recipient-assessment/vate_recipient.py": "9d0da7995805cde1266f94da59ba1be3787776835895546884ba0db39d19afa8",
-    "reference/recipient-inbox/recipient_inbox.py": "674bef741737d6fc49b1defc0220dd76e98fa875665680110bcf6a14e93c02e9",
-    "reference/recipient-signature-authority/recipient_trial.py": "c91b6b2ddb9c7199c1193db5934af2e6f1c21c11abea74e9ce585a512210b4d4",
-    "reference/required-records/NATIVE-SOURCES.json": "5f0564b5b67a93456c179b7d5ec3d529b4de20756f34b592018e38e61de5b5bc",
-    "reference/required-records/native_bridge.py": "9f4c7efc4915b298c09e05e226cc956f5331694213fcfd90530ee0930059357d",
     "reference/required-records/required_records.py": "16030be5d7475a667dedcb38d5b18c7ab21313e67a7a7892a0b018be9960f8b9",
     "reference/s3-observation-example/SEAWEEDFS-PIN.json": "816b2c85f129d06afbf66249ba5943e33a67200af65ee7877e92fea30b4f24c9",
     "reference/s3-observation-example/assess_observation.py": "8c46963e62c2fa4eb390b846b6b0208e4c5f3c6eb501e5834a722f08e5058120",
     "reference/s3-observation-example/capture_s3.py": "96386f1ebd734eb163005004536cd553590f6bad79a273d0d2a6fe256f8389c1",
-    "reference/s3-observation-example/contract.py": "4049c8b92ef1709f96abffc5ac7adab2461be1f1aee29347838b766a8335a935",
     "reference/s3-observation-example/native_fixture.py": "23f9a93d7c3799db5f2d616fa3a36fccef36106693d30c079ebb8132d48596d2",
     "reference/s3-observation-example/run_trial.py": "44a13ea835ddaaa18f4e9c1a1a68632880977164eb7b046cd093f3ab1408fa2e",
     "reference/s3-observation-example/sandbox_macos.py": "f45a46632cab83fe0b30e65f7b9665e0135ade7c904be3eb9b3a5e5f455ccb4a",
-    "reference/vate-verifier-core/vate_verifier_core.py": "ead16bebda908187485cf095f71538b23102ec32ea94c6efca0d7e0a44849e84",
-    "registries/evidence-vocabulary.v0.3.json": "df3c49399ea7082a32eb397e951a88b44630bc26624be08041a8040488776814",
-    "schemas/admission-receipt.schema.json": "fc5fc085a741ce1e23e6435c9402f3838eaa701dd363ba84610a8989ad8af7fb",
-    "schemas/admission-request.schema.json": "8b8ce5931df45b17dbe3d85562f031eb69edf19de8317c4c2f49c7c116421ba9",
-    "schemas/post-execution-receipt.schema.json": "3451185169de5deb210a9f3319dd6217fbe6bf6bb0b8b835c9b7e5a874467892",
-    "scripts/vate_conformance.py": "25ca786e5e5e5e6dd3b985dad62154dd0c61673ec9e749b02b41275de9db8054"
+    "registries/evidence-vocabulary.v0.3.json": "df3c49399ea7082a32eb397e951a88b44630bc26624be08041a8040488776814"
   },
-  "upstream_commit": "a872ef1de6c75ba1820d0589ab7baa5e38be4fc2"
+  "patched_files": {
+    "reference/execution-evidence-demo/admission.py": {
+      "upstream_sha256": "40abe60a4ee7e269a579ce22f35186013510ac10c3640642d5cf21cb696117f8",
+      "sha256": "3d06509a5ce3d98fd1ab2971fd30c2f0e7332766586c1d58dbdfb54c64bded58"
+    },
+    "reference/minimal-al2-demo/trust_envelope_demo.py": {
+      "upstream_sha256": "b0c380b04fe4f357e136456055832009ac41723bca2f47bd8a1ad70f18bdda94",
+      "sha256": "4e897da016818acd9b9ec626b9d9a6d5a4bc4eaed28835686e3b6c1b3bd3350e"
+    },
+    "reference/receipt-linkage-example/SOURCE-PINS.json": {
+      "upstream_sha256": "fc2f2757e944fadd25123ec31595b4a428cd4e0d1642c307bc64100c1352c868",
+      "sha256": "6d137e7ae686319336655000c33a331f88e20ad2f8fa8282ab809bed45a22912"
+    },
+    "reference/receipt-linkage-example/recipient_example.py": {
+      "upstream_sha256": "e91a4c1755a0f264b854c08788dc60e3b8681f111acbcf7b35554d2e8ee322cf",
+      "sha256": "6d357e50bdef992c98eb911a8a60f430364a5aadb0e781f10051604b1e1552b3"
+    },
+    "reference/recipient-assessment/EVALUATOR-SOURCES.json": {
+      "upstream_sha256": "d9a0a12e8abd2dfbeef64dc4e5a6bf7bc9219e9e01424cc775d17d22c1fdb3d1",
+      "sha256": "fbf78ae9074f1aeff09baa4d592be5c4b769f5362ffe0f01ddbf7219356644d6"
+    },
+    "reference/recipient-assessment/vate_recipient.py": {
+      "upstream_sha256": "9d0da7995805cde1266f94da59ba1be3787776835895546884ba0db39d19afa8",
+      "sha256": "d5bc65fb9a23862b8a3dd0215a1f326e265876efa968c5730b806e38c549a3c3"
+    },
+    "reference/recipient-inbox/recipient_inbox.py": {
+      "upstream_sha256": "674bef741737d6fc49b1defc0220dd76e98fa875665680110bcf6a14e93c02e9",
+      "sha256": "14e9dab528d0f425fcc0f07dbc73aa5ebb88ea898b3a5a96388b5fc20ea74d6c"
+    },
+    "reference/recipient-signature-authority/recipient_trial.py": {
+      "upstream_sha256": "c91b6b2ddb9c7199c1193db5934af2e6f1c21c11abea74e9ce585a512210b4d4",
+      "sha256": "ea76db480ccf16fd7652213804951f4d72542673bc041f5e879878ecd2b6185f"
+    },
+    "reference/required-records/NATIVE-SOURCES.json": {
+      "upstream_sha256": "5f0564b5b67a93456c179b7d5ec3d529b4de20756f34b592018e38e61de5b5bc",
+      "sha256": "3c4253a1ba32fd97477138e2965599eaa8d1ca05bb72240e47d2492b87b790d0"
+    },
+    "reference/required-records/native_bridge.py": {
+      "upstream_sha256": "9f4c7efc4915b298c09e05e226cc956f5331694213fcfd90530ee0930059357d",
+      "sha256": "53bfd71637d8b81a3c84aa1f658fca754714e7acc676c1b5695291d9bef12a8e"
+    },
+    "reference/s3-observation-example/contract.py": {
+      "upstream_sha256": "4049c8b92ef1709f96abffc5ac7adab2461be1f1aee29347838b766a8335a935",
+      "sha256": "021d4229edcdc55493bd6a87544bd8dcf5e206062331ef0d6f08a7cf6985b225"
+    },
+    "reference/vate-verifier-core/vate_verifier_core.py": {
+      "upstream_sha256": "ead16bebda908187485cf095f71538b23102ec32ea94c6efca0d7e0a44849e84",
+      "sha256": "2ff1e11580ead331dae020a9d4bef910d6ec800c2e590215cee31dd11a6cbe75"
+    },
+    "schemas/admission-receipt.schema.json": {
+      "upstream_sha256": "fc5fc085a741ce1e23e6435c9402f3838eaa701dd363ba84610a8989ad8af7fb",
+      "sha256": "dc4e9c73339a1c597c6bd32b51b10134abe7d18ccfc73685029bdce495f0a135"
+    },
+    "schemas/admission-request.schema.json": {
+      "upstream_sha256": "8b8ce5931df45b17dbe3d85562f031eb69edf19de8317c4c2f49c7c116421ba9",
+      "sha256": "87de454f4160e4c7f40ad23254e54619072173ae0c05e53fb645a1fffa31b182"
+    },
+    "schemas/post-execution-receipt.schema.json": {
+      "upstream_sha256": "3451185169de5deb210a9f3319dd6217fbe6bf6bb0b8b835c9b7e5a874467892",
+      "sha256": "d7da706f44d0be7942080562c273b62a50c178b86f76c7fc26799daf5c1d8ffd"
+    },
+    "scripts/vate_conformance.py": {
+      "upstream_sha256": "25ca786e5e5e5e6dd3b985dad62154dd0c61673ec9e749b02b41275de9db8054",
+      "sha256": "efb5eaf78e6f54256993eccac66e009bd5925dd5c2df39d7c5e80ec8c5587e0e"
+    }
+  },
+  "added_files": {
+    "reference/request-binding/caller_authority.py": "4077530e26c4fa58b127070fa3022ddec2b6f758dc796c0dd3723deb9a6cb3a8",
+    "reference/request-binding/durable_state.py": "4a9622eb23dbd9a9b45735d276a3cf6de8f88e99b143704c03fae243afae36ca",
+    "reference/request-binding/request_binding.py": "4f574258362fff4017206225dafc5e373979982897799c1f649810c9becbd9bc",
+    "reference/request-binding/runner_binding.py": "5018fcce96bd8fa62933cee88cfa57c75ae6cb7404bb0e1ebbb5e6e9bedc6066",
+    "reference/required-records/test_native_bridge.py": "9c9de8b0fa9a11754df489cd0475b88108be524792564dff5905436b612d9f2b",
+    "scripts/runtime_handoff_inventory.json": "158a68c05a9d544e994ba0cbd8cfe1cb6b1d05a6d56c855c2da551f9d5347951"
+  }
 }

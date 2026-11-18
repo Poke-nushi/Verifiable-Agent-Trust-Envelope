@@ -120,8 +120,8 @@ class Es256Backend:
 
     def __init__(self, *, node: str | Path, node_sha256: str,
                  timeout_seconds: float = 10.0):
-        require(type(timeout_seconds) in (int, float) and math.isfinite(timeout_seconds)
-                and 0 < timeout_seconds <= 60
+        require(type(timeout_seconds) in (int, float) and 0 < timeout_seconds <= 60
+                and math.isfinite(timeout_seconds)
                 and type(node_sha256) is str and re.fullmatch(r"[0-9a-f]{64}", node_sha256) is not None,
                 "INVALID_CONFIGURATION")
         try:

@@ -19,8 +19,11 @@ This contract uses that terminology rather than relying on an unnamed
 
 An external verifier should be able to:
 
-1. Load `conformance/al2-vate-v0.3/corpus.json`.
-2. Execute each listed case in its own runtime.
+1. Load the selected corpus's `corpus.json`. Follow each `cases[].path` from
+   the repository root to the full case definition.
+2. Execute the case in the SUT's runtime. The case definition specifies its
+   requirements. When it declares `request_binding.required_contract`, include
+   `request_binding_artifacts` in that case's result.
 3. Emit a SUT result file matching `schemas/sut-result.schema.json`.
 4. Compare that file against the corpus with the reference runner.
 5. Publish the comparison report and, optionally, an implementation report.
@@ -108,15 +111,16 @@ receipt. An independent receipt-generation result should opt into
 `generated-receipts` explicitly.
 
 For a case that requires the [request-binding v1 contract](../../reference/request-binding/CONTRACT.md),
-`request_binding_artifacts` is a separate digest-addressed local manifest of
-the original/effective request and admission wrapper bytes. Both modes check
+`request_binding_artifacts` references a separate local manifest by URI and
+digest. The manifest identifies the original operation, the admission request
+and, when present, the effective operation. Both modes check
 those bytes against the case-selected admission request. Generated mode uses
 the submitted admission receipt; fixture mode uses the corpus receipt. An
 unmet binding requirement fails the case, even if its reported decision matches.
 See the [runner example](../../reference/request-binding/README.md#use-the-ordinary-runner)
 for the manifest format, sample results and bundle verification.
 
-New reports include `request_binding_required` on each case and a separate
+Current conformance reports include `request_binding_required` on each case and a separate
 `request_binding_coverage` summary. Counts of required and satisfied binding
 cases do not follow from the overall pass count. The original 76-case corpus
 has no request-binding requirement. Historical reports without coverage fields
@@ -322,6 +326,18 @@ reference `uri`.
 The case's linkage checks are then rerun against that pair. This permits
 independent identifiers without weakening transaction, runtime,
 effective-request, decision, expiry, or side-effect linkage checks.
+
+Semantic comparison distinguishes JSON booleans from numbers: `false` is not
+`0`, and `true` is not `1`. Integer and fractional representations of the same
+JSON numeric value remain equivalent in this comparison; artifact digests
+still use their declared byte basis. Reported decimal amounts are summed
+exactly, independently of the embedding process's decimal precision settings.
+The runner rejects raw numeric tokens that would lose their decimal value at
+the JSON parsing boundary; see the [numeric input rule](digest-basis.md#current-vate-v03-fixture-json-byte-basis).
+The same type-preserving equality applies to explicit `path_match` checks and
+implementation metadata copied into report bundles. Digest descriptor checks
+compare validated `alg` and `value`; permitted annotations do not change that
+comparison.
 
 Only generated admission and post-execution receipt roles required by the case
 are accepted. Extra or unknown generated artifact keys fail closed. A top-level

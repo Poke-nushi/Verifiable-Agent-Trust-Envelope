@@ -407,6 +407,29 @@ class RequestBindingTests(unittest.TestCase):
         self.assertIn("POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH",
                       self.verifier.validate_post_execution_linkage(self.receipt, post)["reason_codes"])
 
+    def test_post_attenuation_never_falls_back_to_original_hash(self):
+        post = example.synthetic_post(self.receipt)
+        post["execution"]["effective_request_hash"] = self.receipt["request"]["input_hash"]
+        for attenuation in ({}, None):
+            with self.subTest(attenuation=attenuation):
+                receipt = copy.deepcopy(self.receipt)
+                if attenuation is None:
+                    receipt.pop("attenuation")
+                else:
+                    receipt["attenuation"].pop("effective_request_hash")
+                post["admission"]["digest"] = digest(encode(receipt))
+                result = self.verifier.validate_post_execution_linkage(receipt, post)
+                self.assertEqual(result["outcome"], "failed")
+                self.assertIn("POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH", result["reason_codes"])
+
+    def test_post_allow_uses_the_original_hash(self):
+        receipt = decode(self.issue(cap="25.00").receipt)
+        post = example.synthetic_post(receipt)
+        self.assertEqual(self.verifier.validate_post_execution_linkage(receipt, post)["outcome"], "success")
+        post["execution"]["effective_request_hash"] = "sha-256:" + "0" * 64
+        self.assertIn("POST_EXEC_EFFECTIVE_REQUEST_HASH_MISMATCH",
+                      self.verifier.validate_post_execution_linkage(receipt, post)["reason_codes"])
+
     def test_post_receipt_digest(self):
         post = example.synthetic_post(self.receipt)
         post["admission"]["digest"]["value"] = "0" * 64

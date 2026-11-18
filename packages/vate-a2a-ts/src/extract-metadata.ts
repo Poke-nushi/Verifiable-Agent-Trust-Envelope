@@ -1,5 +1,6 @@
 import { Ajv2020, type ErrorObject } from "ajv/dist/2020.js";
 import { readFileSync } from "node:fs";
+import { isIP } from "node:net";
 import { VATE_A2A_EXTENSION_URI, type A2aLikeObject } from "./types.js";
 
 const schemaUrl = new URL(
@@ -14,7 +15,7 @@ const ajv = new Ajv2020({
 });
 
 const rfc3339DateTimePattern =
-  /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(?:Z|([+-])(\d{2}):(\d{2}))$/;
+  /^(\d{4})-(\d{2})-(\d{2})[Tt](\d{2}):(\d{2}):(\d{2})(?:\.\d{1,6})?(?:[Zz]|([+-])(\d{2}):(\d{2}))(?![\s\S])/;
 
 function isLeapYear(year: number): boolean {
   return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
@@ -67,6 +68,7 @@ function isRfc3339DateTime(value: string): boolean {
   ];
   const daysInMonth = daysByMonth[month - 1];
   if (
+    year < 1 ||
     month < 1 ||
     month > 12 ||
     !daysInMonth ||
@@ -89,15 +91,41 @@ function isRfc3339DateTime(value: string): boolean {
 }
 
 function isAbsoluteUri(value: string): boolean {
-  if (!/^[A-Za-z][A-Za-z0-9+.-]*:/.test(value)) {
+  // RFC 3986 generic URI syntax, without WHATWG URL repair/normalization.
+  // Scheme-specific resolution and authority are separate from this format check.
+  if (/[^\x21-\x7e]/.test(value) || /%(?![0-9A-Fa-f]{2})/.test(value)) {
     return false;
   }
-  try {
-    new URL(value);
-    return true;
-  } catch {
+  const parts = /^[A-Za-z][A-Za-z0-9+.-]*:([^?#]*)(?:\?([^#]*))?(?:#([^#]*))?(?![\s\S])/.exec(value);
+  if (!parts) {
     return false;
   }
+  const queryOrFragment = /^[A-Za-z0-9._~!$&'()*+,;=:@%/?-]*(?![\s\S])/;
+  if (![parts[2], parts[3]].every((part) => part === undefined || queryOrFragment.test(part))) {
+    return false;
+  }
+  let path = parts[1] ?? "";
+  if (path.startsWith("//")) {
+    const end = path.indexOf("/", 2);
+    const authority = end < 0 ? path.slice(2) : path.slice(2, end);
+    path = end < 0 ? "" : path.slice(end);
+    const at = authority.indexOf("@");
+    const hostPort = at < 0 ? authority : authority.slice(at + 1);
+    if (at >= 0 && !/^[A-Za-z0-9._~!$&'()*+,;=:%-]*(?![\s\S])/.test(authority.slice(0, at))) {
+      return false;
+    }
+    if (hostPort.startsWith("[")) {
+      const host = /^\[([^\]]+)\](?::[0-9]*)?(?![\s\S])/.exec(hostPort)?.[1];
+      if (!host || host.includes("%") || !(
+        isIP(host) === 6 || /^[vV][0-9A-Fa-f]+\.[A-Za-z0-9._~!$&'()*+,;=:-]+(?![\s\S])/.test(host)
+      )) {
+        return false;
+      }
+    } else if (!/^[A-Za-z0-9._~!$&'()*+,;=%-]*(?::[0-9]*)?(?![\s\S])/.test(hostPort)) {
+      return false;
+    }
+  }
+  return /^[A-Za-z0-9._~!$&'()*+,;=:@%/-]*(?![\s\S])/.test(path);
 }
 
 ajv.addFormat("date-time", {

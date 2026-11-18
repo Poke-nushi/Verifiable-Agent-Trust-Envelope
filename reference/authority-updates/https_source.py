@@ -38,8 +38,8 @@ def validate_source_options(url, timeout_seconds):
     except ValueError:
         valid = False
     need(valid, "AUTHORITY_URL_INVALID")
-    need(type(timeout_seconds) in (int, float) and math.isfinite(timeout_seconds)
-         and 0 < timeout_seconds <= 30, "AUTHORITY_TIMEOUT_INVALID")
+    need(type(timeout_seconds) in (int, float) and 0 < timeout_seconds <= 30
+         and math.isfinite(timeout_seconds), "AUTHORITY_TIMEOUT_INVALID")
 
 
 class HttpsSnapshotSource:

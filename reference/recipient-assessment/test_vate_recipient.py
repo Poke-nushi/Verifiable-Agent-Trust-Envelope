@@ -290,6 +290,32 @@ class RecipientAssessorTests(unittest.TestCase):
         self.assertEqual(empty["inputs"]["post"]["raw_sha256"], hashlib.sha256(b"").hexdigest())
         self.assertEqual(empty["native_result"]["input_issues"][0]["kind"], "invalid_input")
 
+    def test_mixed_tool_alias_input_errors_survive_worker_and_cli(self):
+        for updates, invalid_alias in (({"tool_id": 42}, "tool_id"),
+                                       ({"tool": 0, "tool_id": "demo.create_file_set"}, "tool")):
+            with self.subTest(updates=updates), tempfile.TemporaryDirectory() as directory:
+                post = json.loads(self.post)
+                post["result"]["side_effects"][0].update(updates)
+                raw = encoded(post)
+                result = self.assessor.assess_receipts(self.admission, raw)
+                native = result["native_result"]
+                self.assertEqual(native["record_linkage"], "not_assessed")
+                self.assertIsNone(native["core_result"])
+                self.assertEqual(native["linkage_checks_run"], [])
+                self.assertEqual([(i["kind"], i["path"]) for i in native["input_issues"]],
+                                 [("semantic_input_invalid", ["result", "side_effects", 0, invalid_alias])])
+                self.assertEqual(result["inputs"]["post"]["raw_sha256"], hashlib.sha256(raw).hexdigest())
+                path = Path(directory) / "post.json"
+                path.write_bytes(raw)
+                completed = subprocess.run(
+                    [sys.executable, "-B", str(HERE / "vate_recipient.py"),
+                     "--api-contract", api.API_CONTRACT, "receipts", "--admission",
+                     str(RECEIPTS / "inputs/R17/admission.json"), "--post", str(path)],
+                    capture_output=True, timeout=60)
+                self.assertEqual(completed.returncode, 2, completed.stderr.decode())
+                self.assertEqual(json.loads(completed.stdout)["native_result"], native)
+                self.assertEqual(path.read_bytes(), raw)
+
     def test_unknown_contract_checks_and_bad_api_inputs_do_not_invoke(self):
         with patch.object(api.subprocess, "run") as run:
             self.assert_error("UNKNOWN_API_CONTRACT", api.RecipientAssessor, expected_api_contract="next-api")

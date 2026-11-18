@@ -23,7 +23,11 @@ jobs:
       - uses: actions/setup-python@v7.0.0
         with:
           python-version: ${{ matrix.python }}
-      - name: Replay originals and exercise capture without site packages
+      - name: Replay originals and exercise capture from a source archive
         run: |
+          archive_root=$(mktemp -d)
+          trap 'rm -rf "$archive_root"' EXIT
+          git archive HEAD reference/authzen-receipt-vectors reference/historical-runtime/f1286390 | tar -x -C "$archive_root"
+          cd "$archive_root"
           python -E -s -S -B reference/authzen-receipt-vectors/verify.py
           python -E -s -S -B -m unittest discover -s reference/authzen-receipt-vectors -p 'test_*.py' -v

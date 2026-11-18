@@ -12,6 +12,9 @@ Existing callers should follow the
 
 ## API Shape
 
+Set `verifier_id` to a non-empty string when constructing `VateVerifier`.
+The core writes that identifier to `verifier.id` in each admission receipt.
+
 ```python
 result = verifier.admit(admission_request_bytes, original=original_operation_bytes, now=now)
 ```
@@ -87,6 +90,11 @@ without checking preimages. The file-set and S3 examples use it after their own
 profile checks. It must not be exposed as an admission endpoint. Receipt-pair
 linkage checks remain available through `validate_post_execution_linkage`;
 they do not inspect request preimages.
+The [receipt-pair API contract](LINKAGE.md) defines its direct-call input checks,
+decision-specific constraint selection, failure reasons and result scope.
+Malformed linkage inputs return a failed result, including invalid attenuation
+data and missing identity fields. For original-byte ingestion with receipt-schema
+and semantic diagnostics, use the [Recipient Assessment API](../recipient-assessment/README.md).
 
 Generated receipt timestamps preserve the supplied clock's microsecond precision
 and use UTC. If a request has already expired, its denial receipt records

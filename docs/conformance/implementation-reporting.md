@@ -28,7 +28,7 @@ For a command-first external SUT path, start with:
 - `docs/conformance/external-implementation-call.md`
 - `docs/conformance/external-sut-quickstart.md`
 
-The report has four important blocks:
+The report contains the following fields.
 
 - `implementation` - name, version, language, source, and optional commit or environment
 - `corpus` - corpus name, root, case count, artifact count, digest, and manifest
@@ -39,6 +39,13 @@ The report has four important blocks:
 `case_results[]` is a strict projection of the conformance report cases. It
 includes `case_id`, expected and actual outcome, expected and actual
 `should_execute`, and `pass`.
+
+For request-binding coverage, open the conformance report referenced by
+`conformance_report.uri`. Its `request_binding_coverage.required_cases` and
+`satisfied_cases` counts show how many cases required and satisfied the
+contract. Use `cases[].request_binding_required` to identify those that
+required it. An implementation report's pass count alone does not give
+these figures.
 
 The portable corpus shape is published separately as:
 
@@ -101,7 +108,10 @@ python3 scripts/vate_conformance.py compare \
 ```
 
 The implementation identity is copied from the SUT result file when `compare`
-generates the implementation report.
+generates the implementation report. `verify-bundle` checks the four required
+identity fields and any copied `source`, `commit`, or `environment` against that
+SUT result. Other implementation annotations may be report-specific. For a
+reference run without a SUT result, identity comes from the command-line options.
 
 For external SUT comparisons, the implementation report records the submitted
 SUT result and comparison output. It does not independently prove that the SUT

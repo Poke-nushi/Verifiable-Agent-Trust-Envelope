@@ -1,9 +1,49 @@
 # Validation
 
-The distribution was exercised on 2026-10-26–27 (Japan time) using a fresh ZIP
+## 2026-11-18 validation
+
+On 2026-11-18 (Japan time), a fresh copy outside the repository passed
+117 tests, comprising 52 provider, 39 receiver, 16 distribution, and 10
+native-worker cleanup tests. All six synthetic histories and the CLI chain
+`init → receive → prepare → run → status → export → replay` passed. Replay used
+a moved evidence directory and a separately supplied receiver selection.
+Source files and exported evidence were unchanged by those executions.
+
+| Environment | CPython | SQLite | OpenSSL |
+| --- | --- | --- | --- |
+| Darwin arm64 | 3.14.8 | 3.54.0 | 4.0.3 |
+
+The tested package included the shared helpers and their source pins, including
+the request-binding modules used by the generic core API. The file-set adapter
+uses its own operation/permit binding and provider ticket contract. Boundary
+tests cover numeric precision, JSON type distinctions, exact amount aggregation,
+schema tokens, digest annotations, worker-group cleanup, empty-assessment source
+identity, the canonical shared-source inventory, mandatory export membership,
+replay from verified file snapshots, and structured rejection of malformed
+reference and report containers.
+
+The run used [the shared-source inventory](UPSTREAM-SOURCES.json) with SHA-256
+`8bf7d2c60ef50a98b378323c477610d955799fbd952484ee5bfcbb04a5d20664`.
+For the complete tested package, run this command in the distribution
+directory. Compare its output with the 2026-11-18 handoff entry in the
+[repository changelog](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/blob/main/CHANGELOG.md).
+
+```sh
+python3 -c 'from pathlib import Path; import hashlib; print(hashlib.sha256(Path("SOURCE-MANIFEST.json").read_bytes()).hexdigest())'
+```
+
+The repository's full handoff check also reports this value in
+`source_sha256["SOURCE-MANIFEST.json"]`. The table below records other
+environments exercised on the earlier package.
+
+## Historical source
+
+The package retained at repository commit
+`675847669851070728431fd1ebd1415f57ad411e` was exercised on 2026-10-26–27
+(Japan time) using a fresh ZIP
 extraction outside the VATE repository for each environment. The code, schemas,
-source pins, and dependency lock file in this archive are identical to those
-exercised by the runs below. The final archive's file inventory and hashes were
+source pins, and dependency lock file at that commit are those
+exercised by the runs below. That archive's file inventory and hashes were
 checked after the documentation was finalized.
 
 | Environment | CPython | SQLite | OpenSSL | Provider / receiver / package tests | Scenarios and CLI |
@@ -44,6 +84,7 @@ the extracted distribution folder:
 "$sample_python" -E -s -B sample/test_handoff.py -v
 "$sample_python" -E -s -B inbox/test_bridge.py -v
 "$sample_python" -E -s -B test_distribution.py -v
+"$sample_python" -E -s -B reference/required-records/test_native_bridge.py -v
 ```
 
 Use the README's six-history and individual CLI examples to reproduce the
@@ -57,8 +98,8 @@ receiver tests cover interrupted storage, frozen assessments, uncertain receipt
 times, mismatched identities and projections, source-version changes, empty
 collections, and type-preserving replay comparison.
 
-All four supported Python minor versions were exercised on both macOS and
-Linux as shown above. Windows and non-CPython
+The historical package was exercised on all four targeted Python minor
+versions on both macOS and Linux as shown above. Windows and non-CPython
 interpreters are outside the sample's target range. These are local synthetic
 checks under the provider/OS assumptions in [CONTRACT.md](CONTRACT.md), not an
 external provider deployment or an independent time/ledger proof.

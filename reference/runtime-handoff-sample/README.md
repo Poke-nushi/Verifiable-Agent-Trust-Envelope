@@ -16,8 +16,8 @@ which B can execute and the evidence each result represents.
 Use **CPython 3.11–3.14 on macOS or Linux**, SQLite, POSIX file locks, and the
 `openssl` command on `PATH`. Windows is outside this sample's supported range.
 The receiver uses `jsonschema==4.26.0`; its dependencies are fixed in
-[requirements.lock](requirements.lock). Exact executed checks belong in
-[VALIDATION.md](VALIDATION.md).
+[requirements.lock](requirements.lock). See [VALIDATION.md](VALIDATION.md) for
+the environments and checks that have been run.
 
 From a VATE checkout or repository source archive, copy the complete
 `reference/runtime-handoff-sample/` folder into a new location. For a standalone
@@ -45,8 +45,9 @@ locally without an external provider or network service.
 The final check must return `"status": "ok"`. It verifies the file inventory,
 source hashes, selected dependency versions, and local tools. A supplied
 manifest establishes file consistency, not publisher identity. Unlisted Python
-modules, bytecode, native modules, and symlinks are rejected; extract a fresh
-copy if this check fails.
+modules, bytecode, native modules, and symlinks are rejected. Extract a fresh
+copy if the source inventory or hash check fails. For dependency or local-tool
+failures, correct the environment and repeat the check.
 
 Keep `work_dir` and `sample_python` in the same terminal for the commands below.
 The work directory contains the environment and results, outside the source
@@ -148,6 +149,7 @@ Inbox's source partition are not automatically included in receipt exports.
 "$sample_python" -E -s -B sample/test_handoff.py -v
 "$sample_python" -E -s -B inbox/test_bridge.py -v
 "$sample_python" -E -s -B test_distribution.py -v
+"$sample_python" -E -s -B reference/required-records/test_native_bridge.py -v
 ```
 
 These check provider behavior, receipt integration, and distribution integrity
@@ -158,8 +160,20 @@ runs all six histories through intake, assessment, export, and replay.
 
 [SOURCE-MANIFEST.json](SOURCE-MANIFEST.json) identifies the complete distribution,
 excluding the manifest itself. [UPSTREAM-SOURCES.json](UPSTREAM-SOURCES.json)
-identifies unchanged VATE helpers, evaluator code, schemas, and registry files
-from commit `a872ef1de6c75ba1820d0589ab7baa5e38be4fc2`.
+identifies unchanged, updated, and added helpers relative to commit
+`a872ef1de6c75ba1820d0589ab7baa5e38be4fc2`. Shared helpers are complete copies of
+the current repository files, including their selected source pins. The
+repository checker rejects differences between those sources and this package.
+The shared file set and historical source hashes are fixed in
+[runtime_handoff_inventory.json](scripts/runtime_handoff_inventory.json), which
+the repository checker also compares with its repository-owned original.
+The file-set adapter validates its operation and permit before using the
+core's policy primitive; the generic bound-admission API remains specific to
+the purchase-cap profile.
+
+The selected source identity changes when helpers change. Start new work
+with a fresh source folder and store; recover an existing job with its original
+source and runtime as described in [CONTRACT.md](CONTRACT.md).
 The shared evaluator's fixed inventory includes S3 helper sources; this demo
 uses local file-set receipts and does not connect to S3.
 

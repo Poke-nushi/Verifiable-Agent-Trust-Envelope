@@ -1,5 +1,7 @@
 # Fixed Historical Replay
 
+## Saved S3 captures and recipient vectors
+
 Replay the saved S3 captures and original recipient vectors with the source
 identity they recorded. The `e845a6a8/` snapshot contains 107 unchanged files:
 the required runtime, receipt expectations and fixed vector inputs from
@@ -38,3 +40,18 @@ provenance lists original hashes and changed source/manifest/policy fields.
 Those derivatives exercise current code, not a new storage operation.
 The [receipt checker](../receipt-linkage-example/README.md#diagnostic-limits)
 describes current diagnostic limits.
+
+## AuthZEN recovery and retry vectors
+
+`f1286390/runtime-handoff-sample/` contains the complete, unchanged distribution
+from commit `f1286390445bb55b92865dc21737e6e0696cee15`. Its original
+`SOURCE-MANIFEST.json` identifies every payload file. The
+[AuthZEN comparison package](../authzen-receipt-vectors/README.md) checks that
+manifest against its fixed SHA-256 before loading the runtime.
+
+The package's replay and fresh-capture commands select this snapshot directly.
+Keep the snapshot alongside the package in the documented directory layout;
+no Git history or download is required. The saved vectors and their source
+declaration retain their original bytes. This snapshot is for those fixed
+comparison cases; use the [current runtime-handoff sample](../runtime-handoff-sample/README.md)
+for new integrations.
