@@ -13,11 +13,12 @@ import copy
 import hashlib
 import importlib.util
 import json
+import math
 import re
 import sys
 from contextlib import contextmanager
 from datetime import datetime, timezone
-from decimal import Decimal, InvalidOperation
+from decimal import Context, Decimal, DivisionByZero, InvalidOperation, Overflow, ROUND_HALF_EVEN, localcontext
 from functools import lru_cache
 from pathlib import Path
 from threading import RLock
@@ -39,13 +40,15 @@ del _source
 EXECUTABLE_ADMISSION_DECISIONS = {"allow", "attenuate"}
 SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 PROFILE_HASH_RE = re.compile(r"^sha-256:[0-9a-f]{64}$")
+CANONICAL_MONEY_VALUE_RE = re.compile(r"(0|[1-9][0-9]*)(\.[0-9]+)?")
+EFFECT_TOOL_ALIASES = ("tool", "tool_id", "name")
 # Match the reference runner's supported timestamp form without truncating
 # sub-microsecond values through datetime.fromisoformat.
 RFC3339_TIMESTAMP_RE = re.compile(
-    r"^\d{4}-\d{2}-\d{2}[Tt]"
-    r"(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d"
-    r"(?:\.\d{1,6})?"
-    r"(?:[Zz]|[+-](?:[01]\d|2[0-3]):[0-5]\d)$"
+    r"^[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt]"
+    r"(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]"
+    r"(?:\.[0-9]{1,6})?"
+    r"(?:[Zz]|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])$"
 )
 MAX_AMOUNT_TEXT_LENGTH = 64
 MAX_AMOUNT_INTEGER_DIGITS = 18
@@ -108,7 +111,7 @@ def parse_time(value: str) -> datetime:
         normalized = normalized[:-1] + "+00:00"
     # Python 3.10 accepts only 3 or 6 fractional digits. Pad the parser input
     # without changing the instant or the receipt's original timestamp text.
-    normalized = re.sub(r"\.(\d{1,6})", lambda part: "." + part.group(1).ljust(6, "0"), normalized)
+    normalized = re.sub(r"\.([0-9]{1,6})", lambda part: "." + part.group(1).ljust(6, "0"), normalized)
     return datetime.fromisoformat(normalized)
 
 
@@ -156,6 +159,39 @@ def is_digest_descriptor(value: Any) -> bool:
     )
 
 
+def _is_json_value(value: Any) -> bool:
+    """Check built-in JSON values without recursing or accepting object hooks."""
+    pending = [(value, False)]
+    ancestors: set[int] = set()
+    while pending:
+        current, leaving = pending.pop()
+        if leaving:
+            ancestors.remove(id(current))
+        elif type(current) in (dict, list):
+            if id(current) in ancestors:
+                return False
+            if type(current) is dict and any(type(key) is not str for key in current):
+                return False
+            ancestors.add(id(current))
+            pending.append((current, True))
+            children = current.values() if type(current) is dict else current
+            pending.extend((child, False) for child in children)
+        elif type(current) is float:
+            if not math.isfinite(current):
+                return False
+        elif current is not None and type(current) not in (str, int, bool):
+            return False
+    return True
+
+
+def _is_json_object(value: Any) -> bool:
+    return type(value) is dict and _is_json_value(value)
+
+
+def _same_nonempty_string(left: Any, right: Any) -> bool:
+    return isinstance(left, str) and bool(left) and isinstance(right, str) and left == right
+
+
 def safe_parse_time(value: Any) -> datetime | None:
     if not isinstance(value, str):
         return None
@@ -168,7 +204,10 @@ def safe_parse_time(value: Any) -> datetime | None:
 def safe_decimal_amount(value: Any) -> Decimal | None:
     if isinstance(value, bool):
         return None
-    amount_text = str(value)
+    try:
+        amount_text = str(value)
+    except (TypeError, ValueError):
+        return None
     if len(amount_text) > MAX_AMOUNT_TEXT_LENGTH:
         return None
     try:
@@ -238,12 +277,64 @@ def evidence_refs_failure_reason(request_obj: dict[str, Any], raw_evidence_refs:
     return "schema-invalid evidence reference"
 
 
+def _valid_linkage_amount(value: Any) -> bool:
+    return (
+        isinstance(value, dict)
+        and isinstance(value.get("currency"), str)
+        and re.fullmatch(r"[A-Z]{3}", value["currency"]) is not None
+        and type(value.get("value")) in (str, int, float)
+        and (not isinstance(value["value"], str)
+             or CANONICAL_MONEY_VALUE_RE.fullmatch(value["value"]) is not None)
+        and safe_decimal_amount(value["value"]) is not None
+    )
+
+
+def _valid_linkage_constraints(constraints: Any) -> bool:
+    if not isinstance(constraints, dict):
+        return False
+    if any(legacy in constraints for legacy in ("max_amount_usd", "resource")):
+        return False  # Issued receipts must use canonical names, not input aliases.
+    if "max_amount" in constraints and not _valid_linkage_amount(constraints["max_amount"]):
+        return False
+    if "tool_allowlist" in constraints:
+        tools = constraints["tool_allowlist"]
+        if not isinstance(tools, list) or not all(isinstance(tool, str) and tool for tool in tools):
+            return False
+    return True
+
+
+def _selected_effect_tool(effect: dict[str, Any]) -> str | None:
+    for name in EFFECT_TOOL_ALIASES:
+        value = effect.get(name)
+        if isinstance(value, str) and value != "":
+            return value
+    return None
+
+
+def _valid_linkage_observations(side_effects: Any, constraints: dict[str, Any]) -> bool:
+    if not isinstance(side_effects, list) or not all(isinstance(effect, dict) for effect in side_effects):
+        return False
+    for effect in side_effects:
+        if "max_amount" in constraints and "amount" in effect and not _valid_linkage_amount(effect["amount"]):
+            return False
+        if "tool_allowlist" in constraints and any(name in effect for name in EFFECT_TOOL_ALIASES):
+            # Validate every supplied alias, including lower-priority ones.
+            # Only null and empty strings are skipped when selecting a tool.
+            if any(effect[name] is not None and not isinstance(effect[name], str)
+                   for name in EFFECT_TOOL_ALIASES if name in effect):
+                return False
+            if _selected_effect_tool(effect) is None:
+                return False
+    return True
+
+
 def side_effects_exceed_constraints(
     side_effects: Any,
     effective_constraints: Any,
 ) -> bool:
-    if not isinstance(side_effects, list) or not isinstance(effective_constraints, dict):
-        return False
+    if (not _valid_linkage_constraints(effective_constraints)
+            or not _valid_linkage_observations(side_effects, effective_constraints)):
+        return True
 
     max_amount = effective_constraints.get("max_amount")
     if isinstance(max_amount, dict):
@@ -251,44 +342,65 @@ def side_effects_exceed_constraints(
         max_currency = max_amount.get("currency")
         if max_value is None or not isinstance(max_currency, str):
             return True
-        total_amount = Decimal("0")
-        for effect in side_effects:
-            if not isinstance(effect, dict):
-                continue
-            amount = effect.get("amount")
-            if not isinstance(amount, dict):
-                continue
-            actual_value = safe_decimal_amount(amount.get("value"))
-            actual_currency = amount.get("currency")
-            if actual_value is None or not isinstance(actual_currency, str):
-                return True
-            if actual_currency != max_currency:
-                return True
-            total_amount += actual_value
-            if total_amount > max_value:
-                return True
+        # Every accepted value has at most 18 integer and 8 fractional digits.
+        # A running total is checked after each addition, so this fresh context
+        # is exact even if the embedding application changes decimal defaults.
+        # Explicitly set every context field: omitted settings would inherit
+        # mutable process-wide DefaultContext values.
+        amount_context = Context(
+            prec=MAX_AMOUNT_INTEGER_DIGITS + MAX_AMOUNT_FRACTIONAL_DIGITS + 2,
+            rounding=ROUND_HALF_EVEN, Emin=-999999, Emax=999999,
+            capitals=1, clamp=0, flags=[], traps=[InvalidOperation, DivisionByZero, Overflow],
+        )
+        with localcontext(amount_context):
+            total_amount = Decimal("0")
+            for effect in side_effects:
+                amount = effect.get("amount")
+                if amount is None:
+                    continue  # Absence does not establish complete observation.
+                actual_value = safe_decimal_amount(amount.get("value"))
+                if actual_value is None or amount.get("currency") != max_currency:
+                    return True
+                total_amount += actual_value
+                if total_amount > max_value:
+                    return True
 
     tool_allowlist = effective_constraints.get("tool_allowlist")
     if isinstance(tool_allowlist, list):
-        allowed_tools = {str(tool) for tool in tool_allowlist}
+        allowed_tools = set(tool_allowlist)
         for effect in side_effects:
-            if not isinstance(effect, dict):
-                continue
-            tool = effect.get("tool") or effect.get("tool_id") or effect.get("name")
-            if tool is not None and str(tool) not in allowed_tools:
+            tool = _selected_effect_tool(effect)
+            if tool is not None and tool not in allowed_tools:
                 return True
 
     return False
 
 
 def admitted_effective_constraints(admission_receipt: dict[str, Any]) -> dict[str, Any]:
-    attenuation_constraints = admission_receipt.get("attenuation", {}).get("effective_constraints")
-    if isinstance(attenuation_constraints, dict):
-        return attenuation_constraints
-    request_constraints = admission_receipt.get("request", {}).get("constraints")
-    if isinstance(request_constraints, dict):
-        return request_constraints
-    return {}
+    """Select one decision's constraint basis; malformed bases are not empty."""
+    if not isinstance(admission_receipt, dict):
+        raise ValueError("admission receipt must be an object")
+    decision = admission_receipt.get("decision")
+    request = admission_receipt.get("request")
+    if not isinstance(decision, dict) or not isinstance(request, dict):
+        raise ValueError("admission decision and request must be objects")
+    if "constraints" in request and not isinstance(request["constraints"], dict):
+        raise ValueError("request constraints must be an object when present")
+    outcome = decision.get("outcome")
+    if outcome == "attenuate":
+        attenuation = admission_receipt.get("attenuation")
+        if not isinstance(attenuation, dict):
+            raise ValueError("attenuate requires an attenuation object")
+        constraints = attenuation.get("effective_constraints")
+        if not isinstance(constraints, dict) or not constraints:
+            raise ValueError("attenuate requires nonempty effective constraints")
+    elif outcome in ("allow", "deny"):
+        if "attenuation" in admission_receipt:
+            raise ValueError("only attenuate may contain attenuation")
+        constraints = request.get("constraints", {})
+    else:
+        raise ValueError("unknown admission decision")
+    return constraints
 
 
 def get_amount(request: dict[str, Any]) -> tuple[str, Decimal] | None:
@@ -383,6 +495,16 @@ class VateVerifier:
         self._seen_request_ids: set[str] = set()
         self._replay_lock = RLock()
         self._replay_transaction_state: dict[str, Any] | None = None
+
+    @property
+    def verifier_id(self) -> str:
+        return self._verifier_id
+
+    @verifier_id.setter
+    def verifier_id(self, value: str) -> None:
+        if not isinstance(value, str) or not value:
+            raise ValueError("verifier_id must be a non-empty string")
+        self._verifier_id = value
 
     @contextmanager
     def _replay_transaction(self, request_id: str) -> Iterator[None]:
@@ -480,10 +602,11 @@ class VateVerifier:
 
     def validate_post_execution_linkage(
         self,
-        admission_receipt: dict[str, Any],
+        admission_receipt: Any,
         post_execution_receipt: Any,
     ) -> dict[str, Any]:
-        if not isinstance(admission_receipt, dict) or not isinstance(post_execution_receipt, dict):
+        """Check the LINKAGE.md input contract; invalid data returns failed."""
+        if not _is_json_object(admission_receipt) or not _is_json_object(post_execution_receipt):
             return {
                 "outcome": "failed",
                 "reason_codes": ["POST_EXEC_LINKAGE_MISMATCH"],
@@ -491,28 +614,39 @@ class VateVerifier:
         admission = post_execution_receipt.get("admission")
         execution = post_execution_receipt.get("execution")
         result = post_execution_receipt.get("result")
-        if not isinstance(admission, dict) or not isinstance(execution, dict) or not isinstance(result, dict):
+        decision = admission_receipt.get("decision")
+        request = admission_receipt.get("request")
+        subject = admission_receipt.get("subject")
+        if (not all(isinstance(block, dict) for block in (admission, execution, result, decision, request, subject))
+                or not isinstance(decision.get("outcome"), str)
+                or not isinstance(admission.get("decision"), str)):
             return {
                 "outcome": "failed",
                 "reason_codes": ["POST_EXEC_LINKAGE_MISMATCH"],
             }
 
         failures: list[str] = []
-        expected_hash = admission_receipt.get("attenuation", {}).get(
-            "effective_request_hash",
-            admission_receipt.get("request", {}).get("input_hash"),
-        )
-        if admission.get("receipt_id") != admission_receipt.get("receipt_id"):
+        receipt_decision = decision["outcome"]
+        attenuation = admission_receipt.get("attenuation")
+        if not isinstance(attenuation, dict):
+            attenuation = {}
+        if receipt_decision == "attenuate":
+            mode = attenuation.get("mode")
+            if (mode not in ("narrow", "require_new_permit", "deny_if_not_accepted")
+                    or type(attenuation.get("require_new_permit")) is not bool):
+                failures.append("POST_EXEC_LINKAGE_MISMATCH")
+        expected_hash = (attenuation.get("effective_request_hash") if receipt_decision == "attenuate"
+                         else request.get("input_hash"))
+        if not _same_nonempty_string(admission.get("receipt_id"), admission_receipt.get("receipt_id")):
             failures.append("POST_EXEC_LINKAGE_MISMATCH")
 
         if not self.validate_digest(admission_receipt, admission.get("digest", {})):
             failures.append("POST_EXEC_ADMISSION_DIGEST_MISMATCH")
 
-        receipt_decision = admission_receipt.get("decision", {}).get("outcome")
         post_decision = admission.get("decision")
         requires_new_permit = (
             receipt_decision == "attenuate"
-            and admission_receipt.get("attenuation", {}).get("require_new_permit") is True
+            and (attenuation.get("require_new_permit") is True or attenuation.get("mode") == "require_new_permit")
         )
         if (
             receipt_decision not in EXECUTABLE_ADMISSION_DECISIONS
@@ -523,10 +657,10 @@ class VateVerifier:
         elif post_decision != receipt_decision:
             failures.append("POST_EXEC_LINKAGE_MISMATCH")
 
-        if execution.get("transaction_id") != admission_receipt.get("request", {}).get("transaction_id"):
+        if not _same_nonempty_string(execution.get("transaction_id"), request.get("transaction_id")):
             failures.append("POST_EXEC_TRANSACTION_MISMATCH")
 
-        if execution.get("runtime") != admission_receipt.get("subject", {}).get("runtime"):
+        if not _same_nonempty_string(execution.get("runtime"), subject.get("runtime")):
             failures.append("POST_EXEC_RUNTIME_MISMATCH")
 
         execution_hash = execution.get("effective_request_hash")
@@ -553,12 +687,16 @@ class VateVerifier:
         ):
             failures.append("POST_EXEC_ADMISSION_EXPIRED")
 
-        effective_constraints = admitted_effective_constraints(admission_receipt)
+        try:
+            effective_constraints = admitted_effective_constraints(admission_receipt)
+        except ValueError:
+            effective_constraints = None
         side_effects = result.get("side_effects")
         policy_violations = result.get("policy_violations")
         if (
-            not isinstance(side_effects, list)
-            or not all(isinstance(effect, dict) for effect in side_effects)
+            effective_constraints is None
+            or not _valid_linkage_constraints(effective_constraints)
+            or not _valid_linkage_observations(side_effects, effective_constraints)
             or not isinstance(policy_violations, list)
             or not all(isinstance(violation, str) and violation for violation in policy_violations)
         ):
@@ -587,12 +725,15 @@ class VateVerifier:
             ],
         }
 
-    def validate_digest(self, artifact: dict[str, Any], digest: dict[str, str]) -> bool:
-        if not isinstance(digest, dict):
+    def validate_digest(self, artifact: Any, digest: Any) -> bool:
+        # Digest validity is independent of the consumer's required root shape.
+        if not is_digest_descriptor(digest) or not _is_json_value(artifact):
             return False
-        if digest.get("alg") != "sha-256":
+        try:
+            actual = hashlib.sha256(canonical_bytes(artifact)).hexdigest()
+        except (TypeError, ValueError, RecursionError):
             return False
-        return hashlib.sha256(canonical_bytes(artifact)).hexdigest() == digest.get("value")
+        return actual == digest["value"]
 
     def is_trusted(self, *, issuer_id: str, kid: str, evidence_type: str) -> bool:
         for issuer in self.trust_bundle.get("issuers", []):

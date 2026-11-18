@@ -1,0 +1,12 @@
+{
+  "release": "4.48",
+  "commit": "530be3e37337488ecc34d58441e0bc476e121c93",
+  "source_url": "https://github.com/seaweedfs/seaweedfs/releases/download/4.48/darwin_arm64.tar.gz",
+  "archive_size": 42699632,
+  "archive_sha256": "faa194e72a346755dc4404288b0561eb3c260351702901d8363024d5099bdd7d",
+  "binary_size": 141196642,
+  "binary_sha256": "1e836167ed1882c0acac670b753b436edd8303834139ea2bdc80b400446119c9",
+  "platform": "darwin-arm64",
+  "upstream": "https://github.com/seaweedfs/seaweedfs",
+  "license": "Apache-2.0"
+}

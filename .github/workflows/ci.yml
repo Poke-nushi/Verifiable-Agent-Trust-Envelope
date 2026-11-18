@@ -13,6 +13,49 @@ permissions:
   contents: read
 
 jobs:
+  planned-migration:
+    name: Planned migration (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.11", "3.12", "3.14"]
+        include:
+          - os: macos-15
+            python: "3.14"
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+          check-latest: true
+
+      - name: Prepare Python standard-library bytecode
+        run: python -B scripts/prepare_ci_stdlib.py
+
+      - name: Set up Node.js for signed fixture evidence
+        uses: actions/setup-node@v7.0.0
+        with:
+          node-version: "22"
+
+      - name: Prepare the supported planned-migration source
+        shell: bash
+        run: |
+          migration_source="$(mktemp -d)"
+          git fetch --no-tags --depth=1 origin 675847669851070728431fd1ebd1415f57ad411e
+          git archive 675847669851070728431fd1ebd1415f57ad411e | tar -x -C "$migration_source"
+          echo "VATE_MIGRATION_BASELINE=$migration_source" >> "$GITHUB_ENV"
+
+      - name: Check planned migration and interrupted transactions
+        run: python -B -m unittest discover -s reference/planned-migration -p 'test_*.py' -v
+
   execution-evidence:
     name: Execution evidence (${{ matrix.os }}, Python ${{ matrix.python }})
     runs-on: ${{ matrix.os }}
@@ -389,8 +432,28 @@ jobs:
           git archive HEAD:reference/runtime-handoff-sample | tar -x -C "$archive_dir"
           python -E -s -B scripts/check_runtime_handoff_sample.py --sample-root "$archive_dir"
 
+  npm-review:
+    name: Development dependency review
+    runs-on: ubuntu-latest
+    permissions: {}
+    timeout-minutes: 2
+    outputs:
+      active: ${{ steps.review.outputs.active }}
+    steps:
+      # This job has no checkout. Project code receives only the review outcome.
+      - id: review
+        name: Check maintainer review
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          REVIEW_UNTIL: ${{ secrets.VATE_PICOMATCH_REVIEW_EXPIRY }}
+        run: |
+          if [[ "$REVIEW_UNTIL" =~ ^[1-9][0-9]{9}$ ]] && (( $(date -u +%s) < REVIEW_UNTIL )); then
+            echo 'active=true' >> "$GITHUB_OUTPUT"
+          fi
+
   validate:
     name: Repository checks
+    needs: npm-review
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -475,7 +538,13 @@ jobs:
           npm run ts:check
           npm run ts:test
           node --test reference/border-receiving-cli/test_receive.mjs
-          npm audit --audit-level=moderate
+
+      - name: Audit full and production npm dependencies
+        env:
+          VATE_REVIEWED_NPM_TREE: ${{ needs.npm-review.outputs.active == 'true' && vars.VATE_PICOMATCH_REVIEW_TREE || '' }}
+        run: |
+          python -B -m unittest discover -s scripts -p test_check_npm_audit.py -v
+          python -B scripts/check_npm_audit.py
 
       - name: Check whitespace
         env:
@@ -495,12 +564,13 @@ jobs:
   ci-complete:
     name: CI complete
     if: ${{ always() }}
-    needs: [execution-evidence, execution-evidence-archive, musubi-receiving, post-admission-revocation, runtime-handoff, validate]
+    needs: [planned-migration, execution-evidence, execution-evidence-archive, musubi-receiving, post-admission-revocation, runtime-handoff, validate]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
       - name: Require every test group to succeed
         env:
+          MIGRATION_RESULT: ${{ needs.planned-migration.result }}
           CHECKOUT_RESULT: ${{ needs.execution-evidence.result }}
           ARCHIVE_RESULT: ${{ needs.execution-evidence-archive.result }}
           REPOSITORY_RESULT: ${{ needs.validate.result }}
@@ -508,6 +578,7 @@ jobs:
           REVOCATION_RESULT: ${{ needs.post-admission-revocation.result }}
           HANDOFF_RESULT: ${{ needs.runtime-handoff.result }}
         run: |
+          test "$MIGRATION_RESULT" = success
           test "$CHECKOUT_RESULT" = success
           test "$ARCHIVE_RESULT" = success
           test "$REPOSITORY_RESULT" = success

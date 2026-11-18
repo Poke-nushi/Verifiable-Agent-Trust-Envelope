@@ -19,10 +19,11 @@ In the reference demo:
 
 The JSON Schemas in `schemas/` validate the decoded payloads, not the compact token representation.
 
-For the future JOSE/JCS production proof verification boundary, see
-`docs/profiles/vate-proof-profile-jose-jcs-v0.2.md`. The reference demo and the
-current v0.3 corpus remain dependency-free fixture checks and do not claim production
-cryptographic signature verification.
+The Minimal and HTTP demos use the local `openssl` executable to sign and
+verify compact JWS artifacts against their demo trust bundle. The Python
+v0.3 corpus runner checks committed fixtures using the standard library.
+The [JOSE/JCS proof profile](profiles/vate-proof-profile-jose-jcs-v0.2.md)
+describes the separate production proof boundary.
 
 ## Compact JWS In The Demo
 
@@ -79,7 +80,7 @@ The demo service exposes:
 - `GET /status/passport/{id}`
 - `GET /status/runtime/{id}`
 - `GET /status/permit/{id}`
-  return signed per-object status entries
+  return one signed status entry for the requested object
 
 ## Status Payload Shapes
 
@@ -90,10 +91,20 @@ The service emits three related payload types before JWS packaging:
 - `asn-event-0.1`
   push event carrying current status entries
 - `asn-entry-0.1`
-  per-object pull entry
+  a single passport, runtime, or permit entry for individual lookup
 
-The verifier normalizes them to a common `entries` structure before applying the trust envelope checks.
-When a permit is `attenuated`, the normalized entry may also carry an `effect` object that narrows allowable execution.
+The verifier requires the passport, runtime, and permit entries together in
+one signed snapshot or event. In pull mode it fetches `/status/bundle`. The
+stapled snapshot and push event each carry the same three entries. Individual
+lookups are available for inspection. The verifier does not assemble them.
+For each delivery, the service reads the status store and checks the new
+signature against its registered status public key before returning the token.
+Every `attenuated` entry requires an `effect` object containing `mode: narrow`,
+a `constraints` object, and a boolean `require_new_permit`. Both demos stop
+when any entry requires a new permit or when a passport or runtime is narrowed.
+They also stop if an entry supplies narrowing constraints without the
+`attenuated` state.
+The HTTP demo applies supported permit constraints to the admission decision.
 
 ## What This Still Does Not Solve
 

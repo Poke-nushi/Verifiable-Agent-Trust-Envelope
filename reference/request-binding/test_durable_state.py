@@ -78,6 +78,22 @@ def process_worker(directory, anchor, key, mode, marker, ready, start, results):
 
 
 class DurableStateTests(unittest.TestCase):
+    def test_invalid_timeout_is_structured_before_creation_or_reopen(self):
+        before = {p.name: p.read_bytes() for p in self.directory.iterdir() if p.is_file()}
+        for value in (10**1000, -(10**1000), 0, 31, float("nan"), float("inf"), -float("inf"), True, None):
+            with self.subTest(type=type(value).__name__):
+                new = self.directory.parent / "invalid-timeout"
+                with self.assertRaises(s.StateError) as created:
+                    s.DurableStateStore.create(new, scope="test", verifier_id="test", timeout=value)
+                self.assertEqual(created.exception.cause, "STATE_CONFIGURATION_INVALID")
+                self.assertFalse(new.exists())
+                with self.assertRaises(s.StateError) as reopened:
+                    s.DurableStateStore(self.directory, expected_anchor=self.store.anchor, timeout=value)
+                self.assertEqual(reopened.exception.cause, "STATE_CONFIGURATION_INVALID")
+        self.assertEqual(before, {p.name: p.read_bytes() for p in self.directory.iterdir() if p.is_file()})
+        for value in (0.01, 2, 30):
+            s.DurableStateStore(self.directory, expected_anchor=self.store.anchor, timeout=value)
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)

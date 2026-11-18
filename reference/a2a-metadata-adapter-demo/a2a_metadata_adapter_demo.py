@@ -12,8 +12,12 @@ import stat
 import sys
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "reference/runtime-support"))
+from vate_uri import is_absolute_uri
+
 EXTENSION_URI = "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/a2a/admission/v0.3"
 CORE = ROOT / "reference" / "vate-verifier-core" / "vate_verifier_core.py"
 TASK_MESSAGE = ROOT / "reference" / "a2a-metadata-adapter-demo" / "task-message.example.json"
@@ -23,6 +27,8 @@ SAFE_PROFILE_HASH = "sha-256:" + ("0" * 64)
 SAFE_DIGEST = {"alg": "sha-256", "value": "0" * 64}
 INLINE_A2A_TASK_MESSAGE_URI = "inline:a2a-task-message"
 INLINE_A2A_METADATA_URI = "inline:a2a-metadata"
+# JSON null is a supplied input, distinct from an omitted failure source.
+_SOURCE_NOT_PROVIDED = object()
 
 
 def load_core():
@@ -98,26 +104,62 @@ def is_digest_descriptor(value: Any) -> bool:
     )
 
 
+def extension_area_failures(value: Any, label: str) -> list[str]:
+    if not isinstance(value, dict):
+        return [f"{label} must be an object"]
+    if any(not isinstance(key, str) or not (
+        re.fullmatch(r"x_[A-Za-z0-9_.-]+", key) or is_absolute_uri(key)
+    ) for key in value):
+        return [f"{label} keys must be URI strings or x_ names"]
+    return []
+
+
 def artifact_reference_failures(
     value: Any,
     *,
     label: str,
-    expected_type: str,
-    expected_media_type: str,
+    expected_type: str | None = None,
+    expected_media_type: str | None = None,
+    evidence: bool = False,
 ) -> list[str]:
     failures: list[str] = []
     if not isinstance(value, dict):
         return [f"{label} must be an object"]
-    if value.get("type") != expected_type:
-        failures.append(f"{label}.type must be {expected_type}")
+    allowed = {"type", "uri", "media_type", "digest"}
+    if evidence:
+        allowed |= {"signature_profile", "extensions", "annotations"}
+    if set(value) - allowed:
+        failures.append(f"{label} contains unknown fields")
+    if not isinstance(value.get("type"), str) or not value["type"] or (
+        expected_type is not None and value["type"] != expected_type
+    ):
+        failures.append(f"{label}.type must be {expected_type or 'a non-empty string'}")
     uri = value.get("uri")
-    if not isinstance(uri, str) or not uri:
-        failures.append(f"{label}.uri must be a non-empty string")
+    if not is_absolute_uri(uri):
+        failures.append(f"{label}.uri must be a URI with a scheme")
     media_type = value.get("media_type")
-    if media_type != expected_media_type:
-        failures.append(f"{label}.media_type must be {expected_media_type}")
-    if not is_digest_descriptor(value.get("digest")):
+    if not isinstance(media_type, str) or not media_type or (
+        expected_media_type is not None and media_type != expected_media_type
+    ):
+        failures.append(f"{label}.media_type must be {expected_media_type or 'a non-empty string'}")
+    if not is_digest_descriptor(value.get("digest")) or set(value["digest"]) != {"alg", "value"}:
         failures.append(f"{label}.digest must be a sha-256 lowercase hex digest descriptor")
+    if evidence:
+        if "extensions" in value:
+            failures.extend(extension_area_failures(value["extensions"], f"{label}.extensions"))
+        if "annotations" in value and not isinstance(value["annotations"], dict):
+            failures.append(f"{label}.annotations must be an object")
+        if "signature_profile" in value:
+            profile = value["signature_profile"]
+            if not isinstance(profile, dict) or set(profile) != {"format", "canonicalization", "required_headers"}:
+                failures.append(f"{label}.signature_profile has an invalid shape")
+            else:
+                headers = profile["required_headers"]
+                if any(not isinstance(profile[key], str) or not profile[key] for key in ("format", "canonicalization")) or (
+                    not isinstance(headers, list) or not headers or
+                    any(not isinstance(header, str) or not header for header in headers)
+                ):
+                    failures.append(f"{label}.signature_profile contains invalid values")
     return failures
 
 
@@ -125,15 +167,39 @@ def admission_requested_metadata_failures(metadata: Any) -> list[str]:
     failures: list[str] = []
     if not isinstance(metadata, dict):
         return ["metadata extension must be an object"]
+    allowed = {"profile", "phase", "transaction_id", "assurance_level", "decision", "admission_request",
+               "admission_receipt", "post_execution_receipt", "policy_snapshot", "evidence_refs",
+               "issuer", "issued_at", "expires_at", "extensions", "annotations"}
+    if set(metadata) - allowed:
+        failures.append("metadata extension contains unknown core fields")
     if metadata.get("profile") != PROFILE:
         failures.append("profile must be VATE-AL2-Verifier-Admission-v0.3")
     if metadata.get("phase") != "admission_requested":
         failures.append("phase must be admission_requested")
     if metadata.get("assurance_level") != "AL2":
         failures.append("assurance_level must be AL2")
-    for field in ("transaction_id", "issuer", "issued_at"):
+    for field in ("transaction_id", "issuer"):
         if not isinstance(metadata.get(field), str) or not metadata.get(field):
             failures.append(f"{field} must be a non-empty string")
+    for field in ("issued_at", "expires_at"):
+        if field == "issued_at" or field in metadata:
+            if core.safe_parse_time(metadata.get(field)) is None:
+                failures.append(f"{field} must be a supported RFC 3339 timestamp")
+    if "decision" in metadata and metadata["decision"] not in ("allow", "attenuate", "deny"):
+        failures.append("decision must be allow, attenuate, or deny")
+    for field in ("admission_receipt", "post_execution_receipt", "policy_snapshot"):
+        if field in metadata:
+            failures.extend(artifact_reference_failures(metadata[field], label=field))
+    if "evidence_refs" in metadata:
+        if not isinstance(metadata["evidence_refs"], list):
+            failures.append("evidence_refs must be an array")
+        else:
+            for index, reference in enumerate(metadata["evidence_refs"]):
+                failures.extend(artifact_reference_failures(reference, label=f"evidence_refs[{index}]", evidence=True))
+    if "extensions" in metadata:
+        failures.extend(extension_area_failures(metadata["extensions"], "extensions"))
+    if "annotations" in metadata and not isinstance(metadata["annotations"], dict):
+        failures.append("annotations must be an object")
     failures.extend(
         artifact_reference_failures(
             metadata.get("admission_request"),
@@ -180,12 +246,12 @@ def make_schema_invalid_receipt(
     metadata: Any,
     failure_reason: str,
     *,
-    source_artifact: Any | None = None,
+    source_artifact: Any = _SOURCE_NOT_PROVIDED,
 ) -> dict[str, Any]:
     receipt_id = "admrec-schema-invalid-" + core.safe_digest_value(
         {
             "failure_reason": failure_reason,
-            "source": source_artifact if source_artifact is not None else metadata,
+            "source": source_artifact if source_artifact is not _SOURCE_NOT_PROVIDED else metadata,
         }
     )
     return make_fail_closed_receipt(
@@ -201,7 +267,7 @@ def make_schema_invalid_decision(
     metadata: Any,
     failure_reason: str,
     *,
-    source_artifact: Any | None = None,
+    source_artifact: Any = _SOURCE_NOT_PROVIDED,
     source_uri: str | None = None,
 ) -> dict[str, Any]:
     decision = {
@@ -213,7 +279,7 @@ def make_schema_invalid_decision(
             source_artifact=source_artifact,
         ),
     }
-    if source_artifact is not None:
+    if source_artifact is not _SOURCE_NOT_PROVIDED:
         decision["demo_local_failure_source"] = make_demo_local_failure_source(
             source_artifact,
             source_uri=source_uri,
@@ -252,11 +318,11 @@ def make_fail_closed_receipt(
     receipt_id: str,
     reason_codes: list[str],
     failure_reason: str,
-    source_artifact: Any | None = None,
+    source_artifact: Any = _SOURCE_NOT_PROVIDED,
 ) -> dict[str, Any]:
     issued_at = "2026-05-04T03:00:30Z"
     reference = metadata.get("admission_request", {}) if isinstance(metadata, dict) else {}
-    if source_artifact is not None:
+    if source_artifact is not _SOURCE_NOT_PROVIDED:
         # Demo-local source binding lives on the A2A response envelope, not in
         # the admission receipt schema contract.
         evidence_items = []
@@ -313,6 +379,12 @@ def make_fail_closed_receipt(
     return receipt
 
 
+def generated_receipt_uri(receipt_type: str, receipt_id: str) -> str:
+    """Illustrative reference: preserve the ID as one UTF-8 URI path segment."""
+    directory = {"admission": "admission-receipts", "post_execution": "post-execution-receipts"}[receipt_type]
+    return "local:generated/" + directory + "/" + quote(receipt_id, safe="") + ".json"
+
+
 def build_post_execution_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
     effective_hash = receipt.get("attenuation", {}).get(
         "effective_request_hash",
@@ -330,7 +402,7 @@ def build_post_execution_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
         },
         "admission": {
             "receipt_id": receipt["receipt_id"],
-            "uri": "local:generated/admission-receipts/" + receipt["receipt_id"] + ".json",
+            "uri": generated_receipt_uri("admission", receipt["receipt_id"]),
             "digest": {
                 "alg": "sha-256",
                 "value": core.canonical_hash(receipt).removeprefix("sha-256:"),
@@ -385,7 +457,7 @@ def make_task_response(
                 "decision": decision["decision"],
                 "admission_receipt": {
                     "type": "admission_receipt",
-                    "uri": "local:generated/admission-receipts/" + receipt["receipt_id"] + ".json",
+                    "uri": generated_receipt_uri("admission", receipt["receipt_id"]),
                     "media_type": "application/vate-admission-receipt+json",
                     "digest": {
                         "alg": "sha-256",
@@ -413,9 +485,7 @@ def make_task_response(
                 "admission_receipt": response["metadata"][EXTENSION_URI]["admission_receipt"],
                 "post_execution_receipt": {
                     "type": "post_execution_receipt",
-                    "uri": "local:generated/post-execution-receipts/"
-                    + post_execution_receipt["receipt_id"]
-                    + ".json",
+                    "uri": generated_receipt_uri("post_execution", post_execution_receipt["receipt_id"]),
                     "media_type": "application/vate-post-execution-receipt+json",
                     "digest": {
                         "alg": "sha-256",

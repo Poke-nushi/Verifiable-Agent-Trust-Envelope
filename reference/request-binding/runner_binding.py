@@ -12,7 +12,7 @@ import re
 import stat
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 HERE = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location("vate_binding_runner_contract", HERE / "request_binding.py")
@@ -35,26 +35,44 @@ def read_raw(path: Path) -> bytes:
     return raw
 
 
-def load_manifest(path: Path, expected_digest: dict | None = None) -> dict[str, bytes]:
+def matches_digest(raw: bytes, expected: object) -> bool:
+    # SUT digest descriptors permit annotations; only alg/value bind the bytes.
+    return binding.matches_digest(raw, expected)
+
+
+def manifest_entries(path: Path, expected_digest: dict | None = None) -> Iterator[dict[str, Any]]:
+    """Yield validated local member references in their evaluation order.
+
+    The corpus collector uses the same member path contract as the loader.
+    Yielding entries preserves the loader's validation/read ordering, including
+    the prefix already consumed when a later entry is invalid.
+    """
     raw = read_raw(path)
     if expected_digest is not None:
-        binding.need(binding.digest(raw) == expected_digest, "MANIFEST_DIGEST_MISMATCH")
+        binding.need(matches_digest(raw, expected_digest), "MANIFEST_DIGEST_MISMATCH")
     manifest = binding.decode(raw)
     binding.exact(manifest, {"contract", "artifacts"})
     binding.need(manifest["contract"] == MANIFEST_CONTRACT, "UNSUPPORTED_ARTIFACT_MANIFEST")
     entries = manifest["artifacts"]
     binding.need(type(entries) is list and 0 < len(entries) <= 16, "SCHEMA_INVALID")
-    result = {}
+    seen: set[str] = set()
     for entry in entries:
         binding.exact(entry, {"uri", "media_type", "digest", "path"})
         ref = {key: entry[key] for key in ("uri", "media_type", "digest")}
         binding.validate_reference(ref)
         binding.need(isinstance(entry["path"], str) and FILE_RE.fullmatch(entry["path"]) is not None,
                      "UNSAFE_ARTIFACT_PATH")
-        binding.need(ref["uri"] not in result, "DUPLICATE_ARTIFACT_URI")
+        binding.need(ref["uri"] not in seen, "DUPLICATE_ARTIFACT_URI")
+        seen.add(ref["uri"])
+        yield entry
+
+
+def load_manifest(path: Path, expected_digest: dict | None = None) -> dict[str, bytes]:
+    result = {}
+    for entry in manifest_entries(path, expected_digest):
         content = read_raw(path.parent / entry["path"])
-        binding.need(binding.digest(content) == ref["digest"], "ARTIFACT_DIGEST_MISMATCH")
-        result[ref["uri"]] = content
+        binding.need(binding.matches_digest(content, entry["digest"]), "ARTIFACT_DIGEST_MISMATCH")
+        result[entry["uri"]] = content
     return result
 
 
@@ -62,7 +80,7 @@ def assess(*, required_contract: str, receipt_path: Path, admission_path: Path, 
            receipt_digest: dict | None = None, manifest_digest: dict | None = None) -> dict[str, Any]:
     receipt = read_raw(receipt_path)
     if receipt_digest is not None:
-        binding.need(binding.digest(receipt) == receipt_digest, "RECEIPT_DIGEST_MISMATCH")
+        binding.need(matches_digest(receipt, receipt_digest), "RECEIPT_DIGEST_MISMATCH")
     admission = read_raw(admission_path)
     artifacts = load_manifest(manifest_path, manifest_digest)
     report = binding.assess_request_binding(receipt, artifacts, required_contract=required_contract,

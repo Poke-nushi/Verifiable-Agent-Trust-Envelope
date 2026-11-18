@@ -50,6 +50,15 @@ expected outcomes, reason codes, required artifacts, and the `2026-09` exchange
 contract remain unchanged. Existing results remain tied to their recorded
 commit and digest; do not replace those pins with the current digest.
 
+The `v0.7.0` AL2 corpus keeps those 76 cases and 217 manifest artifacts
+with digest
+`sha-256:1bd35f100ccc6584ddfdf59122ba377606dbe929b219099f0fa1008b6aa0f5f1`.
+Its case schema rejects trailing line breaks in digest strings. That schema is
+part of the raw-file manifest, so the correction changes the corpus digest
+without changing case IDs, expected outcomes, the AL2 profile, or the `2026-09`
+artifact line. The separate request-binding corpus has digest
+`sha-256:48859e14eb7d61c0fc14b038562cd2965dcfb993752210309348ef6d3b0ebe93`.
+
 ## Historical `2026-07` Validation Lane
 
 The `2026-07` line remains the historical contract for the archived v0.3.2

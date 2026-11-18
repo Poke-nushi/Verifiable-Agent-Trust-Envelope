@@ -206,14 +206,14 @@
       "properties": {
         "currency": {
           "type": "string",
-          "pattern": "^[A-Z]{3}$"
+          "pattern": "^[A-Z]{3}(?![\\s\\S])"
         },
         "value": {
           "description": "Review artifacts SHOULD emit a canonical decimal string. JSON numbers are accepted only for input compatibility and must be normalized before stable receipt emission.",
           "anyOf": [
             {
               "type": "string",
-              "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+              "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?(?![\\s\\S])"
             },
             {
               "type": "number",

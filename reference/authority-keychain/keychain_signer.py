@@ -50,8 +50,8 @@ class KeychainSigner:
                and type(helper_sha256) is str and re.fullmatch(r"[0-9a-f]{64}", helper_sha256)
                and type(application_tag) is str
                and re.fullmatch(r"[A-Za-z0-9._:-]{1,128}", application_tag)
-               and type(timeout_seconds) in (int, float) and math.isfinite(timeout_seconds)
-               and 0 < timeout_seconds <= 10, "KEYCHAIN_SIGNER_CONFIGURATION_INVALID")
+               and type(timeout_seconds) in (int, float) and 0 < timeout_seconds <= 10
+               and math.isfinite(timeout_seconds), "KEYCHAIN_SIGNER_CONFIGURATION_INVALID")
         selection.descriptor()
         try:
             selected_helper, selected_keychain = Path(helper), Path(keychain)

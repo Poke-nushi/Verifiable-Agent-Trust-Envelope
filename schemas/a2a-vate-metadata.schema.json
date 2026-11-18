@@ -82,7 +82,7 @@
             "format": "uri"
           },
           {
-            "pattern": "^x_[A-Za-z0-9_.-]+$"
+            "pattern": "^x_[A-Za-z0-9_.-]+(?![\\s\\S])"
           }
         ]
       },
@@ -187,6 +187,8 @@
             "value": {
               "type": "string",
               "description": "Digest value. For the v0.3 AL2 conformance corpus, use lowercase SHA-256 hexadecimal.",
+              "minLength": 64,
+              "maxLength": 64,
               "pattern": "^[a-f0-9]{64}$"
             }
           },
@@ -269,7 +271,7 @@
             "format": "uri"
           },
           {
-            "pattern": "^x_[A-Za-z0-9_.-]+$"
+            "pattern": "^x_[A-Za-z0-9_.-]+(?![\\s\\S])"
           }
         ]
       },

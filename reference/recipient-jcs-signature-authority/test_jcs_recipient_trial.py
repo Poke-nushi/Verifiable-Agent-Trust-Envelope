@@ -207,7 +207,7 @@ class JcsTrialTests(unittest.TestCase):
     def test_explicit_contract_and_runtime_pin(self):
         self.assert_error("UNKNOWN_CONTRACT", self.fixtures.assessor, expected_contract="other")
         self.assert_error("VERIFIER_CHANGED", self.fixtures.assessor, node_sha256="0" * 64)
-        for timeout in (0, -1, True, math.nan, math.inf, 61):
+        for timeout in (0, -1, True, math.nan, math.inf, 61, 10**1000, -(10**1000)):
             self.assert_error("INVALID_CONFIGURATION", self.fixtures.assessor, timeout_seconds=timeout)
         self.assert_error("INVALID_CONFIGURATION", self.fixtures.assessor, node="node")
         with patch.object(trial, "file_sha", side_effect=OSError("unreadable runtime")):

@@ -83,6 +83,13 @@ when a replacement OAuth token is active. A newer token issuance may require a
 new caller proof; it does not automatically preserve a pending operation's
 authority.
 
+For the selected [planned migration](../planned-migration/CONTRACT.md), retain
+this registration and its selected scope. Reopen the migrated issuer ledger
+under the explicitly selected new root and revision minimum. The first new
+publication MUST repeat introspection and the selected model/permission reads;
+it MUST NOT re-sign a cached old permit. Pending admissions require fresh,
+request-bound proofs under the new installed configuration.
+
 The next revision MUST be greater than the last accepted revision and at least
 the selected minimum. The signer MUST return the exact constructed payload.
 Before publication, the issuer store MUST verify its selected ES256 signature,

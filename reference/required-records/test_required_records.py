@@ -94,6 +94,26 @@ class RequiredRecords(unittest.TestCase):
         self.assertEqual((self.f.folder/'history/review-1.json').read_bytes(),old)
         self.assertEqual((self.f.folder/'history/report-1.json').read_bytes(),report)
 
+    def test_revision_can_reevaluate_a_selected_report_with_source_error(self):
+        self.setup_pair()
+        with patch('native_bridge.source_identity', side_effect=Problem('SOURCE_MISMATCH', 'synthetic source unavailable')):
+            before = self.assess()
+        self.assertEqual(before['review_set_status'], 'selected')
+        self.assertTrue(before['invocation_errors'])
+        old_raw = (self.f.folder/'review-set.json').read_bytes()
+        old_ref = self.f.store(old_raw, 'history/review-1.json')
+        report_raw = encode(before)
+        report_ref = self.f.store(report_raw, 'history/report-1.json')
+        self.f.review.update(revision=2, previous_review_set_ref=old_ref,
+                             previous_report_ref=report_ref, revision_basis_ref=self.f.basis)
+        after = self.assess()
+        self.assertEqual(after['review_set_status'], 'selected')
+        self.assertFalse(after['invocation_errors'])
+        self.assertEqual(after['previous']['previous_report_ref'], report_ref)
+        self.assertEqual((self.f.folder/'history/review-1.json').read_bytes(), old_raw)
+        self.assertEqual((self.f.folder/'history/report-1.json').read_bytes(), report_raw)
+        self.assertTrue(decode(report_raw)['invocation_errors'])
+
     def test_RR11_sender_note_cannot_cancel(self):
         self.f.row(); self.f.store(b'Sender says cancelled', 'sender-note.txt')
         self.assertEqual(self.coverage(self.assess()),{'A':'missing'})

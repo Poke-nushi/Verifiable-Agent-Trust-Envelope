@@ -20,6 +20,10 @@ This backend is optional: applications can supply another Keychain, KMS or HSM
 signing callback without changing VATE's snapshot format. This implementation
 does not establish hardware-backed custody or production readiness.
 
+The [planned migration path](../planned-migration/README.md) uses a distinct new
+key while retaining the old key and operation history. It is separate from
+ordinary same-key publisher restart.
+
 ## Prepare an issuing host
 
 Use an existing macOS Swift compiler with Security and CryptoKit, and the

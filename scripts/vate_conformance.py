@@ -21,7 +21,7 @@ import re
 import shlex
 import sys
 from datetime import datetime, timezone
-from decimal import Decimal, InvalidOperation
+from decimal import Context, Decimal, Inexact, InvalidOperation, MAX_EMAX, MIN_EMIN, ROUND_HALF_EVEN
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterator
@@ -52,13 +52,14 @@ SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 PROFILE_HASH_RE = re.compile(r"^sha-256:[0-9a-f]{64}$")
 CANONICAL_MONEY_VALUE_RE = re.compile(r"^(0|[1-9][0-9]*)(\.[0-9]+)?$")
 RFC3339_TIMESTAMP_RE = re.compile(
-    r"^\d{4}-\d{2}-\d{2}[Tt]"
-    r"(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d"
-    r"(?:\.\d{1,6})?"
-    r"(?:[Zz]|[+-](?:[01]\d|2[0-3]):[0-5]\d)$"
+    r"^[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt]"
+    r"(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]"
+    r"(?:\.[0-9]{1,6})?"
+    r"(?:[Zz]|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])$"
 )
 EVIDENCE_VOCABULARY_PATH = ROOT / "registries" / "evidence-vocabulary.v0.3.json"
 TERMINAL_REASON_CODES = {"FAIL_CLOSED", "POLICY_MATCH"}
+ATTENUATION_MODES = ("narrow", "require_new_permit", "deny_if_not_accepted")
 PAIRING_REQUIRED_FIELDS = (
     "pair_id",
     "role",
@@ -91,6 +92,16 @@ def parse_finite_json_float(value: str) -> float:
     parsed = float(value)
     if not math.isfinite(parsed):
         raise ValueError(f"non-finite JSON number {value} is not allowed")
+    # Keep the existing fixture serialization basis, but never compare a
+    # rounded input token as if it were the submitted numeric value. Ordinary
+    # decimals such as 0.1 and equivalent exponent/trailing-zero forms remain
+    # supported. Decimal construction and equality do not use context precision.
+    try:
+        exact = Decimal(value, context=Context(traps=[InvalidOperation]))
+    except InvalidOperation:
+        raise ValueError("JSON number exceeds the supported decimal range") from None
+    if exact != Decimal(str(parsed)):
+        raise ValueError(f"JSON number {value} loses decimal precision; use a decimal string where supported")
     return parsed
 
 
@@ -794,7 +805,7 @@ def parse_time(value: str) -> datetime:
         normalized = normalized[:-1] + "+00:00"
     # Python 3.10 accepts only 3 or 6 fractional digits. Pad the parser input
     # without changing the instant or the receipt's original timestamp text.
-    normalized = re.sub(r"\.(\d{1,6})", lambda part: "." + part.group(1).ljust(6, "0"), normalized)
+    normalized = re.sub(r"\.([0-9]{1,6})", lambda part: "." + part.group(1).ljust(6, "0"), normalized)
     return datetime.fromisoformat(normalized)
 
 
@@ -923,6 +934,12 @@ def load_artifact(case: dict[str, Any], key: str) -> dict[str, Any] | None:
 
 
 def referenced_paths(case: dict[str, Any]) -> tuple[list[Path], list[str]]:
+    """Collect declared files and the file selectors consumed by case checks.
+
+    Do not recursively collect arbitrary ``artifact``, ``path`` or ``uri``
+    strings: most such fields select JSON values or describe external evidence.
+    Case aliases and direct paths use the evaluator's one-step resolver.
+    """
     paths: list[Path] = []
     failures: list[str] = []
 
@@ -938,28 +955,80 @@ def referenced_paths(case: dict[str, Any]) -> tuple[list[Path], list[str]]:
     for key, value in case_artifacts(case).items():
         if isinstance(value, str):
             add_reference(key, f"artifacts.{key}")
-    for index, check in enumerate(case.get("integrity_checks", [])):
-        add_reference(
-            check.get("artifact") if isinstance(check, dict) else None,
-            f"integrity_checks[{index}].artifact",
-        )
-    for index, check in enumerate(case.get("trust_checks", [])):
-        add_reference(
-            check.get("trust_bundle") if isinstance(check, dict) else None,
-            f"trust_checks[{index}].trust_bundle",
-        )
-    for index, check in enumerate(case.get("jose_checks", [])):
-        if not isinstance(check, dict):
-            failures.append(f"jose_checks[{index}]: expected object")
-            continue
-        for key in ("proof_package", "detached_payload", "trust_bundle"):
-            if key in check:
-                add_reference(check.get(key), f"jose_checks[{index}].{key}")
+    check_reference_fields = {
+        "integrity_checks": ("artifact",),
+        "trust_checks": ("trust_bundle",),
+        "jose_checks": ("proof_package", "detached_payload", "trust_bundle"),
+        "policy_snapshot_checks": ("artifact",),
+        "artifact_reference_checks": ("artifact",),
+        "attenuation_checks": ("artifact",),
+        "al2_context_checks": ("artifact",),
+    }
+    for collection, fields in check_reference_fields.items():
+        for index, check in enumerate(case.get(collection, [])):
+            for field in fields:
+                add_reference(
+                    check.get(field) if isinstance(check, dict) else None,
+                    f"{collection}[{index}].{field}",
+                )
+    for index, check in enumerate(case.get("linkage_checks", [])):
+        # Other linkage kinds use the already loaded receipt objects; their
+        # optional annotation fields are not file selectors.
+        if isinstance(check, dict) and check.get("kind") == "admission_digest":
+            add_reference(
+                check.get("artifact", "admission_receipt"),
+                f"linkage_checks[{index}].artifact",
+            )
+
+    # Policy snapshot preflight reads these named source slots (including the
+    # default) with read_case_artifact. Artifact-reference checks instead use
+    # the registered receipt/request/metadata objects already collected above.
     for index, check in enumerate(case.get("policy_snapshot_checks", [])):
-        add_reference(
-            check.get("artifact") if isinstance(check, dict) else None,
-            f"policy_snapshot_checks[{index}].artifact",
+        if not isinstance(check, dict):
+            continue
+        references = check.get(
+            "reference_paths", [{"artifact": "admission_receipt"}]
         )
+        if not isinstance(references, list):
+            continue
+        for reference_index, reference in enumerate(references):
+            add_reference(
+                reference.get("artifact") if isinstance(reference, dict) else None,
+                f"policy_snapshot_checks[{index}].reference_paths[{reference_index}].artifact",
+            )
+
+    # sut_inputs (including a replay context's consume_key_basis) must select
+    # registered string aliases, so all of those inputs are included above.
+    if "request_binding" in case:
+        member_paths, member_failures = request_binding_referenced_paths(case)
+        paths.extend(member_paths)
+        failures.extend(member_failures)
+    return paths, failures
+
+
+def request_binding_referenced_paths(
+    case: dict[str, Any],
+) -> tuple[list[Path], list[str]]:
+    """Include local preimages read through the selected binding manifest."""
+    paths: list[Path] = []
+    failures: list[str] = []
+    manifest_reference = case_artifacts(case).get("request_binding_manifest")
+    if not isinstance(manifest_reference, str) or not manifest_reference:
+        return [], ["request_binding_manifest: requires artifacts.request_binding_manifest"]
+    try:
+        manifest_path = resolve_artifact_path(case, "request_binding_manifest")
+        adapter = request_binding_support()
+        for entry in adapter.manifest_entries(manifest_path):
+            # Match load_manifest: resolve the member beside the path used to
+            # open the manifest, before corpus_manifest normalizes/deduplicates.
+            member_path = manifest_path.parent / entry["path"]
+            # Preserve the adapter's bounded regular-file / no-symlink read.
+            # Digest correspondence remains an evaluation check; the manifest
+            # must bind changed bytes even when that check fails.
+            adapter.read_raw(member_path)
+            paths.append(member_path)
+    except (OSError, ValueError, TypeError) as exc:
+        failures.append(f"request_binding_manifest: invalid local artifact manifest ({exc})")
     return paths, failures
 
 
@@ -1018,11 +1087,27 @@ def corpus_manifest(
     paths: set[Path] = set()
     failures: set[str] = set()
 
-    def add_manifest_path(path: Path) -> None:
-        resolved = path.resolve()
-        if resolved == corpus_index_path:
+    def add_manifest_path(path: Path, *, case_input: bool = False) -> None:
+        try:
+            resolved = path.resolve()
+        except (OSError, ValueError, RuntimeError) as exc:
+            failures.add(
+                "corpus manifest artifact path could not be resolved: "
+                f"{path.as_posix()!r} ({type(exc).__name__})"
+            )
             return
-        if not resolved.is_file():
+        if resolved == corpus_index_path:
+            if case_input:
+                failures.add(
+                    "corpus index cannot be used as a case artifact: "
+                    f"{display_path(resolved)} (self-referential digest)"
+                )
+            return
+        try:
+            regular_file = resolved.is_file()
+        except (OSError, ValueError):
+            regular_file = False
+        if not regular_file:
             failures.add(
                 "corpus manifest artifact is not a readable regular file: "
                 f"{display_path(resolved)}"
@@ -1039,7 +1124,7 @@ def corpus_manifest(
         failures.update(reference_failures)
         failures.update(policy_snapshot_reference_contract_failures(case))
         for path in case_paths:
-            add_manifest_path(path)
+            add_manifest_path(path, case_input=True)
 
     manifest: list[dict[str, str]] = []
     for path in sorted(paths, key=display_path):
@@ -1297,6 +1382,18 @@ def decimal_amount_failures(value: Any, *, label: str) -> list[str]:
     return []
 
 
+def add_decimal_amounts_exact(left: Decimal, right: Decimal) -> Decimal:
+    """Add validated non-negative amounts without inheriting decimal settings."""
+    # Retain the finest decimal place and every integer digit, plus a carry.
+    # Explicit settings also isolate this operation from mutated DefaultContext.
+    scale = min(left.as_tuple().exponent, right.as_tuple().exponent)
+    precision = max(left.adjusted(), right.adjusted(), 0) - scale + 2
+    context = Context(prec=precision, rounding=ROUND_HALF_EVEN,
+                      Emin=MIN_EMIN, Emax=MAX_EMAX, capitals=1, clamp=0,
+                      flags=[], traps=[InvalidOperation, Inexact])
+    return context.add(left, right)
+
+
 def attenuation_validation_failures(attenuation: Any, *, decision_reason_codes: list[str] | None=None) -> list[str]:
     """Preserve the existing list API; bounded readers use the iterator."""
     return list(iter_attenuation_validation_failures(attenuation, decision_reason_codes=decision_reason_codes))
@@ -1312,11 +1409,7 @@ def iter_attenuation_validation_failures(
         return
 
     mode = attenuation.get("mode")
-    if not isinstance(mode, str) or mode not in {
-        "narrow",
-        "require_new_permit",
-        "deny_if_not_accepted",
-    }:
+    if mode not in ATTENUATION_MODES:
         yield ("mode must be a supported attenuation mode")
 
     original_hash = attenuation.get("original_request_hash")
@@ -1361,7 +1454,7 @@ def iter_attenuation_validation_failures(
             yield ("effective_constraints.resource is a legacy input alias; use target_resource")
 
         max_amount = effective_constraints.get("max_amount")
-        if max_amount is not None:
+        if "max_amount" in effective_constraints:
             if not isinstance(max_amount, dict):
                 yield ("effective_constraints.max_amount must be an object")
             else:
@@ -1380,18 +1473,18 @@ def iter_attenuation_validation_failures(
                 )
 
         tool_allowlist = effective_constraints.get("tool_allowlist")
-        if tool_allowlist is not None and (
+        if "tool_allowlist" in effective_constraints and (
             not isinstance(tool_allowlist, list)
             or not all(isinstance(tool, str) and tool for tool in tool_allowlist)
         ):
             yield ("effective_constraints.tool_allowlist must be an array of non-empty strings")
 
         target_resource = effective_constraints.get("target_resource")
-        if target_resource is not None and (not isinstance(target_resource, str) or not target_resource):
+        if "target_resource" in effective_constraints and (not isinstance(target_resource, str) or not target_resource):
             yield ("effective_constraints.target_resource must be a non-empty string")
 
         approval = effective_constraints.get("approval")
-        if approval is not None:
+        if "approval" in effective_constraints:
             if not isinstance(approval, dict):
                 yield ("effective_constraints.approval must be an object")
             else:
@@ -1399,11 +1492,11 @@ def iter_attenuation_validation_failures(
                 if not isinstance(approval_mode, str) or not approval_mode:
                     yield ("effective_constraints.approval.mode must be a non-empty string")
                 policy_ref = approval.get("policy_ref")
-                if policy_ref is not None and (not isinstance(policy_ref, str) or not policy_ref):
+                if "policy_ref" in approval and (not isinstance(policy_ref, str) or not policy_ref):
                     yield ("effective_constraints.approval.policy_ref must be a non-empty string")
 
         expires_at = effective_constraints.get("expires_at")
-        if expires_at is not None and try_parse_time(expires_at) is None:
+        if "expires_at" in effective_constraints and try_parse_time(expires_at) is None:
             yield ("effective_constraints.expires_at must be an RFC3339 timestamp")
 
     return
@@ -1419,20 +1512,33 @@ def expected_should_execute(case: dict[str, Any]) -> bool:
     return bool(case.get("expected", {}).get("should_execute", False))
 
 
-def actual_should_execute(admission_receipt: dict[str, Any] | None) -> bool:
+def admission_execution_blocker(admission_receipt: dict[str, Any] | None) -> str | None:
+    """Explain a closed decision gate independently of other receipt checks."""
     if admission_receipt is None:
-        return False
-    decision = admission_receipt.get("decision")
-    if not isinstance(decision, dict):
-        return False
-    outcome = decision.get("outcome")
-    if outcome == "deny":
-        return False
-    if outcome == "attenuate":
-        attenuation = admission_receipt.get("attenuation")
-        if not isinstance(attenuation, dict) or attenuation.get("require_new_permit") is True:
-            return False
-    return isinstance(outcome, str) and outcome in {"allow", "attenuate"}
+        return "admission receipt missing"
+    outcome = actual_decision(admission_receipt)
+    if outcome == "allow":
+        if "attenuation" in admission_receipt:
+            return "only attenuate may contain attenuation"
+        return None
+    if outcome != "attenuate":
+        return "admission decision must be allow or attenuate for post-execution linkage"
+    attenuation = admission_receipt.get("attenuation")
+    if not isinstance(attenuation, dict):
+        return "attenuate requires an attenuation object"
+    mode = attenuation.get("mode")
+    if mode not in ATTENUATION_MODES:
+        return "mode must be a supported attenuation mode"
+    required = attenuation.get("require_new_permit")
+    if not isinstance(required, bool):
+        return "require_new_permit must be a boolean"
+    if required or mode == "require_new_permit":
+        return "post-execution receipt must not link to an admission requiring a new permit"
+    return None
+
+
+def actual_should_execute(admission_receipt: dict[str, Any] | None) -> bool:
+    return admission_execution_blocker(admission_receipt) is None
 
 
 def append_unique(items: list[str], item: str) -> None:
@@ -1546,18 +1652,30 @@ def admitted_effective_request_hash(admission_receipt: dict[str, Any]) -> Any:
 
 
 def admitted_effective_constraints(admission_receipt: dict[str, Any]) -> dict[str, Any]:
-    if actual_decision(admission_receipt) == "attenuate":
-        attenuation = admission_receipt.get("attenuation")
-        attenuation_constraints = (
-            attenuation.get("effective_constraints") if isinstance(attenuation, dict) else None
-        )
-        if isinstance(attenuation_constraints, dict):
-            return attenuation_constraints
+    """Select the same decision-specific basis as the core; never fall back."""
+    if not isinstance(admission_receipt, dict):
+        raise ValueError("admission receipt must be an object")
+    decision = admission_receipt.get("decision")
     request = admission_receipt.get("request")
-    request_constraints = request.get("constraints") if isinstance(request, dict) else None
-    if isinstance(request_constraints, dict):
-        return request_constraints
-    return {}
+    if not isinstance(decision, dict) or not isinstance(request, dict):
+        raise ValueError("admission decision and request must be objects")
+    if "constraints" in request and not isinstance(request["constraints"], dict):
+        raise ValueError("request constraints must be an object when present")
+    outcome = decision.get("outcome")
+    if outcome == "attenuate":
+        attenuation = admission_receipt.get("attenuation")
+        if not isinstance(attenuation, dict):
+            raise ValueError("attenuate requires an attenuation object")
+        constraints = attenuation.get("effective_constraints")
+        if not isinstance(constraints, dict) or not constraints:
+            raise ValueError("attenuate requires nonempty effective constraints")
+    elif outcome in ("allow", "deny"):
+        if "attenuation" in admission_receipt:
+            raise ValueError("only attenuate may contain attenuation")
+        constraints = request.get("constraints", {})
+    else:
+        raise ValueError("unknown admission decision")
+    return constraints
 
 
 def post_execution_linkage_failures(
@@ -1576,19 +1694,15 @@ def post_execution_linkage_failures(
     admission_decision = actual_decision(admission_receipt)
     if admission_decision == "deny":
         failures.append("post-execution receipt must not link to a denied admission")
-    if admission_decision not in {"allow", "attenuate"}:
-        failures.append("admission decision must be allow or attenuate for post-execution linkage")
-    attenuation = admission_receipt.get("attenuation")
-    if admission_decision == "attenuate" and (
-        not isinstance(attenuation, dict) or attenuation.get("require_new_permit") is True
-    ):
-        failures.append("post-execution receipt must not link to an admission requiring a new permit")
+    blocker = admission_execution_blocker(admission_receipt)
+    if blocker is not None:
+        failures.append(blocker)
 
     if admission_block.get("receipt_id") != admission_receipt.get("receipt_id"):
         failures.append("admission receipt_id mismatch")
     if admission_block.get("decision") != admission_decision:
         failures.append("admission decision mismatch")
-    if admission_block.get("digest") != {"alg": "sha-256", "value": sha256_value(admission_receipt)}:
+    if not digest_descriptors_match(admission_block.get("digest"), digest_descriptor(admission_receipt)):
         failures.append("admission digest mismatch")
 
     raw_request = admission_receipt.get("request")
@@ -1639,7 +1753,15 @@ def iter_post_execution_side_effect_failures(
     admission_receipt: dict[str, Any],
     post_execution_receipt: dict[str, Any],
 ) -> Iterator[str]:
-    max_amount = admitted_effective_constraints(admission_receipt).get("max_amount")
+    try:
+        constraints = admitted_effective_constraints(admission_receipt)
+    except ValueError as exc:
+        yield f"admission effective constraints invalid: {exc}"
+        return
+    for legacy, canonical in (("max_amount_usd", "max_amount"), ("resource", "target_resource")):
+        if legacy in constraints:
+            yield f"admission effective constraints contain legacy alias {legacy}; use {canonical}"
+    max_amount = constraints.get("max_amount")
     if not isinstance(max_amount, dict):
         return
     max_currency = max_amount.get("currency")
@@ -1674,7 +1796,7 @@ def iter_post_execution_side_effect_failures(
         if amount_failures:
             yield from (amount_failures)
             continue
-        total_decimal += Decimal(str(value))
+        total_decimal = add_decimal_amounts_exact(total_decimal, Decimal(str(value)))
         if total_decimal > max_decimal:
             yield ("side_effects aggregate amount exceeds admitted max_amount")
             break
@@ -1682,13 +1804,7 @@ def iter_post_execution_side_effect_failures(
 
 
 def admission_executable_for_post_execution(admission_receipt: dict[str, Any]) -> bool:
-    admission_decision = actual_decision(admission_receipt)
-    if admission_decision not in {"allow", "attenuate"}:
-        return False
-    if admission_decision != "attenuate":
-        return True
-    attenuation = admission_receipt.get("attenuation")
-    return isinstance(attenuation, dict) and attenuation.get("require_new_permit") is not True
+    return actual_should_execute(admission_receipt)
 
 
 def admission_time_window_valid(
@@ -1735,7 +1851,7 @@ def linkage_check_violation(
         if kind in {"transaction_id", "runtime", "effective_request_hash", "path_match"}:
             left = get_path(admission, check["admission_path"])
             right = get_path(post_execution, check["post_execution_path"])
-            return left != right, None
+            return not json_semantic_equal(left, right), None
         if kind == "admission_digest":
             artifact_name = check.get("artifact", "admission_receipt")
             artifact, artifact_failure = read_case_artifact(case, artifact_name)
@@ -1743,7 +1859,7 @@ def linkage_check_violation(
                 return True, f"{artifact_name}: {artifact_failure}"
             expected_digest = {"alg": "sha-256", "value": sha256_value(artifact)}
             actual_digest = get_path(post_execution, check.get("post_execution_path", "admission.digest"))
-            return actual_digest != expected_digest, None
+            return not digest_descriptors_match(actual_digest, expected_digest), None
         if kind == "admission_receipt_id":
             actual_receipt_id = get_path(post_execution, "admission.receipt_id")
             return actual_receipt_id != admission.get("receipt_id"), None
@@ -2324,7 +2440,7 @@ def evaluate_policy_snapshot_checks(
                 continue
             references.append((artifact_name, snapshot_ref))
 
-            digest_matches = snapshot_ref.get("digest") == artifact_digest
+            digest_matches = digest_descriptors_match(snapshot_ref.get("digest"), artifact_digest)
             if digest_matches != expect_match:
                 failures.append(
                     f"policy_snapshot {artifact_name}: expected digest match={expect_match} actual match={digest_matches}"
@@ -2336,7 +2452,10 @@ def evaluate_policy_snapshot_checks(
         first_name, first_ref = references[0]
         for name, snapshot_ref in references[1:]:
             for field in check.get("compare_fields", ["uri", "media_type", "digest"]):
-                if first_ref.get(field) != snapshot_ref.get(field):
+                matches = (digest_descriptors_match(first_ref.get(field), snapshot_ref.get(field))
+                           if field == "digest" else
+                           json_semantic_equal(first_ref.get(field), snapshot_ref.get(field)))
+                if not matches:
                     failures.append(f"policy_snapshot {first_name}/{name}: field {field} mismatch")
     return failures
 
@@ -2377,7 +2496,7 @@ def evaluate_artifact_reference_checks(
             except (KeyError, IndexError, TypeError, ValueError):
                 failures.append(f"artifact_ref {artifact_name}/{source_name}: reference path missing")
                 continue
-            digest_matches = reference_digest == artifact_digest
+            digest_matches = digest_descriptors_match(reference_digest, artifact_digest)
             if digest_matches != expect_match:
                 failures.append(
                     f"artifact_ref {artifact_name}/{source_name}: "
@@ -3093,17 +3212,18 @@ def evaluate_request_binding(case: dict[str, Any], *, sut_result: dict[str, Any]
     return {"assessment": assessment, "failures": failures}
 
 
+def request_binding_satisfied(block: Any) -> bool:
+    """Binding success is independent of the enclosing conformance verdict."""
+    assessment = block.get("assessment") if isinstance(block, dict) else None
+    return (isinstance(assessment, dict) and block.get("failures") == []
+            and assessment.get("status") == "checked" and assessment.get("pass") is True
+            and assessment.get("binding_requirement_met") is True)
+
+
 def request_binding_coverage(cases: list[dict[str, Any]]) -> dict[str, Any]:
     """Report preimage coverage separately from fixture/implementation matches."""
     required = [case for case in cases if case.get("request_binding_required") is True]
-    satisfied = 0
-    for case in required:
-        block = case.get("request_binding")
-        assessment = block.get("assessment") if isinstance(block, dict) else None
-        if (isinstance(assessment, dict) and block.get("failures") == []
-                and assessment.get("status") == "checked" and assessment.get("pass") is True
-                and assessment.get("binding_requirement_met") is True):
-            satisfied += 1
+    satisfied = sum(request_binding_satisfied(case.get("request_binding")) for case in required)
     return {"required_cases": len(required), "satisfied_cases": satisfied,
             "not_required_cases": len(cases) - len(required),
             "all_cases_satisfied": bool(cases) and satisfied == len(cases)}
@@ -3472,6 +3592,13 @@ def digest_descriptor_failures(value: Any, label: str) -> list[str]:
     return failures
 
 
+def digest_descriptors_match(actual: Any, expected: Any) -> bool:
+    """Compare valid SHA-256 fields while permitting descriptor annotations."""
+    if digest_descriptor_failures(actual, "actual") or digest_descriptor_failures(expected, "expected"):
+        return False
+    return actual["alg"] == expected["alg"] and actual["value"] == expected["value"]
+
+
 def sut_artifact_ref_failures(value: Any, label: str, *, require_media_type: bool) -> list[str]:
     failures: list[str] = []
     if not isinstance(value, dict):
@@ -3657,7 +3784,7 @@ def context_binding_match_failures(
                 f"{label}: missing role={key[0]} source_artifact={key[1]} path={key[2]} evidence_type={key[3]}"
             )
             continue
-        if "digest" in expected and actual.get("digest") != expected.get("digest"):
+        if "digest" in expected and not digest_descriptors_match(actual.get("digest"), expected.get("digest")):
             failures.append(f"{label}: digest mismatch for role={key[0]} source_artifact={key[1]} path={key[2]}")
         if "value" in expected and actual.get("value") != expected.get("value"):
             failures.append(f"{label}: value mismatch for role={key[0]} source_artifact={key[1]} path={key[2]}")
@@ -4003,6 +4130,8 @@ def resolve_sut_generated_artifact_path(
     path_value = local_path if isinstance(local_path, str) and local_path else value.get("uri")
     if not isinstance(path_value, str) or not path_value:
         return None, [f"{label}: local artifact path is unavailable"]
+    if "\x00" in path_value:
+        return None, [f"{label}.local_path: NUL characters are not allowed"]
     if "://" in path_value:
         return None, [f"{label}.local_path: required when uri is not a local path"]
 
@@ -4012,19 +4141,25 @@ def resolve_sut_generated_artifact_path(
     if ".." in raw_path.parts:
         return None, [f"{label}.local_path: parent traversal is not allowed"]
 
-    artifact_root = sut_results_path.parent.resolve()
-    candidate = artifact_root / raw_path
-    if reject_symlinks:
-        component = artifact_root
-        for part in raw_path.parts:
-            component /= part
-            if component.is_symlink():
-                return None, [f"{label}.local_path: symbolic links are not allowed"]
-    resolved = candidate.resolve()
-    if not resolved.is_relative_to(artifact_root):
-        return None, [f"{label}.local_path: resolved path escapes the SUT result directory"]
-    if not candidate.is_file():
-        return None, [f"{label}: generated artifact file not found under {artifact_root.as_posix()}"]
+    try:
+        artifact_root = sut_results_path.parent.resolve()
+        candidate = artifact_root / raw_path
+        if reject_symlinks:
+            component = artifact_root
+            for part in raw_path.parts:
+                component /= part
+                if component.is_symlink():
+                    return None, [f"{label}.local_path: symbolic links are not allowed"]
+        resolved = candidate.resolve()
+        if not resolved.is_relative_to(artifact_root):
+            return None, [f"{label}.local_path: resolved path escapes the SUT result directory"]
+        if not candidate.is_file():
+            return None, [f"{label}: generated artifact file not found under {artifact_root.as_posix()}"]
+    except (OSError, ValueError, RuntimeError) as exc:
+        # pathlib can raise before open(), including RuntimeError for symlink
+        # loops on older supported Python versions. Both report entrypoints
+        # must retain a structured failure rather than abort report generation.
+        return None, [f"{label}.local_path: unable to inspect generated artifact path ({type(exc).__name__})"]
     # Preserve the submitted path for the binding adapter's O_NOFOLLOW open.
     return candidate if reject_symlinks else resolved, []
 
@@ -4094,6 +4229,19 @@ def load_sut_generated_artifact(
     return artifact, path, failures
 
 
+def json_semantic_equal(left: Any, right: Any) -> bool:
+    """Compare JSON values, allowing equivalent number representations only."""
+    if type(left) in (int, float) and type(right) in (int, float):
+        return left == right
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, dict):
+        return left.keys() == right.keys() and all(json_semantic_equal(left[k], right[k]) for k in left)
+    if isinstance(left, list):
+        return len(left) == len(right) and all(json_semantic_equal(a, b) for a, b in zip(left, right))
+    return left == right
+
+
 def semantic_projection_failures(
     expected: Any,
     actual: Any,
@@ -4132,7 +4280,7 @@ def semantic_projection_failures(
                 if len(failures) >= limit:
                     return
             return
-        if expected_value != actual_value:
+        if not json_semantic_equal(expected_value, actual_value):
             failures.append(f"{path}: expected {expected_value!r} actual {actual_value!r}")
 
     visit(expected, actual, label)
@@ -4384,7 +4532,7 @@ def admission_link_relation_state(
     return {
         "receipt_id_match": admission_block.get("receipt_id") == admission_receipt.get("receipt_id"),
         "decision_match": admission_block.get("decision") == actual_decision(admission_receipt),
-        "digest_match": admission_block.get("digest") == digest_descriptor(admission_receipt),
+        "digest_match": digest_descriptors_match(admission_block.get("digest"), digest_descriptor(admission_receipt)),
     }
 
 
@@ -4596,6 +4744,13 @@ def sut_result_envelope_failures(sut_results: dict[str, Any]) -> list[str]:
             failures.append(
                 f"sut_results.implementation.{field}: expected non-empty string"
             )
+    for field in ("source", "commit"):
+        if field in implementation:
+            value = implementation[field]
+            if not isinstance(value, str) or not value:
+                failures.append(
+                    f"sut_results.implementation.{field}: expected non-empty string"
+                )
     return failures
 
 
@@ -4806,7 +4961,7 @@ def compare_sut_results(corpus_root: Path, sut_results_path: Path) -> dict[str, 
         sut_corpus = {}
     if sut_corpus.get("profile") != PROFILE:
         fatal_errors.append(f"sut_results.corpus.profile: expected {PROFILE} actual {sut_corpus.get('profile')}")
-    if sut_corpus.get("digest") != digest:
+    if not digest_descriptors_match(sut_corpus.get("digest"), digest):
         fatal_errors.append("sut_results.corpus.digest: does not match current corpus digest")
 
     sut_implementation = sut_results.get("implementation")
@@ -6090,21 +6245,21 @@ def verify_report_bundle(
     add_bundle_check(
         checks,
         "corpus_index.identity",
-        actual_corpus_index_identity == expected_corpus_index_identity,
+        json_semantic_equal(actual_corpus_index_identity, expected_corpus_index_identity),
         expected=expected_corpus_index_identity,
         actual=actual_corpus_index_identity,
     )
     add_bundle_check(
         checks,
         "corpus_index.digest",
-        corpus_index.get("digest") == corpus_digest,
+        digest_descriptors_match(corpus_index.get("digest"), corpus_digest),
         expected=corpus_digest,
         actual=corpus_index.get("digest"),
     )
     add_bundle_check(
         checks,
         "corpus_index.manifest",
-        corpus_index.get("manifest") == manifest,
+        json_semantic_equal(corpus_index.get("manifest"), manifest),
         details="committed corpus.json manifest matches the recomputed corpus manifest",
     )
 
@@ -6135,7 +6290,7 @@ def verify_report_bundle(
     add_bundle_check(
         checks,
         "corpus_index.cases.entries",
-        corpus_index.get("cases") == expected_index_cases,
+        json_semantic_equal(corpus_index.get("cases"), expected_index_cases),
         details="corpus index case entries match the loaded canonical case files",
     )
     corpus_index_summary = corpus_index.get("summary")
@@ -6146,7 +6301,7 @@ def verify_report_bundle(
         checks,
         "corpus_index.summary.case_count",
         isinstance(corpus_index_summary, dict)
-        and corpus_index_summary.get("case_count") == len(canonical_case_ids),
+        and json_semantic_equal(corpus_index_summary.get("case_count"), len(canonical_case_ids)),
         expected=len(canonical_case_ids),
         actual=(
             corpus_index_summary.get("case_count")
@@ -6158,7 +6313,7 @@ def verify_report_bundle(
         checks,
         "corpus_index.summary.category_counts",
         isinstance(corpus_index_summary, dict)
-        and corpus_index_summary.get("category_counts") == expected_category_counts,
+        and json_semantic_equal(corpus_index_summary.get("category_counts"), expected_category_counts),
         expected=expected_category_counts,
         actual=(
             corpus_index_summary.get("category_counts")
@@ -6243,7 +6398,7 @@ def verify_report_bundle(
     add_bundle_check(
         checks,
         "conformance_report.corpus.digest",
-        isinstance(conformance_corpus, dict) and conformance_corpus.get("digest") == corpus_digest,
+        isinstance(conformance_corpus, dict) and digest_descriptors_match(conformance_corpus.get("digest"), corpus_digest),
         expected=corpus_digest,
         actual=conformance_corpus.get("digest") if isinstance(conformance_corpus, dict) else None,
     )
@@ -6266,7 +6421,7 @@ def verify_report_bundle(
     add_bundle_check(
         checks,
         "implementation_report.corpus.digest",
-        isinstance(implementation_corpus, dict) and implementation_corpus.get("digest") == corpus_digest,
+        isinstance(implementation_corpus, dict) and digest_descriptors_match(implementation_corpus.get("digest"), corpus_digest),
         expected=corpus_digest,
         actual=implementation_corpus.get("digest") if isinstance(implementation_corpus, dict) else None,
     )
@@ -6332,7 +6487,7 @@ def verify_report_bundle(
         checks,
         "implementation_report.conformance_report.digest",
         isinstance(implementation_conformance, dict)
-        and implementation_conformance.get("digest") == conformance_digest,
+        and digest_descriptors_match(implementation_conformance.get("digest"), conformance_digest),
         expected=conformance_digest,
         actual=implementation_conformance.get("digest") if isinstance(implementation_conformance, dict) else None,
     )
@@ -6449,14 +6604,14 @@ def verify_report_bundle(
         add_bundle_check(
             checks,
             "sut_results.corpus.digest",
-            isinstance(sut_corpus, dict) and sut_corpus.get("digest") == corpus_digest,
+            isinstance(sut_corpus, dict) and digest_descriptors_match(sut_corpus.get("digest"), corpus_digest),
             expected=corpus_digest,
             actual=sut_corpus.get("digest") if isinstance(sut_corpus, dict) else None,
         )
         add_bundle_check(
             checks,
             "conformance_report.sut_results.digest",
-            isinstance(conformance_sut, dict) and conformance_sut.get("digest") == sut_digest,
+            isinstance(conformance_sut, dict) and digest_descriptors_match(conformance_sut.get("digest"), sut_digest),
             expected=sut_digest,
             actual=conformance_sut.get("digest") if isinstance(conformance_sut, dict) else None,
         )
@@ -6473,9 +6628,25 @@ def verify_report_bundle(
             "conformance_report.sut_results.implementation",
             isinstance(conformance_sut, dict)
             and isinstance(sut_results, dict)
-            and conformance_sut.get("implementation") == sut_results.get("implementation"),
+            and json_semantic_equal(conformance_sut.get("implementation"), sut_results.get("implementation")),
             expected=sut_results.get("implementation") if isinstance(sut_results, dict) else None,
             actual=conformance_sut.get("implementation") if isinstance(conformance_sut, dict) else None,
+        )
+        sut_identity = sut_results.get("implementation") if isinstance(sut_results, dict) else None
+        expected_identity = (sut_implementation_metadata(sut_identity)
+                             if isinstance(sut_identity, dict) else None)
+        actual_identity = implementation_report.get("implementation")
+        # Extension annotations remain local to each report. The seven fields
+        # copied by the generator must describe the same submitted implementation.
+        identity_fields = {"name", "type", "version", "language", "source", "commit", "environment"}
+        actual_identity = ({key: value for key, value in actual_identity.items() if key in identity_fields}
+                           if isinstance(actual_identity, dict) else None)
+        add_bundle_check(
+            checks,
+            "implementation_report.implementation",
+            expected_identity is not None and json_semantic_equal(actual_identity, expected_identity),
+            expected=expected_identity,
+            actual=actual_identity,
         )
         add_bundle_check(
             checks,
@@ -6581,8 +6752,7 @@ def verify_report_bundle(
             saved = recorded.get(case_id, {})
             current_binding = current.get("request_binding")
             add_bundle_check(checks, f"request_binding.{case_id}.recomputed",
-                             not fresh.get("fatal_errors") and current.get("pass") is True
-                             and isinstance(current_binding, dict) and not current_binding["failures"]
+                             not fresh.get("fatal_errors") and request_binding_satisfied(current_binding)
                              and json_value_equal(saved.get("request_binding"), current_binding),
                              expected="successful binding recomputed from supplied raw artifacts",
                              actual=current_binding)
@@ -6638,20 +6808,24 @@ def text_field(source: dict[str, Any], key: str, default: str) -> str:
     return value if isinstance(value, str) and value else default
 
 
+def sut_implementation_metadata(source: dict[str, Any]) -> dict[str, Any]:
+    """The identity projection shared by report generation and verification."""
+    implementation = {
+        "name": text_field(source, "name", "Unknown external VATE verifier"),
+        "type": text_field(source, "type", "external-verifier"),
+        "version": text_field(source, "version", "unknown"),
+        "language": text_field(source, "language", "unknown"),
+    }
+    for optional in ("source", "commit", "environment"):
+        if isinstance(source.get(optional), str) and source[optional]:
+            implementation[optional] = source[optional]
+    return implementation
+
+
 def implementation_metadata(args: argparse.Namespace, conformance_report: dict[str, Any]) -> dict[str, Any]:
     sut_results = conformance_report.get("sut_results")
     if isinstance(sut_results, dict) and isinstance(sut_results.get("implementation"), dict):
-        source = sut_results["implementation"]
-        implementation = {
-            "name": text_field(source, "name", "Unknown external VATE verifier"),
-            "type": text_field(source, "type", "external-verifier"),
-            "version": text_field(source, "version", "unknown"),
-            "language": text_field(source, "language", "unknown"),
-        }
-        for optional in ("source", "commit", "environment"):
-            if isinstance(source.get(optional), str) and source[optional]:
-                implementation[optional] = source[optional]
-        return implementation
+        return sut_implementation_metadata(sut_results["implementation"])
 
     implementation = {
         "name": getattr(args, "implementation_name", "Unknown VATE verifier"),

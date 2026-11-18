@@ -1,0 +1,23 @@
+{
+  "source_commit": "675847669851070728431fd1ebd1415f57ad411e",
+  "files": {
+    "reference/authority-issuer/authority_issuer.py": "f0ee0627753b0be9702eb2dd09fa702d95254af223789f7e36d2089e5f5f5e5e",
+    "reference/authority-issuer/service_client.py": "ec2aa603c239ebcc4669536268aa6c54a099cbf0cdb4781ff1cbf4b5a1b3a226",
+    "reference/authority-keychain/keychain_bridge.swift": "5c346d3f502bf904b8fc42bb16d2f6922489230cffdc56f4cfcf50c4cb1399cf",
+    "reference/authority-keychain/keychain_signer.py": "2bf546e01590583a61abd9f64733276964af590d0c32a7f07bb622bc10f5fb43",
+    "reference/authority-updates/authority_store.py": "b80f767f0d4554d9350a7baa2096596e169c60ab9166a48cf93a41b88f5e31a0",
+    "reference/authority-updates/https_source.py": "b1023f89ed7c54f3d63a926754fe73956592f43ec7b4faccb08f9809fd7cf019",
+    "reference/authority-updates/managed_verifier.py": "4752e000f802e2fc2cda7661c39c4d00ec1e49811dc4a0f4b4244cbd2e29c147",
+    "reference/authority-updates/refresh_lifecycle.py": "487eac9adbc4a6258a9597f22aefd16ba6e6eb0b84860999de55a50ce80a5d2b",
+    "reference/authority-updates/snapshot.py": "000ced3080af4e432e189db21353957c76cb69f31712ed1fe8e38e4bd925ae0e",
+    "reference/authority-updates/supervised_https.py": "42670fd2cbb214b56ebf7e2a0ec6750b0868580ce0a082c6e4a88b0f62b7424c",
+    "reference/caller-authority/caller_jwt.py": "de38d17bf4b33ce3cb27a8201a4b14cf1688396385956f83a3ca8fac8ee4f7ad",
+    "reference/request-binding/caller_authority.py": "4077530e26c4fa58b127070fa3022ddec2b6f758dc796c0dd3723deb9a6cb3a8",
+    "reference/request-binding/durable_state.py": "4b2dfeeba7fb19182fe204dc9f60bd9666a41729ab058aeeac9c69a820194de2",
+    "reference/request-binding/example.py": "7d7930f9bb47def04eb48ba743cd7be5c6d85eae46aa6c3287e03168b8e2914c",
+    "reference/request-binding/request_binding.py": "e383499498f23d13ffb98843daf6482ce9237a15968a06c21e67e949b3035fb1",
+    "reference/runtime-jwt/runtime_jwt.py": "448a0ac6cbc154068523210dd09155a8212456bb997e767483dcf461517c73d2",
+    "reference/runtime-jwt/verify_es256.mjs": "b8ea005427a96bea28553b0fc4c358b184e860fbf5f50de0d6ebc9372d6a9b93",
+    "reference/vate-verifier-core/vate_verifier_core.py": "b28a8bada4d51acdfc1f28bf6049e8fd15629b20c350270f01f6c62ef1e16b5a"
+  }
+}

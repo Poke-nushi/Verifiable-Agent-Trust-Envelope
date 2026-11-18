@@ -102,3 +102,9 @@ Keychain backup/restoration and distributed publishing are outside this
 profile. The file-based Keychain APIs are platform-specific and partly
 deprecated; their availability, code-signing identity and ACL behavior must be
 checked in the chosen deployment environment.
+
+The separate [planned migration](../planned-migration/CONTRACT.md) composes two
+explicitly provisioned key selections with retained issuer/recipient ledgers.
+Both old and new keys are exercised before the move; the old key is retained.
+The signer itself still cannot select a replacement key, repair a ledger or
+recover a lost key automatically.

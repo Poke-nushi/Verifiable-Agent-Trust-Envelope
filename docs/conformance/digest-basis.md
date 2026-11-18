@@ -105,6 +105,14 @@ and integers outside the safe range. This is a TypeScript helper limitation;
 it does not change the Python fixture basis or prohibit floating-point values
 in the conformance runner.
 
+The Python runner rejects a fractional or exponent token if its exact decimal
+value differs from the shortest decimal representation of the parsed float.
+For example, `0.1`, `25.0`, and `25.000000000000000000` remain accepted, while
+`25.000000000000000001` and a nonzero token that underflows to zero are rejected.
+This check precedes semantic comparison. Use decimal strings for exact amounts
+where the field permits them. Accepted values retain the fixture serialization
+shown above; this input check does not select a new digest basis.
+
 Do not use these object helpers to recompute the digest of arbitrary parsed
 JSON. JavaScript loses numeric representation information: `JSON.parse("1.0")`
 and `JSON.parse("1e0")` both produce `1`, while Python parses those tokens as

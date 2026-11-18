@@ -741,13 +741,19 @@ release only an object it associates with the original or narrowed request basis
 recorded by the admission receipt into an API, MCP tool, remote agent action, or
 other execution environment.
 
-The current runner validates the required attenuation structure, checks that
+For cases that do not require the
+[request-binding extension](../reference/request-binding/CONTRACT.md), the
+current runner validates the required attenuation structure, checks that
 the declared original and effective hashes use the profile hash grammar and
 differ, and uses the declared effective hash in post-execution equality checks.
 It does not verify that the declared original hash equals `request.input_hash`,
 reconstruct an effective request from an original request preimage, apply the
-declared changes, or recompute the declared effective request hash. The current
-profile also does not define a portable predecessor/successor relationship from
+declared changes, or recompute the declared effective request hash. Cases that
+require that extension also verify the original hash against `request.input_hash`,
+reconstruct the effective request under the selected profile, and recompute its
+hash from the supplied preimages.
+
+The current profile does not define a portable predecessor/successor relationship from
 a `require_new_permit: true` receipt to a fresh authority, follow-on request, or
 later admission receipt. Production gate integration and re-admission lineage
 remain implementation-defined.

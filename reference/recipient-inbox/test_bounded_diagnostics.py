@@ -182,7 +182,11 @@ class NativeTests(unittest.TestCase):
         sample=deepcopy(admission['evidence'][0]); sample['digest']['value']='a'*64+'\n'
         admission['evidence']=[sample]*1000
         result=self.assert_bounded_invalid(encode(admission))
-        self.assertTrue(all(i['kind']=='semantic_input_invalid' for i in result['input_issues']))
+        # Exact schema tokens reject the newline before semantic assessment.
+        self.assertEqual(len(result['input_issues']),32)
+        self.assertTrue(all(i['kind']=='schema_invalid' for i in result['input_issues']))
+        self.assertTrue(all(i['path'][0]=='evidence' and i['path'][-2:]==['digest','value']
+                            for i in result['input_issues']))
 
     def test_many_tool_precondition_errors(self):
         admission=json.loads(self.admission); admission['request']['constraints']['tool_allowlist']=['allowed']
@@ -222,10 +226,24 @@ class NativeTests(unittest.TestCase):
                 ('attenuation_validation_failures',(admission.get('attenuation'),),{'decision_reason_codes':admission.get('decision',{}).get('reason_codes')}),
                 ('generated_decision_shape_failures',(admission.get('decision'),'decision'),{}),
                 ('generated_admission_receipt_shape_failures',(admission,'admission'),{}),
-                ('evaluate_evidence_vocabulary_checks',(None,admission),{}),
-                ('post_execution_side_effect_failures',(admission,post or {}),{})]:
+                ('evaluate_evidence_vocabulary_checks',(None,admission),{})]:
                 with self.subTest(function=name):
                     self.assertEqual(getattr(self.reader.runner,name)(*args,**kw),getattr(old,name)(*args,**kw))
+            # Amount diagnostics retain their historical results for a valid
+            # decision-specific constraint basis. Missing bases now fail below.
+            if admission:
+                with self.subTest(function='post_execution_side_effect_failures'):
+                    self.assertEqual(self.reader.runner.post_execution_side_effect_failures(admission,post or {}),
+                                     old.post_execution_side_effect_failures(admission,post or {}))
+
+    def test_runner_side_effects_reject_missing_basis_instead_of_reporting_no_failure(self):
+        old=load('old_runner_missing_basis',HISTORICAL/'scripts/vate_conformance.py')
+        self.assertEqual(old.post_execution_side_effect_failures({},{}),[])
+        expected=['admission effective constraints invalid: admission decision and request must be objects']
+        self.assertEqual(self.reader.runner.post_execution_side_effect_failures({},{}),expected)
+        self.assertEqual(list(self.reader.runner.iter_post_execution_side_effect_failures({},{})),expected)
+        valid={'decision':{'outcome':'allow'},'request':{}}
+        self.assertEqual(self.reader.runner.post_execution_side_effect_failures(valid,{}),[])
 
 
 class IntegrationTests(unittest.TestCase):

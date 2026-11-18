@@ -1,5 +1,25 @@
 # Validation record
 
+## 2026-11-17 — Fixed-source packaging
+
+Local macOS arm64 checks with CPython 3.11.14 and 3.14.8 each replayed the
+four cases, eight variants and 17 snapshots, and passed all 22 tests with site
+packages disabled. The tested Git-created archive contained the comparison
+package and the complete `f128639` runtime under `historical-runtime/`, with
+no Git history or current runtime-handoff sample.
+
+Replay, fresh capture and relocated execution used the fixed source. A missing
+historical source produced an error even when an identical sibling sample was
+available; explicit `--sample` selection of that same fixed source succeeded.
+Selecting the updated current sample failed its source pin check. All 79 saved
+data and manifest files retained their original bytes.
+
+The dedicated workflow now runs replay and tests from this archive layout.
+The updated workflow has not yet been run remotely. The record below describes
+the original vector validation and its pinned CI run.
+
+## 2026-11-06 — Original vector validation
+
 Observed on 2026-11-06 using macOS 27.0.1 (arm64) and OpenSSL 4.0.3.
 
 | Check | Result |

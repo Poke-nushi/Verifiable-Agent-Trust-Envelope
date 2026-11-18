@@ -1,0 +1,10 @@
+{
+  "dependencies.py": "695788c4a6dde10f56f2ab48c3369fa2a90d8626ac6cef52c70761092cb71229",
+  "fixture.py": "ebcca000b5ceb04436a043636eb1012fe6eeb4e7c558149f7850d30b5bcc7fbd",
+  "handoff_contract.py": "ce2ee8725b2eb57164854418ddbd1db935cf954e84a9165417b4ab19f34e9365",
+  "handoff_model.py": "3428b60c219226a3665f00ef2e1e2be2a2f0610404d293484ff148d16433acc2",
+  "handoff_provider.py": "a20f6e1ff1b76de0621ef4aa6954f333dcc49a5d763d59d6e0029525a16608ed",
+  "handoff_reader.py": "f5b1453f83a61f196a8d0c57254ed1f1d5d239a5519d132f2604e282a3b16f19",
+  "run_demo.py": "ecc3f8ee354abfd8b0d63498e2d34ea12e0faf075c3cb3dd2313c3fec14e0db8",
+  "test_handoff.py": "ee06719182be6a5812bed2c26d515fc77bc5217765c4a9f7afe39ff77983f242"
+}

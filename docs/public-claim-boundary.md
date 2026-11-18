@@ -100,6 +100,14 @@ one explicitly selected identity, resource and permission mapping. Describe
 its results as local integration observations, without implying instantaneous
 revocation, general IAM compatibility or production readiness.
 
+[Planned local migration](../reference/planned-migration/README.md) transfers a
+stopped managed Python deployment from its pinned source program to a selected
+new key, program and local stores while retaining receipt originals and operation
+history. It requires one administrator, one host, the usable old key and healthy
+retained stores. New work requires a fresh authority observation and admission.
+Its process-exit evidence does not establish power-loss, key-loss or portable-host
+recovery.
+
 ## Allowed Phrasing
 
 These phrases are safe when they match the artifact being discussed:

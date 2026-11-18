@@ -115,9 +115,24 @@ exists. None of these outcomes grants permission to execute or retry an operatio
 - `FAILURE.json` records caught failures after output initialization. It may be
   absent for startup or output-directory failures; retain standard output and
   standard error too. If evaluation failed, inspect `RUN.json` and `STATUS.json`
-  for a `report_ref` and use the Inbox CLI `get` command to retrieve that report.
-  Only completed assessments are automatically written to `report.json` and
-  `export/` by this command.
+  for the `run_id` and `report_ref`. When `report_ref` is non-null, the Inbox CLI
+  `export` command can retrieve the saved assessment into a new directory.
+  `package_intake.py` automatically writes `report.json` and `export/` only for
+  completed assessments.
+
+Using the variables from the example, recover a saved report:
+
+```bash
+run_id="$(.venv/bin/python -c 'import json,sys; print(json.load(open(sys.argv[1]))["run_id"])' "$work_dir/intake/STATUS.json")"
+.venv/bin/python -B reference/recipient-inbox/recipient_inbox.py \
+  --db "$work_dir/intake/inbox.sqlite3" \
+  --source-root "$source_root" \
+  export "$run_id" "$work_dir/recovered"
+```
+
+Read the recovered report at `"$work_dir/recovered/report.json"`. If no report
+reference was saved, retain the failure records; `export` cannot create a
+missing assessment.
 
 Using the variables from the example, reassess the saved export:
 

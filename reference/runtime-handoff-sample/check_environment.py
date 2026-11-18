@@ -14,7 +14,11 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parent
-REQUIRED = frozenset(['CONTRACT.md', 'LICENSE', 'README.md', 'UPSTREAM-SOURCES.json', 'VALIDATION.md', 'check_environment.py', 'inbox/bridge.py', 'inbox/demo_connection.py', 'inbox/receive_handoff.py', 'inbox/test_bridge.py', 'reference/execution-evidence-demo/admission.py', 'reference/execution-evidence-demo/demo_contract.py', 'reference/minimal-al2-demo/trust_envelope_demo.py', 'reference/post-admission-revocation-sample/sample/contract.py', 'reference/receipt-linkage-example/SOURCE-PINS.json', 'reference/receipt-linkage-example/recipient_example.py', 'reference/recipient-assessment/EVALUATOR-SOURCES.json', 'reference/recipient-assessment/_worker.py', 'reference/recipient-assessment/vate_recipient.py', 'reference/recipient-inbox/recipient_inbox.py', 'reference/recipient-signature-authority/recipient_trial.py', 'reference/required-records/NATIVE-SOURCES.json', 'reference/required-records/native_bridge.py', 'reference/required-records/required_records.py', 'reference/s3-observation-example/SEAWEEDFS-PIN.json', 'reference/s3-observation-example/assess_observation.py', 'reference/s3-observation-example/capture_s3.py', 'reference/s3-observation-example/contract.py', 'reference/s3-observation-example/native_fixture.py', 'reference/s3-observation-example/run_trial.py', 'reference/s3-observation-example/sandbox_macos.py', 'reference/vate-verifier-core/vate_verifier_core.py', 'registries/evidence-vocabulary.v0.3.json', 'requirements.lock', 'sample/SOURCE-PINS.json', 'sample/dependencies.py', 'sample/fixture.py', 'sample/handoff_contract.py', 'sample/handoff_model.py', 'sample/handoff_provider.py', 'sample/handoff_reader.py', 'sample/run_demo.py', 'sample/test_handoff.py', 'schemas/admission-receipt.schema.json', 'schemas/admission-request.schema.json', 'schemas/post-execution-receipt.schema.json', 'scripts/vate_conformance.py', 'test_distribution.py'])
+REQUIRED = frozenset(['CONTRACT.md', 'LICENSE', 'README.md', 'UPSTREAM-SOURCES.json', 'VALIDATION.md', 'check_environment.py', 'inbox/bridge.py', 'inbox/demo_connection.py', 'inbox/receive_handoff.py', 'inbox/test_bridge.py', 'reference/execution-evidence-demo/admission.py', 'reference/execution-evidence-demo/demo_contract.py', 'reference/minimal-al2-demo/trust_envelope_demo.py', 'reference/post-admission-revocation-sample/sample/contract.py', 'reference/receipt-linkage-example/SOURCE-PINS.json', 'reference/receipt-linkage-example/recipient_example.py', 'reference/recipient-assessment/EVALUATOR-SOURCES.json', 'reference/recipient-assessment/_worker.py', 'reference/recipient-assessment/vate_recipient.py', 'reference/recipient-inbox/recipient_inbox.py', 'reference/recipient-signature-authority/recipient_trial.py', 'reference/required-records/NATIVE-SOURCES.json', 'reference/required-records/native_bridge.py', 'reference/required-records/required_records.py', 'reference/required-records/test_native_bridge.py', 'reference/request-binding/request_binding.py', 'reference/request-binding/durable_state.py', 'reference/request-binding/caller_authority.py', 'reference/request-binding/runner_binding.py', 'reference/s3-observation-example/SEAWEEDFS-PIN.json', 'reference/s3-observation-example/assess_observation.py', 'reference/s3-observation-example/capture_s3.py', 'reference/s3-observation-example/contract.py', 'reference/s3-observation-example/native_fixture.py', 'reference/s3-observation-example/run_trial.py', 'reference/s3-observation-example/sandbox_macos.py', 'reference/vate-verifier-core/vate_verifier_core.py', 'registries/evidence-vocabulary.v0.3.json', 'requirements.lock', 'sample/SOURCE-PINS.json', 'sample/dependencies.py', 'sample/fixture.py', 'sample/handoff_contract.py', 'sample/handoff_model.py', 'sample/handoff_provider.py', 'sample/handoff_reader.py', 'sample/run_demo.py', 'sample/test_handoff.py', 'schemas/admission-receipt.schema.json', 'schemas/admission-request.schema.json', 'schemas/post-execution-receipt.schema.json', 'scripts/vate_conformance.py', 'test_distribution.py'])
+
+
+INVENTORY_NAME = "scripts/runtime_handoff_inventory.json"
+REQUIRED = REQUIRED | {INVENTORY_NAME}
 
 
 def regular_bytes(root, name):
@@ -43,6 +47,42 @@ def verify_sources(root=ROOT):
         actual = hashlib.sha256(regular_bytes(root, name)).hexdigest()
         if type(expected) is not str or actual != expected:
             raise ValueError("source digest mismatch: " + name)
+    inventory = json.loads(regular_bytes(root, INVENTORY_NAME))
+    if (not isinstance(inventory, dict)
+            or set(inventory) != {"upstream_commit", "original_files", "added_files", "package_files"}
+            or not isinstance(inventory["original_files"], dict)
+            or not isinstance(inventory["added_files"], list)
+            or not isinstance(inventory["package_files"], list)
+            or not all(isinstance(name, str) for name in inventory["added_files"] + inventory["package_files"])):
+        raise ValueError("invalid canonical source inventory")
+    original, expected_added = inventory["original_files"], set(inventory["added_files"])
+    if (set(original) & expected_added or
+            (set(original) | expected_added) & set(inventory["package_files"]) or
+            set(original) | expected_added | set(inventory["package_files"]) != REQUIRED):
+        raise ValueError("invalid canonical source inventory")
+    upstream = json.loads(regular_bytes(root, "UPSTREAM-SOURCES.json"))
+    if not isinstance(upstream, dict):
+        raise ValueError("invalid upstream provenance")
+    unchanged, patched = upstream.get("unchanged_files"), upstream.get("patched_files")
+    if (not isinstance(unchanged, dict) or not isinstance(patched, dict)
+            or set(unchanged) & set(patched) or set(unchanged) | set(patched) != set(original)
+            or upstream.get("upstream_commit") != inventory["upstream_commit"]):
+        raise ValueError("invalid upstream provenance")
+    for name, digest in unchanged.items():
+        if name not in REQUIRED or digest != files[name] or digest != original[name]:
+            raise ValueError("unchanged upstream source mismatch: " + name)
+    for name, patch in patched.items():
+        if (name not in REQUIRED or not isinstance(patch, dict)
+                or set(patch) != {"upstream_sha256", "sha256"}
+                or patch["upstream_sha256"] != original[name]
+                or patch["upstream_sha256"] == patch["sha256"] or patch["sha256"] != files[name]):
+            raise ValueError("patched upstream source mismatch: " + name)
+    added = upstream.get("added_files")
+    if not isinstance(added, dict) or set(added) != expected_added:
+        raise ValueError("invalid added source inventory")
+    for name, digest in added.items():
+        if digest != files[name]:
+            raise ValueError("added source mismatch: " + name)
     # Refuse stale modules, packages, and bytecode left by an earlier extraction.
     # Non-importable notes/OS metadata do not affect the selected source inventory.
     suffixes = tuple(all_suffixes())

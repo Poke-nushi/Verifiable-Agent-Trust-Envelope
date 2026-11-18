@@ -14,8 +14,8 @@ and separate expected PEP comparison conditions.
 | [3. Nonexecution and handoff](cases/03-confirmed-nonexecution-handoff/) | Live worker; fenced old attempt | A live worker blocks handoff. Confirmed nonexecution and exclusion permit considering continuation under separate authorization conditions. |
 | [4. A new permit](cases/04-new-permit-does-not-reopen/) | Unresolved; completed | A new local admission does not reopen the same unresolved or completed effect. |
 
-The eight variants contain 17 saved snapshots from the existing
-[runtime-handoff sample](../runtime-handoff-sample/README.md), fixed at
+The eight variants contain 17 saved snapshots from the
+[fixed runtime-handoff source](../historical-runtime/f1286390/runtime-handoff-sample/README.md) at
 [`f128639`](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/tree/f1286390445bb55b92865dc21737e6e0696cee15/reference/runtime-handoff-sample).
 They use two runtimes, a trusted local provider, disposable test keys, a fixed
 fixture clock, and a two-file operation. No live AuthZEN PDP or PEP participates.
@@ -64,10 +64,22 @@ PEP's output as an automated conformance test.
 
 ## Replay the fixed inputs
 
-Use CPython 3.11–3.14 on macOS or Linux with `openssl` on `PATH`. Keep this folder
-and the complete `runtime-handoff-sample/` folder as siblings. A repository
-checkout or source archive already has that layout. The commands below run
-from the repository root and do not install packages or contact a network service.
+Use CPython 3.11–3.14 on macOS or Linux with `openssl` on `PATH`. A repository
+checkout or source archive includes both required directories:
+
+```text
+reference/authzen-receipt-vectors/
+reference/historical-runtime/f1286390/runtime-handoff-sample/
+```
+
+Keep this layout when copying the package. Replay and capture select the bundled
+`f128639` source and verify its unchanged manifest and files before import.
+They do not fall back to the current `reference/runtime-handoff-sample/`.
+For an existing separate copy of the same fixed source, pass `--sample PATH`
+to either command. The same source checks apply.
+
+The commands below run from the repository root without Git history, installed
+Python packages or a network service.
 
 ```sh
 python3 -E -s -S -B reference/authzen-receipt-vectors/verify.py
@@ -87,7 +99,7 @@ sequence, requests and responses are checked against the case and journal. They
 remain harness observations; replay does not independently re-execute them.
 To exercise the provider paths again, use the fresh-capture command below.
 
-## Capture new local histories
+## Capture new histories with the fixed runtime
 
 This command performs synthetic local file operations in temporary stores,
 creates temporary test keys, and saves only the exported inputs and expected
@@ -101,8 +113,10 @@ python3 -E -s -S -B reference/authzen-receipt-vectors/capture.py --out /tmp/vate
 python3 -E -s -S -B reference/authzen-receipt-vectors/verify.py --vectors /tmp/vate-authzen795-new
 ```
 
-New captures have new keys, signatures and identifiers, so their bytes differ.
-The same expected states and binding checks apply.
+New captures use the same `f128639` runtime with new keys, signatures and
+identifiers, so their bytes differ. The same expected states and binding checks
+apply. For new runtime integrations, use the
+[current runtime-handoff sample](../runtime-handoff-sample/README.md).
 The live-worker case uses a process rendezvous at the provider lock;
 the interruption cases inject faults at named sample boundaries.
 
@@ -114,8 +128,8 @@ See [VALIDATION.md](VALIDATION.md) for the observed environments and results.
 python3 -E -s -S -B -m unittest discover -s reference/authzen-receipt-vectors -p 'test_*.py' -v
 ```
 
-The tests include fresh capture, fixed replay, relocated execution, original-file
-preservation, and rejection of changed inputs, substituted context, modified
+The tests include fresh capture, fixed replay, relocated execution, explicit
+source selection without fallback, original-file preservation, and rejection of changed inputs, substituted context, modified
 receipts, inconsistent calls, unexpected files, untrusted source caches and
 permission relabelling. This package is a comparison aid; it is not an AuthZEN conformance suite, WG
 adoption, production approval or a distributed exactly-once guarantee.

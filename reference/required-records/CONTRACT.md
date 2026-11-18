@@ -240,9 +240,16 @@ invalid. These states do not create invented requirement results.
 Revision 1 forbids history fields. Later revisions require
 `previous_review_set_ref`, `previous_report_ref` and `revision_basis_ref`.
 The checker requires the same review-set ID and namespace, exactly one revision
-increment, an accepted prior report under this contract bound to the previous
-review-set raw identity, and a non-regressing cutoff. Old requirement IDs remain;
+increment, a prior report under this contract with `review_set_status` of
+`selected` or `selected_empty`, bound to the previous review-set raw identity,
+and a non-regressing cutoff. Old requirement IDs remain;
 withdrawal uses a waiver. An existing ID cannot change subject or record kind.
+
+Selection of the prior report does not require `invocation_errors` to be false
+or its native assessments to succeed. A selected report containing a processing
+or source error may be referenced when a later revision reevaluates the records.
+The new revision must pass its own input and source checks; history does not
+grant execution permission or turn the prior failure into a success.
 
 The selected prior report and originals are not rewritten. History refs remain
 in the new report. This is a check of one supplied revision step, not recursive
@@ -291,6 +298,22 @@ Deadline checks cover reads, native waits, candidate comparisons and report
 preparation. Native subprocesses have hard deadlines; remaining Python work
 uses cooperative checks and may finish diagnostics after the deadline. It is
 not an immediate timer interrupt or a complete memory-usage guarantee.
+Direct calls own a separate group for each native process and stop that group
+on every exit, including a leader that has already finished. Reaping the leader
+has a five-second cleanup bound. A cleanup failure returns
+`NATIVE_CLEANUP_ERROR` rather than a successful native result.
+
+When launched by the recipient inbox, the reviewer accepts process-group
+ownership only from its explicit immediate parent and only while it is that
+session's group leader. Native workers then stay in the inbox-owned group.
+A started native process's failure, time/output limit or interruption stops
+the entire evaluation group; no later call continues within that evaluation.
+The inbox retains a bounded stop reason and removes the shared temporary
+directory. The direct-call result-retention rules below apply when the reviewer
+can finish its report; a stopped inbox evaluation may have no report.
+Normally returned evaluation errors, including invalid receiver policies, do
+not by themselves stop the group and retain the same report behavior.
+
 Unprocessed candidates remain unknown. An independent native failure does not
 erase an already established operation-level presence, but missing native
 attempt evidence cannot establish an attempt binding.

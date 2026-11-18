@@ -89,12 +89,19 @@ connects real local Hydra/OpenFGA and the retained Keychain key through supervis
 intake and managed dispatch, including fresh publisher/recipient processes and
 an interrupted recording callback. It retains the original host, stores and anchors.
 Broader IAM mappings, root-key selection/migration and deployment-wide authority
-policy remain application responsibilities. Both local stores require unchanged anchored
-filesystem identities. Their contracts provide no portable host recovery,
-re-anchoring or storage migration procedure; such a procedure must preserve
-revision, clock and replay history. These Python paths do
+policy remain application responsibilities. Ordinary store reopening requires
+unchanged anchored filesystem identities; it does not perform re-anchoring or
+storage migration. These Python paths do
 not establish the caller's or runtime's transport peer identity or
 hardware-backed runtime attestation.
+
+The separate [planned migration](../reference/planned-migration/CONTRACT.md)
+supports one explicit stopped transition from pinned `6758476` source, with new
+authority keys and physical store locations on the same local filesystem.
+It preserves original histories and rejects old-store execution. It requires
+fresh current authorization and new admissions for pending operations after the
+move. Portable host recovery, key loss/compromise, stale-backup restore and
+arbitrary upgrade paths remain outside that transition.
 
 ### 4. Receipt Semantics Need More Precision
 

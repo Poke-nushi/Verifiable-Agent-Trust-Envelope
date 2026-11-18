@@ -1078,6 +1078,58 @@ def iter_negative_schema_cases() -> list[tuple[str, dict, str]]:
     ]
 
 
+def check_a2a_metadata_digest_values(validator) -> None:
+    cases = (
+        ("lowercase hex", "0123456789abcdef" * 4, True),
+        ("short", "a" * 63, False),
+        ("long", "a" * 65, False),
+        ("trailing LF", "a" * 64 + "\n", False),
+        ("trailing CR", "a" * 64 + "\r", False),
+        ("trailing CRLF", "a" * 64 + "\r\n", False),
+        ("trailing line separator", "a" * 64 + "\u2028", False),
+        ("trailing paragraph separator", "a" * 64 + "\u2029", False),
+        ("leading space", " " + "a" * 64, False),
+        ("trailing space", "a" * 64 + " ", False),
+        ("uppercase", "A" * 64, False),
+        ("non-hex", "g" * 64, False),
+        ("empty", "", False),
+    )
+    for kind in ("artifact", "evidence"):
+        for label, value, accepted in cases:
+            metadata = load_json(
+                ROOT / "examples/a2a/metadata-admission-requested-with-signed-agent-card.json"
+            )
+            if kind == "artifact":
+                reference = metadata["admission_request"]
+                expected_path = ["admission_request", "digest", "value"]
+            else:
+                reference = metadata["evidence_refs"][0]
+                expected_path = ["evidence_refs", 0, "digest", "value"]
+            reference["digest"]["value"] = value
+            errors = list(validator.iter_errors(metadata))
+            if (not errors) != accepted:
+                raise SystemExit(f"A2A {kind} digest {label}: unexpected schema acceptance")
+            if any(list(error.path) != expected_path for error in errors):
+                raise SystemExit(f"A2A {kind} digest {label}: rejected outside the digest value")
+
+
+def check_exact_schema_tokens(validator_class) -> None:
+    """Use the same token examples as Ajv, including terminal line separators."""
+    cases = load_json(ROOT / "scripts/schema-token-cases.json")
+    for case in cases["cases"]:
+        node = load_json(ROOT / case["schema"])
+        for component in case["pointer"].lstrip("/").split("/"):
+            node = node[int(component)] if isinstance(node, list) else node[component]
+        validator = validator_class(node)
+        label = case["schema"] + case["pointer"]
+        for value in cases["valid"][case["kind"]]:
+            if not validator.is_valid(value):
+                raise SystemExit(f"{label}: rejected valid token {value!r}")
+            for suffix in cases["invalid_suffixes"]:
+                if validator.is_valid(value + suffix):
+                    raise SystemExit(f"{label}: accepted token suffix {suffix!r}")
+
+
 def main() -> int:
     try:
         from jsonschema import Draft202012Validator, FormatChecker
@@ -1088,6 +1140,20 @@ def main() -> int:
         ) from exc
 
     format_checker = FormatChecker()
+    check_exact_schema_tokens(Draft202012Validator)
+
+    # jsonschema's URI checker is optional. Register the same dependency-free
+    # syntax check as the request adapter so missing extras cannot skip it.
+    sys.path.insert(0, str(ROOT / "reference/runtime-support"))
+    from vate_uri import is_absolute_uri
+
+    @format_checker.checks("uri")
+    def is_supported_uri(value: object) -> bool:
+        return not isinstance(value, str) or is_absolute_uri(value)
+
+    for case in load_json(ROOT / "reference/a2a-metadata-adapter-demo/uri-test-vectors.json"):
+        if format_checker.conforms(case["uri"], "uri") != case["valid"]:
+            raise SystemExit(f"strict URI checker disagrees with shared vector {case!r}")
 
     @format_checker.checks("date-time")
     def is_supported_rfc3339_date_time(value: object) -> bool:
@@ -1124,6 +1190,11 @@ def main() -> int:
             first = errors[0]
             path = ".".join(str(part) for part in first.path) or "root"
             raise SystemExit(f"{example_rel} failed strict validation at {path}: {first.message}")
+
+    check_a2a_metadata_digest_values(Draft202012Validator(
+        load_json(ROOT / "schemas/a2a-vate-metadata.schema.json"),
+        format_checker=format_checker,
+    ))
 
     binding_root = ROOT / "reference/request-binding"
     binding_example = binding_root / "examples/purchase-cap"

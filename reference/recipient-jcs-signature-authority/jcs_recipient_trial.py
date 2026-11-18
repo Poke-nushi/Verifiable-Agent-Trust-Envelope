@@ -19,7 +19,7 @@ CONTRACT = "vate-local-jcs-signature-authority-trial-v1"
 BRIDGE_CONTRACT = "vate-local-jcs-es256-bridge-v1"
 SIGNATURE_PROFILE = "vate-local-jcs-es256-detached-v1"
 LEGACY_PATH = "reference/recipient-signature-authority/recipient_trial.py"
-LEGACY_SHA = "4c8930e05e08a5fdc74adfc174699ae5878d6a1932eac5ff4ba38009fb1b3b00"
+LEGACY_SHA = "ea76db480ccf16fd7652213804951f4d72542673bc041f5e879878ecd2b6185f"
 BRIDGE_PATH = "reference/recipient-jcs-signature-authority/bridge.mjs"
 BRIDGE_SOURCES = (BRIDGE_PATH, "packages/vate-core-ts/dist/jcs-es256.js", "packages/vate-core-ts/dist/jcs.js")
 KINDS = ("admission", "post_execution")
@@ -61,7 +61,7 @@ def require(condition, code, detail):
 class JcsRecipientTrial:
     def __init__(self, *, expected_contract, node, node_sha256, source_root=ROOT, timeout_seconds=10.0):
         require(expected_contract == CONTRACT, "UNKNOWN_CONTRACT", "explicit local JCS trial contract required")
-        require(type(timeout_seconds) in (int, float) and math.isfinite(timeout_seconds) and 0 < timeout_seconds <= 60,
+        require(type(timeout_seconds) in (int, float) and 0 < timeout_seconds <= 60 and math.isfinite(timeout_seconds),
                 "INVALID_CONFIGURATION", "timeout must be finite, positive and at most 60 seconds")
         require(type(node_sha256) is str and HEX.fullmatch(node_sha256), "INVALID_CONFIGURATION", "Node executable pin required")
         try:

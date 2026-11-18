@@ -178,6 +178,22 @@ includes a saved report with `invocation_errors: true`. Calling `run` again
 returns that recorded state; correct the inputs or configuration and prepare
 a new job. A report that was never produced cannot be retained.
 
+The inbox owns one process group for the reviewer, native workers and their
+descendants, and one temporary directory containing their temporary files.
+It stops the group on every evaluation exit, including normal completion and
+an already-exited reviewer leader, then allows at most five seconds to reap
+the reviewer. The evaluation wait remains limited to 90 seconds.
+
+Within this group, a started native process that exceeds its time/output limit,
+fails, or is interrupted stops the whole evaluation before another native call
+can start. Its bounded stop record becomes `NATIVE_EVALUATION_STOPPED` with the
+native error code. A complete report may be absent; received originals and the
+prepared selection remain stored. An interruption of the inbox itself leaves
+the job `prepared` and resumable after group cleanup. Native evaluation errors
+returned normally, such as an invalid receiver policy, remain in the report.
+Cleanup failures are
+reported as `EVALUATOR_CLEANUP` when evaluation returns a recorded result.
+
 These limits do not bound every temporary allocation inside jsonschema or
 guarantee completion for every input. The receipt checker marks truncated
 diagnostics and preserves invalidity independently of the retained item count.

@@ -8,6 +8,28 @@ For public wording rules, see
 
 ## Current Direction
 
+### v0.7.0 release
+
+The [v0.7.0 release notes](docs/release-notes/v0.7.0.md) show how a receiver
+checks the original and approved instructions for a purchase. The Python
+reference also demonstrates checking current authority before dispatch and
+migrating one stopped deployment. The [release verification record](docs/release-gate-v0.7.0.md)
+identifies the source and the two fixture sets an implementer can compare against.
+
+### Planned Local Migration
+
+The [planned migration path](reference/planned-migration/README.md) addresses
+maintenance of the managed Python reference: one stopped deployment moves from
+the pinned `6758476` source to a selected successor, with a new authority key and
+new store locations. Original receipt/proof bytes and consumed-operation history
+are retained. Old stores are retired in the same transaction that creates the
+usable destination state. New operation admission requires a fresh authority
+observation under the new key.
+
+This transition keeps one administrator, host, filesystem and authority mapping.
+Key-loss recovery, stale backups, arbitrary upgrades and uninterrupted operation
+remain separate work. It does not relabel existing release or experiment pins.
+
 ### v0.6.0: Receiving, Reassessment and Runtime-Key Revocation
 
 The `v0.6.0` discussion-draft pre-release adds receiver-selected required-record checks, persistent
@@ -167,6 +189,8 @@ or produce VATE receipts.
 
 The current public review surface is:
 
+- [v0.7.0 release notes](docs/release-notes/v0.7.0.md) and
+  [release verification](docs/release-gate-v0.7.0.md)
 - `v0.6.0` release notes and publication/archive gate:
   [docs/release-notes/v0.6.0.md](docs/release-notes/v0.6.0.md) and
   [docs/release-gate-v0.6.0.md](docs/release-gate-v0.6.0.md)

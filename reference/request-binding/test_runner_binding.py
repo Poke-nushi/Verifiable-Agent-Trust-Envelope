@@ -79,6 +79,174 @@ class RunnerBindingTests(unittest.TestCase):
         write(implementation_path, implementation)
         return report_path, implementation_path
 
+    def test_sut_digest_annotations_preserve_binding_and_bundle_checks(self):
+        for filename in ("sut-results-fixtures.json", "sut-results-generated.json"):
+            with self.subTest(filename=filename):
+                path = self.submitted / filename
+                sut = read(path)
+                for case in sut["results"]:
+                    case["request_binding_artifacts"]["digest"]["note"] = "local annotation"
+                    for ref in case.get("generated_artifacts", {}).values():
+                        ref["digest"]["note"] = "local annotation"
+                write(path, sut)
+                report = runner.compare_sut_results(CORPUS, path)
+                self.assertEqual(report["summary"]["failed"], 0, report)
+                report_path, implementation_path = self.write_bundle(report)
+                bundle = runner.verify_report_bundle(CORPUS, report_path, implementation_path, path)
+                self.assertEqual(bundle["summary"]["failed"], 0, bundle)
+
+    def test_manifest_digest_annotations_do_not_relax_algorithm_or_value(self):
+        path = self.directory / "binding-manifest.json"
+        expected = b.digest(path.read_bytes())
+        for supplied in ({**expected, "alg": "sha-512"}, {**expected, "value": "0" * 64},
+                         {"value": expected["value"]}):
+            with self.subTest(supplied=supplied):
+                supplied["note"] = "annotation does not authorize different bytes"
+                with self.assertRaisesRegex(adapter.binding.Invalid, "MANIFEST_DIGEST_MISMATCH"):
+                    adapter.load_manifest(path, supplied)
+
+    def test_constraint_basis_matches_core_for_supported_decisions(self):
+        for decision in ("allow", "deny", "attenuate"):
+            for present in (True, False):
+                with self.subTest(decision=decision, present=present):
+                    receipt = {"decision": {"outcome": decision}, "request": {}}
+                    requested = {"max_amount": {"currency": "USD", "value": "100"}}
+                    if present:
+                        receipt["request"]["constraints"] = requested
+                    selected = requested if present else {}
+                    if decision == "attenuate":
+                        selected = {"max_amount": {"currency": "USD", "value": "25"}}
+                        receipt["attenuation"] = {"effective_constraints": selected}
+                    for module in (b.core, runner):
+                        self.assertEqual(module.admitted_effective_constraints(receipt), selected)
+
+    def test_constraint_basis_rejects_malformed_receipts_without_fallback(self):
+        base = read(self.directory / "admission-receipt.json")
+        invalid = [None, [], {}, {"decision": {}, "request": {}},
+                   {"decision": {"outcome": []}, "request": {}},
+                   {"decision": {"outcome": "allow"}, "request": None}]
+        for value in (None, [], True, {}, "bad"):
+            receipt = copy.deepcopy(base)
+            receipt["attenuation"]["effective_constraints"] = value
+            invalid.append(receipt)
+            receipt = copy.deepcopy(base)
+            receipt["request"]["constraints"] = value
+            if value != {}:
+                invalid.append(receipt)
+        receipt = copy.deepcopy(base)
+        del receipt["attenuation"]["effective_constraints"]
+        invalid.append(receipt)
+        for value in (None, [], {}, True):
+            receipt = copy.deepcopy(base)
+            receipt["attenuation"] = value
+            invalid.append(receipt)
+        for decision in ("allow", "deny"):
+            receipt = copy.deepcopy(base)
+            receipt["decision"]["outcome"] = decision
+            invalid.append(receipt)
+        for index, receipt in enumerate(invalid):
+            with self.subTest(index=index):
+                for module in (b.core, runner):
+                    with self.assertRaises(ValueError):
+                        module.admitted_effective_constraints(receipt)
+
+    def test_runner_linkage_reports_invalid_basis_instead_of_raising(self):
+        receipt = read(self.directory / "admission-receipt.json")
+        post = read(self.directory / "post-execution.json")
+        for value in (None, [], {}, True):
+            with self.subTest(value=value):
+                receipt["attenuation"]["effective_constraints"] = value
+                post["admission"]["digest"] = runner.digest_descriptor(receipt)
+                failures = runner.post_execution_side_effect_failures(receipt, post)
+                self.assertEqual(len(failures), 1)
+                self.assertIn("admission effective constraints invalid", failures[0])
+                self.assertIn(failures[0], runner.post_execution_linkage_failures(receipt, post))
+                self.assertEqual(runner.linkage_check_violation({}, {"kind": "effective_constraints"}, receipt, post),
+                                 (True, None))
+
+    def test_runner_linkage_rejects_selected_legacy_constraints(self):
+        for decision in ("allow", "attenuate"):
+            for name in ("max_amount_usd", "resource"):
+                with self.subTest(decision=decision, name=name):
+                    receipt = read(self.submitted / decision / "admission-receipt.json")
+                    post = read(self.submitted / decision / "post-execution.json")
+                    runner.admitted_effective_constraints(receipt)[name] = None
+                    self.assertTrue(any("legacy alias" in message for message in
+                                        runner.post_execution_side_effect_failures(receipt, post)))
+
+    def test_non_ascii_timestamp_digits_are_rejected_before_the_datetime_parser(self):
+        value = "2026-11-16T12:34:56.123456+09:00"
+        for digits in ("０１２３４５６７８９", "٠١٢٣٤٥٦٧٨٩"):
+            for index, char in enumerate(value):
+                if char not in "0123456789":
+                    continue
+                changed = value[:index] + digits[int(char)] + value[index + 1:]
+                for module in (b.core, runner):
+                    with self.subTest(module=module.__name__, index=index, value=changed):
+                        with mock.patch.object(module, "datetime") as parser:
+                            with self.assertRaises(ValueError):
+                                module.parse_time(changed)
+                            parser.fromisoformat.assert_not_called()
+        for valid in (value, "2026-11-16t12:34:56.1z", "2026-11-16T12:34:56Z"):
+            self.assertEqual(b.core.parse_time(valid), runner.parse_time(valid))
+
+    def assert_receipt_digest_relation(self, receipt, post, *, matches):
+        case = {"artifacts": {"admission_receipt": str(self.directory / "admission-receipt.json")}}
+        core_result = b.core.VateVerifier(verifier_id="urn:vate:digest-controls").validate_post_execution_linkage(receipt, post)
+        self.assertEqual(core_result["outcome"], "success" if matches else "failed")
+        failures = runner.post_execution_linkage_failures(receipt, post)
+        self.assertEqual("admission digest mismatch" not in failures, matches)
+        self.assertEqual(runner.linkage_check_violation(case, {"kind": "admission_digest"}, receipt, post),
+                         (not matches, None))
+        self.assertEqual(runner.admission_link_relation_state(receipt, post)["digest_match"], matches)
+
+    def test_receipt_digest_annotations_preserve_all_linkage_comparisons(self):
+        receipt = read(self.directory / "admission-receipt.json")
+        post = read(self.directory / "post-execution.json")
+        self.assert_receipt_digest_relation(receipt, post, matches=True)
+        post["admission"]["digest"].update(note="retained", extension={"values": [None, True, 1]})
+        self.assert_receipt_digest_relation(receipt, post, matches=True)
+
+    def test_receipt_digest_annotations_do_not_relax_algorithm_or_value(self):
+        receipt = read(self.directory / "admission-receipt.json")
+        expected = runner.digest_descriptor(receipt)
+        invalid = (None, [], {}, {"alg": "sha-256"}, {"value": expected["value"]},
+                   {**expected, "alg": "sha-512"}, {**expected, "value": "0" * 64},
+                   {**expected, "value": expected["value"][:63]},
+                   {**expected, "value": expected["value"] + "0"},
+                   {**expected, "value": expected["value"].upper()},
+                   {**expected, "value": expected["value"] + "\n"},
+                   {**expected, "value": True})
+        for digest in invalid:
+            with self.subTest(digest=digest):
+                post = read(self.directory / "post-execution.json")
+                post["admission"]["digest"] = copy.deepcopy(digest)
+                if isinstance(digest, dict):
+                    post["admission"]["digest"]["note"] = "annotation does not authorize different bytes"
+                self.assert_receipt_digest_relation(receipt, post, matches=False)
+
+    def test_admission_annotations_remain_in_digest_basis(self):
+        path = self.directory / "admission-receipt.json"
+        receipt = read(path)
+        post = read(self.directory / "post-execution.json")
+        receipt["note"] = "part of the hashed admission"
+        write(path, receipt)
+        self.assert_receipt_digest_relation(receipt, post, matches=False)
+        post["admission"]["digest"] = {**runner.digest_descriptor(receipt), "note": "descriptor annotation"}
+        self.assert_receipt_digest_relation(receipt, post, matches=True)
+
+    def test_receipt_digest_annotations_preserve_generated_compare_and_bundle(self):
+        path = self.directory / "post-execution.json"
+        post = read(path)
+        post["admission"]["digest"]["note"] = "receipt-internal annotation"
+        write(path, post)
+        self.update_ref("post_execution_receipt", path.name)
+        report = runner.compare_sut_results(CORPUS, self.sut_path)
+        self.assertEqual(report["summary"]["failed"], 0, report)
+        paths = self.write_bundle(report)
+        bundle = runner.verify_report_bundle(CORPUS, *paths, self.sut_path)
+        self.assertEqual(bundle["summary"]["failed"], 0, bundle)
+
     def test_all_modes_and_bundle_recompute(self):
         run = runner.run_corpus(CORPUS)
         self.assertNotIn("fatal_errors", run)
@@ -297,8 +465,13 @@ class RunnerBindingTests(unittest.TestCase):
                 forged = copy.deepcopy(good); forged["sut_results"] = bad["sut_results"]
                 checked = runner.verify_report_bundle(CORPUS, *self.write_bundle(forged), self.sut_path)
                 self.assertEqual(checked["status"], "fail")
-                self.assertIn("request_binding.request-binding-attenuate.recomputed",
-                              [c["name"] for c in checked["checks"] if not c["pass"]])
+                failed = [c["name"] for c in checked["checks"] if not c["pass"]]
+                self.assertIn("sut_results.generated_artifacts.request-binding-attenuate", failed)
+                # The post-execution link is invalid; the admission's input
+                # binding remains valid and must keep its separate verdict.
+                binding = next(c for c in checked["checks"]
+                               if c["name"] == "request_binding.request-binding-attenuate.recomputed")
+                self.assertTrue(binding["pass"])
 
     def test_bundle_distinguishes_boolean_from_numbers(self):
         good = runner.compare_sut_results(CORPUS, self.sut_path)

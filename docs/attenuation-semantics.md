@@ -9,10 +9,10 @@ It is not a human note such as "restricted".
 
 ## Short Walk-Through
 
-Requested action:
+Requested authority:
 
 ```text
-transfer USD 10000 from account A to account B
+transfer up to USD 10000 from account A to account B
 ```
 
 Verifier decision:
@@ -74,10 +74,20 @@ disclosure.
 
 For the current AL2 v0.3 corpus, both fields use the profile hash string grammar:
 `sha-256:` followed by a lowercase 64-character hexadecimal digest.
-The hash input is the profile-canonicalized request object after any accepted
-input aliases have been normalized. Raw legacy input, if retained, belongs in a
-separate evidence artifact or annotation and must not replace the profile hash
-basis.
+Issuers normalize any input aliases their profile accepts before hashing.
+Retained raw input belongs in a separate evidence artifact or annotation.
+
+Without a request-binding requirement, the runner checks that the declared
+original and effective hashes differ. It accepts a `request.input_hash` that
+differs from `attenuation.original_request_hash` and uses the declared
+effective hash for linkage. The receipt alone cannot establish the contents of
+either operation.
+
+Under the `vate-request-binding-v1` purchase-cap contract, the receiver hashes
+the canonical original operation and requires both `request.input_hash` and
+`attenuation.original_request_hash` to match it. The receiver also reconstructs
+the amount reduction and checks the effective operation and its hash.
+See the [receipt binding rules](receipt-model-v0.3.md#request-to-admission-to-effect-binding-invariant).
 
 The post-execution receipt MUST link to the admitted effective request hash.
 If post-execution evidence references the original request hash or a different
@@ -150,21 +160,20 @@ canonical field names used in emitted `effective_constraints`.
 - `require_new_permit` - execution may not proceed until a fresh or narrower permit is issued
 - `deny_if_not_accepted` - the verifier can proceed only if the runtime accepts the effective constraints
 
-When `require_new_permit` is `true`, an AL2 conformance case should report
-`should_execute: false` even if the admission decision remains `attenuate`.
-The decision records that the verifier found a possible narrower path; the
-execution gate remains closed until a fresh permit is presented.
+Either a true `require_new_permit` flag or the `require_new_permit` mode
+closes the execution gate. A receipt with that mode and a false flag fails
+attenuation validation. Its fixture `run` reports `actual_should_execute: false`.
+A missing or non-boolean flag or an unrecognized mode also closes the gate.
 
 `approval.mode` describes the approval constraint that remains in the admitted
-authority. `attenuation.require_new_permit` is the execution gate used by the
-AL2 corpus. If an approval mode is intended to block execution until a fresh
-permit is presented, the emitted receipt must set `require_new_permit: true`.
+authority. If that constraint calls for a fresh permit, the emitted receipt
+must set `attenuation.require_new_permit: true`.
 
 The current profile distinguishes two execution-gate outcomes.
 
-For `require_new_permit: false`, one admission receipt preserves the
-original/effective request relationship by recording both profile hashes, the
-machine-readable changes, and the effective constraints together. When
+For `narrow` or `deny_if_not_accepted` with `require_new_permit: false`,
+one admission receipt records both profile hashes, the machine-readable changes,
+and the effective constraints. When
 execution proceeds, the v0.3 linkage checks bind the post-execution receipt to
 the specific admission receipt digest and the admitted effective request hash.
 

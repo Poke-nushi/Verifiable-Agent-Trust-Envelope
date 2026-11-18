@@ -169,8 +169,12 @@ Without a configured runtime verifier, this entry evaluates exactly one
 `local_policy` evidence reference.
 Its `uri` MUST equal the verifier-selected policy's `policy_ref` (or `local`
 when absent), its `media_type` MUST be `application/json`, and its digest MUST
-equal SHA-256 of that policy under the canonical JSON basis above. The policy
-comes from the verifier configuration; the request MUST NOT select or replace
+equal SHA-256 of that policy under the canonical JSON basis above. This
+comparison MUST use validated `alg` and `value`; permitted digest
+annotations MUST be preserved in receipt evidence and MUST NOT cause a content
+digest mismatch. The closed references inside `request_binding` retain their
+exact-field requirement.
+The policy comes from the verifier configuration; the request MUST NOT select or replace
 it. Missing, inconsistent, duplicate or unsupported evidence MUST be rejected
 before policy evaluation and replay-state consumption. Other evidence types
 require an adapter that implements their verification contract.
@@ -278,6 +282,10 @@ and compare them to the saved report. Deleting report coverage or renewing outer
 report digests MUST NOT satisfy a missing or invalid binding.
 Saved assessments MUST satisfy their schema's field types and status conditions.
 Comparison with a recomputed assessment MUST distinguish booleans from numbers.
+A successful binding assessment MUST NOT require the enclosing conformance case
+to pass: an unrelated outcome, reason-code, or execution-decision comparison can
+fail while the binding remains valid. Missing or invalid bindings MUST still
+fail bundle verification, including when the conformance case already failed.
 
 TypeScript `assessRequestBinding` implements the same receiver checks using raw
 byte inputs and a native `Map`. It preserves six fractional timestamp digits

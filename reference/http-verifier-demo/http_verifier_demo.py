@@ -13,12 +13,14 @@ import copy
 import hashlib
 import importlib.util
 import json
+import math
 import shutil
 import socket
 import subprocess
 import sys
 import tempfile
 import time
+from datetime import datetime, timedelta
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -26,9 +28,23 @@ from typing import Any
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "reference/runtime-support"))
+from vate_uri import is_absolute_uri
+
 MINIMAL_DEMO = ROOT / "reference" / "minimal-al2-demo" / "trust_envelope_demo.py"
 DEFAULT_POLICY = ROOT / "policies" / "al2-http-verifier.example.json"
 DEFAULT_CORPUS = ROOT / "conformance" / "al2-http"
+APPROVAL_MODES = frozenset({"policy_auto", "human_required"})
+ASSURANCE_LEVELS = ("AL0", "AL1", "AL2", "AL3", "AL4")
+RESPONSE_FILES = ("http-verifier-response.json", "verifier-admission-receipt.json", "verifier-admission-receipt.jws")
+AGE_FIELDS = tuple(f"{kind}_max_age_seconds" for kind in ("status", "runtime", "permit"))
+ATTENUATION_HANDLERS = {
+    "resource": "replace",
+    "max_amount_usd": "min",
+    "max_redelegation_depth": "min",
+    "tool_allowlist": "intersect",
+    "approval": "escalate",
+}
 
 
 def load_minimal_demo():
@@ -41,6 +57,7 @@ def load_minimal_demo():
 
 
 demo = load_minimal_demo()
+STATUS_KINDS = demo.STATUS_KINDS
 
 
 def write_json(path: Path, data: dict[str, Any]) -> None:
@@ -49,7 +66,7 @@ def write_json(path: Path, data: dict[str, Any]) -> None:
 
 
 def read_json(path: Path) -> dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return demo.read_json(path)
 
 
 def write_text(path: Path, data: str) -> None:
@@ -72,23 +89,97 @@ def ensure_verifier_key(bundle: dict[str, Any], out_dir: Path) -> None:
 
 
 def policy_default_for_dir(directory: Path) -> Path:
-    candidate = directory.parent.parent / "policy.json"
-    if candidate.exists():
-        return candidate
-    return DEFAULT_POLICY
+    return directory.resolve().parent.parent / "policy.json"
+
+
+class PolicyFileError(ValueError):
+    """The selected local policy could not be read or interpreted."""
+
+
+def read_policy_file(path: Path) -> tuple[dict[str, Any], bytes]:
+    try:
+        raw = path.read_bytes()
+        policy = demo.parse_demo_json(raw.decode("utf-8"))
+        validate_policy(policy)
+    except (OSError, ValueError) as exc:
+        raise PolicyFileError(f"cannot use verifier policy {path}: {exc}") from exc
+    return policy, raw
 
 
 def load_policy(path: Path) -> dict[str, Any]:
-    return read_json(path)
+    return read_policy_file(path)[0]
 
 
-def assurance_value(label: str) -> int:
-    if not label.startswith("AL"):
-        return -1
-    try:
-        return int(label[2:])
-    except ValueError:
-        return -1
+def freshness_limit(policy: dict[str, Any], field: str) -> int | float:
+    value = policy["freshness"].get(field)
+    if (type(value) not in (int, float) or value < 1
+            or (isinstance(value, float) and (not math.isfinite(value) or not value.is_integer()))):
+        raise ValueError(f"{field} must be a positive integer number of seconds")
+    return value
+
+
+def assurance_value(label: Any, field: str = "assurance_level") -> int:
+    if label not in ASSURANCE_LEVELS:
+        raise ValueError(f"{field} must be one of AL0 through AL4")
+    return ASSURANCE_LEVELS.index(label)
+
+
+def string_list(value: Any, field: str) -> list[str]:
+    if not isinstance(value, list) or any(not isinstance(item, str) or not item for item in value):
+        raise ValueError(f"{field} must be an array of non-empty strings")
+    return value
+
+
+def validate_policy_identity(policy: Any) -> None:
+    if not isinstance(policy, dict):
+        raise ValueError("verifier policy must be an object")
+    for field in ("policy_id", "policy_version"):
+        demo.required_text(policy, field)
+
+
+def copy_json_value(value: Any) -> Any:
+    """Take a private copy without coercing Python-only values into JSON types."""
+    if isinstance(value, dict):
+        members = value.copy()
+        if not all(isinstance(key, str) for key in members):
+            raise ValueError("policy JSON object keys must be strings")
+        return {key: copy_json_value(item) for key, item in members.items()}
+    if isinstance(value, list):
+        return [copy_json_value(item) for item in value.copy()]
+    if value is None or type(value) in (str, bool, int) or (type(value) is float and math.isfinite(value)):
+        return value
+    raise ValueError("policy values must be JSON data with finite numbers")
+
+
+def validate_policy(policy: Any) -> None:
+    """Validate the local policy contract before any membership or threshold decision."""
+    validate_policy_identity(policy)
+    if policy.get("version") != "app-verifier-policy-0.1" or policy.get("profile") != "AL2-http":
+        raise ValueError("verifier policy requires version app-verifier-policy-0.1 and profile AL2-http")
+    if not is_absolute_uri(policy.get("verifier_id")):
+        raise ValueError("verifier_id must be an absolute URI")
+    assurance_value(policy.get("required_assurance_level"), "required_assurance_level")
+    if not isinstance(policy.get("fail_closed"), bool):
+        raise ValueError("fail_closed must be a boolean")
+    states = policy.get("accepted_states")
+    if not isinstance(states, dict) or set(states) != set(STATUS_KINDS):
+        raise ValueError("accepted_states must contain exactly passport, runtime, and permit")
+    for kind in STATUS_KINDS:
+        accepted = string_list(states[kind], f"accepted_states.{kind}")
+        if demo.BLOCKING_STATUS_STATES.intersection(accepted):
+            raise ValueError(f"accepted_states.{kind} cannot include a suspended, revoked, or quarantined state")
+    if not isinstance(policy.get("freshness"), dict):
+        raise ValueError("freshness must be an object")
+    for field in AGE_FIELDS:
+        freshness_limit(policy, field)
+    for field in ("allowed_actions", "allowed_resources"):
+        string_list(policy.get(field), field)
+    handlers = policy.get("attenuation_handlers")
+    if not isinstance(handlers, dict):
+        raise ValueError("attenuation_handlers must be an object")
+    for field, handler in handlers.items():
+        if field not in ATTENUATION_HANDLERS or handler != ATTENUATION_HANDLERS[field]:
+            raise ValueError(f"unsupported attenuation_handlers entry for {field}")
 
 
 def record(checks: list[dict[str, Any]], phase: str, name: str, ok: bool, details: str) -> None:
@@ -215,21 +306,53 @@ def build_request(bundle: dict[str, Any], scenario_name: str) -> dict[str, Any]:
     }
 
 
-def generate_demo(out_dir: Path, *, policy_path: Path) -> None:
-    if out_dir.exists():
-        shutil.rmtree(out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
+def validate_legacy_execution_receipts(root: Path, seen: set[Path], legacy: set[Path]) -> None:
+    """Recognize the previous generator's identical, signed fixture before retiring it."""
+    if not seen.intersection(legacy):
+        return
+    base = root / "_base"
+    problem = "unrecognized execution receipts in the existing HTTP demo; choose a new directory"
+    if not legacy.issubset(seen):
+        raise demo.DemoOutputError(problem)
+    try:
+        copies = {name: (base / name).read_bytes() for name in ("execution-receipt.json", "execution-receipt.jws")}
+        if any((root / path).read_bytes() != copies[path.name] for path in legacy):
+            raise demo.DemoOutputError(problem)
+        spec = demo.ARTIFACT_SPECS["receipt"]
+        verified = demo.verify_role_bound_jws(
+            out_dir=base, trust_bundle=read_json(base / "trust-bundle.json"),
+            token=demo.read_text(base / "execution-receipt.jws"),
+            expected_typ=spec["typ"], expected_cty=spec["cty"], expected_role="runtime")
+        body = verified["payload"]
+        recognized = (verified["ok"] and body.get("receipt_id") == "aer:demo-receipt"
+                      and body.get("receipt_phase") == "post_execution"
+                      and demo.canonical(body) == demo.canonical(read_json(base / "execution-receipt.json")))
+    except (OSError, ValueError, TypeError, KeyError, RuntimeError) as exc:
+        raise demo.DemoOutputError(problem) from exc
+    if not recognized:
+        raise demo.DemoOutputError(problem)
 
+
+def generate_demo(out_dir: Path, *, policy_path: Path) -> None:
+    policy, policy_bytes = read_policy_file(policy_path)
+    with demo.staged_output(out_dir) as staged:
+        generate_scenarios(staged, policy, policy_bytes)
+        scenarios = [Path("scenarios") / name for name in scenario_definitions()]
+        reports = {directory / file for directory in scenarios for file in RESPONSE_FILES}
+        legacy = {directory / file for directory in [Path("_base"), *scenarios]
+                  for file in ("execution-receipt.json", "execution-receipt.jws")}
+        seed = Path("policy.json") if policy_path.resolve() == (out_dir / "policy.json").resolve() else None
+        demo.publish_output(staged, out_dir, optional_files=reports | legacy, seed=seed,
+                            validate_previous=lambda root, seen: validate_legacy_execution_receipts(root, seen, legacy))
+
+
+def generate_scenarios(out_dir: Path, policy: dict[str, Any], policy_bytes: bytes) -> None:
     base_dir = out_dir / "_base"
-    policy = load_policy(policy_path)
-    bundle = demo.build_demo_bundle(base_dir)
+    bundle = demo.build_demo_bundle(base_dir, audience=policy["verifier_id"], include_execution_receipt=False)
     ensure_verifier_key(bundle, base_dir)
-    bundle["artifacts"]["runtime_proof"]["payload"]["challenge_binding"]["aud"] = policy["verifier_id"]
-    bundle["artifacts"]["permit"]["payload"]["aud"] = policy["verifier_id"]
-    demo.issue_artifact_tokens(bundle, base_dir)
     demo.write_bundle(base_dir, bundle)
 
-    shutil.copy2(policy_path, out_dir / "policy.json")
+    (out_dir / "policy.json").write_bytes(policy_bytes)
 
     scenario_root = out_dir / "scenarios"
     for scenario_name, scenario in scenario_definitions().items():
@@ -255,38 +378,33 @@ def verify_status(
     verifier_dir: Path,
     trust_bundle: dict[str, Any],
     app_context: dict[str, Any],
-    policy: dict[str, Any],
     checks: list[dict[str, Any]],
-) -> dict[str, Any]:
+) -> dict[str, Any] | None:
     status = app_context.get("status", {})
     delivery = status.get("delivery", "stapled")
     token = status.get("jws", "")
     expected_typ = demo.STATUS_TYP if delivery != "push" else demo.STATUS_EVENT_TYP
     expected_cty = demo.STATUS_CONTENT_TYPE if delivery != "push" else demo.STATUS_EVENT_CONTENT_TYPE
-    verification = demo.verify_compact_jws(
+    verification = demo.verify_role_bound_jws(
         out_dir=verifier_dir,
         trust_bundle=trust_bundle,
         token=token,
         expected_typ=expected_typ,
         expected_cty=expected_cty,
+        expected_role="status",
     )
-    record(checks, "status", "status_signature", verification["ok"], verification["details"])
-    if not verification["payload"]:
-        return {"entries": {}}
+    record(checks, "status", "status_signature", verification["signature_ok"], verification["details"])
+    record(checks, "status", "status_signer_role", verification["signer_role_ok"], verification["signer_role_details"])
+    if not verification["ok"]:
+        return None
 
-    payload = demo.normalize_status_payload(verification["payload"])
-    now = demo.utc_now()
-    generated_at = demo.parse_time(payload["generated_at"])
-    next_update_at = demo.parse_time(payload["next_update_at"])
-    max_age = policy["freshness"]["status_max_age_seconds"]
-    age_seconds = max(0, (now - generated_at).total_seconds())
-    record(
-        checks,
-        "status",
-        "status_document_window",
-        generated_at <= now <= next_update_at and age_seconds <= max_age,
-        f"status delivery is {delivery} and age is {int(age_seconds)}s",
-    )
+    try:
+        payload = demo.validated_status_payload(verification["payload"])
+    except demo.StatusEffectError as exc:
+        checks_by_field = {"constraints": "policy_attenuation_effect_valid", "mode": "policy_attenuation_mode",
+                           "require_new_permit": "policy_attenuation_reissue"}
+        record(checks, "status", checks_by_field[exc.field], False, str(exc))
+        raise
     return payload
 
 
@@ -297,29 +415,24 @@ def verify_identity(
     request: dict[str, Any],
     policy: dict[str, Any],
     checks: list[dict[str, Any]],
-) -> dict[str, Any]:
-    verification = demo.verify_compact_jws(
+) -> dict[str, Any] | None:
+    verification = demo.verify_role_bound_jws(
         out_dir=verifier_dir,
         trust_bundle=trust_bundle,
         token=request["app_context"]["passport"]["jws"],
         expected_typ=demo.ARTIFACT_SPECS["passport"]["typ"],
         expected_cty=demo.ARTIFACT_SPECS["passport"]["cty"],
+        expected_role=demo.ARTIFACT_SPECS["passport"]["role"],
     )
-    record(checks, "identity", "passport_signature", verification["ok"], verification["details"])
+    record(checks, "identity", "passport_signature", verification["signature_ok"], verification["details"])
+    record(checks, "identity", "passport_signer_role", verification["signer_role_ok"], verification["signer_role_details"])
     payload = verification["payload"]
-    if not payload:
-        return {}
+    if not verification["ok"]:
+        return None
 
-    now = demo.utc_now()
-    valid_from = demo.parse_time(payload["valid_from"])
-    valid_until = demo.parse_time(payload["valid_until"])
-    record(
-        checks,
-        "identity",
-        "passport_window",
-        valid_from <= now <= valid_until,
-        "passport is valid at verification time",
-    )
+    demo.required_text(payload, "passport_id")
+    for field in ("root_id", "public_alias"):
+        demo.required_text(payload.get("subject"), field)
     required_level = policy["required_assurance_level"]
     record(
         checks,
@@ -339,51 +452,44 @@ def verify_runtime(
     passport: dict[str, Any],
     policy: dict[str, Any],
     checks: list[dict[str, Any]],
-) -> tuple[dict[str, Any], dict[str, Any]]:
-    verification = demo.verify_compact_jws(
+) -> tuple[dict[str, Any] | None, dict[str, Any]]:
+    verification = demo.verify_role_bound_jws(
         out_dir=verifier_dir,
         trust_bundle=trust_bundle,
         token=request["app_context"]["runtime_proof"]["jws"],
         expected_typ=demo.ARTIFACT_SPECS["runtime_proof"]["typ"],
         expected_cty=demo.ARTIFACT_SPECS["runtime_proof"]["cty"],
+        expected_role=demo.ARTIFACT_SPECS["runtime_proof"]["role"],
     )
-    record(checks, "runtime", "runtime_proof_signature", verification["ok"], verification["details"])
+    record(checks, "runtime", "runtime_proof_signature", verification["signature_ok"], verification["details"])
+    record(checks, "runtime", "runtime_proof_signer_role", verification["signer_role_ok"], verification["signer_role_details"])
     payload = verification["payload"]
     header = verification["header"]
-    if not payload:
-        return {}, {}
+    if not verification["ok"]:
+        return None, {}
 
-    now = demo.utc_now()
-    issued_at = demo.parse_time(payload["issued_at"])
-    expires_at = demo.parse_time(payload["expires_at"])
-    max_age = policy["freshness"]["runtime_max_age_seconds"]
-    age_seconds = max(0, (now - issued_at).total_seconds())
-    record(
-        checks,
-        "runtime",
-        "runtime_window",
-        issued_at <= now <= expires_at and age_seconds <= max_age,
-        f"runtime proof age is {int(age_seconds)}s",
-    )
+    demo.required_text(payload, "runtime_id")
+    subject_id = demo.required_text(payload, "subject_id")
+    audience = demo.required_text(payload.get("challenge_binding"), "aud")
     record(
         checks,
         "runtime",
         "runtime_subject_binding",
-        payload.get("subject_id") == passport.get("subject", {}).get("root_id"),
+        subject_id == passport["subject"]["root_id"],
         "runtime subject matches passport root id",
     )
     record(
         checks,
         "runtime",
         "runtime_audience",
-        payload.get("challenge_binding", {}).get("aud") == policy["verifier_id"],
+        audience == policy["verifier_id"],
         "runtime audience matches verifier policy",
     )
     record(
         checks,
         "runtime",
         "runtime_presented_key_owner",
-        trust_bundle["keys"].get(payload.get("presented_key", {}).get("kid"), {}).get("owner") == "runtime",
+        demo.registered_key(trust_bundle, payload.get("presented_key", {}).get("kid")).get("owner") == "runtime",
         "runtime presented key resolves to a runtime-owned key",
     )
     return payload, header
@@ -399,49 +505,53 @@ def verify_permit(
     runtime_header: dict[str, Any],
     policy: dict[str, Any],
     checks: list[dict[str, Any]],
-) -> tuple[dict[str, Any], dict[str, Any]]:
-    verification = demo.verify_compact_jws(
+) -> tuple[dict[str, Any] | None, dict[str, Any]]:
+    verification = demo.verify_role_bound_jws(
         out_dir=verifier_dir,
         trust_bundle=trust_bundle,
         token=request["app_context"]["mission_permit"]["jws"],
         expected_typ=demo.ARTIFACT_SPECS["permit"]["typ"],
         expected_cty=demo.ARTIFACT_SPECS["permit"]["cty"],
+        expected_role=demo.ARTIFACT_SPECS["permit"]["role"],
     )
-    record(checks, "permit", "mission_permit_signature", verification["ok"], verification["details"])
+    record(checks, "permit", "mission_permit_signature", verification["signature_ok"], verification["details"])
+    record(checks, "permit", "mission_permit_signer_role", verification["signer_role_ok"], verification["signer_role_details"])
     payload = verification["payload"]
     header = verification["header"]
-    if not payload:
-        return {}, {}
+    if not verification["ok"]:
+        return None, {}
 
-    now = demo.utc_now()
-    issued_at = demo.parse_time(payload["issued_at"])
-    expires_at = demo.parse_time(payload["constraints"]["expires_at"])
+    permit_transaction, actions = demo.validated_permit_scope(payload)
+    for field in ("permit_id", "actor", "aud"):
+        demo.required_text(payload, field)
+    if "principal" in payload:
+        demo.required_text(payload, "principal")
     record(
         checks,
         "permit",
-        "permit_window",
-        issued_at <= now <= expires_at,
-        "mission permit is valid at verification time",
+        "permit_transaction_binding",
+        request["transaction_id"] == permit_transaction,
+        "request transaction matches the mission permit transaction",
     )
     record(
         checks,
         "permit",
         "permit_actor_binding",
-        payload.get("actor") == passport.get("subject", {}).get("public_alias"),
+        payload["actor"] == passport["subject"]["public_alias"],
         "permit actor matches passport alias",
     )
     record(
         checks,
         "permit",
         "permit_audience",
-        payload.get("aud") == policy["verifier_id"],
+        payload["aud"] == policy["verifier_id"],
         "permit audience matches verifier policy",
     )
     record(
         checks,
         "permit",
         "permit_action_scope",
-        request["requested_action"] in payload.get("actions", []),
+        request["requested_action"] in actions,
         "requested action is within the permit action scope",
     )
     record(
@@ -455,20 +565,99 @@ def verify_permit(
         checks,
         "permit",
         "permit_tool_scope",
-        request["requested_tool"] in payload.get("constraints", {}).get("tool_allowlist", []),
+        request["requested_tool"] in tool_allowlist(payload.get("constraints", {}).get("tool_allowlist", [])),
         "requested tool is within the mission permit tool allowlist",
     )
     record(
         checks,
         "permit",
         "permit_proof_binding",
-        payload.get("proof_binding", {}).get("kid") == runtime_proof.get("presented_key", {}).get("kid")
-        and payload.get("proof_binding", {}).get("spki_sha256")
-        == runtime_proof.get("presented_key", {}).get("spki_sha256")
+        demo.runtime_key_bound(verifier_dir, trust_bundle, payload, runtime_proof)
         and runtime_header.get("kid") != header.get("kid"),
         "permit proof binding matches the runtime-presented key",
     )
     return payload, header
+
+
+def check_time_windows(checks, policy, status, passport, runtime, permit, checked_at: datetime) -> None:
+    valid_from = demo.parse_time(passport["valid_from"])
+    valid_until = demo.parse_time(passport["valid_until"])
+    record(checks, "identity", "passport_window", valid_from <= checked_at <= valid_until,
+           "passport is valid at the admission decision time")
+    windows = (
+        ("status", "status_document_window", status["generated_at"], status["next_update_at"]),
+        ("runtime", "runtime_window", runtime["issued_at"], runtime["expires_at"]),
+        ("permit", "permit_window", permit["issued_at"], permit["constraints"]["expires_at"]),
+    )
+    for kind, check, start, expiry in windows:
+        issued_at, expires_at = demo.parse_time(start), demo.parse_time(expiry)
+        max_age = freshness_limit(policy, f"{kind}_max_age_seconds")
+        age_us = (checked_at - issued_at) // timedelta(microseconds=1)
+        record(checks, kind, check, issued_at <= checked_at <= expires_at and age_us <= int(max_age) * 1_000_000,
+               f"{kind} must be current and at most {max_age} seconds old at the admission decision")
+
+
+def tool_allowlist(value: Any) -> list[str]:
+    return string_list(value, "tool_allowlist")
+
+
+def approval_requirement(value: Any) -> dict[str, Any]:
+    if (not isinstance(value, dict) or not isinstance(value.get("mode"), str)
+            or value["mode"] not in APPROVAL_MODES):
+        raise ValueError("approval must select policy_auto or human_required")
+    if "policy_ref" in value and (not isinstance(value["policy_ref"], str) or not value["policy_ref"]):
+        raise ValueError("approval policy_ref must be a non-empty string")
+    return copy.deepcopy(value)
+
+
+def same_json_value(left: Any, right: Any) -> bool:
+    """JSON booleans are distinct from numbers, including inside annotations."""
+    if isinstance(left, bool) or isinstance(right, bool):
+        return left is right
+    if isinstance(left, dict):
+        return isinstance(right, dict) and left.keys() == right.keys() and all(
+            same_json_value(value, right[key]) for key, value in left.items())
+    if isinstance(left, list):
+        return isinstance(right, list) and len(left) == len(right) and all(
+            same_json_value(a, b) for a, b in zip(left, right))
+    return left == right
+
+
+def narrow_approval(original: Any, proposed: Any) -> dict[str, Any]:
+    original = approval_requirement(original)
+    proposed = approval_requirement(proposed)
+    if original["mode"] == "human_required" and proposed["mode"] != "human_required":
+        raise ValueError("attenuation cannot remove required human approval")
+    # An omitted reference or annotation is retained; changing an existing one
+    # has no defined strengthening relation in this local profile.
+    if any(key != "mode" and key in proposed and not same_json_value(proposed[key], value)
+           for key, value in original.items()):
+        raise ValueError("attenuation cannot replace an existing approval requirement")
+    return {**original, **proposed}
+
+
+def effective_permit_constraints(permit: dict[str, Any]) -> dict[str, Any]:
+    constraints = copy.deepcopy(permit["constraints"])
+    if not isinstance(constraints, dict):
+        raise ValueError("permit constraints must be an object")
+    demo.required_text(constraints, "resource")
+    for key in ("max_amount_usd", "max_redelegation_depth"):
+        constraint_limit(key, constraints.get(key))
+    tool_allowlist(constraints.get("tool_allowlist", []))
+    approval = approval_requirement(permit.get("approval"))
+    if "approval" in constraints:
+        approval = narrow_approval(approval, constraints["approval"])
+    constraints["approval"] = approval
+    return constraints
+
+
+def constraint_limit(key: str, value: Any) -> int | float:
+    if (type(value) not in (int, float) or value < 0
+            or (isinstance(value, float) and not math.isfinite(value))
+            or (key == "max_redelegation_depth" and isinstance(value, float) and not value.is_integer())):
+        raise ValueError(f"{key} must be a finite non-negative "
+                         + ("integer" if key == "max_redelegation_depth" else "number"))
+    return value
 
 
 def apply_effect(
@@ -477,26 +666,29 @@ def apply_effect(
     policy: dict[str, Any],
 ) -> tuple[dict[str, Any] | None, list[str]]:
     handlers = policy["attenuation_handlers"]
-    effect_constraints = effect.get("constraints", {})
-    unknown = sorted(set(effect_constraints) - set(handlers))
+    effect_constraints = effect.get("constraints")
+    if not isinstance(effect_constraints, dict) or not isinstance(handlers, dict):
+        raise ValueError("attenuation constraints and handler selection must be objects")
+    unknown = sorted(set(effect_constraints) - (set(handlers) & set(ATTENUATION_HANDLERS)))
     if unknown:
         return None, unknown
 
     narrowed = copy.deepcopy(base_constraints)
     for key, value in effect_constraints.items():
         handler = handlers[key]
-        if handler == "intersect":
-            base = narrowed.get(key, [])
-            narrowed[key] = sorted(set(base).intersection(value))
-        elif handler == "min":
-            base = narrowed.get(key)
-            narrowed[key] = value if base is None else min(base, value)
-        elif handler == "replace":
-            narrowed[key] = value
-        elif handler == "escalate":
-            narrowed[key] = value
-        else:
+        if handler != ATTENUATION_HANDLERS[key]:
             raise ValueError(f"unsupported attenuation handler {handler} for {key}")
+        if handler == "intersect":
+            base = tool_allowlist(narrowed.get(key, []))
+            narrowed[key] = sorted(set(base).intersection(tool_allowlist(value)))
+        elif handler == "min":
+            value = constraint_limit(key, value)
+            narrowed[key] = min(narrowed[key], value)
+        elif handler == "replace":
+            if not isinstance(value, str) or not value or value != narrowed.get(key):
+                raise ValueError("an exact resource scope cannot be replaced during attenuation")
+        elif handler == "escalate":
+            narrowed[key] = narrow_approval(narrowed.get(key), value)
     return narrowed, []
 
 
@@ -508,18 +700,18 @@ def build_attenuations(
     status_entry: dict[str, Any],
 ) -> list[dict[str, Any]]:
     attenuations = []
-    for key in sorted(effect.get("constraints", {})):
+    for key in sorted(effect["constraints"]):
         original = original_constraints.get(key)
         applied = effective_constraints.get(key)
-        if original == applied:
+        if same_json_value(original, applied):
             continue
         attenuations.append(
             {
                 "field": f"constraints.{key}",
                 "original": original,
                 "applied": applied,
-                "reason_code": status_entry.get("reason", "status-attenuation"),
-                "source_status_ref": status_entry.get("id"),
+                "reason_code": status_entry["reason"],
+                "source_status_ref": status_entry["id"],
             }
         )
     return attenuations
@@ -534,13 +726,17 @@ def request_within_constraints(
     if request["requested_resource"] != constraints.get("resource"):
         return False
 
-    tools = constraints.get("tool_allowlist", [])
-    if tools and request["requested_tool"] not in tools:
+    tools = tool_allowlist(constraints.get("tool_allowlist", []))
+    if request["requested_tool"] not in tools:
         return False
 
-    approval = constraints.get("approval") or permit.get("approval", {})
-    if approval.get("mode") == "human_required" and not request.get("approval_ref"):
-        return False
+    approval = approval_requirement(permit.get("approval"))
+    if "approval" in constraints:
+        approval = narrow_approval(approval, constraints["approval"])
+    if approval["mode"] == "human_required":
+        reference = request.get("approval_ref")
+        if not isinstance(reference, str) or not reference.strip():
+            return False
 
     return True
 
@@ -550,15 +746,16 @@ def build_receipt(
     verifier_dir: Path,
     request: dict[str, Any],
     policy: dict[str, Any],
+    trust_bundle: dict[str, Any],
     permit: dict[str, Any],
     runtime_proof: dict[str, Any],
     decision: str,
     attenuations: list[dict[str, Any]],
     response_payload: dict[str, Any],
     status_entries: dict[str, Any],
+    started_at: datetime,
+    finished_at: datetime,
 ) -> tuple[dict[str, Any], str]:
-    started_at = demo.utc_now()
-    finished_at = demo.utc_now()
     receipt_id = f"aer:http-verifier:{request['transaction_id']}:{decision}:admission"
     receipt = {
         "version": "aer-0.1",
@@ -566,7 +763,6 @@ def build_receipt(
         "receipt_phase": "admission",
         "transaction_id": request["transaction_id"],
         "actor": permit["actor"],
-        "principal": permit.get("principal"),
         "runtime_ref": runtime_proof["runtime_id"],
         "permit_ref": permit["permit_id"],
         "verifier": policy["verifier_id"],
@@ -600,18 +796,59 @@ def build_receipt(
         "finished_at": demo.iso(finished_at),
         "outcome": "success" if decision in {"allow", "attenuate"} else "failure",
     }
+    if "principal" in permit:
+        receipt["principal"] = permit["principal"]
     verifier_key = {
         "kid": "verifier-key-1",
         "alg": "ES256",
         "private_key": demo.key_path(verifier_dir, "verifier", "private"),
     }
-    token = demo.build_compact_jws(
-        receipt,
-        key_info=verifier_key,
-        typ=demo.ARTIFACT_SPECS["receipt"]["typ"],
-        cty=demo.ARTIFACT_SPECS["receipt"]["cty"],
-    )
+    spec = demo.ARTIFACT_SPECS["receipt"]
+    try:
+        token = demo.build_compact_jws(
+            receipt,
+            key_info=verifier_key,
+            typ=spec["typ"],
+            cty=spec["cty"],
+        )
+        verification = demo.verify_role_bound_jws(
+            out_dir=verifier_dir, trust_bundle=trust_bundle, token=token,
+            expected_typ=spec["typ"], expected_cty=spec["cty"], expected_role="verifier")
+        if not verification["ok"]:
+            raise RuntimeError("the receipt signing key does not match its verifier registration")
+    except (ValueError, KeyError, TypeError, AttributeError, RecursionError) as exc:
+        raise RuntimeError("could not produce a verifiable admission receipt") from exc
     return receipt, token
+
+
+def verification_report(request, policy, checks, *, decision, receipt_emitted, checked_at=None):
+    return {
+        "version": "app-verification-report-0.1",
+        "profile": "AL2-http",
+        "checked_at": demo.iso(checked_at if checked_at is not None else demo.utc_now()),
+        "policy_id": policy["policy_id"],
+        "policy_version": policy["policy_version"],
+        "decision": decision,
+        "receipt_emitted": receipt_emitted,
+        "receipt_phase": "admission",
+        "request": {
+            "action": request["requested_action"],
+            "resource": request["requested_resource"],
+            "tool": request["requested_tool"],
+        },
+        "failed_checks": sorted(check["name"] for check in checks if not check["ok"]),
+        "passed_checks": sorted(check["name"] for check in checks if check["ok"]),
+        "request_binding": {"status": "not_checked", "pass": None,
+                            "binding_requirement_met": False,
+                            "cause": "LEGACY_AER_PROFILE"},
+    }
+
+
+def rejected_input_response(request, policy, checks):
+    # Unauthenticated or unusable artifact fields cannot supply receipt identity.
+    return {"decision": "deny", "check_details": checks,
+            "verification_report": verification_report(request, policy, checks,
+                                                        decision="deny", receipt_emitted=False)}
 
 
 def verify_execute_request(
@@ -620,17 +857,63 @@ def verify_execute_request(
     request: dict[str, Any],
     policy: dict[str, Any],
 ) -> dict[str, Any]:
-    trust_bundle = read_json(verifier_dir / "trust-bundle.json")
-    checks: list[dict[str, Any]] = []
-    record(checks, "request", "request_shape", True, "request body parsed as JSON")
+    return evaluate_execute_request(verifier_dir=verifier_dir, request=request, policy=policy, checks=[])
+
+
+class RequestEnvelopeError(ValueError):
+    """The caller did not send a usable request envelope."""
+
+
+def evaluate_execute_request(
+    *,
+    verifier_dir: Path,
+    request: dict[str, Any],
+    policy: dict[str, Any],
+    checks: list[dict[str, Any]],
+) -> dict[str, Any]:
+    started_at = demo.utc_now()
+    if not isinstance(request, dict) or any(
+        not isinstance(request.get(name), str) or not request[name]
+        for name in ("transaction_id", "requested_action", "requested_resource", "requested_tool")
+    ):
+        raise RequestEnvelopeError("request must contain non-empty transaction_id, requested_action, requested_resource, and requested_tool")
+    record(checks, "request", "request_shape", True, "request envelope contains the required identifiers")
+    try:
+        policy = copy_json_value(policy)
+        validate_policy(policy)
+        return _evaluate_validated_request(verifier_dir=verifier_dir, request=request, policy=policy, checks=checks,
+                                           started_at=started_at)
+    except (ValueError, TypeError, KeyError, AttributeError, RecursionError) as exc:
+        # Without a usable policy identity a rejection report cannot be attributed.
+        validate_policy_identity(policy)
+        record(checks, "request", "verification_input", False,
+               f"unable to interpret verification input ({type(exc).__name__}): {exc}")
+        return rejected_input_response(request, policy, checks)
+
+
+def _evaluate_validated_request(
+    *,
+    verifier_dir: Path,
+    request: dict[str, Any],
+    policy: dict[str, Any],
+    checks: list[dict[str, Any]],
+    started_at: datetime,
+) -> dict[str, Any]:
+    try:
+        trust_bundle = read_json(verifier_dir / "trust-bundle.json")
+        if not isinstance(trust_bundle, dict) or not isinstance(trust_bundle.get("keys"), dict):
+            raise ValueError("expected a local trust bundle with keys")
+    except ValueError as exc:
+        raise RuntimeError("could not read the verifier's local trust bundle") from exc
 
     status_payload = verify_status(
         verifier_dir=verifier_dir,
         trust_bundle=trust_bundle,
         app_context=request["app_context"],
-        policy=policy,
         checks=checks,
     )
+    if status_payload is None:
+        return rejected_input_response(request, policy, checks)
     passport = verify_identity(
         verifier_dir=verifier_dir,
         trust_bundle=trust_bundle,
@@ -638,6 +921,8 @@ def verify_execute_request(
         policy=policy,
         checks=checks,
     )
+    if passport is None:
+        return rejected_input_response(request, policy, checks)
     runtime_proof, runtime_header = verify_runtime(
         verifier_dir=verifier_dir,
         trust_bundle=trust_bundle,
@@ -646,6 +931,8 @@ def verify_execute_request(
         policy=policy,
         checks=checks,
     )
+    if runtime_proof is None:
+        return rejected_input_response(request, policy, checks)
     permit, _ = verify_permit(
         verifier_dir=verifier_dir,
         trust_bundle=trust_bundle,
@@ -656,6 +943,8 @@ def verify_execute_request(
         policy=policy,
         checks=checks,
     )
+    if permit is None:
+        return rejected_input_response(request, policy, checks)
 
     entries = status_payload.get("entries", {})
     record(
@@ -667,14 +956,14 @@ def verify_execute_request(
         and entries.get("permit", {}).get("id") == permit.get("permit_id"),
         "status entries refer to the presented passport, runtime proof, and mission permit",
     )
-    for object_type in ("passport", "runtime", "permit"):
+    for object_type in STATUS_KINDS:
         acceptable = policy["accepted_states"][object_type]
         state = entries.get(object_type, {}).get("state")
         record(
             checks,
             "status",
             f"{object_type}_state_acceptable",
-            state in acceptable,
+            state not in demo.BLOCKING_STATUS_STATES and state in acceptable,
             f"{object_type} state is {state}, policy accepts {acceptable}",
         )
 
@@ -693,10 +982,16 @@ def verify_execute_request(
         "requested resource is allowed by verifier policy",
     )
 
-    effective_constraints = copy.deepcopy(permit.get("constraints", {}))
+    effective_constraints = effective_permit_constraints(permit)
     original_constraints = copy.deepcopy(effective_constraints)
     attenuations: list[dict[str, Any]] = []
     decision = "allow"
+
+    unsupported, reissue = demo.status_attenuation_requirements(entries)
+    record(checks, "policy", "status_attenuation_scope", not unsupported,
+           f"unsupported narrowing on {', '.join(unsupported)}" if unsupported else "supported status scope")
+    record(checks, "policy", "policy_attenuation_reissue", not reissue,
+           f"new permit required by {', '.join(reissue)}" if reissue else "no status entry requires a new permit")
 
     permit_state = entries.get("permit", {}).get("state")
     if permit_state == "attenuated":
@@ -709,23 +1004,17 @@ def verify_execute_request(
             effect.get("mode") == "narrow",
             "attenuated permits must use mode=narrow in this demo profile",
         )
-        narrowed, unknown_fields = apply_effect(effective_constraints, effect, policy)
-        record(
-            checks,
-            "policy",
-            "policy_attenuation_effect_known",
-            not unknown_fields,
-            "attenuation effect fields are known to the verifier policy"
-            if not unknown_fields
-            else f"unknown attenuation effect fields: {', '.join(unknown_fields)}",
-        )
-        record(
-            checks,
-            "policy",
-            "policy_attenuation_reissue",
-            not effect.get("require_new_permit", False),
-            "attenuation does not require permit re-issuance",
-        )
+        try:
+            narrowed, unknown_fields = apply_effect(effective_constraints, effect, policy)
+        except ValueError as exc:
+            narrowed = None
+            record(checks, "policy", "policy_attenuation_effect_valid", False, str(exc))
+        else:
+            record(checks, "policy", "policy_attenuation_effect_valid", True,
+                   "attenuation uses supported types and preserves the original obligations")
+            record(checks, "policy", "policy_attenuation_effect_known", not unknown_fields,
+                   "attenuation effect fields are known to the verifier policy" if not unknown_fields
+                   else f"unknown attenuation effect fields: {', '.join(unknown_fields)}")
         if narrowed is not None:
             effective_constraints = narrowed
             attenuations = build_attenuations(
@@ -762,41 +1051,19 @@ def verify_execute_request(
         record(
             checks,
             "policy",
-            "policy_attenuation_reissue",
-            True,
-            "permit is not attenuated",
-        )
-        record(
-            checks,
-            "policy",
             "policy_request_within_effective_constraints",
             request_within_constraints(request, constraints=effective_constraints, permit=permit),
             "requested operation remains within the permit constraints",
         )
 
+    finished_at = demo.utc_now()
+    if finished_at < started_at:
+        raise RuntimeError("the verifier clock moved backwards during evaluation")
+    check_time_windows(checks, policy, status_payload, passport, runtime_proof, permit, finished_at)
     if not all(check["ok"] for check in checks):
         decision = "deny"
 
-    report = {
-        "version": "app-verification-report-0.1",
-        "profile": "AL2-http",
-        "checked_at": demo.iso(demo.utc_now()),
-        "policy_id": policy["policy_id"],
-        "policy_version": policy["policy_version"],
-        "decision": decision,
-        "receipt_emitted": True,
-        "receipt_phase": "admission",
-        "request": {
-            "action": request["requested_action"],
-            "resource": request["requested_resource"],
-            "tool": request["requested_tool"],
-        },
-        "failed_checks": sorted(check["name"] for check in checks if not check["ok"]),
-        "passed_checks": sorted(check["name"] for check in checks if check["ok"]),
-        "request_binding": {"status": "not_checked", "pass": None,
-                            "binding_requirement_met": False,
-                            "cause": "LEGACY_AER_PROFILE"},
-    }
+    report = verification_report(request, policy, checks, decision=decision, receipt_emitted=True, checked_at=finished_at)
     if decision == "attenuate":
         report["effective_constraints"] = effective_constraints
     if attenuations:
@@ -815,12 +1082,15 @@ def verify_execute_request(
         verifier_dir=verifier_dir,
         request=request,
         policy=policy,
+        trust_bundle=trust_bundle,
         permit=permit,
         runtime_proof=runtime_proof,
         decision=decision,
         attenuations=attenuations,
         response_payload=response_payload,
         status_entries=entries,
+        started_at=started_at,
+        finished_at=finished_at,
     )
 
     return {
@@ -833,13 +1103,34 @@ def verify_execute_request(
 
 
 def store_response_artifacts(directory: Path, response: dict[str, Any]) -> None:
-    write_json(directory / "http-verifier-response.json", response)
-    write_json(directory / "verifier-admission-receipt.json", response["admission_receipt"])
-    write_text(directory / "verifier-admission-receipt.jws", response["admission_receipt_jws"])
+    clear_response_artifacts(directory)
+    try:
+        if response["verification_report"]["receipt_emitted"]:
+            write_json(directory / "verifier-admission-receipt.json", response["admission_receipt"])
+            write_text(directory / "verifier-admission-receipt.jws", response["admission_receipt_jws"])
+        write_json(directory / "http-verifier-response.json", response)
+    except (OSError, ValueError, TypeError, KeyError):
+        clear_response_artifacts(directory)
+        raise
+
+
+def clear_response_artifacts(directory: Path) -> None:
+    failure = None
+    for filename in RESPONSE_FILES:
+        try:
+            (directory / filename).unlink(missing_ok=True)
+        except OSError as exc:
+            failure = exc
+    if failure is not None:
+        raise failure
 
 
 def serve(directory: Path, *, policy_path: Path, host: str, port: int) -> None:
-    policy = load_policy(policy_path)
+    try:
+        policy = load_policy(policy_path)
+    except PolicyFileError:
+        clear_response_artifacts(directory)
+        raise
 
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self) -> None:  # noqa: N802
@@ -858,20 +1149,30 @@ def serve(directory: Path, *, policy_path: Path, host: str, port: int) -> None:
                 self.send_error(HTTPStatus.NOT_FOUND, "unsupported path")
                 return
 
-            content_length = int(self.headers.get("Content-Length", "0"))
-            raw = self.rfile.read(content_length)
             try:
-                request = json.loads(raw.decode("utf-8"))
+                clear_response_artifacts(directory)
+                try:
+                    content_length = int(self.headers.get("Content-Length", "0"))
+                    if content_length < 0:
+                        raise ValueError("Content-Length must not be negative")
+                    raw = self.rfile.read(content_length)
+                    request = demo.parse_demo_json(raw.decode("utf-8"))
+                except ValueError as exc:
+                    raise RequestEnvelopeError("invalid request length or JSON body") from exc
                 response = verify_execute_request(verifier_dir=directory, request=request, policy=policy)
                 store_response_artifacts(directory, response)
                 body = json.dumps(response, indent=2, sort_keys=True).encode("utf-8")
-                self.send_response(HTTPStatus.OK)
-                self.send_header("Content-Type", "application/json")
-                self.send_header("Content-Length", str(len(body)))
-                self.end_headers()
-                self.wfile.write(body)
-            except Exception as exc:  # pragma: no cover - demo server path
+            except RequestEnvelopeError as exc:
                 self.send_error(HTTPStatus.BAD_REQUEST, str(exc))
+                return
+            except Exception:
+                self.send_error(HTTPStatus.INTERNAL_SERVER_ERROR, "Verifier could not complete the request")
+                return
+            self.send_response(HTTPStatus.OK)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
 
         def log_message(self, format: str, *args) -> None:  # noqa: A003
             return
@@ -891,10 +1192,11 @@ def http_post_json(url: str, payload: dict[str, Any]) -> dict[str, Any]:
         method="POST",
     )
     with urlopen(request, timeout=10) as response:
-        return json.loads(response.read().decode("utf-8"))
+        return demo.parse_demo_json(response.read().decode("utf-8"))
 
 
 def execute_demo(directory: Path, *, base_url: str) -> dict[str, Any]:
+    clear_response_artifacts(directory)
     request_body = read_json(directory / "request.json")
     response = http_post_json(f"{base_url.rstrip('/')}/execute", request_body)
     store_response_artifacts(directory, response)
@@ -924,19 +1226,19 @@ def compare_subset(expected: Any, actual: Any) -> bool:
         if not isinstance(actual, dict):
             return False
         return all(key in actual and compare_subset(value, actual[key]) for key, value in expected.items())
-    if isinstance(expected, list):
-        if not isinstance(actual, list):
-            return False
-        return expected == actual
-    return expected == actual
+    return same_json_value(expected, actual)
 
 
 def run_corpus(corpus_root: Path, *, policy_path: Path) -> dict[str, Any]:
+    cases = sorted(corpus_root.rglob("case.json"))
+    if not cases:
+        return {"ok": False, "checked_at": demo.iso(demo.utc_now()), "results": [],
+                "error": f"no HTTP corpus cases found in {corpus_root}"}
     temp_dir = Path(tempfile.mkdtemp(prefix="app-http-verifier-"))
     try:
         generate_demo(temp_dir, policy_path=policy_path)
         results = []
-        for case_path in sorted(corpus_root.rglob("case.json")):
+        for case_path in cases:
             case = read_json(case_path)
             expected = read_json(case_path.with_name("expected-report.json"))
             scenario_dir = temp_dir / "scenarios" / case["scenario"]
@@ -949,8 +1251,6 @@ def run_corpus(corpus_root: Path, *, policy_path: Path) -> dict[str, Any]:
                     "serve",
                     "--dir",
                     str(scenario_dir),
-                    "--policy",
-                    str(policy_path),
                     "--host",
                     "127.0.0.1",
                     "--port",
@@ -979,6 +1279,7 @@ def run_corpus(corpus_root: Path, *, policy_path: Path) -> dict[str, Any]:
                     server.wait(timeout=5)
                 except subprocess.TimeoutExpired:
                     server.kill()
+                    server.wait()
         summary = {
             "ok": all(item["ok"] for item in results),
             "checked_at": demo.iso(demo.utc_now()),
@@ -1028,8 +1329,11 @@ def main() -> None:
     elif args.command == "run-corpus":
         summary = run_corpus(Path(args.corpus_root), policy_path=Path(args.policy))
         if not summary["ok"]:
-            raise SystemExit("HTTP verifier corpus run failed")
+            raise SystemExit(summary.get("error", "HTTP verifier corpus run failed"))
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (PolicyFileError, demo.DemoOutputError) as exc:
+        raise SystemExit(str(exc)) from exc

@@ -1,0 +1,194 @@
+[
+  {
+    "uri": "https://example.test/a%20b?x=%2F#part",
+    "valid": true
+  },
+  {
+    "uri": "local:reference/input.json",
+    "valid": true
+  },
+  {
+    "uri": "urn:example:receipt:1",
+    "valid": true
+  },
+  {
+    "uri": "did:web:example.test",
+    "valid": true
+  },
+  {
+    "uri": "file:///tmp/receipt.json",
+    "valid": true
+  },
+  {
+    "uri": "mailto:owner@example.test",
+    "valid": true
+  },
+  {
+    "uri": "data:application/json,%7B%7D",
+    "valid": true
+  },
+  {
+    "uri": "custom+v1:opaque:@value",
+    "valid": true
+  },
+  {
+    "uri": "custom:",
+    "valid": true
+  },
+  {
+    "uri": "custom:/path",
+    "valid": true
+  },
+  {
+    "uri": "custom://",
+    "valid": true
+  },
+  {
+    "uri": "https://user:p%40ss@example.test:443/path",
+    "valid": true
+  },
+  {
+    "uri": "custom://example.test:/path",
+    "valid": true
+  },
+  {
+    "uri": "custom://example.test:70000/path",
+    "valid": true
+  },
+  {
+    "uri": "https://[2001:db8::1]:443/a",
+    "valid": true
+  },
+  {
+    "uri": "custom://[::ffff:192.0.2.1]/a",
+    "valid": true
+  },
+  {
+    "uri": "custom://[v1.example:future]/",
+    "valid": true
+  },
+  {
+    "uri": "custom:/a?query=/?:@#fragment?/x",
+    "valid": true
+  },
+  {
+    "uri": "custom:!$&'()*+,;=._~-",
+    "valid": true
+  },
+  {
+    "uri": "https://example.test/%E3%81%82",
+    "valid": true
+  },
+  {
+    "uri": "relative/path",
+    "valid": false
+  },
+  {
+    "uri": "//example.test/a",
+    "valid": false
+  },
+  {
+    "uri": "1bad:value",
+    "valid": false
+  },
+  {
+    "uri": "https://example.test/a b",
+    "valid": false
+  },
+  {
+    "uri": "https://example.test/a\nb",
+    "valid": false
+  },
+  {
+    "uri": "https://example.test/a\n",
+    "valid": false
+  },
+  {
+    "uri": "https://example.test/a\r",
+    "valid": false
+  },
+  {
+    "uri": "\thttps://example.test/a",
+    "valid": false
+  },
+  {
+    "uri": "custom:\u0000",
+    "valid": false
+  },
+  {
+    "uri": "custom:",
+    "valid": false
+  },
+  {
+    "uri": "https://example.test/%",
+    "valid": false
+  },
+  {
+    "uri": "https://example.test/%2",
+    "valid": false
+  },
+  {
+    "uri": "https://example.test/%zz",
+    "valid": false
+  },
+  {
+    "uri": "https://example.test/%aG",
+    "valid": false
+  },
+  {
+    "uri": "custom:日本語",
+    "valid": false
+  },
+  {
+    "uri": "https://example.test/a\\b",
+    "valid": false
+  },
+  {
+    "uri": "https://example.test/{a}",
+    "valid": false
+  },
+  {
+    "uri": "custom:a#b#c",
+    "valid": false
+  },
+  {
+    "uri": "https://[not-ip]/",
+    "valid": false
+  },
+  {
+    "uri": "https://[::1",
+    "valid": false
+  },
+  {
+    "uri": "https://::1/",
+    "valid": false
+  },
+  {
+    "uri": "https://[127.0.0.1]/",
+    "valid": false
+  },
+  {
+    "uri": "https://[fe80::1%25en0]/",
+    "valid": false
+  },
+  {
+    "uri": "custom://[v1.]/",
+    "valid": false
+  },
+  {
+    "uri": "https://user@other@example.test/",
+    "valid": false
+  },
+  {
+    "uri": "https://example.test:abc/",
+    "valid": false
+  },
+  {
+    "uri": "https://example.test:80:90/",
+    "valid": false
+  },
+  {
+    "uri": "https://example.test/ ",
+    "valid": false
+  }
+]

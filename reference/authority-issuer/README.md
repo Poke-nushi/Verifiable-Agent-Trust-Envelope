@@ -12,6 +12,10 @@ operation is a recording callback; login and consent are synthetic fixtures.
 This is an implementation and interoperability review aid, not production
 approval or a general IAM compatibility result.
 
+The [planned migration path](../planned-migration/README.md) retains this fixed
+registration while moving the signing key, installed program and stores.
+Publication after the move rereads current service authority before new work.
+
 ## One selected registration
 
 The issuing application registers one OAuth subject/client/audience, one

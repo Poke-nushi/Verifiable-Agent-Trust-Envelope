@@ -88,6 +88,9 @@ For external SUT comparison bundles, `verify-bundle` checks:
   their corresponding reason-code arrays
 - the SUT result corpus digest against the recomputed corpus
 - the conformance report SUT result digest against the supplied SUT result file
+- the implementation report's `name`, `type`, `version`, `language`, and copied
+  optional `source`, `commit`, and `environment` against the submitted SUT
+  identity; other implementation annotations may differ between reports
 - each conformance case's actual outcome, execution decision, reason-code
   projection, artifact mode, and non-completed state failure against the
   supplied SUT result
@@ -108,6 +111,8 @@ summary arithmetic, conformance report, and implementation report chain.
 An internally consistent conformance report may contain failed cases and still
 form a valid bundle; bundle integrity does not convert a failed comparison into
 a passing conformance result.
+For cases requiring request binding, the recomputed binding assessment must
+succeed and match the saved assessment even when another comparison fails.
 
 `verify-bundle` is a local digest-chain verifier. It reads the files supplied on
 the command line and compares their canonical JSON digests, corpus digest,

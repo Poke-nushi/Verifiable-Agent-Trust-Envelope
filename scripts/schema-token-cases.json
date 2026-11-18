@@ -1,0 +1,150 @@
+{
+  "valid": {
+    "digest": [
+      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+    ],
+    "profile_hash": [
+      "sha-256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+    ],
+    "amount": [
+      "0",
+      "25.00",
+      "0.000000000000000000000000001"
+    ],
+    "extension_name": [
+      "x_name",
+      "x_A-1.foo"
+    ],
+    "currency": [
+      "USD",
+      "JPY"
+    ]
+  },
+  "invalid_suffixes": [
+    "\n",
+    "\r",
+    "\r\n",
+    "\u2028",
+    "\u2029",
+    " ",
+    "\t",
+    "\u0000"
+  ],
+  "cases": [
+    {
+      "schema": "schemas/a2a-vate-metadata.schema.json",
+      "pointer": "/properties/extensions/propertyNames/anyOf/1",
+      "kind": "extension_name"
+    },
+    {
+      "schema": "schemas/a2a-vate-metadata.schema.json",
+      "pointer": "/$defs/artifact_reference/properties/digest/properties/value",
+      "kind": "digest"
+    },
+    {
+      "schema": "schemas/a2a-vate-metadata.schema.json",
+      "pointer": "/$defs/extensions/propertyNames/anyOf/1",
+      "kind": "extension_name"
+    },
+    {
+      "schema": "schemas/admission-receipt.schema.json",
+      "pointer": "/$defs/digestDescriptor/properties/value",
+      "kind": "digest"
+    },
+    {
+      "schema": "schemas/admission-receipt.schema.json",
+      "pointer": "/$defs/profileHash",
+      "kind": "profile_hash"
+    },
+    {
+      "schema": "schemas/admission-receipt.schema.json",
+      "pointer": "/$defs/moneyAmount/properties/value/anyOf/0",
+      "kind": "amount"
+    },
+    {
+      "schema": "schemas/admission-request.schema.json",
+      "pointer": "/$defs/digestDescriptor/properties/value",
+      "kind": "digest"
+    },
+    {
+      "schema": "schemas/admission-request.schema.json",
+      "pointer": "/$defs/profileHash",
+      "kind": "profile_hash"
+    },
+    {
+      "schema": "schemas/attenuation-effect.schema.json",
+      "pointer": "/$defs/moneyAmount/properties/value/anyOf/0",
+      "kind": "amount"
+    },
+    {
+      "schema": "schemas/conformance-report.schema.json",
+      "pointer": "/$defs/digest/properties/value",
+      "kind": "digest"
+    },
+    {
+      "schema": "schemas/conformance-report.schema.json",
+      "pointer": "/$defs/requestBindingAssessment/properties/receipt_digest/properties/value",
+      "kind": "digest"
+    },
+    {
+      "schema": "schemas/execution-receipt.schema.json",
+      "pointer": "/properties/action_binding/properties/digest/properties/value",
+      "kind": "digest"
+    },
+    {
+      "schema": "schemas/implementation-report.schema.json",
+      "pointer": "/properties/corpus/properties/manifest/items/properties/sha256",
+      "kind": "digest"
+    },
+    {
+      "schema": "schemas/implementation-report.schema.json",
+      "pointer": "/$defs/digest/properties/value",
+      "kind": "digest"
+    },
+    {
+      "schema": "schemas/post-execution-receipt.schema.json",
+      "pointer": "/$defs/digestDescriptor/properties/value",
+      "kind": "digest"
+    },
+    {
+      "schema": "schemas/post-execution-receipt.schema.json",
+      "pointer": "/$defs/profileHash",
+      "kind": "profile_hash"
+    },
+    {
+      "schema": "schemas/report-bundle-verification.schema.json",
+      "pointer": "/$defs/digest/properties/value",
+      "kind": "digest"
+    },
+    {
+      "schema": "schemas/sut-result.schema.json",
+      "pointer": "/$defs/digest/properties/value",
+      "kind": "digest"
+    },
+    {
+      "schema": "schemas/sut-result.schema.json",
+      "pointer": "/$defs/inputDigest/properties/value",
+      "kind": "digest"
+    },
+    {
+      "schema": "conformance/al2-vate-v0.3/conformance-case.schema.json",
+      "pointer": "/properties/integrity_checks/items/properties/expected_digest/properties/value",
+      "kind": "digest"
+    },
+    {
+      "schema": "conformance/request-binding-v1/conformance-case.schema.json",
+      "pointer": "/properties/integrity_checks/items/properties/expected_digest/properties/value",
+      "kind": "digest"
+    },
+    {
+      "schema": "schemas/admission-receipt.schema.json",
+      "pointer": "/$defs/moneyAmount/properties/currency",
+      "kind": "currency"
+    },
+    {
+      "schema": "schemas/attenuation-effect.schema.json",
+      "pointer": "/$defs/moneyAmount/properties/currency",
+      "kind": "currency"
+    }
+  ]
+}

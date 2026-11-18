@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vate:schema:admission-request:0.3",
+  "title": "VATE Admission Request",
+  "description": "Draft v0.3 verifier admission request for AL2 external digital actions.",
+  "type": "object",
+  "$defs": {
+    "evidenceType": {
+      "type": "string",
+      "enum": [
+        "admission_receipt",
+        "admission_request",
+        "agent_card",
+        "attenuation_candidate",
+        "delegated_payment_token",
+        "did_document",
+        "http_message_signature",
+        "local_policy",
+        "mission_permit",
+        "oap_decision",
+        "oauth_access_token",
+        "oauth_transaction_token",
+        "oid4vp_presentation",
+        "openid_subject",
+        "payment_authority",
+        "payment_mandate",
+        "payment_required_state",
+        "policy_snapshot",
+        "post_execution_receipt",
+        "runtime_attestation",
+        "runtime_disclosure",
+        "signed_agent_card",
+        "status_bundle",
+        "ucp_checkout_session",
+        "vc_status",
+        "verifiable_credential",
+        "web_bot_auth_signature"
+      ]
+    },
+    "protocolHint": {
+      "type": "string",
+      "enum": [
+        "ap2",
+        "ap2_human_not_present",
+        "mcp-oauth",
+        "oap_aport",
+        "openid-connect",
+        "spiffe",
+        "stripe_spt",
+        "ucp",
+        "x402"
+      ]
+    },
+    "digestDescriptor": {
+      "type": "object",
+      "required": [
+        "alg",
+        "value"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "const": "sha-256"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": true
+    },
+    "profileHash": {
+      "type": "string",
+      "description": "Profile-defined SHA-256 hash string for AL2 request and execution binding fields.",
+      "pattern": "^sha-256:[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "version",
+    "profile",
+    "request_id",
+    "transaction_id",
+    "issued_at",
+    "expires_at",
+    "action",
+    "target",
+    "actor",
+    "principal",
+    "runtime",
+    "audience",
+    "input_hash",
+    "evidence_refs"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "vate-0.3"
+    },
+    "profile": {
+      "type": "string",
+      "const": "VATE-AL2-Verifier-Admission-v0.3"
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "action": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target": {
+      "type": "object",
+      "required": [
+        "resource",
+        "audience"
+      ],
+      "properties": {
+        "resource": {
+          "type": "string",
+          "minLength": 1
+        },
+        "audience": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "actor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "principal": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runtime": {
+      "type": "string",
+      "minLength": 1
+    },
+    "audience": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input_hash": {
+      "$ref": "#/$defs/profileHash"
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "correlation": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "uri",
+          "media_type",
+          "digest"
+        ],
+        "properties": {
+          "type": {
+            "$ref": "#/$defs/evidenceType"
+          },
+          "uri": {
+            "type": "string",
+            "minLength": 1
+          },
+          "media_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "protocol_hint": {
+            "$ref": "#/$defs/protocolHint",
+            "description": "Optional informative hint for the concrete source protocol. Verifiers must not infer authority from this field without local policy."
+          },
+          "digest": {
+            "$ref": "#/$defs/digestDescriptor"
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

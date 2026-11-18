@@ -57,7 +57,16 @@ The manifest includes:
 - all JSON files under the corpus root except `corpus.json`
 - artifacts referenced by case files, including examples outside the corpus root
 
+Artifact references in evaluated check fields use the same alias-or-path
+resolution as the check itself. The manifest includes both direct paths and
+paths registered in `artifacts`. For request-binding cases, it also includes
+the local members read through `request_binding_manifest`, using the adapter's
+member validation rules. An invalid member reference is a manifest error.
+
 The manifest intentionally excludes `corpus.json` to avoid a self-referential digest.
+Cases and request-binding manifests MUST NOT select that index as an evaluated
+input, including through an alias or symlink. The runner rejects such a reference
+instead of silently excluding an input it evaluates.
 
 Each manifest entry records:
 

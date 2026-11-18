@@ -235,11 +235,16 @@ outcome. A case can therefore have `should_execute: true` for its pre-execution
 admission projection and still fail a later post-execution linkage or constraint
 check.
 
-The current runner checks the declared attenuation hashes, changes, and
+For cases that do not require the
+[request-binding extension](../../reference/request-binding/CONTRACT.md), the
+current runner checks the declared attenuation hashes, changes, and
 effective-constraint shape, and it carries the declared effective request hash
 into post-execution linkage comparison. It does not reconstruct the effective
 request by applying `attenuation.changes` to an original request preimage or
 recompute `attenuation.effective_request_hash` from such a reconstructed object.
+Cases that require that extension also check the original hash against
+`request.input_hash`, reconstruct the effective request under the selected
+profile, and recompute its hash from the supplied preimages.
 
 The current profile closes the immediate handoff condition when
 `require_new_permit` is true, but it does not define or validate a typed

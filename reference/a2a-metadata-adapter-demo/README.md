@@ -19,8 +19,10 @@ The purpose is to show a dependency-free A2A-shaped adapter:
   task response with `DIGEST_MISMATCH` and `FAIL_CLOSED`
 - invalid original references or preimage relationships are rejected with
   `SCHEMA_INVALID` and `FAIL_CLOSED`
-- malformed VATE metadata is checked before local fixture dereference and mapped to `SCHEMA_INVALID` with `FAIL_CLOSED`
-- missing extension metadata or a non-object task message is mapped to a rejected task response with `SCHEMA_INVALID` and `FAIL_CLOSED`
+- request-phase metadata is checked before local fixture dereference, including
+  timestamps, unknown core fields, URI syntax, and optional reference shapes;
+  malformed metadata is mapped to `SCHEMA_INVALID` with `FAIL_CLOSED`
+- missing extension metadata or a non-object task message, including JSON `null`, is mapped to a rejected task response with `SCHEMA_INVALID` and `FAIL_CLOSED`
 - for those malformed A2A input paths, the task response records the rejected input as a digest-bound demo-local `demo_local_failure_source`, while the generated admission receipt does not classify it as admission-request evidence
 
 For the A2A v1.0-shaped extension sketch, see

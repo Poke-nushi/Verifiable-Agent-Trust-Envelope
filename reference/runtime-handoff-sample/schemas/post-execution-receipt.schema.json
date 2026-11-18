@@ -18,7 +18,7 @@
         },
         "value": {
           "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
         }
       },
       "additionalProperties": true
@@ -26,7 +26,7 @@
     "profileHash": {
       "type": "string",
       "description": "Profile-defined SHA-256 hash string for AL2 request and execution binding fields.",
-      "pattern": "^sha-256:[0-9a-f]{64}$"
+      "pattern": "^sha-256:[0-9a-f]{64}(?![\\s\\S])"
     },
     "actionBinding": {
       "type": "object",

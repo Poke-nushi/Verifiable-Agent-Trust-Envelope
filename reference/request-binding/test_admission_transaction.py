@@ -17,6 +17,16 @@ class AdmissionTransactionTests(unittest.TestCase):
         self.now = b.core.parse_time(example.EVALUATED_AT)
         self.verifier = b.core.VateVerifier(verifier_id="urn:verifier", policy=self.policy)
 
+    def test_verifier_identity_is_a_nonempty_receipt_identifier(self):
+        for invalid in ("", None, False, 1, []):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                b.core.VateVerifier(verifier_id=invalid)
+            with self.assertRaises(ValueError):
+                self.verifier.verifier_id = invalid
+        self.verifier.verifier_id = "例"
+        result = self.admit()
+        self.assertEqual(json.loads(result.receipt)["verifier"]["id"], "例")
+
     def admit(self, request=None, **options):
         request = self.request if request is None else request
         raw = json.dumps(request, ensure_ascii=False, separators=(",", ":")).encode()

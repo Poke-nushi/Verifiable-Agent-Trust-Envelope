@@ -116,7 +116,8 @@ class AuthorityStore:
         s.need(os.getpid() == self._pid, "AUTHORITY_FORK_REOPEN_REQUIRED")
         s.class_identity(self, sys.modules[__name__])
         return b.object_hash({"contract": CONTRACT, "anchor": b.digest(self.anchor),
-            "verifier": self.verifier.configuration_id(), "source": s.module_identity(sys.modules[__name__])})
+            "verifier": self.verifier.configuration_id(), "source": s.module_identity(sys.modules[__name__]),
+            "migration_guard": s.module_identity(b.durable_state_module())})
 
     def _files(self):
         for name, path in (("directory", self.directory), ("db", self.directory / "authority.sqlite3"),
@@ -183,7 +184,11 @@ class AuthorityStore:
                  and connection.execute("PRAGMA user_version").fetchone()[0] == 1, "AUTHORITY_DB_MODE_INVALID")
             schema = {row["name"]: " ".join(row["sql"].split()) for row in connection.execute(
                 "SELECT name,sql FROM sqlite_master WHERE name NOT GLOB 'sqlite_*'")}
-            s.need(schema == TABLES, "AUTHORITY_SCHEMA_CHANGED")
+            try:
+                s.need(b.durable_state_module().migration_schema(connection, schema, TABLES, self.anchor),
+                       "AUTHORITY_SCHEMA_CHANGED")
+            except b.durable_state_module().StateError as error:
+                raise s.AuthorityError(error.cause) from None
             identity = connection.execute("SELECT * FROM identity").fetchall()
             s.need(len(identity) == 1 and identity[0]["singleton"] == 1
                  and identity[0]["store_id"] == self._anchor["store_id"]

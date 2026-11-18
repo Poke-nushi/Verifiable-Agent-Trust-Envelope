@@ -133,9 +133,13 @@ The A2A metadata schema validates artifact reference `uri` values as absolute
 URI-shaped strings. This does not make a referenced location trusted or
 reachable; verifier implementations still need dereference controls, media type
 pinning, digest checks, and local trust policy before using the artifact.
-The dependency-free adapter demo performs a lightweight metadata shape check
-before dereferencing `local:` fixture URIs. Malformed VATE metadata is mapped to
-a fail-closed VATE denial with `SCHEMA_INVALID` and `FAIL_CLOSED`.
+The dependency-free adapter demo checks the `admission_requested` metadata
+shape, including unknown core fields, timestamps, optional reference shapes,
+and URI syntax, before dereferencing `local:` fixture URIs. Extension and
+annotation contents remain open data and do not grant authority. Malformed
+metadata is mapped to a fail-closed VATE denial with `SCHEMA_INVALID` and
+`FAIL_CLOSED`. This hand-written check covers the demo's request phase; it is
+not a general JSON Schema engine or an A2A SDK validator.
 
 For `admission_issued`, the required decision digest is the `admission_receipt.digest`.
 An optional `policy_snapshot.digest` can be added when the verifier wants consumers or auditors to reconstruct the policy basis for the decision.

@@ -15,11 +15,14 @@ import subprocess
 import sys
 import tempfile
 
+from sync_runtime_handoff_sample import DISTRIBUTION_FILES, expected_files
+
 SAMPLE = Path(__file__).resolve().parents[1] / "reference/runtime-handoff-sample"
 SUITES = (
     ("provider", "sample/test_handoff.py", 52),
-    ("receiver", "inbox/test_bridge.py", 32),
-    ("distribution", "test_distribution.py", 8),
+    ("receiver", "inbox/test_bridge.py", 39),
+    ("distribution", "test_distribution.py", 16),
+    ("native-cleanup", "reference/required-records/test_native_bridge.py", 10),
 )
 # First effect, latest effect, first coverage, latest coverage, linkage outcome.
 EXPECTED = {
@@ -56,7 +59,8 @@ def snapshot(root):
 def verify_inventory(source):
     before = snapshot(source)
     manifest = json.loads((source / "SOURCE-MANIFEST.json").read_bytes())
-    require(len(before) == 49, "expected the complete 49-file distribution")
+    require(set(before) == DISTRIBUTION_FILES | {"SOURCE-MANIFEST.json"},
+            "expected the complete canonical distribution inventory")
     require({k: v for k, v in before.items() if k != "SOURCE-MANIFEST.json"} == manifest["files"],
             "source inventory or hashes differ from the distribution manifest")
     return before
@@ -91,7 +95,16 @@ def verify_scenarios(summary):
             require(reasons == SUCCESS_REASONS, "successful linkage reasons differ: " + name)
 
 
+def verify_shared_boundaries(source):
+    """The package uses whole current helpers, not a separately patched fork."""
+    for name, expected in expected_files(source).items():
+        path = source / name
+        require(path.is_file() and path.read_bytes() == expected,
+                "handoff source drift; run scripts/sync_runtime_handoff_sample.py: " + name)
+
+
 def check(source, integrity_only=False):
+    verify_shared_boundaries(source)
     before = verify_inventory(source)
     prefix = [sys.executable, "-E", "-s", "-B"]
     with tempfile.TemporaryDirectory(prefix="vate handoff check ") as directory:
@@ -111,7 +124,7 @@ def check(source, integrity_only=False):
         if integrity_only:
             environment_args.append("--sources-only")
         environment = json.loads(call("environment", environment_args).stdout)
-        require(environment["status"] == "ok" and environment["source_files_verified"] == 48,
+        require(environment["status"] == "ok" and environment["source_files_verified"] == len(before) - 1,
                 "environment or source verification failed")
         if integrity_only:
             require(before == snapshot(copied) == snapshot(source), "source files changed")

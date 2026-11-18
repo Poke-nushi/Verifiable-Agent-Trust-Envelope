@@ -35,8 +35,8 @@ class JsonService:
         except ValueError:
             valid = False
         s.need(valid and type(development_loopback) is bool, "ISSUER_ENDPOINT_INVALID")
-        s.need(type(timeout_seconds) in (int, float) and math.isfinite(timeout_seconds)
-               and 0 < timeout_seconds <= 30, "ISSUER_TIMEOUT_INVALID")
+        s.need(type(timeout_seconds) in (int, float) and 0 < timeout_seconds <= 30
+               and math.isfinite(timeout_seconds), "ISSUER_TIMEOUT_INVALID")
         s.need(authorization is None or type(authorization) is str and 0 < len(authorization) <= 8192
                and all(32 <= ord(ch) < 127 for ch in authorization), "ISSUER_CREDENTIAL_INVALID")
         self.base_url = base_url.rstrip("/")

@@ -152,7 +152,7 @@ def action_binding(effective):
 
 
 def mint(effective, permit, evaluated_at, checker):
-    """A controller-owned unsigned test permit, validated before core.admit."""
+    """Validate the S3 preimage and local permit before evaluating core policy."""
     validate_effective(effective)
     exact(permit, ('contract', 'operation_id', 'input_hash', 'issued_at', 'expires_at', 'status'), 'permit')
     need(permit['contract'] == CONTRACT and permit['operation_id'] == effective['operation_id']
@@ -169,7 +169,7 @@ def mint(effective, permit, evaluated_at, checker):
                'evidence_refs': [{'type': 'mission_permit', 'uri': 'local:permit.json', 'media_type': 'application/json',
                                   'digest': digest(encode(permit))}]}
     policy = {'policy_id': CONTRACT, 'policy_version': '1', 'policy_ref': 'local:controller-policy', 'allowed_actions': [ACTION]}
-    decision = core.VateVerifier(verifier_id=VERIFIER, policy=policy).admit(request, now=evaluated)
+    decision = core.VateVerifier(verifier_id=VERIFIER, policy=policy)._evaluate_policy(request, now=evaluated)
     need(decision['decision'] == 'allow', 'core did not allow this test operation')
     admission = copy.deepcopy(decision['admission_receipt'])
     admission['proof'] = {'format': 'none'}
