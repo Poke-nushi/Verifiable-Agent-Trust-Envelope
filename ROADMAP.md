@@ -190,7 +190,8 @@ or produce VATE receipts.
 The current public review surface is:
 
 - [v0.7.0 release notes](docs/release-notes/v0.7.0.md) and
-  [release verification](docs/release-gate-v0.7.0.md)
+  [release verification](docs/release-gate-v0.7.0.md), with the archived source at
+  [10.5281/zenodo.24330626](https://doi.org/10.5281/zenodo.24330626)
 - `v0.6.0` release notes and publication/archive gate:
   [docs/release-notes/v0.6.0.md](docs/release-notes/v0.6.0.md) and
   [docs/release-gate-v0.6.0.md](docs/release-gate-v0.6.0.md)
