@@ -67,10 +67,12 @@ The [main CI run](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/
 
 Zenodo published [the exact v0.7.0 software archive](https://doi.org/10.5281/zenodo.24330626)
 in the [existing release series](https://doi.org/10.5281/zenodo.19839768).
-Both downloads matched the tagged source at all 1,972 file paths.
-The GitHub and Zenodo ZIP files were byte-for-byte identical.
+All 1,972 files in the [GitHub release-page ZIP](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/archive/refs/tags/v0.7.0.zip)
+and the Zenodo ZIP matched the tagged source. The two archives use different
+top-level directory names. The [GitHub API ZIP](https://api.github.com/repos/Poke-nushi/Verifiable-Agent-Trust-Envelope/zipball/v0.7.0)
+was byte-for-byte identical to the Zenodo download.
 
-The archive is 6,264,512 bytes. Its SHA-256 digest is
+The Zenodo ZIP is 6,264,512 bytes. Its SHA-256 digest is
 `cfc46c589ac6551f349e00ff93b78a22605af685a0fd3c4f11248c9475b29894`.
 
 The [technical report](https://doi.org/10.5281/zenodo.22685689) has its own
