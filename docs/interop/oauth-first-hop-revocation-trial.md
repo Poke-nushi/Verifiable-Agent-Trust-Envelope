@@ -6,6 +6,9 @@ The trial uses Ory Hydra 26.2.0 for OAuth and OpenFGA 1.22.1 for stored
 relationship checks. Its 14 cases expose the policy inputs, changes, HTTP
 observations and fixture action counts for comparison with another implementation.
 
+To trace a delayed execution receipt back to a selected request from this trial,
+use the [VATE v0.7.0 receiving example](oauth-first-hop-vate-example.md).
+
 ## Get the standalone package
 
 The [fixed download](https://vate.rognalia.com/downloads/oauth-first-hop-revocation/2026-11-10/oauth-first-hop-revocation-trial-20261110.zip)
