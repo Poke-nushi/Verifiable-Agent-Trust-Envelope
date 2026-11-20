@@ -11,7 +11,7 @@ and separate expected PEP comparison conditions.
 | --- | --- | --- |
 | [1. Lost-response recovery](cases/01-lost-response-recovery/) | With and without a caller's unknown observation | Recover A's result against A's original admission and attempt; retain earlier records; do not repeat the effect. |
 | [2. Accepted work interrupted](cases/02-accepted-interrupted/) | Zero effects; partial effects | Neither zero nor partial observed effects establishes nonexecution after acceptance. |
-| [3. Nonexecution and handoff](cases/03-confirmed-nonexecution-handoff/) | Live worker; fenced old attempt | A live worker blocks handoff. Confirmed nonexecution and exclusion permit considering continuation under separate authorization conditions. |
+| [3. Nonexecution and handoff](cases/03-confirmed-nonexecution-handoff/) | Live worker; fenced old attempt | A live worker blocks handoff. Confirmed nonexecution and exclusion permit considering continuation under separate authorization conditions. [ICAM A/B comparison](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/blob/main/docs/interop/icam-handoff-comparison.md) |
 | [4. A new permit](cases/04-new-permit-does-not-reopen/) | Unresolved; completed | A new local admission does not reopen the same unresolved or completed effect. |
 
 The eight variants contain 17 saved snapshots from the
