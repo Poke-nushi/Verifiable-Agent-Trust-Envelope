@@ -1,0 +1,32 @@
+{
+ "vate": {
+  "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+  "commit": "c7533ad70c20e71b7912cdf708f33220e49c1f00",
+  "files": {
+   "reference/authzen-receipt-vectors/cases/01-lost-response-recovery/with-unknown-observation/context.json": "d44d3c587613b736afe77d61cba11ec330b018b9b02e97d0a4819d6a127e874a",
+   "reference/authzen-receipt-vectors/cases/01-lost-response-recovery/with-unknown-observation/interactions.json": "3f754019aaf3faa68af61fe20280f2f2920d0133afcbf6d4135917ad45097902",
+   "reference/authzen-receipt-vectors/cases/01-lost-response-recovery/with-unknown-observation/pending-history.json": "51aded93d717d44ee7e626f07fc803002601c083cdaa1f2da6f02443161e74ea",
+   "reference/authzen-receipt-vectors/cases/01-lost-response-recovery/with-unknown-observation/recovered-history.json": "b6d25addffa5d4274070cc91a7388b867914a848fcac7fe70f0d8bf4a320b8d2",
+   "reference/authzen-receipt-vectors/cases/01-lost-response-recovery/with-unknown-observation/expected-assessments.json": "2e98647bb543f13accf043dea45cfe07f75a849ee0b296f3be121a9fd90e6f4d"
+  }
+ },
+ "amep": {
+  "repository": "https://github.com/stafordtituss/amep",
+  "commit": "765855de32d6649446d3d57ec2289b8a6e349095",
+  "source_dir": "interop/authzen-receipts/vate-01-lost-response",
+  "files": {
+   "1-pending.packet.json": "8c0c2209428fb5c98268d4bad29eccf4e781155c47fa31175b3c1137edbd2dcd",
+   "1-pending.verdict.dsse.json": "ff94b42aa27e09edd164c158db8f83853b0028078121d312af2bb127163a8387",
+   "2-recovered.packet.json": "7a1af0a840000c702028e77386a21e8174de87bb47c7ac2669273571cf1450b9",
+   "2-recovered.verdict.dsse.json": "24413095a0898419909a2131866737d2e4fa94df20de752b6b233ec473b39d85",
+   "3-retried.packet.json": "8bd26ce496f0ef63b2141e96ed94d6181b285b1ceaa0c8ba80a1454f2eb9f633",
+   "3-retried.verdict.dsse.json": "270e8247f42fb42c878258e26a6d6d186ca57283f5bae7c4dd1aa855db7b755d",
+   "4-approved-recovered.packet.json": "ed4b3562bb00afbc794bbc6a03e8bc2d62500918ce6c22f2a8f099c50546fffd",
+   "4-approved-recovered.verdict.dsse.json": "682d9a0cfc71f275cd47be566a4d269cd41bd7e4bb712ff18cafe1348f5b2a5b",
+   "5-approved-retried.packet.json": "ff2b4a5aa88b487e648314f456ca0373be392236dca0f3f375f0bc64b917096d",
+   "5-approved-retried.verdict.dsse.json": "bea562e575a6c33b7a9f94cc121a6a73f2919718fbb23ee40724d6721fb9606f",
+   "keys.json": "73f89d16e5952a43cd0dee4e062ee7294628d5a85e9ed0d836a49da12c7edacd",
+   "verifier-key.json": "e48d927ad8bbe89007cc44926dd7b1d1878ba38ae141f4a2a8aac180a2e02066"
+  }
+ }
+}
