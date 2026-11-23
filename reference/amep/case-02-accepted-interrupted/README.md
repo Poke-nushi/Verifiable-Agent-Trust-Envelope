@@ -21,20 +21,22 @@ The admission is an AMEP operation approval over the digests of both file effect
 | AMEP packet | VATE | What the evidence holds | AMEP |
 |---|---|---|---|
 | `z1-interrupted` | zero-effects, interrupted | runtime-a's signed invocation; nothing from the provider | `unresolved` (I7), gap `receipt` |
-| `z2-handoff-rerun` | zero-effects, after handoff | runtime-b re-runs the operation under the same admission | runtime-a `unresolved` (`receipt`); runtime-b **`unresolved`, gap `held_outcome` naming runtime-a's call** |
+| `z2-handoff-rerun` | zero-effects, after handoff¹ | runtime-b re-runs the operation under the same admission | runtime-a `unresolved` (`receipt`); runtime-b **`unresolved`, gap `held_outcome` naming runtime-a's call** |
 | `z3-not-executed` | — | the provider signs `not_executed` for runtime-a's call | `preserved`, "nothing executed" |
 | `z4-late-write` | — | as `z3`, then a receipt for that call appears | `violated` (I11), blame `server` |
 | `p1-interrupted` | partial-effects, interrupted | one signed receipt, `first.txt`, matching VATE's inventory; no call statement | `preserved` |
 | `p2-promised-two` | — | the provider's statement says `completed`, 2 effects; one receipt is present | `unresolved` (I7), gap `receipt` |
-| `p3-handoff-rerun` | partial-effects, after handoff | runtime-b re-runs both files under the same admission | runtime-a `preserved`; runtime-b `violated` (I8) |
+| `p3-handoff-rerun` | partial-effects, after handoff¹ | runtime-b re-runs both files under the same admission | runtime-a `preserved`; runtime-b `violated` (I8) |
 
 **VATE marks some rows "—"**: these show what further evidence would establish, and VATE doesn't record them.
+
+¹ **In VATE, this re-run doesn't happen.** The handoff retains runtime-a's original attempt, and runtime-b's request for a new ticket is refused (`repeat-ticket`: "no new ticket"). B's re-run under the same approval is the scenario AMEP adds: it asks what the evidence shows if an enforcement point lets the re-run through anyway.
 
 ## What the evidence establishes
 
 - **Neither write seen.** The same answer as VATE: zero observed effects isn't nonexecution, so the call is `unresolved`, and the missing evidence is named.
 - **One write seen.** AMEP's `preserved` answers a different question from VATE's `unresolved`: the write that happened was within authority. It doesn't say the operation finished. Only the provider's own statement makes the incompleteness visible (`p2`). So for "is this operation done?", VATE's `unresolved` is the right answer, and AMEP doesn't replace it.
-- **A signed "not executed".** AMEP takes the provider's statement at its word (`z3`). After acceptance, VATE asks for more: confirmed nonexecution *and exclusion*, so the old worker can't still write (case 3). AMEP's answer to a late write is accountability, not prevention: the receipt contradicts the statement, and the provider is blamed (`z4`).
+- **A signed "not executed".** AMEP takes the provider's statement at its word (`z3`). VATE records no such statement in case 2, and with the evidence on record its accepted attempt stays `unresolved`. VATE reports `confirmed_unexecuted` in a different situation: in case 3's `fenced-handoff`, the old attempt has no recorded acceptance and the old worker can no longer write (its late submit is denied as `old_generation`). AMEP's answer to a late write is accountability, not prevention: the receipt contradicts the statement, and the provider is blamed (`z4`).
 - **The handoff.** When runtime-b re-runs the work under the same admission:
   - if runtime-a's write is known, the admission is spent twice: `violated` (`p3`);
   - if runtime-a's outcome is unknown, runtime-b's call is `unresolved` until it's known (`z2`). That's AMEP's form of holding the same logical effect, when an admission exists.

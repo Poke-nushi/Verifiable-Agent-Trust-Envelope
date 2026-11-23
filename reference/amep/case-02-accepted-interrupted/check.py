@@ -7,9 +7,11 @@ Default mode uses only the Python standard library. It checks:
      - each variant's interrupted history has one accepted record, for the pinned attempt of runtime-a;
      - after the handoff, VATE's provider-reported inventory is empty (zero-effects), or holds first.txt only
        (partial-effects), and the handoff retains runtime-a's attempt;
-     - the files in AMEP's receipts and admission are the operation's files: each name, SHA-256 and size equals
-       the operation's text, and the partial-effects receipts for runtime-a's call cover first.txt only, as VATE's
-       inventory does;
+     - AMEP's receipt files are compared with VATE: each file a receipt names is one of the operation's files, by
+       name, SHA-256 and size of the operation's text, and the partial-effects receipts for runtime-a's call cover
+       first.txt only, as VATE's inventory does;
+     - the approval data is not compared with VATE separately: it is part of each packet, so it is pinned with the
+       packet, by the packet's SHA-256 in SOURCE-PINS.json (check 1) and in its verdict record (check 4);
   4. each AMEP verdict record names the SHA-256 of its packet, and states the expected packet verdict and every
      invocation's result (so z2-handoff-rerun records runtime-b's held_outcome).
 
