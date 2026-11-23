@@ -1,0 +1,156 @@
+{
+ "amep_version": "0.3",
+ "mandates": [
+  {
+   "id": "m-1",
+   "kind": "mandate",
+   "principal": "urn:vate:demo:local-owner",
+   "claims": {
+    "actions": [
+     "demo.create_file_set"
+    ],
+    "resources": [
+     "store:handoff/*"
+    ],
+    "ceiling": "write_local",
+    "exp": 100
+   },
+   "proof": {
+    "kid": "owner",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "8811cb749e8619e6365d6c36fa108af263d8b688269d6daec263309a6d88d58834c4a8d61ccd71433c769275915af878b534edcc40dec2163650517869cc7807"
+   }
+  }
+ ],
+ "delegations": [],
+ "interpretations": [
+  {
+   "id": "a-1",
+   "kind": "interpretation",
+   "source": "curated",
+   "adapter": "vate-demo-file-set",
+   "version": "v1",
+   "proof": {
+    "kid": "runtime-a",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "f5aaa17f94ddb085e333998cbc265eb6e494a339776bb728773a74886c3316f2557c870c5dc903218dce6f99c02f85fe8370267b36a56730da3b0c89039fbe00"
+   }
+  }
+ ],
+ "approvals": [
+  {
+   "id": "ap-1",
+   "kind": "approval",
+   "effect_digests": [
+    "98e88756978d88ee8bc92bb9b1e3b754eb284283c34e18b29b737575ccdb8588",
+    "d1456a42938eb41707de91ec0864d0ed3d70f8f6b28c459be379693782e40913"
+   ],
+   "presence": "host_ui",
+   "expiry": 50,
+   "proof": {
+    "kid": "owner",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "c40f0e9af17c28f30830462df77b91dfe144bdc92d888d4fb0fcc882c0cf105ea70b206081589e5a331ba16743947ed3aaf840e4bd3f61bf88f8accf5bb14307"
+   }
+  }
+ ],
+ "invocations": [
+  {
+   "id": "i-1",
+   "kind": "invocation",
+   "authority_ref": "m-1",
+   "interpretation_ref": "a-1",
+   "actor": "urn:vate:demo:requester",
+   "t": 10,
+   "approval_ref": "ap-1",
+   "declared": {
+    "action": "demo.create_file_set",
+    "resource": "store:handoff/resource-6d36e653fa774434a64b99885539fb3b",
+    "effect": "write_local"
+   },
+   "args_digest": "9260cf90f7942e2420762c8d05dee5b2aa1670ec6a4055758f61fa4bf637a8ce",
+   "proof": {
+    "kid": "runtime-a",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "141e38b9f2f84161da3e00c9667b406abd97bd264dd141b4cbd39f4a987f93eb4d214aea164ed9b9527d9c80fe621cec68098c55b43c476eae5a12ff903ee002"
+   }
+  }
+ ],
+ "effects": [
+  {
+   "id": "e-1-1",
+   "kind": "effect",
+   "invocation": "i-1",
+   "observed_by": "provider-local",
+   "assurance": "L3",
+   "executed": {
+    "action": "demo.create_file_set",
+    "resource": "store:handoff/resource-6d36e653fa774434a64b99885539fb3b",
+    "effect": "write_local",
+    "released": [],
+    "t": 11,
+    "x-file": {
+     "name": "first.txt",
+     "sha256": "c6d0b56bb7dcde279c493625746cf72dd968d0b68b38724658dac44479f36d84",
+     "size": 19
+    }
+   },
+   "invocation_digest": "4f5d978d9ce721807e7c8881c181976567440e659afd36bbf5e45bef8344dcbd",
+   "proof": {
+    "kid": "provider-local",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "51084abce7f7bc928814cd8f9c5993886ec561fd2dcee6a0dd7f754744f03b0b173d91bb9f0eefce9ba670c85e5653775d62cad3c27652cd5faf6619b183db0a"
+   }
+  },
+  {
+   "id": "e-1-2",
+   "kind": "effect",
+   "invocation": "i-1",
+   "observed_by": "provider-local",
+   "assurance": "L3",
+   "executed": {
+    "action": "demo.create_file_set",
+    "resource": "store:handoff/resource-6d36e653fa774434a64b99885539fb3b",
+    "effect": "write_local",
+    "released": [],
+    "t": 11,
+    "x-file": {
+     "name": "second.txt",
+     "sha256": "d1844cecf2c9f8e459d882b6be79bbd1ba9e95ce649e140609c9ebf3ac0f0b32",
+     "size": 20
+    }
+   },
+   "invocation_digest": "4f5d978d9ce721807e7c8881c181976567440e659afd36bbf5e45bef8344dcbd",
+   "proof": {
+    "kid": "provider-local",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "b7e1367b3848d1f5381cf5c05f38282acad469ab2667df5707c5b9600070fa561f60dd44c39cb0c331c0680f82983f31b6166fb7313486d2f19971d83f69fe0f"
+   }
+  }
+ ],
+ "call_statements": [
+  {
+   "id": "c-1",
+   "kind": "call_statement",
+   "invocation": "i-1",
+   "observed_by": "provider-local",
+   "disposition": "completed",
+   "effect_count": 2,
+   "t": 12,
+   "invocation_digest": "4f5d978d9ce721807e7c8881c181976567440e659afd36bbf5e45bef8344dcbd",
+   "args_digest": "9260cf90f7942e2420762c8d05dee5b2aa1670ec6a4055758f61fa4bf637a8ce",
+   "proof": {
+    "kid": "provider-local",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "bc783c6d7e4e5bd3a6add55171fd28251a1e85ba5dd324b1c8298bc582f14b51e61971211ea09d4d152b1627d5e9e73d7ffc0e2e8ebd7a62d2a5f84b63752e05"
+   }
+  }
+ ]
+}

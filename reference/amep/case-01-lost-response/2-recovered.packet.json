@@ -1,0 +1,137 @@
+{
+ "amep_version": "0.3",
+ "mandates": [
+  {
+   "id": "m-1",
+   "kind": "mandate",
+   "principal": "urn:vate:demo:local-owner",
+   "claims": {
+    "actions": [
+     "demo.create_file_set"
+    ],
+    "resources": [
+     "store:handoff/*"
+    ],
+    "ceiling": "write_local",
+    "exp": 100
+   },
+   "proof": {
+    "kid": "owner",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "8811cb749e8619e6365d6c36fa108af263d8b688269d6daec263309a6d88d58834c4a8d61ccd71433c769275915af878b534edcc40dec2163650517869cc7807"
+   }
+  }
+ ],
+ "delegations": [],
+ "interpretations": [
+  {
+   "id": "a-1",
+   "kind": "interpretation",
+   "source": "curated",
+   "adapter": "vate-demo-file-set",
+   "version": "v1",
+   "proof": {
+    "kid": "runtime-a",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "f5aaa17f94ddb085e333998cbc265eb6e494a339776bb728773a74886c3316f2557c870c5dc903218dce6f99c02f85fe8370267b36a56730da3b0c89039fbe00"
+   }
+  }
+ ],
+ "invocations": [
+  {
+   "id": "i-1",
+   "kind": "invocation",
+   "authority_ref": "m-1",
+   "interpretation_ref": "a-1",
+   "actor": "urn:vate:demo:requester",
+   "t": 10,
+   "declared": {
+    "action": "demo.create_file_set",
+    "resource": "store:handoff/resource-6d36e653fa774434a64b99885539fb3b",
+    "effect": "write_local"
+   },
+   "args_digest": "9260cf90f7942e2420762c8d05dee5b2aa1670ec6a4055758f61fa4bf637a8ce",
+   "proof": {
+    "kid": "runtime-a",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "669ac8930eb4f9bdef57520b2613b65fc3f4bf8b7e4d2d557fb69964f564f7952f8fcaf2c7c781847b0471160d35922a6fa4997a056fef01cd62dd22ca16cf0a"
+   }
+  }
+ ],
+ "effects": [
+  {
+   "id": "e-1-1",
+   "kind": "effect",
+   "invocation": "i-1",
+   "observed_by": "provider-local",
+   "assurance": "L3",
+   "executed": {
+    "action": "demo.create_file_set",
+    "resource": "store:handoff/resource-6d36e653fa774434a64b99885539fb3b",
+    "effect": "write_local",
+    "released": [],
+    "t": 11,
+    "x-file": {
+     "name": "first.txt",
+     "sha256": "c6d0b56bb7dcde279c493625746cf72dd968d0b68b38724658dac44479f36d84",
+     "size": 19
+    }
+   },
+   "invocation_digest": "bb8d7caed6f0279d945f297b69cf5d57cdc80a03c476a5deeb8a7af83fb9a63f",
+   "proof": {
+    "kid": "provider-local",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "05b7e6ff2f71eaafe383138edb75b80ea62c9211f5e4529d3435004529fdfbc8ee80fe7b49409d1a407953c22f5260d45fa9d31fe41456062f09d8d95c98190c"
+   }
+  },
+  {
+   "id": "e-1-2",
+   "kind": "effect",
+   "invocation": "i-1",
+   "observed_by": "provider-local",
+   "assurance": "L3",
+   "executed": {
+    "action": "demo.create_file_set",
+    "resource": "store:handoff/resource-6d36e653fa774434a64b99885539fb3b",
+    "effect": "write_local",
+    "released": [],
+    "t": 11,
+    "x-file": {
+     "name": "second.txt",
+     "sha256": "d1844cecf2c9f8e459d882b6be79bbd1ba9e95ce649e140609c9ebf3ac0f0b32",
+     "size": 20
+    }
+   },
+   "invocation_digest": "bb8d7caed6f0279d945f297b69cf5d57cdc80a03c476a5deeb8a7af83fb9a63f",
+   "proof": {
+    "kid": "provider-local",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "3d6a0926e931967d303f7e489024b0282eecdf511bf3eb3b933723aeeea6d44bbe47a24e5f08495dfc29df5b4052cedf658bbc1492823ae6836506bd26e2d902"
+   }
+  }
+ ],
+ "call_statements": [
+  {
+   "id": "c-1",
+   "kind": "call_statement",
+   "invocation": "i-1",
+   "observed_by": "provider-local",
+   "disposition": "completed",
+   "effect_count": 2,
+   "t": 12,
+   "invocation_digest": "bb8d7caed6f0279d945f297b69cf5d57cdc80a03c476a5deeb8a7af83fb9a63f",
+   "args_digest": "9260cf90f7942e2420762c8d05dee5b2aa1670ec6a4055758f61fa4bf637a8ce",
+   "proof": {
+    "kid": "provider-local",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "d76c771af5131926d13e0a7df0430b5c8888953f27a0155aa5ff9abe7252ff8bf34e8618cfced98de37d1f9ce6f9504e4e9a5103705efb125137b27b33902105"
+   }
+  }
+ ]
+}

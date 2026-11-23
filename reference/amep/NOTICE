@@ -1,0 +1,15 @@
+Agentic Mandate Evidence Protocol (AMEP)
+Copyright 2026 Staford Titus Selvaraj and the AMEP Contributors.
+
+AMEP was originally designed and written by Staford Titus Selvaraj.
+
+This product includes the AMEP specification, schemas, reference verifiers
+and conformance vectors, developed by the AMEP project (original author and maintainer:
+Staford Titus Selvaraj) at https://github.com/stafordtituss/amep.
+
+"AMEP", "Agentic Mandate Evidence Protocol" and "AMEP Conformant" are
+trademarks of Staford Titus Selvaraj. See TRADEMARKS.md.
+
+Under section 4(d) of the Apache License 2.0, redistributions of the code in
+this repository must retain this NOTICE file, or reproduce its attribution
+notices, in the places that license describes.
