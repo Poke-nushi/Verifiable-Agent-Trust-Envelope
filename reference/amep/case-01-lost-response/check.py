@@ -115,20 +115,23 @@ def check(amep_path=None):
     if len(pend) != 1 or len(rec) != 1:
         problems.append(f"expected one ticket in each history, found {len(pend)} pending and {len(rec)} recovered")
     else:
-        (pi, psha, praw, pbody), (ri, rsha, _, _) = pend[0], rec[0]
+        (pi, psha, praw, pbody), (ri, rsha, rraw, _) = pend[0], rec[0]
         if praw != psha:
             problems.append("the pending ticket's record digest does not match its bytes")
         if psha != want_t["ticket_record_sha256"] or pbody.get("attempt_id") != want_t["attempt_id"]:
             problems.append("the pending ticket is not the pinned original attempt")
         if rsha != psha:
             problems.append("the recovered history does not carry the pending ticket unchanged")
+        if rraw != psha:
+            problems.append("the hash of the recovered ticket's bytes differs from the pending ticket's hash")
         if len(obs) == 1:
             c = obs[0]["claims"]
             for k in ("attempt_id", "runtime", "operation_id"):
                 if c.get(k) != pbody.get(k):
                     problems.append(f"the signed observation's {k} ({c.get(k)}) differs from the pending ticket's ({pbody.get(k)})")
         lines.append(f"original attempt: pending-history.json records[{pi}] ticket {pbody.get('attempt_id')}, record sha256 {psha[:16]}…; "
-                     f"the same record in recovered-history.json records[{ri}]; the signed observation names the same attempt")
+                     f"the same record in recovered-history.json records[{ri}], whose bytes hash to the same value; "
+                     f"the signed observation names the same attempt")
 
     # 4. each verdict record names its packet and states the expected outcome
     for phase, exp in expected["phases"].items():

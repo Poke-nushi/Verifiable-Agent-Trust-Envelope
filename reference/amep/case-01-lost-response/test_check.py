@@ -18,6 +18,29 @@ class CaseOneComparison(unittest.TestCase):
         self.assertEqual(obs["claims"]["attempt_id"], pending["attempt_id"])
         self.assertEqual(check.ticket("pending-history.json")[0][1], check.ticket("recovered-history.json")[0][1])
 
+    def test_the_recovered_ticket_bytes_hash_to_the_pending_ticket(self):
+        (_, pending_sha, pending_raw, _), = check.ticket("pending-history.json")
+        (_, _, recovered_raw, _), = check.ticket("recovered-history.json")
+        self.assertEqual(recovered_raw, pending_sha)
+        self.assertEqual(recovered_raw, pending_raw)
+
+    def test_changed_recovered_ticket_bytes_are_reported(self):
+        real = check.ticket
+
+        def altered(history_file):
+            found = real(history_file)
+            if history_file == "recovered-history.json":
+                index, record_sha, _, body = found[0]
+                return [(index, record_sha, "0" * 64, body)]
+            return found
+
+        check.ticket = altered
+        try:
+            problems, _ = check.check()
+        finally:
+            check.ticket = real
+        self.assertIn("the hash of the recovered ticket's bytes differs from the pending ticket's hash", problems)
+
     def test_the_unknown_observation_is_found_once(self):
         obs = check.unknown_observation()
         self.assertEqual(len(obs), 1)
