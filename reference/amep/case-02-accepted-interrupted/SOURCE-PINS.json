@@ -1,0 +1,44 @@
+{
+ "vate": {
+  "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+  "commit": "093194d5406a5b70358687aee6ba024bda825caa",
+  "files": {
+   "reference/authzen-receipt-vectors/cases/02-accepted-interrupted/case.json": "0b3f14a7c6737aedf7dfde2737f1b4cd1483295b5394ef7c9f032caf03a58114",
+   "reference/authzen-receipt-vectors/cases/02-accepted-interrupted/zero-effects/context.json": "8a4f63cb43227251796e91dd640aed001e8878a305b0f397a94fb295b9464b7f",
+   "reference/authzen-receipt-vectors/cases/02-accepted-interrupted/zero-effects/operation.json": "7b42d169a46f6b04d3b38c257fffdce6dbf958f49efb30d415bda27207c72f1c",
+   "reference/authzen-receipt-vectors/cases/02-accepted-interrupted/zero-effects/interrupted-history.json": "4c924f61be01a09073c0252e940c4d5f78dbb764ae32d711f41a49fd79c39fa6",
+   "reference/authzen-receipt-vectors/cases/02-accepted-interrupted/zero-effects/after-handoff-history.json": "b37b6de20463a5d9d837ca70ab8223d6af565b0fd7593d586d902f1fb7868633",
+   "reference/authzen-receipt-vectors/cases/02-accepted-interrupted/zero-effects/expected-assessments.json": "b0b41b7b5adaa359afe5da679e33d04448eae4c05ce9706ddf26127198db6a0f",
+   "reference/authzen-receipt-vectors/cases/02-accepted-interrupted/zero-effects/expected-pep-decision.json": "b57a259b47ad8608da1b1066954a6c611eb3a107415327623870795433363ddd",
+   "reference/authzen-receipt-vectors/cases/02-accepted-interrupted/partial-effects/context.json": "4063e25297e774e6d200325cdda71e1a298aa29bfc71a8430b40f92d20ef9308",
+   "reference/authzen-receipt-vectors/cases/02-accepted-interrupted/partial-effects/operation.json": "2bfdd63420a0659dae15b7fedd2ee499818e7051b808a1a06d4a2058f8d6d555",
+   "reference/authzen-receipt-vectors/cases/02-accepted-interrupted/partial-effects/interrupted-history.json": "57cbebda38f9a9e38074e441268fda19d92cdad324c49f51fcaca8157d72991c",
+   "reference/authzen-receipt-vectors/cases/02-accepted-interrupted/partial-effects/after-handoff-history.json": "30a3836d6788545076a357c812615c952d276c9bb20ac73a3e259a1e3bb003ca",
+   "reference/authzen-receipt-vectors/cases/02-accepted-interrupted/partial-effects/expected-assessments.json": "2f63512af1c22954295e2852f51450157f84d78abfe5a353be93477e42be97e5",
+   "reference/authzen-receipt-vectors/cases/02-accepted-interrupted/partial-effects/expected-pep-decision.json": "b57a259b47ad8608da1b1066954a6c611eb3a107415327623870795433363ddd"
+  }
+ },
+ "amep": {
+  "repository": "https://github.com/stafordtituss/amep",
+  "commit": "160159d961248c561e94152e208e5b1e22553a7d",
+  "source_dir": "interop/authzen-receipts/vate-02-accepted-interrupted",
+  "files": {
+   "keys.json": "fc9f76f63138267ab735fd80c8834be29df66b4656bce717fb3a49133fa42f2d",
+   "p1-interrupted.packet.json": "1a3b8bbc5b4b2f2c2948be2d7356a11f923cdf854f89d30c66ec323b2ba1b35c",
+   "p1-interrupted.verdict.dsse.json": "ce6a6f9023a5fc3d8a604eb9a472833a400db35933da9f615f45d505d45e97df",
+   "p2-promised-two.packet.json": "8d5dcd313446f9d1cbf4092aa6d728d34b8707add6cafdefb2a6049be031eff7",
+   "p2-promised-two.verdict.dsse.json": "ff91dcbff1a4bf4ad666c89ba04aefda9a5a541ef3b8cd816a505631ee98bde6",
+   "p3-handoff-rerun.packet.json": "c2c728f54bee38f8aaf714173612f0d652262a4266a51971b446acdff79fee60",
+   "p3-handoff-rerun.verdict.dsse.json": "2c81d965bf9d32b5f16443f7a2a53db412f1efa6edb3163cf4ccdc96d404e3f7",
+   "verifier-key.json": "e48d927ad8bbe89007cc44926dd7b1d1878ba38ae141f4a2a8aac180a2e02066",
+   "z1-interrupted.packet.json": "2ad228215591884fadaadedfa416110b138220cb9e2dc2508542f4992e0f64e6",
+   "z1-interrupted.verdict.dsse.json": "9c0d9955d2998a18031c015da81f8fa932c8adbd439e6c90e33d003d983f78ca",
+   "z2-handoff-rerun.packet.json": "89fdbec9729e0caff5302d9daca9286b1357aa2136965d78db7948a086078783",
+   "z2-handoff-rerun.verdict.dsse.json": "dc6d2a8c34bda3970b380b364859168bd8ccee0892b9e348b83a40704e52a4d0",
+   "z3-not-executed.packet.json": "d3a5bd9586a907b8ec6f2408e48c8f208c61dd839633030263e025d055ea3630",
+   "z3-not-executed.verdict.dsse.json": "b221adc6568f7528f1e967ac89a2dd0bdb36db36ac4c52cfe45d6aef27610f65",
+   "z4-late-write.packet.json": "cb7b843f745e2136df57f4a934ac2527430a28ad635359b469eef5828ffa7772",
+   "z4-late-write.verdict.dsse.json": "62c154aff2bcf74e3731af140880033f33ba6bc3cc0a928c51ba019fa32ec5b3"
+  }
+ }
+}
