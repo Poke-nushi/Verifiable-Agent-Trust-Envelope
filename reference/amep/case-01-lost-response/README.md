@@ -67,7 +67,8 @@ python3 -B -m unittest reference/amep/case-01-lost-response/test_check.py
 These check:
 1. both sides' pinned digests;
 2. that the caller's observation is present under the digests above, for the same operation, attempt and time as the pending phase;
-3. that each AMEP verdict record names its packet's digest and states the expected outcome (`expected-results.json`).
+3. that the ticket in `pending-history.json` (`records[1]`) and the signed observation refer to the same original attempt (`attempt-6919…`, runtime-a, `operation-one`), and that `recovered-history.json` still carries that ticket record unchanged (the same record digest, `ffa8ccc6…`). Recovery adds to the history; it doesn't replace the attempt;
+4. that each AMEP verdict record names its packet's digest and states the expected outcome (`expected-results.json`).
 
 To re-evaluate the packets with AMEP's Python verifier, and verify the signatures (the verdict records' Ed25519, and the caller's ES256 on the observation):
 

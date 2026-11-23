@@ -5,6 +5,9 @@ Default mode uses only the Python standard library. It checks:
   2. the VATE case 1 inputs in this checkout match the pinned VATE revision;
   3. the caller's signed unknown observation is in the recovered history, under the digest VATE records for it, and
      names the same operation and attempt as the pending phase;
+  3a. the pending ticket and the signed observation refer to the same original attempt: the observation's attempt_id,
+     runtime and operation_id are the ticket's, and the recovered history still carries that ticket record unchanged
+     (the same record digest), so recovery added to the history rather than replacing the attempt;
   4. each AMEP verdict record names the SHA-256 of its packet, and states the expected outcome.
 
 With --amep PATH (a checkout of github.com/stafordtituss/amep at the pinned commit, with its Python package's dependency
@@ -58,6 +61,18 @@ def unknown_observation():
     return found
 
 
+def ticket(history_file):
+    """The ticket record in one of the case's histories: (index, record sha256 as VATE records it, decoded body)."""
+    history = load(os.path.join(ROOT, CASE, history_file))
+    found = []
+    for index, record in enumerate(history["records"]):
+        raw = b64u(record["raw"])
+        body = json.loads(raw)
+        if body.get("kind") == "ticket":
+            found.append((index, record["sha256"], hashlib.sha256(raw).hexdigest(), body["body"]))
+    return found
+
+
 def check(amep_path=None):
     problems, lines = [], []
     pins = load(os.path.join(HERE, "SOURCE-PINS.json"))
@@ -93,6 +108,27 @@ def check(amep_path=None):
             problems.append("the unknown observation's observed_at differs from the pending phase's")
         lines.append(f"caller's unknown observation: recovered-history.json records[{o['index']}], record sha256 {o['record_sha256'][:16]}…, "
                      f"JWS sha256 {o['jws_sha256'][:16]}…, outcome {o['claims'].get('outcome')} at {o['claims'].get('observed_at')}")
+
+    # 3a. both records refer to the original attempt (requested in VATE PR #138 review)
+    want_t = expected["original_attempt"]
+    pend, rec = ticket("pending-history.json"), ticket("recovered-history.json")
+    if len(pend) != 1 or len(rec) != 1:
+        problems.append(f"expected one ticket in each history, found {len(pend)} pending and {len(rec)} recovered")
+    else:
+        (pi, psha, praw, pbody), (ri, rsha, _, _) = pend[0], rec[0]
+        if praw != psha:
+            problems.append("the pending ticket's record digest does not match its bytes")
+        if psha != want_t["ticket_record_sha256"] or pbody.get("attempt_id") != want_t["attempt_id"]:
+            problems.append("the pending ticket is not the pinned original attempt")
+        if rsha != psha:
+            problems.append("the recovered history does not carry the pending ticket unchanged")
+        if len(obs) == 1:
+            c = obs[0]["claims"]
+            for k in ("attempt_id", "runtime", "operation_id"):
+                if c.get(k) != pbody.get(k):
+                    problems.append(f"the signed observation's {k} ({c.get(k)}) differs from the pending ticket's ({pbody.get(k)})")
+        lines.append(f"original attempt: pending-history.json records[{pi}] ticket {pbody.get('attempt_id')}, record sha256 {psha[:16]}…; "
+                     f"the same record in recovered-history.json records[{ri}]; the signed observation names the same attempt")
 
     # 4. each verdict record names its packet and states the expected outcome
     for phase, exp in expected["phases"].items():

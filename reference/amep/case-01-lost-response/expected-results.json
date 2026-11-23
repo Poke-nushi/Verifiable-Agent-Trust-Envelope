@@ -1,14 +1,38 @@
 {
  "phases": {
-  "1-pending": {"outcome": "unresolved", "invariant": "I7", "vate_phase": "pending"},
-  "2-recovered": {"outcome": "preserved", "invariant": "-", "vate_phase": "recovered"},
-  "3-retried": {"outcome": "preserved", "invariant": "-", "vate_phase": null},
-  "4-approved-recovered": {"outcome": "preserved", "invariant": "-", "vate_phase": "recovered"},
-  "5-approved-retried": {"outcome": "violated", "invariant": "I8", "vate_phase": null}
+  "1-pending": {
+   "outcome": "unresolved",
+   "invariant": "I7",
+   "vate_phase": "pending"
+  },
+  "2-recovered": {
+   "outcome": "preserved",
+   "invariant": "-",
+   "vate_phase": "recovered"
+  },
+  "3-retried": {
+   "outcome": "preserved",
+   "invariant": "-",
+   "vate_phase": null
+  },
+  "4-approved-recovered": {
+   "outcome": "preserved",
+   "invariant": "-",
+   "vate_phase": "recovered"
+  },
+  "5-approved-retried": {
+   "outcome": "violated",
+   "invariant": "I8",
+   "vate_phase": null
+  }
  },
  "unknown_observation": {
   "path": "reference/authzen-receipt-vectors/cases/01-lost-response-recovery/with-unknown-observation/recovered-history.json",
   "record_sha256": "fdf3e31cbb4ed8b2922a0e8080ff291570a5a153e73f908b3798dacc8ce1c84b",
   "jws_sha256": "067fbc1edb27a7cc7bb07c73381b63e00ae3c023cdfb2735c464db2da5270c28"
+ },
+ "original_attempt": {
+  "attempt_id": "attempt-691929927987426a8b8359f6f3c572f1",
+  "ticket_record_sha256": "ffa8ccc604d0bba678889e3e8b0e03ade98a17f2592ddcbdbfbe7db104682bb5"
  }
 }
