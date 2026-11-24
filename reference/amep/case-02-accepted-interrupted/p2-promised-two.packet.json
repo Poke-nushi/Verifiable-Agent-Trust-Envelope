@@ -1,0 +1,130 @@
+{
+ "amep_version": "0.3",
+ "mandates": [
+  {
+   "id": "m-1",
+   "kind": "mandate",
+   "principal": "urn:vate:demo:local-owner",
+   "claims": {
+    "actions": [
+     "demo.create_file_set"
+    ],
+    "resources": [
+     "store:handoff/*"
+    ],
+    "ceiling": "write_local",
+    "exp": 100
+   },
+   "proof": {
+    "kid": "owner",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "8811cb749e8619e6365d6c36fa108af263d8b688269d6daec263309a6d88d58834c4a8d61ccd71433c769275915af878b534edcc40dec2163650517869cc7807"
+   }
+  }
+ ],
+ "delegations": [],
+ "interpretations": [
+  {
+   "id": "a-1",
+   "kind": "interpretation",
+   "source": "curated",
+   "adapter": "vate-demo-file-set",
+   "version": "v1",
+   "proof": {
+    "kid": "runtime-a",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "f5aaa17f94ddb085e333998cbc265eb6e494a339776bb728773a74886c3316f2557c870c5dc903218dce6f99c02f85fe8370267b36a56730da3b0c89039fbe00"
+   }
+  }
+ ],
+ "approvals": [
+  {
+   "id": "ap-1",
+   "kind": "approval",
+   "effect_digests": [
+    "741d49e81f1240aafb84706a09246bb8fa8953ddd51aca77ec6f9317563beb99",
+    "bb81cfeec8a72e0802a8a796bef8cb0fe94649347853f4780eeaabfc3a131731"
+   ],
+   "presence": "host_ui",
+   "expiry": 50,
+   "proof": {
+    "kid": "owner",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "e7f2cb63ce9302eef2414733b3e0433b0b69d716ce3eef60937088e1cffc513dee554b8a4421d7e82e7e2e5162e4dfad9f8c3c96843d7e04e64c5f10e33cca0c"
+   }
+  }
+ ],
+ "invocations": [
+  {
+   "id": "i-1",
+   "kind": "invocation",
+   "authority_ref": "m-1",
+   "interpretation_ref": "a-1",
+   "actor": "urn:vate:demo:runtime-a",
+   "t": 10,
+   "approval_ref": "ap-1",
+   "declared": {
+    "action": "demo.create_file_set",
+    "resource": "store:handoff/resource-3b4427e6b8a74b308b28114ffe7cd6b2",
+    "effect": "write_local"
+   },
+   "args_digest": "9260cf90f7942e2420762c8d05dee5b2aa1670ec6a4055758f61fa4bf637a8ce",
+   "proof": {
+    "kid": "runtime-a",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "244d3552c91ffbbbcd23eede4f9bf30f8f372202bd959b6ed85c8187363642936320387d50305087698ee6520ae151144e3e8cd7a58eeffc210ccb6634e3a40e"
+   }
+  }
+ ],
+ "effects": [
+  {
+   "id": "e-1-1",
+   "kind": "effect",
+   "invocation": "i-1",
+   "observed_by": "provider-local",
+   "assurance": "L3",
+   "executed": {
+    "action": "demo.create_file_set",
+    "resource": "store:handoff/resource-3b4427e6b8a74b308b28114ffe7cd6b2",
+    "effect": "write_local",
+    "released": [],
+    "t": 11,
+    "x-file": {
+     "name": "first.txt",
+     "sha256": "c6d0b56bb7dcde279c493625746cf72dd968d0b68b38724658dac44479f36d84",
+     "size": 19
+    }
+   },
+   "invocation_digest": "ad7a549cba08d49c736c6faf4380091320e4794f83068b94b8495b5684356d8f",
+   "proof": {
+    "kid": "provider-local",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "877804f32211b86919085a596d02c3f596dd9519446c61fb3365e58ce85b8c14fac24f8c94dd774143d26d43dd609f4ba8fc97c66369b64d781673f2c788eb00"
+   }
+  }
+ ],
+ "call_statements": [
+  {
+   "id": "c-1",
+   "kind": "call_statement",
+   "invocation": "i-1",
+   "observed_by": "provider-local",
+   "disposition": "completed",
+   "effect_count": 2,
+   "t": 12,
+   "invocation_digest": "ad7a549cba08d49c736c6faf4380091320e4794f83068b94b8495b5684356d8f",
+   "args_digest": "9260cf90f7942e2420762c8d05dee5b2aa1670ec6a4055758f61fa4bf637a8ce",
+   "proof": {
+    "kid": "provider-local",
+    "alg": "Ed25519",
+    "v": 2,
+    "sig": "d3d15ffa713dbbcdb24f8a9a351cc176204ae8858a1385fa8f6b72971ce761cd5495d0e342ab533f0b2d11b25db9ae1f5054cf8f48364ae0c5a39e3ffa391706"
+   }
+  }
+ ]
+}
