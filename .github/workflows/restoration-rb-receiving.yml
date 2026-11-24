@@ -59,5 +59,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install the pinned recorded set and second reader
         run: python -m pip install --disable-pip-version-check -r reference/restoration-rb-receiving/requirements-recorded.txt
+      - name: Test the comparison of retained and fresh reports
+        run: |
+          python -E -B reference/restoration-rb-receiving/test_check_recorded_set.py
+          python -E -B -O reference/restoration-rb-receiving/test_check_recorded_set.py
       - name: Read the published captures again and compare
         run: python -E -B reference/restoration-rb-receiving/check_recorded_set.py
