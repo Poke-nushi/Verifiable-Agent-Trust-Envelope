@@ -90,6 +90,11 @@
       overflow-x: auto;
     }
 
+    .diagram:focus-visible {
+      outline: 2px solid var(--purple);
+      outline-offset: 2px;
+    }
+
     .scroll-hint {
       display: none;
     }
@@ -207,7 +212,9 @@
       .cards {
         grid-template-columns: 1fr;
       }
+    }
 
+    @media (max-width: 1328px) {
       .scroll-hint {
         display: block;
         width: 100%;
@@ -225,15 +232,15 @@
       <p class="eyebrow">VATE · v0.3 reference architecture</p>
       <h1>Declare the request basis. Decide locally. Link the outcome.</h1>
       <p class="lede">
-        VATE is the verifier-side admission and receipt boundary. It evaluates one
-        declared request basis with digest-addressed, protocol-native evidence
-        references and records one local decision. An implementation-owned gate
-        controls handoff; later outcome evidence links back to the admitted basis.
+        The receiving system evaluates one agent request and its evidence under
+        local policy. A VATE admission receipt records that decision. The
+        deployment controls handoff. A later outcome receipt can link back to
+        the admission and the instructions it approved.
       </p>
     </header>
 
-    <section class="diagram" aria-label="VATE v0.3 reference architecture diagram">
-      <p class="scroll-hint">Swipe horizontally to inspect the full diagram.</p>
+    <section class="diagram" tabindex="0" aria-label="VATE v0.3 reference architecture diagram">
+      <p class="scroll-hint">Scroll horizontally to inspect the full diagram.</p>
       <svg viewBox="0 0 1480 1040" role="img" aria-labelledby="architecture-title architecture-desc">
         <title id="architecture-title">VATE v0.3 verifier admission reference architecture</title>
         <desc id="architecture-desc">
@@ -243,10 +250,12 @@
           consequence-owning relying party,
           a local verifier applies structural and integrity gates, binding and authority
           checks, and local policy. It issues an admission receipt with allow, attenuate,
-          or deny. An implementation-owned handoff gate may stop or pass a handoff
-          candidate according to deployment rules. Later outcome evidence is recorded
-          in a post-execution receipt that links back to the identified admission
-          receipt and admitted request basis.
+          or deny. Allow makes the original request a candidate. Attenuate makes
+          only the narrowed request a candidate if no fresh permit is required.
+          Denial, a required fresh permit or a failed check stops handoff. If the
+          deployment's remaining checks pass, the target may attempt the action.
+          A post-execution receipt can link available outcome evidence back to
+          the admission receipt and the effective request.
         </desc>
 
         <defs>
@@ -277,8 +286,9 @@
         <path d="M1090 814 H1106 V241 H1130" fill="none" stroke="#b892ff" stroke-width="2.5" marker-end="url(#arrow-purple)"/>
         <path d="M1348 318 V340" fill="none" stroke="#7fd8a4" stroke-width="2" marker-end="url(#arrow-allow)"/>
         <path d="M1190 318 V340" fill="none" stroke="#ff8fa0" stroke-width="1.75" stroke-dasharray="6 6" marker-end="url(#arrow-deny)"/>
+        <path d="M1300 440 V461 H1190 V440" fill="none" stroke="#ff8fa0" stroke-width="1.75" stroke-dasharray="6 6" marker-end="url(#arrow-deny)"/>
         <path d="M1348 440 V470 H1280 V500" fill="none" stroke="#7fd8a4" stroke-width="2" marker-end="url(#arrow-allow)"/>
-        <path d="M1280 590 V640" fill="none" stroke="#8f89a0" stroke-width="2" marker-end="url(#arrow)"/>
+        <path d="M1280 590 V640" fill="none" stroke="#8f89a0" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
         <path d="M1280 730 V780" fill="none" stroke="#b892ff" stroke-width="1.75" marker-end="url(#arrow-purple)"/>
         <path d="M1130 835 H1110 V814 H1090" fill="none" stroke="#b892ff" stroke-width="1.75" stroke-dasharray="7 7" marker-end="url(#arrow-purple)"/>
 
@@ -305,8 +315,8 @@
         <text class="track" x="46" y="450">DECLARED REQUEST BASIS</text>
         <text class="label" x="46" y="486">Action · target · constraints</text>
         <text class="mono" x="46" y="520">declared input_hash</text>
-        <text class="mono-fine" x="46" y="544">reference runner does not</text>
-        <text class="mono-fine" x="46" y="564">reconstruct request preimage</text>
+        <text class="mono-fine" x="46" y="544">Purchase binding supplies the</text>
+        <text class="mono-fine" x="46" y="564">original operation separately.</text>
 
         <!-- Protocol-native evidence sources -->
         <text class="track" x="382" y="34">ADJACENT EVIDENCE · NOT VATE-OWNED</text>
@@ -374,29 +384,32 @@
         <text class="track" x="1130" y="34">IMPLEMENTATION EXECUTION &amp; OUTCOME</text>
 
         <rect x="1130" y="164" width="300" height="154" fill="#0b0b11" stroke="#4a4360" stroke-width="1.5"/>
-        <text class="track" x="1152" y="194">IMPLEMENTATION-OWNED HANDOFF GATE</text>
-        <text class="label" x="1152" y="226">Apply deployment rules</text>
-        <text class="mono-micro" x="1152" y="250" fill="#7fd8a4">GO · allow</text>
-        <text class="mono-micro" x="1152" y="268" fill="#7fd8a4">GO · attenuate + no new permit</text>
-        <text class="mono-micro" x="1152" y="288" fill="#ff8fa0">STOP · deny / invalid</text>
-        <text class="mono-micro" x="1152" y="306" fill="#ff8fa0">STOP · attenuate + fresh permit required</text>
+        <text class="track" x="1152" y="194">IMPLEMENTATION-OWNED GATE</text>
+        <text class="label" x="1152" y="225">Admission decision</text>
+        <text class="mono-fine" x="1152" y="254">allow → original request</text>
+        <text class="mono-fine" x="1152" y="279">attenuate → narrowed request</text>
+        <text class="mono-fine" x="1152" y="301">if no fresh permit is required</text>
+        <text class="outcome" x="1361" y="333" fill="#7fd8a4" style="font-size: 12px">candidate</text>
 
         <rect x="1130" y="340" width="120" height="100" fill="#0b0b11" stroke="#ff8fa0" stroke-width="1.5"/>
-        <text class="label-tiny" x="1146" y="373">Stop path</text>
-        <text class="mono-micro" x="1146" y="400">no immediate</text>
-        <text class="mono-micro" x="1146" y="418">handoff</text>
+        <text class="label-tiny" x="1142" y="366">Stop handoff</text>
+        <text class="mono-micro" x="1142" y="389">deny or invalid</text>
+        <text class="mono-micro" x="1142" y="408">fresh permit</text>
+        <text class="mono-micro" x="1142" y="424">required</text>
 
         <rect x="1265" y="340" width="165" height="100" fill="#0b0b11" stroke="#7fd8a4" stroke-width="1.5"/>
-        <text class="label-tiny" x="1281" y="373">Handoff candidate</text>
-        <text class="mono-micro" x="1281" y="400" style="font-size: 10px">allow: unchanged basis</text>
-        <text class="mono-micro" x="1281" y="418" style="font-size: 10px">attenuate: narrowed basis</text>
+        <text class="label-tiny" x="1277" y="367">Deployment checks</text>
+        <text class="mono-micro" x="1277" y="395">validity · replay</text>
+        <text class="mono-micro" x="1277" y="417">status · target rules</text>
+        <text class="outcome" x="1202" y="454" fill="#ff8fa0">fail</text>
+        <text class="outcome" x="1360" y="465" fill="#7fd8a4">pass</text>
 
         <rect x="1130" y="500" width="300" height="90" fill="#0b0b11" stroke="#7fd8a4" stroke-width="1.5"/>
-        <text class="label-small" x="1152" y="534">Target surface</text>
+        <text class="label-small" x="1152" y="534">Target may attempt the action</text>
         <text class="mono-fine" x="1152" y="562">API · MCP tool · agent action</text>
 
         <rect x="1130" y="640" width="300" height="90" fill="#0b0b11" stroke="#8f89a0" stroke-width="1.5"/>
-        <text class="label-small" x="1152" y="674">Outcome evidence</text>
+        <text class="label-small" x="1152" y="674">Outcome evidence, if available</text>
         <text class="mono-fine" x="1152" y="702">result · side effects · violations</text>
 
         <rect x="1130" y="780" width="300" height="110" fill="#0b0b11" stroke="#b892ff" stroke-width="1.75"/>
@@ -409,8 +422,8 @@
 
     <section class="cards" aria-label="Reference architecture boundaries">
       <article class="card">
-        <h2>Profile flow</h2>
-        <p>Admission request → ordered local checks → admission receipt → implementation-owned handoff gate → target or stop → linked post-execution receipt.</p>
+        <h2>Purchase request binding</h2>
+        <p>In the v0.7.0 purchase example, the receiver checks the receipt against its selected admission request and both sets of instructions. Applying the recorded limit change to the original reproduces the approved instructions.</p>
       </article>
       <article class="card">
         <h2>Adjacent systems</h2>
@@ -423,7 +436,7 @@
     </section>
 
     <p class="footer">
-      VATE-AL2-Verifier-Admission-v0.3 · reference architecture view · updated 2026-08-24
+      VATE-AL2-Verifier-Admission-v0.3 · reference architecture view · updated 2026-11-24
     </p>
   </main>
 </body>

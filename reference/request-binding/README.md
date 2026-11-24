@@ -61,8 +61,9 @@ execution. It is not production-ready.
 
 ## Use the ordinary runner
 
-The separate `conformance/request-binding-v1` corpus covers allow, attenuation,
-a new-permit candidate and denial of a purchase above the effective cap. Each
+The separate `conformance/request-binding-v1` corpus covers allow, narrowing
+without a fresh permit, narrowing that stops immediate handoff because a fresh
+permit is required, and denial of a purchase above the effective cap. Each
 case requires the binding contract and pins its admission request. `run`
 checks the fixture receipt and raw preimages:
 

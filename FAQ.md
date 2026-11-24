@@ -34,10 +34,12 @@ The preserved `v0.1` core makes that concrete through a verifier-centered `AL2` 
 
 and then emits a machine-readable receipt.
 
-The current `v0.3` profile keeps that boundary, makes the admission moment more
-explicit, and hardens digest-bound evidence-reference handling across the review
-package. Its concrete machine-readable change is narrower: AL2 admission
-requests must include at least one `evidence_refs` entry.
+In the AL2 v0.3 profile the verifier records its decision before handoff.
+The admission request carries at least one digest-addressed evidence reference.
+The [v0.7.0 purchase example](reference/request-binding/README.md) shows what a
+receiver can check afterward. Using the admission request it selected and both
+sets of purchase instructions, it can reproduce the approved instructions
+from the original and the receipt's recorded change.
 
 ## Why Isn't A Valid Token Enough?
 
@@ -116,8 +118,8 @@ The concrete implementation and review scope is:
 
 - the core claim is narrow
 - the target is `AL2` external digital writes
-- `v0.3` keeps the most concrete new work in a narrow AL2 verifier admission
-  profile and hardens empty `evidence_refs` handling
+- the v0.3 profile defines the admission decision, any narrowing and how a
+  later outcome record links back to that decision
 - broader deployment shapes should move into profiles, extensions, or later drafts where possible
 
 If reviewers think a concept does not help that verifier-side boundary, it is a good candidate to remove from the core.
@@ -135,9 +137,9 @@ The preserved v0.1 core discussion draft centers on:
 The repository also includes payload schemas, examples, verifier guidance, negative tests, and educational reference demos.
 The current v0.3 additions provide a concrete AL2 verifier admission profile,
 reference-only A2A metadata binding, separate admission and post-execution
-receipt schemas, and a 76-case machine-readable conformance corpus. The current
-count and artifact manifest are recorded in
-[corpus.json](conformance/al2-vate-v0.3/corpus.json).
+receipt schemas, and a [76-case AL2 corpus](conformance/al2-vate-v0.3/corpus.json).
+The [purchase request-binding corpus](conformance/request-binding-v1/corpus.json)
+has four separate cases for checks that use the supplied operation bytes.
 
 ## What Is Still Future Work?
 
@@ -149,13 +151,16 @@ The current repo does not yet freeze:
 - physical `ABS` profiles
 - full runnable conformance corpora across multiple implementations
 
-For the next steps in recipient-application reuse, signature and issuer-authority
-connections, and missing-record checks, see the
-[public roadmap](ROADMAP.md#next-technical-work).
+Local examples already check [signatures and issuer authority](reference/recipient-signature-authority/README.md)
+and [missing required records](reference/required-records/README.md). The next
+step is to exercise them with another receiving application using its own
+issuer policy and collection requirements. See the [public roadmap](ROADMAP.md#next-technical-work).
 
 ## What Does `attenuated` Mean?
 
-`attenuated` means an artifact is not fully revoked, but it is no longer usable under the original scope.
+In the [status model](docs/status-network-model.md), `attenuated` means a
+credential or permit remains usable under a narrower scope. Its `effect`
+describes the restriction.
 
 Typical effects include:
 
@@ -164,7 +169,10 @@ Typical effects include:
 - reduced redelegation depth
 - stronger approval requirements
 
-In this draft, attenuation should be machine-readable. The status payload should carry an `effect` object so a verifier can decide whether it can safely narrow execution or must require a new permit.
+In a [v0.3 admission receipt](docs/receipt-model-v0.3.md), `attenuate` is
+the verifier's decision about one request. The receipt records the change and
+whether a fresh permit is required. If one is required, this receipt stops
+immediate handoff.
 
 ## How Should Pairwise Identifiers Work?
 
