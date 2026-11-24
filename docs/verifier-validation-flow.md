@@ -11,7 +11,9 @@ It is intended as implementation guidance, not as a replacement for the core spe
 
 ## Inputs
 
-A verifier typically receives or resolves the following artifacts:
+In the v0.3 AL2 profile, the admission request identifies the action, target,
+actor, principal and runtime, and supplies digest-addressed evidence references.
+A verifier using the v0.1 credential and permit model can draw on:
 
 - `APC` - Agent Passport Credential
 - `ARP` - Agent Runtime Proof
@@ -23,7 +25,7 @@ A verifier typically receives or resolves the following artifacts:
 Optionally, the verifier may also receive:
 
 - human approval references
-- evidence references
+- additional evidence beyond the references required by the admission request
 - prior receipts in a delegated chain
 
 ---
@@ -56,9 +58,12 @@ The verifier should identify:
 - whether human approval is mandatory
 - whether delegated execution is allowed
 
-### 3. Check current status first
+<a id="3-check-current-status-first"></a>
 
-Before trusting signatures alone, the verifier should check current status for:
+### 3. Check status for each identified artifact
+
+After identifying the artifact and a trusted source for its status, check
+freshness and any revocation or narrowing for:
 
 - the passport credential
 - the runtime proof, if separately addressable
@@ -125,52 +130,38 @@ Only after the cryptographic and structural checks pass should the verifier eval
 - approval gates
 - risk score overrides
 
-### 9. Execute, attenuate, or deny
+<a id="9-execute-attenuate-or-deny"></a>
 
-If any required check fails, deny before execution.
+### 9. Decide admission before handoff
 
-If the permit is `attenuated` and the verifier understands the `effect` object, the verifier MAY continue with a narrowed effective policy and return an `attenuate` decision instead of a full deny.
-
-At the admission boundary, the verifier should emit or persist a verifier-signed admission receipt.
-If execution proceeds, the verifier should also capture enough context to emit or require a post-execution receipt.
+The verifier records its decision before the target is called. A valid
+`allow` makes the original request a handoff candidate. A valid `attenuate`
+with `attenuation.require_new_permit: false` makes only the narrowed request
+a candidate. The deployment checks validity, current authority, replay state
+and target-side requirements before handing it off. A `deny`, a failed
+required check or a required fresh permit stops immediate handoff. See the
+[admission-to-handoff conditions](profiles/vate-al2-verifier-admission-profile-v0.3.md#admission-to-handoff-conditions).
 
 ### 10. Emit or require receipts
 
-For AL2 and above, the verifier should distinguish two receipt phases:
+The v0.3 [admission receipt](../schemas/admission-receipt.schema.json)
+identifies the verifier in `verifier.id`. It records the request and its
+subject, the evaluated evidence, the policy, the decision and its validity
+window. For `attenuate`, the receipt also records the original and effective
+hashes, the changes, the effective constraints and the fresh-permit flag.
 
-- `admission`: emitted at policy-evaluation time, before execution, and carrying the verifier decision
-- `post_execution`: emitted or stored after the action completes, and linked back to the admission receipt when available
+When outcome evidence is available, the v0.3
+[post-execution receipt](../schemas/post-execution-receipt.schema.json)
+identifies its issuer in `issuer.id` and `issuer.role`. Its `admission` object
+records the earlier receipt's ID, URI, digest and decision. A receiver can
+then check the transaction, runtime, effective request hash, execution window
+and reported effects against that admission. The
+[receipt model](receipt-model-v0.3.md) describes the linkage checks.
 
-An admission receipt should record at least:
-
-- permit reference
-- runtime reference
-- actor reference
-- action/resource
-- decision: `allow`, `attenuate`, or `deny`
-- policy_id and policy_version
-- `attenuation` with structured `changes` when the verifier narrowed the
-  original authority
-- timestamp
-
-A post-execution receipt should record at least:
-
-- admission_receipt_ref when an admission receipt exists
-- permit reference
-- runtime reference
-- action/resource
-- outcome
-- start and finish time
-- evidence references when available
-
-The receipt should also make its signer semantics explicit.
-At minimum, it should declare `issuer_role`, for example:
-
-- `runtime`
-- `verifier`
-- `broker`
-
-That prevents ambiguity between "the runtime claims it executed this" and "the relying party attests that it accepted or observed this."
+The legacy v0.1 [execution receipt](../schemas/execution-receipt.schema.json)
+uses the top-level fields `issuer_role` and `admission_receipt_ref`.
+Authenticating an issuer requires the signing and trust rules of the selected
+profile.
 
 ---
 
@@ -185,13 +176,11 @@ The verifier should reject immediately when any of the following is true:
 - the requested action is outside permit scope
 - redelegation rules are violated
 - required approval is missing
+- a required attenuation effect cannot be interpreted or enforced
+- required evidence is missing or unverifiable under a fail-closed policy
 
-The verifier should downgrade or require extra controls when any of the following is true:
-
-- status is attenuated and the verifier cannot safely honor the `effect` object
-- evidence is incomplete
-- the identity presentation reveals more than necessary
-- online status is unavailable but cached status is still within bounded freshness
+Local policy can require a more limited identity presentation or permit cached
+status within its defined freshness window.
 
 ---
 

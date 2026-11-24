@@ -22,11 +22,12 @@ rules and receipt model introduced below.
 [![DOI](https://zenodo.org/badge/1214949350.svg)](https://doi.org/10.5281/zenodo.19839768)
 
 <picture>
-  <source media="(max-width: 600px)" srcset="docs/figures/where-trust-envelope-fits-readme-mobile.png">
-  <img src="docs/figures/where-trust-envelope-fits-readme.png" alt="One request and evidence references flow into local VATE admission and an allow, attenuate, or deny receipt; an implementation-owned handoff gate reaches a target or stops, and later outcome evidence links back to the admission receipt.">
+  <source media="(max-width: 680px)" srcset="docs/figures/purchase-cap-mobile.png">
+  <img src="docs/figures/purchase-cap.png" alt="For a $24.50 purchase, the store narrows the spending limit from $120 to $25. Each set of instructions matches its own hash in the VATE admission receipt. Applying the recorded change to the original instructions reproduces the approved version.">
 </picture>
 
-[Open the accessible HTML diagram](docs/figures/where-trust-envelope-fits.html).
+[Read the figure as text](#purchase-cap-example) ·
+[Run the purchase example](reference/request-binding/README.md)
 
 ## Try It in 60 Seconds
 
@@ -189,11 +190,20 @@ separates byte linkage from actual dataset use and formal acceptance.
   and digest, transaction, runtime, effective request hash, and selected result
   fields.
 
-In the purchase-cap example, an agent requests a USD 120.00 spending limit
-for a USD 24.50 purchase. The verifier lowers the limit to USD 25.00. The
-purchase amount stays at USD 24.50. A purchase above the effective limit is
-denied. The receiver can recompute both request hashes from the original and
-effective operations. [Run the purchase-cap example](reference/request-binding/README.md).
+[View the admission and handoff diagram](docs/verifiable-agent-trust-envelope-spec-v0.1.md#11-reference-architecture).
+
+### Purchase-cap example
+
+An agent requests a USD 120.00 spending limit for a USD 24.50 purchase.
+The store's verifier approves a USD 25.00 limit. The purchase amount stays at
+USD 24.50. A purchase above the effective limit is denied.
+
+The receiving system uses the admission request it selected to check both
+sets of purchase instructions against the hashes in the store's receipt.
+Applying the recorded change to the original instructions reproduces the
+approved version, confirming that only the spending limit changed.
+The [runnable example](reference/request-binding/README.md) uses an unsigned
+receipt and runs without making a purchase.
 
 ## Status and Scope
 
@@ -459,8 +469,8 @@ For a deeper technical review, the following references expand on the overview:
 16. section `0` and section `1` of [docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md)
 17. [reference/http-verifier-demo/README.md](reference/http-verifier-demo/README.md)
 
-For the visual system view, see section `11` of
-[docs/verifiable-agent-trust-envelope-spec-v0.1.md](docs/verifiable-agent-trust-envelope-spec-v0.1.md).
+For the visual system view, see the
+[admission and handoff diagrams in Section 11](docs/verifiable-agent-trust-envelope-spec-v0.1.md#11-reference-architecture).
 For the shortest unresolved-work list, read [docs/known-gaps.md](docs/known-gaps.md).
 
 ## Review Questions

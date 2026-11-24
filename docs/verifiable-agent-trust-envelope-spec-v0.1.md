@@ -5,6 +5,10 @@
 **Audience:** protocol designers, IAM / security engineers, agent platform builders, client / verifier builders, robotics / mobility architects  
 **Language style:** English primary
 
+This document preserves the v0.1 artifact model. For the AL2 rules used in
+the v0.7.0 release, see the [verifier admission profile v0.3](profiles/vate-al2-verifier-admission-profile-v0.3.md).
+[Section 11](#11-reference-architecture) illustrates its admission and handoff boundaries.
+
 ---
 
 ## Conformance Language
@@ -42,11 +46,9 @@ It may also need to know:
 
 This draft proposes a portable trust envelope for that boundary.
 For publication and reference implementation purposes, it deliberately treats **AL2 external digital write** as the primary `v0.1` battlefield.
-The current repository therefore includes a verifier-centered HTTP wedge that:
-
-- applies `status -> identity -> runtime -> permit -> policy`
-- returns `allow / attenuate / deny`
-- emits a machine-readable admission receipt
+The v0.1 HTTP verifier checks status, identity, runtime and permit scope
+before applying local policy. It returns `allow`, `attenuate`, or `deny` and
+emits a machine-readable admission receipt.
 
 This draft is not intended to replace A2A, MCP, VC / JWT, OpenID, OAuth, SPIFFE, workload identity, or control-plane products.
 It is intended to compose with those layers at the point where a verifier must admit, narrow, or deny a risky external action.
@@ -475,7 +477,7 @@ Typical effect constraints include:
 - explicit redelegation constraints
 
 For v0.1 publication, this is the narrowest implementation wedge the repository prioritizes.
-The current reference path is an HTTP verifier that accepts the trust envelope artifacts, evaluates them in verifier order, and returns `allow`, `attenuate`, or `deny`.
+The v0.1 HTTP verifier accepts the trust envelope artifacts, evaluates them in verifier order, and returns `allow`, `attenuate`, or `deny`.
 
 ### 8.4 AL3 - Regulated / Sensitive
 - PII
@@ -622,28 +624,28 @@ Different assurance / jurisdiction / industry profiles SHOULD be composable.
 ## 11. Reference Architecture
 
 <picture>
-  <source media="(max-width: 600px)" srcset="figures/where-trust-envelope-fits-readme-mobile.png">
-  <img src="figures/where-trust-envelope-fits-readme.png" alt="One request and evidence basis enters local VATE admission, producing an admission receipt for an implementation-owned gate that reaches the target or stops and links outcome evidence">
+  <source media="(max-width: 767px)" srcset="figures/where-trust-envelope-fits-readme-mobile.png">
+  <img src="figures/where-trust-envelope-fits-readme.png" alt="Allow makes the original request a handoff candidate. Attenuation makes only the narrowed request a candidate when no fresh permit is required. After the implementation's remaining checks pass, the target may attempt the operation. A later outcome receipt can link back to the admission receipt.">
 </picture>
 
 Figure 1. Current verifier-side admission and receipt-linkage view for the
 `VATE-AL2-Verifier-Admission-v0.3` profile.
 
-Overview source: [figures/where-trust-envelope-fits.html](figures/where-trust-envelope-fits.html)
+[Read the handoff conditions](profiles/vate-al2-verifier-admission-profile-v0.3.md#admission-to-handoff-conditions) ·
+[Diagram source](figures/where-trust-envelope-fits.html)
 
-Detailed reference architecture:
-[HTML](figures/trust-envelope-reference-architecture.html) ·
-[PNG](figures/trust-envelope-reference-architecture.png)
+[View the detailed architecture diagram (PNG)](figures/trust-envelope-reference-architecture.png) ·
+[HTML source](figures/trust-envelope-reference-architecture.html)
 
 This is a profile-facing architecture view, not a claim that VATE owns the
 adjacent transport, identity, authorization, payment, attestation, permission,
 execution, or provenance systems shown around it.
 
 The `APC`, `ARP`, `AMP`, `ASN`, and `AER` names remain part of the
-v0.1 artifact vocabulary. The current v0.3 profile flow makes the narrower
-verifier boundary concrete as:
-
-`admission request -> local verification -> admission receipt -> execution gate -> effective request -> post-execution receipt`
+v0.1 artifact vocabulary. In v0.3 the verifier checks one admission request
+and records its decision. If the deployment's handoff conditions pass, the
+target may attempt the effective request. A later post-execution receipt can
+link the reported result to that admission.
 
 The execution gate and effective-request representation are implementation
 responsibilities. The current reference runner derives a review-time
@@ -1040,6 +1042,10 @@ In the compact JWS demo profile, this decoded payload is packaged separately as 
 
 ## 15. Sequence Flows
 
+These four diagrams illustrate the original v0.1 roles and messages.
+For the AL2 v0.3 path from a request through local admission to a possible
+handoff and linked outcome, use the [architecture in Section 11](#11-reference-architecture).
+
 ### 15.1 Issuance Flow
 
 ```mermaid
@@ -1101,10 +1107,10 @@ sequenceDiagram
     V->>RL: write AER
 ```
 
-The current v0.3 sequence remains:
-`admission request -> local verification -> admission receipt -> execution gate -> effective request -> post-execution receipt`.
-
 ### 15.4 Delegated Multi-Agent Flow
+
+The narrowed permit below is the v0.1 delegation example. For a subtask
+that needs AL2 v0.3 admission, the receiving system evaluates it before handoff.
 
 ```mermaid
 sequenceDiagram

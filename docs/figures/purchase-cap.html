@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How a receiver checks a purchase approval</title>
+  <!-- Export the figure at 840 CSS px (2×) and 360 CSS px (2.5×) for the README. -->
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      color: #f4f1fa;
+      background: #050507;
+      --paper: #dacbff;
+      --paper-ink: #130d22;
+      --paper-muted: #4b3f6b;
+      --amber: #e8c36a;
+    }
+    body, figure, h1, p { margin: 0; }
+    figure { max-width: 980px; margin-inline: auto; background: #050507; }
+    h1 { padding: 24px 28px 0; font-size: 34px; line-height: 1.08; letter-spacing: -.035em; }
+    .item { margin: 8px 28px 12px; color: #cfc9dd; font-size: 19px; }
+    .item strong { color: #f4f1fa; font-weight: 650; }
+    .definitions { position: absolute; width: 0; height: 0; overflow: hidden; }
+    .board { display: block; width: 100%; height: auto; }
+    .mobile { display: none; }
+    text { fill: currentColor; }
+    .role { font-size: 21px; font-weight: 650; }
+    .amount { font-size: 44px; font-weight: 680; letter-spacing: -.045em; font-variant-numeric: tabular-nums; }
+    .unit { fill: #cfc9dd; font-size: 17px; }
+    .narrowed { fill: var(--amber); }
+    .hash, .change { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .hash { font-size: 18px; }
+    .paper { fill: var(--paper); }
+    .ticket { color: var(--paper-ink); }
+    .ticket-title { font-size: 24px; font-weight: 720; letter-spacing: -.035em; }
+    .field { fill: var(--paper-muted); font-size: 16px; font-weight: 550; }
+    .ticket .hash { font-size: 20px; font-weight: 650; }
+    .change { font-size: 20px; font-weight: 650; letter-spacing: -.04em; }
+    .rule, .perforation { fill: none; stroke: #988ab3; }
+    .perforation { stroke: #82739d; stroke-dasharray: 3 4; }
+    .seal { color: #673208; }
+    .seal text { font-size: 13px; font-weight: 750; letter-spacing: .045em; }
+    .decision-line, .match-line, .paper-line {
+      fill: none; stroke-width: 1.8; stroke-linejoin: miter;
+    }
+    .decision-line { stroke: var(--amber); }
+    .match-line { stroke: #b892ff; }
+    .paper-line { stroke: #5d3c8e; }
+    .match-label { fill: var(--paper); font-size: 16px; text-anchor: middle; }
+    .hash-scope { fill: #cfc9dd; font-size: 16px; }
+    figcaption {
+      display: grid;
+      grid-template-columns: auto minmax(75px, 1fr) auto;
+      align-items: end;
+      column-gap: 12px;
+      padding: 12px 28px 24px;
+      font-size: 18px; font-weight: 600; line-height: 1.15;
+    }
+    .apply {
+      position: relative;
+      margin-bottom: .45em; padding: 0 .3em 4px;
+      border-bottom: 2px solid var(--amber);
+      color: var(--amber); text-align: center; font-size: 16px; font-weight: 500;
+    }
+    .apply::after {
+      content: ""; position: absolute; right: 0; bottom: -4px;
+      width: 6px; height: 6px; transform: rotate(45deg);
+      border-top: 2px solid var(--amber); border-right: 2px solid var(--amber);
+    }
+    .screen-reader {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+    }
+    @media (max-width: 680px) {
+      h1 { padding: 20px 18px 0; font-size: 29px; line-height: 1.06; text-wrap: balance; }
+      .item { margin: 8px 18px 12px; font-size: 17px; }
+      .desktop { display: none; }
+      .mobile { display: block; }
+      .role { font-size: 17px; }
+      .amount { font-size: 34px; }
+      .unit, .field { font-size: 15px; }
+      .hash, .ticket .hash { font-size: 15px; }
+      .ticket-title { font-size: 21px; }
+      .change { font-size: 17px; }
+      .seal text { font-size: 14.5px; }
+      figcaption { grid-template-columns: 1fr 1.42fr 1fr; column-gap: 8px; padding: 7px 18px 20px; font-size: 16px; }
+      .apply { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <figure aria-labelledby="diagram-title">
+    <h1 id="diagram-title">How a receiver checks a purchase approval</h1>
+    <p class="item">The item price stays at <strong>$24.50</strong>.</p>
+
+    <!-- Both layouts use the same values from reference/request-binding/examples/purchase-cap. -->
+    <svg class="definitions" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <text id="original-limit" class="amount">$120.00</text>
+        <text id="approved-limit" class="amount narrowed">$25.00</text>
+        <text id="original-hash">c1a39c78…027b</text>
+        <text id="approved-hash">702626db…d1e4</text>
+        <text id="change" class="change">$120.00 → $25.00</text>
+        <text id="hash-scope" class="hash-scope">Both hashes cover the full instructions.</text>
+        <g id="stamp" class="seal" transform="rotate(-2 58 13)">
+          <rect width="116" height="26" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="3" y="3" width="110" height="20" fill="none" stroke="currentColor" stroke-width=".8"/>
+          <text x="58" y="18" text-anchor="middle">ATTENUATED</text>
+        </g>
+      </defs>
+    </svg>
+
+    <svg class="board desktop" viewBox="0 0 840 291" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <rect class="paper" x="442" y="4" width="370" height="280"/>
+      <g class="ticket">
+        <text class="ticket-title" x="465" y="38">VATE admission receipt</text>
+        <path class="rule" d="M465 52H789"/>
+        <text class="field" x="465" y="80">Original hash</text>
+        <use class="hash" href="#original-hash" x="465" y="105"/>
+        <path class="rule" d="M465 144H789"/>
+        <text class="field" x="465" y="178">Approved hash</text>
+        <use class="hash" href="#approved-hash" x="465" y="203"/>
+        <path class="perforation" d="M442 220H812"/>
+        <text class="field" x="465" y="246">Recorded limit change</text>
+        <use href="#change" x="465" y="271"/>
+        <use href="#stamp" x="674" y="243"/>
+      </g>
+
+      <g>
+        <text class="role" x="56" y="32">Agent requested</text>
+        <use href="#original-limit" x="56" y="76"/>
+        <text class="unit" x="243" y="74">spending limit</text>
+        <use class="hash" href="#original-hash" x="56" y="105"/>
+        <text class="role" x="56" y="135">Store approved</text>
+        <use href="#approved-limit" x="56" y="178"/>
+        <text class="unit" x="216" y="176">spending limit</text>
+        <use class="hash" href="#approved-hash" x="56" y="203"/>
+        <use href="#hash-scope" x="56" y="254"/>
+      </g>
+
+      <path class="decision-line" d="M46 61H31V162H46 M39 156l7 6-7 6"/>
+      <g>
+        <path class="match-line" d="M207 100H442 M207 198H442"/>
+        <path class="paper-line" d="M442 100h15m-6-5 6 5-6 5 M442 198h15m-6-5 6 5-6 5"/>
+        <text class="match-label" x="376" y="92">matches</text>
+        <text class="match-label" x="376" y="190">matches</text>
+      </g>
+    </svg>
+
+    <svg class="board mobile" viewBox="0 0 360 335" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <text class="role" x="18" y="25">Agent requested</text>
+      <use href="#original-limit" x="18" y="66"/>
+      <text class="unit" x="18" y="89">spending limit</text>
+      <use class="hash" href="#original-hash" x="18" y="117"/>
+      <text class="role" x="192" y="25">Store approved</text>
+      <use href="#approved-limit" x="192" y="66"/>
+      <text class="unit" x="192" y="89">spending limit</text>
+      <use class="hash" href="#approved-hash" x="192" y="117"/>
+      <path class="decision-line" d="M157 55h24m-7-6 7 6-7 6"/>
+
+      <rect class="paper" x="12" y="146" width="336" height="154"/>
+      <g class="ticket">
+        <text class="ticket-title" x="180" y="175" text-anchor="middle">VATE admission receipt</text>
+        <path class="rule" d="M43 184H317"/>
+        <text class="field" x="42" y="207">Original hash</text>
+        <use class="hash" href="#original-hash" x="42" y="228"/>
+        <text class="field" x="195" y="207">Approved hash</text>
+        <use class="hash" href="#approved-hash" x="195" y="228"/>
+        <path class="perforation" d="M12 243H348"/>
+        <text class="field" x="29" y="266">Recorded limit change</text>
+        <use href="#change" x="29" y="289"/>
+        <use href="#stamp" x="214" y="262"/>
+      </g>
+      <path class="match-line" d="M58 125v10H26v11 M283 125v10h49v11"/>
+      <path class="paper-line" d="M26 146v77h11m-5-5 5 5-5 5 M332 146v77h-12m5-5-5 5 5 5"/>
+      <use href="#hash-scope" x="18" y="328"/>
+    </svg>
+
+    <p class="screen-reader">The agent requests a $120 spending limit. The store approves a $25 limit.
+      The receiver matches each set of instructions to its SHA-256 hash in the admission receipt.
+      The receipt records the change from $120 to $25. The diagram abbreviates the hashes.</p>
+    <figcaption>
+      <span class="screen-reader">Applying the recorded change to the original instructions reproduces the approved version.</span>
+      <span aria-hidden="true">Original instructions</span>
+      <span class="apply" aria-hidden="true">Apply the recorded change</span>
+      <span aria-hidden="true">Approved instructions</span>
+    </figcaption>
+  </figure>
+</body>
+</html>
