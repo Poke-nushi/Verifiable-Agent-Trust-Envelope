@@ -1,0 +1,2 @@
+agent-evidence-vectors==0.38.0
+agent-evidence-verify==0.9.0

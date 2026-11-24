@@ -126,6 +126,31 @@ history and export. RB entries remain opaque to Required Records; this command
 does not register a native RB requirement or turn an RB into a VATE admission
 or post-execution receipt.
 
+## Check the published captures
+
+The three captures above, recorded at `eaa47be4`, are published as the
+recorded set `vate-rb-receiving-captures` in the
+[agent-evidence-vectors](https://pypi.org/project/agent-evidence-vectors/)
+package. `check_recorded_set.py` confirms the retained bytes still match the
+set's pinned digest list, reads each case again with this reader and compares
+the result with the retained `report.json` (every member except
+`reader_source`), and checks that a second RB reader written from the same
+draft text,
+[agent-evidence-verify](https://pypi.org/project/agent-evidence-verify/),
+gives the same record verdict and reason.
+
+```sh
+python3 -m pip install -r reference/restoration-rb-receiving/requirements-recorded.txt
+python3 -E -B reference/restoration-rb-receiving/check_recorded_set.py
+```
+
+Exit 0 means all three cases reproduce and both readers agree; 1 means a case
+differs and the output names the member; 2 means the check could not run. A
+change to the reader that changes a reading shows here as a difference, so
+the set is a fixed baseline for later changes. Both packages are pinned in
+[requirements-recorded.txt](requirements-recorded.txt), and Dependabot
+proposes each new release as a pull request this check runs on.
+
 ## Run tests
 
 ```sh
