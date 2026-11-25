@@ -38,6 +38,37 @@ class CaseThreeComparison(unittest.TestCase):
             check.records = real
         self.assertTrue(any("late submit is not denied" in p for p in problems), problems)
 
+    def _with_expected(self, change):
+        """Run the check with expected-results.json altered in memory, as a reviewer's local edit would."""
+        real = check.load
+
+        def altered(path):
+            doc = real(path)
+            if path.endswith("expected-results.json"):
+                change(doc)
+            return doc
+
+        check.load = altered
+        try:
+            problems, _ = check.check()
+        finally:
+            check.load = real
+        return problems
+
+    def test_an_expected_handoff_status_the_recorded_response_contradicts_is_reported(self):
+        # From review: busy -> committed passed before interactions.json was pinned and compared.
+        problems = self._with_expected(lambda d: d["variants"]["live-worker"].update(handoff_status="committed"))
+        self.assertTrue(any("recorded handoff response says 'busy'" in p for p in problems), problems)
+
+    def test_an_omitted_phase_is_reported(self):
+        # From review: removing f3-completed from expected-results.json left seven phases checked and passed.
+        problems = self._with_expected(lambda d: d["phases"].pop("f3-completed"))
+        self.assertTrue(any("not expected: ['f3-completed']" in p for p in problems), problems)
+
+    def test_a_changed_late_submit_reason_is_reported(self):
+        problems = self._with_expected(lambda d: d["variants"]["fenced-handoff"].update(late_submit="stale"))
+        self.assertTrue(any("late submit denied as 'stale'" in p for p in problems), problems)
+
 
 if __name__ == "__main__":
     unittest.main()

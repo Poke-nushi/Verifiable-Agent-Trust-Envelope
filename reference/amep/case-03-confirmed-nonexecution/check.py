@@ -8,6 +8,9 @@ Default mode uses only the Python standard library. It checks:
      - fenced-handoff: the fenced history's handoff confirms that attempt unexecuted and retains it; the completed
        history denies its late submit (old_generation) and accepts runtime-b's attempt;
      - live-worker: the completed history accepts runtime-a's own attempt;
+     - the expected values match the recorded provider responses (interactions.json, pinned): the live-worker handoff
+       status, the fenced-handoff state and runtime-a's denied late submit;
+     - the expected phases are exactly the pinned packets and the signed verdict records;
      - every file an AMEP receipt names is one of the operation's files, by name, SHA-256 and size; the pending and
        fenced packets carry no receipts, as VATE's inventory is empty then; and the completing runtime's receipts
        (runtime-b in f3, runtime-a in l3) cover exactly VATE's completed inventory;
@@ -122,6 +125,37 @@ def check(amep_path=None):
                     problems.append(f"{phase}: {want['completed_by']}'s receipts cover {sorted(observed)}, but VATE's inventory is {sorted(inventory)}")
         lines.append(f"{variant}: runtime-a's attempt {want['first_attempt'][:16]}…, completed by {want['completed_by']}, "
                      f"inventory {sorted(inventory)} matching its receipts")
+
+    # 3b. the expected values agree with the recorded provider responses, not only with the histories
+    for variant, want in expected["variants"].items():
+        interactions = {i["id"]: i["response"] for i in load(os.path.join(ROOT, CASE, variant, "interactions.json"))}
+        handoff = interactions.get("handoff", {})
+        if variant == "live-worker":
+            if handoff.get("status") != want["handoff_status"]:
+                problems.append(f"{variant}: expected handoff status {want['handoff_status']!r}, but the recorded handoff "
+                                f"response says {handoff.get('status')!r}")
+        else:
+            if (handoff.get("result") or {}).get("effect_state") != want["fenced_state"]:
+                problems.append(f"{variant}: expected the handoff to report {want['fenced_state']!r}, but the recorded "
+                                f"response says {(handoff.get('result') or {}).get('effect_state')!r}")
+            late = interactions.get("late-a", {})
+            if (late.get("status"), late.get("reason")) != ("denied", want["late_submit"]):
+                problems.append(f"{variant}: expected runtime-a's late submit denied as {want['late_submit']!r}, but the "
+                                f"recorded response is {late.get('status')!r} {late.get('reason')!r}")
+    lines.append("recorded provider responses: handoff and late submit match the expected values")
+
+    # 3c. the expected phases are exactly the pinned packets and the signed verdict records, no more and no fewer
+    names = set(expected["phases"])
+    packets = {f[: -len(".packet.json")] for f in os.listdir(HERE) if f.endswith(".packet.json")}
+    verdicts = {f[: -len(".verdict.dsse.json")] for f in os.listdir(HERE) if f.endswith(".verdict.dsse.json")}
+    pinned = {f[: -len(".packet.json")] for f in pins["amep"]["files"] if f.endswith(".packet.json")}
+    for label, found in (("packets", packets), ("signed verdict records", verdicts), ("pinned AMEP packets", pinned)):
+        if found != names:
+            missing, extra = sorted(found - names), sorted(names - found)
+            problems.append(f"expected-results.json phases differ from the {label}: "
+                            + (f"not expected: {missing}" if missing else "") + (" " if missing and extra else "")
+                            + (f"expected but absent: {extra}" if extra else ""))
+    lines.append(f"phases: {len(names)} expected, matching {len(packets)} packets and {len(verdicts)} signed verdict records")
 
     # 4. each verdict record names its packet and states the expected results
     for phase, exp in expected["phases"].items():

@@ -16,7 +16,9 @@
    "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/live-worker/expected-assessments.json": "f8f92d0faf9494563fa1bb8bc2b8ab5c4875c55c264ecc95f21823b11246db63",
    "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/live-worker/expected-pep-decision.json": "78a9b13e6771f2c04d6edca26153552168b1fd3852b3940d7e79784b748142fc",
    "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/live-worker/pending-history.json": "8ca1aa8c04d5f9aa58f804de516fa6fe68dacab910ee1192a351653a4e40c29b",
-   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/live-worker/completed-history.json": "b612c79c946bf25143a9baf4fe3a229fe54544d2d32fd52955fe2ef2e140385a"
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/live-worker/completed-history.json": "b612c79c946bf25143a9baf4fe3a229fe54544d2d32fd52955fe2ef2e140385a",
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/fenced-handoff/interactions.json": "60a86c826a5c22620384a1ddcbce91c865c10db46e76a986393954a2b2761783",
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/live-worker/interactions.json": "4b62b03cb50851d306c8041f9503b0fb3a79c149aa2f7a70d10758947a278b1a"
   }
  },
  "amep": {

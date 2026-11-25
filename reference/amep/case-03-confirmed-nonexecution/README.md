@@ -26,7 +26,7 @@ The admission is an AMEP operation approval over the digests of both file effect
 | `l1-pending` | live-worker, pending | as `f1` | `unresolved` (I7), gap `receipt` | `unresolved`, hold |
 | `l2-busy-rerun` | — | runtime-b runs while runtime-a's outcome is unknown | runtime-b **`unresolved`, gap `held_outcome` naming runtime-a's call** | prevented (`busy`) |
 | `l3-completed` | live-worker, completed | runtime-a's two writes, signed by the provider | `preserved` | `completed` |
-| `l4-rerun-after` | — | as `l3`, then runtime-b re-runs | runtime-b `violated` (I8): the admission is spent twice | prevented |
+| `l4-rerun-after` | — | as `l3`, then runtime-b re-runs | runtime-b `violated` (I8): the admission is spent twice | expected to hold a retry of the same operation (the VATE trace ends when runtime-a completes; runtime-b's retry is the scenario AMEP adds) |
 
 **"—" rows** show evidence VATE never records, because its provider prevents it. They ask what the evidence would show if an enforcement point let it through anyway.
 
@@ -55,6 +55,8 @@ These check:
    - every file in AMEP's receipts is one of the operation's files, by name, SHA-256 and size;
    - the pending and fenced packets carry no receipts;
    - the completing runtime's receipts cover exactly VATE's completed inventory;
+   - the expected values match the recorded provider responses in the pinned `interactions.json` (the live-worker handoff status, the fenced handoff and runtime-a's denied late submit);
+   - the expected phases are exactly the pinned packets and the signed verdict records, so an omitted phase is reported;
 3. that each verdict record names its packet's digest and states the expected results (`expected-results.json`).
 
 To re-evaluate the packets with AMEP's Python verifier and verify the verdict records' Ed25519 signatures:
