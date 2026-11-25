@@ -1,0 +1,35 @@
+{
+ "owner": {
+  "kid": "owner",
+  "alg": "Ed25519",
+  "x": "cd3263d4d182960faf46db9e5352f1ecf94e01b6e180b3273c322754b35de259",
+  "roles": [
+   "issuer",
+   "approver"
+  ]
+ },
+ "runtime-a": {
+  "kid": "runtime-a",
+  "alg": "Ed25519",
+  "x": "0101717680cb0fdc9a1e5c677ea81bb49edc9c3c08bb7c9eb1b553064284ea1e",
+  "roles": [
+   "host"
+  ]
+ },
+ "runtime-b": {
+  "kid": "runtime-b",
+  "alg": "Ed25519",
+  "x": "9de168766ff7ffc5a77ba4c1f18f173d130c6baecdf75148a88bfbf867a4b134",
+  "roles": [
+   "host"
+  ]
+ },
+ "provider-local": {
+  "kid": "provider-local",
+  "alg": "Ed25519",
+  "x": "99a03d721c3b1bbd9fee290e76a4d9579eb9a19097b0deda750732556fd53450",
+  "roles": [
+   "observer"
+  ]
+ }
+}

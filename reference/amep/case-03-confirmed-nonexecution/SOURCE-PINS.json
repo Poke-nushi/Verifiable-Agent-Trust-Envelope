@@ -1,0 +1,49 @@
+{
+ "vate": {
+  "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+  "commit": "3e9c262f1131f1b3fcb5907d8dc78c85a91ab9e5",
+  "files": {
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/case.json": "1f53476b1567dd74b8914006ec4bc6f9a3638dab1251101b82082ff491c7c866",
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/fenced-handoff/context.json": "03f5a2144ed54e1f8c940ea47ab3570ff3996ea621337db50e344bf360da2c40",
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/fenced-handoff/operation.json": "9cb9dc85c926b2be4e83c929b7cf9237a3dd5f4fb0e479dce3c3819f10493f43",
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/fenced-handoff/expected-assessments.json": "0681a762af73129d1953f9e8593e6112968081471f12ae3c8aaaa40c5993a098",
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/fenced-handoff/expected-pep-decision.json": "28c355346d2668903f38384ba79f04e867c182d57121009c3afc9181a07d7e3e",
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/fenced-handoff/pending-history.json": "d8ca24fa52b5d9b49e6e753fc121957654299feae7e21313a625e8192ab8ccea",
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/fenced-handoff/fenced-history.json": "5638a391599f7c275d1e701a0db271011ce2e0619ae3991255982494e8764944",
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/fenced-handoff/completed-history.json": "d8688b5ba2430794330a7846496cfd00b9727284d416f3c610941a4f9d1713ca",
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/live-worker/context.json": "c673b16dda5b466b8d590c08a9f58d4fedbbd5f82a0e1cea7581fa0bfecda1c9",
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/live-worker/operation.json": "eb53c61a6777b76b8581865870805efca0ce5c4bd85277a3dc48c1d612fe53fe",
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/live-worker/expected-assessments.json": "f8f92d0faf9494563fa1bb8bc2b8ab5c4875c55c264ecc95f21823b11246db63",
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/live-worker/expected-pep-decision.json": "78a9b13e6771f2c04d6edca26153552168b1fd3852b3940d7e79784b748142fc",
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/live-worker/pending-history.json": "8ca1aa8c04d5f9aa58f804de516fa6fe68dacab910ee1192a351653a4e40c29b",
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/live-worker/completed-history.json": "b612c79c946bf25143a9baf4fe3a229fe54544d2d32fd52955fe2ef2e140385a",
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/fenced-handoff/interactions.json": "60a86c826a5c22620384a1ddcbce91c865c10db46e76a986393954a2b2761783",
+   "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff/live-worker/interactions.json": "4b62b03cb50851d306c8041f9503b0fb3a79c149aa2f7a70d10758947a278b1a"
+  }
+ },
+ "amep": {
+  "repository": "https://github.com/stafordtituss/amep",
+  "commit": "957be0252287a44217f903084b4db73f862659a6",
+  "source_dir": "interop/authzen-receipts/vate-03-confirmed-nonexecution",
+  "files": {
+   "f1-pending.packet.json": "ced93de3984c00889fcc6f230d186b8f875cd0e9f5060b3662bc1a8068d09585",
+   "f1-pending.verdict.dsse.json": "f3224a2ee63d995482942176ae560b23b0031944fedb0d80b437f3cbbe217129",
+   "f2-fenced.packet.json": "dc65a5301d13116f2814b87634c6aa540f85f9a6ffea36701e5d0312187b4a4e",
+   "f2-fenced.verdict.dsse.json": "95768c37b220c9fc4154f4777c2ee587f435897a18f7b2729c2908aa5f755022",
+   "f3-completed.packet.json": "d04c834658af3fe973d55eae6670d3257f2a216a4187f77bff6dfebf31b89a2c",
+   "f3-completed.verdict.dsse.json": "2935274b3c7981bce3434edf080d72e8fdd2abba091db57a499d354ace971da4",
+   "f4-late-write.packet.json": "65a2581eedd917a251950f3861761873a56439d20b8713faf040312be673d5b8",
+   "f4-late-write.verdict.dsse.json": "89d9f24e552a7c9f71a69bbbf59c6f6aa13b04f5a5880988a0abaa9a06335cd5",
+   "keys.json": "fc9f76f63138267ab735fd80c8834be29df66b4656bce717fb3a49133fa42f2d",
+   "l1-pending.packet.json": "109d6639839ddb16a9ef29604952c1540b2b81887583bbb3dfc390decddbe37b",
+   "l1-pending.verdict.dsse.json": "3da945287f14a34eb17467d704fbf1a092754893b1607a33236e0edb138a1fa2",
+   "l2-busy-rerun.packet.json": "67c74d6efdd4eb0e2859ddb7137c5c81513cf25d7fe0e53a1a8027b271efdf0b",
+   "l2-busy-rerun.verdict.dsse.json": "b9e8698a67219ac8cca958256357658fc7f60f839294907456be01f549fdd8a2",
+   "l3-completed.packet.json": "63dd6861e5413f168ec4417329fedb8a53305ba86bfba524cd49c7b17fa92386",
+   "l3-completed.verdict.dsse.json": "82cf5402cae2521af0730a59d769763bfd4b9df32334b8ac17d790a3e8e001ca",
+   "l4-rerun-after.packet.json": "1551049a8bbfbde3761de49fcd3428d071eab5c643b110e241d6182ab3cf66e5",
+   "l4-rerun-after.verdict.dsse.json": "182d2512a224c3a5aa0360190d613086b797524a3b215cf8d9018dc8d7a9435f",
+   "verifier-key.json": "e48d927ad8bbe89007cc44926dd7b1d1878ba38ae141f4a2a8aac180a2e02066"
+  }
+ }
+}

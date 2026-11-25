@@ -1,0 +1,214 @@
+"""Check the AMEP comparison for VATE case 3 (confirmed nonexecution, and handoff).
+
+Default mode uses only the Python standard library. It checks:
+  1. every file here matches SOURCE-PINS.json (the AMEP revision it was copied from);
+  2. the VATE case 3 inputs in this checkout match the pinned VATE revision;
+  3. the AMEP packets describe this case's evidence:
+     - in both variants, the pending history has runtime-a's ticket for the pinned attempt, and no acceptance;
+     - fenced-handoff: the fenced history's handoff confirms that attempt unexecuted and retains it; the completed
+       history denies its late submit (old_generation) and accepts runtime-b's attempt;
+     - live-worker: the completed history accepts runtime-a's own attempt;
+     - the expected values match the recorded provider responses (interactions.json, pinned): the live-worker handoff
+       status, the fenced-handoff state and runtime-a's denied late submit;
+     - the expected phases are exactly the pinned packets and the signed verdict records;
+     - every file an AMEP receipt names is one of the operation's files, by name, SHA-256 and size; the pending and
+       fenced packets carry no receipts, as VATE's inventory is empty then; and the completing runtime's receipts
+       (runtime-b in f3, runtime-a in l3) cover exactly VATE's completed inventory;
+  4. each AMEP verdict record names the SHA-256 of its packet, and states the expected packet verdict and every
+     invocation's result (so l2-busy-rerun records runtime-b's held_outcome).
+
+With --amep PATH (a checkout of github.com/stafordtituss/amep at the pinned commit, with its Python package's dependency
+`cryptography` installed), it also:
+  5. re-evaluates each packet with AMEP's Python verifier and compares every result with expected-results.json;
+  6. verifies each verdict record's signature.
+
+Run from the repository root:
+  python3 -B reference/amep/case-03-confirmed-nonexecution/check.py
+  python3 -B reference/amep/case-03-confirmed-nonexecution/check.py --amep ../amep
+"""
+import argparse
+import base64
+import hashlib
+import json
+import os
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
+CASE = "reference/authzen-receipt-vectors/cases/03-confirmed-nonexecution-handoff"
+
+
+def sha256_file(path):
+    with open(path, "rb") as fh:
+        return hashlib.sha256(fh.read()).hexdigest()
+
+
+def b64u(s):
+    return base64.urlsafe_b64decode(s + "=" * (-len(s) % 4))
+
+
+def load(path):
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def records(variant, history):
+    """The decoded records of one of a variant's histories: (index, kind, body)."""
+    out = []
+    for index, record in enumerate(load(os.path.join(ROOT, CASE, variant, history))["records"]):
+        doc = json.loads(b64u(record["raw"]))
+        out.append((index, doc.get("kind"), doc.get("body")))
+    return out
+
+
+def results_of(statement):
+    return {r["id"]: {k: r[k] for k in ("outcome", "invariant", "blame", "gaps")} for r in statement["predicate"]["results"]}
+
+
+def check(amep_path=None):
+    problems, lines = [], []
+    pins = load(os.path.join(HERE, "SOURCE-PINS.json"))
+    expected = load(os.path.join(HERE, "expected-results.json"))
+
+    # 1. the AMEP files here are the ones at the pinned AMEP commit
+    for name, digest in pins["amep"]["files"].items():
+        if sha256_file(os.path.join(HERE, name)) != digest:
+            problems.append(f"{name} differs from AMEP {pins['amep']['commit'][:7]}")
+    # 2. the VATE inputs are the ones at the pinned VATE commit
+    for path, digest in pins["vate"]["files"].items():
+        if sha256_file(os.path.join(ROOT, path)) != digest:
+            problems.append(f"{path} differs from VATE {pins['vate']['commit'][:7]}")
+    lines.append(f"pinned files: {len(pins['amep']['files'])} AMEP ({pins['amep']['commit'][:7]}), "
+                 f"{len(pins['vate']['files'])} VATE ({pins['vate']['commit'][:7]})")
+
+    # 3. the packets describe this case's evidence
+    for variant, want in expected["variants"].items():
+        pending = records(variant, "pending-history.json")
+        tickets = [b for _, k, b in pending if k == "ticket"]
+        if len(tickets) != 1 or tickets[0].get("attempt_id") != want["first_attempt"] or tickets[0].get("runtime") != "runtime-a":
+            problems.append(f"{variant}: expected runtime-a's one ticket for {want['first_attempt']} in the pending history")
+        if any(k == "accepted" for _, k, _ in pending):
+            problems.append(f"{variant}: the pending history already has an acceptance")
+        completed = records(variant, "completed-history.json")
+        accepted = [b for _, k, b in completed if k == "accepted"]
+        if len(accepted) != 1:
+            problems.append(f"{variant}: expected one acceptance in the completed history, found {len(accepted)}")
+            continue
+        runtimes = {b.get("attempt_id"): b.get("runtime") for _, k, b in completed if k == "ticket"}
+        if runtimes.get(accepted[0].get("attempt_id")) != want["completed_by"]:
+            problems.append(f"{variant}: the accepted attempt is not {want['completed_by']}'s")
+        if variant == "fenced-handoff":
+            handoffs = [b for _, k, b in records(variant, "fenced-history.json") if k == "handoff"]
+            if (len(handoffs) != 1 or handoffs[0].get("effect_state") != want["fenced_state"]
+                    or want["first_attempt"] not in handoffs[0].get("retained_attempts", [])):
+                problems.append(f"{variant}: the fenced history does not confirm runtime-a's attempt {want['fenced_state']}")
+            denied = [b for _, k, b in completed if k == "denied"]
+            if [(b.get("attempt_id"), b.get("reason")) for b in denied] != [(want["first_attempt"], want["late_submit"])]:
+                problems.append(f"{variant}: runtime-a's late submit is not denied as {want['late_submit']}")
+        operation = load(os.path.join(ROOT, CASE, variant, "operation.json"))
+        files = {f["name"]: {"sha256": hashlib.sha256(f["text"].encode("utf-8")).hexdigest(), "size": len(f["text"].encode("utf-8"))}
+                 for f in operation["target"]["files"]}
+        inventory = load(os.path.join(ROOT, CASE, variant, "completed-history.json"))["inventory"]
+        for phase, exp in ((p, e) for p, e in expected["phases"].items() if e["variant"] == variant):
+            packet = load(os.path.join(HERE, f"{phase}.packet.json"))
+            for e in packet.get("effects", []):
+                xf = e["executed"]["x-file"]
+                if files.get(xf["name"]) != {"sha256": xf["sha256"], "size": xf["size"]}:
+                    problems.append(f"{phase}: receipt {e['id']} names a file that is not the operation's")
+            if exp["vate_phase"] in ("pending", "fenced") and packet.get("effects"):
+                problems.append(f"{phase}: carries receipts, but VATE's inventory is empty in the {exp['vate_phase']} phase")
+            if exp["vate_phase"] == "completed":
+                by = "i-2" if want["completed_by"] == "runtime-b" else "i-1"
+                observed = {e["executed"]["x-file"]["name"]: {"sha256": e["executed"]["x-file"]["sha256"], "size": e["executed"]["x-file"]["size"]}
+                            for e in packet.get("effects", []) if e["invocation"] == by}
+                if observed != inventory:
+                    problems.append(f"{phase}: {want['completed_by']}'s receipts cover {sorted(observed)}, but VATE's inventory is {sorted(inventory)}")
+        lines.append(f"{variant}: runtime-a's attempt {want['first_attempt'][:16]}…, completed by {want['completed_by']}, "
+                     f"inventory {sorted(inventory)} matching its receipts")
+
+    # 3b. the expected values agree with the recorded provider responses, not only with the histories
+    for variant, want in expected["variants"].items():
+        interactions = {i["id"]: i["response"] for i in load(os.path.join(ROOT, CASE, variant, "interactions.json"))}
+        handoff = interactions.get("handoff", {})
+        if variant == "live-worker":
+            if handoff.get("status") != want["handoff_status"]:
+                problems.append(f"{variant}: expected handoff status {want['handoff_status']!r}, but the recorded handoff "
+                                f"response says {handoff.get('status')!r}")
+        else:
+            if (handoff.get("result") or {}).get("effect_state") != want["fenced_state"]:
+                problems.append(f"{variant}: expected the handoff to report {want['fenced_state']!r}, but the recorded "
+                                f"response says {(handoff.get('result') or {}).get('effect_state')!r}")
+            late = interactions.get("late-a", {})
+            if (late.get("status"), late.get("reason")) != ("denied", want["late_submit"]):
+                problems.append(f"{variant}: expected runtime-a's late submit denied as {want['late_submit']!r}, but the "
+                                f"recorded response is {late.get('status')!r} {late.get('reason')!r}")
+    lines.append("recorded provider responses: handoff and late submit match the expected values")
+
+    # 3c. the expected phases are exactly the pinned packets and the signed verdict records, no more and no fewer
+    names = set(expected["phases"])
+    packets = {f[: -len(".packet.json")] for f in os.listdir(HERE) if f.endswith(".packet.json")}
+    verdicts = {f[: -len(".verdict.dsse.json")] for f in os.listdir(HERE) if f.endswith(".verdict.dsse.json")}
+    pinned = {f[: -len(".packet.json")] for f in pins["amep"]["files"] if f.endswith(".packet.json")}
+    for label, found in (("packets", packets), ("signed verdict records", verdicts), ("pinned AMEP packets", pinned)):
+        if found != names:
+            missing, extra = sorted(found - names), sorted(names - found)
+            problems.append(f"expected-results.json phases differ from the {label}: "
+                            + (f"not expected: {missing}" if missing else "") + (" " if missing and extra else "")
+                            + (f"expected but absent: {extra}" if extra else ""))
+    lines.append(f"phases: {len(names)} expected, matching {len(packets)} packets and {len(verdicts)} signed verdict records")
+
+    # 4. each verdict record names its packet and states the expected results
+    for phase, exp in expected["phases"].items():
+        env = load(os.path.join(HERE, f"{phase}.verdict.dsse.json"))
+        stmt = json.loads(base64.b64decode(env["payload"]))
+        packet_sha = sha256_file(os.path.join(HERE, f"{phase}.packet.json"))
+        if stmt["subject"][0]["digest"]["sha256"] != packet_sha or stmt["predicate"]["packet"]["sha256"] != packet_sha:
+            problems.append(f"{phase}: the verdict record does not name the packet's digest")
+        v = stmt["predicate"]["verdict"]
+        if [v["outcome"], v["invariant"]] != [exp["outcome"], exp["invariant"]]:
+            problems.append(f"{phase}: verdict record says {v['outcome']} {v['invariant']}, expected {exp['outcome']} {exp['invariant']}")
+        if results_of(stmt) != exp["results"]:
+            problems.append(f"{phase}: verdict record's per-invocation results differ from expected-results.json")
+        each = "; ".join(f"{i} {r['outcome']}" + "".join(f" {g['need']} {g['ref']}" for g in r["gaps"])
+                         for i, r in exp["results"].items())
+        lines.append(f"{phase:16} {v['outcome']:10} {v['invariant']:3} [{each}]")
+
+    # 5 and 6, with AMEP's verifier
+    if amep_path:
+        sys.path.insert(0, os.path.join(os.path.abspath(amep_path), "packages", "python", "src"))
+        from amep_protocol import evaluate_text, verdict  # noqa: E402
+        from amep_protocol.verdicts import verify_envelope  # noqa: E402
+        keys = load(os.path.join(HERE, "keys.json"))
+        verifier_key = load(os.path.join(HERE, "verifier-key.json"))
+        for phase, exp in expected["phases"].items():
+            with open(os.path.join(HERE, f"{phase}.packet.json"), encoding="utf-8") as fh:
+                res = evaluate_text(fh.read(), keys)
+            v = verdict(res)
+            if (v.outcome, v.invariant) != (exp["outcome"], exp["invariant"]):
+                problems.append(f"{phase}: AMEP evaluates {v.outcome} {v.invariant}, expected {exp['outcome']} {exp['invariant']}")
+            got = {r.invocation: {"outcome": r.outcome, "invariant": r.invariant, "blame": r.blame, "gaps": r.gaps} for r in res}
+            if got != exp["results"]:
+                problems.append(f"{phase}: AMEP's per-invocation results differ from expected-results.json")
+            try:
+                verify_envelope(load(os.path.join(HERE, f"{phase}.verdict.dsse.json")), verifier_key)
+            except Exception as exc:  # any failure to verify is a problem to report, not to hide
+                problems.append(f"{phase}: verdict record signature does not verify ({exc})")
+        lines.append("AMEP re-evaluation and signatures: " + ("checked" if not problems else "see problems"))
+    return problems, lines
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--amep", help="path to a checkout of github.com/stafordtituss/amep at the pinned commit")
+    args = parser.parse_args()
+    problems, lines = check(args.amep)
+    print("\n".join(lines))
+    if problems:
+        print("\nPROBLEMS:\n  " + "\n  ".join(problems))
+        return 1
+    print("\nall checks pass")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

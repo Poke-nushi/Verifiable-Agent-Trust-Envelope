@@ -1,0 +1,173 @@
+{
+  "phases": {
+    "f1-pending": {
+      "variant": "fenced-handoff",
+      "vate_phase": "pending",
+      "outcome": "unresolved",
+      "invariant": "I7",
+      "results": {
+        "i-1": {
+          "outcome": "unresolved",
+          "invariant": "I7",
+          "blame": null,
+          "gaps": [
+            {
+              "need": "receipt",
+              "ref": "i-1"
+            }
+          ]
+        }
+      }
+    },
+    "f2-fenced": {
+      "variant": "fenced-handoff",
+      "vate_phase": "fenced",
+      "outcome": "preserved",
+      "invariant": "-",
+      "results": {
+        "i-1": {
+          "outcome": "preserved",
+          "invariant": "-",
+          "blame": null,
+          "gaps": []
+        }
+      }
+    },
+    "f3-completed": {
+      "variant": "fenced-handoff",
+      "vate_phase": "completed",
+      "outcome": "preserved",
+      "invariant": "-",
+      "results": {
+        "i-1": {
+          "outcome": "preserved",
+          "invariant": "-",
+          "blame": null,
+          "gaps": []
+        },
+        "i-2": {
+          "outcome": "preserved",
+          "invariant": "-",
+          "blame": null,
+          "gaps": []
+        }
+      }
+    },
+    "f4-late-write": {
+      "variant": "fenced-handoff",
+      "vate_phase": null,
+      "outcome": "violated",
+      "invariant": "I11",
+      "results": {
+        "i-1": {
+          "outcome": "violated",
+          "invariant": "I11",
+          "blame": "server",
+          "gaps": []
+        },
+        "i-2": {
+          "outcome": "preserved",
+          "invariant": "-",
+          "blame": null,
+          "gaps": []
+        }
+      }
+    },
+    "l1-pending": {
+      "variant": "live-worker",
+      "vate_phase": "pending",
+      "outcome": "unresolved",
+      "invariant": "I7",
+      "results": {
+        "i-1": {
+          "outcome": "unresolved",
+          "invariant": "I7",
+          "blame": null,
+          "gaps": [
+            {
+              "need": "receipt",
+              "ref": "i-1"
+            }
+          ]
+        }
+      }
+    },
+    "l2-busy-rerun": {
+      "variant": "live-worker",
+      "vate_phase": null,
+      "outcome": "unresolved",
+      "invariant": "I7",
+      "results": {
+        "i-1": {
+          "outcome": "unresolved",
+          "invariant": "I7",
+          "blame": null,
+          "gaps": [
+            {
+              "need": "receipt",
+              "ref": "i-1"
+            }
+          ]
+        },
+        "i-2": {
+          "outcome": "unresolved",
+          "invariant": "I7",
+          "blame": null,
+          "gaps": [
+            {
+              "need": "held_outcome",
+              "ref": "i-1"
+            }
+          ]
+        }
+      }
+    },
+    "l3-completed": {
+      "variant": "live-worker",
+      "vate_phase": "completed",
+      "outcome": "preserved",
+      "invariant": "-",
+      "results": {
+        "i-1": {
+          "outcome": "preserved",
+          "invariant": "-",
+          "blame": null,
+          "gaps": []
+        }
+      }
+    },
+    "l4-rerun-after": {
+      "variant": "live-worker",
+      "vate_phase": null,
+      "outcome": "violated",
+      "invariant": "I8",
+      "results": {
+        "i-1": {
+          "outcome": "preserved",
+          "invariant": "-",
+          "blame": null,
+          "gaps": []
+        },
+        "i-2": {
+          "outcome": "violated",
+          "invariant": "I8",
+          "blame": "agent",
+          "gaps": []
+        }
+      }
+    }
+  },
+  "variants": {
+    "fenced-handoff": {
+      "first_attempt": "attempt-15311cb66a25471fb89831031c8072b4",
+      "fenced_state": "confirmed_unexecuted",
+      "late_submit": "old_generation",
+      "completed_by": "runtime-b"
+    },
+    "live-worker": {
+      "first_attempt": "attempt-70ab8b8663814e33b06504affa3a5b53",
+      "handoff_status": "busy",
+      "completed_by": "runtime-a"
+    }
+  }
+}
