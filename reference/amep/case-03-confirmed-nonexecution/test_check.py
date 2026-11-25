@@ -38,13 +38,14 @@ class CaseThreeComparison(unittest.TestCase):
             check.records = real
         self.assertTrue(any("late submit is not denied" in p for p in problems), problems)
 
-    def _with_expected(self, change):
-        """Run the check with expected-results.json altered in memory, as a reviewer's local edit would."""
+    def _with_json_edit(self, change, *, filename="expected-results.json"):
+        """Run the check with one comparison input edited in memory."""
         real = check.load
+        target = os.path.join(check.HERE, filename)
 
         def altered(path):
             doc = real(path)
-            if path.endswith("expected-results.json"):
+            if path == target:
                 change(doc)
             return doc
 
@@ -57,16 +58,21 @@ class CaseThreeComparison(unittest.TestCase):
 
     def test_an_expected_handoff_status_the_recorded_response_contradicts_is_reported(self):
         # From review: busy -> committed passed before interactions.json was pinned and compared.
-        problems = self._with_expected(lambda d: d["variants"]["live-worker"].update(handoff_status="committed"))
+        problems = self._with_json_edit(lambda d: d["variants"]["live-worker"].update(handoff_status="committed"))
         self.assertTrue(any("recorded handoff response says 'busy'" in p for p in problems), problems)
 
     def test_an_omitted_phase_is_reported(self):
         # From review: removing f3-completed from expected-results.json left seven phases checked and passed.
-        problems = self._with_expected(lambda d: d["phases"].pop("f3-completed"))
+        problems = self._with_json_edit(lambda d: d["phases"].pop("f3-completed"))
         self.assertTrue(any("not expected: ['f3-completed']" in p for p in problems), problems)
 
+    def test_a_missing_signed_verdict_pin_is_reported(self):
+        name = "f3-completed.verdict.dsse.json"
+        problems = self._with_json_edit(lambda d: d["amep"]["files"].pop(name), filename="SOURCE-PINS.json")
+        self.assertIn(f"SOURCE-PINS.json: missing SHA-256 for {name}", problems)
+
     def test_a_changed_late_submit_reason_is_reported(self):
-        problems = self._with_expected(lambda d: d["variants"]["fenced-handoff"].update(late_submit="stale"))
+        problems = self._with_json_edit(lambda d: d["variants"]["fenced-handoff"].update(late_submit="stale"))
         self.assertTrue(any("late submit denied as 'stale'" in p for p in problems), problems)
 
 

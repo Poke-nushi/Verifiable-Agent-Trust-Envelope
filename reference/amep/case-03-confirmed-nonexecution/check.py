@@ -14,8 +14,8 @@ Default mode uses only the Python standard library. It checks:
      - every file an AMEP receipt names is one of the operation's files, by name, SHA-256 and size; the pending and
        fenced packets carry no receipts, as VATE's inventory is empty then; and the completing runtime's receipts
        (runtime-b in f3, runtime-a in l3) cover exactly VATE's completed inventory;
-  4. each AMEP verdict record names the SHA-256 of its packet, and states the expected packet verdict and every
-     invocation's result (so l2-busy-rerun records runtime-b's held_outcome).
+  4. each AMEP verdict record is pinned in SOURCE-PINS.json, names its packet's SHA-256, and states the expected
+     packet verdict and every invocation's result (so l2-busy-rerun records runtime-b's held_outcome).
 
 With --amep PATH (a checkout of github.com/stafordtituss/amep at the pinned commit, with its Python package's dependency
 `cryptography` installed), it also:
@@ -157,9 +157,12 @@ def check(amep_path=None):
                             + (f"expected but absent: {extra}" if extra else ""))
     lines.append(f"phases: {len(names)} expected, matching {len(packets)} packets and {len(verdicts)} signed verdict records")
 
-    # 4. each verdict record names its packet and states the expected results
+    # 4. each verdict record is pinned, names its packet and states the expected results
     for phase, exp in expected["phases"].items():
-        env = load(os.path.join(HERE, f"{phase}.verdict.dsse.json"))
+        verdict_name = f"{phase}.verdict.dsse.json"
+        if verdict_name not in pins["amep"]["files"]:
+            problems.append(f"SOURCE-PINS.json: missing SHA-256 for {verdict_name}")
+        env = load(os.path.join(HERE, verdict_name))
         stmt = json.loads(base64.b64decode(env["payload"]))
         packet_sha = sha256_file(os.path.join(HERE, f"{phase}.packet.json"))
         if stmt["subject"][0]["digest"]["sha256"] != packet_sha or stmt["predicate"]["packet"]["sha256"] != packet_sha:
