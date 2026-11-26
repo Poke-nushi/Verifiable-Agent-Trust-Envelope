@@ -1,0 +1,31 @@
+{
+  "vector_set": "vate-purchase-receiver-selection-v2",
+  "generator_revision": "83443e52ddfb18aa3f17ea6539d8bc31ae8a5dff",
+  "cases": {
+    "select-a-receive-a": {
+      "receiver_request": "A",
+      "delivery": "A"
+    },
+    "select-a-receive-b": {
+      "receiver_request": "A",
+      "delivery": "B"
+    },
+    "select-b-receive-b": {
+      "receiver_request": "B",
+      "delivery": "B"
+    },
+    "no-selection-receive-b": {
+      "receiver_request": null,
+      "delivery": "B"
+    },
+    "select-a-earlier-expiry-receive-a": {
+      "receiver_request": "A-earlier-expiry",
+      "delivery": "A"
+    },
+    "select-a-receive-a-with-b-result": {
+      "receiver_request": "A",
+      "delivery": "A",
+      "post_delivery": "B"
+    }
+  }
+}

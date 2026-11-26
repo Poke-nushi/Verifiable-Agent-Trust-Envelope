@@ -31,6 +31,14 @@ and checks the synthetic post receipt's linkage. In an integration, supply the
 admission request selected by the receiver, independently of the submitted
 receipt. Here the expected request comes from the example itself.
 
+The [purchase receiver-selection vectors](receiver-selection/README.md) give
+the receiver a separately stored request. Six cases use two USD 24.50 purchase
+requests to check whether the admission matches the saved request and whether
+the result belongs to that admission. Try a saved request with matching IDs
+and a different expiry, or pair one purchase's admission with the other's result.
+To replay the six cases offline, download the [ZIP](https://vate.rognalia.com/downloads/purchase-receiver-selection/2026-11-27/vate-purchase-receiver-selection-v2.zip)
+and [checksum](https://vate.rognalia.com/downloads/purchase-receiver-selection/2026-11-27/vate-purchase-receiver-selection-v2.zip.sha256).
+
 Generate a separate bundle in a new directory:
 
 ```bash

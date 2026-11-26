@@ -5,6 +5,7 @@ reference/historical-runtime/f1286390/** -text whitespace=-blank-at-eof,cr-at-eo
 # Keep digest-addressed corpus and fixture bytes stable across platforms.
 conformance/** text eol=lf
 examples/** text eol=lf
+reference/request-binding/receiver-selection/** text eol=lf
 
 # Preserve captured HTTP bytes, including CRLF and the terminal empty line.
 reference/s3-observation-example/inputs/seaweedfs-4.48/instance/**/*-headers.txt -text whitespace=cr-at-eol,-blank-at-eof

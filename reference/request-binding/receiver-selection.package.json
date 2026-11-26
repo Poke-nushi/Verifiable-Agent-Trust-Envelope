@@ -1,0 +1,25 @@
+{
+  "format": "vate-purchase-receiver-selection-download-1",
+  "vector_set": "vate-purchase-receiver-selection-v2",
+  "archive": "vate-purchase-receiver-selection-v2.zip",
+  "url": "https://vate.rognalia.com/downloads/purchase-receiver-selection/2026-11-27/vate-purchase-receiver-selection-v2.zip",
+  "checksum_url": "https://vate.rognalia.com/downloads/purchase-receiver-selection/2026-11-27/vate-purchase-receiver-selection-v2.zip.sha256",
+  "size_bytes": 143401,
+  "sha256": "f19e68eec5f480741790180a416c33d32ad456b238af37c50f437cead9ee9dd2",
+  "manifest_sha256": "ef61d44b665a055ffe0a96a7974e3ce773c5acc2514dd6d48bee8b87ff37e9b9",
+  "archive_files": 40,
+  "manifest_payload_files": 39,
+  "vector_manifest_sha256": "fc62455a82283c8eb29edf4a0270063ade130112c50f892e2a6a93fe4e469e76",
+  "source_pins": {
+    "repository": "https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope",
+    "reference_evaluators_commit": "83443e52ddfb18aa3f17ea6539d8bc31ae8a5dff",
+    "vector_sources_commit": "2d760af2ef149f418cd5c3d6b6872b8a378e484e"
+  },
+  "tested_environment": {
+    "platform": "macOS arm64",
+    "python": "3.14.8",
+    "reference_reader_dependency": "jsonschema==4.26.0"
+  },
+  "package_license": "Apache-2.0",
+  "scope": "Six synthetic purchase cases compare the link between the admission and result receipts and the binding to the request selected by the receiver."
+}
