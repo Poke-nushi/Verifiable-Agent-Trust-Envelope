@@ -1,0 +1,39 @@
+--- a/trial/NATIVE-RELEASES.json
++++ b/trial/NATIVE-RELEASES.json
+@@ -13,7 +13,7 @@
+         "name": "openfga",
+-        "version": "1.22.1",
+-        "archive": "openfga_1.22.1_darwin_arm64.tar.gz",
+-        "url": "https://github.com/openfga/openfga/releases/download/v1.22.1/openfga_1.22.1_darwin_arm64.tar.gz",
+-        "sha256": "4d64ccd3ead676e3b13154bb32372421f3cd4735eda0211f5d0b7d244c689b90",
+-        "checksum_source": "https://github.com/openfga/openfga/releases/download/v1.22.1/checksums.txt"
++        "version": "1.23.0",
++        "archive": "openfga_1.23.0_darwin_arm64.tar.gz",
++        "url": "https://github.com/openfga/openfga/releases/download/v1.23.0/openfga_1.23.0_darwin_arm64.tar.gz",
++        "sha256": "2d3ee4a739bcf0f48cea2d575a311ac82bd762836fc4681987f1eeb792d403d7",
++        "checksum_source": "https://github.com/openfga/openfga/releases/download/v1.23.0/checksums.txt"
+       }
+--- a/trial/run_chain.py
++++ b/trial/run_chain.py
+@@ -34,3 +34,3 @@
+     "bin/hydra": "50f7f8beadfe0209a0e44797f41e69d87e4a3226faa21a20a2a25cf8cfe94a4b",
+-    "bin/openfga": "891dee8221d6a535e456c48ef1e59a25e80f26e7e60e2a06af86a4ff05f04178",
++    "bin/openfga": "5f158a3508bf5ed9e98546f9d5c4f7910a601bc1757fd4ca75113f00507dcbc2",
+ }
+@@ -378,3 +378,3 @@
+              "concurrency": "sequential experiment; binding read and policy checks are not an atomic snapshot",
+-             "grant_bindings": GRANTS, "component_versions": {"hydra": "26.2.0", "openfga": "1.22.1"},
++             "grant_bindings": GRANTS, "component_versions": {"hydra": "26.2.0", "openfga": "1.23.0"},
+              "chain_evaluation": "OpenFGA child enabled AND enabled from parent; fixed server-side client/grant binding"})
+@@ -717,3 +717,3 @@
+                   "source_sha256": {name: sha((HERE / name).read_bytes()) for name in ("run_chain.py", "MODEL.json", "GRANTS.json")},
+-                  "component_versions": {"hydra": "26.2.0", "openfga": "1.22.1"}, "binary_pins": json.loads((ROOT / "BINARY-PINS.json").read_text()),
++                  "component_versions": {"hydra": "26.2.0", "openfga": "1.23.0"}, "binary_pins": json.loads((ROOT / "BINARY-PINS.json").read_text()),
+                   "limits": ["synthetic login/consent", "HTTP loopback in development mode", "custom PAP/resource adapters", "sequential single-store checks, not atomic", "OpenFGA memory store", "trusted fixed client/grant/parent mapping; one user, path and action", "no delegation issuance or token-exchange protocol", "no policy or decision signatures", "no VATE receipt conversion", "no external adoption or production validation"]}
+--- a/vate/reference/authority-issuer/native_fixture.py
++++ b/vate/reference/authority-issuer/native_fixture.py
+@@ -28,3 +28,3 @@
+     "hydra": "50f7f8beadfe0209a0e44797f41e69d87e4a3226faa21a20a2a25cf8cfe94a4b",
+-    "openfga": "891dee8221d6a535e456c48ef1e59a25e80f26e7e60e2a06af86a4ff05f04178",
++    "openfga": "5f158a3508bf5ed9e98546f9d5c4f7910a601bc1757fd4ca75113f00507dcbc2",
+ }

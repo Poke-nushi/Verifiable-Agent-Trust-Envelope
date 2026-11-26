@@ -38,13 +38,16 @@ registered grant's lifetime. See [CONTRACT.md](CONTRACT.md) for the exact rules.
 
 ## Run the native example
 
+For OpenFGA 1.23.0, follow the [signed-issuer comparison and run
+instructions](../../docs/interop/openfga-1.23.0/README.md). The commands
+below reproduce the original OpenFGA 1.22.1 example.
+
 Use an existing Node.js 22+ executable, an existing OpenSSL with `req -addext`,
 and the pinned macOS arm64 binaries for Hydra 26.2.0 and OpenFGA 1.22.1. This
 fixture checks their binary SHA-256 values in
 [`native_fixture.py`](native_fixture.py); it does not download or install them.
 Place those two binaries at `bin/hydra` and `bin/openfga` under the selected
-native directory. Other binary versions/platforms have not been exercised by
-this fixture.
+native directory.
 
 From the repository root, replace the executable paths and digests below with
 the independently selected local values. The output directory must be new.

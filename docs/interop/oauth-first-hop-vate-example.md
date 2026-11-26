@@ -51,6 +51,8 @@ revision. All seven are `completed` in the standard replay. The OAuth assessment
 of each request is in `report.attempts`. The fixture trusts its local collector
 and uses unsigned records from synthetic operations.
 
-The bundled README includes commands for the second capture, the receipt and
-OAuth test suites, and a fresh loopback run with Ory Hydra 26.2.0 and OpenFGA
-1.22.1. Only the fresh run needs those two executables.
+The bundled README covers the second capture, the receipt and OAuth test
+suites, and the original Hydra 26.2.0 / OpenFGA 1.22.1 loopback run.
+For a fresh run of the underlying 14 OAuth cases with OpenFGA 1.23.0, use
+[the native comparison](openfga-1.23.0/README.md). The receipt replay above
+uses the archived captures and runs offline.

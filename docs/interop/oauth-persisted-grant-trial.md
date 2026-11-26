@@ -89,10 +89,12 @@ The live SQLite database is omitted. Each reader report records the reader
 source SHA-256; replay refuses a different reader identity, so retain this
 package with the export.
 
-## Run new native cases
+## Reproduce the ten native cases with the recorded versions
 
-Download the official Ory Hydra **26.2.0** and OpenFGA **1.22.1** archives and
-verify their fixed hashes before extraction:
+The ten-case archive pins Ory Hydra **26.2.0** and OpenFGA **1.22.1**.
+The [OpenFGA 1.23.0 comparison](openfga-1.23.0/README.md) covers the separate
+14-case first-hop trial and the signed issuer. To reproduce the original
+ten-case run, fetch and verify its pinned archives.
 
 ```sh
 python3 -B setup_native.py --download
