@@ -6,6 +6,10 @@ The trial uses Ory Hydra 26.2.0 for OAuth and OpenFGA 1.22.1 for stored
 relationship checks. Its 14 cases expose the policy inputs, changes, HTTP
 observations and fixture action counts for comparison with another implementation.
 
+For a fresh run with OpenFGA 1.23.0, see the [version comparison and
+reproduction steps](openfga-1.23.0/README.md). The download below preserves
+the original 1.22.1 trial.
+
 To trace a delayed execution receipt back to a selected request from this trial,
 use the [VATE v0.7.0 receiving example](oauth-first-hop-vate-example.md).
 

@@ -1,0 +1,224 @@
+{
+  "date": "2026-11-26",
+  "platform": "macOS 27.2.1 arm64",
+  "python": "3.14.8",
+  "vate_source_commit": "fac9d94c4c8093fdfb32491413794c9ac0a6411f",
+  "first_hop_trial_zip_sha256": "f34795280c075cb6bf45220afeab13bac58c1c9b76f0610b69fa335776876926",
+  "pins_patch_sha256": "a00d4586adf11ef22114f4d17cbc035213495bf6a4805386d252147bbcb27668",
+  "hydra": {
+    "version": "26.2.0",
+    "binary_sha256": "50f7f8beadfe0209a0e44797f41e69d87e4a3226faa21a20a2a25cf8cfe94a4b"
+  },
+  "node": {
+    "version": "22.23.4",
+    "binary_sha256": "daa77e22e1b8778361b392461e9921a6d292d0382ebf4ae872a0081f02f01fef"
+  },
+  "openssl": {
+    "version": "4.0.3",
+    "binary_sha256": "2ed8d3feea05b602f61fa27f9c799cdb50f7a4540a3325c7e610ea9ded7cc6db"
+  },
+  "openfga": {
+    "1.22.1": {
+      "archive_sha256": "4d64ccd3ead676e3b13154bb32372421f3cd4735eda0211f5d0b7d244c689b90",
+      "binary_sha256": "891dee8221d6a535e456c48ef1e59a25e80f26e7e60e2a06af86a4ff05f04178"
+    },
+    "1.23.0": {
+      "archive_sha256": "2d3ee4a739bcf0f48cea2d575a311ac82bd762836fc4681987f1eeb792d403d7",
+      "binary_sha256": "5f158a3508bf5ed9e98546f9d5c4f7910a601bc1757fd4ca75113f00507dcbc2"
+    }
+  },
+  "observations_equal_across_versions": true,
+  "first_hop": {
+    "observed_by_case": {
+      "01-chain-permit": [
+        200,
+        "permit",
+        [
+          true,
+          true
+        ],
+        1
+      ],
+      "02-as-cannot-write-user-permission": [
+        403,
+        "writer_namespace_mismatch",
+        true
+      ],
+      "03-owner-cannot-write-either-grant": [
+        403,
+        403,
+        true
+      ],
+      "04-as-cannot-bypass-pap": [
+        true,
+        true
+      ],
+      "05-pap-refuses-parent-rebinding": [
+        400,
+        "unsupported_update",
+        true
+      ],
+      "06-caller-cannot-select-parent": [
+        400,
+        "context_injection_not_supported",
+        1,
+        false
+      ],
+      "07-owner-permission-still-required": [
+        403,
+        "deny",
+        [
+          true,
+          false
+        ],
+        1,
+        true
+      ],
+      "08-missing-parent-binding-denies": [
+        true,
+        true,
+        false,
+        true,
+        403,
+        "parent_binding_mismatch",
+        1
+      ],
+      "09-additional-parent-binding-denies": [
+        true,
+        403,
+        "parent_binding_mismatch",
+        1
+      ],
+      "09b-revoked-parent-extra-parent-denies": {
+        "only_first_hop_removed": true,
+        "both_parent_references_retained": true,
+        "first_hop_disabled": true,
+        "extra_parent_enabled": true,
+        "child_still_enabled": true,
+        "model_allows_through_extra_parent": true,
+        "owner_still_permits": true,
+        "fixed_parent_guard_denies": true,
+        "same_token": true,
+        "token_active_before_and_after": true,
+        "token_claims_unchanged": true,
+        "no_new_calendar_action": true
+      },
+      "10-first-hop-revoked-child-unchanged": {
+        "before_permits": true,
+        "after_denies_on_policy": true,
+        "same_token": true,
+        "token_active_before_and_after": true,
+        "token_claims_unchanged": true,
+        "child_tuple_retained": true,
+        "parent_binding_retained": true,
+        "grant_descriptions_unchanged": true,
+        "only_first_hop_removed": true,
+        "first_hop_disabled": true,
+        "child_still_enabled": true,
+        "effective_child_denied": true,
+        "owner_still_permits": true,
+        "no_new_calendar_action": true,
+        "both_services_healthy": true
+      },
+      "11-leaf-only-comparison": {
+        "leaf_only_would_permit": true,
+        "chain_permits": false,
+        "calendar_action_executed_by_control": false,
+        "operations": 2
+      },
+      "12-pdp-unavailable": [
+        503,
+        "deny",
+        2
+      ],
+      "13-revoked-token": [
+        401,
+        "deny",
+        2
+      ]
+    },
+    "checks_recomputed_from_tuple_writes_per_run": 22,
+    "fixture_action_count_per_run": 2
+  },
+  "signed_issuer": {
+    "observed_by_case": {
+      "native-permit-admits-without-dispatch": [
+        "attenuate",
+        0
+      ],
+      "other-registration-is-independently-permitted": true,
+      "owner-revocation-stops-dispatch": {
+        "cause": "CALLER_AUTHORIZATION_FAILED",
+        "new_callback_calls": 0
+      },
+      "publisher-restart-rejects-old-revision": "AUTHORITY_ROLLBACK",
+      "recipient-restart-rejects-old-revision": "AUTHORITY_ROLLBACK",
+      "restart-retains-revocation": {
+        "cause": "CALLER_AUTHORIZATION_FAILED",
+        "new_callback_calls": 0
+      },
+      "delegation-revocation-stops-dispatch": {
+        "cause": "CALLER_AUTHORIZATION_FAILED",
+        "new_callback_calls": 0
+      },
+      "other-registration-cannot-supply-selected-delegation": [],
+      "delivery-failure-marks-recipient-unavailable": [
+        true,
+        5
+      ],
+      "restart-cannot-restore-while-unavailable": "AUTHORITY_NOT_AVAILABLE",
+      "restart-cannot-clear-delivery-failure": {
+        "cause": "AUTHORITY_NOT_AVAILABLE",
+        "unavailable": true,
+        "new_callback_calls": 0
+      },
+      "fresh-recovery-executes-original-receipt-once": [
+        1,
+        true,
+        true
+      ],
+      "pdp-credential-failure-blocks-publication": [
+        true,
+        6
+      ],
+      "publisher-persists-unavailability": true,
+      "pdp-failure-stops-pending-dispatch": {
+        "cause": "AUTHORITY_NOT_AVAILABLE",
+        "unavailable": true,
+        "new_callback_calls": 0
+      },
+      "fresh-source-recovery-clears-unavailability": [
+        false,
+        false
+      ],
+      "native-pdp-unavailable-blocks-publication": [
+        true,
+        7
+      ],
+      "native-pdp-unavailable-stops-dispatch": {
+        "cause": "AUTHORITY_NOT_AVAILABLE",
+        "unavailable": true,
+        "new_callback_calls": 0
+      },
+      "inactive-oauth-skips-pdp": [
+        true,
+        false
+      ],
+      "oauth-revocation-stops-dispatch": {
+        "cause": "CALLER_AUTHORIZATION_FAILED",
+        "new_callback_calls": 0
+      }
+    },
+    "verified_snapshot_grant_counts_in_revision_order_per_run": [
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      0
+    ],
+    "recording_callback_count_per_run": 1
+  }
+}
