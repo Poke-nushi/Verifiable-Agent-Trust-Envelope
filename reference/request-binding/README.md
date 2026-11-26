@@ -31,6 +31,12 @@ and checks the synthetic post receipt's linkage. In an integration, supply the
 admission request selected by the receiver, independently of the submitted
 receipt. Here the expected request comes from the example itself.
 
+The [purchase receiver-selection vectors](receiver-selection/README.md) give
+the receiver a separately stored request. Six cases use two USD 24.50 purchase
+requests to check whether the admission matches the saved request and whether
+the result belongs to that admission. Try a saved request with matching IDs
+and a different expiry, or pair one purchase's admission with the other's result.
+
 Generate a separate bundle in a new directory:
 
 ```bash

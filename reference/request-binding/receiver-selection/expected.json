@@ -1,0 +1,59 @@
+{
+  "vector_set": "vate-purchase-receiver-selection-v2",
+  "cases": {
+    "select-a-receive-a": {
+      "record_linkage": "matched",
+      "request_binding": {
+        "status": "checked",
+        "pass": true,
+        "binding_requirement_met": true,
+        "selection_cause": null
+      }
+    },
+    "select-a-receive-b": {
+      "record_linkage": "matched",
+      "request_binding": {
+        "status": "checked",
+        "pass": false,
+        "binding_requirement_met": false,
+        "selection_cause": "ADMISSION_REFERENCE_MISMATCH"
+      }
+    },
+    "select-b-receive-b": {
+      "record_linkage": "matched",
+      "request_binding": {
+        "status": "checked",
+        "pass": true,
+        "binding_requirement_met": true,
+        "selection_cause": null
+      }
+    },
+    "no-selection-receive-b": {
+      "record_linkage": "matched",
+      "request_binding": {
+        "status": "not_checked",
+        "pass": null,
+        "binding_requirement_met": false,
+        "selection_cause": "EXPECTED_ADMISSION_REQUEST_NOT_SUPPLIED"
+      }
+    },
+    "select-a-earlier-expiry-receive-a": {
+      "record_linkage": "matched",
+      "request_binding": {
+        "status": "checked",
+        "pass": false,
+        "binding_requirement_met": false,
+        "selection_cause": "ADMISSION_REFERENCE_MISMATCH"
+      }
+    },
+    "select-a-receive-a-with-b-result": {
+      "record_linkage": "mismatch",
+      "request_binding": {
+        "status": "checked",
+        "pass": true,
+        "binding_requirement_met": true,
+        "selection_cause": null
+      }
+    }
+  }
+}
