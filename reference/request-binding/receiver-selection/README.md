@@ -24,6 +24,10 @@ admission.
 
 ## Replay the six cases
 
+[Download the six-case ZIP](https://vate.rognalia.com/downloads/purchase-receiver-selection/2026-11-27/vate-purchase-receiver-selection-v2.zip) and its
+[SHA-256 checksum](https://vate.rognalia.com/downloads/purchase-receiver-selection/2026-11-27/vate-purchase-receiver-selection-v2.zip.sha256).
+The [package record](../receiver-selection.package.json) identifies the exact archive and source revisions.
+
 If you are using the ZIP, keep it beside its companion `.zip.sha256` file
 and the extracted directory. The first command checks the archive. The second
 checks the extracted reference code, schemas, documentation and inputs listed
