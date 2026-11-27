@@ -78,6 +78,10 @@ Vaara 2.17.0 evidence and retains earlier and later assessments in Recipient Inb
 It separates native verification and argument binding from receiver-selected
 call association when a receipt is withheld, swapped or delivered.
 
+The [DPS/SCITT refund example](docs/interop/dps-scitt-refund/README.md)
+compares two packets for the same €120 refund with an approval the recipient
+selected in advance. It also shows what changes when the cited result receipt arrives.
+
 The [OAuth permission-change trial](docs/interop/oauth-persisted-grant-trial.md)
 uses Hydra and OpenFGA to exercise ten persisted-grant cases with the same token.
 Use it independently, or add the VATE example to check admission/result
