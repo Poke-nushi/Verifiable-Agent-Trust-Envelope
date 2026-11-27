@@ -18,6 +18,8 @@ local receipt package, use the [package intake example](PACKAGE-INTAKE.md).
 It preserves collection failures separately from record absence and receipt
 contradictions, and includes a generated A/B/C example with B omitted.
 
+For a purchase whose result arrives later, [replay both assessments from the latest Inbox export](purchase-late-result/README.md). The example compares the result for the selected purchase with a receipt from another purchase of the same amount.
+
 ## Run the intake example
 
 Use Linux or macOS, Python 3.10 or later, and a trusted checkout or source
