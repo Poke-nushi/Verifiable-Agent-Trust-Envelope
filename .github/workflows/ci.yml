@@ -103,6 +103,19 @@ jobs:
       - name: Check request binding, source identity, and durable dispatch
         run: python -B -m unittest discover -s reference/request-binding -p 'test_*.py' -v
 
+      - name: Replay the fixed DPS refund recipient examples
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.14'
+        working-directory: docs/interop/dps-scitt-refund
+        run: |
+          sha256sum -c SHA256SUMS
+          python -m zipfile -e refund-recipient-examples.zip "$RUNNER_TEMP/dps-refund"
+          cd "$RUNNER_TEMP/dps-refund/refund-recipient-examples"
+          sha256sum -c SHA256SUMS
+          python -m venv .venv
+          .venv/bin/python -m pip --isolated --disable-pip-version-check install --index-url https://pypi.org/simple --only-binary=:all: --require-hashes -r requirements.txt
+          .venv/bin/python -IB probe.py > "$RUNNER_TEMP/dps-refund-results.json"
+          cmp RESULTS.json "$RUNNER_TEMP/dps-refund-results.json"
+
       - name: Check signed runtime evidence through admission and dispatch
         run: python -B -m unittest discover -s reference/runtime-jwt -p 'test_*.py' -v
 
