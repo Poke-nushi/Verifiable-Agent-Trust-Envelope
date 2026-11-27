@@ -10,10 +10,10 @@ directory holds AMEP's evaluation of VATE cases, for the comparison in
 | 1, lost response, then recovery (`with-unknown-observation`) | [`case-01-lost-response/`](case-01-lost-response/) | `c7533ad` | `765855d` |
 | 2, accepted work interrupted (`zero-effects`, `partial-effects`) | [`case-02-accepted-interrupted/`](case-02-accepted-interrupted/) | `093194d` | `160159d` |
 | 3, confirmed nonexecution and handoff (`fenced-handoff`, `live-worker`) | [`case-03-confirmed-nonexecution/`](case-03-confirmed-nonexecution/) | `3e9c262` | `957be02` |
-| 4, a new permit does not reopen (`completed`, `unresolved`) | to follow | | |
+| [4, a new permit does not reopen](../authzen-receipt-vectors/cases/04-new-permit-does-not-reopen/) (`completed`, `unresolved`) | Awaiting signed AMEP verdicts | | |
 
-Each case pins both revisions and carries a standard-library check. The AMEP files are copied unchanged from the pinned
-AMEP revision, under the Apache License 2.0; `NOTICE` is AMEP's notice, kept as that licence requires.
+Each published comparison pins both revisions and carries a standard-library check. The AMEP files are copied unchanged
+from the pinned AMEP revision, under the Apache License 2.0; `NOTICE` is AMEP's notice, kept as that licence requires.
 
 ## The AMEP column, across cases
 
@@ -34,6 +34,7 @@ executed stayed within delegated authority, given the evidence, so `preserved` d
 | 3 | live-worker, pending | `unresolved` | `unresolved` (I7), gap `receipt` |
 | 3 | live-worker, completed | `completed` | `preserved` |
 
-Case 4 depends on AMEP's operation identity (an operation key that holds across approvals), which is under review
-in [stafordtituss/amep#24](https://github.com/stafordtituss/amep/pull/24). It will be added here once that is merged,
-pinned to the merged commit.
+[AMEP #24](https://github.com/stafordtituss/amep/pull/24) added the optional `operation` identifier.
+A retry under a new approval can carry the same identifier as the original attempt.
+AMEP's author [offered to contribute the case 4 comparison](https://github.com/Poke-nushi/Verifiable-Agent-Trust-Envelope/pull/142)
+using the verifier at [AMEP commit `7ba1899`](https://github.com/stafordtituss/amep/commit/7ba189940d9bc1a72f16829d00505af4fbe30d3b).
