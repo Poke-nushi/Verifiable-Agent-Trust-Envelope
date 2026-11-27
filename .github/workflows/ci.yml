@@ -186,6 +186,9 @@ jobs:
           python -B reference/recipient-inbox/package_example.py --output "$output_dir/package-inputs"
           python -B reference/recipient-inbox/package_intake.py --source-root "$PWD" --inventory "$output_dir/package-inputs/inventory.json" --membership "$output_dir/package-inputs/membership.json" --package "$output_dir/package-inputs/package" --due-at 2026-10-16T20:03:00Z --output "$output_dir/package-intake"
 
+      - name: Replay purchase decisions before and after a result arrives
+        run: python -IB reference/recipient-inbox/purchase-late-result/run_example.py --output "$RUNNER_TEMP/purchase-late-result"
+
       - name: Check NENRIN saved records and replay the pinned VATE cases
         run: |
           output_dir="$(mktemp -d)"

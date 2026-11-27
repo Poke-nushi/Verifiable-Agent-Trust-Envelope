@@ -39,6 +39,8 @@ and a different expiry, or pair one purchase's admission with the other's result
 To replay the six cases offline, download the [ZIP](https://vate.rognalia.com/downloads/purchase-receiver-selection/2026-11-27/vate-purchase-receiver-selection-v2.zip)
 and [checksum](https://vate.rognalia.com/downloads/purchase-receiver-selection/2026-11-27/vate-purchase-receiver-selection-v2.zip.sha256).
 
+For a result delivered after the first assessment, [replay both purchase decisions with Recipient Inbox](../recipient-inbox/purchase-late-result/README.md).
+
 Generate a separate bundle in a new directory:
 
 ```bash
